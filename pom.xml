@@ -103,12 +103,19 @@
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <neo4j.version>1.9.1</neo4j.version>
+        <graphaware.utils.version>1.9-1.3</graphaware.utils.version>
         <graphaware.tx-event-api.version>1.9-1.2</graphaware.tx-event-api.version>
     </properties>
 
     <dependencies>
 
         <!-- GraphAware -->
+        <dependency>
+            <groupId>com.graphaware</groupId>
+            <artifactId>neo4j-utils</artifactId>
+            <version>${graphaware.utils.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.graphaware</groupId>
             <artifactId>neo4j-tx-event-api</artifactId>

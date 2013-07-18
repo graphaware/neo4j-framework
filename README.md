@@ -3,10 +3,11 @@ GraphAware Neo4j Framework
 
 [![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework)
 
+The aim of the GraphAware Neo4j Framework is to speed-up development with Neo4j and provide useful generic and domain-specific
+modules, analytical capabilities, graph algorithm libraries, etc.
 
-Features
---------
-
+The purpose of this specific project is to allow for convenient usage of GraphAware Modules as well as custom ones.
+These modules are typically units that perform some (behind-the-scenes) mutations of the graph as transactions occur.
 
 Download
 --------
@@ -25,9 +26,27 @@ Releases are synced to Maven Central repository. In order to use the latest rele
         ...
      </dependencies>
 
+### Note on Versioning Scheme
+
+The version number has two parts, separated by a dash. The first part indicates compatibility with a Neo4j version.
+ The second part is the version of the framework. For example, version 1.9-1.2 is a 1.2 version of the framework
+ compatible with Neo4j 1.9.x
+
 Usage
 -----
 
+Using the framework is very easy. Instantiate it, register desired modules, and start it. For example:
+
+```java
+    GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //replace with your own database, probably a permanent one
+
+    GraphAwareFramework framework = new GraphAwareFramework(database);
+
+    framework.registerModule(new SomeModule());
+    framework.registerModule(new SomeOtherModule());
+
+    framework.start();
+```
 
 
 License
