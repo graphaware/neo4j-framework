@@ -17,6 +17,7 @@
 package com.graphaware.neo4j.framework.strategy;
 
 import com.graphaware.neo4j.framework.GraphAwareFramework;
+import com.graphaware.neo4j.framework.config.FrameworkConfiguration;
 import com.graphaware.neo4j.tx.event.strategy.RelationshipInclusionStrategy;
 import org.neo4j.graphdb.Relationship;
 
@@ -33,7 +34,7 @@ public abstract class IncludeAllBusinessRelationships implements RelationshipInc
      */
     @Override
     public final boolean include(Relationship relationship) {
-        if (relationship.getType().name().startsWith(GraphAwareFramework.GA_PREFIX)) {
+        if (relationship.getType().name().startsWith(FrameworkConfiguration.GA_PREFIX)) {
             return false;
         }
 

@@ -1,5 +1,7 @@
 package com.graphaware.neo4j.framework;
 
+import com.graphaware.neo4j.framework.config.DefaultConfiguration;
+import com.graphaware.neo4j.framework.config.FrameworkConfigured;
 import com.graphaware.neo4j.framework.strategy.InclusionStrategiesImpl;
 import com.graphaware.neo4j.tx.event.api.ImprovedTransactionData;
 import com.graphaware.neo4j.tx.single.SimpleTransactionExecutor;
@@ -12,8 +14,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.neo4j.framework.GraphAwareFramework.FORCE_INITIALIZATION;
-import static com.graphaware.neo4j.framework.GraphAwareFramework.GA_PREFIX;
 import static com.graphaware.neo4j.framework.GraphAwareFramework.HASH_CODE;
+import static com.graphaware.neo4j.framework.config.FrameworkConfiguration.*;
 import static com.graphaware.neo4j.utils.IterableUtils.count;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -336,5 +338,35 @@ public class GraphAwareFrameworkTest {
         GraphAwareFramework framework = new GraphAwareFramework(database);
         framework.start();
         framework.start();
+    }
+
+    @Test
+    public void frameworkConfiguredModulesShouldBeConfigured() {
+        FrameworkConfiguredModule mockModule = mock(FrameworkConfiguredModule.class);
+        when(mockModule.getId()).thenReturn("MOCK");
+
+        GraphAwareFramework framework = new GraphAwareFramework(database);
+        framework.registerModule(mockModule);
+
+        verify(mockModule).configurationChanged(DefaultConfiguration.getInstance());
+        verify(mockModule, atLeastOnce()).getId();
+        verifyNoMoreInteractions(mockModule);
+    }
+
+    @Test
+    public void frameworkConfiguredModulesShouldBeConfigured2() {
+        FrameworkConfiguredModule mockModule = mock(FrameworkConfiguredModule.class);
+        when(mockModule.getId()).thenReturn("MOCK");
+
+        GraphAwareFramework framework = new GraphAwareFramework(database);
+        framework.registerModule(mockModule, true);
+
+        verify(mockModule).configurationChanged(DefaultConfiguration.getInstance());
+        verify(mockModule, atLeastOnce()).getId();
+        verifyNoMoreInteractions(mockModule);
+    }
+
+    private interface FrameworkConfiguredModule extends GraphAwareModule, FrameworkConfigured {
+
     }
 }

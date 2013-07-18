@@ -17,6 +17,7 @@
 package com.graphaware.neo4j.framework.strategy;
 
 import com.graphaware.neo4j.framework.GraphAwareFramework;
+import com.graphaware.neo4j.framework.config.FrameworkConfiguration;
 import com.graphaware.neo4j.tx.event.strategy.NodeInclusionStrategy;
 import org.neo4j.graphdb.Node;
 
@@ -32,7 +33,7 @@ public abstract class IncludeAllBusinessNodes implements NodeInclusionStrategy {
      */
     @Override
     public final boolean include(Node node) {
-        if (node.hasProperty(GraphAwareFramework.GA_NODE_PROPERTY)) {
+        if (node.hasProperty(FrameworkConfiguration.GA_NODE_PROPERTY_KEY)) {
             return false;
         }
 

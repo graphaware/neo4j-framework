@@ -1,5 +1,8 @@
 package com.graphaware.neo4j.framework;
 
+import com.graphaware.neo4j.framework.config.DefaultConfiguration;
+import com.graphaware.neo4j.framework.config.FrameworkConfiguration;
+import com.graphaware.neo4j.framework.config.FrameworkConfigured;
 import com.graphaware.neo4j.strategy.InclusionStrategy;
 import com.graphaware.neo4j.tx.event.api.FilteredTransactionData;
 import com.graphaware.neo4j.tx.event.api.LazyTransactionData;
@@ -37,25 +40,13 @@ import java.util.*;
  * in the database.
  */
 public final class GraphAwareFramework implements TransactionEventHandler<Void> {
-    /**
-     * Prefix for GraphAware internal nodes, relationships, and properties
-     */
-    public static final String GA_PREFIX = "_GA_";
-    /**
-     * Key of a property present on GraphAware internal nodes.
-     */
-    public static final String GA_NODE_PROPERTY = GA_PREFIX + "LABEL";
-    /**
-     * Separator used as an information delimiter for String-convertible nodes, relationships, and properties.
-     */
-    public static final String SEPARATOR = "#";
-
     static final String FORCE_INITIALIZATION = "FORCE_INIT:";
     static final String HASH_CODE = "HASH_CODE:";
 
     private static final Logger LOG = Logger.getLogger(GraphAwareFramework.class);
 
     private final GraphDatabaseService database;
+    private final FrameworkConfiguration configuration;
     private final List<GraphAwareModule> modules = new LinkedList<>();
 
     private volatile boolean started;
@@ -66,7 +57,18 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void> 
      * @param database on which the framework should operate.
      */
     public GraphAwareFramework(GraphDatabaseService database) {
+        this(database, DefaultConfiguration.getInstance());
+    }
+
+    /**
+     * Create a new instance of the framework.
+     *
+     * @param database      on which the framework should operate.
+     * @param configuration of the framework.
+     */
+    public GraphAwareFramework(GraphDatabaseService database, FrameworkConfiguration configuration) {
         this.database = database;
+        this.configuration = configuration;
         findRootOrThrowException();
     }
 
@@ -103,6 +105,10 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void> 
 
         LOG.info("Registering module " + module.getId() + " with GraphAware.");
         modules.add(module);
+
+        if (module instanceof FrameworkConfigured) {
+            ((FrameworkConfigured) module).configurationChanged(configuration);
+        }
 
         if (forceInitialization) {
             LOG.info("Forcing module " + module.getId() + " to be initialized.");
@@ -195,7 +201,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void> 
      * Initialize modules if needed.
      * <p/>
      * Metadata about modules is stored as properties on the root node (node with ID = 0) in the form of
-     * {@link #GA_PREFIX} + {@link com.graphaware.neo4j.framework.GraphAwareModule#getId()} as key and one of the
+     * {@link FrameworkConfiguration#GA_PREFIX} + {@link com.graphaware.neo4j.framework.GraphAwareModule#getId()} as key and one of the
      * following as value:
      * - {@link #HASH_CODE} + {@link com.graphaware.neo4j.framework.GraphAwareModule#hashCode()} capturing the last configuration
      * the module has been run with
@@ -285,7 +291,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void> 
     }
 
     /**
-     * Get properties starting with {@link #GA_PREFIX} from a node.
+     * Get properties starting with {@link FrameworkConfiguration#GA_PREFIX} from a node.
      *
      * @param node to get properties from.
      * @return map of properties (key-value).
@@ -294,19 +300,19 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void> 
         return PropertyContainerUtils.propertiesToObjectMap(node, new InclusionStrategy<String>() {
             @Override
             public boolean include(String s) {
-                return s.startsWith(GA_PREFIX);
+                return s.startsWith(FrameworkConfiguration.GA_PREFIX);
             }
         });
     }
 
     /**
-     * Build a module key to use as a property on the root node for storing metadata..
+     * Build a module key to use as a property on the root node for storing metadata.
      *
      * @param module to build a key for.
      * @return module key.
      */
     private String moduleKey(GraphAwareModule module) {
-        return GA_PREFIX + module.getId();
+        return FrameworkConfiguration.GA_PREFIX + module.getId();
     }
 
     /**
