@@ -3,7 +3,7 @@ package com.graphaware.neo4j.framework.config;
 /**
  * Abstract base-class for {@link FrameworkConfiguration} implementations.
  */
-public abstract class BaseConfiguration implements FrameworkConfiguration {
+public abstract class BaseFrameworkConfiguration implements FrameworkConfiguration {
 
     /**
      * {@inheritDoc}

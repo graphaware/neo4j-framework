@@ -1,6 +1,6 @@
 package com.graphaware.neo4j.framework;
 
-import com.graphaware.neo4j.framework.config.DefaultConfiguration;
+import com.graphaware.neo4j.framework.config.DefaultFrameworkConfiguration;
 import com.graphaware.neo4j.framework.config.FrameworkConfigured;
 import com.graphaware.neo4j.framework.strategy.InclusionStrategiesImpl;
 import com.graphaware.neo4j.tx.event.api.ImprovedTransactionData;
@@ -348,7 +348,7 @@ public class GraphAwareFrameworkTest {
         GraphAwareFramework framework = new GraphAwareFramework(database);
         framework.registerModule(mockModule);
 
-        verify(mockModule).configurationChanged(DefaultConfiguration.getInstance());
+        verify(mockModule).configurationChanged(DefaultFrameworkConfiguration.getInstance());
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
     }
@@ -361,7 +361,7 @@ public class GraphAwareFrameworkTest {
         GraphAwareFramework framework = new GraphAwareFramework(database);
         framework.registerModule(mockModule, true);
 
-        verify(mockModule).configurationChanged(DefaultConfiguration.getInstance());
+        verify(mockModule).configurationChanged(DefaultFrameworkConfiguration.getInstance());
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
     }

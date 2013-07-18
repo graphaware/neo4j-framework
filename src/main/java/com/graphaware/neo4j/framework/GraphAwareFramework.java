@@ -1,6 +1,6 @@
 package com.graphaware.neo4j.framework;
 
-import com.graphaware.neo4j.framework.config.DefaultConfiguration;
+import com.graphaware.neo4j.framework.config.DefaultFrameworkConfiguration;
 import com.graphaware.neo4j.framework.config.FrameworkConfiguration;
 import com.graphaware.neo4j.framework.config.FrameworkConfigured;
 import com.graphaware.neo4j.strategy.InclusionStrategy;
@@ -57,7 +57,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void> 
      * @param database on which the framework should operate.
      */
     public GraphAwareFramework(GraphDatabaseService database) {
-        this(database, DefaultConfiguration.getInstance());
+        this(database, DefaultFrameworkConfiguration.getInstance());
     }
 
     /**

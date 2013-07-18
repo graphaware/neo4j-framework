@@ -3,15 +3,15 @@ package com.graphaware.neo4j.framework.config;
 /**
  * Default {@link FrameworkConfiguration} for {@link com.graphaware.neo4j.framework.GraphAwareFramework}. Singleton.
  */
-public final class DefaultConfiguration extends BaseConfiguration {
+public final class DefaultFrameworkConfiguration extends BaseFrameworkConfiguration {
 
-    public static final DefaultConfiguration INSTANCE = new DefaultConfiguration();
+    public static final DefaultFrameworkConfiguration INSTANCE = new DefaultFrameworkConfiguration();
 
-    public static DefaultConfiguration getInstance() {
+    public static DefaultFrameworkConfiguration getInstance() {
         return INSTANCE;
     }
 
-    private DefaultConfiguration() {
+    private DefaultFrameworkConfiguration() {
     }
 
     /**

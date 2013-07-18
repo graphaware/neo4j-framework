@@ -21,7 +21,7 @@ Releases are synced to Maven Central repository. In order to use the latest rele
         <dependency>
             <groupId>com.graphaware</groupId>
             <artifactId>neo4j-framework</artifactId>
-            <version>1.9-1.0</version>
+            <version>1.9-1.1</version>
         </dependency>
         ...
      </dependencies>
