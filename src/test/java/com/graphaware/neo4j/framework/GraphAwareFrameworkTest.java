@@ -185,6 +185,16 @@ public class GraphAwareFrameworkTest {
         assertEquals(HASH_CODE + "123", database.getNodeById(0).getProperty(GA_PREFIX + "MOCK").toString());
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotBeAbleToRegisterModuleWithTheSameIdTwice() {
+        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
+        when(mockModule.getId()).thenReturn("MOCK");
+
+        GraphAwareFramework framework = new GraphAwareFramework(database);
+        framework.registerModule(mockModule);
+        framework.registerModule(mockModule);
+    }
+
     @Test
     public void unusedModulesShouldBeRemoved() {
         final GraphAwareModule mockModule = mock(GraphAwareModule.class);

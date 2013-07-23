@@ -104,6 +104,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void> 
         }
 
         LOG.info("Registering module " + module.getId() + " with GraphAware.");
+        checkNotAlreadyRegistered(module.getId());
         modules.add(module);
 
         if (module instanceof FrameworkConfigured) {
@@ -113,6 +114,14 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void> 
         if (forceInitialization) {
             LOG.info("Forcing module " + module.getId() + " to be initialized.");
             forceInitialization(module);
+        }
+    }
+
+    private void checkNotAlreadyRegistered(String id) {
+        for (GraphAwareModule module : modules) {
+            if (id.equals(module.getId())) {
+                throw new IllegalStateException("Module " + id + " cannot be registered more than once!");
+            }
         }
     }
 
