@@ -175,6 +175,10 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void>,
 
         LazyTransactionData lazyTransactionData = new LazyTransactionData(data);
 
+        if (lazyTransactionData.hasBeenDeleted(database.getNodeById(0))) {
+            throw new IllegalStateException("Deleting node with ID=0 is not allowed by GraphAware!");
+        }
+
         for (GraphAwareModule module : modules) {
             FilteredTransactionData filteredTransactionData = new FilteredTransactionData(lazyTransactionData, module.getInclusionStrategies());
 

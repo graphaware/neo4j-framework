@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.TransactionFailureException;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.neo4j.framework.GraphAwareFramework.FORCE_INITIALIZATION;
@@ -388,6 +389,19 @@ public class GraphAwareFrameworkTest {
         database.shutdown();
 
         verify(mockModule).shutdown();
+    }
+
+    @Test(expected = TransactionFailureException.class)
+    public void shouldNotBeAllowedToDeleteRootNode() {
+        GraphAwareFramework framework = new GraphAwareFramework(database);
+        framework.start();
+
+        new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
+            @Override
+            protected void doInTx(GraphDatabaseService database) {
+                database.getNodeById(0).delete();
+            }
+        });
     }
 
     private interface FrameworkConfiguredModule extends GraphAwareModule, FrameworkConfigured {
