@@ -107,7 +107,7 @@ public class GraphAwareFrameworkTest {
 
         framework.start();
 
-        verify(mockModule).initialize(database);
+        verify(mockModule).reinitialize(database);
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
@@ -131,7 +131,7 @@ public class GraphAwareFrameworkTest {
 
         framework.start();
 
-        verify(mockModule).initialize(database);
+        verify(mockModule).reinitialize(database);
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
@@ -155,7 +155,7 @@ public class GraphAwareFrameworkTest {
 
         framework.start();
 
-        verify(mockModule).initialize(database);
+        verify(mockModule).reinitialize(database);
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 

@@ -30,6 +30,15 @@ public interface GraphAwareModule {
     void initialize(GraphDatabaseService database);
 
     /**
+     * Re-initialize this module. This method must remove all metadata written to the graph by this module and bring the
+     * module to a state equivalent to a state of the same module that has been registered at all times since the
+     * database was empty. It can perform global-graph operations to achieve this.
+     *
+     * @param database to initialize this module for.
+     */
+    void reinitialize(GraphDatabaseService database);
+
+    /**
      * Perform the core business logic of this module before a transaction commits.
      *
      * @param transactionData data about the soon-to-be-committed transaction. It is already filtered based on {@link #getInclusionStrategies()}.

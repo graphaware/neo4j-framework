@@ -11,7 +11,7 @@ public abstract class BaseFrameworkConfigured implements FrameworkConfigured {
      * {@inheritDoc}
      */
     @Override
-    public final void configurationChanged(FrameworkConfiguration configuration) {
+    public void configurationChanged(FrameworkConfiguration configuration) {
         this.configuration = configuration;
     }
 

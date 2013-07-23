@@ -228,7 +228,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void> 
             if (value.startsWith(HASH_CODE)) {
                 if (!value.replaceFirst(HASH_CODE, "").equals(Integer.toString(module.hashCode()))) {
                     LOG.info("Module " + module.getId() + " seems to have changed configuration since last run, will re-initialize...");
-                    initializeModule(module);
+                    reinitializeModule(module);
                 } else {
                     LOG.info("Module " + module.getId() + " has not changed configuration since last run, already initialized.");
                 }
@@ -238,7 +238,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void> 
             if (value.startsWith(FORCE_INITIALIZATION)) {
                 LOG.info("Module " + module.getId() + " has been marked for re-initialization on "
                         + new Date(Long.valueOf(value.replace(FORCE_INITIALIZATION, ""))).toString() + ". Will re-initialize...");
-                initializeModule(module);
+                reinitializeModule(module);
                 continue;
 
             }
@@ -257,7 +257,25 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void> 
      */
     private void initializeModule(final GraphAwareModule module) {
         module.initialize(database);
+        recordInitialization(module);
+    }
 
+    /**
+     * Re-initialize a module and capture that fact on the as a root node's property.
+     *
+     * @param module to initialize.
+     */
+    private void reinitializeModule(final GraphAwareModule module) {
+        module.reinitialize(database);
+        recordInitialization(module);
+    }
+
+    /**
+     * Capture the fact the a module has been (re-)initialized as a root node's property.
+     *
+     * @param module that has been initialized.
+     */
+    private void recordInitialization(final GraphAwareModule module) {
         final Node root = findRootOrThrowException();
         final String key = moduleKey(module);
 
