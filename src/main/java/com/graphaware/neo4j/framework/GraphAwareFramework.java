@@ -13,6 +13,8 @@ import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
+import org.neo4j.graphdb.event.ErrorState;
+import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 
@@ -39,7 +41,7 @@ import java.util.*;
  * need to be used by the application, nor does it need to be connected to any other node, but it needs to be present
  * in the database.
  */
-public final class GraphAwareFramework implements TransactionEventHandler<Void> {
+public final class GraphAwareFramework implements TransactionEventHandler<Void>, KernelEventHandler {
     static final String FORCE_INITIALIZATION = "FORCE_INIT:";
     static final String HASH_CODE = "HASH_CODE:";
 
@@ -147,6 +149,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void> 
         LOG.info("Starting GraphAware...");
 
         database.registerTransactionEventHandler(this);
+        database.registerKernelEventHandler(this);
 
         if (skipInitialization) {
             LOG.info("Initialization skipped.");
@@ -373,5 +376,41 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void> 
                     " re-create the database and do not delete the root node. There is no need for it to be used in" +
                     " the application, but it must be present in the database.");
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void beforeShutdown() {
+        LOG.info("Shutting down GraphAware... ");
+        for (GraphAwareModule module : modules) {
+            module.shutdown();
+        }
+        LOG.info("GraphAware shut down.");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void kernelPanic(ErrorState error) {
+        //do nothing
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Object getResource() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ExecutionOrder orderComparedTo(KernelEventHandler other) {
+        return ExecutionOrder.DOESNT_MATTER;
     }
 }

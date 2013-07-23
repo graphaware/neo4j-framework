@@ -376,6 +376,20 @@ public class GraphAwareFrameworkTest {
         verifyNoMoreInteractions(mockModule);
     }
 
+    @Test
+    public void shutdownShouldBeCalledBeforeShutdown() {
+        FrameworkConfiguredModule mockModule = mock(FrameworkConfiguredModule.class);
+        when(mockModule.getId()).thenReturn("MOCK");
+
+        GraphAwareFramework framework = new GraphAwareFramework(database);
+        framework.registerModule(mockModule);
+        framework.start();
+
+        database.shutdown();
+
+        verify(mockModule).shutdown();
+    }
+
     private interface FrameworkConfiguredModule extends GraphAwareModule, FrameworkConfigured {
 
     }

@@ -39,6 +39,11 @@ public interface GraphAwareModule {
     void reinitialize(GraphDatabaseService database);
 
     /**
+     * Perform cleanup if needed before database shutdown.
+     */
+    void shutdown();
+
+    /**
      * Perform the core business logic of this module before a transaction commits.
      *
      * @param transactionData data about the soon-to-be-committed transaction. It is already filtered based on {@link #getInclusionStrategies()}.
