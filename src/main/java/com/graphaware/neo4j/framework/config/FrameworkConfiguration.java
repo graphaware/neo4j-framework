@@ -31,6 +31,7 @@ public interface FrameworkConfiguration {
 
     /**
      * Create prefix a component should use for internal data it reads/writes (nodes, relationships, properties).
+     *
      * @param id of the component/module.
      * @return prefix of the form {@link #GA_PREFIX} + id + "_"
      */

@@ -45,7 +45,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void>,
     static final String FORCE_INITIALIZATION = "FORCE_INIT:";
     static final String HASH_CODE = "HASH_CODE:";
 
-    public static final String META = "META_";
+    public static final String CORE = "CORE";
 
     private static final Logger LOG = Logger.getLogger(GraphAwareFramework.class);
 
@@ -93,7 +93,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void>,
      * expensive, graph-global operation, should only be run once, database stopped and started again without forcing
      * re-initialization.
      * <p/>
-     * New modules and modules with changed configuration will be re-initialized automatically; there is no need to use
+     * New modules and modules with changed configuration will be (re-)initialized automatically; there is no need to use
      * this method for that purpose.
      * <p/>
      * Note that modules are delegated to in the order they are registered.
@@ -219,7 +219,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void>,
      * Initialize modules if needed.
      * <p/>
      * Metadata about modules is stored as properties on the root node (node with ID = 0) in the form of
-     * {@link FrameworkConfiguration#GA_PREFIX} + {@link #META}+ {@link com.graphaware.neo4j.framework.GraphAwareModule#getId()} as key and one of the
+     * {@link FrameworkConfiguration#GA_PREFIX}{@link #CORE}_{@link com.graphaware.neo4j.framework.GraphAwareModule#getId()} as key and one of the
      * following as value:
      * - {@link #HASH_CODE} + {@link com.graphaware.neo4j.framework.GraphAwareModule#hashCode()} capturing the last configuration
      * the module has been run with
@@ -327,7 +327,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void>,
     }
 
     /**
-     * Get properties starting with {@link FrameworkConfiguration#GA_PREFIX} + {@link #META} from a node.
+     * Get properties starting with {@link FrameworkConfiguration#GA_PREFIX} + {@link #CORE} from a node.
      *
      * @param node to get properties from.
      * @return map of properties (key-value).
@@ -336,7 +336,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void>,
         return PropertyContainerUtils.propertiesToObjectMap(node, new InclusionStrategy<String>() {
             @Override
             public boolean include(String s) {
-                return s.startsWith(FrameworkConfiguration.GA_PREFIX + META);
+                return s.startsWith(configuration.createPrefix(CORE));
             }
         });
     }
@@ -348,7 +348,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void>,
      * @return module key.
      */
     private String moduleKey(GraphAwareModule module) {
-        return FrameworkConfiguration.GA_PREFIX + META + module.getId();
+        return configuration.createPrefix(CORE) + module.getId();
     }
 
     /**
