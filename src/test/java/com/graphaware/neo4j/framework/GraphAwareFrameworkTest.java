@@ -16,6 +16,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.neo4j.framework.GraphAwareFramework.FORCE_INITIALIZATION;
 import static com.graphaware.neo4j.framework.GraphAwareFramework.HASH_CODE;
+import static com.graphaware.neo4j.framework.GraphAwareFramework.META;
 import static com.graphaware.neo4j.framework.config.FrameworkConfiguration.*;
 import static com.graphaware.neo4j.utils.IterableUtils.count;
 import static org.junit.Assert.assertEquals;
@@ -65,7 +66,7 @@ public class GraphAwareFrameworkTest {
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + mockModule.hashCode(), database.getNodeById(0).getProperty(GA_PREFIX + "MOCK").toString());
+        assertEquals(HASH_CODE + mockModule.hashCode(), database.getNodeById(0).getProperty(GA_PREFIX + META + "MOCK").toString());
     }
 
     @Test
@@ -76,7 +77,7 @@ public class GraphAwareFrameworkTest {
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(0).setProperty(GA_PREFIX + "MOCK", HASH_CODE + mockModule.hashCode());
+                database.getNodeById(0).setProperty(GA_PREFIX + META + "MOCK", HASH_CODE + mockModule.hashCode());
             }
         });
 
@@ -88,7 +89,7 @@ public class GraphAwareFrameworkTest {
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + mockModule.hashCode(), database.getNodeById(0).getProperty(GA_PREFIX + "MOCK").toString());
+        assertEquals(HASH_CODE + mockModule.hashCode(), database.getNodeById(0).getProperty(GA_PREFIX + META + "MOCK").toString());
     }
 
     @Test
@@ -99,7 +100,7 @@ public class GraphAwareFrameworkTest {
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(0).setProperty(GA_PREFIX + "MOCK", HASH_CODE + "123");
+                database.getNodeById(0).setProperty(GA_PREFIX + META + "MOCK", HASH_CODE + "123");
             }
         });
 
@@ -112,7 +113,7 @@ public class GraphAwareFrameworkTest {
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + mockModule.hashCode(), database.getNodeById(0).getProperty(GA_PREFIX + "MOCK").toString());
+        assertEquals(HASH_CODE + mockModule.hashCode(), database.getNodeById(0).getProperty(GA_PREFIX + META + "MOCK").toString());
     }
 
     @Test
@@ -123,7 +124,7 @@ public class GraphAwareFrameworkTest {
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(0).setProperty(GA_PREFIX + "MOCK", FORCE_INITIALIZATION + "123");
+                database.getNodeById(0).setProperty(GA_PREFIX + META + "MOCK", FORCE_INITIALIZATION + "123");
             }
         });
 
@@ -136,7 +137,7 @@ public class GraphAwareFrameworkTest {
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + mockModule.hashCode(), database.getNodeById(0).getProperty(GA_PREFIX + "MOCK").toString());
+        assertEquals(HASH_CODE + mockModule.hashCode(), database.getNodeById(0).getProperty(GA_PREFIX + META + "MOCK").toString());
     }
 
     @Test
@@ -147,7 +148,7 @@ public class GraphAwareFrameworkTest {
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(0).setProperty(GA_PREFIX + "MOCK", HASH_CODE + mockModule.hashCode());
+                database.getNodeById(0).setProperty(GA_PREFIX + META + "MOCK", HASH_CODE + mockModule.hashCode());
             }
         });
 
@@ -160,7 +161,7 @@ public class GraphAwareFrameworkTest {
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + mockModule.hashCode(), database.getNodeById(0).getProperty(GA_PREFIX + "MOCK").toString());
+        assertEquals(HASH_CODE + mockModule.hashCode(), database.getNodeById(0).getProperty(GA_PREFIX + META + "MOCK").toString());
     }
 
     @Test
@@ -171,7 +172,7 @@ public class GraphAwareFrameworkTest {
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(0).setProperty(GA_PREFIX + "MOCK", HASH_CODE + "123");
+                database.getNodeById(0).setProperty(GA_PREFIX + META + "MOCK", HASH_CODE + "123");
             }
         });
 
@@ -183,7 +184,7 @@ public class GraphAwareFrameworkTest {
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + "123", database.getNodeById(0).getProperty(GA_PREFIX + "MOCK").toString());
+        assertEquals(HASH_CODE + "123", database.getNodeById(0).getProperty(GA_PREFIX + META + "MOCK").toString());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -205,8 +206,8 @@ public class GraphAwareFrameworkTest {
             @Override
             protected void doInTx(GraphDatabaseService database) {
                 Node root = database.getNodeById(0);
-                root.setProperty(GA_PREFIX + "MOCK", HASH_CODE + mockModule.hashCode());
-                root.setProperty(GA_PREFIX + "UNUSED", HASH_CODE + "123");
+                root.setProperty(GA_PREFIX + META + "MOCK", HASH_CODE + mockModule.hashCode());
+                root.setProperty(GA_PREFIX + META + "UNUSED", HASH_CODE + "123");
             }
         });
 
@@ -230,7 +231,7 @@ public class GraphAwareFrameworkTest {
             @Override
             protected void doInTx(GraphDatabaseService database) {
                 Node root = database.getNodeById(0);
-                root.setProperty(GA_PREFIX + "MOCK", "CORRUPT");
+                root.setProperty(GA_PREFIX + META + "MOCK", "CORRUPT");
             }
         });
 
@@ -249,8 +250,8 @@ public class GraphAwareFrameworkTest {
             @Override
             protected void doInTx(GraphDatabaseService database) {
                 Node root = database.getNodeById(0);
-                root.setProperty(GA_PREFIX + "MOCK", HASH_CODE + mockModule.hashCode());
-                root.setProperty(GA_PREFIX + "UNUSED", "CORRUPT");
+                root.setProperty(GA_PREFIX + META + "MOCK", HASH_CODE + mockModule.hashCode());
+                root.setProperty(GA_PREFIX + META + "UNUSED", "CORRUPT");
             }
         });
 
@@ -322,7 +323,7 @@ public class GraphAwareFrameworkTest {
 
         framework.start();
 
-        assertTrue(database.getNodeById(0).getProperty(GA_PREFIX + "MOCK").toString().startsWith(HASH_CODE));
+        assertTrue(database.getNodeById(0).getProperty(GA_PREFIX + META + "MOCK").toString().startsWith(HASH_CODE));
 
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
@@ -331,7 +332,7 @@ public class GraphAwareFrameworkTest {
             }
         });
 
-        assertTrue(database.getNodeById(0).getProperty(GA_PREFIX + "MOCK").toString().startsWith(FORCE_INITIALIZATION));
+        assertTrue(database.getNodeById(0).getProperty(GA_PREFIX + META + "MOCK").toString().startsWith(FORCE_INITIALIZATION));
     }
 
     @Test(expected = IllegalStateException.class)

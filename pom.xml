@@ -103,7 +103,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <neo4j.version>1.9.1</neo4j.version>
         <graphaware.utils.version>1.9-1.3</graphaware.utils.version>
-        <graphaware.tx-event-api.version>1.9-1.2</graphaware.tx-event-api.version>
+        <graphaware.tx-event-api.version>1.9-1.3-SNAPSHOT</graphaware.tx-event-api.version>
     </properties>
 
     <dependencies>

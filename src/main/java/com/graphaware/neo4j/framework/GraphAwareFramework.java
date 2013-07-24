@@ -45,6 +45,8 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void>,
     static final String FORCE_INITIALIZATION = "FORCE_INIT:";
     static final String HASH_CODE = "HASH_CODE:";
 
+    public static final String META = "META_";
+
     private static final Logger LOG = Logger.getLogger(GraphAwareFramework.class);
 
     private final GraphDatabaseService database;
@@ -217,7 +219,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void>,
      * Initialize modules if needed.
      * <p/>
      * Metadata about modules is stored as properties on the root node (node with ID = 0) in the form of
-     * {@link FrameworkConfiguration#GA_PREFIX} + {@link com.graphaware.neo4j.framework.GraphAwareModule#getId()} as key and one of the
+     * {@link FrameworkConfiguration#GA_PREFIX} + {@link #META}+ {@link com.graphaware.neo4j.framework.GraphAwareModule#getId()} as key and one of the
      * following as value:
      * - {@link #HASH_CODE} + {@link com.graphaware.neo4j.framework.GraphAwareModule#hashCode()} capturing the last configuration
      * the module has been run with
@@ -325,7 +327,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void>,
     }
 
     /**
-     * Get properties starting with {@link FrameworkConfiguration#GA_PREFIX} from a node.
+     * Get properties starting with {@link FrameworkConfiguration#GA_PREFIX} + {@link #META} from a node.
      *
      * @param node to get properties from.
      * @return map of properties (key-value).
@@ -334,7 +336,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void>,
         return PropertyContainerUtils.propertiesToObjectMap(node, new InclusionStrategy<String>() {
             @Override
             public boolean include(String s) {
-                return s.startsWith(FrameworkConfiguration.GA_PREFIX);
+                return s.startsWith(FrameworkConfiguration.GA_PREFIX + META);
             }
         });
     }
@@ -346,7 +348,7 @@ public final class GraphAwareFramework implements TransactionEventHandler<Void>,
      * @return module key.
      */
     private String moduleKey(GraphAwareModule module) {
-        return FrameworkConfiguration.GA_PREFIX + module.getId();
+        return FrameworkConfiguration.GA_PREFIX + META + module.getId();
     }
 
     /**
