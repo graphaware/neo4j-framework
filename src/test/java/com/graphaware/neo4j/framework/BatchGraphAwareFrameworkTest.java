@@ -10,13 +10,12 @@ import com.graphaware.neo4j.tx.single.VoidReturningCallback;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.TransactionFailureException;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchInserterImpl;
+
+import java.io.IOException;
 
 import static com.graphaware.neo4j.framework.GraphAwareFramework.*;
 import static com.graphaware.neo4j.framework.config.FrameworkConfiguration.GA_PREFIX;
@@ -30,16 +29,21 @@ import static org.mockito.Mockito.*;
  */
 public class BatchGraphAwareFrameworkTest {
 
-    private String dir;
+    private final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Before
-    public void setUp() {
-        dir = "/tmp/" + System.currentTimeMillis();
+    public void setUp() throws IOException {
+        temporaryFolder.create();
+    }
+
+    @After
+    public void tearDown() {
+        temporaryFolder.delete();
     }
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotWorkOnDatabaseWithNoRootNode() {
-        GraphDatabaseService database = new GraphDatabaseFactory().newEmbeddedDatabase(dir);
+        GraphDatabaseService database = new GraphDatabaseFactory().newEmbeddedDatabase(temporaryFolder.getRoot().getAbsolutePath());
 
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
@@ -50,7 +54,7 @@ public class BatchGraphAwareFrameworkTest {
 
         database.shutdown();
 
-        new BatchGraphAwareFramework(new TransactionSimulatingBatchInserterImpl(dir));
+        new BatchGraphAwareFramework(new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath()));
     }
 
     @Test
@@ -58,7 +62,7 @@ public class BatchGraphAwareFrameworkTest {
         GraphAwareModule mockModule = mock(GraphAwareModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.registerModule(mockModule);
 
@@ -76,7 +80,7 @@ public class BatchGraphAwareFrameworkTest {
         final GraphAwareModule mockModule = mock(GraphAwareModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", HASH_CODE + mockModule.hashCode());
 
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
@@ -95,7 +99,7 @@ public class BatchGraphAwareFrameworkTest {
         final GraphAwareModule mockModule = mock(GraphAwareModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", HASH_CODE + "123");
 
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
@@ -115,7 +119,7 @@ public class BatchGraphAwareFrameworkTest {
         final GraphAwareModule mockModule = mock(GraphAwareModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", FORCE_INITIALIZATION + "123");
 
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
@@ -135,7 +139,7 @@ public class BatchGraphAwareFrameworkTest {
         final GraphAwareModule mockModule = mock(GraphAwareModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", HASH_CODE + mockModule.hashCode());
 
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
@@ -155,7 +159,7 @@ public class BatchGraphAwareFrameworkTest {
         final GraphAwareModule mockModule = mock(GraphAwareModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", HASH_CODE + "123");
 
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
@@ -174,7 +178,7 @@ public class BatchGraphAwareFrameworkTest {
         final GraphAwareModule mockModule = mock(GraphAwareModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.registerModule(mockModule);
         framework.registerModule(mockModule);
@@ -185,7 +189,7 @@ public class BatchGraphAwareFrameworkTest {
         final GraphAwareModule mockModule = mock(GraphAwareModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", HASH_CODE + mockModule.hashCode());
         batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_UNUSED", HASH_CODE + "123");
 
@@ -206,7 +210,7 @@ public class BatchGraphAwareFrameworkTest {
         when(mockModule.getId()).thenReturn("MOCK");
 
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", "CORRUPT");
 
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
@@ -220,7 +224,7 @@ public class BatchGraphAwareFrameworkTest {
         final GraphAwareModule mockModule = mock(GraphAwareModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", HASH_CODE + mockModule.hashCode());
         batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_UNUSED", "CORRUPT");
 
@@ -249,7 +253,7 @@ public class BatchGraphAwareFrameworkTest {
         when(mockModule3.getId()).thenReturn("MOCK3");
         when(mockModule3.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.none());
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.registerModule(mockModule1);
         framework.registerModule(mockModule2);
@@ -287,7 +291,7 @@ public class BatchGraphAwareFrameworkTest {
         when(mockModule.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
         doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.registerModule(mockModule);
 
@@ -298,7 +302,7 @@ public class BatchGraphAwareFrameworkTest {
         batchInserter.createNode(null);
         batchInserter.shutdown();
 
-        batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         assertTrue(batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_MOCK").toString().startsWith(FORCE_INITIALIZATION));
     }
 
@@ -307,7 +311,7 @@ public class BatchGraphAwareFrameworkTest {
         final GraphAwareModule mockModule = mock(GraphAwareModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.start(true);
         framework.registerModule(mockModule);
@@ -315,7 +319,7 @@ public class BatchGraphAwareFrameworkTest {
 
     @Test(expected = IllegalStateException.class)
     public void frameworkCanOnlyBeStartedOnce() {
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.start();
         framework.start();
@@ -326,7 +330,7 @@ public class BatchGraphAwareFrameworkTest {
         FrameworkConfiguredModule mockModule = mock(FrameworkConfiguredModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.registerModule(mockModule);
 
@@ -340,7 +344,7 @@ public class BatchGraphAwareFrameworkTest {
         FrameworkConfiguredModule mockModule = mock(FrameworkConfiguredModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.registerModule(mockModule, true);
 
@@ -354,7 +358,7 @@ public class BatchGraphAwareFrameworkTest {
         FrameworkConfiguredModule mockModule = mock(FrameworkConfiguredModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
 
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(dir);
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.registerModule(mockModule);
         framework.start();

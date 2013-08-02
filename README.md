@@ -46,8 +46,28 @@ Using the framework is very easy. Instantiate it, register desired modules, and 
     framework.registerModule(new SomeOtherModule());
 
     framework.start();
+
+    //use database as usual
 ```
 
+Batch Usage
+-----------
+
+For populating a database quickly, people sometimes use Neo4j `BatchInserter`s. The framework can be used with those as
+well, in the following fashion:
+
+```java
+    TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(/path/to/your/db);
+
+    GraphAwareFramework framework = new GraphAwareFramework(batchInserter);
+
+    framework.registerModule(new SomeModule());
+    framework.registerModule(new SomeOtherModule());
+
+    framework.start();
+
+    //use batchInserter as usual
+```
 
 License
 -------
