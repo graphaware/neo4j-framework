@@ -3,6 +3,7 @@ package com.graphaware.neo4j.framework;
 import com.graphaware.neo4j.tx.event.api.ImprovedTransactionData;
 import com.graphaware.neo4j.tx.event.strategy.InclusionStrategies;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.unsafe.batchinsert.BatchInserter;
 
 /**
  * A {@link GraphAwareFramework} module performing some useful work based on about-to-be-committed transaction data.
@@ -37,6 +38,24 @@ public interface GraphAwareModule {
      * @param database to initialize this module for.
      */
     void reinitialize(GraphDatabaseService database);
+
+    /**
+     * Initialize this module. This method must bring the module to a state equivalent to a state of the same module that
+     * has been registered at all times since the database was empty. It can perform global-graph operations to achieve
+     * this.
+     *
+     * @param batchInserter to initialize this module for.
+     */
+    void initialize(BatchInserter batchInserter);
+
+    /**
+     * Re-initialize this module. This method must remove all metadata written to the graph by this module and bring the
+     * module to a state equivalent to a state of the same module that has been registered at all times since the
+     * database was empty. It can perform global-graph operations to achieve this.
+     *
+     * @param batchInserter to initialize this module for.
+     */
+    void reinitialize(BatchInserter batchInserter);
 
     /**
      * Perform cleanup if needed before database shutdown.
