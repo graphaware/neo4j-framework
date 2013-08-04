@@ -1,0 +1,2 @@
+org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase and
+org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchInserterImpl would ideally also be here

@@ -11,10 +11,11 @@
   ~  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   ~ See the GNU General Public License for more details. You should have received a copy of
   ~ the GNU General Public License along with this program.  If not, see
-  ~ <http://www.gnu.org/licenses />.
+  ~ <http://www.gnu.org/licenses/>.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.graphaware</groupId>
@@ -102,24 +103,9 @@
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <neo4j.version>1.9.1</neo4j.version>
-        <graphaware.utils.version>1.9-1.4-SNAPSHOT</graphaware.utils.version>
-        <graphaware.tx-event-api.version>1.9-1.5-SNAPSHOT</graphaware.tx-event-api.version>
     </properties>
 
     <dependencies>
-
-        <!-- GraphAware -->
-        <dependency>
-            <groupId>com.graphaware</groupId>
-            <artifactId>neo4j-utils</artifactId>
-            <version>${graphaware.utils.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.graphaware</groupId>
-            <artifactId>neo4j-tx-event-api</artifactId>
-            <version>${graphaware.tx-event-api.version}</version>
-        </dependency>
 
         <!-- Neo4j -->
         <dependency>
