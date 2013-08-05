@@ -28,7 +28,7 @@ import org.neo4j.graphdb.RelationshipType;
 import java.util.Map;
 
 /**
- * An abstract base-class for {@link SerializableDirectedRelationship} implementations.
+ * Base-class for {@link SerializableDirectedRelationship} implementations.
  *
  * @param <P> type of properties held by this relationship representation.
  */

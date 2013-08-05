@@ -28,7 +28,7 @@ import java.util.Map;
 import static com.graphaware.propertycontainer.util.DirectionUtils.resolveDirection;
 
 /**
- * Abstract base-class for {@link ImmutableDirectedRelationship} implementations.
+ * Base-class for {@link ImmutableDirectedRelationship} implementations.
  *
  * @param <V> type with which property values are represented.
  * @param <P> type of properties held by this relationship representation.

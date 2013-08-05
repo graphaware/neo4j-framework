@@ -20,13 +20,14 @@ import com.graphaware.propertycontainer.dto.common.property.BaseProperties;
 import org.neo4j.graphdb.PropertyContainer;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 import static com.graphaware.propertycontainer.util.PropertyContainerUtils.cleanStringProperties;
 import static com.graphaware.propertycontainer.util.PropertyContainerUtils.propertiesToStringMap;
 
 
 /**
- * Abstract base-class for implementations of {@link com.graphaware.propertycontainer.dto.common.property.ImmutableProperties}
+ * Base-class for implementations of {@link com.graphaware.propertycontainer.dto.common.property.ImmutableProperties}
  * and {@link com.graphaware.propertycontainer.dto.common.property.MutableProperties} with {@link String} values.
  */
 public abstract class StringProperties extends BaseProperties<String> {
@@ -47,6 +48,14 @@ public abstract class StringProperties extends BaseProperties<String> {
      */
     protected StringProperties(Map<String, ?> properties) {
         super(properties);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Map<String, String> newMap() {
+        return new TreeMap<>();
     }
 
     /**

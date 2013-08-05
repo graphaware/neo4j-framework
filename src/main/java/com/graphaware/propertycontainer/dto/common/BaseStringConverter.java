@@ -17,7 +17,7 @@
 package com.graphaware.propertycontainer.dto.common;
 
 /**
- * Abstract base-class for {@link StringConverter}s for {@link org.neo4j.graphdb.Relationship} representations.
+ * Base-class for {@link StringConverter}s for {@link org.neo4j.graphdb.Relationship} representations.
  *
  * @param <T> type of the object this component is capable of converting.
  */

@@ -21,8 +21,8 @@ import com.graphaware.propertycontainer.dto.common.propertycontainer.HasProperti
 import org.neo4j.graphdb.Relationship;
 
 /**
- * Component that has a {@link org.neo4j.graphdb.RelationshipType} and a {@link org.neo4j.graphdb.Direction}.
- * Useful for property-less directed {@link org.neo4j.graphdb.Relationship} representations.
+ * Component that has a {@link org.neo4j.graphdb.RelationshipType} and {@link ImmutableProperties}.
+ * Useful for undirected {@link org.neo4j.graphdb.Relationship} representations.
  *
  * @param <V> type with which property values are represented.
  * @param <P> type of properties contained.

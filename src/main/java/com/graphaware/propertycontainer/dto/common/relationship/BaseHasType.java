@@ -20,7 +20,7 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 
 /**
- * Abstract base-class for {@link HasType} implementations.
+ * Base-class for {@link HasType} implementations.
  */
 public abstract class BaseHasType {
 

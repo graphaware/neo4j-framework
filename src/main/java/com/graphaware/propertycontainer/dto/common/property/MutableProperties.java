@@ -17,7 +17,14 @@
 package com.graphaware.propertycontainer.dto.common.property;
 
 /**
- * Mutable {@link ImmutableProperties}.
+ * A mutable representation of Neo4j properties, usually coming from a {@link org.neo4j.graphdb.PropertyContainer}.
+ * <p/>
+ * Keys must not be null or empty, values can be any object of type V, or null.
+ * <p/>
+ * Please note that the semantics of {@link #get(String)} and {@link #containsKey(String)} are slightly different than
+ * in a regular {@link java.util.Map} in the sense that implementations can choose to pretend some key-value pairs exist
+ * and generate them. In such cases, all the other methods should still work as expected, i.e. consult the underlying
+ * properties.
  *
  * @param <V> type with which property values are represented.
  */

@@ -23,7 +23,7 @@ import com.graphaware.propertycontainer.dto.string.property.StringPropertiesConv
 import java.util.Map;
 
 /**
- * Abstract base-class for {@link com.graphaware.propertycontainer.dto.common.StringConverter}s for {@link org.neo4j.graphdb.Relationship} representations.
+ * Base-class for {@link com.graphaware.propertycontainer.dto.common.StringConverter}s for {@link org.neo4j.graphdb.Relationship} representations.
  */
 public abstract class BaseRelationshipStringConverter<T extends HasType> extends BaseStringConverter<T> {
 

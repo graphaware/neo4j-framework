@@ -19,7 +19,7 @@ package com.graphaware.propertycontainer.dto.common.relationship;
 import com.graphaware.propertycontainer.dto.common.Serializable;
 
 /**
- * {@link Serializable} {@link HasTypeAndDirection}
+ * {@link Serializable} {@link HasTypeAndDirection}.
  */
 public interface SerializableTypeAndDirection extends HasTypeAndDirection, Serializable {
 }

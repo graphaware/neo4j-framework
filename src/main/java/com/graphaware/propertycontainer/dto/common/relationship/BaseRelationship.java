@@ -28,7 +28,7 @@ import java.util.Map;
 import static com.graphaware.propertycontainer.util.PropertyContainerUtils.propertiesToObjectMap;
 
 /**
- * Abstract base-class for {@link ImmutableRelationship} implementations.
+ * Base-class for {@link ImmutableRelationship} implementations.
  *
  * @param <V> type with which property values are represented.
  * @param <P> type of properties held by this relationship representation.

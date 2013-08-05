@@ -25,13 +25,13 @@ import static com.graphaware.propertycontainer.util.ArrayUtils.arrayFriendlyMapE
 import static com.graphaware.propertycontainer.util.PropertyContainerUtils.cleanKey;
 
 /**
- * Abstract base-class for {@link ImmutableProperties} and {@link MutableProperties} implementations.
+ * Base-class for {@link ImmutableProperties} and {@link MutableProperties} implementations.
  *
  * @param <V> type with which property values are represented.
  */
 public abstract class BaseProperties<V> {
 
-    private final Map<String, V> properties = new TreeMap<>();
+    private final Map<String, V> properties;
 
     /**
      * Construct a representation of properties from a {@link org.neo4j.graphdb.PropertyContainer}.
@@ -39,6 +39,7 @@ public abstract class BaseProperties<V> {
      * @param propertyContainer to take (copy) properties from.
      */
     protected BaseProperties(PropertyContainer propertyContainer) {
+        properties = newMap();
         properties.putAll(propertiesToMap(propertyContainer));
     }
 
@@ -57,6 +58,7 @@ public abstract class BaseProperties<V> {
      * @param properties to take (copy).
      */
     protected BaseProperties(Map<String, ?> properties) {
+        this.properties = newMap();
         this.properties.putAll(cleanProperties(properties));
     }
 
@@ -67,6 +69,15 @@ public abstract class BaseProperties<V> {
      * @return cleaned properties.
      */
     protected abstract Map<String, V> cleanProperties(Map<String, ?> properties);
+
+    /**
+     * Construct a new {@link Map} where properties will be stored.
+     *
+     * @return a map.
+     */
+    protected Map<String, V> newMap() {
+        return new HashMap<>();
+    }
 
     /**
      * Set a property.

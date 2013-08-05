@@ -26,7 +26,7 @@ import static com.graphaware.propertycontainer.util.DirectionUtils.resolveDirect
 
 
 /**
- * An abstract base-class for {@link HasTypeAndDirection} implementations.
+ * Base-class for {@link HasTypeAndDirection} implementations.
  */
 public abstract class BaseHasTypeAndDirection extends BaseHasType {
 

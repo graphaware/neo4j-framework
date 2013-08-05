@@ -24,7 +24,7 @@ import java.util.Map;
 import static com.graphaware.propertycontainer.util.PropertyContainerUtils.valueToString;
 
 /**
- * An abstract base-class for Neo4j properties representations that wish to implement {@link CopyMakingSerializableProperties}.
+ * Base-class for Neo4j properties representations that wish to implement {@link CopyMakingSerializableProperties}.
  *
  * @param <T> type of object returned with and without a property.
  */

@@ -20,7 +20,7 @@ import com.graphaware.propertycontainer.dto.common.property.MutableProperties;
 import com.graphaware.propertycontainer.dto.common.propertycontainer.HasMutableProperties;
 
 /**
- * An mutable representation of a directed Neo4j {@link org.neo4j.graphdb.Relationship}.
+ * A mutable representation of a directed Neo4j {@link org.neo4j.graphdb.Relationship}.
  *
  * @param <V> type with which property values are represented.
  * @param <P> type of properties held by this relationship representation.
