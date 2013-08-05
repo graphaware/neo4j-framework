@@ -27,8 +27,8 @@ import java.util.Collection;
 
 
 /**
- * {@link com.graphaware.framework.BaseGraphAwareFramework} that operates on a {@link org.neo4j.unsafe.batchinsert.BatchInserter},
- * or more precisely {@link TransactionSimulatingBatchInserter}.
+ * {@link com.graphaware.framework.BaseGraphAwareFramework} that operates on a {@link org.neo4j.unsafe.batchinsert.BatchInserter}
+ * (or more precisely {@link TransactionSimulatingBatchInserter}) rather than {@link org.neo4j.graphdb.GraphDatabaseService}.
  *
  * @see com.graphaware.framework.BaseGraphAwareFramework
  * @see org.neo4j.unsafe.batchinsert.BatchInserter - same limitations apply.

@@ -35,20 +35,22 @@ import java.util.*;
 
 
 /**
- * Framework that delegates to registered {@link com.graphaware.framework.GraphAwareModule}s to perform useful work. There must be exactly one
- * instance of this framework for a single {@link org.neo4j.graphdb.GraphDatabaseService}.
+ * Framework that delegates to registered {@link com.graphaware.framework.GraphAwareModule}s to perform useful work.
+ * There must be exactly one instance of this framework for a single {@link org.neo4j.graphdb.GraphDatabaseService}.
  * <p/>
- * The framework registers itself as a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler}, translates {@link org.neo4j.graphdb.event.TransactionData} into
- * {@link com.graphaware.tx.event.improved.api.ImprovedTransactionData} and lets registered {@link com.graphaware.framework.GraphAwareModule}s
- * deal with the data before each transaction commits, in the order the modules were registered.
+ * The framework registers itself as a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler},
+ * translates {@link org.neo4j.graphdb.event.TransactionData} into {@link com.graphaware.tx.event.improved.api.ImprovedTransactionData}
+ * and lets registered {@link com.graphaware.framework.GraphAwareModule}s deal with the data before each transaction
+ * commits, in the order the modules were registered.
  * <p/>
  * After all desired modules have been registered, {@link #start()} must be called before anything gets written into the
  * database. No more modules can be registered thereafter.
  * <p/>
- * Every new {@link com.graphaware.framework.GraphAwareModule} and every {@link com.graphaware.framework.GraphAwareModule} whose configuration has changed since the last
- * run will be forced to re-initialize, which can lead to very long initialization startup time, as (re-)initialization
- * could be a global graph operation. Re-initialization will also be automatically performed for all modules, for which
- * it has been detected that something is out-of-sync (module threw a {@link com.graphaware.framework.NeedsInitializationException}).
+ * Every new {@link com.graphaware.framework.GraphAwareModule} and every {@link com.graphaware.framework.GraphAwareModule}
+ * whose configuration has changed since the last run will be forced to (re-)initialize, which can lead to very long
+ * startup times, as (re-)initialization could be a global graph operation. Re-initialization will also be automatically
+ * performed for all modules, for which it has been detected that something is out-of-sync
+ * (module threw a {@link com.graphaware.framework.NeedsInitializationException}).
  * <p/>
  * The root node (node with ID = 0) needs to be present in the database in order for this framework to work. It does not
  * need to be used by the application, nor does it need to be connected to any other node, but it needs to be present
@@ -68,7 +70,7 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
     private volatile boolean started;
 
     /**
-     * Create a new instance of the framework.
+     * Create a new instance of the framework with {@link DefaultFrameworkConfiguration}.
      */
     public BaseGraphAwareFramework() {
         this(DefaultFrameworkConfiguration.getInstance());
@@ -84,7 +86,8 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
     }
 
     /**
-     * Register a {@link com.graphaware.framework.GraphAwareModule}. Note that modules are delegated to in the order they are registered.
+     * Register a {@link com.graphaware.framework.GraphAwareModule}. Note that modules are delegated to in the order
+     * they are registered.
      *
      * @param module to register.
      */
@@ -115,7 +118,7 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
         }
 
         LOG.info("Registering module " + module.getId() + " with GraphAware.");
-        checkNotAlreadyRegistered(module.getId());
+        checkNotAlreadyRegistered(module);
         modules.add(module);
 
         if (module instanceof FrameworkConfigured) {
@@ -128,11 +131,15 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
         }
     }
 
-    private void checkNotAlreadyRegistered(String id) {
-        for (GraphAwareModule module : modules) {
-            if (id.equals(module.getId())) {
-                throw new IllegalStateException("Module " + id + " cannot be registered more than once!");
-            }
+    /**
+     * Check that the given module isn't already registered with the framework.
+     *
+     * @param module to check.
+     * @throws IllegalStateException in case the module is already registered.
+     */
+    private void checkNotAlreadyRegistered(GraphAwareModule module) {
+        if (modules.contains(module)) {
+            throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
         }
     }
 
@@ -230,8 +237,8 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
      * Initialize modules if needed.
      * <p/>
      * Metadata about modules is stored as properties on the root node (node with ID = 0) in the form of
-     * {@link com.graphaware.framework.config.FrameworkConfiguration#GA_PREFIX}{@link #CORE}_{@link GraphAwareModule#getId()} as key and one of the
-     * following as value:
+     * {@link com.graphaware.framework.config.FrameworkConfiguration#GA_PREFIX}{@link #CORE}_{@link GraphAwareModule#getId()}
+     * as key and one of the following as value:
      * - {@link #HASH_CODE} + {@link GraphAwareModule#hashCode()} capturing the last configuration
      * the module has been run with
      * - {@link #FORCE_INITIALIZATION} + timestamp indicating the module should be re-initialized.

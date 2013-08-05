@@ -17,7 +17,7 @@
 package com.graphaware.framework.config;
 
 /**
- * Abstract base-class for {@link FrameworkConfiguration} implementations.
+ * Base-class for {@link FrameworkConfiguration} implementations.
  */
 public abstract class BaseFrameworkConfiguration implements FrameworkConfiguration {
 

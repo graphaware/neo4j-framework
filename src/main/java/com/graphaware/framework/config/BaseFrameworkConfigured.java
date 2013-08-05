@@ -17,7 +17,7 @@
 package com.graphaware.framework.config;
 
 /**
- * Convenience abstract base-class for {@link FrameworkConfigured} components.
+ * Convenience base-class for {@link FrameworkConfigured} components.
  */
 @SuppressWarnings("UnusedDeclaration") //used by GraphAware modules
 public abstract class BaseFrameworkConfigured implements FrameworkConfigured {
@@ -40,7 +40,8 @@ public abstract class BaseFrameworkConfigured implements FrameworkConfigured {
      */
     protected FrameworkConfiguration getConfig() {
         if (configuration == null) {
-            throw new IllegalStateException("Module hasn't been configured. Has it been registered with the GraphAware framework?");
+            throw new IllegalStateException("Module hasn't been configured. Has it been registered with the " +
+                    "GraphAware framework?");
         }
 
         return configuration;

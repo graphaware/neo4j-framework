@@ -45,7 +45,7 @@ public class GraphAwareFramework extends BaseGraphAwareFramework {
     public GraphAwareFramework(GraphDatabaseService database) {
         super(DefaultFrameworkConfiguration.getInstance());
         this.database = database;
-        findRootOrThrowException();
+        findRootOrThrowException();  //fail fast
     }
 
     /**
@@ -57,7 +57,7 @@ public class GraphAwareFramework extends BaseGraphAwareFramework {
     public GraphAwareFramework(GraphDatabaseService database, FrameworkConfiguration configuration) {
         super(configuration);
         this.database = database;
-        findRootOrThrowException();
+        findRootOrThrowException();  //fail fast
     }
 
     /**
