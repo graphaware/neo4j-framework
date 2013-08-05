@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Unit test for {@link IterableInputBatchTransactionExecutor}.
  */
-public class IterableInputBatchExecutorTest {
+public class IterableInputBatchTransactionExecutorTest {
 
     private GraphDatabaseService database;
 

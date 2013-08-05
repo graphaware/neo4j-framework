@@ -29,9 +29,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Unit test for {@link IterableInputBatchTransactionExecutor}.
+ * Unit test for {@link MultiThreadedBatchTransactionExecutor}.
  */
-public class MultiThreadedBatchExecutorTest {
+public class MultiThreadedBatchTransactionExecutorTest {
 
     private GraphDatabaseService database;
 

@@ -26,7 +26,7 @@ import static junit.framework.Assert.fail;
 /**
  * Unit tests for {@link DisposableBatchTransactionExecutor}.
  */
-public class DisposableBatchExecutorTest {
+public class DisposableBatchTransactionExecutorTest {
 
     @Test
     public void shouldExecuteForTheFirstTime() {

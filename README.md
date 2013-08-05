@@ -158,12 +158,12 @@ for each operation results in too much overhead. For some use-cases, `BatchInser
 operations performed using these do not run in transactions and have some other limitations (such as no node/relationship
  delete capabilities).
 
-GraphAware can help here with `BatchExecutor`s. There are a few of them:
+GraphAware can help here with `BatchTransactionExecutor`s. There are a few of them:
 
 #### Input-Based Batch Operations
 
-If you have some input, such as lines from a CSV file, or a result of a Neo4j traversal and you want to perform an operation
-for each item of such input, use `IterableInputBatchExecutor`. As the name suggests, the input needs to be in the form
+If you have some input, such as lines from a CSV file or a result of a Neo4j traversal, and you want to perform an operation
+for each item of such input, use `IterableInputBatchTransactionExecutor`. As the name suggests, the input needs to be in the form
 of an `Iterable`. Additionally, you need to define a `UnitOfWork`, which will be executed against the database for each
 input item. After a specified number of batch operations have been executed, the current transaction is committed and a
 new one started, until we run out of input items to process.
@@ -176,7 +176,7 @@ For example, if you were to create a number of nodes from a list of node names, 
     List<String> nodeNames = Arrays.asList("Name1", "Name2", "Name3");  //there will be many more
 
     int batchSize = 10;
-    BatchExecutor executor = new IterableInputBatchExecutor<String>(database, batchSize, nodeNames, new UnitOfWork<String>() {
+    BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, batchSize, nodeNames, new UnitOfWork<String>() {
         @Override
         public void execute(GraphDatabaseService database, String nodeName) {
             Node node = database.createNode();
@@ -190,7 +190,7 @@ For example, if you were to create a number of nodes from a list of node names, 
 #### Batch Operations with None or Generated Input
 
 In case you wish to do something input-independent, for example just generate a number of nodes with random names, you
-can use the `NoInputBatchExecutor`.
+can use the `NoInputBatchTransactionExecutor`.
 
 First, you would create an implementation of `UnitOfWork<NullItem>`, which is a unit of work expecting no input:
 
@@ -216,26 +216,26 @@ First, you would create an implementation of `UnitOfWork<NullItem>`, which is a 
     }
 ```
 
-Then, you would use it in `NoInputBatchExecutor`:
+Then, you would use it in `NoInputBatchTransactionExecutor`:
 
 ```java
     //create 100,000 nodes in batches of 1,000:
     int batchSize = 1000;
     int noNodes = 100000;
-    BatchExecutor batchExecutor = new NoInputBatchExecutor(database, batchSize, noNodes, CreateRandomNode.getInstance());
+    BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, batchSize, noNodes, CreateRandomNode.getInstance());
     batchExecutor.execute();
 ```
 
 #### Multi-Threaded Batch Operations
 
-If you wish to execute any batch operation using more than one thread, you can use the `MultiThreadedBatchExecutor`
- as a decorator of any `BatchExecutor`. For example, to execute the above example using 4 threads:
+If you wish to execute any batch operation using more than one thread, you can use the `MultiThreadedBatchTransactionExecutor`
+ as a decorator of any `BatchTransactionExecutor`. For example, to execute the above example using 4 threads:
 
 ```java
     int batchSize = 1000;
     int noNodes = 100000;
-    BatchExecutor batchExecutor = new NoInputBatchExecutor(database, batchSize, noNodes, CreateRandomNode.getInstance());
-    BatchExecutor multiThreadedExecutor = new MultiThreadedBatchExecutor(batchExecutor, 4);
+    BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, batchSize, noNodes, CreateRandomNode.getInstance());
+    BatchTransactionExecutor multiThreadedExecutor = new MultiThreadedBatchTransactionExecutor(batchExecutor, 4);
     multiThreadedExecutor.execute();
 ```
 

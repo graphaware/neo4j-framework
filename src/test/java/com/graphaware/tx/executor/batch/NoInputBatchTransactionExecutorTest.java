@@ -21,21 +21,21 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.test.ImpermanentGraphDatabase;
+import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.test.IterableUtils.countNodes;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Unit test for {@link IterableInputBatchTransactionExecutor}.
+ * Unit test for {@link NoInputBatchTransactionExecutor}.
  */
-public class NoInputBatchExecutorTest {
+public class NoInputBatchTransactionExecutorTest {
 
     private GraphDatabaseService database;
 
     @Before
     public void setUp() {
-        database = new ImpermanentGraphDatabase();
+        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
     }
 
     @After
