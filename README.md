@@ -6,8 +6,8 @@ GraphAware Neo4j Framework
 The aim of the GraphAware Framework is to speed-up development with Neo4j and provide useful generic and domain-specific
 modules, analytical capabilities, graph algorithm libraries, etc.
 
-The framework can be used in two ways: as a library of useful tested code for that simplifies tasks commonly needed when
-developing with Neo4j, or as a real framework with modules, which perform some (behind-the-scenes) mutations on the graph
+The framework can be used in two ways: as a [library of useful tested code](#lib) for that simplifies tasks commonly needed when
+developing with Neo4j, or as a [real framework with modules](#fw), which perform some (behind-the-scenes) mutations on the graph
 as transactions occur. In the latter case, you get the benefit of the "library" as well.
 
 Download
@@ -50,6 +50,7 @@ The version number has two parts, separated by a dash. The first part indicates 
  The second part is the version of the framework. For example, version 1.9-1.2 is a 1.2 version of the framework
  compatible with Neo4j 1.9.x
 
+<a name="fw"/>
 Framework Usage
 ---------------
 
@@ -91,6 +92,7 @@ well, in the following fashion:
     //use batchInserter as usual
 ```
 
+<a name="lib"/>
 Features
 --------
 
