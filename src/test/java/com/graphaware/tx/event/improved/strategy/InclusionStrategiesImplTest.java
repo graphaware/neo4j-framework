@@ -14,11 +14,8 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.framework.strategy;
+package com.graphaware.tx.event.improved.strategy;
 
-import com.graphaware.tx.event.improved.strategy.IncludeAllNodeProperties;
-import com.graphaware.tx.event.improved.strategy.IncludeNoNodeProperties;
-import com.graphaware.tx.event.improved.strategy.InclusionStrategiesImpl;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

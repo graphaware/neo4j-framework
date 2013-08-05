@@ -1,2 +1,0 @@
-Classes in this package are exercised in other modules, which is a bad excuse for no tests in this package. The plan is,
- however, to merge utils, dtos, tx-event and framework together, at which point there will be proper coverage.
