@@ -17,7 +17,6 @@
 package com.graphaware.framework;
 
 import com.graphaware.framework.config.DefaultFrameworkConfiguration;
-import com.graphaware.framework.config.FrameworkConfigured;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.strategy.InclusionStrategiesImpl;
@@ -43,7 +42,7 @@ import static org.mockito.Mockito.*;
 /**
  * Unit test for {@link com.graphaware.framework.GraphAwareFramework}.
  */
-public class BatchGraphAwareFrameworkTest {
+public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
 
     private final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
@@ -118,7 +117,7 @@ public class BatchGraphAwareFrameworkTest {
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", HASH_CODE + "123");
 
-        BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
+        BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter, new CustomConfig());
         framework.registerModule(mockModule);
 
         framework.start();
@@ -301,6 +300,36 @@ public class BatchGraphAwareFrameworkTest {
     }
 
     @Test
+    public void noRegisteredInterestedModulesShouldBeDelegatedToBeforeFrameworkStarts() {
+        GraphAwareModule mockModule1 = mock(GraphAwareModule.class);
+        when(mockModule1.getId()).thenReturn("MOCK1");
+        when(mockModule1.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+
+        GraphAwareModule mockModule2 = mock(GraphAwareModule.class);
+        when(mockModule2.getId()).thenReturn("MOCK2");
+        when(mockModule2.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+
+        GraphAwareModule mockModule3 = mock(GraphAwareModule.class);
+        when(mockModule3.getId()).thenReturn("MOCK3");
+        when(mockModule3.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.none());
+
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
+        framework.registerModule(mockModule1);
+        framework.registerModule(mockModule2);
+        framework.registerModule(mockModule3);
+
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule3, atLeastOnce()).getId();
+        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
+
+        batchInserter.shutdown();
+
+        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
+    }
+
+    @Test
     public void moduleThrowingInitExceptionShouldBeMarkedForReinitialization() {
         final GraphAwareModule mockModule = mock(GraphAwareModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
@@ -370,6 +399,23 @@ public class BatchGraphAwareFrameworkTest {
     }
 
     @Test
+    public void realFrameworkConfiguredModulesShouldBeConfigured() {
+        RealFrameworkConfiguredModule module = new RealFrameworkConfiguredModule();
+
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
+        framework.registerModule(module);
+
+        assertEquals(DefaultFrameworkConfiguration.getInstance(), module.getConfig());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void unConfiguredModuleShouldThrowException() {
+        RealFrameworkConfiguredModule module = new RealFrameworkConfiguredModule();
+        module.getConfig();
+    }
+
+    @Test
     public void shutdownShouldBeCalledBeforeShutdown() {
         FrameworkConfiguredModule mockModule = mock(FrameworkConfiguredModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
@@ -382,9 +428,5 @@ public class BatchGraphAwareFrameworkTest {
         batchInserter.shutdown();
 
         verify(mockModule).shutdown();
-    }
-
-    private interface FrameworkConfiguredModule extends GraphAwareModule, FrameworkConfigured {
-
     }
 }

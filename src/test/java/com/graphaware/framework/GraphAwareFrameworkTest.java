@@ -17,7 +17,6 @@
 package com.graphaware.framework;
 
 import com.graphaware.framework.config.DefaultFrameworkConfiguration;
-import com.graphaware.framework.config.FrameworkConfigured;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.strategy.InclusionStrategiesImpl;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
@@ -40,7 +39,7 @@ import static org.mockito.Mockito.*;
 /**
  * Unit test for {@link GraphAwareFramework}.
  */
-public class GraphAwareFrameworkTest {
+public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
 
     private GraphDatabaseService database;
 
@@ -294,7 +293,7 @@ public class GraphAwareFrameworkTest {
         when(mockModule3.getId()).thenReturn("MOCK3");
         when(mockModule3.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.none());
 
-        GraphAwareFramework framework = new GraphAwareFramework(database);
+        GraphAwareFramework framework = new GraphAwareFramework(database, new CustomConfig());
         framework.registerModule(mockModule1);
         framework.registerModule(mockModule2);
         framework.registerModule(mockModule3);
@@ -321,6 +320,41 @@ public class GraphAwareFrameworkTest {
         verify(mockModule3).getInclusionStrategies();
         verify(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
         verify(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
+        //no interaction with module3, it is not interested!
+        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
+    }
+
+    @Test
+    public void noRegisteredInterestedModulesShouldBeDelegatedToBeforeFrameworkStarts() {
+        GraphAwareModule mockModule1 = mock(GraphAwareModule.class);
+        when(mockModule1.getId()).thenReturn("MOCK1");
+        when(mockModule1.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+
+        GraphAwareModule mockModule2 = mock(GraphAwareModule.class);
+        when(mockModule2.getId()).thenReturn("MOCK2");
+        when(mockModule2.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+
+        GraphAwareModule mockModule3 = mock(GraphAwareModule.class);
+        when(mockModule3.getId()).thenReturn("MOCK3");
+        when(mockModule3.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.none());
+
+        GraphAwareFramework framework = new GraphAwareFramework(database);
+        framework.registerModule(mockModule1);
+        framework.registerModule(mockModule2);
+        framework.registerModule(mockModule3);
+
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule3, atLeastOnce()).getId();
+        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
+
+        new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
+            @Override
+            protected void doInTx(GraphDatabaseService database) {
+                database.createNode();
+            }
+        });
+
         //no interaction with module3, it is not interested!
         verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
     }
@@ -393,6 +427,22 @@ public class GraphAwareFrameworkTest {
     }
 
     @Test
+    public void realFrameworkConfiguredModulesShouldBeConfigured() {
+        RealFrameworkConfiguredModule module = new RealFrameworkConfiguredModule();
+
+        GraphAwareFramework framework = new GraphAwareFramework(database);
+        framework.registerModule(module, true);
+
+        assertEquals(DefaultFrameworkConfiguration.getInstance(), module.getConfig());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void unConfiguredModuleShouldThrowException() {
+        RealFrameworkConfiguredModule module = new RealFrameworkConfiguredModule();
+        module.getConfig();
+    }
+
+    @Test
     public void shutdownShouldBeCalledBeforeShutdown() {
         FrameworkConfiguredModule mockModule = mock(FrameworkConfiguredModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
@@ -417,9 +467,5 @@ public class GraphAwareFrameworkTest {
                 database.getNodeById(0).delete();
             }
         });
-    }
-
-    private interface FrameworkConfiguredModule extends GraphAwareModule, FrameworkConfigured {
-
     }
 }
