@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Unit test for {@link IterableInputBatchExecutor}.
+ * Unit test for {@link IterableInputBatchTransactionExecutor}.
  */
 public class MultiThreadedBatchExecutorTest {
 
@@ -47,7 +47,7 @@ public class MultiThreadedBatchExecutorTest {
 
     @Test
     public void resultShouldBeCorrectWhenExecutedInMultipleThreads() {
-        BatchExecutor batchExecutor = new MultiThreadedBatchExecutor(new NoInputBatchExecutor(database, 100, 40000, CreateNode.getInstance()), 4);
+        BatchTransactionExecutor batchExecutor = new MultiThreadedBatchTransactionExecutor(new NoInputBatchTransactionExecutor(database, 100, 40000, CreateNode.getInstance()), 4);
 
         batchExecutor.execute();
 
@@ -57,8 +57,8 @@ public class MultiThreadedBatchExecutorTest {
     @Test
     @Ignore("Multi-threaded not faster for some reason in CI") //todo investigate
     public void executionShouldBeFasterWhenExecutedInMultipleThreads() {
-        final BatchExecutor singleThreadedBatchExecutor = new NoInputBatchExecutor(database, 100, 40000, CreateNode.getInstance());
-        final BatchExecutor multiThreadedBatchExecutor = new MultiThreadedBatchExecutor(new NoInputBatchExecutor(database, 100, 40000, CreateNode.getInstance()), 4);
+        final BatchTransactionExecutor singleThreadedBatchExecutor = new NoInputBatchTransactionExecutor(database, 100, 40000, CreateNode.getInstance());
+        final BatchTransactionExecutor multiThreadedBatchExecutor = new MultiThreadedBatchTransactionExecutor(new NoInputBatchTransactionExecutor(database, 100, 40000, CreateNode.getInstance()), 4);
 
         long singleThreadedTime = TestUtils.time(new TestUtils.Timed() {
             @Override

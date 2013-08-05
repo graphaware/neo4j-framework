@@ -28,7 +28,7 @@ import static com.graphaware.propertycontainer.util.PropertyContainerUtils.prope
 
 
 /**
- * Abstract base-class for implementations of {@link com.graphaware.propertycontainer.dto.common.property.ImmutableProperties} with {@link Object} values.
+ * Base-class for implementations of {@link com.graphaware.propertycontainer.dto.common.property.ImmutableProperties} with {@link Object} values.
  */
 public abstract class PlainProperties extends BaseProperties<Object> {
 

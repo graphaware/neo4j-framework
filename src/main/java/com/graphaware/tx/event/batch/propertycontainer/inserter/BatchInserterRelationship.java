@@ -72,15 +72,6 @@ public class BatchInserterRelationship extends BatchInserterPropertyContainer<Re
      * {@inheritDoc}
      */
     @Override
-    public Relationship getWrapped() {
-        throw new UnsupportedOperationException("There is no wrapped Node in BatchInserterNode. All operations must" +
-                " be overridden as it talks to a different API from GraphDatabaseService. This is a bug.");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Node getStartNode() {
         return new BatchInserterNode(startNodeId, batchInserter);
     }

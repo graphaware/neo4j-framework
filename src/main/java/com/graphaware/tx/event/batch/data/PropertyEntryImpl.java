@@ -40,11 +40,11 @@ public class PropertyEntryImpl<T extends PropertyContainer> implements PropertyE
         if (value == null) {
             throw new IllegalArgumentException("Null value");
         }
-        return new PropertyEntryImpl<T>(entity, key, value, valueBeforeTransaction);
+        return new PropertyEntryImpl<>(entity, key, value, valueBeforeTransaction);
     }
 
     public static <T extends PropertyContainer> PropertyEntry<T> removed(T entity, String key, Object valueBeforeTransaction) {
-        return new PropertyEntryImpl<T>(entity, key, null, valueBeforeTransaction);
+        return new PropertyEntryImpl<>(entity, key, null, valueBeforeTransaction);
     }
 
     public T entity() {

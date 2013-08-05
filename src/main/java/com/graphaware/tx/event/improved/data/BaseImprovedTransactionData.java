@@ -26,7 +26,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Abstract base-class for {@link com.graphaware.tx.event.improved.api.ImprovedTransactionData} implementations that delegates all work to
+ * Base-class for {@link com.graphaware.tx.event.improved.api.ImprovedTransactionData} implementations that delegates all work to
  * {@link NodeTransactionData} and {@link RelationshipTransactionData} provided by subclasses.
  */
 public abstract class BaseImprovedTransactionData {

@@ -16,30 +16,13 @@
 
 package com.graphaware.tx.executor.batch;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /**
- * {@link BatchExecutor} which expects the {@link #execute()} method to only ever be called at most once.
- * After that, it must be discarded.
+ * Component that executes transactional work in batches.
  */
-public abstract class DisposableBatchExecutor implements BatchExecutor {
-
-    private final AtomicBoolean alreadyExecuted = new AtomicBoolean(false);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void execute() {
-        if (alreadyExecuted.compareAndSet(false, true)) {
-            doExecute();
-        } else {
-            throw new IllegalStateException("DisposableBatchExecutor must only ever be executed once!");
-        }
-    }
+public interface BatchTransactionExecutor {
 
     /**
      * Execute work in batches.
      */
-    protected abstract void doExecute();
+    void execute();
 }

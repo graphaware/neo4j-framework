@@ -20,9 +20,9 @@ import com.graphaware.tx.executor.NullItem;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
- * A {@link BatchExecutor} that executes a specified number of {@link UnitOfWork} in batches. These units need no input.
+ * A {@link BatchTransactionExecutor} that executes a specified number of {@link UnitOfWork} in batches. These units need no input.
  */
-public class NoInputBatchExecutor extends IterableInputBatchExecutor<NullItem> implements BatchExecutor {
+public class NoInputBatchTransactionExecutor extends IterableInputBatchTransactionExecutor<NullItem> implements BatchTransactionExecutor {
 
     /**
      * Construct a new batch executor.
@@ -32,7 +32,7 @@ public class NoInputBatchExecutor extends IterableInputBatchExecutor<NullItem> i
      * @param noSteps    how many {@link UnitOfWork} should be executed in total.
      * @param unitOfWork a unit of work definition. Must be thread-safe.
      */
-    public NoInputBatchExecutor(GraphDatabaseService database, int batchSize, int noSteps, UnitOfWork<NullItem> unitOfWork) {
+    public NoInputBatchTransactionExecutor(GraphDatabaseService database, int batchSize, int noSteps, UnitOfWork<NullItem> unitOfWork) {
         super(database, batchSize, new NoInput(noSteps), unitOfWork);
     }
 }

@@ -17,7 +17,7 @@
 package com.graphaware.tx.event.improved.strategy;
 
 /**
- * Abstract base-class for {@link InclusionStrategies} implementations.
+ * Base-class for {@link InclusionStrategies} implementations.
  */
 public abstract class BaseInclusionStrategies<T extends BaseInclusionStrategies<T>> {
 

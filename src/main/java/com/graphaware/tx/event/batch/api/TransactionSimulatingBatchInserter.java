@@ -21,10 +21,10 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 
 /**
- * A {@link org.neo4j.unsafe.batchinsert.BatchInserter} that can produce {@link org.neo4j.graphdb.event.TransactionData} despite the fact that there
- * are no transactions involved. Therefore, {@link org.neo4j.graphdb.event.TransactionEventHandler} can be registered on it. It is up to the
- * implementations to decide when / how often to simulate a "transaction commit" and call {@link org.neo4j.graphdb.event.TransactionEventHandler}
- * methods.
+ * A {@link org.neo4j.unsafe.batchinsert.BatchInserter} that can produce {@link org.neo4j.graphdb.event.TransactionData}
+ * despite the fact that there are no transactions involved. Therefore, {@link org.neo4j.graphdb.event.TransactionEventHandler}
+ * can be registered on it. It is up to the implementations to decide when / how often to simulate a "transaction commit"
+ * and call {@link org.neo4j.graphdb.event.TransactionEventHandler} methods.
  */
 public interface TransactionSimulatingBatchInserter extends BatchInserter {
 

@@ -21,8 +21,8 @@ import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
 
 /**
- * A {@link com.graphaware.tx.event.batch.propertycontainer.BatchPropertyContainer} to be used with {@link org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase} when performing
- * batch inserts.
+ * A {@link com.graphaware.tx.event.batch.propertycontainer.BatchPropertyContainer} to be used with
+ * {@link org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase} when performing batch inserts.
  */
 public abstract class BatchDatabasePropertyContainer<T extends PropertyContainer> extends BatchPropertyContainer<T> {
 

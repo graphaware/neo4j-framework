@@ -21,7 +21,7 @@ import com.graphaware.framework.config.FrameworkConfiguration;
 import org.neo4j.graphdb.Node;
 
 /**
- * Abstract base-class for all {@link NodeInclusionStrategy} implementations
+ * Base-class for all {@link NodeInclusionStrategy} implementations
  * that include arbitrary business / application level nodes (up to subclasses to decide which ones), but exclude any
  * {@link GraphAwareFramework}/{@link com.graphaware.framework.GraphAwareModule} internal nodes.
  */

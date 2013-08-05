@@ -27,7 +27,7 @@ import static com.graphaware.test.IterableUtils.countNodes;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Unit test for {@link IterableInputBatchExecutor}.
+ * Unit test for {@link IterableInputBatchTransactionExecutor}.
  */
 public class NoInputBatchExecutorTest {
 
@@ -45,7 +45,7 @@ public class NoInputBatchExecutorTest {
 
     @Test
     public void whenBatchSizeDividesNumberOfStepsThenAllStepsShouldBeExecuted() {
-        BatchExecutor batchExecutor = new NoInputBatchExecutor(database, 3, 6, CreateNode.getInstance());
+        BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, 3, 6, CreateNode.getInstance());
 
         batchExecutor.execute();
 
@@ -54,7 +54,7 @@ public class NoInputBatchExecutorTest {
 
     @Test
     public void whenBatchSizeDoesNotNumberOfStepsThenAllStepsShouldBeExecuted() {
-        BatchExecutor batchExecutor = new NoInputBatchExecutor(database, 5, 6, CreateNode.getInstance());
+        BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, 5, 6, CreateNode.getInstance());
 
         batchExecutor.execute();
 
@@ -63,7 +63,7 @@ public class NoInputBatchExecutorTest {
 
     @Test
     public void whenBatchSizeGreaterThanNumberOfStepsThenAllStepsShouldBeExecuted() {
-        BatchExecutor batchExecutor = new NoInputBatchExecutor(database, 7, 6, CreateNode.getInstance());
+        BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, 7, 6, CreateNode.getInstance());
 
         batchExecutor.execute();
 
@@ -72,7 +72,7 @@ public class NoInputBatchExecutorTest {
 
     @Test
     public void whenStepSometimesThrowsAnExceptionThenOnlySomeBatchesShouldBeSuccessful() {
-        BatchExecutor batchExecutor = new NoInputBatchExecutor(database, 3, 10, new ExceptionThrowingUnitOfWork(6));
+        BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, 3, 10, new ExceptionThrowingUnitOfWork(6));
 
         batchExecutor.execute();
 
@@ -81,7 +81,7 @@ public class NoInputBatchExecutorTest {
 
     @Test
     public void whenStepSometimesThrowsAnExceptionThenOnlySomeBatchesShouldBeSuccessful2() {
-        BatchExecutor batchExecutor = new NoInputBatchExecutor(database, 3, 10, new ExceptionThrowingUnitOfWork(4));
+        BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, 3, 10, new ExceptionThrowingUnitOfWork(4));
 
         batchExecutor.execute();
 

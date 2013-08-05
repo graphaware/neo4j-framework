@@ -19,7 +19,7 @@ package com.graphaware.tx.executor.batch;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
- * A unit of work to be executed as a part of batch execution by {@link com.graphaware.tx.executor.batch.BatchExecutor}.
+ * A unit of work to be executed as a part of batch execution by {@link BatchTransactionExecutor}.
  *
  * @param <T> type of the input/parameter for the unit of work.
  */

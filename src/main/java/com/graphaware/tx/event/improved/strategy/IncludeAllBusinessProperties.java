@@ -21,7 +21,7 @@ import com.graphaware.framework.config.FrameworkConfiguration;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
- * Abstract base-class for all {@link com.graphaware.tx.event.strategy.PropertyInclusionStrategy}
+ * Base-class for all {@link PropertyInclusionStrategy}
  * implementations that include arbitrary business / application level
  * properties (up to subclasses to decide which ones), but exclude any
  * {@link GraphAwareFramework}/{@link com.graphaware.framework.GraphAwareModule} internal properties.

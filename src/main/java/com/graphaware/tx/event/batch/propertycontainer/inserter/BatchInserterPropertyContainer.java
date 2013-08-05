@@ -49,4 +49,13 @@ public abstract class BatchInserterPropertyContainer<T extends PropertyContainer
     public GraphDatabaseService getGraphDatabase() {
         throw new UnsupportedOperationException("BatchInserter does not operate on GraphDatabaseService!");
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T getWrapped() {
+        throw new UnsupportedOperationException("There is no wrapped Node/Relationship in BatchInserterNode. All operations must" +
+                " be overridden as it talks to a different API from GraphDatabaseService. This is a bug.");
+    }
 }

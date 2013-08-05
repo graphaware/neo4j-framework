@@ -24,13 +24,13 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
 
 /**
- * Unit tests for {@link DisposableBatchExecutor}.
+ * Unit tests for {@link DisposableBatchTransactionExecutor}.
  */
 public class DisposableBatchExecutorTest {
 
     @Test
     public void shouldExecuteForTheFirstTime() {
-        DummyDisposableBatchExecutor executor = new DummyDisposableBatchExecutor();
+        DummyDisposableBatchTransactionExecutor executor = new DummyDisposableBatchTransactionExecutor();
 
         executor.execute();
 
@@ -39,7 +39,7 @@ public class DisposableBatchExecutorTest {
 
     @Test
     public void shouldNotExecuteMoreThanOnce() {
-        DummyDisposableBatchExecutor executor = new DummyDisposableBatchExecutor();
+        DummyDisposableBatchTransactionExecutor executor = new DummyDisposableBatchTransactionExecutor();
 
         executor.execute();
         try {
@@ -52,7 +52,7 @@ public class DisposableBatchExecutorTest {
         assertEquals(1, executor.getNoTimesExecuted());
     }
 
-    private static class DummyDisposableBatchExecutor extends DisposableBatchExecutor {
+    private static class DummyDisposableBatchTransactionExecutor extends DisposableBatchTransactionExecutor {
 
         AtomicInteger noTimesExecuted = new AtomicInteger(0);
 

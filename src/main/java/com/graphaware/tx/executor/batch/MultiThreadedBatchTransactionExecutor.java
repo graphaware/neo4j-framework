@@ -23,12 +23,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Decorator for a {@link BatchExecutor}, which allows it to be executed using multiple threads.
+ * Decorator for a {@link BatchTransactionExecutor}, which allows it to be executed using multiple threads.
  */
-public class MultiThreadedBatchExecutor extends DisposableBatchExecutor {
-    private static final Logger LOG = Logger.getLogger(MultiThreadedBatchExecutor.class);
+public class MultiThreadedBatchTransactionExecutor extends DisposableBatchTransactionExecutor {
+    private static final Logger LOG = Logger.getLogger(MultiThreadedBatchTransactionExecutor.class);
 
-    private final BatchExecutor wrappedExecutor;
+    private final BatchTransactionExecutor wrappedExecutor;
     private final int numberOfThreads;
 
     /**
@@ -37,7 +37,7 @@ public class MultiThreadedBatchExecutor extends DisposableBatchExecutor {
      * @param wrappedExecutor the executor to which each thread will delegate work.
      * @param numberOfThreads the total number of threads used for the execution.
      */
-    public MultiThreadedBatchExecutor(BatchExecutor wrappedExecutor, int numberOfThreads) {
+    public MultiThreadedBatchTransactionExecutor(BatchTransactionExecutor wrappedExecutor, int numberOfThreads) {
         this.wrappedExecutor = wrappedExecutor;
         this.numberOfThreads = numberOfThreads;
     }

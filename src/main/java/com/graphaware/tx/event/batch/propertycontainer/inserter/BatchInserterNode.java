@@ -50,15 +50,6 @@ public class BatchInserterNode extends BatchInserterPropertyContainer<Node> impl
      * {@inheritDoc}
      */
     @Override
-    public Node getWrapped() {
-        throw new UnsupportedOperationException("There is no wrapped Node in BatchInserterNode. All operations must" +
-                " be overridden as it talks to a different API from GraphDatabaseService. This is a bug.");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean hasProperty(String key) {
         return batchInserter.nodeHasProperty(id, key);
     }

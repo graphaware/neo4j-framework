@@ -24,8 +24,8 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
 
 /**
- * {@link org.neo4j.graphdb.Node} proxy to be used in {@link com.graphaware.tx.event.batch.data.BatchTransactionData} when using {@link org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase}
- * for batch inserts.
+ * {@link org.neo4j.graphdb.Node} proxy to be used in {@link com.graphaware.tx.event.batch.data.BatchTransactionData}
+ * when using {@link org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase} for batch inserts.
  */
 public class BatchDatabaseNode extends BatchDatabasePropertyContainer<Node> implements Node, NodeWrapper {
 

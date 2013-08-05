@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A base class for {@link Iterable}s, items of which are generated on-demand. Intended to be used as input to
- * implementations of {@link BatchExecutor}s that expect input.
+ * implementations of {@link BatchTransactionExecutor}s that expect input.
  *
  * @param <T> type of the generated input.
  */

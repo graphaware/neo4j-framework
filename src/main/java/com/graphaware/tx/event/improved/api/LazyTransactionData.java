@@ -25,7 +25,8 @@ import com.graphaware.tx.event.improved.data.lazy.LazyRelationshipTransactionDat
 import org.neo4j.graphdb.event.TransactionData;
 
 /**
- * {@link ImprovedTransactionData} delegating all work to {@link com.graphaware.tx.event.improved.data.lazy.LazyNodeTransactionData} and {@link com.graphaware.tx.event.improved.data.lazy.LazyRelationshipTransactionData}.
+ * {@link ImprovedTransactionData} delegating all work to {@link com.graphaware.tx.event.improved.data.lazy.LazyNodeTransactionData}
+ * and {@link com.graphaware.tx.event.improved.data.lazy.LazyRelationshipTransactionData}.
  */
 public class LazyTransactionData extends BaseImprovedTransactionData implements ImprovedTransactionData, TransactionDataContainer {
 

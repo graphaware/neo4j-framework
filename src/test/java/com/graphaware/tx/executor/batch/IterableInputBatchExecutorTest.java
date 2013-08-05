@@ -31,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Unit test for {@link IterableInputBatchExecutor}.
+ * Unit test for {@link IterableInputBatchTransactionExecutor}.
  */
 public class IterableInputBatchExecutorTest {
 
@@ -51,7 +51,7 @@ public class IterableInputBatchExecutorTest {
     public void nodesShouldBeCreatedFromListOfNames() {
         List<String> nodeNames = Arrays.asList("Name1", "Name2", "Name3");
 
-        BatchExecutor executor = new IterableInputBatchExecutor<String>(database, 2, nodeNames, new UnitOfWork<String>() {
+        BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<String>(database, 2, nodeNames, new UnitOfWork<String>() {
             @Override
             public void execute(GraphDatabaseService database, String nodeName) {
                 Node node = database.createNode();

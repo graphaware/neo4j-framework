@@ -21,7 +21,7 @@ import com.graphaware.framework.config.FrameworkConfiguration;
 import org.neo4j.graphdb.Relationship;
 
 /**
- * Abstract base-class for all {@link com.graphaware.tx.event.improved.strategy.RelationshipInclusionStrategy} that include
+ * Base-class for all {@link com.graphaware.tx.event.improved.strategy.RelationshipInclusionStrategy} that include
  * arbitrary business / application level
  * relationships (up to subclasses to decide which ones), but exclude any {@link GraphAwareFramework}/{@link com.graphaware.framework.GraphAwareModule}
  * internal relationships.

@@ -29,13 +29,13 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * {@link BatchExecutor} which executes a {@link UnitOfWork} for each input item. Input items are  provided
+ * {@link BatchTransactionExecutor} which executes a {@link UnitOfWork} for each input item. Input items are  provided
  * in the form of an {@link Iterable}.
  *
  * @param <T> type of the input item, on which steps are executed.
  */
-public class IterableInputBatchExecutor<T> implements BatchExecutor {
-    private static final Logger LOG = Logger.getLogger(IterableInputBatchExecutor.class);
+public class IterableInputBatchTransactionExecutor<T> implements BatchTransactionExecutor {
+    private static final Logger LOG = Logger.getLogger(IterableInputBatchTransactionExecutor.class);
 
     private final int batchSize;
     private final UnitOfWork<T> unitOfWork;
@@ -54,7 +54,7 @@ public class IterableInputBatchExecutor<T> implements BatchExecutor {
      * @param input      to the execution. These are provided to each unit of work, one by one.
      * @param unitOfWork to be executed for each input item. Must be thread-safe.
      */
-    public IterableInputBatchExecutor(GraphDatabaseService database, int batchSize, Iterable<T> input, UnitOfWork<T> unitOfWork) {
+    public IterableInputBatchTransactionExecutor(GraphDatabaseService database, int batchSize, Iterable<T> input, UnitOfWork<T> unitOfWork) {
         this.batchSize = batchSize;
         this.unitOfWork = unitOfWork;
         this.iterator = input.iterator();
