@@ -349,8 +349,8 @@ public class TotalFriendshipStrengthCounter implements TransactionEventHandler<V
 All that remains is registering this event handler on the database:
 
 ```java
-    GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-    database.registerTransactionEventHandler(new TotalFriendshipStrengthCounter(database));
+GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+database.registerTransactionEventHandler(new TotalFriendshipStrengthCounter(database));
 ```
 
 `TotalFriendshipStrengthCountingDemo` demonstrates the entire example.
