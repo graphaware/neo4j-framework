@@ -56,6 +56,30 @@ public class TestDataBuilder {
      * Create a relationship from the last created node to a node with specific ID. Creates its own transaction.
      *
      * @param nodeId to create the relationship to.
+     * @param type   of the relationship.
+     * @return this.
+     */
+    public TestDataBuilder relationshipTo(final long nodeId, final RelationshipType type) {
+        if (lastNode == null) {
+            throw new IllegalStateException("Illegal usage! There's no node to create the relationship from. Please call node() first.");
+        }
+
+        final Node node = lastNode;
+
+        lastRelationship = executor.executeInTransaction(new TransactionCallback<Relationship>() {
+            @Override
+            public Relationship doInTransaction(GraphDatabaseService database) {
+                return node.createRelationshipTo(database.getNodeById(nodeId), type);
+            }
+        });
+
+        return this;
+    }
+
+    /**
+     * Create a relationship from the last created node to a node with specific ID. Creates its own transaction.
+     *
+     * @param nodeId to create the relationship to.
      * @param type   of the relationship as String.
      * @return this.
      */
@@ -70,6 +94,30 @@ public class TestDataBuilder {
             @Override
             public Relationship doInTransaction(GraphDatabaseService database) {
                 return node.createRelationshipTo(database.getNodeById(nodeId), DynamicRelationshipType.withName(type));
+            }
+        });
+
+        return this;
+    }
+
+    /**
+     * Create a relationship to the last created node from a node with specific ID. Creates its own transaction.
+     *
+     * @param nodeId to create the relationship from.
+     * @param type   of the relationship.
+     * @return this.
+     */
+    public TestDataBuilder relationshipFrom(final long nodeId, final RelationshipType type) {
+        if (lastNode == null) {
+            throw new IllegalStateException("Illegal usage! There's no node to create the relationship tp. Please call node() first.");
+        }
+
+        final Node node = lastNode;
+
+        lastRelationship = executor.executeInTransaction(new TransactionCallback<Relationship>() {
+            @Override
+            public Relationship doInTransaction(GraphDatabaseService database) {
+                return database.getNodeById(nodeId).createRelationshipTo(node, type);
             }
         });
 
