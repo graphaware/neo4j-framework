@@ -92,6 +92,36 @@ well, in the following fashion:
     //use batchInserter as usual
 ```
 
+Configuration
+-------------
+
+In the above examples, the framework is used with sensible default configuration. At the moment, the only thing that is
+configurable on the framework level is the character/String that the framework is using to delimit information in its
+internal metadata secretly written into the graph. By defaul, this separator is the hash character (#). In the unlikely
+event of interference with your application logic (e.g. # is used in property keys or values in your application), this
+can be changed.
+
+If, for instance, you would like to use the dollar sign ($) as a delimiter instead, instantiate the framework in the
+  following fashion:
+```java
+
+    GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+
+    FrameworkConfiguration customFrameworkConfig = new BaseFrameworkConfiguration() {
+      @Override
+      public String separator() {
+          return "$";
+      }
+    };
+
+    GraphAwareFramework framework = new GraphAwareFramework(database, customFrameworkConfig);
+
+    framework.registerModule(new SomeModule());
+    framework.registerModule(new SomeOtherModule());
+
+    framework.start();
+```
+
 <a name="lib"/>
 Features
 --------
