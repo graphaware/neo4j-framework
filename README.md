@@ -23,7 +23,7 @@ and put it on your classpath. When using Maven, include the following snippet in
         <dependency>
             <groupId>com.graphaware</groupId>
             <artifactId>neo4j-framework</artifactId>
-            <version>1.9-1.2</version>
+            <version>1.9-1.3</version>
         </dependency>
         ...
     </dependencies>
@@ -39,7 +39,7 @@ your pom.xml instead of copying the .jar:
         <dependency>
             <groupId>com.graphaware</groupId>
             <artifactId>neo4j-framework</artifactId>
-            <version>1.9-1.3-SNAPSHOT</version>
+            <version>1.9-1.4-SNAPSHOT</version>
         </dependency>
         ...
     </dependencies>
