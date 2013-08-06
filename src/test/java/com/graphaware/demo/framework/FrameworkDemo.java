@@ -23,7 +23,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 /**
- *
+ * Just for documentation.
  */
 public class FrameworkDemo {
 

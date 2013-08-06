@@ -29,7 +29,7 @@ import static com.graphaware.demo.tx.event.improved.TotalFriendshipStrengthCount
 import static org.junit.Assert.assertEquals;
 
 /**
- *
+ * Just for documentation.
  */
 public class TotalFriendshipStrengthCountingDemo {
 
