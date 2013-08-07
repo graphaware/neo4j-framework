@@ -35,6 +35,18 @@ import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
  * An example of using the framework for logging every change (to std out).
+ * <p/>
+ * Running the test prints the following to std out:
+ * <p/>
+ * Created node 1 with properties: name#One
+ * Created node 2 with properties: name#Two
+ * Created node 3 with properties: name#Three
+ * Created relationship 0 between nodes 1 and 2 with properties: level#2
+ * Created relationship 1 between nodes 2 and 1 with properties:
+ * Deleted node 3 with properties: name#Three
+ * Changed node 1 from properties: name#One to properties: name#New One
+ * Deleted relationship 1 between nodes 2 and 1 with properties:
+ * Changed relationship 0 between nodes 1 and 2 from properties: level#2 to properties: level#3
  */
 public class ChangeLoggingDemo {
 
