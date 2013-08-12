@@ -112,7 +112,7 @@ public class ChangeLoggingDemo {
     private class ChangeLogger extends TransactionEventHandler.Adapter<Void> {
 
         @Override
-        public Void beforeCommit(TransactionData data) throws Exception {
+        public void afterCommit(TransactionData data, Void state) {
             ImprovedTransactionData improvedData = new LazyTransactionData(data);
 
             for (Node createdNode : improvedData.getAllCreatedNodes()) {
@@ -152,8 +152,6 @@ public class ChangeLoggingDemo {
                         + " from properties: " + new SerializablePropertiesImpl(changedRelationship.getPrevious()).toString()
                         + " to properties: " + new SerializablePropertiesImpl(changedRelationship.getCurrent()).toString());
             }
-
-            return null;
         }
     }
 }
