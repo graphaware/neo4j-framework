@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.demo.framework;
+package com.graphaware.demo.tx.event.improved;
 
 import com.graphaware.propertycontainer.dto.string.property.SerializablePropertiesImpl;
 import com.graphaware.tx.event.improved.api.Change;
