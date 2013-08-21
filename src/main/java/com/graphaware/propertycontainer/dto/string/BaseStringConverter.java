@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.dto.common;
+package com.graphaware.propertycontainer.dto.string;
 
 /**
  * Base-class for {@link StringConverter}s for {@link org.neo4j.graphdb.Relationship} representations.

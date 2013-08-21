@@ -18,7 +18,9 @@ package com.graphaware.demo.tx.event.improved;
 
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.TransactionFailureException;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -63,5 +65,46 @@ public class BlogPostDemo {
          > Committing transaction
          > Committed transaction
          **/
+    }
+
+    @Test(expected = TransactionFailureException.class)
+    public void attemptLoggingDeletedNodes() {
+        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+
+        database.registerTransactionEventHandler(new TransactionEventHandler.Adapter<Void>() {
+            @Override
+            public Void beforeCommit(TransactionData data) throws Exception {
+                for (Node deletedNode : data.deletedNodes()) {
+                    StringBuilder message = new StringBuilder("About to delete node ID ")
+                            .append(deletedNode.getId())
+                            .append(" ");
+
+                    for (String key : deletedNode.getPropertyKeys()) {
+                        message.append("key=").append(key);
+                        message.append("value=").append(deletedNode.getProperty(key));
+                    }
+
+                    System.out.println(message.toString());
+                }
+
+                return null;
+            }
+        });
+
+        Transaction tx = database.beginTx();
+        try {
+            database.getNodeById(0).setProperty("test key", "test value");
+            tx.success();
+        } finally {
+            tx.finish();
+        }
+
+        tx = database.beginTx();
+        try {
+            database.getNodeById(0).delete();
+            tx.success();
+        } finally {
+            tx.finish();
+        }
     }
 }

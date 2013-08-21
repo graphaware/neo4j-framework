@@ -14,15 +14,17 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.dto.common.relationship;
+package com.graphaware.propertycontainer.dto.string.relationship;
 
-import com.graphaware.propertycontainer.dto.common.StringConverter;
+import com.graphaware.propertycontainer.dto.common.relationship.HasTypeAndDirection;
+import com.graphaware.propertycontainer.dto.common.relationship.TypeAndDirection;
+import com.graphaware.propertycontainer.dto.string.StringConverter;
 
 import static org.neo4j.graphdb.Direction.valueOf;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
- * {@link StringConverter} for {@link HasTypeAndDirection}.
+ * {@link StringConverter} for {@link com.graphaware.propertycontainer.dto.common.relationship.HasTypeAndDirection}.
  */
 public class TypeAndDirectionStringConverter extends BaseRelationshipStringConverter<HasTypeAndDirection> implements StringConverter<HasTypeAndDirection> {
 

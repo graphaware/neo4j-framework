@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.dto.common;
+package com.graphaware.propertycontainer.dto.string;
 
 /**
  * A component capable of converting and object to and from {@link String}.

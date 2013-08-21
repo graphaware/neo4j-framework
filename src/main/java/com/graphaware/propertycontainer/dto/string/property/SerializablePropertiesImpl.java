@@ -17,7 +17,7 @@
 package com.graphaware.propertycontainer.dto.string.property;
 
 
-import com.graphaware.propertycontainer.dto.common.StringConverter;
+import com.graphaware.propertycontainer.dto.string.StringConverter;
 import org.neo4j.graphdb.PropertyContainer;
 
 import java.util.Map;

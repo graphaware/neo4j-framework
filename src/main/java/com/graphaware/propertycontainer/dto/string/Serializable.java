@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.dto.common;
+package com.graphaware.propertycontainer.dto.string;
 
 /**
  * Object that can be converted to/from String. Implementations should provide corresponding {@link String}-based constructors, so that:

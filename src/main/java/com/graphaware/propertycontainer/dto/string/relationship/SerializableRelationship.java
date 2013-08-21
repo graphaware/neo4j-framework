@@ -16,8 +16,8 @@
 
 package com.graphaware.propertycontainer.dto.string.relationship;
 
-import com.graphaware.propertycontainer.dto.common.Serializable;
 import com.graphaware.propertycontainer.dto.common.relationship.ImmutableRelationship;
+import com.graphaware.propertycontainer.dto.string.Serializable;
 import com.graphaware.propertycontainer.dto.string.property.SerializableProperties;
 
 /**

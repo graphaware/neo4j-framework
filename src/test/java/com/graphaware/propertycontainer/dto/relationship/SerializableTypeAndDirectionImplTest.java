@@ -18,7 +18,7 @@ package com.graphaware.propertycontainer.dto.relationship;
 
 import com.graphaware.propertycontainer.dto.AbstractTest;
 import com.graphaware.propertycontainer.dto.common.relationship.HasTypeAndDirection;
-import com.graphaware.propertycontainer.dto.common.relationship.SerializableTypeAndDirectionImpl;
+import com.graphaware.propertycontainer.dto.string.relationship.SerializableTypeAndDirectionImpl;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertFalse;

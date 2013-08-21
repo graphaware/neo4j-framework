@@ -14,12 +14,13 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.dto.common.relationship;
+package com.graphaware.propertycontainer.dto.string.relationship;
 
-import com.graphaware.propertycontainer.dto.common.Serializable;
+import com.graphaware.propertycontainer.dto.common.relationship.HasTypeAndDirection;
+import com.graphaware.propertycontainer.dto.string.Serializable;
 
 /**
- * {@link Serializable} {@link HasTypeAndDirection}.
+ * {@link Serializable} {@link com.graphaware.propertycontainer.dto.common.relationship.HasTypeAndDirection}.
  */
 public interface SerializableTypeAndDirection extends HasTypeAndDirection, Serializable {
 }

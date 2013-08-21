@@ -16,8 +16,8 @@
 
 package com.graphaware.propertycontainer.dto.string.property;
 
-import com.graphaware.propertycontainer.dto.common.BaseStringConverter;
-import com.graphaware.propertycontainer.dto.common.StringConverter;
+import com.graphaware.propertycontainer.dto.string.BaseStringConverter;
+import com.graphaware.propertycontainer.dto.string.StringConverter;
 
 import java.util.HashMap;
 import java.util.Map;

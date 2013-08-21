@@ -16,9 +16,9 @@
 
 package com.graphaware.propertycontainer.dto.string.relationship;
 
-import com.graphaware.propertycontainer.dto.common.StringConverter;
 import com.graphaware.propertycontainer.dto.common.relationship.BaseRelationship;
 import com.graphaware.propertycontainer.dto.common.relationship.HasTypeAndProperties;
+import com.graphaware.propertycontainer.dto.string.StringConverter;
 import com.graphaware.propertycontainer.dto.string.property.SerializableProperties;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;

@@ -14,16 +14,18 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.dto.common.relationship;
+package com.graphaware.propertycontainer.dto.string.relationship;
 
-import com.graphaware.propertycontainer.dto.common.StringConverter;
+import com.graphaware.propertycontainer.dto.common.relationship.HasTypeAndDirection;
+import com.graphaware.propertycontainer.dto.common.relationship.TypeAndDirection;
+import com.graphaware.propertycontainer.dto.string.StringConverter;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 
 /**
- * {@link TypeAndDirection} convertible to and from {@link String}. Could be used as string-convertible
+ * {@link com.graphaware.propertycontainer.dto.common.relationship.TypeAndDirection} convertible to and from {@link String}. Could be used as string-convertible
  * {@link org.neo4j.graphdb.Relationship} representation when not interested in properties.
  */
 public class SerializableTypeAndDirectionImpl extends TypeAndDirection implements SerializableTypeAndDirection {

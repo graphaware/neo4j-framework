@@ -14,16 +14,17 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.dto.common.relationship;
+package com.graphaware.propertycontainer.dto.string.relationship;
 
-import com.graphaware.propertycontainer.dto.common.BaseStringConverter;
-import com.graphaware.propertycontainer.dto.common.StringConverter;
+import com.graphaware.propertycontainer.dto.common.relationship.HasType;
+import com.graphaware.propertycontainer.dto.string.BaseStringConverter;
+import com.graphaware.propertycontainer.dto.string.StringConverter;
 import com.graphaware.propertycontainer.dto.string.property.StringPropertiesConverter;
 
 import java.util.Map;
 
 /**
- * Base-class for {@link com.graphaware.propertycontainer.dto.common.StringConverter}s for {@link org.neo4j.graphdb.Relationship} representations.
+ * Base-class for {@link com.graphaware.propertycontainer.dto.string.StringConverter}s for {@link org.neo4j.graphdb.Relationship} representations.
  */
 public abstract class BaseRelationshipStringConverter<T extends HasType> extends BaseStringConverter<T> {
 
