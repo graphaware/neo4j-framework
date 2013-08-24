@@ -210,7 +210,9 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
                 module.beforeCommit(filteredTransactionData);
             } catch (NeedsInitializationException e) {
                 LOG.warn("Module " + module.getId() + " seems to have a problem and will be re-initialized next time the database is started. ");
-                forceInitialization(module);
+                if (!findRootOrThrowException().getProperty(moduleKey(module)).toString().startsWith(FORCE_INITIALIZATION)) {
+                    forceInitialization(module);
+                }
             }
         }
 

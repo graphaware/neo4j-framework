@@ -388,6 +388,40 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         assertTrue(database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_" + MOCK).toString().startsWith(FORCE_INITIALIZATION));
     }
 
+    @Test
+    public void moduleThrowingInitExceptionShouldBeMarkedForReinitializationOnlyTheFirstTime() throws InterruptedException {
+        final GraphAwareModule mockModule = createMockModule();
+        when(mockModule.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+        doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
+
+        GraphAwareFramework framework = new GraphAwareFramework(database);
+        framework.registerModule(mockModule);
+
+        framework.start();
+
+        new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
+            @Override
+            protected void doInTx(GraphDatabaseService database) {
+                database.createNode();
+            }
+        });
+
+        long firstFailureTimestamp = Long.valueOf(database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_" + MOCK).toString().replaceFirst(FORCE_INITIALIZATION, ""));
+
+        Thread.sleep(1);
+
+        new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
+            @Override
+            protected void doInTx(GraphDatabaseService database) {
+                database.createNode();
+            }
+        });
+
+        long secondFailureTimestamp = Long.valueOf(database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_" + MOCK).toString().replaceFirst(FORCE_INITIALIZATION, ""));
+
+        assertEquals(firstFailureTimestamp, secondFailureTimestamp);
+    }
+
     @Test(expected = IllegalStateException.class)
     public void modulesCannotBeRegisteredAfterStart() {
         final GraphAwareModule mockModule = createMockModule();

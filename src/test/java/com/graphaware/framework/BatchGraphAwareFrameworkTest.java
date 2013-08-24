@@ -355,6 +355,33 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         assertTrue(batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_" + MOCK).toString().startsWith(FORCE_INITIALIZATION));
     }
 
+    @Test
+    public void moduleThrowingInitExceptionShouldBeMarkedForReinitializationOnlyTheFirstTime() throws InterruptedException {
+        final GraphAwareModule mockModule = createMockModule();
+        when(mockModule.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+        doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
+
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath(), 0);
+        BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
+        framework.registerModule(mockModule);
+
+        framework.start();
+
+        batchInserter.createNode(null);
+
+        long firstFailureTimestamp = Long.valueOf(batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_" + MOCK).toString().replaceFirst(FORCE_INITIALIZATION, ""));
+
+        Thread.sleep(1);
+
+        batchInserter.createNode(null);
+
+        long secondFailureTimestamp = Long.valueOf(batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_" + MOCK).toString().replaceFirst(FORCE_INITIALIZATION, ""));
+
+        batchInserter.shutdown();
+
+        assertEquals(firstFailureTimestamp, secondFailureTimestamp);
+    }
+
     @Test(expected = IllegalStateException.class)
     public void modulesCannotBeRegisteredAfterStart() {
         final GraphAwareModule mockModule = createMockModule();
