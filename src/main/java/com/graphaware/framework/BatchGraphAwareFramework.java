@@ -90,7 +90,7 @@ public class BatchGraphAwareFramework extends BaseGraphAwareFramework {
      */
     @Override
     protected void doRecordInitialization(final GraphAwareModule module, final String key) {
-        findRootOrThrowException().setProperty(key, HASH_CODE + module.hashCode());
+        findRootOrThrowException().setProperty(key, CONFIG + module.asString());
     }
 
     /**

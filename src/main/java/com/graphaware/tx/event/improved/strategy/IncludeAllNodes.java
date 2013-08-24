@@ -40,4 +40,12 @@ public final class IncludeAllNodes extends IncludeAllBusinessNodes {
     protected boolean doInclude(Node node) {
         return true;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String asString() {
+        return this.getClass().getCanonicalName();
+    }
 }

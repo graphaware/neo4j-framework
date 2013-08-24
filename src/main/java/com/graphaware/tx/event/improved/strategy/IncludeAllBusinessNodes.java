@@ -46,12 +46,4 @@ public abstract class IncludeAllBusinessNodes implements NodeInclusionStrategy {
      * @return true iff the node should be included.
      */
     protected abstract boolean doInclude(Node node);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return this.getClass().getCanonicalName().hashCode();
-    }
 }

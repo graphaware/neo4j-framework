@@ -58,7 +58,7 @@ import java.util.*;
  */
 public abstract class BaseGraphAwareFramework implements TransactionEventHandler<Void>, KernelEventHandler {
     static final String FORCE_INITIALIZATION = "FORCE_INIT:";
-    static final String HASH_CODE = "HASH_CODE:";
+    static final String CONFIG = "CONFIG:";
 
     public static final String CORE = "CORE";
 
@@ -239,7 +239,7 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
      * Metadata about modules is stored as properties on the root node (node with ID = 0) in the form of
      * {@link com.graphaware.framework.config.FrameworkConfiguration#GA_PREFIX}{@link #CORE}_{@link GraphAwareModule#getId()}
      * as key and one of the following as value:
-     * - {@link #HASH_CODE} + {@link GraphAwareModule#hashCode()} capturing the last configuration
+     * - {@link #CONFIG} + {@link com.graphaware.framework.GraphAwareModule#asString()} capturing the last configuration
      * the module has been run with
      * - {@link #FORCE_INITIALIZATION} + timestamp indicating the module should be re-initialized.
      */
@@ -261,8 +261,8 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
 
             String value = (String) moduleMetadata.get(key);
 
-            if (value.startsWith(HASH_CODE)) {
-                if (!value.replaceFirst(HASH_CODE, "").equals(Integer.toString(module.hashCode()))) {
+            if (value.startsWith(CONFIG)) {
+                if (!value.replaceFirst(CONFIG, "").equals(module.asString())) {
                     LOG.info("Module " + module.getId() + " seems to have changed configuration since last run, will re-initialize...");
                     reinitializeModule(module);
                 } else {

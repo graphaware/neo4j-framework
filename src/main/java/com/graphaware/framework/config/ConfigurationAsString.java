@@ -14,32 +14,19 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.strategy;
-
-
-import org.neo4j.graphdb.PropertyContainer;
+package com.graphaware.framework.config;
 
 /**
- * Strategy that ignores all property containers.
+ * Interface for components that have a configuration that can be represented as a String, or that themselves are such
+ * configuration. When the configuration changes, its String representation must also change.
  */
-public abstract class IncludeNoPropertyContainers<T extends PropertyContainer> implements PropertyContainerInclusionStrategy<T> {
-
-    protected IncludeNoPropertyContainers() {
-    }
+public interface ConfigurationAsString {
 
     /**
-     * {@inheritDoc}
+     * Return string representation of the configuration. Does not have to be human-readable, but must change when the
+     * semantics of the configuration changes.
+     *
+     * @return configuration as String.
      */
-    @Override
-    public final boolean include(T propertyContainer) {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String asString() {
-        return this.getClass().getCanonicalName();
-    }
+    String asString();
 }

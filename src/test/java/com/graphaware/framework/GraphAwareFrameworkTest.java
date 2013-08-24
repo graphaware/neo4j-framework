@@ -67,8 +67,7 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
 
     @Test
     public void moduleRegisteredForTheFirstTimeShouldBeInitialized() {
-        GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         GraphAwareFramework framework = new GraphAwareFramework(database);
         framework.registerModule(mockModule);
@@ -76,21 +75,21 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         framework.start();
 
         verify(mockModule).initialize(database);
+        verify(mockModule).asString();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + mockModule.hashCode(), database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_MOCK").toString());
+        assertEquals(CONFIG + TEST_CONFIG, database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_" + MOCK).toString());
     }
 
     @Test
     public void moduleAlreadyRegisteredShouldNotBeInitialized() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(0).setProperty(GA_PREFIX + CORE + "_MOCK", HASH_CODE + mockModule.hashCode());
+                database.getNodeById(0).setProperty(GA_PREFIX + CORE + "_" + MOCK, CONFIG + TEST_CONFIG);
             }
         });
 
@@ -100,20 +99,20 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         framework.start();
 
         verify(mockModule, atLeastOnce()).getId();
+        verify(mockModule).asString();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + mockModule.hashCode(), database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_MOCK").toString());
+        assertEquals(CONFIG + TEST_CONFIG, database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_" + MOCK).toString());
     }
 
     @Test
     public void changedModuleShouldBeReInitialized() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(0).setProperty(GA_PREFIX + CORE + "_MOCK", HASH_CODE + "123");
+                database.getNodeById(0).setProperty(GA_PREFIX + CORE + "_" + MOCK, CONFIG + "123");
             }
         });
 
@@ -123,21 +122,21 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         framework.start();
 
         verify(mockModule).reinitialize(database);
+        verify(mockModule, times(2)).asString();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + mockModule.hashCode(), database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_MOCK").toString());
+        assertEquals(CONFIG + TEST_CONFIG, database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_" + MOCK).toString());
     }
 
     @Test
     public void forcedModuleShouldBeReInitialized() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(0).setProperty(GA_PREFIX + CORE + "_MOCK", FORCE_INITIALIZATION + "123");
+                database.getNodeById(0).setProperty(GA_PREFIX + CORE + "_" + MOCK, FORCE_INITIALIZATION + "123");
             }
         });
 
@@ -147,21 +146,21 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         framework.start();
 
         verify(mockModule).reinitialize(database);
+        verify(mockModule).asString();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + mockModule.hashCode(), database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_MOCK").toString());
+        assertEquals(CONFIG + TEST_CONFIG, database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_" + MOCK).toString());
     }
 
     @Test
     public void moduleAlreadyRegisteredShouldBeInitializedWhenForced() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(0).setProperty(GA_PREFIX + CORE + "_MOCK", HASH_CODE + mockModule.hashCode());
+                database.getNodeById(0).setProperty(GA_PREFIX + CORE + "_" + MOCK, CONFIG + TEST_CONFIG);
             }
         });
 
@@ -172,20 +171,20 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
 
         verify(mockModule).reinitialize(database);
         verify(mockModule, atLeastOnce()).getId();
+        verify(mockModule).asString();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + mockModule.hashCode(), database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_MOCK").toString());
+        assertEquals(CONFIG + TEST_CONFIG, database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_" + MOCK).toString());
     }
 
     @Test
     public void changedModuleShouldNotBeReInitializedWhenInitializationSkipped() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(0).setProperty(GA_PREFIX + CORE + "_MOCK", HASH_CODE + "123");
+                database.getNodeById(0).setProperty(GA_PREFIX + CORE + "_" + MOCK, CONFIG + "123");
             }
         });
 
@@ -197,13 +196,12 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + "123", database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_MOCK").toString());
+        assertEquals(CONFIG + "123", database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_" + MOCK).toString());
     }
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotBeAbleToRegisterModuleWithTheSameIdTwice() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         GraphAwareFramework framework = new GraphAwareFramework(database);
         framework.registerModule(mockModule);
@@ -212,15 +210,14 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
 
     @Test
     public void unusedModulesShouldBeRemoved() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
                 Node root = database.getNodeById(0);
-                root.setProperty(GA_PREFIX + CORE + "_MOCK", HASH_CODE + mockModule.hashCode());
-                root.setProperty(GA_PREFIX + CORE + "_UNUSED", HASH_CODE + "123");
+                root.setProperty(GA_PREFIX + CORE + "_" + MOCK, CONFIG + TEST_CONFIG);
+                root.setProperty(GA_PREFIX + CORE + "_UNUSED", CONFIG + "123");
             }
         });
 
@@ -230,6 +227,7 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         framework.start();
 
         verify(mockModule, atLeastOnce()).getId();
+        verify(mockModule).asString();
         verifyNoMoreInteractions(mockModule);
 
         assertEquals(1, count(database.getNodeById(0).getPropertyKeys()));
@@ -237,14 +235,13 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
 
     @Test(expected = IllegalStateException.class)
     public void usedCorruptModulesShouldThrowException() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
                 Node root = database.getNodeById(0);
-                root.setProperty(GA_PREFIX + CORE + "_MOCK", "CORRUPT");
+                root.setProperty(GA_PREFIX + CORE + "_" + MOCK, "CORRUPT");
             }
         });
 
@@ -256,14 +253,13 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
 
     @Test
     public void unusedCorruptModulesShouldBeRemoved() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
                 Node root = database.getNodeById(0);
-                root.setProperty(GA_PREFIX + CORE + "_MOCK", HASH_CODE + mockModule.hashCode());
+                root.setProperty(GA_PREFIX + CORE + "_" + MOCK, CONFIG + TEST_CONFIG);
                 root.setProperty(GA_PREFIX + CORE + "_UNUSED", "CORRUPT");
             }
         });
@@ -274,6 +270,7 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         framework.start();
 
         verify(mockModule, atLeastOnce()).getId();
+        verify(mockModule).asString();
         verifyNoMoreInteractions(mockModule);
 
         assertEquals(1, count(database.getNodeById(0).getPropertyKeys()));
@@ -282,15 +279,18 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
     @Test
     public void allRegisteredInterestedModulesShouldBeDelegatedTo() {
         GraphAwareModule mockModule1 = mock(GraphAwareModule.class);
-        when(mockModule1.getId()).thenReturn("MOCK1");
+        when(mockModule1.getId()).thenReturn(MOCK + "1");
+        when(mockModule1.asString()).thenReturn(TEST_CONFIG);
         when(mockModule1.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
 
         GraphAwareModule mockModule2 = mock(GraphAwareModule.class);
-        when(mockModule2.getId()).thenReturn("MOCK2");
+        when(mockModule2.getId()).thenReturn(MOCK + "2");
+        when(mockModule2.asString()).thenReturn(TEST_CONFIG);
         when(mockModule2.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
 
         GraphAwareModule mockModule3 = mock(GraphAwareModule.class);
-        when(mockModule3.getId()).thenReturn("MOCK3");
+        when(mockModule3.getId()).thenReturn(MOCK + "3");
+        when(mockModule3.asString()).thenReturn(TEST_CONFIG);
         when(mockModule3.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.none());
 
         GraphAwareFramework framework = new GraphAwareFramework(database, new CustomConfig());
@@ -303,6 +303,9 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         verify(mockModule1).initialize(database);
         verify(mockModule2).initialize(database);
         verify(mockModule3).initialize(database);
+        verify(mockModule1).asString();
+        verify(mockModule2).asString();
+        verify(mockModule3).asString();
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule3, atLeastOnce()).getId();
@@ -327,15 +330,18 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
     @Test
     public void noRegisteredInterestedModulesShouldBeDelegatedToBeforeFrameworkStarts() {
         GraphAwareModule mockModule1 = mock(GraphAwareModule.class);
-        when(mockModule1.getId()).thenReturn("MOCK1");
+        when(mockModule1.getId()).thenReturn(MOCK + "1");
+        when(mockModule1.asString()).thenReturn(TEST_CONFIG);
         when(mockModule1.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
 
         GraphAwareModule mockModule2 = mock(GraphAwareModule.class);
-        when(mockModule2.getId()).thenReturn("MOCK2");
+        when(mockModule2.getId()).thenReturn(MOCK + "2");
+        when(mockModule2.asString()).thenReturn(TEST_CONFIG);
         when(mockModule2.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
 
         GraphAwareModule mockModule3 = mock(GraphAwareModule.class);
-        when(mockModule3.getId()).thenReturn("MOCK3");
+        when(mockModule3.getId()).thenReturn(MOCK + "3");
+        when(mockModule3.asString()).thenReturn(TEST_CONFIG);
         when(mockModule3.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.none());
 
         GraphAwareFramework framework = new GraphAwareFramework(database);
@@ -361,8 +367,7 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
 
     @Test
     public void moduleThrowingInitExceptionShouldBeMarkedForReinitialization() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
         when(mockModule.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
         doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
@@ -371,7 +376,7 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
 
         framework.start();
 
-        assertTrue(database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_MOCK").toString().startsWith(HASH_CODE));
+        assertTrue(database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_" + MOCK).toString().startsWith(CONFIG));
 
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
@@ -380,13 +385,12 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
             }
         });
 
-        assertTrue(database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_MOCK").toString().startsWith(FORCE_INITIALIZATION));
+        assertTrue(database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_" + MOCK).toString().startsWith(FORCE_INITIALIZATION));
     }
 
     @Test(expected = IllegalStateException.class)
     public void modulesCannotBeRegisteredAfterStart() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         GraphAwareFramework framework = new GraphAwareFramework(database);
         framework.start(true);
@@ -403,7 +407,8 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
     @Test
     public void frameworkConfiguredModulesShouldBeConfigured() {
         FrameworkConfiguredModule mockModule = mock(FrameworkConfiguredModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        when(mockModule.getId()).thenReturn(MOCK);
+        when(mockModule.asString()).thenReturn(TEST_CONFIG);
 
         GraphAwareFramework framework = new GraphAwareFramework(database);
         framework.registerModule(mockModule);
@@ -416,7 +421,8 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
     @Test
     public void frameworkConfiguredModulesShouldBeConfigured2() {
         FrameworkConfiguredModule mockModule = mock(FrameworkConfiguredModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        when(mockModule.getId()).thenReturn(MOCK);
+        when(mockModule.asString()).thenReturn(TEST_CONFIG);
 
         GraphAwareFramework framework = new GraphAwareFramework(database);
         framework.registerModule(mockModule, true);
@@ -445,7 +451,8 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
     @Test
     public void shutdownShouldBeCalledBeforeShutdown() {
         FrameworkConfiguredModule mockModule = mock(FrameworkConfiguredModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        when(mockModule.getId()).thenReturn(MOCK);
+        when(mockModule.asString()).thenReturn(TEST_CONFIG);
 
         GraphAwareFramework framework = new GraphAwareFramework(database);
         framework.registerModule(mockModule);

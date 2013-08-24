@@ -1369,6 +1369,11 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         public boolean include(Node node) {
                             return !node.getProperty("name", "").equals("Four") && !node.hasProperty(INTERNAL_NODE_PROPERTY);
                         }
+
+                        @Override
+                        public String asString() {
+                            return "custom";
+                        }
                     };
                 }
 
@@ -1378,6 +1383,11 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         @Override
                         public boolean include(String key, Node propertyContainer) {
                             return !"place".equals(key) && !key.startsWith(INTERNAL_PREFIX);
+                        }
+
+                        @Override
+                        public String asString() {
+                            return "custom";
                         }
                     };
                 }
@@ -1389,6 +1399,11 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         public boolean include(Relationship relationship) {
                             return !relationship.isType(withName("R3")) && !relationship.getType().name().startsWith(INTERNAL_PREFIX);
                         }
+
+                        @Override
+                        public String asString() {
+                            return "custom";
+                        }
                     };
                 }
 
@@ -1399,7 +1414,17 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         public boolean include(String key, Relationship propertyContainer) {
                             return !"time".equals(key) && !key.startsWith(INTERNAL_PREFIX);
                         }
+
+                        @Override
+                        public String asString() {
+                            return "custom";
+                        }
                     };
+                }
+
+                @Override
+                public String asString() {
+                    return "custom";
                 }
             }));
             return null;
@@ -1572,6 +1597,11 @@ public class FilteredLazyTransactionDataIntegrationTest {
         @Override
         public RelationshipPropertyInclusionStrategy getRelationshipPropertyInclusionStrategy() {
             return IncludeNoRelationshipProperties.getInstance();
+        }
+
+        @Override
+        public String asString() {
+            return "nothing";
         }
     }
 }

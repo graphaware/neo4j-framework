@@ -49,12 +49,4 @@ public abstract class IncludeAllBusinessProperties<T extends PropertyContainer> 
      * @return true iff the property should be included.
      */
     protected abstract boolean doInclude(String key, T propertyContainer);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return this.getClass().getCanonicalName().hashCode();
-    }
 }

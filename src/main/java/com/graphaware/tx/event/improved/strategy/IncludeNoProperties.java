@@ -31,7 +31,7 @@ public abstract class IncludeNoProperties<T extends PropertyContainer> implement
      * {@inheritDoc}
      */
     @Override
-    public boolean include(String key, T propertyContainer) {
+    public final boolean include(String key, T propertyContainer) {
         return false;
     }
 
@@ -39,7 +39,7 @@ public abstract class IncludeNoProperties<T extends PropertyContainer> implement
      * {@inheritDoc}
      */
     @Override
-    public int hashCode() {
-        return this.getClass().getCanonicalName().hashCode();
+    public String asString() {
+        return this.getClass().getCanonicalName();
     }
 }

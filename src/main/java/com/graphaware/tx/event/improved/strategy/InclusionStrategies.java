@@ -16,10 +16,12 @@
 
 package com.graphaware.tx.event.improved.strategy;
 
+import com.graphaware.framework.config.ConfigurationAsString;
+
 /**
  * Container for {@link InclusionStrategy}s related to this project.
  */
-public interface InclusionStrategies {
+public interface InclusionStrategies extends ConfigurationAsString {
 
     /**
      * @return contained node inclusion strategy.

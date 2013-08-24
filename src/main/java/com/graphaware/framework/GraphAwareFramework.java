@@ -93,7 +93,7 @@ public class GraphAwareFramework extends BaseGraphAwareFramework {
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
-                findRootOrThrowException().setProperty(key, HASH_CODE + module.hashCode());
+                findRootOrThrowException().setProperty(key, CONFIG + module.asString());
             }
         });
     }

@@ -39,4 +39,12 @@ public final class IncludeAllNodeProperties extends IncludeAllBusinessProperties
     protected boolean doInclude(String key, Node node) {
         return true;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String asString() {
+        return this.getClass().getCanonicalName();
+    }
 }

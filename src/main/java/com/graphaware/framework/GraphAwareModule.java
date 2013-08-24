@@ -16,6 +16,7 @@
 
 package com.graphaware.framework;
 
+import com.graphaware.framework.config.ConfigurationAsString;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.strategy.InclusionStrategies;
@@ -23,11 +24,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  * A {@link GraphAwareFramework} module performing some useful work based on about-to-be-committed transaction data.
- * <p/>
- * The implementation should override {@link #hashCode()}, which should ideally change when the module's configuration
- * changes.
  */
-public interface GraphAwareModule {
+public interface GraphAwareModule extends ConfigurationAsString {
 
     /**
      * Get a human-readable (ideally short) ID of this module. This ID must be unique across all {@link GraphAwareModule}s

@@ -47,12 +47,4 @@ public abstract class IncludeAllBusinessRelationships implements RelationshipInc
      * @return true iff the relationship should be included.
      */
     protected abstract boolean doInclude(Relationship relationship);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return this.getClass().getCanonicalName().hashCode();
-    }
 }

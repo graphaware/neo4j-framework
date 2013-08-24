@@ -27,14 +27,14 @@ import static org.junit.Assert.assertNotSame;
 public class InclusionStrategiesImplTest {
 
     @Test
-    public void sameStrategiesShouldHaveSameHashCode() {
-        assertEquals(InclusionStrategiesImpl.all().hashCode(), InclusionStrategiesImpl.all().hashCode());
-        assertEquals(InclusionStrategiesImpl.all().with(IncludeAllNodeProperties.getInstance()).hashCode(), InclusionStrategiesImpl.all().hashCode());
+    public void sameStrategiesShouldReturnSameString() {
+        assertEquals(InclusionStrategiesImpl.all().asString(), InclusionStrategiesImpl.all().asString());
+        assertEquals(InclusionStrategiesImpl.all().with(IncludeAllNodeProperties.getInstance()).asString(), InclusionStrategiesImpl.all().asString());
     }
 
     @Test
-    public void differentStrategiesShouldHaveDifferentHashCode() {
-        assertNotSame(InclusionStrategiesImpl.all().hashCode(), InclusionStrategiesImpl.none().hashCode());
-        assertNotSame(InclusionStrategiesImpl.all().hashCode(), InclusionStrategiesImpl.all().with(IncludeNoNodeProperties.getInstance()).hashCode());
+    public void differentStrategiesShouldReturnDifferentString() {
+        assertNotSame(InclusionStrategiesImpl.all().asString(), InclusionStrategiesImpl.none().asString());
+        assertNotSame(InclusionStrategiesImpl.all().asString(), InclusionStrategiesImpl.all().with(IncludeNoNodeProperties.getInstance()).asString());
     }
 }

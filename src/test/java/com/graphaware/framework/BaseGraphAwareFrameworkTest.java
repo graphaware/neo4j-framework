@@ -26,10 +26,23 @@ import com.graphaware.tx.event.improved.strategy.InclusionStrategies;
 import com.graphaware.tx.event.improved.strategy.InclusionStrategiesImpl;
 import org.neo4j.graphdb.GraphDatabaseService;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 /**
  * Base-class for framework tests.
  */
 public abstract class BaseGraphAwareFrameworkTest {
+
+    protected static final String TEST_CONFIG = "test config";
+    protected static final String MOCK = "MOCK";
+
+    protected GraphAwareModule createMockModule() {
+        GraphAwareModule mockModule = mock(GraphAwareModule.class);
+        when(mockModule.getId()).thenReturn(MOCK);
+        when(mockModule.asString()).thenReturn(TEST_CONFIG);
+        return mockModule;
+    }
 
     protected interface FrameworkConfiguredModule extends GraphAwareModule, FrameworkConfigured {
 
@@ -46,6 +59,11 @@ public abstract class BaseGraphAwareFrameworkTest {
         @Override
         public String getId() {
             return "TEST";
+        }
+
+        @Override
+        public String asString() {
+            return "someConfig";
         }
 
         @Override

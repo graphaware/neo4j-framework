@@ -16,6 +16,7 @@
 
 package com.graphaware.tx.event.improved.strategy;
 
+import com.graphaware.framework.config.ConfigurationAsString;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
@@ -24,7 +25,7 @@ import org.neo4j.graphdb.PropertyContainer;
  * It is highly recommended to extend IncludeAllBusinessProperties from the GraphAware framework rather than implementing
  * this class directly, as it is important to ignore all GraphAware internal nodes for many applications.
  */
-public interface PropertyInclusionStrategy<T extends PropertyContainer> {
+public interface PropertyInclusionStrategy<T extends PropertyContainer> extends ConfigurationAsString {
 
     /**
      * Should a property with the given key of the given property container be included for the purposes of transaction

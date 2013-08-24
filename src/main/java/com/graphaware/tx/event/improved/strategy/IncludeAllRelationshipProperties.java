@@ -39,4 +39,12 @@ public final class IncludeAllRelationshipProperties extends IncludeAllBusinessPr
     protected boolean doInclude(String key, Relationship relationship) {
         return true;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String asString() {
+        return this.getClass().getCanonicalName();
+    }
 }

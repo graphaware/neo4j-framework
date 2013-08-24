@@ -74,8 +74,7 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
 
     @Test
     public void moduleRegisteredForTheFirstTimeShouldBeInitialized() {
-        GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
@@ -84,19 +83,19 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         framework.start();
 
         verify(mockModule).initialize(batchInserter);
+        verify(mockModule).asString();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + mockModule.hashCode(), batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_MOCK").toString());
+        assertEquals(CONFIG + TEST_CONFIG, batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_" + MOCK).toString());
     }
 
     @Test
     public void moduleAlreadyRegisteredShouldNotBeInitialized() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
-        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", HASH_CODE + mockModule.hashCode());
+        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_" + MOCK, CONFIG + TEST_CONFIG);
 
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.registerModule(mockModule);
@@ -104,18 +103,18 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         framework.start();
 
         verify(mockModule, atLeastOnce()).getId();
+        verify(mockModule).asString();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + mockModule.hashCode(), batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_MOCK").toString());
+        assertEquals(CONFIG + TEST_CONFIG, batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_" + MOCK).toString());
     }
 
     @Test
     public void changedModuleShouldBeReInitialized() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
-        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", HASH_CODE + "123");
+        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_" + MOCK, CONFIG + "123");
 
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter, new CustomConfig());
         framework.registerModule(mockModule);
@@ -123,19 +122,19 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         framework.start();
 
         verify(mockModule).reinitialize(batchInserter);
+        verify(mockModule, times(2)).asString();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + mockModule.hashCode(), batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_MOCK").toString());
+        assertEquals(CONFIG + TEST_CONFIG, batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_" + MOCK).toString());
     }
 
     @Test
     public void forcedModuleShouldBeReInitialized() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
-        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", FORCE_INITIALIZATION + "123");
+        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_" + MOCK, FORCE_INITIALIZATION + "123");
 
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.registerModule(mockModule);
@@ -143,19 +142,19 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         framework.start();
 
         verify(mockModule).reinitialize(batchInserter);
+        verify(mockModule).asString();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + mockModule.hashCode(), batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_MOCK").toString());
+        assertEquals(CONFIG + TEST_CONFIG, batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_" + MOCK).toString());
     }
 
     @Test
     public void moduleAlreadyRegisteredShouldBeInitializedWhenForced() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
-        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", HASH_CODE + mockModule.hashCode());
+        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_" + MOCK, CONFIG + TEST_CONFIG);
 
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.registerModule(mockModule, true);
@@ -163,19 +162,19 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         framework.start();
 
         verify(mockModule).reinitialize(batchInserter);
+        verify(mockModule).asString();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + mockModule.hashCode(), batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_MOCK").toString());
+        assertEquals(CONFIG + TEST_CONFIG, batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_" + MOCK).toString());
     }
 
     @Test
     public void changedModuleShouldNotBeReInitializedWhenInitializationSkipped() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
-        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", HASH_CODE + "123");
+        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_" + MOCK, CONFIG + "123");
 
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.registerModule(mockModule);
@@ -185,13 +184,12 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(HASH_CODE + "123", batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_MOCK").toString());
+        assertEquals(CONFIG + "123", batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_" + MOCK).toString());
     }
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotBeAbleToRegisterModuleWithTheSameIdTwice() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
@@ -201,12 +199,11 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
 
     @Test
     public void unusedModulesShouldBeRemoved() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
-        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", HASH_CODE + mockModule.hashCode());
-        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_UNUSED", HASH_CODE + "123");
+        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_" + MOCK, CONFIG + TEST_CONFIG);
+        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_UNUSED", CONFIG + "123");
 
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.registerModule(mockModule);
@@ -214,6 +211,7 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         framework.start();
 
         verify(mockModule, atLeastOnce()).getId();
+        verify(mockModule).asString();
         verifyNoMoreInteractions(mockModule);
 
         assertEquals(1, count(batchInserter.getNodeProperties(0).keySet()));
@@ -221,12 +219,10 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
 
     @Test(expected = IllegalStateException.class)
     public void usedCorruptModulesShouldThrowException() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
-
+        final GraphAwareModule mockModule = createMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
-        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", "CORRUPT");
+        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_" + MOCK, "CORRUPT");
 
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.registerModule(mockModule);
@@ -236,11 +232,10 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
 
     @Test
     public void unusedCorruptModulesShouldBeRemoved() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
-        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_MOCK", HASH_CODE + mockModule.hashCode());
+        batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_" + MOCK, CONFIG + TEST_CONFIG);
         batchInserter.setNodeProperty(0, GA_PREFIX + CORE + "_UNUSED", "CORRUPT");
 
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
@@ -249,6 +244,7 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         framework.start();
 
         verify(mockModule, atLeastOnce()).getId();
+        verify(mockModule).asString();
         verifyNoMoreInteractions(mockModule);
 
         assertEquals(1, count(batchInserter.getNodeProperties(0).keySet()));
@@ -258,14 +254,17 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
     public void allRegisteredInterestedModulesShouldBeDelegatedTo() {
         GraphAwareModule mockModule1 = mock(GraphAwareModule.class);
         when(mockModule1.getId()).thenReturn("MOCK1");
+        when(mockModule1.asString()).thenReturn(TEST_CONFIG);
         when(mockModule1.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
 
         GraphAwareModule mockModule2 = mock(GraphAwareModule.class);
         when(mockModule2.getId()).thenReturn("MOCK2");
+        when(mockModule2.asString()).thenReturn(TEST_CONFIG);
         when(mockModule2.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
 
         GraphAwareModule mockModule3 = mock(GraphAwareModule.class);
         when(mockModule3.getId()).thenReturn("MOCK3");
+        when(mockModule3.asString()).thenReturn(TEST_CONFIG);
         when(mockModule3.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.none());
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
@@ -279,6 +278,9 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         verify(mockModule1).initialize(batchInserter);
         verify(mockModule2).initialize(batchInserter);
         verify(mockModule3).initialize(batchInserter);
+        verify(mockModule1).asString();
+        verify(mockModule2).asString();
+        verify(mockModule3).asString();
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule3, atLeastOnce()).getId();
@@ -303,14 +305,17 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
     public void noRegisteredInterestedModulesShouldBeDelegatedToBeforeFrameworkStarts() {
         GraphAwareModule mockModule1 = mock(GraphAwareModule.class);
         when(mockModule1.getId()).thenReturn("MOCK1");
+        when(mockModule1.asString()).thenReturn(TEST_CONFIG);
         when(mockModule1.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
 
         GraphAwareModule mockModule2 = mock(GraphAwareModule.class);
         when(mockModule2.getId()).thenReturn("MOCK2");
+        when(mockModule2.asString()).thenReturn(TEST_CONFIG);
         when(mockModule2.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
 
         GraphAwareModule mockModule3 = mock(GraphAwareModule.class);
         when(mockModule3.getId()).thenReturn("MOCK3");
+        when(mockModule3.asString()).thenReturn(TEST_CONFIG);
         when(mockModule3.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.none());
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
@@ -331,8 +336,7 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
 
     @Test
     public void moduleThrowingInitExceptionShouldBeMarkedForReinitialization() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
         when(mockModule.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
         doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
@@ -342,19 +346,18 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
 
         framework.start();
 
-        assertTrue(batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_MOCK").toString().startsWith(HASH_CODE));
+        assertTrue(batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_" + MOCK).toString().startsWith(CONFIG));
 
         batchInserter.createNode(null);
         batchInserter.shutdown();
 
         batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
-        assertTrue(batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_MOCK").toString().startsWith(FORCE_INITIALIZATION));
+        assertTrue(batchInserter.getNodeProperties(0).get(GA_PREFIX + CORE + "_" + MOCK).toString().startsWith(FORCE_INITIALIZATION));
     }
 
     @Test(expected = IllegalStateException.class)
     public void modulesCannotBeRegisteredAfterStart() {
-        final GraphAwareModule mockModule = mock(GraphAwareModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        final GraphAwareModule mockModule = createMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
@@ -373,7 +376,8 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
     @Test
     public void frameworkConfiguredModulesShouldBeConfigured() {
         FrameworkConfiguredModule mockModule = mock(FrameworkConfiguredModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        when(mockModule.getId()).thenReturn(MOCK);
+        when(mockModule.asString()).thenReturn(TEST_CONFIG);
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
@@ -387,7 +391,8 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
     @Test
     public void frameworkConfiguredModulesShouldBeConfigured2() {
         FrameworkConfiguredModule mockModule = mock(FrameworkConfiguredModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        when(mockModule.getId()).thenReturn(MOCK);
+        when(mockModule.asString()).thenReturn(TEST_CONFIG);
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
@@ -418,7 +423,8 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
     @Test
     public void shutdownShouldBeCalledBeforeShutdown() {
         FrameworkConfiguredModule mockModule = mock(FrameworkConfiguredModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
+        when(mockModule.getId()).thenReturn(MOCK);
+        when(mockModule.asString()).thenReturn(TEST_CONFIG);
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);

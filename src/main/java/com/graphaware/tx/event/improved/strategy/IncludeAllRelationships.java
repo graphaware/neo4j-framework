@@ -40,4 +40,12 @@ public final class IncludeAllRelationships extends IncludeAllBusinessRelationshi
     public boolean doInclude(Relationship relationship) {
         return true;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String asString() {
+        return this.getClass().getCanonicalName();
+    }
 }

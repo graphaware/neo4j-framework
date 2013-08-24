@@ -123,32 +123,12 @@ public abstract class BaseInclusionStrategies<T extends BaseInclusionStrategies<
     }
 
     /**
-     * {@inheritDoc}
+     * @see {@link com.graphaware.framework.config.ConfigurationAsString#asString()}.
      */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        BaseInclusionStrategies that = (BaseInclusionStrategies) o;
-
-        if (!nodeInclusionStrategy.equals(that.nodeInclusionStrategy)) return false;
-        if (!nodePropertyInclusionStrategy.equals(that.nodePropertyInclusionStrategy)) return false;
-        if (!relationshipInclusionStrategy.equals(that.relationshipInclusionStrategy)) return false;
-        if (!relationshipPropertyInclusionStrategy.equals(that.relationshipPropertyInclusionStrategy)) return false;
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int result = nodeInclusionStrategy.hashCode();
-        result = 31 * result + nodePropertyInclusionStrategy.hashCode();
-        result = 31 * result + relationshipInclusionStrategy.hashCode();
-        result = 31 * result + relationshipPropertyInclusionStrategy.hashCode();
-        return result;
+    public String asString() {
+        return nodeInclusionStrategy.toString() + ";"
+                + nodePropertyInclusionStrategy.toString() + ";"
+                + relationshipInclusionStrategy.toString() + ";"
+                + relationshipPropertyInclusionStrategy.toString() + ";";
     }
 }
