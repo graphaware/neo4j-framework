@@ -39,11 +39,11 @@ import com.graphaware.tx.event.improved.strategy.*;
  * to this are relationship start and end nodes - they are returned even if they would normally be filtered out. This is
  * a design decision in order to honor the requirement that relationships must have start and end node.
  */
-public class FilteredTransactionData extends BaseImprovedTransactionData implements ImprovedTransactionData {
+public class FilteredTransactionData extends BaseImprovedTransactionData implements ImprovedTransactionData, TransactionDataContainer {
 
     private final InclusionStrategies inclusionStrategies;
-    private final FilteredNodeTransactionData nodeTransactionData;
-    private final FilteredRelationshipTransactionData relationshipTransactionData;
+    private final NodeTransactionData nodeTransactionData;
+    private final RelationshipTransactionData relationshipTransactionData;
 
     /**
      * Construct a new filtered transaction data.
@@ -61,7 +61,7 @@ public class FilteredTransactionData extends BaseImprovedTransactionData impleme
      * {@inheritDoc}
      */
     @Override
-    protected NodeTransactionData getNodeTransactionData() {
+    public NodeTransactionData getNodeTransactionData() {
         return nodeTransactionData;
     }
 
@@ -69,7 +69,7 @@ public class FilteredTransactionData extends BaseImprovedTransactionData impleme
      * {@inheritDoc}
      */
     @Override
-    protected RelationshipTransactionData getRelationshipTransactionData() {
+    public RelationshipTransactionData getRelationshipTransactionData() {
         return relationshipTransactionData;
     }
 
