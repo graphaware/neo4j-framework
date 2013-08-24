@@ -126,9 +126,9 @@ public abstract class BaseInclusionStrategies<T extends BaseInclusionStrategies<
      * @see {@link com.graphaware.framework.config.ConfigurationAsString#asString()}.
      */
     public String asString() {
-        return nodeInclusionStrategy.toString() + ";"
-                + nodePropertyInclusionStrategy.toString() + ";"
-                + relationshipInclusionStrategy.toString() + ";"
-                + relationshipPropertyInclusionStrategy.toString() + ";";
+        return nodeInclusionStrategy.asString() + ";"
+                + nodePropertyInclusionStrategy.asString() + ";"
+                + relationshipInclusionStrategy.asString() + ";"
+                + relationshipPropertyInclusionStrategy.asString() + ";";
     }
 }
