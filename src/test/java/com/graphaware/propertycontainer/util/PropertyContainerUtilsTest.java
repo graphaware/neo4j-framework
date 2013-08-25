@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer;
+package com.graphaware.propertycontainer.util;
 
 import com.graphaware.test.TestDataBuilder;
 import com.graphaware.tx.event.improved.api.Change;

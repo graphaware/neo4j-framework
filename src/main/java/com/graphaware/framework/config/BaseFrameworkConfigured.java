@@ -40,7 +40,7 @@ public abstract class BaseFrameworkConfigured implements FrameworkConfigured {
      */
     protected FrameworkConfiguration getConfig() {
         if (configuration == null) {
-            throw new IllegalStateException("Module hasn't been configured. Has it been registered with the " +
+            throw new IllegalStateException("Component hasn't been configured. Has it been registered with the " +
                     "GraphAware framework?");
         }
 

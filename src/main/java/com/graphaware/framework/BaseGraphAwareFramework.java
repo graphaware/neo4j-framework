@@ -138,7 +138,7 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
      * @throws IllegalStateException in case the module is already registered.
      */
     private void checkNotAlreadyRegistered(GraphAwareModule module) {
-        if (modules.contains(module)) {
+        if (modules.contains(module)) {              //todo also check for ID uniqueness
             throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
         }
     }
@@ -193,11 +193,11 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
             return null;
         }
 
-        LazyTransactionData lazyTransactionData = new LazyTransactionData(data);
-
-        if (lazyTransactionData.hasBeenDeleted(getRoot())) {
+        if (data.isDeleted(getRoot())) {
             throw new IllegalStateException("Deleting node with ID=0 is not allowed by GraphAware!");
         }
+
+        LazyTransactionData lazyTransactionData = new LazyTransactionData(data);
 
         for (GraphAwareModule module : modules) {
             FilteredTransactionData filteredTransactionData = new FilteredTransactionData(lazyTransactionData, module.getInclusionStrategies());
@@ -213,6 +213,8 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
                 if (!findRootOrThrowException().getProperty(moduleKey(module)).toString().startsWith(FORCE_INITIALIZATION)) {
                     forceInitialization(module);
                 }
+            } catch (RuntimeException e) {
+                LOG.warn("Module " + module.getId() + " threw an exception!", e);
             }
         }
 
