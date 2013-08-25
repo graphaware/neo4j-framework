@@ -6,7 +6,7 @@ GraphAware Neo4j Framework
 The aim of the GraphAware Framework is to speed-up development with Neo4j and provide useful generic and domain-specific
 modules, analytical capabilities, graph algorithm libraries, etc.
 
-The framework can be used in two ways: as a [library of useful tested code](#lib) for that simplifies tasks commonly needed when
+The framework can be used in two ways: as a [library of useful tested code](#lib) that simplifies tasks commonly needed when
 developing with Neo4j, or as a [real framework with modules](#fw), which perform some (behind-the-scenes) mutations on the graph
 as transactions occur. In the latter case, you get the benefit of the "library" as well.
 
@@ -97,7 +97,7 @@ Configuration
 
 In the above examples, the framework is used with sensible default configuration. At the moment, the only thing that is
 configurable on the framework level is the character/String that the framework is using to delimit information in its
-internal metadata secretly written into the graph. By defaul, this separator is the hash character (#). In the unlikely
+internal metadata secretly written into the graph. By default, this separator is the hash character (#). In the unlikely
 event of interference with your application logic (e.g. # is used in property keys or values in your application), this
 can be changed.
 
@@ -217,7 +217,7 @@ For example, if you were to create a number of nodes from a list of node names, 
     executor.execute();
 ```
 
-#### Batch Operations with None or Generated Input
+#### Batch Operations with Generated Input or No Input
 
 In case you wish to do something input-independent, for example just generate a number of nodes with random names, you
 can use the `NoInputBatchTransactionExecutor`.
@@ -283,8 +283,8 @@ easily access relationships/nodes that were changed and/or deleted in a transact
 
 #### Usage
 
-To use the API, simply instantiate one of the `ImprovedTransactionData` implementations, passing in the Neo4j
-`TransactionData` object. `LazyTransactionData` is recommended as it is the easiest one to use.
+To use the API, simply instantiate one of the `ImprovedTransactionData` implementations.
+`LazyTransactionData` is recommended as it is the easiest one to use.
 
 ```java
      GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
@@ -307,7 +307,48 @@ To use the API, simply instantiate one of the `ImprovedTransactionData` implemen
          public void afterRollback(TransactionData data, Object state) {
          }
      });
+```
 
+`FilteredTransactionData` can be used instead. They effectively hide portions of the graph, including any changes performed
+on nodes and relationships that are not interesting. `InclusionStrategies` are used to convey the information about
+what is interesting and what is not. For example, of only nodes with name equal to "Two" and no relationships at all
+are of interest, the example above could be modified as follows:
+
+```java
+    GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+
+    database.registerTransactionEventHandler(new TransactionEventHandler<Object>() {
+        @Override
+        public Object beforeCommit(TransactionData data) throws Exception {
+            InclusionStrategies inclusionStrategies = InclusionStrategiesImpl.all()
+                    .with(new IncludeAllBusinessNodes() {
+                        @Override
+                        protected boolean doInclude(Node node) {
+                            return node.getProperty("name", "default").equals("Two");
+                        }
+
+                        @Override
+                        public String asString() {
+                            return "includeOnlyNodeWithNameEqualToTwo";
+                        }
+                    })
+                    .with(IncludeNoRelationships.getInstance());
+
+            ImprovedTransactionData improvedTransactionData = new FilteredTransactionData(new LazyTransactionData(data), inclusionStrategies);
+
+            //have fun here with improvedTransactionData!
+
+            return null;
+        }
+
+        @Override
+        public void afterCommit(TransactionData data, Object state) {
+        }
+
+        @Override
+        public void afterRollback(TransactionData data, Object state) {
+        }
+    });
 ```
 
 #### Example Scenario
