@@ -19,7 +19,7 @@
 
     <groupId>com.graphaware</groupId>
     <artifactId>neo4j-framework</artifactId>
-    <version>1.9-1.4-SNAPSHOT</version>
+    <version>1.9-1.4</version>
     <packaging>jar</packaging>
 
     <parent>
