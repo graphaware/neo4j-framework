@@ -97,7 +97,7 @@ public class NoInputBatchTransactionExecutorTest {
         }
 
         @Override
-        public void execute(GraphDatabaseService database, NullItem input) {
+        public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
             steps++;
             if (steps % exceptionRate == 0) {
                 throw new RuntimeException("Testing exception");

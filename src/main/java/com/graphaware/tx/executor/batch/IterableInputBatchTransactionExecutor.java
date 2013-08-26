@@ -80,9 +80,9 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
 
                     while (iterator.hasNext() && currentBatchSteps.get() < batchSize) {
                         try {
-                            unitOfWork.execute(database, iterator.next());
-                            totalSteps.incrementAndGet();
                             currentBatchSteps.incrementAndGet();
+                            totalSteps.incrementAndGet();
+                            unitOfWork.execute(database, iterator.next(), batches.get(), currentBatchSteps.get());
                         } catch (NoSuchElementException e) {
                             //this is OK, another thread could have gotten the item after this one called hasNext().
                             //Simply means there's no more items to process.

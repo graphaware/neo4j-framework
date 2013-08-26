@@ -28,8 +28,10 @@ public interface UnitOfWork<T> {
     /**
      * Execute the unit of work.
      *
-     * @param database against which to execute the work.
-     * @param input    to the unit of work.
+     * @param database    against which to execute the work.
+     * @param input       to the unit of work.
+     * @param batchNumber current batch number.
+     * @param stepNumber  current step number.
      */
-    void execute(GraphDatabaseService database, T input);
+    void execute(GraphDatabaseService database, T input, int batchNumber, int stepNumber);
 }

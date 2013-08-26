@@ -33,7 +33,7 @@ public class CreateNode implements UnitOfWork<NullItem> {
     }
 
     @Override
-    public void execute(GraphDatabaseService database, NullItem input) {
+    public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
         database.createNode();
     }
 }

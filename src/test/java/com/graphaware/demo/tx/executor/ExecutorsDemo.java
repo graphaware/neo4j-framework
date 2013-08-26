@@ -41,7 +41,7 @@ public class ExecutorsDemo {
         int batchSize = 10;
         BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, batchSize, nodeNames, new UnitOfWork<String>() {
             @Override
-            public void execute(GraphDatabaseService database, String nodeName) {
+            public void execute(GraphDatabaseService database, String nodeName, int batchNumber, int stepNumber) {
                 Node node = database.createNode();
                 node.setProperty("name", nodeName);
             }
@@ -64,7 +64,7 @@ public class ExecutorsDemo {
         }
 
         @Override
-        public void execute(GraphDatabaseService database, NullItem input) {
+        public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
             Node node = database.createNode();
             node.setProperty("name", UUID.randomUUID());
         }

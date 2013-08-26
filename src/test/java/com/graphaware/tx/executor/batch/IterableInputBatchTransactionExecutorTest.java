@@ -28,7 +28,6 @@ import java.util.List;
 
 import static com.graphaware.test.IterableUtils.countNodes;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Unit test for {@link IterableInputBatchTransactionExecutor}.
@@ -51,19 +50,19 @@ public class IterableInputBatchTransactionExecutorTest {
     public void nodesShouldBeCreatedFromListOfNames() {
         List<String> nodeNames = Arrays.asList("Name1", "Name2", "Name3");
 
-        BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<String>(database, 2, nodeNames, new UnitOfWork<String>() {
+        BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, 2, nodeNames, new UnitOfWork<String>() {
             @Override
-            public void execute(GraphDatabaseService database, String nodeName) {
+            public void execute(GraphDatabaseService database, String nodeName, int batchNumber, int stepNumber) {
                 Node node = database.createNode();
-                node.setProperty("name", nodeName);
+                node.setProperty("name", nodeName + batchNumber + stepNumber);
             }
         });
 
         executor.execute();
 
         assertEquals(4, countNodes(database));  //3 + root
-        assertTrue(nodeNames.contains(database.getNodeById(1).getProperty("name")));
-        assertTrue(nodeNames.contains(database.getNodeById(2).getProperty("name")));
-        assertTrue(nodeNames.contains(database.getNodeById(3).getProperty("name")));
+        assertEquals("Name111", database.getNodeById(1).getProperty("name"));
+        assertEquals("Name212", database.getNodeById(2).getProperty("name"));
+        assertEquals("Name321", database.getNodeById(3).getProperty("name"));
     }
 }

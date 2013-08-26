@@ -208,7 +208,7 @@ For example, if you were to create a number of nodes from a list of node names, 
     int batchSize = 10;
     BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, batchSize, nodeNames, new UnitOfWork<String>() {
         @Override
-        public void execute(GraphDatabaseService database, String nodeName) {
+        public void execute(GraphDatabaseService database, String nodeName, int batchNumber, int stepNumber) {
             Node node = database.createNode();
             node.setProperty("name", nodeName);
         }
@@ -239,7 +239,7 @@ First, you would create an implementation of `UnitOfWork<NullItem>`, which is a 
         }
 
         @Override
-        public void execute(GraphDatabaseService database, NullItem input) {
+        public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
             Node node = database.createNode();
             node.setProperty("name", UUID.randomUUID());
         }

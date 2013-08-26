@@ -36,7 +36,7 @@ public class CreateRandomNode implements UnitOfWork<NullItem> {
     }
 
     @Override
-    public void execute(GraphDatabaseService database, NullItem input) {
+    public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
         Node node = database.createNode();
         node.setProperty("name", UUID.randomUUID());
     }
