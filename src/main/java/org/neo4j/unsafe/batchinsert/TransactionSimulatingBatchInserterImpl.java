@@ -38,6 +38,7 @@ import java.util.*;
  * <p/>
  *
  * @see org.neo4j.unsafe.batchinsert.BatchInserter - same limitations apply to this class.
+ * todo make this a decorator, not an extension
  */
 public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl implements TransactionSimulatingBatchInserter {
 
