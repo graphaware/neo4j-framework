@@ -21,13 +21,26 @@ package com.graphaware.test;
  */
 public final class TestUtils {
 
+    /**
+     * Measure the time of the timed callback.
+     *
+     * @param timed callback.
+     * @return time in microseconds
+     */
     public static long time(Timed timed) {
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         timed.time();
-        return System.currentTimeMillis() - start;
+        return (System.nanoTime() - start) / 1000;
     }
 
+    /**
+     * Timed operation.
+     */
     public interface Timed {
+
+        /**
+         * Perform the operation to be timed.
+         */
         void time();
     }
 
