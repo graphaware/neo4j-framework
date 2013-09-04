@@ -15,7 +15,7 @@ Download
 
 ### Releases
 
-Releases are synced to Maven Central repository. To use the latest release, [download it](http://search.maven.org/remotecontent?filepath=com/graphaware/neo4j-framework/1.9-1.2/neo4j-framework-1.9-1.2.jar)
+Releases are synced to Maven Central repository. To use the latest release, [download it](http://search.maven.org/remotecontent?filepath=com/graphaware/neo4j-framework/1.9-1.7/neo4j-framework-1.9-1.7.jar)
 and put it on your classpath. When using Maven, include the following snippet in your pom.xml:
 
     <dependencies>
