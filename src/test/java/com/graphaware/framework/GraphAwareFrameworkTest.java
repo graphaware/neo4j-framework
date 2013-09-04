@@ -509,4 +509,46 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
             }
         });
     }
+
+    @Test
+    public void whenOneModuleThrowsAnExceptionThenOtherModulesShouldStillBeDelegatedTo() {
+        GraphAwareModule mockModule1 = mock(GraphAwareModule.class);
+        when(mockModule1.getId()).thenReturn(MOCK + "1");
+        when(mockModule1.asString()).thenReturn(TEST_CONFIG);
+        when(mockModule1.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+        doThrow(new RuntimeException()).when(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
+
+        GraphAwareModule mockModule2 = mock(GraphAwareModule.class);
+        when(mockModule2.getId()).thenReturn(MOCK + "2");
+        when(mockModule2.asString()).thenReturn(TEST_CONFIG);
+        when(mockModule2.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+
+        GraphAwareFramework framework = new GraphAwareFramework(database, new CustomConfig());
+        framework.registerModule(mockModule1);
+        framework.registerModule(mockModule2);
+
+        framework.start();
+
+        verify(mockModule1).initialize(database);
+        verify(mockModule2).initialize(database);
+        verify(mockModule1).asString();
+        verify(mockModule2).asString();
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verifyNoMoreInteractions(mockModule1, mockModule2);
+
+        new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
+            @Override
+            protected void doInTx(GraphDatabaseService database) {
+                database.createNode();
+            }
+        });
+
+        verify(mockModule1).getInclusionStrategies();
+        verify(mockModule2).getInclusionStrategies();
+        verify(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
+        verify(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
+        verify(mockModule1, atLeastOnce()).getId();
+        verifyNoMoreInteractions(mockModule1, mockModule2);
+    }
 }

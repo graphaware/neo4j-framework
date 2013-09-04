@@ -31,6 +31,7 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchInserterImpl;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import static com.graphaware.framework.GraphAwareFramework.*;
 import static com.graphaware.framework.config.FrameworkConfiguration.GA_PREFIX;
@@ -461,5 +462,42 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         batchInserter.shutdown();
 
         verify(mockModule).shutdown();
+    }
+
+    @Test
+    public void whenOneModuleThrowsAnExceptionThenOtherModulesShouldStillBeDelegatedTo() {
+        GraphAwareModule mockModule1 = mock(GraphAwareModule.class);
+        when(mockModule1.getId()).thenReturn(MOCK + "1");
+        when(mockModule1.asString()).thenReturn(TEST_CONFIG);
+        when(mockModule1.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+        doThrow(new RuntimeException()).when(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
+
+        GraphAwareModule mockModule2 = mock(GraphAwareModule.class);
+        when(mockModule2.getId()).thenReturn(MOCK + "2");
+        when(mockModule2.asString()).thenReturn(TEST_CONFIG);
+        when(mockModule2.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter, new CustomConfig());
+        framework.registerModule(mockModule1);
+        framework.registerModule(mockModule2);
+
+        framework.start();
+
+        verify(mockModule1).initialize(batchInserter);
+        verify(mockModule2).initialize(batchInserter);
+        verify(mockModule1).asString();
+        verify(mockModule2).asString();
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verifyNoMoreInteractions(mockModule1, mockModule2);
+
+        batchInserter.createNode(new HashMap<String, Object>());
+        batchInserter.shutdown();
+
+        verify(mockModule1).getInclusionStrategies();
+        verify(mockModule2).getInclusionStrategies();
+        verify(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
+        verify(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
     }
 }
