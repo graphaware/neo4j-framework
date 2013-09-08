@@ -563,9 +563,4 @@ public class GraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
         verify(mockModule1, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule1, mockModule2);
     }
-
-    @Test(expected = IllegalStateException.class)
-    public void shouldNotBeAbleToRegisterTwoModulesWithTheSameId() {
-
-    }
 }
