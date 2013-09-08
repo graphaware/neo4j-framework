@@ -71,15 +71,7 @@ public class RelationshipSnapshot extends PropertyContainerSnapshot<Relationship
      * {@inheritDoc}
      */
     @Override
-    public Node getStartNode() {
-        return new NodeSnapshot(super.getStartNode(), transactionDataContainer);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Node getEndNode() {
-        return new NodeSnapshot(super.getEndNode(), transactionDataContainer);
+    protected Node wrapNode(Node node) {
+        return new NodeSnapshot(node, transactionDataContainer);
     }
 }

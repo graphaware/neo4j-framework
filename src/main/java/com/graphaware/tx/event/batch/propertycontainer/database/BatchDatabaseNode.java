@@ -92,4 +92,12 @@ public class BatchDatabaseNode extends BatchDatabasePropertyContainer<Node> impl
         transactionData.relationshipCreated(relationship);
         return relationship;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Relationship wrapRelationship(Relationship relationship) {
+        return new BatchDatabaseRelationship(relationship.getId(), database, transactionData);
+    }
 }

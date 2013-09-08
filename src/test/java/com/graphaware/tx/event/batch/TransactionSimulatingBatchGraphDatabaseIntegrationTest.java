@@ -23,7 +23,6 @@ import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import com.graphaware.tx.executor.single.*;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -37,6 +36,7 @@ import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.kernel.Uniqueness;
 import org.neo4j.kernel.impl.traversal.TraversalDescriptionImpl;
+import org.neo4j.unsafe.batchinsert.BatchInserters;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
 
 import java.io.IOException;
@@ -74,10 +74,9 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
     }
 
     @Test
-    @Ignore("https://github.com/neo4j/neo4j/issues/1034")
     public void shouldBeAbleToSetPropertyOnRoot() {
         String dir = temporaryFolder.getRoot().getAbsolutePath();
-        database = new TransactionSimulatingBatchGraphDatabase(dir);
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(dir));
 
         Node root = database.getNodeById(0);
         root.setProperty("test", "test");
@@ -788,7 +787,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         );
 
         database.shutdown();
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath());
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
 
         Relationship r1 = database.getNodeById(5).getSingleRelationship(withName("R5"), OUTGOING);
         assertEquals(1, count(r1.getPropertyKeys()));
@@ -814,7 +813,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         );
 
         database.shutdown();
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath());
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
 
         Node createdNode = database.getNodeById(5L);
 
@@ -843,7 +842,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         );
 
         database.shutdown();
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath());
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
 
         Relationship r = database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING);
 
@@ -873,7 +872,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         );
 
         database.shutdown();
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath());
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
 
         Relationship r = database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING);
 
@@ -903,7 +902,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         );
 
         database.shutdown();
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath());
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
 
         Node node = database.getNodeById(1L);
 
@@ -933,7 +932,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         );
 
         database.shutdown();
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath());
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
 
         Node node = database.getNodeById(1L);
 
@@ -969,7 +968,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         );
 
         database.shutdown();
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath());
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
 
         Relationship newRelationship = database.getNodeById(1).getSingleRelationship(withName("R6"), OUTGOING);
         assertNotNull(newRelationship);
@@ -996,7 +995,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         );
 
         database.shutdown();
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath());
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
 
         Relationship newRelationship = database.getNodeById(1).getSingleRelationship(withName("R6"), OUTGOING);
         assertNotNull(newRelationship);
@@ -1083,12 +1082,12 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
     @Test
     public void verifyAutoCommit() {
         String dir = temporaryFolder.getRoot().getAbsolutePath();
-        database = new TransactionSimulatingBatchGraphDatabase(dir);
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(dir));
 
         populateDatabase();
 
         database.shutdown();
-        database = new TransactionSimulatingBatchGraphDatabase(dir, 27);
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(dir), 27);
 
         final AtomicInteger numberOfCommits = new AtomicInteger(0);
 
@@ -1115,14 +1114,14 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
 
     @Test
     public void shouldReturnNoNodesWhenNothingInTheDatabase() {
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath());
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
 
         assertFalse(database.getAllNodes().iterator().hasNext());
     }
 
     @Test
     public void shouldReturnAllNodesFromTheDatabase() {
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath());
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
 
         Node node1 = database.createNode();
         Node node2 = database.createNode();
@@ -1160,7 +1159,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
 
         database.shutdown();
 
-        database = new TransactionSimulatingBatchGraphDatabase(dir);
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(dir));
 
         Iterable<Node> allNodes = database.getAllNodes();
         assertEquals(2, count(allNodes));
@@ -1172,7 +1171,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
 
     @Test
     public void shouldGetRoot() {
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath());
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
         assertEquals(0, database.getReferenceNode().getId());
     }
 
@@ -1233,12 +1232,12 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
 
     private void createTestDatabase() {
         String dir = temporaryFolder.getRoot().getAbsolutePath();
-        database = new TransactionSimulatingBatchGraphDatabase(dir);
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(dir));
 
         populateDatabase();
 
         database.shutdown();
-        database = new TransactionSimulatingBatchGraphDatabase(dir);
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(dir));
     }
 
     private void populateDatabase() {
@@ -1288,7 +1287,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
             r = three.getSingleRelationship(withName("R3"), OUTGOING);
             r.setProperty("time", 4);
             r.removeProperty("tag");
-            r.removeProperty("tag");
+//            r.removeProperty("tag");  //can't do this for the second time, this is a bug in Neo - see https://github.com/neo4j/neo4j/issues/1025
             r.setProperty("tag", "bla");
             r.removeProperty("tag");
             r.setProperty("tags", "cool");

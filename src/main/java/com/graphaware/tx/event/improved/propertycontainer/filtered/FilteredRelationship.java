@@ -65,28 +65,8 @@ public class FilteredRelationship extends FilteredPropertyContainer<Relationship
      * {@inheritDoc}
      */
     @Override
-    public Node getStartNode() {
-        //strategies not checked, we want relationships to have both start and end node no matter what
-        return filteredNode(super.getStartNode());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Node getEndNode() {
-        //strategies not checked, we want relationships to have both start and end node no matter what
-        return filteredNode(super.getEndNode());
-    }
-
-    /**
-     * Create a filtered node.
-     *
-     * @param original node.
-     * @return filtered node.
-     */
-    private Node filteredNode(Node original) {
-        return new FilteredNode(original, strategies);
+    protected Node wrapNode(Node node) {
+        return new FilteredNode(node, strategies);
     }
 }
 

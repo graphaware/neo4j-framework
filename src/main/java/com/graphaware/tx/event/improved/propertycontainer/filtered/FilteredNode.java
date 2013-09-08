@@ -59,57 +59,15 @@ public class FilteredNode extends FilteredPropertyContainer<Node> implements Nod
      * {@inheritDoc}
      */
     @Override
-    public Iterable<Relationship> getRelationships() {
-        return filtered(super.getRelationships());
+    protected Iterable<Relationship> wrapRelationships(Iterable<Relationship> relationships, Direction direction, RelationshipType... relationshipTypes) {
+        return new FilteredRelationshipIterator(relationships, strategies);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Iterable<Relationship> getRelationships(RelationshipType... types) {
-        return filtered(super.getRelationships(types));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<Relationship> getRelationships(Direction direction, RelationshipType... types) {
-        return filtered(super.getRelationships(direction, types));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<Relationship> getRelationships(Direction dir) {
-        return filtered(super.getRelationships(dir));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<Relationship> getRelationships(RelationshipType type, Direction dir) {
-        return filtered(super.getRelationships(type, dir));
-    }
-
-    /**
-     * Create a filtering iterable for relationships.
-     *
-     * @param original iterable.
-     * @return filtering iterable.
-     */
-    private Iterable<Relationship> filtered(Iterable<Relationship> original) {
-        return new FilteredRelationshipIterator(original, strategies);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Relationship createRelationshipTo(Node otherNode, RelationshipType type) {
-        return new FilteredRelationship(super.createRelationshipTo(otherNode, type), strategies);
+    protected Relationship wrapRelationship(Relationship relationship) {
+        return new FilteredRelationship(relationship, strategies);
     }
 }

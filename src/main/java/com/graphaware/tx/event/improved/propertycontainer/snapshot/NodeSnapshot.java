@@ -73,48 +73,24 @@ public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Nod
      * {@inheritDoc}
      */
     @Override
-    public Iterable<Relationship> getRelationships() {
-        return new RelationshipSnapshotIterator(wrapped, transactionDataContainer);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<Relationship> getRelationships(RelationshipType... types) {
-        return new RelationshipSnapshotIterator(wrapped, transactionDataContainer, types);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<Relationship> getRelationships(Direction direction, RelationshipType... types) {
-        return new RelationshipSnapshotIterator(wrapped, transactionDataContainer, direction, types);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<Relationship> getRelationships(Direction dir) {
-        return new RelationshipSnapshotIterator(wrapped, transactionDataContainer, dir);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<Relationship> getRelationships(RelationshipType type, Direction dir) {
-        return new RelationshipSnapshotIterator(wrapped, transactionDataContainer, dir, type);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Relationship createRelationshipTo(Node otherNode, RelationshipType type) {
         checkCanBeMutated();
-        return new RelationshipSnapshot(super.createRelationshipTo(otherNode, type), transactionDataContainer);
+        return super.createRelationshipTo(otherNode, type);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Relationship wrapRelationship(Relationship relationship) {
+        return new RelationshipSnapshot(relationship, transactionDataContainer);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Iterable<Relationship> wrapRelationships(Iterable<Relationship> relationships, Direction direction, RelationshipType... relationshipTypes) {
+        return new RelationshipSnapshotIterator(this, relationships, transactionDataContainer, direction, relationshipTypes);
     }
 }

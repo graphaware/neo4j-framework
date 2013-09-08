@@ -28,6 +28,7 @@ import org.junit.rules.TemporaryFolder;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.unsafe.batchinsert.BatchInserters;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
 
 import java.io.IOException;
@@ -50,7 +51,7 @@ public class GraphAwareFrameworkBatchDatabaseTest extends BaseGraphAwareFramewor
     @Before
     public void setUp() throws IOException {
         temporaryFolder.create();
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath());
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
     }
 
     @After
@@ -74,7 +75,7 @@ public class GraphAwareFrameworkBatchDatabaseTest extends BaseGraphAwareFramewor
 
         database.shutdown();
 
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath());
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
         new GraphAwareFramework(database);
     }
 
@@ -262,7 +263,7 @@ public class GraphAwareFrameworkBatchDatabaseTest extends BaseGraphAwareFramewor
     @Test
     public void allRegisteredInterestedModulesShouldBeDelegatedTo() {
         database.shutdown();
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath(), 0);
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()), 0);
 
         GraphAwareModule mockModule1 = mock(GraphAwareModule.class);
         when(mockModule1.getId()).thenReturn("MOCK1");
@@ -348,7 +349,7 @@ public class GraphAwareFrameworkBatchDatabaseTest extends BaseGraphAwareFramewor
         doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
         database.shutdown();
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath(), 0);
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()), 0);
 
         GraphAwareFramework framework = new GraphAwareFramework(database);
         framework.registerModule(mockModule);
@@ -381,7 +382,7 @@ public class GraphAwareFrameworkBatchDatabaseTest extends BaseGraphAwareFramewor
         });
 
         database.shutdown();
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath(), 0);
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()), 0);
 
         long firstFailureTimestamp = Long.valueOf(database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_" + MOCK).toString().replaceFirst(FORCE_INITIALIZATION, ""));
 
@@ -395,7 +396,7 @@ public class GraphAwareFrameworkBatchDatabaseTest extends BaseGraphAwareFramewor
         });
 
         database.shutdown();
-        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath(), 0);
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()), 0);
 
         long secondFailureTimestamp = Long.valueOf(database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_" + MOCK).toString().replaceFirst(FORCE_INITIALIZATION, ""));
 

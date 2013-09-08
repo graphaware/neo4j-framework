@@ -17,6 +17,9 @@
 package com.graphaware.propertycontainer.wrapper;
 
 import org.neo4j.graphdb.*;
+import org.neo4j.helpers.collection.IterableWrapper;
+
+import static org.neo4j.graphdb.Direction.BOTH;
 
 /**
  * Base class for {@link PropertyContainerWrapper} implementations.
@@ -83,7 +86,7 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
             throw new IllegalStateException("Not a node, this is a bug");
         }
 
-        return ((Node) getWrapped()).getRelationships();
+        return wrapRelationships(((Node) getWrapped()).getRelationships(), BOTH);
     }
 
     /**
@@ -94,7 +97,7 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
             throw new IllegalStateException("Not a node, this is a bug");
         }
 
-        return ((Node) getWrapped()).getRelationships(types);
+        return wrapRelationships(((Node) getWrapped()).getRelationships(types), BOTH, types);
     }
 
     /**
@@ -105,7 +108,7 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
             throw new IllegalStateException("Not a node, this is a bug");
         }
 
-        return ((Node) getWrapped()).getRelationships(direction, types);
+        return wrapRelationships(((Node) getWrapped()).getRelationships(direction, types), direction, types);
     }
 
     /**
@@ -116,7 +119,7 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
             throw new IllegalStateException("Not a node, this is a bug");
         }
 
-        return ((Node) getWrapped()).getRelationships(dir);
+        return wrapRelationships(((Node) getWrapped()).getRelationships(dir), dir);
     }
 
     /**
@@ -127,7 +130,7 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
             throw new IllegalStateException("Not a node, this is a bug");
         }
 
-        return ((Node) getWrapped()).getRelationships(type, dir);
+        return wrapRelationships(((Node) getWrapped()).getRelationships(type, dir), dir, type);
     }
 
     /**
@@ -138,7 +141,7 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
             throw new IllegalStateException("Not a node, this is a bug");
         }
 
-        return ((Node) getWrapped()).createRelationshipTo(otherNode, type);
+        return wrapRelationship(((Node) getWrapped()).createRelationshipTo(otherNode, type));
     }
 
     /**
@@ -160,7 +163,7 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
             throw new IllegalStateException("Not a relationship, this is a bug");
         }
 
-        return ((Relationship) getWrapped()).getStartNode();
+        return wrapNode(((Relationship) getWrapped()).getStartNode());
     }
 
     /**
@@ -171,7 +174,24 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
             throw new IllegalStateException("Not a relationship, this is a bug");
         }
 
-        return ((Relationship) getWrapped()).getEndNode();
+        return wrapNode(((Relationship) getWrapped()).getEndNode());
+    }
+
+    protected Node wrapNode(Node node) {
+        return node;
+    }
+
+    protected Relationship wrapRelationship(Relationship relationship) {
+        return relationship;
+    }
+
+    protected Iterable<Relationship> wrapRelationships(Iterable<Relationship> relationships, Direction direction, RelationshipType... relationshipTypes) {
+        return new IterableWrapper<Relationship, Relationship>(relationships) {
+            @Override
+            protected Relationship underlyingObjectToObject(Relationship object) {
+                return wrapRelationship(object);
+            }
+        };
     }
 
     //Typically no need to override:

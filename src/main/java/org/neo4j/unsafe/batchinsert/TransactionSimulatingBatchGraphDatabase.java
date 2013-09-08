@@ -16,23 +16,21 @@
 
 package org.neo4j.unsafe.batchinsert;
 
+import com.graphaware.propertycontainer.wrapper.Wrapper;
 import com.graphaware.tx.event.batch.data.BatchTransactionData;
 import com.graphaware.tx.event.batch.propertycontainer.database.BatchDatabaseNode;
 import com.graphaware.tx.event.batch.propertycontainer.database.BatchDatabaseRelationship;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.graphdb.event.TransactionEventHandler;
+import org.neo4j.graphdb.index.IndexManager;
 import org.neo4j.helpers.collection.PrefetchingIterator;
-import org.neo4j.kernel.impl.nioneo.store.FileSystemAbstraction;
 import org.neo4j.kernel.impl.nioneo.store.NeoStore;
 
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A {@link org.neo4j.unsafe.batchinsert.BatchGraphDatabaseImpl} that can produce {@link org.neo4j.graphdb.event.TransactionData} despite the fact
@@ -42,51 +40,28 @@ import java.util.Map;
  * By default, a transaction commit is simulated every {@link com.graphaware.tx.event.batch.data.BatchTransactionData#COMMIT_TX_AFTER_MUTATIONS} mutations,
  * but this can be changed by constructing this object using one of the appropriate constructors.
  * <p/>
- * This is a hacky extension of {@link org.neo4j.unsafe.batchinsert.BatchGraphDatabaseImpl}, which isn't really maintained by Neo4j as it is "fake"
+ * This is a hacky decorator of {@link org.neo4j.unsafe.batchinsert.BatchGraphDatabaseImpl}, which isn't really maintained by Neo4j as it is "fake"
  * and doesn't, for example, take indices into account. Thus, it is preferable to use {@link com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter}.
  */
-public class TransactionSimulatingBatchGraphDatabase extends BatchGraphDatabaseImpl {
+public class TransactionSimulatingBatchGraphDatabase implements GraphDatabaseService, Wrapper<GraphDatabaseService> {
 
     private final BatchTransactionData batchTransactionData;
     private final List<KernelEventHandler> kernelEventHandlers = new LinkedList<>();
+    private final GraphDatabaseService wrapped;
 
-    public TransactionSimulatingBatchGraphDatabase(String storeDir) {
-        super(storeDir);
+    public TransactionSimulatingBatchGraphDatabase(GraphDatabaseService database) {
+        if (!(database instanceof BatchGraphDatabaseImpl)) {
+            throw new IllegalArgumentException("This wrapper is only intended for BatchGraphDatabaseServiceImpl");
+        }
+        this.wrapped = database;
         batchTransactionData = new BatchTransactionData();
     }
 
-    public TransactionSimulatingBatchGraphDatabase(String storeDir, Map<String, String> stringParams) {
-        super(storeDir, stringParams);
-        batchTransactionData = new BatchTransactionData();
-    }
-
-    public TransactionSimulatingBatchGraphDatabase(String storeDir, FileSystemAbstraction fileSystem, Map<String, String> stringParams) {
-        super(storeDir, fileSystem, stringParams);
-        batchTransactionData = new BatchTransactionData();
-    }
-
-    public TransactionSimulatingBatchGraphDatabase(BatchInserter batchInserter) {
-        super(batchInserter);
-        batchTransactionData = new BatchTransactionData();
-    }
-
-    public TransactionSimulatingBatchGraphDatabase(String storeDir, int commitTxAfterMutations) {
-        super(storeDir);
-        batchTransactionData = new BatchTransactionData(commitTxAfterMutations);
-    }
-
-    public TransactionSimulatingBatchGraphDatabase(String storeDir, Map<String, String> stringParams, int commitTxAfterMutations) {
-        super(storeDir, stringParams);
-        batchTransactionData = new BatchTransactionData(commitTxAfterMutations);
-    }
-
-    public TransactionSimulatingBatchGraphDatabase(String storeDir, FileSystemAbstraction fileSystem, Map<String, String> stringParams, int commitTxAfterMutations) {
-        super(storeDir, fileSystem, stringParams);
-        batchTransactionData = new BatchTransactionData(commitTxAfterMutations);
-    }
-
-    public TransactionSimulatingBatchGraphDatabase(BatchInserter batchInserter, int commitTxAfterMutations) {
-        super(batchInserter);
+    public TransactionSimulatingBatchGraphDatabase(GraphDatabaseService database, int commitTxAfterMutations) {
+        if (!(database instanceof BatchGraphDatabaseImpl)) {
+            throw new IllegalArgumentException("This wrapper is only intended for BatchGraphDatabaseServiceImpl");
+        }
+        this.wrapped = database;
         batchTransactionData = new BatchTransactionData(commitTxAfterMutations);
     }
 
@@ -114,8 +89,24 @@ public class TransactionSimulatingBatchGraphDatabase extends BatchGraphDatabaseI
      * {@inheritDoc}
      */
     @Override
+    public <T> TransactionEventHandler<T> unregisterTransactionEventHandler(TransactionEventHandler<T> handler) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public KernelEventHandler unregisterKernelEventHandler(KernelEventHandler handler) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Node createNode() {
-        BatchDatabaseNode result = new BatchDatabaseNode(super.createNode().getId(), this, batchTransactionData);
+        BatchDatabaseNode result = new BatchDatabaseNode(wrapped.createNode().getId(), this, batchTransactionData);
         batchTransactionData.nodeCreated(result);
         return result;
     }
@@ -125,7 +116,7 @@ public class TransactionSimulatingBatchGraphDatabase extends BatchGraphDatabaseI
      */
     @Override
     public Node getNodeById(long id) {
-        return new BatchDatabaseNode(super.getNodeById(id).getId(), this, batchTransactionData);
+        return new BatchDatabaseNode(getNodeByIdInternal(id).getId(), this, batchTransactionData);
     }
 
     /**
@@ -135,7 +126,7 @@ public class TransactionSimulatingBatchGraphDatabase extends BatchGraphDatabaseI
      * @return Node with the given ID.
      */
     public Node getNodeByIdInternal(long id) {
-        return super.getNodeById(id);
+        return wrapped.getNodeById(id);
     }
 
     /**
@@ -143,7 +134,7 @@ public class TransactionSimulatingBatchGraphDatabase extends BatchGraphDatabaseI
      */
     @Override
     public Node getReferenceNode() {
-        return new BatchDatabaseNode(super.getReferenceNode().getId(), this, batchTransactionData);
+        return new BatchDatabaseNode(wrapped.getReferenceNode().getId(), this, batchTransactionData);
     }
 
     /**
@@ -157,7 +148,7 @@ public class TransactionSimulatingBatchGraphDatabase extends BatchGraphDatabaseI
         try {
             Field neoStoreField = BatchInserterImpl.class.getDeclaredField("neoStore");
             neoStoreField.setAccessible(true);
-            NeoStore neoStore = (NeoStore) neoStoreField.get(batchInserter);
+            NeoStore neoStore = (NeoStore) neoStoreField.get(((BatchGraphDatabaseImpl) wrapped).batchInserter);
             highId = neoStore.getNodeStore().getHighId();
         } catch (NoSuchFieldException e) {
             throw new RuntimeException("No field named neoStore in BatchInserterImpl. This is a bug.");
@@ -173,7 +164,7 @@ public class TransactionSimulatingBatchGraphDatabase extends BatchGraphDatabaseI
      */
     @Override
     public Relationship getRelationshipById(long id) {
-        return new BatchDatabaseRelationship(id, this, batchTransactionData);
+        return new BatchDatabaseRelationship(getRelationshipByIdInternal(id).getId(), this, batchTransactionData);
     }
 
     /**
@@ -183,7 +174,7 @@ public class TransactionSimulatingBatchGraphDatabase extends BatchGraphDatabaseI
      * @return Relationship with the given ID.
      */
     public Relationship getRelationshipByIdInternal(long id) {
-        return super.getRelationshipById(id);
+        return wrapped.getRelationshipById(id);
     }
 
     /**
@@ -197,7 +188,7 @@ public class TransactionSimulatingBatchGraphDatabase extends BatchGraphDatabaseI
             handler.beforeShutdown();
         }
 
-        super.shutdown();
+        wrapped.shutdown();
     }
 
     private class AllNodesIterator extends PrefetchingIterator<Node> implements Iterable<Node> {
@@ -227,5 +218,28 @@ public class TransactionSimulatingBatchGraphDatabase extends BatchGraphDatabaseI
 
             return null;
         }
+    }
+
+    //pure delegates
+
+
+    @Override
+    public Iterable<RelationshipType> getRelationshipTypes() {
+        return wrapped.getRelationshipTypes();
+    }
+
+    @Override
+    public Transaction beginTx() {
+        return wrapped.beginTx();
+    }
+
+    @Override
+    public IndexManager index() {
+        return wrapped.index();
+    }
+
+    @Override
+    public GraphDatabaseService getWrapped() {
+        return wrapped;
     }
 }

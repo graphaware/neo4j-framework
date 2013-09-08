@@ -34,28 +34,10 @@ public class RelationshipSnapshotIterator extends PrefetchingIterator<Relationsh
     private final TransactionDataContainer transactionDataContainer;
     private final Iterator<Relationship> deletedRelationshipIterator;
 
-    public RelationshipSnapshotIterator(Node wrappedNode, TransactionDataContainer transactionDataContainer) {
-        this.wrappedIterator = wrappedNode.getRelationships().iterator();
+    public RelationshipSnapshotIterator(Node node, Iterable<Relationship> wrappedIterable, TransactionDataContainer transactionDataContainer, Direction direction, RelationshipType... relationshipTypes) {
+        this.wrappedIterator = wrappedIterable.iterator();
         this.transactionDataContainer = transactionDataContainer;
-        this.deletedRelationshipIterator = transactionDataContainer.getRelationshipTransactionData().getDeleted(wrappedNode).iterator();
-    }
-
-    public RelationshipSnapshotIterator(Node wrappedNode, TransactionDataContainer transactionDataContainer, RelationshipType... types) {
-        this.wrappedIterator = wrappedNode.getRelationships(types).iterator();
-        this.transactionDataContainer = transactionDataContainer;
-        this.deletedRelationshipIterator = transactionDataContainer.getRelationshipTransactionData().getDeleted(wrappedNode, types).iterator();
-    }
-
-    public RelationshipSnapshotIterator(Node wrappedNode, TransactionDataContainer transactionDataContainer, Direction direction, RelationshipType... types) {
-        this.wrappedIterator = wrappedNode.getRelationships(direction, types).iterator();
-        this.transactionDataContainer = transactionDataContainer;
-        this.deletedRelationshipIterator = transactionDataContainer.getRelationshipTransactionData().getDeleted(wrappedNode, direction, types).iterator();
-    }
-
-    public RelationshipSnapshotIterator(Node wrappedNode, TransactionDataContainer transactionDataContainer, Direction direction) {
-        this.wrappedIterator = wrappedNode.getRelationships(direction).iterator();
-        this.transactionDataContainer = transactionDataContainer;
-        this.deletedRelationshipIterator = transactionDataContainer.getRelationshipTransactionData().getDeleted(wrappedNode, direction).iterator();
+        this.deletedRelationshipIterator = transactionDataContainer.getRelationshipTransactionData().getDeleted(node, direction, relationshipTypes).iterator();
     }
 
     /**

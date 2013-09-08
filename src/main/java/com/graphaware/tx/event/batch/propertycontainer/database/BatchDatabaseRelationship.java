@@ -18,6 +18,7 @@ package com.graphaware.tx.event.batch.propertycontainer.database;
 
 import com.graphaware.propertycontainer.wrapper.RelationshipWrapper;
 import com.graphaware.tx.event.batch.data.BatchTransactionData;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
 
@@ -79,5 +80,13 @@ public class BatchDatabaseRelationship extends BatchDatabasePropertyContainer<Re
         }
         transactionData.relationshipPropertyRemoved(this, key);
         return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Node wrapNode(Node node) {
+        return new BatchDatabaseNode(node.getId(), database, transactionData);
     }
 }
