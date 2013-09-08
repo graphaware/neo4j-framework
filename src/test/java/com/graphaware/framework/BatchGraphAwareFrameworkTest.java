@@ -190,13 +190,26 @@ public class BatchGraphAwareFrameworkTest extends BaseGraphAwareFrameworkTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void shouldNotBeAbleToRegisterModuleWithTheSameIdTwice() {
+    public void shouldNotBeAbleToRegisterTheSameModuleTwice() {
         final GraphAwareModule mockModule = createMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
         framework.registerModule(mockModule);
         framework.registerModule(mockModule);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotBeAbleToRegisterModuleWithTheSameIdTwice() {
+        final GraphAwareModule mockModule1 = createMockModule();
+        final GraphAwareModule mockModule2 = createMockModule();
+        when(mockModule1.getId()).thenReturn("ID");
+        when(mockModule2.getId()).thenReturn("ID");
+
+        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
+        BatchGraphAwareFramework framework = new BatchGraphAwareFramework(batchInserter);
+        framework.registerModule(mockModule1);
+        framework.registerModule(mockModule2);
     }
 
     @Test

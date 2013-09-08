@@ -138,8 +138,14 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
      * @throws IllegalStateException in case the module is already registered.
      */
     private void checkNotAlreadyRegistered(GraphAwareModule module) {
-        if (modules.contains(module)) {              //todo also check for ID uniqueness
+        if (modules.contains(module)) {
             throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
+        }
+
+        for (GraphAwareModule existing : modules) {
+            if (existing.getId().equals(module.getId())) {
+                throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
+            }
         }
     }
 

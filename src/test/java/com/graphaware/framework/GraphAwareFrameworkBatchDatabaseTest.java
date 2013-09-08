@@ -186,12 +186,24 @@ public class GraphAwareFrameworkBatchDatabaseTest extends BaseGraphAwareFramewor
     }
 
     @Test(expected = IllegalStateException.class)
-    public void shouldNotBeAbleToRegisterModuleWithTheSameIdTwice() {
+    public void shouldNotBeAbleToRegisterTheSameModuleTwice() {
         final GraphAwareModule mockModule = createMockModule();
 
         GraphAwareFramework framework = new GraphAwareFramework(database);
         framework.registerModule(mockModule);
         framework.registerModule(mockModule);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotBeAbleToRegisterModuleWithTheSameIdTwice() {
+        final GraphAwareModule mockModule1 = createMockModule();
+        final GraphAwareModule mockModule2 = createMockModule();
+        when(mockModule1.getId()).thenReturn("ID");
+        when(mockModule2.getId()).thenReturn("ID");
+
+        GraphAwareFramework framework = new GraphAwareFramework(database);
+        framework.registerModule(mockModule1);
+        framework.registerModule(mockModule2);
     }
 
     @Test
