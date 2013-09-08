@@ -125,7 +125,7 @@ public class TransactionSimulatingBatchGraphDatabase extends BatchGraphDatabaseI
      */
     @Override
     public Node getNodeById(long id) {
-        return new BatchDatabaseNode(id, this, batchTransactionData);
+        return new BatchDatabaseNode(super.getNodeById(id).getId(), this, batchTransactionData);
     }
 
     /**

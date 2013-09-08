@@ -23,11 +23,11 @@ import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
 
 import java.io.IOException;
@@ -42,8 +42,6 @@ import static org.mockito.Mockito.*;
 /**
  * Unit test for {@link com.graphaware.framework.GraphAwareFramework} used with batch graph database.
  */
-@Ignore("due to bugs in Neo 1.9.2 - see https://github.com/neo4j/neo4j/issues/1034")
-//todo unignore when 1.9.3 is released
 public class GraphAwareFrameworkBatchDatabaseTest extends BaseGraphAwareFrameworkTest {
 
     private GraphDatabaseService database;
@@ -63,7 +61,20 @@ public class GraphAwareFrameworkBatchDatabaseTest extends BaseGraphAwareFramewor
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotWorkOnDatabaseWithNoRootNode() {
-        database.getNodeById(0).delete();
+        database.shutdown();
+
+        database = new GraphDatabaseFactory().newEmbeddedDatabase(temporaryFolder.getRoot().getAbsolutePath());
+
+        new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
+            @Override
+            protected void doInTx(GraphDatabaseService database) {
+                database.getNodeById(0).delete();
+            }
+        });
+
+        database.shutdown();
+
+        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath());
         new GraphAwareFramework(database);
     }
 
@@ -112,7 +123,7 @@ public class GraphAwareFrameworkBatchDatabaseTest extends BaseGraphAwareFramewor
         framework.start();
 
         verify(mockModule).reinitialize(database);
-        verify(mockModule).asString();
+        verify(mockModule, times(2)).asString();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
@@ -238,6 +249,9 @@ public class GraphAwareFrameworkBatchDatabaseTest extends BaseGraphAwareFramewor
 
     @Test
     public void allRegisteredInterestedModulesShouldBeDelegatedTo() {
+        database.shutdown();
+        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath(), 0);
+
         GraphAwareModule mockModule1 = mock(GraphAwareModule.class);
         when(mockModule1.getId()).thenReturn("MOCK1");
         when(mockModule1.asString()).thenReturn(TEST_CONFIG);
@@ -272,6 +286,7 @@ public class GraphAwareFrameworkBatchDatabaseTest extends BaseGraphAwareFramewor
         verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
 
         database.createNode();
+
 
         verify(mockModule1).getInclusionStrategies();
         verify(mockModule2).getInclusionStrategies();
@@ -320,6 +335,9 @@ public class GraphAwareFrameworkBatchDatabaseTest extends BaseGraphAwareFramewor
         when(mockModule.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
         doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
+        database.shutdown();
+        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath(), 0);
+
         GraphAwareFramework framework = new GraphAwareFramework(database);
         framework.registerModule(mockModule);
 
@@ -350,6 +368,9 @@ public class GraphAwareFrameworkBatchDatabaseTest extends BaseGraphAwareFramewor
             }
         });
 
+        database.shutdown();
+        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath(), 0);
+
         long firstFailureTimestamp = Long.valueOf(database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_" + MOCK).toString().replaceFirst(FORCE_INITIALIZATION, ""));
 
         Thread.sleep(1);
@@ -360,6 +381,9 @@ public class GraphAwareFrameworkBatchDatabaseTest extends BaseGraphAwareFramewor
                 database.createNode();
             }
         });
+
+        database.shutdown();
+        database = new TransactionSimulatingBatchGraphDatabase(temporaryFolder.getRoot().getAbsolutePath(), 0);
 
         long secondFailureTimestamp = Long.valueOf(database.getNodeById(0).getProperty(GA_PREFIX + CORE + "_" + MOCK).toString().replaceFirst(FORCE_INITIALIZATION, ""));
 

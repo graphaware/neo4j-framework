@@ -14,9 +14,9 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package org.neo4j.unsafe.batchinsert;
+package com.graphaware.tx.event.batch.api;
 
-import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
+import com.graphaware.propertycontainer.wrapper.Wrapper;
 import com.graphaware.tx.event.batch.data.BatchTransactionData;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterRelationship;
@@ -26,91 +26,45 @@ import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.helpers.collection.PrefetchingIterator;
-import org.neo4j.kernel.impl.nioneo.store.FileSystemAbstraction;
 import org.neo4j.kernel.impl.nioneo.store.NeoStore;
+import org.neo4j.unsafe.batchinsert.BatchInserter;
+import org.neo4j.unsafe.batchinsert.BatchInserterImpl;
+import org.neo4j.unsafe.batchinsert.BatchRelationship;
 
 import java.lang.reflect.Field;
 import java.util.*;
 
 /**
- * {@link com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter} that simulates a transaction commit every {@link com.graphaware.tx.event.batch.data.BatchTransactionData#commitTxAfterMutations}
- * mutations. It is a decorator for a real {@link org.neo4j.unsafe.batchinsert.BatchInserter}.
+ * {@link com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter} that simulates a transaction commit
+ * every {@link com.graphaware.tx.event.batch.data.BatchTransactionData#commitTxAfterMutations} mutations.
+ * It is a decorator for a real {@link org.neo4j.unsafe.batchinsert.BatchInserter}.
  * <p/>
- *
  * @see org.neo4j.unsafe.batchinsert.BatchInserter - same limitations apply to this class.
- * todo make this a decorator, not an extension
  */
-public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl implements TransactionSimulatingBatchInserter {
+public class TransactionSimulatingBatchInserterImpl implements TransactionSimulatingBatchInserter, Wrapper<BatchInserter> {
 
     private final BatchTransactionData transactionData;
     private final List<KernelEventHandler> kernelEventHandlers = new LinkedList<>();
+    private final BatchInserter wrapped;
 
     /**
      * Construct a new inserter.
      *
-     * @param storeDir database directory.
+     * @param batchInserter wrapped batch inserter.
      */
-    public TransactionSimulatingBatchInserterImpl(String storeDir) {
-        super(storeDir);
+    public TransactionSimulatingBatchInserterImpl(BatchInserter batchInserter) {
+        this.wrapped = batchInserter;
         this.transactionData = new BatchTransactionData();
     }
 
     /**
      * Construct a new inserter.
      *
-     * @param storeDir     database directory.
-     * @param stringParams config parameters.
-     */
-    public TransactionSimulatingBatchInserterImpl(String storeDir, Map<String, String> stringParams) {
-        super(storeDir, stringParams);
-        this.transactionData = new BatchTransactionData();
-    }
-
-    /**
-     * Construct a new inserter.
-     *
-     * @param storeDir     database directory.
-     * @param fileSystem   file system.
-     * @param stringParams config parameters.
-     */
-    public TransactionSimulatingBatchInserterImpl(String storeDir, FileSystemAbstraction fileSystem, Map<String, String> stringParams) {
-        super(storeDir, fileSystem, stringParams);
-        this.transactionData = new BatchTransactionData();
-    }
-
-    /**
-     * Construct a new inserter.
-     *
-     * @param storeDir               database directory.
+     * @param batchInserter          wrapped batch inserter.
      * @param commitTxAfterMutations how many mutations it should take before a commit is simulated.
      */
-    public TransactionSimulatingBatchInserterImpl(String storeDir, int commitTxAfterMutations) {
-        super(storeDir);
-        this.transactionData = new BatchTransactionData(commitTxAfterMutations);
-    }
-
-    /**
-     * Construct a new inserter.
-     *
-     * @param storeDir               database directory.
-     * @param stringParams           config parameters.
-     * @param commitTxAfterMutations how many mutations it should take before a commit is simulated.
-     */
-    public TransactionSimulatingBatchInserterImpl(String storeDir, Map<String, String> stringParams, int commitTxAfterMutations) {
-        super(storeDir, stringParams);
-        this.transactionData = new BatchTransactionData(commitTxAfterMutations);
-    }
-
-    /**
-     * Construct a new inserter.
-     *
-     * @param storeDir               database directory.
-     * @param fileSystem             file system.
-     * @param stringParams           config parameters.
-     * @param commitTxAfterMutations how many mutations it should take before a commit is simulated.
-     */
-    public TransactionSimulatingBatchInserterImpl(String storeDir, FileSystemAbstraction fileSystem, Map<String, String> stringParams, int commitTxAfterMutations) {
-        super(storeDir, fileSystem, stringParams);
+    public TransactionSimulatingBatchInserterImpl(BatchInserter batchInserter, int commitTxAfterMutations) {
+        this.wrapped = batchInserter;
         this.transactionData = new BatchTransactionData(commitTxAfterMutations);
     }
 
@@ -137,7 +91,7 @@ public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl im
      */
     @Override
     public long createNode(Map<String, Object> properties) {
-        long nodeId = super.createNode(properties);
+        long nodeId = wrapped.createNode(properties);
         transactionData.nodeCreated(nodeById(nodeId));
         return nodeId;
     }
@@ -147,7 +101,7 @@ public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl im
      */
     @Override
     public void setNodeProperties(long nodeId, Map<String, Object> properties) {
-        Set<String> removedProperties = super.getNodeProperties(nodeId).keySet();
+        Set<String> removedProperties = wrapped.getNodeProperties(nodeId).keySet();
 
         Node node = nodeById(nodeId);
 
@@ -159,7 +113,7 @@ public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl im
             transactionData.nodePropertyToBeSet(node, key, properties.get(key));
         }
 
-        super.setNodeProperties(nodeId, properties);
+        wrapped.setNodeProperties(nodeId, properties);
 
         for (String key : removedProperties) {
             transactionData.nodePropertyRemoved(node, key);
@@ -176,7 +130,7 @@ public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl im
     @Override
     public void setNodeProperty(long nodeId, String propertyName, Object propertyValue) {
         transactionData.nodePropertyToBeSet(nodeById(nodeId), propertyName, propertyValue);
-        super.setNodeProperty(nodeId, propertyName, propertyValue);
+        wrapped.setNodeProperty(nodeId, propertyName, propertyValue);
         transactionData.nodePropertySet(nodeById(nodeId), propertyName, propertyValue);
     }
 
@@ -186,7 +140,7 @@ public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl im
     @Override
     public void setRelationshipProperty(long relationshipId, String propertyName, Object propertyValue) {
         transactionData.relationshipPropertyToBeSet(relationshipById(relationshipId), propertyName, propertyValue);
-        super.setRelationshipProperty(relationshipId, propertyName, propertyValue);
+        wrapped.setRelationshipProperty(relationshipId, propertyName, propertyValue);
         transactionData.relationshipPropertySet(relationshipById(relationshipId), propertyName, propertyValue);
     }
 
@@ -195,7 +149,7 @@ public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl im
      */
     @Override
     public void createNode(long nodeId, Map<String, Object> properties) {
-        super.createNode(nodeId, properties);
+        wrapped.createNode(nodeId, properties);
         transactionData.nodeCreated(nodeById(nodeId));
     }
 
@@ -204,7 +158,7 @@ public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl im
      */
     @Override
     public long createRelationship(long node1, long node2, RelationshipType type, Map<String, Object> properties) {
-        long relationshipId = super.createRelationship(node1, node2, type, properties);
+        long relationshipId = wrapped.createRelationship(node1, node2, type, properties);
         transactionData.relationshipCreated(relationshipById(relationshipId));
         return relationshipId;
     }
@@ -214,7 +168,7 @@ public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl im
      */
     @Override
     public void setRelationshipProperties(long relationshipId, Map<String, Object> properties) {
-        Set<String> removedProperties = super.getRelationshipProperties(relationshipId).keySet();
+        Set<String> removedProperties = wrapped.getRelationshipProperties(relationshipId).keySet();
 
         Relationship relationship = relationshipById(relationshipId);
 
@@ -226,7 +180,7 @@ public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl im
             transactionData.relationshipPropertyToBeSet(relationship, key, properties.get(key));
         }
 
-        super.setRelationshipProperties(relationshipId, properties);
+        wrapped.setRelationshipProperties(relationshipId, properties);
 
         for (String key : removedProperties) {
             transactionData.relationshipPropertyRemoved(relationship, key);
@@ -243,7 +197,7 @@ public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl im
     @Override
     public void removeNodeProperty(long nodeId, String property) {
         transactionData.nodePropertyToBeRemoved(nodeById(nodeId), property);
-        super.removeNodeProperty(nodeId, property);
+        wrapped.removeNodeProperty(nodeId, property);
         transactionData.nodePropertyRemoved(nodeById(nodeId), property);
     }
 
@@ -253,7 +207,7 @@ public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl im
     @Override
     public void removeRelationshipProperty(long relationshipId, String property) {
         transactionData.relationshipPropertyToBeRemoved(relationshipById(relationshipId), property);
-        super.removeRelationshipProperty(relationshipId, property);
+        wrapped.removeRelationshipProperty(relationshipId, property);
         transactionData.relationshipPropertyRemoved(relationshipById(relationshipId), property);
     }
 
@@ -268,7 +222,7 @@ public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl im
             handler.beforeShutdown();
         }
 
-        super.shutdown();
+        wrapped.shutdown();
     }
 
     /**
@@ -285,7 +239,7 @@ public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl im
      * Get a {@link org.neo4j.graphdb.Relationship} object by its ID from the wrapped batch inserter.
      */
     private Relationship relationshipById(long id) {
-        return new BatchInserterRelationship(super.getRelationshipById(id), this);
+        return new BatchInserterRelationship(wrapped.getRelationshipById(id), this);
     }
 
     /**
@@ -299,7 +253,7 @@ public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl im
         try {
             Field neoStoreField = BatchInserterImpl.class.getDeclaredField("neoStore");
             neoStoreField.setAccessible(true);
-            NeoStore neoStore = (NeoStore) neoStoreField.get(this);
+            NeoStore neoStore = (NeoStore) neoStoreField.get(wrapped);
             highId = neoStore.getNodeStore().getHighId();
         } catch (NoSuchFieldException e) {
             throw new RuntimeException("No field named neoStore in BatchInserterImpl. This is a bug.");
@@ -334,5 +288,62 @@ public class TransactionSimulatingBatchInserterImpl extends BatchInserterImpl im
 
             return null;
         }
+    }
+
+    //pure delegates
+
+    @Override
+    public boolean nodeExists(long nodeId) {
+        return wrapped.nodeExists(nodeId);
+    }
+
+    @Override
+    public boolean nodeHasProperty(long node, String propertyName) {
+        return wrapped.nodeHasProperty(node, propertyName);
+    }
+
+    @Override
+    public boolean relationshipHasProperty(long relationship, String propertyName) {
+        return wrapped.relationshipHasProperty(relationship, propertyName);
+    }
+
+    @Override
+    public Map<String, Object> getNodeProperties(long nodeId) {
+        return wrapped.getNodeProperties(nodeId);
+    }
+
+    @Override
+    public Iterable<Long> getRelationshipIds(long nodeId) {
+        return wrapped.getRelationshipIds(nodeId);
+    }
+
+    @Override
+    public Iterable<BatchRelationship> getRelationships(long nodeId) {
+        return wrapped.getRelationships(nodeId);
+    }
+
+    @Override
+    public BatchRelationship getRelationshipById(long relId) {
+        return wrapped.getRelationshipById(relId);
+    }
+
+    @Override
+    public Map<String, Object> getRelationshipProperties(long relId) {
+        return wrapped.getRelationshipProperties(relId);
+    }
+
+    @Override
+    public String getStoreDir() {
+        return wrapped.getStoreDir();
+    }
+
+    @Override
+    public long getReferenceNode() {
+        return wrapped.getReferenceNode();
+    }
+
+    @Override
+    public BatchInserter getWrapped() {
+        return wrapped;
     }
 }

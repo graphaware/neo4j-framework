@@ -17,6 +17,7 @@
 package com.graphaware.tx.event.batch;
 
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
+import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserterImpl;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterRelationship;
 import com.graphaware.tx.event.improved.api.Change;
@@ -40,7 +41,7 @@ import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.kernel.Uniqueness;
 import org.neo4j.kernel.impl.traversal.TraversalDescriptionImpl;
-import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchInserterImpl;
+import org.neo4j.unsafe.batchinsert.BatchInserters;
 
 import java.io.IOException;
 import java.util.*;
@@ -791,7 +792,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
                 }
         );
 
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
 
         Relationship r1 = getNodeById(5).getSingleRelationship(withName("R5"), OUTGOING);
         assertEquals(1, count(r1.getPropertyKeys()));
@@ -816,7 +817,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
                 }
         );
 
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
 
         Node createdNode = getNodeById(5L);
 
@@ -844,7 +845,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
                 }
         );
 
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
 
         Relationship r = getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING);
 
@@ -873,7 +874,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
                 }
         );
 
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
 
         Relationship r = getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING);
 
@@ -903,7 +904,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
                 }
         );
 
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
 
         Node node = getNodeById(1L);
 
@@ -933,7 +934,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
                 }
         );
 
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
 
         Node node = getNodeById(1L);
 
@@ -968,7 +969,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
                 }
         );
 
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
 
         Relationship newRelationship = getNodeById(1).getSingleRelationship(withName("R6"), OUTGOING);
         assertNotNull(newRelationship);
@@ -994,7 +995,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
                 }
         );
 
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
 
         Relationship newRelationship = getNodeById(1).getSingleRelationship(withName("R6"), OUTGOING);
         assertNotNull(newRelationship);
@@ -1100,12 +1101,12 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
 
     @Test
     public void verifyAutoCommit() {
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
 
         populateDatabase();
 
         batchInserter.shutdown();
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath(), 27);
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()), 27);
 
         final AtomicInteger numberOfCommits = new AtomicInteger(0);
 
@@ -1133,14 +1134,14 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
 
     @Test
     public void shouldReturnNoNodesWhenNothingInTheDatabase() {
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
 
         assertFalse(batchInserter.getAllNodes().iterator().hasNext());
     }
 
     @Test
     public void shouldReturnAllNodesFromTheDatabase() {
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
 
         batchInserter.createNode(Collections.<String, Object>singletonMap("name", "One"));
         batchInserter.createNode(Collections.<String, Object>singletonMap("name", "Two"));
@@ -1174,7 +1175,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
 
         database.shutdown();
 
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
 
         Iterable<Long> allNodes = batchInserter.getAllNodes();
         assertEquals(2, count(allNodes));
@@ -1186,7 +1187,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
 
     @Test
     public void shouldGetRoot() {
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         assertEquals(0, batchInserter.getReferenceNode());
     }
 
@@ -1286,12 +1287,12 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
     }
 
     private void createBatchInserter() {
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
 
         populateDatabase();
 
         batchInserter.shutdown();
-        batchInserter = new TransactionSimulatingBatchInserterImpl(temporaryFolder.getRoot().getAbsolutePath());
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
     }
 
     private void populateDatabase() {
