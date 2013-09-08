@@ -30,10 +30,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
@@ -50,8 +47,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.graphaware.propertycontainer.util.PropertyContainerUtils.*;
 import static com.graphaware.test.IterableUtils.count;
 import static junit.framework.Assert.*;
-import static org.neo4j.graphdb.Direction.INCOMING;
-import static org.neo4j.graphdb.Direction.OUTGOING;
+import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
@@ -1077,6 +1073,8 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertEquals(5, count(getNodeById(1).getRelationships()));
+                        assertEquals(5, count(getNodeById(1).getRelationships(BOTH, null)));
+                        assertEquals(5, count(getNodeById(1).getRelationships(BOTH, new RelationshipType[0])));
                         assertEquals(2, count(getNodeById(1).getRelationships(withName("R3"))));
                         assertEquals(3, count(getNodeById(1).getRelationships(withName("R3"), withName("R1"))));
                         assertEquals(4, count(getNodeById(1).getRelationships(OUTGOING)));

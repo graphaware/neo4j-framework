@@ -36,28 +36,12 @@ public class BatchInserterRelationshipIterator extends PrefetchingIterator<Relat
     private final Direction direction;
     private final RelationshipType[] relationshipTypes;
 
-    public BatchInserterRelationshipIterator(long nodeId, BatchInserter batchInserter) {
-        this(nodeId, batchInserter, Direction.BOTH);
-    }
-
-    public BatchInserterRelationshipIterator(long nodeId, BatchInserter batchInserter, Direction direction) {
-        this.nodeId = nodeId;
-        this.batchInserter = batchInserter;
-        this.batchRelationships = batchInserter.getRelationships(nodeId).iterator();
-        this.direction = direction;
-        this.relationshipTypes = null; // = any
-    }
-
-    public BatchInserterRelationshipIterator(long nodeId, BatchInserter batchInserter, RelationshipType... relationshipTypes) {
-        this(nodeId, batchInserter, Direction.BOTH, relationshipTypes);
-    }
-
     public BatchInserterRelationshipIterator(long nodeId, BatchInserter batchInserter, Direction direction, RelationshipType... relationshipTypes) {
         this.nodeId = nodeId;
         this.batchInserter = batchInserter;
         this.batchRelationships = batchInserter.getRelationships(nodeId).iterator();
         this.direction = direction;
-        this.relationshipTypes = relationshipTypes; //empty = none
+        this.relationshipTypes = relationshipTypes; //empty or null = any
     }
 
     @Override
@@ -79,7 +63,7 @@ public class BatchInserterRelationshipIterator extends PrefetchingIterator<Relat
     }
 
     private boolean typeMatches(BatchRelationship batchRelationship) {
-        if (relationshipTypes == null) {
+        if (relationshipTypes == null || relationshipTypes.length == 0) {
             return true;
         }
 

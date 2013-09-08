@@ -103,40 +103,8 @@ public class BatchInserterNode extends BatchInserterPropertyContainer<Node> impl
      * {@inheritDoc}
      */
     @Override
-    public Iterable<Relationship> getRelationships() {
-        return new BatchInserterRelationshipIterator(id, batchInserter);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<Relationship> getRelationships(RelationshipType... types) {
-        return new BatchInserterRelationshipIterator(id, batchInserter, types);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Iterable<Relationship> getRelationships(Direction direction, RelationshipType... types) {
         return new BatchInserterRelationshipIterator(id, batchInserter, direction, types);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<Relationship> getRelationships(Direction dir) {
-        return new BatchInserterRelationshipIterator(id, batchInserter, dir);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<Relationship> getRelationships(RelationshipType type, Direction dir) {
-        return new BatchInserterRelationshipIterator(id, batchInserter, dir, type);
     }
 
     /**

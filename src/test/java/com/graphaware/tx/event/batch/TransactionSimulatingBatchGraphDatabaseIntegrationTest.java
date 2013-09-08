@@ -1287,7 +1287,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
             r = three.getSingleRelationship(withName("R3"), OUTGOING);
             r.setProperty("time", 4);
             r.removeProperty("tag");
-//            r.removeProperty("tag");  //can't do this for the second time, this is a bug in Neo - see https://github.com/neo4j/neo4j/issues/1025
+            r.removeProperty("tag");
             r.setProperty("tag", "bla");
             r.removeProperty("tag");
             r.setProperty("tags", "cool");

@@ -76,29 +76,35 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
         return getWrapped().getPropertyKeys();
     }
 
-    //The following methods intentionally break object-orientation a bit to keep the rest of the codebase DRY:
-
     /**
      * @see {@link org.neo4j.graphdb.Node#getRelationships()}.
      */
     public Iterable<Relationship> getRelationships() {
-        if (!(getWrapped() instanceof Node)) {
-            throw new IllegalStateException("Not a node, this is a bug");
-        }
-
-        return wrapRelationships(((Node) getWrapped()).getRelationships(), BOTH);
+        return getRelationships(BOTH);
     }
 
     /**
      * @see {@link org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.RelationshipType...)}.
      */
     public Iterable<Relationship> getRelationships(RelationshipType... types) {
-        if (!(getWrapped() instanceof Node)) {
-            throw new IllegalStateException("Not a node, this is a bug");
-        }
-
-        return wrapRelationships(((Node) getWrapped()).getRelationships(types), BOTH, types);
+        return getRelationships(BOTH, types);
     }
+
+    /**
+     * @see {@link org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.Direction)}.
+     */
+    public Iterable<Relationship> getRelationships(Direction dir) {
+        return getRelationships(dir, new RelationshipType[0]);
+    }
+
+    /**
+     * @see {@link org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction)}.
+     */
+    public Iterable<Relationship> getRelationships(RelationshipType type, Direction dir) {
+        return getRelationships(dir, type);
+    }
+
+    //The following methods intentionally break object-orientation a bit to keep the rest of the codebase DRY:
 
     /**
      * @see {@link org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.Direction, org.neo4j.graphdb.RelationshipType...)}.
@@ -108,29 +114,11 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
             throw new IllegalStateException("Not a node, this is a bug");
         }
 
+        if (types == null || types.length == 0) {
+            return wrapRelationships(((Node) getWrapped()).getRelationships(direction), direction);
+        }
+
         return wrapRelationships(((Node) getWrapped()).getRelationships(direction, types), direction, types);
-    }
-
-    /**
-     * @see {@link org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.Direction)}.
-     */
-    public Iterable<Relationship> getRelationships(Direction dir) {
-        if (!(getWrapped() instanceof Node)) {
-            throw new IllegalStateException("Not a node, this is a bug");
-        }
-
-        return wrapRelationships(((Node) getWrapped()).getRelationships(dir), dir);
-    }
-
-    /**
-     * @see {@link org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction)}.
-     */
-    public Iterable<Relationship> getRelationships(RelationshipType type, Direction dir) {
-        if (!(getWrapped() instanceof Node)) {
-            throw new IllegalStateException("Not a node, this is a bug");
-        }
-
-        return wrapRelationships(((Node) getWrapped()).getRelationships(type, dir), dir, type);
     }
 
     /**
@@ -177,14 +165,39 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
         return wrapNode(((Relationship) getWrapped()).getEndNode());
     }
 
+    /**
+     * Allow subclasses to wrap a node. By default, no wrapping is performed. This method is called every time a node
+     * is about to be returned.
+     *
+     * @param node to wrap.
+     * @return wrapped node.
+     */
     protected Node wrapNode(Node node) {
         return node;
     }
 
+    /**
+     * Allow subclasses to wrap a relationship. By default, no wrapping is performed. This method is called every time
+     * a relationship is about to be returned.
+     *
+     * @param relationship to wrap.
+     * @return wrapped relationship.
+     */
     protected Relationship wrapRelationship(Relationship relationship) {
         return relationship;
     }
 
+    /**
+     * Allow subclasses to wrap an iterable relationship. By default, {@link #wrapRelationship(org.neo4j.graphdb.Relationship)}
+     * is called for each relationship. This method is called every time a relationship iterable is about to be returned.
+     *
+     * @param relationships     to wrap.
+     * @param direction         of that the returned relationships should all have (for cases where the subclass wants
+     *                          to add additional relationships).
+     * @param relationshipTypes one of which the returned relationships should all have (for cases where the subclass
+     *                          wants to add additional relationships). Empty array means "any".
+     * @return wrapped relationship.
+     */
     protected Iterable<Relationship> wrapRelationships(Iterable<Relationship> relationships, Direction direction, RelationshipType... relationshipTypes) {
         return new IterableWrapper<Relationship, Relationship>(relationships) {
             @Override
