@@ -41,6 +41,7 @@ final class Any extends BasePredicate {
      */
     @Override
     public boolean evaluate(Object beta) {
+        checkValueIsLegal(beta);
         return true;
     }
 

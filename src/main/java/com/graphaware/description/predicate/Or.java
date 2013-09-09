@@ -48,6 +48,18 @@ final class Or extends BasePredicate {
      */
     @Override
     public boolean isMoreGeneralThan(Predicate other) {
+        if (super.isMoreGeneralThan(other)) {
+            return true;
+        }
+
         return first.isMoreGeneralThan(other) || second.isMoreGeneralThan(other);
+    }
+
+    Predicate getFirst() {
+        return first;
+    }
+
+    Predicate getSecond() {
+        return second;
     }
 }

@@ -47,7 +47,8 @@ class EqualTo extends ValueBasedPredicate<Object> {
      */
     @Override
     public boolean isMoreGeneralThan(Predicate other) {
-        return other instanceof EqualTo && arrayFriendlyEquals(getValue(), ((EqualTo) other).getValue());
+        return super.isMoreGeneralThan(other)
+                || (other instanceof EqualTo && arrayFriendlyEquals(getValue(), ((EqualTo) other).getValue()));
     }
 
     /**

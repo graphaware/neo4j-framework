@@ -44,12 +44,16 @@ final class GreaterThan extends ComparablePredicate {
      */
     @Override
     public boolean isMoreGeneralThan(Predicate other) {
+        if (super.isMoreGeneralThan(other)) {
+            return true;
+        }
+
         if (!(other instanceof ValueBasedPredicate)) {
             return false;
         }
 
         if (other instanceof EqualTo || other instanceof GreaterThan) {
-            return isLessThan(((ValueBasedPredicate) other).getValue());
+            return isLessThan(((ValueBasedPredicate) other).getValue()) || getValue().equals(((ValueBasedPredicate) other).getValue());
         }
 
         return false;

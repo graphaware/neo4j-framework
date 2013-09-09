@@ -211,9 +211,9 @@ public class EqualToTest {
         assertFalse(equalTo(2).isMoreGeneralThan(greaterThan(2)));
         assertFalse(equalTo(2).isMoreGeneralThan(lessThan(2)));
         assertFalse(equalTo(2).isMoreGeneralThan(any()));
-        assertFalse(equalTo(2).isMoreGeneralThan(new Or(equalTo(2), equalTo(3))));
-        assertFalse(equalTo(2).isMoreGeneralThan(lessThanOrEqualTo(2)));
-        assertFalse(equalTo(2).isMoreGeneralThan(greaterThanOrEqualTo(2)));
+        assertTrue(equalTo(2).isMoreGeneralThan(new Or(equalTo(2), equalTo(3))));
+        assertTrue(equalTo(2).isMoreGeneralThan(lessThanOrEqualTo(2)));
+        assertTrue(equalTo(2).isMoreGeneralThan(greaterThanOrEqualTo(2)));
     }
 
     @Test
