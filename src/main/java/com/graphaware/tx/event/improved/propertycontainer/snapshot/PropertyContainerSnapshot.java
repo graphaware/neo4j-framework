@@ -16,9 +16,9 @@
 
 package com.graphaware.tx.event.improved.propertycontainer.snapshot;
 
-import com.graphaware.propertycontainer.wrapper.BasePropertyContainerWrapper;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
+import com.graphaware.wrapper.BasePropertyContainerWrapper;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.PropertyContainer;

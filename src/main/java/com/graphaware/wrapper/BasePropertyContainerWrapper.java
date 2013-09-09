@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.wrapper;
+package com.graphaware.wrapper;
 
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.IterableWrapper;

@@ -14,19 +14,12 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.wrapper;
+package com.graphaware.wrapper;
+
+import org.neo4j.graphdb.Node;
 
 /**
- * A wrapper (typically a decorator) for an object.
- *
- * @param <T> type of the object this wrapper wraps.
+ * A {@link Wrapper} for {@link org.neo4j.graphdb.Node}
  */
-public interface Wrapper<T> {
-
-    /**
-     * Get the wrapped instance.
-     *
-     * @return wrapped instance.
-     */
-    T getWrapped();
+public interface NodeWrapper extends Node, PropertyContainerWrapper<Node> {
 }

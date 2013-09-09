@@ -16,8 +16,8 @@
 
 package com.graphaware.tx.event.batch.propertycontainer.database;
 
-import com.graphaware.propertycontainer.wrapper.RelationshipWrapper;
 import com.graphaware.tx.event.batch.data.BatchTransactionData;
+import com.graphaware.wrapper.RelationshipWrapper;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;

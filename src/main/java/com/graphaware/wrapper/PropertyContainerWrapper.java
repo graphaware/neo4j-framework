@@ -14,12 +14,14 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.wrapper;
+package com.graphaware.wrapper;
 
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.PropertyContainer;
 
 /**
- * A {@link Wrapper} for {@link org.neo4j.graphdb.Relationship}
+ * A {@link Wrapper} for {@link org.neo4j.graphdb.PropertyContainer}s.
+ *
+ * @param <T> type of the wrapped property container.
  */
-public interface RelationshipWrapper extends Relationship, PropertyContainerWrapper<Relationship> {
+public interface PropertyContainerWrapper<T extends PropertyContainer> extends PropertyContainer, Wrapper<T> {
 }

@@ -16,10 +16,10 @@
 
 package com.graphaware.tx.event.batch.api;
 
-import com.graphaware.propertycontainer.wrapper.Wrapper;
 import com.graphaware.tx.event.batch.data.BatchTransactionData;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterRelationship;
+import com.graphaware.wrapper.Wrapper;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
