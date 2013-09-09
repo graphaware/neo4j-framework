@@ -78,7 +78,7 @@ public final class Predicates {
      * @return predicate.
      */
     public static Predicate lessThan(Comparable value) {
-        return new GreaterThan(value);
+        return new LessThan(value);
     }
 
     /**
