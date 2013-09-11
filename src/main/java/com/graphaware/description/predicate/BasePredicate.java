@@ -34,20 +34,20 @@ abstract class BasePredicate implements Predicate {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public boolean isMoreSpecificThan(Predicate other) {
-        return other.isMoreGeneralThan(this);
+    public boolean isMutuallyExclusive(Predicate other) {
+        if (other instanceof Or) {
+            return isMutuallyExclusive(((Or) other).getFirst()) && isMutuallyExclusive(((Or) other).getSecond());
+        }
+        return false;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean isMutuallyExclusive(Predicate other) {
-        return !isMoreGeneralThan(other) && !isMoreSpecificThan(other);
+    public boolean isMoreSpecificThan(Predicate other) {
+        return other.isMoreGeneralThan(this);
     }
 
     /**

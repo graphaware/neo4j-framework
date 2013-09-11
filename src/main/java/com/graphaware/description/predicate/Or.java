@@ -55,6 +55,18 @@ final class Or extends BasePredicate {
         return first.isMoreGeneralThan(other) || second.isMoreGeneralThan(other);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isMutuallyExclusive(Predicate other) {
+        if (super.isMutuallyExclusive(other)) {
+            return true;
+        }
+
+        return first.isMutuallyExclusive(other) && second.isMutuallyExclusive(other);
+    }
+
     Predicate getFirst() {
         return first;
     }

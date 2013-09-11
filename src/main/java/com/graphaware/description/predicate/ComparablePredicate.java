@@ -30,11 +30,6 @@ abstract class ComparablePredicate extends ValueBasedPredicate<Comparable> {
 
     protected ComparablePredicate(Comparable value) {
         super(value);
-
-        if (!isComparable(value)) {
-            throw new IllegalArgumentException("Value for the GreaterThan predicate must be comparable, i.e. a numerical" +
-                    " value, String, or char");
-        }
     }
 
     protected final boolean isLessThan(Object value) {
@@ -50,6 +45,10 @@ abstract class ComparablePredicate extends ValueBasedPredicate<Comparable> {
         }
     }
 
+    protected final boolean isLessThanOrEqualTo(Object value) {
+        return isLessThan(value) || arrayFriendlyEquals(getValue(), value);
+    }
+
     protected final boolean isGreaterThan(Object value) {
         if (!isComparable(value)) {
             return false;
@@ -61,6 +60,10 @@ abstract class ComparablePredicate extends ValueBasedPredicate<Comparable> {
             LOG.warn(String.valueOf(getValue()) + " cannot be compared to " + String.valueOf(value));
             return false;
         }
+    }
+
+    protected final boolean isGreaterThanOrEqualTo(Object value) {
+        return isGreaterThan(value) || arrayFriendlyEquals(getValue(), value);
     }
 
     protected final boolean isComparable(Object value) {

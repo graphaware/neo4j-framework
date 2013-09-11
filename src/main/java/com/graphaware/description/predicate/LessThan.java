@@ -36,6 +36,7 @@ final class LessThan extends ComparablePredicate {
      */
     @Override
     public boolean evaluate(Object beta) {
+        checkValueIsLegal(beta);
         return isGreaterThan(beta);
     }
 
@@ -52,8 +53,35 @@ final class LessThan extends ComparablePredicate {
             return false;
         }
 
-        if (other instanceof EqualTo || other instanceof LessThan) {
-            return isGreaterThan(((ValueBasedPredicate) other).getValue()) || getValue().equals(((ValueBasedPredicate) other).getValue());
+        if (other instanceof EqualTo) {
+            return isGreaterThan(((EqualTo) other).getValue());
+        }
+
+        if (other instanceof LessThan) {
+            return isGreaterThan(((LessThan) other).getValue()) || arrayFriendlyEquals(getValue(), ((LessThan) other).getValue());
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isMutuallyExclusive(Predicate other) {
+        if (super.isMutuallyExclusive(other)) {
+            return true;
+        }
+
+        if (other instanceof GreaterThan || other instanceof EqualTo) {
+            return !isGreaterThan(((ValueBasedPredicate) other).getValue());
+        }
+
+        if (other instanceof LessThan) {
+            if (!isGreaterThanOrEqualTo(((ValueBasedPredicate) other).getValue())
+                    && !isLessThanOrEqualTo(((ValueBasedPredicate) other).getValue())) {
+                return true;
+            }
         }
 
         return false;

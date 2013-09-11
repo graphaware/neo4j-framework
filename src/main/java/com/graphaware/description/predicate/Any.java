@@ -52,4 +52,12 @@ final class Any extends BasePredicate {
     public boolean isMoreGeneralThan(Predicate other) {
         return true;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isMutuallyExclusive(Predicate other) {
+        return false;
+    }
 }

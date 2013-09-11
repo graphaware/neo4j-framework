@@ -25,7 +25,7 @@ import static com.graphaware.description.predicate.Predicates.*;
 import static org.junit.Assert.*;
 
 /**
- * Unit test for {@link com.graphaware.description.predicate.EqualTo}.
+ * Unit test for {@link Any}.
  */
 public class AnyTest {
 
@@ -106,6 +106,7 @@ public class AnyTest {
         assertFalse(any().isMoreSpecificThan(lessThan(2)));
         assertFalse(any().isMoreSpecificThan(lessThan(3)));
         assertTrue(any().isMoreSpecificThan(any()));
+        assertFalse(any().isMoreSpecificThan(new Or(equalTo(2), equalTo(3))));
         assertFalse(any().isMoreSpecificThan(greaterThanOrEqualTo(2)));
         assertFalse(any().isMoreSpecificThan(lessThanOrEqualTo(2)));
         assertFalse(any().isMoreSpecificThan(greaterThanOrEqualTo(2)));
@@ -125,6 +126,7 @@ public class AnyTest {
         assertFalse(any().isMutuallyExclusive(lessThan(2)));
         assertFalse(any().isMutuallyExclusive(lessThan(3)));
         assertFalse(any().isMutuallyExclusive(any()));
+        assertFalse(any().isMutuallyExclusive(new Or(equalTo(2), equalTo(3))));
         assertFalse(any().isMutuallyExclusive(greaterThanOrEqualTo(2)));
         assertFalse(any().isMutuallyExclusive(lessThanOrEqualTo(2)));
         assertFalse(any().isMutuallyExclusive(greaterThanOrEqualTo(2)));

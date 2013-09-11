@@ -200,57 +200,218 @@ public class EqualToTest {
         assertTrue(equalTo(UndefinedValue.getInstance()).evaluate(UndefinedValue.getInstance()));
     }
 
+
     @Test
     public void shouldCorrectlyJudgeMoreGeneral() {
-        assertTrue(equalTo(2).isMoreGeneralThan(equalTo(2)));
-        assertTrue(equalTo(UndefinedValue.getInstance()).isMoreGeneralThan(equalTo(UndefinedValue.getInstance())));
-        assertTrue(equalTo(UndefinedValue.getInstance()).isMoreGeneralThan(undefined()));
-        assertFalse(equalTo(2).isMoreGeneralThan(equalTo(3)));
-        assertFalse(equalTo(2).isMoreGeneralThan(equalTo(2L)));
-        assertFalse(equalTo(2).isMoreGeneralThan(equalTo((short) 2)));
-        assertFalse(equalTo(2).isMoreGeneralThan(greaterThan(2)));
-        assertFalse(equalTo(2).isMoreGeneralThan(lessThan(2)));
+        assertFalse(equalTo(2).isMoreGeneralThan(equalTo(UndefinedValue.getInstance())));
+        assertFalse(equalTo(2).isMoreGeneralThan(undefined()));
         assertFalse(equalTo(2).isMoreGeneralThan(any()));
-        assertTrue(equalTo(2).isMoreGeneralThan(new Or(equalTo(2), equalTo(3))));
-        assertTrue(equalTo(2).isMoreGeneralThan(lessThanOrEqualTo(2)));
-        assertTrue(equalTo(2).isMoreGeneralThan(greaterThanOrEqualTo(2)));
+        assertFalse(equalTo("abc").isMoreGeneralThan(equalTo(UndefinedValue.getInstance())));
+        assertFalse(equalTo("abc").isMoreGeneralThan(undefined()));
+        assertFalse(equalTo("abc").isMoreGeneralThan(any()));
+
+        assertFalse(equalTo(2).isMoreGeneralThan(equalTo(1)));
+        assertFalse(equalTo(2).isMoreGeneralThan(equalTo(1L)));
+        assertTrue(equalTo(2).isMoreGeneralThan(equalTo(2)));
+        assertFalse(equalTo(2).isMoreGeneralThan(equalTo(2L)));
+        assertFalse(equalTo(2).isMoreGeneralThan(equalTo(3)));
+        assertFalse(equalTo(2).isMoreGeneralThan(equalTo(3L)));
+        assertFalse(equalTo(2).isMoreGeneralThan(equalTo(new int[]{3})));
+        assertFalse(equalTo("abc").isMoreGeneralThan(equalTo("abb")));
+        assertTrue(equalTo("abc").isMoreGeneralThan(equalTo("abc")));
+        assertFalse(equalTo("abc").isMoreGeneralThan(equalTo("abd")));
+
+        assertFalse(equalTo(2).isMoreGeneralThan(greaterThan(1)));
+        assertFalse(equalTo(2).isMoreGeneralThan(greaterThan(1L)));
+        assertFalse(equalTo(2).isMoreGeneralThan(greaterThan(2)));
+        assertFalse(equalTo(2).isMoreGeneralThan(greaterThan(3)));
+        assertFalse(equalTo("abc").isMoreGeneralThan(greaterThan("abb")));
+        assertFalse(equalTo("abc").isMoreGeneralThan(greaterThan("abc")));
+        assertFalse(equalTo("abc").isMoreGeneralThan(greaterThan("abd")));
+
+        assertFalse(equalTo(2).isMoreGeneralThan(lessThan(1)));
+        assertFalse(equalTo(2).isMoreGeneralThan(lessThan(1L)));
+        assertFalse(equalTo(2).isMoreGeneralThan(lessThan(2)));
+        assertFalse(equalTo(2).isMoreGeneralThan(lessThan(3)));
+        assertFalse(equalTo(2).isMoreGeneralThan(lessThan(3L)));
+        assertFalse(equalTo("abc").isMoreGeneralThan(lessThan("abb")));
+        assertFalse(equalTo("abc").isMoreGeneralThan(lessThan("abc")));
+        assertFalse(equalTo("abc").isMoreGeneralThan(lessThan("abd")));
+
+        assertFalse(equalTo(2).isMoreGeneralThan(greaterThanOrEqualTo(1)));
+        assertFalse(equalTo(2).isMoreGeneralThan(greaterThanOrEqualTo(2)));
+        assertFalse(equalTo(2).isMoreGeneralThan(greaterThanOrEqualTo(3)));
+        assertFalse(equalTo(2).isMoreGeneralThan(greaterThanOrEqualTo(3L)));
+        assertFalse(equalTo("abc").isMoreGeneralThan(greaterThanOrEqualTo("abb")));
+        assertFalse(equalTo("abc").isMoreGeneralThan(greaterThanOrEqualTo("abc")));
+        assertFalse(equalTo("abc").isMoreGeneralThan(greaterThanOrEqualTo("abd")));
+
+        assertFalse(equalTo(2).isMoreGeneralThan(lessThanOrEqualTo(1)));
+        assertFalse(equalTo(2).isMoreGeneralThan(lessThanOrEqualTo(1L)));
+        assertFalse(equalTo(2).isMoreGeneralThan(lessThanOrEqualTo(2)));
+        assertFalse(equalTo(2).isMoreGeneralThan(lessThanOrEqualTo(3)));
+        assertFalse(equalTo(2).isMoreGeneralThan(lessThanOrEqualTo(3L)));
+        assertFalse(equalTo("abc").isMoreGeneralThan(lessThanOrEqualTo("abb")));
+        assertFalse(equalTo("abc").isMoreGeneralThan(lessThanOrEqualTo("abc")));
+        assertFalse(equalTo("abc").isMoreGeneralThan(lessThanOrEqualTo("abd")));
+
+        assertFalse(equalTo(2).isMoreGeneralThan(new Or(greaterThan(1), equalTo(1))));
+        assertFalse(equalTo(2).isMoreGeneralThan(new Or(greaterThan(2), equalTo(2))));
+        assertFalse(equalTo(2).isMoreGeneralThan(new Or(greaterThan(3), equalTo(3))));
+        assertFalse(equalTo(2).isMoreGeneralThan(new Or(greaterThan(3L), equalTo(3L))));
+        assertFalse(equalTo("abc").isMoreGeneralThan(new Or(greaterThan("abb"), equalTo("abb"))));
+        assertFalse(equalTo("abc").isMoreGeneralThan(new Or(greaterThan("abc"), equalTo("abc"))));
+        assertFalse(equalTo("abc").isMoreGeneralThan(new Or(greaterThan("abd"), equalTo("abd"))));
+
+        assertFalse(equalTo(2).isMoreGeneralThan(new Or(lessThan(1), equalTo(1))));
+        assertFalse(equalTo(2).isMoreGeneralThan(new Or(lessThan(1L), equalTo(1L))));
+        assertFalse(equalTo(2).isMoreGeneralThan(new Or(lessThan(2), equalTo(2))));
+        assertFalse(equalTo(2).isMoreGeneralThan(new Or(lessThan(3), equalTo(3))));
+        assertFalse(equalTo(2).isMoreGeneralThan(new Or(lessThan(3L), equalTo(3L))));
+        assertFalse(equalTo("abc").isMoreGeneralThan(new Or(lessThan("abb"), equalTo("abb"))));
+        assertFalse(equalTo("abc").isMoreGeneralThan(new Or(lessThan("abc"), equalTo("abc"))));
+        assertFalse(equalTo("abc").isMoreGeneralThan(new Or(lessThan("abd"), equalTo("abd"))));
     }
 
     @Test
     public void shouldCorrectlyJudgeMoreSpecific() {
+        assertFalse(equalTo(2).isMoreSpecificThan(equalTo(UndefinedValue.getInstance())));
+        assertFalse(equalTo(2).isMoreSpecificThan(undefined()));
+        assertTrue(equalTo(2).isMoreSpecificThan(any()));
+        assertFalse(equalTo("abc").isMoreSpecificThan(equalTo(UndefinedValue.getInstance())));
+        assertFalse(equalTo("abc").isMoreSpecificThan(undefined()));
+        assertTrue(equalTo("abc").isMoreSpecificThan(any()));
+
+        assertFalse(equalTo(2).isMoreSpecificThan(equalTo(1)));
+        assertFalse(equalTo(2).isMoreSpecificThan(equalTo(1L)));
         assertTrue(equalTo(2).isMoreSpecificThan(equalTo(2)));
-        assertTrue(equalTo(UndefinedValue.getInstance()).isMoreSpecificThan(equalTo(UndefinedValue.getInstance())));
-        assertTrue(equalTo(UndefinedValue.getInstance()).isMoreSpecificThan(undefined()));
         assertFalse(equalTo(2).isMoreSpecificThan(equalTo(3)));
-        assertFalse(equalTo(2).isMoreSpecificThan(equalTo(2L)));
-        assertFalse(equalTo(2).isMoreSpecificThan(equalTo((short) 2)));
-        assertFalse(equalTo(2).isMoreSpecificThan(greaterThan(2)));
+        assertFalse(equalTo(2).isMoreSpecificThan(equalTo(3L)));
+        assertFalse(equalTo(2).isMoreSpecificThan(equalTo(new int[]{3})));
+        assertFalse(equalTo("abc").isMoreSpecificThan(equalTo("abb")));
+        assertTrue(equalTo("abc").isMoreSpecificThan(equalTo("abc")));
+        assertFalse(equalTo("abc").isMoreSpecificThan(equalTo("abd")));
+
         assertTrue(equalTo(2).isMoreSpecificThan(greaterThan(1)));
+        assertFalse(equalTo(2).isMoreSpecificThan(greaterThan(1L)));
+        assertFalse(equalTo(2).isMoreSpecificThan(greaterThan(2)));
+        assertFalse(equalTo(2).isMoreSpecificThan(greaterThan(3)));
+        assertTrue(equalTo("abc").isMoreSpecificThan(greaterThan("abb")));
+        assertFalse(equalTo("abc").isMoreSpecificThan(greaterThan("abc")));
+        assertFalse(equalTo("abc").isMoreSpecificThan(greaterThan("abd")));
+
+        assertFalse(equalTo(2).isMoreSpecificThan(lessThan(1)));
+        assertFalse(equalTo(2).isMoreSpecificThan(lessThan(1L)));
         assertFalse(equalTo(2).isMoreSpecificThan(lessThan(2)));
         assertTrue(equalTo(2).isMoreSpecificThan(lessThan(3)));
-        assertTrue(equalTo(2).isMoreSpecificThan(any()));
+        assertFalse(equalTo(2).isMoreSpecificThan(lessThan(3L)));
+        assertFalse(equalTo("abc").isMoreSpecificThan(lessThan("abb")));
+        assertFalse(equalTo("abc").isMoreSpecificThan(lessThan("abc")));
+        assertTrue(equalTo("abc").isMoreSpecificThan(lessThan("abd")));
+
+        assertTrue(equalTo(2).isMoreSpecificThan(greaterThanOrEqualTo(1)));
         assertTrue(equalTo(2).isMoreSpecificThan(greaterThanOrEqualTo(2)));
+        assertFalse(equalTo(2).isMoreSpecificThan(greaterThanOrEqualTo(3)));
+        assertFalse(equalTo(2).isMoreSpecificThan(greaterThanOrEqualTo(3L)));
+        assertTrue(equalTo("abc").isMoreSpecificThan(greaterThanOrEqualTo("abb")));
+        assertTrue(equalTo("abc").isMoreSpecificThan(greaterThanOrEqualTo("abc")));
+        assertFalse(equalTo("abc").isMoreSpecificThan(greaterThanOrEqualTo("abd")));
+
+        assertFalse(equalTo(2).isMoreSpecificThan(lessThanOrEqualTo(1)));
+        assertFalse(equalTo(2).isMoreSpecificThan(lessThanOrEqualTo(1L)));
         assertTrue(equalTo(2).isMoreSpecificThan(lessThanOrEqualTo(2)));
-        assertTrue(equalTo(3).isMoreSpecificThan(greaterThanOrEqualTo(2)));
-        assertTrue(equalTo(1).isMoreSpecificThan(lessThanOrEqualTo(2)));
+        assertTrue(equalTo(2).isMoreSpecificThan(lessThanOrEqualTo(3)));
+        assertFalse(equalTo(2).isMoreSpecificThan(lessThanOrEqualTo(3L)));
+        assertFalse(equalTo("abc").isMoreSpecificThan(lessThanOrEqualTo("abb")));
+        assertTrue(equalTo("abc").isMoreSpecificThan(lessThanOrEqualTo("abc")));
+        assertTrue(equalTo("abc").isMoreSpecificThan(lessThanOrEqualTo("abd")));
+
+        assertTrue(equalTo(2).isMoreSpecificThan(new Or(greaterThan(1), equalTo(1))));
+        assertTrue(equalTo(2).isMoreSpecificThan(new Or(greaterThan(2), equalTo(2))));
+        assertFalse(equalTo(2).isMoreSpecificThan(new Or(greaterThan(3), equalTo(3))));
+        assertFalse(equalTo(2).isMoreSpecificThan(new Or(greaterThan(3L), equalTo(3L))));
+        assertTrue(equalTo("abc").isMoreSpecificThan(new Or(greaterThan("abb"), equalTo("abb"))));
+        assertTrue(equalTo("abc").isMoreSpecificThan(new Or(greaterThan("abc"), equalTo("abc"))));
+        assertFalse(equalTo("abc").isMoreSpecificThan(new Or(greaterThan("abd"), equalTo("abd"))));
+
+        assertFalse(equalTo(2).isMoreSpecificThan(new Or(lessThan(1), equalTo(1))));
+        assertFalse(equalTo(2).isMoreSpecificThan(new Or(lessThan(1L), equalTo(1L))));
+        assertTrue(equalTo(2).isMoreSpecificThan(new Or(lessThan(2), equalTo(2))));
+        assertTrue(equalTo(2).isMoreSpecificThan(new Or(lessThan(3), equalTo(3))));
+        assertFalse(equalTo(2).isMoreSpecificThan(new Or(lessThan(3L), equalTo(3L))));
+        assertFalse(equalTo("abc").isMoreSpecificThan(new Or(lessThan("abb"), equalTo("abb"))));
+        assertTrue(equalTo("abc").isMoreSpecificThan(new Or(lessThan("abc"), equalTo("abc"))));
+        assertTrue(equalTo("abc").isMoreSpecificThan(new Or(lessThan("abd"), equalTo("abd"))));
     }
 
     @Test
     public void shouldCorrectlyJudgeMutuallyExclusive() {
+        assertTrue(equalTo(2).isMutuallyExclusive(equalTo(UndefinedValue.getInstance())));
+        assertTrue(equalTo(2).isMutuallyExclusive(undefined()));
+        assertFalse(equalTo(2).isMutuallyExclusive(any()));
+        assertTrue(equalTo("abc").isMutuallyExclusive(equalTo(UndefinedValue.getInstance())));
+        assertTrue(equalTo("abc").isMutuallyExclusive(undefined()));
+        assertFalse(equalTo("abc").isMutuallyExclusive(any()));
+
+        assertTrue(equalTo(2).isMutuallyExclusive(equalTo(1)));
+        assertTrue(equalTo(2).isMutuallyExclusive(equalTo(1L)));
         assertFalse(equalTo(2).isMutuallyExclusive(equalTo(2)));
-        assertFalse(equalTo(UndefinedValue.getInstance()).isMutuallyExclusive(equalTo(UndefinedValue.getInstance())));
-        assertFalse(equalTo(UndefinedValue.getInstance()).isMutuallyExclusive(undefined()));
         assertTrue(equalTo(2).isMutuallyExclusive(equalTo(3)));
-        assertTrue(equalTo(2).isMutuallyExclusive(equalTo(2L)));
-        assertTrue(equalTo(2).isMutuallyExclusive(equalTo((short) 2)));
-        assertTrue(equalTo(2).isMutuallyExclusive(greaterThan(2)));
+        assertTrue(equalTo(2).isMutuallyExclusive(equalTo(3L)));
+        assertTrue(equalTo(2).isMutuallyExclusive(equalTo(new int[]{3})));
+        assertTrue(equalTo("abc").isMutuallyExclusive(equalTo("abb")));
+        assertFalse(equalTo("abc").isMutuallyExclusive(equalTo("abc")));
+        assertTrue(equalTo("abc").isMutuallyExclusive(equalTo("abd")));
+
         assertFalse(equalTo(2).isMutuallyExclusive(greaterThan(1)));
+        assertTrue(equalTo(2).isMutuallyExclusive(greaterThan(1L)));
+        assertTrue(equalTo(2).isMutuallyExclusive(greaterThan(2)));
+        assertTrue(equalTo(2).isMutuallyExclusive(greaterThan(3)));
+        assertFalse(equalTo("abc").isMutuallyExclusive(greaterThan("abb")));
+        assertTrue(equalTo("abc").isMutuallyExclusive(greaterThan("abc")));
+        assertTrue(equalTo("abc").isMutuallyExclusive(greaterThan("abd")));
+
+        assertTrue(equalTo(2).isMutuallyExclusive(lessThan(1)));
+        assertTrue(equalTo(2).isMutuallyExclusive(lessThan(1L)));
         assertTrue(equalTo(2).isMutuallyExclusive(lessThan(2)));
         assertFalse(equalTo(2).isMutuallyExclusive(lessThan(3)));
-        assertFalse(equalTo(2).isMutuallyExclusive(any()));
+        assertTrue(equalTo(2).isMutuallyExclusive(lessThan(3L)));
+        assertTrue(equalTo("abc").isMutuallyExclusive(lessThan("abb")));
+        assertTrue(equalTo("abc").isMutuallyExclusive(lessThan("abc")));
+        assertFalse(equalTo("abc").isMutuallyExclusive(lessThan("abd")));
+
+        assertFalse(equalTo(2).isMutuallyExclusive(greaterThanOrEqualTo(1)));
         assertFalse(equalTo(2).isMutuallyExclusive(greaterThanOrEqualTo(2)));
+        assertTrue(equalTo(2).isMutuallyExclusive(greaterThanOrEqualTo(3)));
+        assertTrue(equalTo(2).isMutuallyExclusive(greaterThanOrEqualTo(3L)));
+        assertFalse(equalTo("abc").isMutuallyExclusive(greaterThanOrEqualTo("abb")));
+        assertFalse(equalTo("abc").isMutuallyExclusive(greaterThanOrEqualTo("abc")));
+        assertTrue(equalTo("abc").isMutuallyExclusive(greaterThanOrEqualTo("abd")));
+
+        assertTrue(equalTo(2).isMutuallyExclusive(lessThanOrEqualTo(1)));
+        assertTrue(equalTo(2).isMutuallyExclusive(lessThanOrEqualTo(1L)));
         assertFalse(equalTo(2).isMutuallyExclusive(lessThanOrEqualTo(2)));
-        assertFalse(equalTo(3).isMutuallyExclusive(greaterThanOrEqualTo(2)));
-        assertFalse(equalTo(1).isMutuallyExclusive(lessThanOrEqualTo(2)));
+        assertFalse(equalTo(2).isMutuallyExclusive(lessThanOrEqualTo(3)));
+        assertTrue(equalTo(2).isMutuallyExclusive(lessThanOrEqualTo(3L)));
+        assertTrue(equalTo("abc").isMutuallyExclusive(lessThanOrEqualTo("abb")));
+        assertFalse(equalTo("abc").isMutuallyExclusive(lessThanOrEqualTo("abc")));
+        assertFalse(equalTo("abc").isMutuallyExclusive(lessThanOrEqualTo("abd")));
+
+        assertFalse(equalTo(2).isMutuallyExclusive(new Or(greaterThan(1), equalTo(1))));
+        assertFalse(equalTo(2).isMutuallyExclusive(new Or(greaterThan(2), equalTo(2))));
+        assertTrue(equalTo(2).isMutuallyExclusive(new Or(greaterThan(3), equalTo(3))));
+        assertTrue(equalTo(2).isMutuallyExclusive(new Or(greaterThan(3L), equalTo(3L))));
+        assertFalse(equalTo("abc").isMutuallyExclusive(new Or(greaterThan("abb"), equalTo("abb"))));
+        assertFalse(equalTo("abc").isMutuallyExclusive(new Or(greaterThan("abc"), equalTo("abc"))));
+        assertTrue(equalTo("abc").isMutuallyExclusive(new Or(greaterThan("abd"), equalTo("abd"))));
+
+        assertTrue(equalTo(2).isMutuallyExclusive(new Or(lessThan(1), equalTo(1))));
+        assertTrue(equalTo(2).isMutuallyExclusive(new Or(lessThan(1L), equalTo(1L))));
+        assertFalse(equalTo(2).isMutuallyExclusive(new Or(lessThan(2), equalTo(2))));
+        assertFalse(equalTo(2).isMutuallyExclusive(new Or(lessThan(3), equalTo(3))));
+        assertTrue(equalTo(2).isMutuallyExclusive(new Or(lessThan(3L), equalTo(3L))));
+        assertTrue(equalTo("abc").isMutuallyExclusive(new Or(lessThan("abb"), equalTo("abb"))));
+        assertFalse(equalTo("abc").isMutuallyExclusive(new Or(lessThan("abc"), equalTo("abc"))));
+        assertFalse(equalTo("abc").isMutuallyExclusive(new Or(lessThan("abd"), equalTo("abd"))));
     }
 }
