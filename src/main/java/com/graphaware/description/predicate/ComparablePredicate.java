@@ -28,10 +28,21 @@ abstract class ComparablePredicate extends ValueBasedPredicate<Comparable> {
 
     private static final Logger LOG = Logger.getLogger(ComparablePredicate.class);
 
+    /**
+     * Construct a new predicate.
+     *
+     * @param value to compare.
+     */
     protected ComparablePredicate(Comparable value) {
         super(value);
     }
 
+    /**
+     * Is the value of this predicate less than the given value?
+     *
+     * @param value to compare to.
+     * @return true iff the value held by this predicate < given value.
+     */
     protected final boolean isLessThan(Object value) {
         if (!isComparable(value)) {
             return false;
@@ -45,10 +56,22 @@ abstract class ComparablePredicate extends ValueBasedPredicate<Comparable> {
         }
     }
 
+    /**
+     * Is the value of this predicate less than or equal to the given value?
+     *
+     * @param value to compare to.
+     * @return true iff the value held by this predicate <= given value.
+     */
     protected final boolean isLessThanOrEqualTo(Object value) {
         return isLessThan(value) || arrayFriendlyEquals(getValue(), value);
     }
 
+    /**
+     * Is the value of this predicate greater than the given value?
+     *
+     * @param value to compare to.
+     * @return true iff the value held by this predicate > given value.
+     */
     protected final boolean isGreaterThan(Object value) {
         if (!isComparable(value)) {
             return false;
@@ -62,10 +85,22 @@ abstract class ComparablePredicate extends ValueBasedPredicate<Comparable> {
         }
     }
 
+    /**
+     * Is the value of this predicate greater than or equal to the given value?
+     *
+     * @param value to compare to.
+     * @return true iff the value held by this predicate >= given value.
+     */
     protected final boolean isGreaterThanOrEqualTo(Object value) {
         return isGreaterThan(value) || arrayFriendlyEquals(getValue(), value);
     }
 
+    /**
+     * Is the given value an instance of {@link Comparable}?
+     *
+     * @param value to check.
+     * @return true iff value instanceof Comparable.
+     */
     protected final boolean isComparable(Object value) {
         return value instanceof Comparable;
     }

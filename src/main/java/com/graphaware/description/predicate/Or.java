@@ -67,10 +67,20 @@ final class Or extends BasePredicate {
         return first.isMutuallyExclusive(other) && second.isMutuallyExclusive(other);
     }
 
+    /**
+     * Get the first predicate in the disjunction.
+     *
+     * @return predicate
+     */
     Predicate getFirst() {
         return first;
     }
 
+    /**
+     * Get the second predicate in the disjunction.
+     *
+     * @return predicate
+     */
     Predicate getSecond() {
         return second;
     }

@@ -19,17 +19,27 @@ package com.graphaware.description.predicate;
 import java.util.Arrays;
 
 /**
- *
+ * A {@link Predicate} that contains a value and performs some comparison to is when {@link #evaluate(Object)} is invoked.
  */
 abstract class ValueBasedPredicate<V> extends BasePredicate {
 
     private final V value;
 
+    /**
+     * Construct a new predicate.
+     *
+     * @param value contained.
+     */
     protected ValueBasedPredicate(V value) {
         checkValueIsLegal(value);
         this.value = value;
     }
 
+    /**
+     * Get the value this predicate operates with.
+     *
+     * @return value.
+     */
     protected V getValue() {
         return value;
     }
