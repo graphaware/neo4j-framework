@@ -16,12 +16,20 @@
 
 package com.graphaware.description.predicate;
 
-import com.graphaware.description.value.UndefinedValue;
+import com.graphaware.description.BasePartiallyComparable;
 
 /**
  * Base-class for {@link Predicate} implementations.
  */
-abstract class BasePredicate implements Predicate {
+abstract class BasePredicate extends BasePartiallyComparable<Predicate> implements Predicate {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Predicate self() {
+        return this;
+    }
 
     /**
      * {@inheritDoc}
@@ -40,14 +48,6 @@ abstract class BasePredicate implements Predicate {
             return isMutuallyExclusive(((Or) other).getFirst()) && isMutuallyExclusive(((Or) other).getSecond());
         }
         return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isMoreSpecificThan(Predicate other) {
-        return other.isMoreGeneralThan(this);
     }
 
     /**

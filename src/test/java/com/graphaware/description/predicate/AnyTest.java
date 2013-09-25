@@ -16,7 +16,6 @@
 
 package com.graphaware.description.predicate;
 
-import com.graphaware.description.value.UndefinedValue;
 import org.junit.Test;
 
 import java.util.HashMap;

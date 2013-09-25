@@ -14,19 +14,19 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.description.value;
+package com.graphaware.description.predicate;
 
 /**
  * Singleton representing an undefined value.
  */
-public final class UndefinedValue {
+final class UndefinedValue {
 
     private static final UndefinedValue INSTANCE = new UndefinedValue();
 
     private UndefinedValue() {
     }
 
-    public static UndefinedValue getInstance() {
+    static UndefinedValue getInstance() {
         return INSTANCE;
     }
 }

@@ -83,7 +83,7 @@ abstract class ValueBasedPredicate<V> extends BasePredicate {
 
         ValueBasedPredicate that = (ValueBasedPredicate) o;
 
-        if (!value.equals(that.value)) return false;
+        if (!arrayFriendlyEquals(value, that.value)) return false;
 
         return true;
     }

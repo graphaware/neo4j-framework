@@ -14,16 +14,22 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.description.properties;
-
-import com.graphaware.description.MutuallyExclusive;
-import com.graphaware.description.PartiallyComparable;
-import com.graphaware.description.predicate.Predicate;
+package com.graphaware.description;
 
 /**
- *
+ * Base-class for {@link com.graphaware.description.predicate.Predicate} implementations.
  */
-public interface PropertiesDescription extends PartiallyComparable<PropertiesDescription>, MutuallyExclusive<PropertiesDescription> {
+public abstract class BasePartiallyComparable<T extends PartiallyComparable<T>> {
 
-    PropertiesDescription with(String propertyKey, Predicate predicate);
+    /**
+     * @return this.
+     */
+    protected abstract T self();
+
+    /**
+     * @see {@link PartiallyComparable#isMoreSpecificThan(Object)}.
+     */
+    public boolean isMoreSpecificThan(T other) {
+        return other.isMoreGeneralThan(self());
+    }
 }

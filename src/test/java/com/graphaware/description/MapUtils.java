@@ -14,25 +14,26 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.description.predicate;
+package com.graphaware.description;
+
+import com.graphaware.description.predicate.Predicate;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * A {@link Predicate} checking that beta (the property value) is {@link UndefinedValue}. Singleton.
+ *  Map utils for tests in this package.
  */
-final class Undefined extends EqualTo {
+public final class MapUtils {
 
-    private static final Undefined INSTANCE = new Undefined();
-
-    private Undefined() {
-        super(UndefinedValue.getInstance());
+    private MapUtils() {
     }
 
-    /**
-     * Get an instance of this predicate.
-     *
-     * @return an instance.
-     */
-    public static Undefined getInstance() {
-        return INSTANCE;
+    public static Map<String, Predicate> toMap(Object... stringOrPredicate) {
+        Map<String, Predicate> result = new HashMap<>();
+        for (int i = 0; i < stringOrPredicate.length - 1; i += 2) {
+            result.put((String) stringOrPredicate[i], (Predicate) stringOrPredicate[i + 1]);
+        }
+        return result;
     }
 }
