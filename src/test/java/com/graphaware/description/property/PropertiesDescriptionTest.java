@@ -16,7 +16,7 @@
 
 package com.graphaware.description.property;
 
-import com.graphaware.description.MapUtils;
+import com.graphaware.description.TestMapUtils;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
 import org.junit.Before;
@@ -59,10 +59,10 @@ public abstract class PropertiesDescriptionTest {
     }
 
     protected LiteralPropertiesDescription literal(Object... stringOrPredicate) {
-        return new LiteralPropertiesDescription(MapUtils.toMap(stringOrPredicate));
+        return new LiteralPropertiesDescription(TestMapUtils.toMap(stringOrPredicate));
     }
 
     protected WildcardPropertiesDescription wildcard(Object... stringOrPredicate) {
-        return new WildcardPropertiesDescription(MapUtils.toMap(stringOrPredicate));
+        return new WildcardPropertiesDescription(TestMapUtils.toMap(stringOrPredicate));
     }
 }

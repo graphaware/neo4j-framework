@@ -27,7 +27,6 @@ import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.neo4j.graphdb.*;
@@ -882,7 +881,6 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
     }
 
     @Test
-    @Ignore("Ignored due to a bug in Neo4j - https://github.com/neo4j/neo4j/issues/1026")
     public void shouldBeAbleToChangeCurrentChangedNodeBeforeCommit() {
         createBatchInserter();
         mutateGraph(
@@ -912,7 +910,6 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
     }
 
     @Test
-    @Ignore("Ignored due to a bug in Neo4j - https://github.com/neo4j/neo4j/issues/1026")
     public void shouldBeAbleToChangePreviousChangedNodeBeforeCommit() {
         createBatchInserter();
         mutateGraph(

@@ -24,9 +24,9 @@ import java.util.Map;
 /**
  *  Map utils for tests in this package.
  */
-public final class MapUtils {
+public final class TestMapUtils {
 
-    private MapUtils() {
+    private TestMapUtils() {
     }
 
     public static Map<String, Predicate> toMap(Object... stringOrPredicate) {
