@@ -62,4 +62,6 @@ public class WildcardPropertiesDescription extends DetachedPropertiesDescription
     protected Predicate undefined() {
         return any();
     }
+
+    //todo is more general than = always if empty
 }
