@@ -60,4 +60,22 @@ final class Any extends BasePredicate {
     public boolean isMutuallyExclusive(Predicate other) {
         return false;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return "any".hashCode();
+    }
 }

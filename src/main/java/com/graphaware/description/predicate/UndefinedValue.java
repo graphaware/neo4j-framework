@@ -29,4 +29,22 @@ final class UndefinedValue {
     static UndefinedValue getInstance() {
         return INSTANCE;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return "undef".hashCode();
+    }
 }

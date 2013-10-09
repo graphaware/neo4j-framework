@@ -18,6 +18,7 @@ package com.graphaware.test;
 
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.TransactionExecutor;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -35,6 +36,11 @@ public class DummyTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         txExecutor = new SimpleTransactionExecutor(database);
+    }
+
+    @After
+    public void tearDown() {
+        database.shutdown();
     }
 
     @Test

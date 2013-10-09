@@ -84,4 +84,30 @@ final class Or extends BasePredicate {
     Predicate getSecond() {
         return second;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Or or = (Or) o;
+
+        if (!first.equals(or.first)) return false;
+        if (!second.equals(or.second)) return false;
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int result = first.hashCode();
+        result = 31 * result + second.hashCode();
+        return result;
+    }
 }

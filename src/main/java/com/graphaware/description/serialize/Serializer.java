@@ -70,7 +70,7 @@ public class Serializer {
         output.flush();
         output.close();
 
-        return Base64.encode(stream.toByteArray()) + prefix;
+        return prefix + Base64.encode(stream.toByteArray());
     }
 
     public static <T> T deserialize(String string, Class<T> clazz, String prefix) {
