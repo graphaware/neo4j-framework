@@ -20,10 +20,13 @@ import com.graphaware.description.BasePartiallyComparable;
 import com.graphaware.description.property.PropertiesDescription;
 import com.graphaware.propertycontainer.util.DirectionUtils;
 import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.RelationshipType;
 
 /**
  * Base class for {@link RelationshipDescription} implementations.
+ *
+ * @param <P> type of properties description contained by this relationship description.
  */
 public abstract class BaseRelationshipDescription<P extends PropertiesDescription> extends BasePartiallyComparable<RelationshipDescription> implements RelationshipDescription {
 
@@ -31,8 +34,15 @@ public abstract class BaseRelationshipDescription<P extends PropertiesDescriptio
     private final Direction direction;
     private final P propertiesDescription;
 
+    /**
+     * Construct a new relationship description.
+     *
+     * @param relationshipType      relationship type.
+     * @param direction             direction.
+     * @param propertiesDescription properties description.
+     */
     protected BaseRelationshipDescription(RelationshipType relationshipType, Direction direction, P propertiesDescription) {
-        this.relationshipType = relationshipType;
+        this.relationshipType = DynamicRelationshipType.withName(relationshipType.name());
         this.direction = direction;
         this.propertiesDescription = propertiesDescription;
     }
@@ -87,5 +97,33 @@ public abstract class BaseRelationshipDescription<P extends PropertiesDescriptio
     @Override
     public P getPropertiesDescription() {
         return propertiesDescription;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BaseRelationshipDescription that = (BaseRelationshipDescription) o;
+
+        if (direction != that.direction) return false;
+        if (!propertiesDescription.equals(that.propertiesDescription)) return false;
+        if (!relationshipType.name().equals(that.relationshipType.name())) return false;
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int result = relationshipType.name().hashCode();
+        result = 31 * result + direction.hashCode();
+        result = 31 * result + propertiesDescription.hashCode();
+        return result;
     }
 }

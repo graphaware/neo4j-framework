@@ -104,9 +104,6 @@ public abstract class BaseGraphAwareFrameworkTest {
 
     protected class CustomConfig extends BaseFrameworkConfiguration implements FrameworkConfiguration {
 
-        @Override
-        public String separator() {
-            return ";";
-        }
+      //todo pointless
     }
 }

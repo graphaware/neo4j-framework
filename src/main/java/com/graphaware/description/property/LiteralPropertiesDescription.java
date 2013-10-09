@@ -23,10 +23,10 @@ import org.neo4j.graphdb.PropertyContainer;
 import java.util.Map;
 
 /**
- * A {@link DetachedPropertiesDescription} where every predicate not explicitly defined is
+ * A {@link BaseDetachedPropertiesDescription} where every predicate not explicitly defined is
  * {@link com.graphaware.description.predicate.Undefined}.
  */
-public class LiteralPropertiesDescription extends DetachedPropertiesDescription {
+public class LiteralPropertiesDescription extends BaseDetachedPropertiesDescription {
 
     /**
      * Construct a new properties description as the most specific description of the given property container.
@@ -50,7 +50,7 @@ public class LiteralPropertiesDescription extends DetachedPropertiesDescription 
      * {@inheritDoc}
      */
     @Override
-    protected FluentPropertiesDescription newInstance(Map<String, Predicate> predicates) {
+    protected LiteralPropertiesDescription newInstance(Map<String, Predicate> predicates) {
         return new LiteralPropertiesDescription(predicates);
     }
 

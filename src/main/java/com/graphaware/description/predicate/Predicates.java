@@ -16,6 +16,8 @@
 
 package com.graphaware.description.predicate;
 
+import com.esotericsoftware.kryo.Kryo;
+
 /**
  * Utility class acting as a factory for {@link Predicate}s.
  */
@@ -35,6 +37,7 @@ public final class Predicates {
 
     /**
      * Create an {@link Undefined} predicate.
+     *
      * @return predicate.
      */
     public static Predicate undefined() {
@@ -89,5 +92,20 @@ public final class Predicates {
      */
     public static Predicate lessThanOrEqualTo(Comparable value) {
         return new Or(new LessThan(value), new EqualTo(value));
+    }
+
+    /**
+     * Register all concrete predicates with kryo.
+     *
+     * @param kryo to register with.
+     */
+    public static void register(Kryo kryo) {
+        kryo.register(Any.class, 20);
+        kryo.register(EqualTo.class, 21);
+        kryo.register(GreaterThan.class, 22);
+        kryo.register(LessThan.class, 23);
+        kryo.register(Or.class, 24);
+        kryo.register(Undefined.class, 25);
+        kryo.register(UndefinedValue.class, 26);
     }
 }

@@ -34,18 +34,6 @@ public interface FrameworkConfiguration {
     public static final String GA_NODE_PROPERTY_KEY = GA_PREFIX + "LABEL";
 
     /**
-     * Default value for {@link #separator()}.
-     */
-    static final String DEFAULT_SEPARATOR = "#";
-
-    /**
-     * Get the separator used as an information delimiter for String-convertible nodes, relationships, and properties.
-     *
-     * @return separator.
-     */
-    String separator();
-
-    /**
      * Create prefix a component should use for internal data it reads/writes (nodes, relationships, properties).
      *
      * @param id of the component/module.

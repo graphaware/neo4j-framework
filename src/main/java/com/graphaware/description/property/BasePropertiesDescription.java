@@ -27,6 +27,14 @@ public abstract class BasePropertiesDescription extends BasePartiallyComparable<
      * {@inheritDoc}
      */
     @Override
+    protected final PropertiesDescription self() {
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isMoreGeneralThan(PropertiesDescription other) {
         for (String key : getKeys()) {
             if (!get(key).isMoreGeneralThan(other.get(key))) {

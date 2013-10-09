@@ -24,10 +24,10 @@ import java.util.Map;
 import static com.graphaware.description.predicate.Predicates.any;
 
 /**
- * A {@link DetachedPropertiesDescription} where every predicate not explicitly defined is
+ * A {@link BaseDetachedPropertiesDescription} where every predicate not explicitly defined is
  * {@link com.graphaware.description.predicate.Any}.
  */
-public class WildcardPropertiesDescription extends DetachedPropertiesDescription {
+public class WildcardPropertiesDescription extends BaseDetachedPropertiesDescription {
 
     /**
      * Construct a new properties description as the most specific description of the given property container.
@@ -51,7 +51,7 @@ public class WildcardPropertiesDescription extends DetachedPropertiesDescription
      * {@inheritDoc}
      */
     @Override
-    protected FluentPropertiesDescription newInstance(Map<String, Predicate> predicates) {
+    protected DetachedPropertiesDescription newInstance(Map<String, Predicate> predicates) {
         return new WildcardPropertiesDescription(predicates);
     }
 

@@ -17,92 +17,20 @@
 package com.graphaware.description.property;
 
 import com.graphaware.description.predicate.Predicate;
-import org.neo4j.graphdb.PropertyContainer;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.graphaware.description.predicate.Predicates.equalTo;
 
 /**
- * A {@link com.graphaware.description.property.PropertiesDescription} that is immutable and maintains all its data;
- * thus, it can be serialized and stored. It also allows for generating new instances with different predicates, by
- * implementing the {@link FluentPropertiesDescription} interface.
+ * A {@link PropertiesDescription} that must be detached from the database, i.e. store its own data internally rather
+ * than referring to an underlying {@link org.neo4j.graphdb.PropertyContainer}. It is immutable; once instantiated,
+ * new instances with different {@link Predicate}s can be constructed using the {@link #with(String, Predicate)} method.
  */
-public abstract class DetachedPropertiesDescription extends BasePropertiesDescription implements FluentPropertiesDescription {
-
-    protected final Map<String, Predicate> predicates = new HashMap<>();
+public interface DetachedPropertiesDescription extends PropertiesDescription {
 
     /**
-     * Construct a new properties description as the most specific description of the given property container.
+     * Construct a new description from this description by adding/replacing a predicate with a new one.
      *
-     * @param propertyContainer to construct the most specific properties description from.
+     * @param propertyKey key of the property the predicate is for.
+     * @param predicate   the predicate.
+     * @return a new instance of properties description.
      */
-    protected DetachedPropertiesDescription(PropertyContainer propertyContainer) {
-        for (String key : propertyContainer.getPropertyKeys()) {
-            predicates.put(key, equalTo(propertyContainer.getProperty(key)));
-        }
-    }
-
-    /**
-     * Construct a new properties description from the given map of predicates.
-     *
-     * @param predicates to copy.
-     */
-    protected DetachedPropertiesDescription(Map<String, Predicate> predicates) {
-        this.predicates.putAll(predicates);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FluentPropertiesDescription with(String propertyKey, Predicate predicate) {
-        Map<String, Predicate> newPredicates = new HashMap<>(predicates);
-        newPredicates.put(propertyKey, predicate);
-        return newInstance(newPredicates);
-    }
-
-    /**
-     * Create a new instance of this class with the given predicates.
-     *
-     * @param predicates to copy.
-     * @return new instance.
-     */
-    protected abstract FluentPropertiesDescription newInstance(Map<String, Predicate> predicates);
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected PropertiesDescription self() {
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Predicate get(String key) {
-        if (!predicates.containsKey(key)) {
-            return undefined();
-        }
-
-        return predicates.get(key);
-    }
-
-    /**
-     * Get the default predicate for undefined keys.
-     *
-     * @return predicate.
-     */
-    protected abstract Predicate undefined();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<String> getKeys() {
-        return predicates.keySet();
-    }
+    DetachedPropertiesDescription with(String propertyKey, Predicate predicate);
 }

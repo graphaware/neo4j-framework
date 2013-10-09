@@ -17,36 +17,21 @@
 package com.graphaware.description.relationship;
 
 import com.graphaware.description.predicate.Predicate;
-import com.graphaware.description.property.FluentPropertiesDescription;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.RelationshipType;
+import com.graphaware.description.property.PropertiesDescription;
 
 /**
- * A {@link RelationshipDescription} that is immutable and maintains all its data;
- * thus, it can be serialized and stored. It also allows for generating new instances with different predicates, by
- * implementing the {@link com.graphaware.description.property.FluentPropertiesDescription} interface.
+ * A {@link RelationshipDescription} that must be detached from the database, i.e. store its own data internally rather
+ * than referring to an underlying {@link org.neo4j.graphdb.Relationship}. It is immutable; once instantiated,
+ * new instances with different {@link PropertiesDescription}s can be constructed using the {@link #with(String, Predicate)} method.
  */
-public abstract class DetachedRelationshipDescription extends BaseRelationshipDescription<FluentPropertiesDescription> implements FluentRelationshipDescription {
-
-    protected DetachedRelationshipDescription(RelationshipType relationshipType, Direction direction, FluentPropertiesDescription propertiesDescription) {
-        super(relationshipType, direction, propertiesDescription);
-    }
+public interface DetachedRelationshipDescription extends RelationshipDescription {
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FluentRelationshipDescription with(String propertyKey, Predicate predicate) {
-        return newInstance(getType(), getDirection(), getPropertiesDescription().with(propertyKey, predicate));
-    }
-
-    /**
-     * Create a new instance of this class with the given predicates.
+     * Construct a new description from this description by adding/replacing a properties predicate with a new one.
      *
-     * @param predicates to copy.
-     * @return new instance.
+     * @param propertyKey key of the property the predicate is for.
+     * @param predicate   the predicate.
+     * @return a new instance of relationship description.
      */
-    protected abstract FluentRelationshipDescription newInstance(RelationshipType relationshipType, Direction direction, FluentPropertiesDescription propertiesDescription);
-
-
+    DetachedRelationshipDescription with(String propertyKey, Predicate predicate);
 }

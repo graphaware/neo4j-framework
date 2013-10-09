@@ -17,7 +17,6 @@
 package com.graphaware.description.relationship;
 
 import com.graphaware.description.property.LazyPropertiesDescription;
-import com.graphaware.description.property.PropertiesDescription;
 import com.graphaware.propertycontainer.util.DirectionUtils;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -27,7 +26,7 @@ import org.neo4j.graphdb.Relationship;
  * {@link Relationship}. It returns {@link com.graphaware.description.property.LazyPropertiesDescription} when
  * asked for properties.
  */
-public class LazyRelationshipDescription extends BaseRelationshipDescription<PropertiesDescription> implements RelationshipDescription {
+public class LazyRelationshipDescription extends BaseRelationshipDescription<LazyPropertiesDescription> implements RelationshipDescription {
 
     /**
      * Construct a new relationship description as the most specific description of the given relationship.

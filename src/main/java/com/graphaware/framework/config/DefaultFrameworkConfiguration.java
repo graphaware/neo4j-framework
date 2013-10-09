@@ -29,12 +29,4 @@ public final class DefaultFrameworkConfiguration extends BaseFrameworkConfigurat
 
     private DefaultFrameworkConfiguration() {
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String separator() {
-        return DEFAULT_SEPARATOR;
-    }
 }

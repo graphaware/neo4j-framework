@@ -30,12 +30,12 @@ public interface PropertiesDescription extends PartiallyComparable<PropertiesDes
      * Get predicate for a property with the given key.
      *
      * @param key key.
-     * @return predicate.
+     * @return predicate. Never null.
      */
     Predicate get(String key);
 
     /**
-     * Get keys for all predicates.
+     * Get keys of all predicates.
      *
      * @return all keys.
      */

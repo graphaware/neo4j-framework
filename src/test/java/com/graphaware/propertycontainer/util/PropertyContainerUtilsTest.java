@@ -21,6 +21,7 @@ import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.strategy.InclusionStrategy;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.TransactionCallback;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -55,6 +56,11 @@ public class PropertyContainerUtilsTest {
                 .node().setProp("", "e").setProp("key", "value")
                 .relationshipTo(0, "test")
                 .node().setProp("key", "value");
+    }
+
+    @After
+    public void tearDown() {
+       database.shutdown();
     }
 
     @Test

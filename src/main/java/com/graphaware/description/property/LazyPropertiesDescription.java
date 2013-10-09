@@ -45,14 +45,6 @@ public class LazyPropertiesDescription extends BasePropertiesDescription impleme
      * {@inheritDoc}
      */
     @Override
-    protected final PropertiesDescription self() {
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Predicate get(String key) {
         if (!propertyContainer.hasProperty(key)) {
             return undefined();

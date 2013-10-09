@@ -23,7 +23,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 /**
- * Just for documentation.
+ * Just for documentation.    //todo pointless
  */
 public class FrameworkDemo {
 
@@ -31,10 +31,7 @@ public class FrameworkDemo {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //replace with your own database, probably a permanent one
 
         FrameworkConfiguration customFrameworkConfig = new BaseFrameworkConfiguration() {
-            @Override
-            public String separator() {
-                return "$";
-            }
+
         };
 
         GraphAwareFramework framework = new GraphAwareFramework(database, customFrameworkConfig);
