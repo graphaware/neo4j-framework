@@ -14,18 +14,18 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.util;
+package com.graphaware.util;
 
 import org.junit.Test;
 
 import java.util.Collections;
 
-import static com.graphaware.propertycontainer.util.ArrayUtils.*;
+import static com.graphaware.util.ArrayUtils.*;
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.*;
 
 /**
- * Unit test for {@link com.graphaware.propertycontainer.util.ArrayUtils}.
+ * Unit test for {@link com.graphaware.util.ArrayUtils}.
  */
 public class ArrayUtilsTest {
 

@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.util;
+package com.graphaware.util;
 
 import com.graphaware.test.TestDataBuilder;
 import com.graphaware.tx.event.improved.api.Change;
@@ -33,8 +33,8 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import java.util.Collections;
 import java.util.Map;
 
-import static com.graphaware.propertycontainer.util.PropertyContainerUtils.*;
 import static com.graphaware.test.IterableUtils.toList;
+import static com.graphaware.util.PropertyContainerUtils.*;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -43,7 +43,7 @@ import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 import static org.neo4j.helpers.collection.MapUtil.stringMap;
 
 /**
- * Unit test for {@link com.graphaware.propertycontainer.util.PropertyContainerUtils}.
+ * Unit test for {@link com.graphaware.util.PropertyContainerUtils}.
  */
 public class PropertyContainerUtilsTest {
 

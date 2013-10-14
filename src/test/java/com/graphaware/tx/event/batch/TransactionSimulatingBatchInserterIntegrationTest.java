@@ -43,8 +43,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.graphaware.propertycontainer.util.PropertyContainerUtils.*;
 import static com.graphaware.test.IterableUtils.count;
+import static com.graphaware.util.PropertyContainerUtils.*;
 import static junit.framework.Assert.*;
 import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;

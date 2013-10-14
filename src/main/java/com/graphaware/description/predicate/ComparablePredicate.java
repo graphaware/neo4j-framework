@@ -18,6 +18,8 @@ package com.graphaware.description.predicate;
 
 import org.apache.log4j.Logger;
 
+import static com.graphaware.util.ArrayUtils.arrayFriendlyEquals;
+
 /**
  * A {@link com.graphaware.description.predicate.Predicate} comparing beta (the property value) to the
  * predefined value. Only compatible with numerical values (in which case number comparison applies), and Strings and

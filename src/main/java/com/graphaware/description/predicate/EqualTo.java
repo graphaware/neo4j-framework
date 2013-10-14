@@ -16,6 +16,8 @@
 
 package com.graphaware.description.predicate;
 
+import static com.graphaware.util.ArrayUtils.arrayFriendlyEquals;
+
 /**
  * A {@link Predicate} checking that beta (the property value) is equal to a predefined value.
  */

@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.util;
+package com.graphaware.util;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -111,7 +111,7 @@ public final class ArrayUtils {
     }
 
     /**
-     * Get has code of the object, which could be an arrays. Hash codes of arrays that are equal accoring
+     * Get has code of the object, which could be an arrays. Hash codes of arrays that are equal according
      * to {@link #arrayFriendlyEquals(Object, Object)} are the same.
      *
      * @param o to get a hash code for.

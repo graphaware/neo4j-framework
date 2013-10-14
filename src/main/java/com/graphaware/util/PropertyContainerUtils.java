@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.util;
+package com.graphaware.util;
 
 import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.strategy.IncludeAll;
@@ -27,8 +27,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.graphaware.propertycontainer.util.ArrayUtils.isPrimitiveOrStringArray;
-import static com.graphaware.propertycontainer.util.ArrayUtils.primitiveOrStringArrayToString;
+import static com.graphaware.util.ArrayUtils.isPrimitiveOrStringArray;
+import static com.graphaware.util.ArrayUtils.primitiveOrStringArrayToString;
 
 /**
  * Utility methods for dealing with {@link org.neo4j.graphdb.PropertyContainer}s.

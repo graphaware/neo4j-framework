@@ -14,10 +14,11 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.util;
+package com.graphaware.util;
 
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.TransactionCallback;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -25,14 +26,14 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.propertycontainer.util.DirectionUtils.matches;
-import static com.graphaware.propertycontainer.util.DirectionUtils.resolveDirection;
+import static com.graphaware.util.DirectionUtils.matches;
+import static com.graphaware.util.DirectionUtils.resolveDirection;
 import static junit.framework.Assert.*;
 import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
- * Unit test for {@link com.graphaware.propertycontainer.util.DirectionUtils}.
+ * Unit test for {@link com.graphaware.util.DirectionUtils}.
  */
 public class DirectionUtilsTest {
 
@@ -54,6 +55,11 @@ public class DirectionUtilsTest {
                 return null;
             }
         });
+    }
+
+    @After
+    public void tearDown() {
+        database.shutdown();
     }
 
     @Test

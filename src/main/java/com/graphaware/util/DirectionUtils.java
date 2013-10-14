@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.propertycontainer.util;
+package com.graphaware.util;
 
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Direction;

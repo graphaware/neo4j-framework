@@ -19,7 +19,7 @@ package com.graphaware.description.relationship;
 import com.graphaware.description.predicate.Predicate;
 import com.graphaware.description.property.LiteralPropertiesDescription;
 import com.graphaware.description.property.WildcardPropertiesDescription;
-import com.graphaware.propertycontainer.util.DirectionUtils;
+import com.graphaware.util.DirectionUtils;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;

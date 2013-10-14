@@ -16,6 +16,8 @@
 
 package com.graphaware.description.predicate;
 
+import static com.graphaware.util.ArrayUtils.arrayFriendlyEquals;
+
 /**
  * A {@link ComparablePredicate} checking that beta (the property value) is less than the predefined value.
  */

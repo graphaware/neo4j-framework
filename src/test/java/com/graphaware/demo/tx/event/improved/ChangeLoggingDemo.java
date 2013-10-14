@@ -16,7 +16,7 @@
 
 package com.graphaware.demo.tx.event.improved;
 
-import com.graphaware.propertycontainer.dto.string.property.SerializablePropertiesImpl;
+import com.graphaware.description.property.LiteralPropertiesDescription;
 import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -118,40 +118,40 @@ public class ChangeLoggingDemo {
     private void logChanges(ImprovedTransactionData improvedData) {
         for (Node createdNode : improvedData.getAllCreatedNodes()) {
             System.out.println("Created node " + createdNode.getId()
-                    + " with properties: " + new SerializablePropertiesImpl(createdNode).toString());
+                    + " with properties: " + new LiteralPropertiesDescription(createdNode).toString());
         }
 
         for (Node deletedNode : improvedData.getAllDeletedNodes()) {
             System.out.println("Deleted node " + deletedNode.getId()
-                    + " with properties: " + new SerializablePropertiesImpl(deletedNode).toString());
+                    + " with properties: " + new LiteralPropertiesDescription(deletedNode).toString());
         }
 
         for (Change<Node> changedNode : improvedData.getAllChangedNodes()) {
             System.out.println("Changed node " + changedNode.getCurrent().getId()
-                    + " from properties: " + new SerializablePropertiesImpl(changedNode.getPrevious()).toString()
-                    + " to properties: " + new SerializablePropertiesImpl(changedNode.getCurrent()).toString());
+                    + " from properties: " + new LiteralPropertiesDescription(changedNode.getPrevious()).toString()
+                    + " to properties: " + new LiteralPropertiesDescription(changedNode.getCurrent()).toString());
         }
 
         for (Relationship createdRelationship : improvedData.getAllCreatedRelationships()) {
             System.out.println("Created relationship " + createdRelationship.getId()
                     + " between nodes " + createdRelationship.getStartNode().getId()
                     + " and " + createdRelationship.getEndNode().getId()
-                    + " with properties: " + new SerializablePropertiesImpl(createdRelationship).toString());
+                    + " with properties: " + new LiteralPropertiesDescription(createdRelationship).toString());
         }
 
         for (Relationship deletedRelationship : improvedData.getAllDeletedRelationships()) {
             System.out.println("Deleted relationship " + deletedRelationship.getId()
                     + " between nodes " + deletedRelationship.getStartNode().getId()
                     + " and " + deletedRelationship.getEndNode().getId()
-                    + " with properties: " + new SerializablePropertiesImpl(deletedRelationship).toString());
+                    + " with properties: " + new LiteralPropertiesDescription(deletedRelationship).toString());
         }
 
         for (Change<Relationship> changedRelationship : improvedData.getAllChangedRelationships()) {
             System.out.println("Changed relationship " + changedRelationship.getCurrent().getId()
                     + " between nodes " + changedRelationship.getCurrent().getStartNode().getId()
                     + " and " + changedRelationship.getCurrent().getEndNode().getId()
-                    + " from properties: " + new SerializablePropertiesImpl(changedRelationship.getPrevious()).toString()
-                    + " to properties: " + new SerializablePropertiesImpl(changedRelationship.getCurrent()).toString());
+                    + " from properties: " + new LiteralPropertiesDescription(changedRelationship.getPrevious()).toString()
+                    + " to properties: " + new LiteralPropertiesDescription(changedRelationship.getCurrent()).toString());
         }
     }
 
