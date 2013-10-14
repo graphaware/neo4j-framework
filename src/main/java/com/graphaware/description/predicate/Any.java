@@ -78,4 +78,12 @@ final class Any extends BasePredicate {
     public int hashCode() {
         return "any".hashCode();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "=*";
+    }
 }

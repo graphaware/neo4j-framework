@@ -413,4 +413,13 @@ public class EqualToTest {
         assertFalse(equalTo("abc").isMutuallyExclusive(new Or(lessThan("abc"), equalTo("abc"))));
         assertFalse(equalTo("abc").isMutuallyExclusive(new Or(lessThan("abd"), equalTo("abd"))));
     }
+
+    @Test
+    public void equalPredicatesShouldBeEqualAndHaveSameHashCode() {
+        assertEquals(equalTo(3), equalTo(3));
+        assertEquals(equalTo(3).hashCode(), equalTo(3).hashCode());
+
+        assertEquals(equalTo(new byte[]{1,2,3}), equalTo(new byte[]{1,2,3}));
+        assertEquals(equalTo(new byte[]{1,2,3}).hashCode(), equalTo(new byte[]{1,2,3}).hashCode());
+    }
 }

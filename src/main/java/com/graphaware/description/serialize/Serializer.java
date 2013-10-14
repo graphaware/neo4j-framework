@@ -29,11 +29,15 @@ import org.objenesis.strategy.StdInstantiatorStrategy;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
- *
+ * Utility class for serializing objects to/from String or byte array using {@link Kryo}. For framework use only.
+ * <p/>
+ * Note: every class that wishes to be serialized must be registered with Kryo. It is the responsibility of the class
+ * developer to test that serialization works ok for that class.
  */
-public class Serializer {
+public final class Serializer {
 
     private static Kryo kryo;
 
@@ -45,6 +49,7 @@ public class Serializer {
         kryo.register(DynamicRelationshipType.class, 10);
         kryo.register(Direction.class, 11);
         kryo.register(HashMap.class, 15);
+        kryo.register(TreeMap.class, 16);
 
         Predicates.register(kryo); //allocated 20-30
 
@@ -63,18 +68,55 @@ public class Serializer {
         kryo.register(String[].class, 108);
     }
 
-    public static String serialize(Object object, String prefix) {
+    private Serializer() {
+    }
+
+    /**
+     * Serialize an object to byte array.
+     *
+     * @param object to serialize.
+     * @return byte array.
+     */
+    public static byte[] toByteArray(Object object) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         Output output = new Output(stream);
         kryo.writeObject(output, object);
         output.flush();
         output.close();
 
-        return prefix + Base64.encode(stream.toByteArray());
+        return stream.toByteArray();
     }
 
-    public static <T> T deserialize(String string, Class<T> clazz, String prefix) {
-        return (T) kryo.readObject(new Input(Base64.decode(string.replaceFirst(prefix, ""))), clazz);
+    /**
+     * Serialize an object to String.
+     *
+     * @param object to serialize.
+     * @return object as String.
+     */
+    public static String toString(Object object, String prefix) {
+        return prefix + Base64.encode(toByteArray(object));
+    }
+
+    /**
+     * Read an object from byte array.
+     *
+     * @param array to read from.
+     * @param clazz to return.
+     * @return de-serialized object.
+     */
+    public static <T> T fromByteArray(byte[] array, Class<T> clazz) {
+        return kryo.readObject(new Input(array), clazz);
+    }
+
+    /**
+     * Read an object from String.
+     *
+     * @param string to read from.
+     * @param clazz  to return.
+     * @return de-serialized object.
+     */
+    public static <T> T fromString(String string, Class<T> clazz, String prefix) {
+        return fromByteArray(Base64.decode(string.replaceFirst(prefix, "")), clazz);
     }
 
 }

@@ -74,6 +74,36 @@ abstract class ValueBasedPredicate<V> extends BasePredicate {
     }
 
     /**
+     * Compute an array-friendly hash code.
+     *
+     * @param o object to compute hash code for.
+     * @return hash code.
+     */
+    protected int arrayFriendlyHasCode(Object o) {
+        if (o instanceof byte[]) {
+            return Arrays.hashCode((byte[]) o);
+        } else if (o instanceof char[]) {
+            return Arrays.hashCode((char[]) o);
+        } else if (o instanceof boolean[]) {
+            return Arrays.hashCode((boolean[]) o);
+        } else if (o instanceof long[]) {
+            return Arrays.hashCode((long[]) o);
+        } else if (o instanceof double[]) {
+            return Arrays.hashCode((double[]) o);
+        } else if (o instanceof int[]) {
+            return Arrays.hashCode((int[]) o);
+        } else if (o instanceof short[]) {
+            return Arrays.hashCode((short[]) o);
+        } else if (o instanceof float[]) {
+            return Arrays.hashCode((float[]) o);
+        } else if (o instanceof Object[]) {
+            return Arrays.hashCode((Object[]) o);
+        } else {
+            return o.hashCode();
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -93,6 +123,6 @@ abstract class ValueBasedPredicate<V> extends BasePredicate {
      */
     @Override
     public int hashCode() {
-        return value.hashCode();
+        return arrayFriendlyHasCode(value);
     }
 }

@@ -86,4 +86,12 @@ final class LessThan extends ComparablePredicate {
 
         return false;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "<" + getValue();
+    }
 }

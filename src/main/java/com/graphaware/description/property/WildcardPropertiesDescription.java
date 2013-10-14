@@ -63,5 +63,15 @@ public class WildcardPropertiesDescription extends BaseDetachedPropertiesDescrip
         return any();
     }
 
-    //todo is more general than = always if empty
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isMoreGeneralThan(PropertiesDescription other) {
+        //optimization
+        if (predicates.isEmpty()) {
+            return true;
+        }
+        return super.isMoreGeneralThan(other);
+    }
 }

@@ -64,4 +64,12 @@ class EqualTo extends ValueBasedPredicate<Object> {
 
         return other.isMutuallyExclusive(this);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "=" + getValue();
+    }
 }

@@ -26,6 +26,13 @@ import org.neo4j.graphdb.RelationshipType;
  */
 public class DetachedRelationshipDescriptionImpl extends BaseRelationshipDescription<DetachedPropertiesDescription> implements DetachedRelationshipDescription {
 
+    /**
+     * Construct a new relationship description.
+     *
+     * @param relationshipType      relationship type.
+     * @param direction             direction.
+     * @param propertiesDescription properties description.
+     */
     public DetachedRelationshipDescriptionImpl(RelationshipType relationshipType, Direction direction, DetachedPropertiesDescription propertiesDescription) {
         super(relationshipType, direction, propertiesDescription);
     }
@@ -36,5 +43,13 @@ public class DetachedRelationshipDescriptionImpl extends BaseRelationshipDescrip
     @Override
     public DetachedRelationshipDescription with(String propertyKey, Predicate predicate) {
         return new DetachedRelationshipDescriptionImpl(getType(), getDirection(), getPropertiesDescription().with(propertyKey, predicate));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return getType() + "#" + getDirection() + "#" + getPropertiesDescription().toString();
     }
 }

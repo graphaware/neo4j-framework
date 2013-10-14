@@ -30,33 +30,90 @@ import java.util.Collections;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
- *
+ * Factory for {@link RelationshipDescription}s.
  */
 public final class RelationshipDescriptionFactory {
 
     private RelationshipDescriptionFactory() {
     }
 
+    /**
+     * Construct a new "literal" relationship description, i.e., one that treats properties that are not explicitly
+     * constrained by a {@link Predicate} as {@link com.graphaware.description.predicate.Undefined}.
+     * <p/>
+     * This will be the most specific description of the given relationship, i.e., all property constraints will be taken
+     * from the relationship properties and constrained to {@link com.graphaware.description.predicate.EqualTo} the actual
+     * value on the relationship.
+     *
+     * @param relationship to create a description of.
+     * @param pointOfView  node that is looking at this relationship for the purposes of determining direction. Must be one
+     *                     of the participating nodes.
+     * @return relationship description.
+     */
     public static DetachedRelationshipDescription literal(Relationship relationship, Node pointOfView) {
         return new DetachedRelationshipDescriptionImpl(relationship.getType(), DirectionUtils.resolveDirection(relationship, pointOfView), new LiteralPropertiesDescription(relationship));
     }
 
+    /**
+     * Construct a new "literal" relationship description, i.e., one that treats properties that are not explicitly
+     * constrained by a {@link Predicate} as {@link com.graphaware.description.predicate.Undefined}.
+     *
+     * @param type      of the relationship.
+     * @param direction of the relationship.
+     * @return relationship description.
+     */
     public static DetachedRelationshipDescription literal(RelationshipType type, Direction direction) {
         return new DetachedRelationshipDescriptionImpl(type, direction, new LiteralPropertiesDescription(Collections.<String, Predicate>emptyMap()));
     }
 
+    /**
+     * Construct a new "literal" relationship description, i.e., one that treats properties that are not explicitly
+     * constrained by a {@link Predicate} as {@link com.graphaware.description.predicate.Undefined}.
+     *
+     * @param type      of the relationship.
+     * @param direction of the relationship.
+     * @return relationship description.
+     */
     public static DetachedRelationshipDescription literal(String type, Direction direction) {
         return new DetachedRelationshipDescriptionImpl(withName(type), direction, new LiteralPropertiesDescription(Collections.<String, Predicate>emptyMap()));
     }
 
+    /**
+     * Construct a new "wildcard" relationship description, i.e., one that treats properties that are not explicitly
+     * constrained by a {@link Predicate} as {@link com.graphaware.description.predicate.Any} (wildcard).
+     * <p/>
+     * All property constraints will be taken from the relationship properties and constrained to {@link com.graphaware.description.predicate.EqualTo} the actual
+     * value on the relationship.
+     *
+     * @param relationship to create a description of.
+     * @param pointOfView  node that is looking at this relationship for the purposes of determining direction. Must be one
+     *                     of the participating nodes.
+     * @return relationship description.
+     */
     public static DetachedRelationshipDescription wildcard(Relationship relationship, Node pointOfView) {
         return new DetachedRelationshipDescriptionImpl(relationship.getType(), DirectionUtils.resolveDirection(relationship, pointOfView), new WildcardPropertiesDescription(relationship));
     }
 
+    /**
+     * Construct a new "wildcard" relationship description, i.e., one that treats properties that are not explicitly
+     * constrained by a {@link Predicate} as {@link com.graphaware.description.predicate.Any}.
+     *
+     * @param type      of the relationship.
+     * @param direction of the relationship.
+     * @return relationship description.
+     */
     public static DetachedRelationshipDescription wildcard(RelationshipType type, Direction direction) {
         return new DetachedRelationshipDescriptionImpl(type, direction, new WildcardPropertiesDescription(Collections.<String, Predicate>emptyMap()));
     }
 
+    /**
+     * Construct a new "wildcard" relationship description, i.e., one that treats properties that are not explicitly
+     * constrained by a {@link Predicate} as {@link com.graphaware.description.predicate.Any}.
+     *
+     * @param type      of the relationship.
+     * @param direction of the relationship.
+     * @return relationship description.
+     */
     public static DetachedRelationshipDescription wildcard(String type, Direction direction) {
         return new DetachedRelationshipDescriptionImpl(withName(type), direction, new WildcardPropertiesDescription(Collections.<String, Predicate>emptyMap()));
     }

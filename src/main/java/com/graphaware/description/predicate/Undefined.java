@@ -35,4 +35,12 @@ final class Undefined extends EqualTo {
     public static Undefined getInstance() {
         return INSTANCE;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "=UNDEF";
+    }
 }

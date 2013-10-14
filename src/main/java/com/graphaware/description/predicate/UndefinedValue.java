@@ -47,4 +47,12 @@ final class UndefinedValue {
     public int hashCode() {
         return "undef".hashCode();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "UNDEF";
+    }
 }

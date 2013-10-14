@@ -70,4 +70,16 @@ public abstract class BasePropertiesDescription extends BasePartiallyComparable<
 
         return false;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        for (String key : getKeys()) {
+            result.append(key).append(get(key)).append("#");
+        }
+        return result.toString();
+    }
 }

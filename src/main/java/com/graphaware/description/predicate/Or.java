@@ -110,4 +110,12 @@ final class Or extends BasePredicate {
         result = 31 * result + second.hashCode();
         return result;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return getFirst().toString() + "||" + getSecond().toString();
+    }
 }

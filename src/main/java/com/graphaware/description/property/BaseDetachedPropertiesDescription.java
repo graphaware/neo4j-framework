@@ -21,6 +21,7 @@ import org.neo4j.graphdb.PropertyContainer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import static com.graphaware.description.predicate.Predicates.equalTo;
 
@@ -29,7 +30,7 @@ import static com.graphaware.description.predicate.Predicates.equalTo;
  */
 public abstract class BaseDetachedPropertiesDescription extends BasePropertiesDescription implements DetachedPropertiesDescription {
 
-    protected final Map<String, Predicate> predicates = new HashMap<>();
+    protected final Map<String, Predicate> predicates = new TreeMap<>();
 
     /**
      * Construct a new properties description as the most specific description of the given property container.
