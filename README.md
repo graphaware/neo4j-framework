@@ -92,36 +92,6 @@ well, in the following fashion:
     //use batchInserter as usual
 ```
 
-Configuration
--------------
-
-In the above examples, the framework is used with sensible default configuration. At the moment, the only thing that is
-configurable on the framework level is the character/String that the framework is using to delimit information in its
-internal metadata secretly written into the graph. By default, this separator is the hash character (#). In the unlikely
-event of interference with your application logic (e.g. # is used in property keys or values in your application), this
-can be changed.
-
-If, for instance, you would like to use the dollar sign ($) as a delimiter instead, instantiate the framework in the
-  following fashion:
-```java
-
-    GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-
-    FrameworkConfiguration customFrameworkConfig = new BaseFrameworkConfiguration() {
-      @Override
-      public String separator() {
-          return "$";
-      }
-    };
-
-    GraphAwareFramework framework = new GraphAwareFramework(database, customFrameworkConfig);
-
-    framework.registerModule(new SomeModule());
-    framework.registerModule(new SomeOtherModule());
-
-    framework.start();
-```
-
 <a name="lib"/>
 Features
 --------
@@ -486,43 +456,6 @@ allows `TransactionEventHandler`s to be registered on it. It then simulates a tr
 
 As a `GraphDatabaseService` equivalent for batch inserts, this project provides `TransactionSimulatingBatchGraphDatabase`
 for completeness, but its usage is discouraged.
-
-### DTOs
-
-In `com.graphaware.propertycontainer.dto`, you will find classes used for creating detached representations (or Data
-Transfer Objects (DTOs)) from Nodes, Relationships and Properties.
-
-First, there are property-less representations of Relationships, useful for encapsulating a `RelationshipType` and
-(optionally) `Direction`. These can be found in the `common` sub-package. For instance, if you need an object that
-encapsulates `RelationshipType` and `Direction`, which can be constructed from a `Relationship` object, use
-
-```java
-   Relationship relationship = ... //get it in the database
-   HasTypeAndDirection relationshipRepresentation = new TypeAndDirection(relationship); //now you can store this, serialize it, or whatever
-```
-
-Of course, other commonly needed constructors are provided. For String-convertible encapsulation of `RelationshipType`
-and `Direction`, use `SerializableTypeAndDirectionImpl`, which provides a toString(...) method and a String-based
-constructor.
-
-If your relationship representations need to contain properties as well, have a look at the `plain.relationship`
-sub-package. Specifically,there are immutable relationship representations, like `ImmutableRelationshipImpl` and
-`ImmutableDirectedRelationshipImpl`, and their mutable counterparts. The reason they are in the `plain` package is that
-no conversion is done on property values; they are represented as `Object`s.
-
-In the `string.relationship` package, you will find some classes with the same names as above (`ImmutableRelationshipImpl`
-and `ImmutableDirectedRelationshipImpl`,...). These are essentially the same except that property values are represented
-as Strings. This is useful, for instance, when you want to convert a `Relationship` representation (including its
-properties) to and from a single String. For that purpose, use `SerializableRelationshipImpl` and
-`SerializableDirectedRelationshipImpl`.
-
-Please note that when using this feature, it would be good not to name anything (properties, relationships) with names
-that start with "_GA_". Also, please refrain from using the "#" (or anything else you choose to be your information
-separator in string representations of relationships, nodes, and properties) symbol altogether, especially in
-relationship and node property values.
-
-Neo4j does not allow null keys for properties, but *does allow* empty Strings to be keys. GraphAware *does not allow this*,
-please make sure you don't use empty Strings as property keys. Empty Strings (or nulls) as values are absolutely fine.
 
 ### Miscellaneous Utilities
 
