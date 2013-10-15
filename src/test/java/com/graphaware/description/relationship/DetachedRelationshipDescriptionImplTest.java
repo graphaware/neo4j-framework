@@ -29,8 +29,8 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.description.predicate.Predicates.equalTo;
 import static com.graphaware.description.relationship.RelationshipDescriptionFactory.literal;
-import static org.junit.Assert.assertEquals;
-import static org.neo4j.graphdb.Direction.OUTGOING;
+import static org.junit.Assert.*;
+import static org.neo4j.graphdb.Direction.*;
 
 /**
  *  Test for {@link DetachedRelationshipDescriptionImpl}.
@@ -56,6 +56,42 @@ public class DetachedRelationshipDescriptionImplTest {
     @After
     public void tearDown() {
         database.shutdown();
+    }
+
+    @Test
+    public void shouldCorrectlyJudgeMoreGeneral() {
+        assertTrue(literal("TEST", OUTGOING).isMoreGeneralThan(literal("TEST", OUTGOING)));
+        assertFalse(literal("TEST2", OUTGOING).isMoreGeneralThan(literal("TEST", OUTGOING)));
+        assertTrue(literal("TEST", BOTH).isMoreGeneralThan(literal("TEST", OUTGOING)));
+        assertTrue(literal("TEST", OUTGOING).isMoreGeneralThan(literal("TEST", BOTH)));
+        assertFalse(literal("TEST", OUTGOING).isMoreGeneralThan(literal("TEST", INCOMING)));
+        assertFalse(literal("TEST", INCOMING).isMoreGeneralThan(literal("TEST", OUTGOING)));
+        assertTrue(literal("TEST", OUTGOING).with("k1", equalTo("v1")).isMoreGeneralThan(literal("TEST", OUTGOING).with("k1", equalTo("v1"))));
+        assertFalse(literal("TEST2", OUTGOING).with("k1", equalTo("v1")).isMoreGeneralThan(literal("TEST", OUTGOING).with("k1", equalTo("v1"))));
+    }
+
+    @Test
+    public void shouldCorrectlyJudgeMoreSpecific() {
+        assertTrue(literal("TEST", OUTGOING).isMoreSpecificThan(literal("TEST", OUTGOING)));
+        assertFalse(literal("TEST2", OUTGOING).isMoreSpecificThan(literal("TEST", OUTGOING)));
+        assertTrue(literal("TEST", BOTH).isMoreSpecificThan(literal("TEST", OUTGOING)));
+        assertTrue(literal("TEST", OUTGOING).isMoreSpecificThan(literal("TEST", BOTH)));
+        assertFalse(literal("TEST", OUTGOING).isMoreSpecificThan(literal("TEST", INCOMING)));
+        assertFalse(literal("TEST", INCOMING).isMoreSpecificThan(literal("TEST", OUTGOING)));
+        assertTrue(literal("TEST", OUTGOING).with("k1", equalTo("v1")).isMoreSpecificThan(literal("TEST", OUTGOING).with("k1", equalTo("v1"))));
+        assertFalse(literal("TEST2", OUTGOING).with("k1", equalTo("v1")).isMoreSpecificThan(literal("TEST", OUTGOING).with("k1", equalTo("v1"))));
+    }
+
+    @Test
+    public void shouldCorrectlyJudgeMutex() {
+        assertFalse(literal("TEST", OUTGOING).isMutuallyExclusive(literal("TEST", OUTGOING)));
+        assertTrue(literal("TEST2", OUTGOING).isMutuallyExclusive(literal("TEST", OUTGOING)));
+        assertFalse(literal("TEST", BOTH).isMutuallyExclusive(literal("TEST", OUTGOING)));
+        assertFalse(literal("TEST", OUTGOING).isMutuallyExclusive(literal("TEST", BOTH)));
+        assertTrue(literal("TEST", OUTGOING).isMutuallyExclusive(literal("TEST", INCOMING)));
+        assertTrue(literal("TEST", INCOMING).isMutuallyExclusive(literal("TEST", OUTGOING)));
+        assertFalse(literal("TEST", OUTGOING).with("k1", equalTo("v1")).isMutuallyExclusive(literal("TEST", OUTGOING).with("k1", equalTo("v1"))));
+        assertTrue(literal("TEST2", OUTGOING).with("k1", equalTo("v1")).isMutuallyExclusive(literal("TEST", OUTGOING).with("k1", equalTo("v1"))));
     }
 
     @Test
