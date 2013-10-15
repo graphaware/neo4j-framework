@@ -19,6 +19,7 @@ package com.graphaware.description.relationship;
 import com.graphaware.description.serialize.Serializer;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -52,11 +53,16 @@ public class DetachedRelationshipDescriptionImplTest {
         });
     }
 
+    @After
+    public void tearDown() {
+        database.shutdown();
+    }
+
     @Test
     public void verifySerialization() {
         RelationshipDescription description = literal(database.getRelationshipById(0), database.getNodeById(0));
+
         String serialized = Serializer.toString(description, "testPrefix");
-        System.out.println(serialized);
         RelationshipDescription deserialized = Serializer.fromString(serialized, DetachedRelationshipDescriptionImpl.class, "testPrefix");
 
         assertEquals(deserialized, description);
@@ -79,7 +85,6 @@ public class DetachedRelationshipDescriptionImplTest {
                 .with("k13", equalTo(new String[]{"test1", "test2", "some very long string that should hopefully be long enough, very very very loooooooong string"}));
 
         String serialized = Serializer.toString(description, "testPrefix");
-        System.out.println(serialized);
         RelationshipDescription deserialized = Serializer.fromString(serialized, DetachedRelationshipDescriptionImpl.class, "testPrefix");
 
         assertEquals(deserialized, description);

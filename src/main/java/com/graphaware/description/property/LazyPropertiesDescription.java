@@ -60,4 +60,27 @@ public class LazyPropertiesDescription extends BasePropertiesDescription impleme
     public Iterable<String> getKeys() {
         return propertyContainer.getPropertyKeys();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LazyPropertiesDescription that = (LazyPropertiesDescription) o;
+
+        if (!propertyContainer.equals(that.propertyContainer)) return false;
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return propertyContainer.hashCode();
+    }
 }
