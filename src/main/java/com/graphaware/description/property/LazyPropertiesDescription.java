@@ -46,11 +46,13 @@ public class LazyPropertiesDescription extends BasePropertiesDescription impleme
      */
     @Override
     public Predicate get(String key) {
-        if (!propertyContainer.hasProperty(key)) {
+        Object value = propertyContainer.getProperty(key, null);
+
+        if (value == null) {
             return undefined();
         }
 
-        return equalTo(propertyContainer.getProperty(key));
+        return equalTo(value);
     }
 
     /**

@@ -72,6 +72,13 @@ public class WildcardPropertiesDescription extends BaseDetachedPropertiesDescrip
         if (predicates.isEmpty()) {
             return true;
         }
-        return super.isMoreGeneralThan(other);
+
+        for (String key : getKeys()) {
+            if (!get(key).isMoreGeneralThan(other.get(key))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

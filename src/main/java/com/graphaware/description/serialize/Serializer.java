@@ -116,7 +116,7 @@ public final class Serializer {
      * @return de-serialized object.
      */
     public static <T> T fromString(String string, Class<T> clazz, String prefix) {
-        return fromByteArray(Base64.decode(string.replaceFirst(prefix, "")), clazz);
+        return fromByteArray(Base64.decode(string.substring(prefix.length())), clazz);
     }
 
 }
