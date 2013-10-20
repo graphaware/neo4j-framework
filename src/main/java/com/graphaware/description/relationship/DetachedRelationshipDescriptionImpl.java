@@ -50,6 +50,6 @@ public class DetachedRelationshipDescriptionImpl extends BaseRelationshipDescrip
      */
     @Override
     public String toString() {
-        return getType() + "#" + getDirection() + "#" + getPropertiesDescription().toString();
+        return getType().name() + "#" + getDirection() + "#" + getPropertiesDescription().toString();
     }
 }
