@@ -23,10 +23,13 @@ import com.graphaware.tx.executor.batch.BatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.UnitOfWork;
 import org.apache.log4j.Logger;
+import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.*;
 
 import java.util.*;
 
+import static com.graphaware.blog.RelationshipTypeOrProperty.PROPERTY;
+import static com.graphaware.blog.RelationshipTypeOrProperty.RELATIONSHIP_TYPE;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
@@ -34,9 +37,9 @@ import static org.neo4j.graphdb.Direction.OUTGOING;
 /**
  *
  */
-public class RelationshipTypeVsPropertyReadTest implements PerformanceTest {
+public class RelationshipTypeVsPropertyReadCypherTest implements PerformanceTest {
 
-    private static final Logger LOG = Logger.getLogger(RelationshipTypeVsPropertyReadTest.class);
+    private static final Logger LOG = Logger.getLogger(RelationshipTypeVsPropertyReadCypherTest.class);
 
     protected static final Random RANDOM = new Random(System.currentTimeMillis());
 
@@ -60,6 +63,8 @@ public class RelationshipTypeVsPropertyReadTest implements PerformanceTest {
     }
 
     private RelationshipTypeOrProperty lastRelationshipTypeOrProperty;
+
+    private ExecutionEngine executionEngine;
 
     @Override
     public String shortName() {
@@ -128,43 +133,22 @@ public class RelationshipTypeVsPropertyReadTest implements PerformanceTest {
         });
 
         executor.execute();
+
+        executionEngine = new ExecutionEngine(database);
     }
 
     @Override
     public long run(GraphDatabaseService database, final Map<String, Object> params) {
         long time = 0;
 
+        final String query = buildQuery(params);
+
         for (int i = 0; i < 100; i++) {
             final Node node = randomNode(database, NO_NODES);
-
-            final int noTypes = (int) params.get(NO_TYPES);
-
             time += TestUtils.time(new TestUtils.Timed() {
                 @Override
                 public void time() {
-                    switch ((RelationshipTypeOrProperty) params.get(TYPE_OR_PROPERTY)) {
-                        case PROPERTY:
-                            int count = 0;
-                            for (Relationship r : node.getRelationships(RATED, randomDirection())) {
-                                if ((int) r.getProperty("rating") >= (noTypes / 2)) {
-                                    count++;
-                                }
-                            }
-                            LOG.trace(count);
-                            break;
-                        case RELATIONSHIP_TYPE:
-                            count = 0;
-                            RelationshipType[] types = new RelationshipType[noTypes / 2];
-                            for (int i = 0; i < noTypes / 2; i++) {
-                                types[i] = TYPES[(noTypes / 2) + i];
-                            }
-
-                            for (Relationship r : node.getRelationships(randomDirection(), types)) {
-                                count++;
-                            }
-                            LOG.trace(count);
-                            break;
-                    }
+                    executionEngine.execute(query,Collections.<String, Object>singletonMap("id", node.getId()));
                 }
             });
 
@@ -184,6 +168,50 @@ public class RelationshipTypeVsPropertyReadTest implements PerformanceTest {
         boolean result = !typeOrProperty.equals(lastRelationshipTypeOrProperty);
         lastRelationshipTypeOrProperty = typeOrProperty;
         return result;
+    }
+
+    private String buildQuery(Map<String, Object> params) {
+        StringBuilder query = new StringBuilder("START n=node({id}) MATCH n");
+
+        Direction direction = randomDirection();
+        RelationshipTypeOrProperty typeOrProperty = (RelationshipTypeOrProperty) params.get(TYPE_OR_PROPERTY);
+
+        if (INCOMING.equals(direction)) {
+            query.append("<");
+        }
+
+        query.append("-[");
+
+        final int noTypes = (int) params.get(NO_TYPES);
+        if (RELATIONSHIP_TYPE.equals(typeOrProperty)) {
+            for (int i = 0; i < noTypes / 2; i++) {
+                if (i == 0) {
+                    query.append(":");
+                }
+                else {
+                    query.append("|");
+                }
+                query.append("TYPE").append((noTypes / 2) + i);
+            }
+        } else {
+            query.append("r:RATED");
+        }
+
+        query.append("]-");
+
+        if (OUTGOING.equals(direction)) {
+            query.append(">");
+        }
+
+        query.append("m");
+
+        if (PROPERTY.equals(typeOrProperty)) {
+            query.append(" WHERE r.rating >= ").append(noTypes / 2);
+        }
+
+        query.append(" RETURN count (m)");
+
+        return query.toString();
     }
 
     private Node randomNode(GraphDatabaseService database, int noNodes) {

@@ -3,34 +3,57 @@ __author__ = 'bachmanm'
 import matplotlib.pyplot as plt
 import numpy as np
 
-filename = "rel-type-vs-property-read.txt"
+filename = "rel-type-vs-property-read-cypher.txt"
 
 resultsAsArray = np.loadtxt(open(filename, "rb"), delimiter=";", dtype=str, skiprows=3)
 
 def f(arr, value):
     return arr[np.where(arr == value)[0:1]]
 
+propMeans = np.mean(f(resultsAsArray, "PROPERTY")[:,2:].astype(int), 1)
+typeMeans = np.mean(f(resultsAsArray, "RELATIONSHIP_TYPE")[:,2:].astype(int), 1)
 
-def plot(toPlot, color, ls):
-    xaxis = toPlot[:, 0].astype(int)
-    data = toPlot[:, 3:].astype(int)
-    plt.plot(xaxis, np.mean(data, 1), c=color, ls=ls, linewidth=2.0)
-    plt.errorbar(xaxis, np.mean(data,1), c=color, ls=ls, yerr=(np.std(data, 1)))
+propStd = np.std(f(resultsAsArray, "PROPERTY")[:,2:].astype(int), 1)
+typeStd = np.std(f(resultsAsArray, "RELATIONSHIP_TYPE")[:,2:].astype(int), 1)
 
+fig = plt.figure()
+ax = fig.add_subplot(111)
 
-plot(f(f(resultsAsArray, "nocache"), "RELATIONSHIP_TYPE"), "purple", ":")
-plot(f(f(resultsAsArray, "nocache"), "PROPERTY"), "purple", "-")
-plot(f(f(resultsAsArray, "lowcache"), "RELATIONSHIP_TYPE"), "green", ":")
-plot(f(f(resultsAsArray, "lowcache"), "PROPERTY"), "green", "-")
-plot(f(f(resultsAsArray, "highcache"), "RELATIONSHIP_TYPE"), "blue", ":")
-plot(f(f(resultsAsArray, "highcache"), "PROPERTY"), "blue", "-")
+ind = np.arange(3)
+width = 0.35
 
-plt.xlabel('Relationships per Node')
-plt.ylabel('Time (microseconds)')
-plt.title('Counting Relationships for 10 Nodes (2 Properties per Relationship)')
-# plt.legend(("Plain Neo4j (disk)", "RelCount Module (disk)", "Plain Neo4j (low level cache)",
-#             "RelCount Module (low level cache)", "Plain Neo4j (high level cache)",
-#             "RelCount Module (high level cache)"), loc=0)
-plt.yscale('log')
-# plt.xscale('log')
+rects1 = ax.bar(ind, propMeans, width,
+                color='#902c8e',
+                yerr=propStd,
+                error_kw=dict(elinewidth=2,ecolor='#2377ba'),log=True)
+
+rects2 = ax.bar(ind+width, typeMeans, width,
+                color='#2377ba',
+                yerr=typeStd,
+                error_kw=dict(elinewidth=2,ecolor='#902c8e',log=True))
+
+# axes and labels
+ax.set_xlim(-width,len(ind)+width)
+ax.set_ylim(10)
+ax.set_ylabel('Scores')
+ax.set_title('Scores by group and gender')
+xTickMarks = ['Group'+str(i) for i in range(1,4)]
+ax.set_xticks(ind+width)
+xtickNames = ax.set_xticklabels(xTickMarks)
+plt.setp(xtickNames, rotation=45, fontsize=10)
+
+## add a legend
+ax.legend( (rects1[0], rects2[0]), ('Men', 'Women') )
+# plt.yscale('log')
+
+def autolabel(rects):
+    # attach some text labels
+    for rect in rects:
+        height = rect.get_height()
+        ax.text(rect.get_x()+rect.get_width()/2., 1.20*height, '%d'%int(height),
+                ha='center', va='bottom')
+
+autolabel(rects1)
+autolabel(rects2)
+
 plt.show()

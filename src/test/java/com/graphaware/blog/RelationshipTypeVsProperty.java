@@ -27,7 +27,8 @@ public class RelationshipTypeVsProperty extends PerformanceTestSuite {
     @Override
     protected PerformanceTest[] getPerfTests() {
         return new PerformanceTest[]{
-                new RelationshipTypeVsPropertyReadTest()
+//                new RelationshipTypeVsPropertyReadTest()
+                new RelationshipTypeVsPropertyReadCypherTest()
         };
     }
 }
