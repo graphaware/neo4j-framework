@@ -144,11 +144,10 @@ public class RelationshipTypeVsPropertyReadCypherTest implements PerformanceTest
         final String query = buildQuery(params);
 
         for (int i = 0; i < 100; i++) {
-            final Node node = randomNode(database, NO_NODES);
             time += TestUtils.time(new TestUtils.Timed() {
                 @Override
                 public void time() {
-                    executionEngine.execute(query,Collections.<String, Object>singletonMap("id", node.getId()));
+                    executionEngine.execute(query,Collections.<String, Object>singletonMap("id", RANDOM.nextInt(NO_NODES)));
                 }
             });
 
