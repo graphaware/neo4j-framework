@@ -3,7 +3,7 @@ __author__ = 'bachmanm'
 import matplotlib.pyplot as plt
 import numpy as np
 
-filename = "rel-type-vs-property-read-cypher.txt"
+filename = "rel-type-vs-property-read-java.txt"
 
 resultsAsArray = np.loadtxt(open(filename, "rb"), delimiter=";", dtype=str, skiprows=3)
 
@@ -35,15 +35,15 @@ rects2 = ax.bar(ind+width, typeMeans, width,
 # axes and labels
 ax.set_xlim(-width,len(ind)+width)
 ax.set_ylim(10)
-ax.set_ylabel('Scores')
-ax.set_title('Scores by group and gender')
-xTickMarks = ['Group'+str(i) for i in range(1,4)]
+ax.set_ylabel('Time (microseconds)')
+ax.set_title('Traversing half of node\'s (cca 100) relationships 100x (Java API)')
+xTickMarks = ['No Cache','Low Level Cache','High Level Cache']
 ax.set_xticks(ind+width)
 xtickNames = ax.set_xticklabels(xTickMarks)
-plt.setp(xtickNames, rotation=45, fontsize=10)
+plt.setp(xtickNames, rotation=0, fontsize=10)
 
 ## add a legend
-ax.legend( (rects1[0], rects2[0]), ('Men', 'Women') )
+ax.legend( (rects1[0], rects2[0]), ('1 Relationship Type + Properties', 'Different Relationship Types') )
 # plt.yscale('log')
 
 def autolabel(rects):
