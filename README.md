@@ -4,7 +4,7 @@ GraphAware Neo4j Framework
 [![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework)
 
 The aim of the GraphAware Framework is to speed-up development with Neo4j and provide useful generic and domain-specific
-modules, analytical capabilities, graph algorithms, etc.
+modules, analytical capabilities, [graph algorithms](#algos), etc.
 
 The framework can be used in two ways: as a [library of useful tested code](#lib) that simplifies tasks commonly needed when
 developing with Neo4j, or as a [real framework with modules](#fw), which perform some (behind-the-scenes) mutations on the graph
@@ -457,6 +457,7 @@ allows `TransactionEventHandler`s to be registered on it. It then simulates a tr
 As a `GraphDatabaseService` equivalent for batch inserts, this project provides `TransactionSimulatingBatchGraphDatabase`
 for completeness, but its usage is discouraged.
 
+<a name="algos"/>
 ### Graph Algorithms
 
 #### Increasingly Longer (Weighted) Shortest Paths
