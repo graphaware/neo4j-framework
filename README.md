@@ -478,7 +478,7 @@ the shortest path from (1) to (3) is (1)->(2)->(3) and has a length of 2. If mor
 returned will be (1)->(4)->(5)->(3) with a length of 3. Note that there is another path of length 3:
 (1)->(4)->(2)->(3), but it is not returned, since (2)->(3) is contained in a shorter path.
 
-**API:** POST to {SERVER_URI}/db/data/ext/NumberOfShortestPaths/node/{sourceNodeId}/paths with the following parameters:
+**API:** `POST` to `{SERVER_URI}/db/data/ext/NumberOfShortestPaths/node/{sourceNodeId}/paths` with the following parameters:
 
 ```
 {
