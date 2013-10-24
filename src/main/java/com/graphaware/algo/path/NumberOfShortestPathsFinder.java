@@ -45,7 +45,7 @@ import java.util.List;
 public class NumberOfShortestPathsFinder {
 
     private final int maxDepth;
-    private final int minResultCount;
+    private final int noResults;
     private final PathExpander expander;
 
     /**
@@ -58,8 +58,8 @@ public class NumberOfShortestPathsFinder {
      */
     public NumberOfShortestPathsFinder(int maxDepth, int noResults, PathExpander expander) {
         this.maxDepth = maxDepth;
+        this.noResults = noResults;
         this.expander = expander;
-        this.minResultCount = noResults;
     }
 
     /**
@@ -76,13 +76,13 @@ public class NumberOfShortestPathsFinder {
         result.addAll(Iterables.toList(new ShortestPath(maxDepth, expander).findAllPaths(start, end)));
 
         //If there are no results, there will never be any. If there are enough, then we just return them:
-        if (result.isEmpty() || result.size() >= minResultCount) {
+        if (result.isEmpty() || result.size() >= noResults) {
             return result;
         }
 
         //Now, we have some results, but not enough. All the resulting paths so far must have the same length (they are
         //the shortest paths after all). We try with longer path length until we have enough:
-        for (int depth = result.get(0).length() + 1; depth <= maxDepth && result.size() < minResultCount; depth++) {
+        for (int depth = result.get(0).length() + 1; depth <= maxDepth && result.size() < noResults; depth++) {
             result.addAll(Iterables.toList(new ShortestPath(depth, expander, Integer.MAX_VALUE, true).findAllPaths(start, end)));
         }
 
