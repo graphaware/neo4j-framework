@@ -16,7 +16,7 @@
 
 package com.graphaware.tx.event.batch.propertycontainer.inserter;
 
-import com.graphaware.wrapper.RelationshipWrapper;
+import com.graphaware.common.wrapper.RelationshipWrapper;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Relationship;

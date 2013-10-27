@@ -20,16 +20,14 @@ import com.graphaware.common.config.ConfigurationAsString;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
- * Strategy deciding which properties to include for the purposes of transaction data analysis.
- * <p/>
- * It is highly recommended to extend IncludeAllBusinessProperties from the GraphAware framework rather than implementing
- * this class directly, as it is important to ignore all GraphAware internal nodes for many applications.
+ * Strategy deciding whether to include properties of some {@link PropertyContainer} or not.
+ *
+ * @param <T> type of the property container.
  */
 public interface PropertyInclusionStrategy<T extends PropertyContainer> extends ConfigurationAsString {
 
     /**
-     * Should a property with the given key of the given property container be included for the purposes of transaction
-     * data analysis.
+     * Should a property with the given key of the given property container be included?
      *
      * @param key               of the property.
      * @param propertyContainer containing the property.

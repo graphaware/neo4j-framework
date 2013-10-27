@@ -16,7 +16,7 @@
 
 package com.graphaware.tx.event.batch.propertycontainer.inserter;
 
-import com.graphaware.wrapper.NodeWrapper;
+import com.graphaware.common.wrapper.NodeWrapper;
 import org.neo4j.graphdb.*;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 

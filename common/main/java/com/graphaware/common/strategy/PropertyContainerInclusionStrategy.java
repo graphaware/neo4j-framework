@@ -17,11 +17,10 @@
 package com.graphaware.common.strategy;
 
 
-import com.graphaware.common.config.ConfigurationAsString;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
- * Strategy deciding which property containers to include for the purposes of transaction data analysis.
+ * {@link InclusionStrategy} for {@link PropertyContainer}s.
  */
-public interface PropertyContainerInclusionStrategy<T extends PropertyContainer> extends InclusionStrategy<T>, ConfigurationAsString {
+public interface PropertyContainerInclusionStrategy<T extends PropertyContainer> extends InclusionStrategy<T> {
 }

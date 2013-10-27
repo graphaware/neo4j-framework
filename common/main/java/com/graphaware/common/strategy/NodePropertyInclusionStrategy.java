@@ -19,7 +19,7 @@ package com.graphaware.common.strategy;
 import org.neo4j.graphdb.Node;
 
 /**
- * {@link PropertyInclusionStrategy} for {@link org.neo4j.graphdb.Node}s.
+ * {@link PropertyInclusionStrategy} for {@link Node}s.
  */
 public interface NodePropertyInclusionStrategy extends PropertyInclusionStrategy<Node> {
 }

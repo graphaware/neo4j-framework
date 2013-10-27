@@ -16,12 +16,14 @@
 
 package com.graphaware.common.strategy;
 
+import com.graphaware.common.config.ConfigurationAsString;
+
 /**
  * Strategy deciding whether to include something or not.
  *
  * @param <T> type of the object to make a decision about.
  */
-public interface InclusionStrategy<T> {
+public interface InclusionStrategy<T> extends ConfigurationAsString {
 
     /**
      * Include the given object?

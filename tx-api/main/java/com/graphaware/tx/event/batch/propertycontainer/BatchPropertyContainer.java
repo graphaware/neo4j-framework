@@ -16,7 +16,7 @@
 
 package com.graphaware.tx.event.batch.propertycontainer;
 
-import com.graphaware.wrapper.BasePropertyContainerWrapper;
+import com.graphaware.common.wrapper.BasePropertyContainerWrapper;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**

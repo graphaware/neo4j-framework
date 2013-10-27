@@ -20,10 +20,7 @@ package com.graphaware.common.strategy;
 import org.neo4j.graphdb.Relationship;
 
 /**
- * Strategy deciding which {@link org.neo4j.graphdb.Relationship}s to include for the purposes of transaction data analysis.
- * <p/>
- * It is highly recommended to extend IncludeAllBusinessRelationships from the GraphAware framework rather than implementing
- * this class directly, as it is important to ignore all GraphAware internal nodes for many applications.
+ * {@link PropertyContainerInclusionStrategy} for {@link Relationship}s.
  */
 public interface RelationshipInclusionStrategy extends PropertyContainerInclusionStrategy<Relationship> {
 }

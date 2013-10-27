@@ -22,7 +22,7 @@ import com.graphaware.framework.config.FrameworkConfiguration;
 import com.graphaware.framework.config.FrameworkConfigured;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
-import com.graphaware.util.PropertyContainerUtils;
+import com.graphaware.common.util.PropertyContainerUtils;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;

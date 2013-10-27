@@ -48,8 +48,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.graphaware.test.IterableUtils.count;
-import static com.graphaware.util.PropertyContainerUtils.*;
+import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static junit.framework.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;

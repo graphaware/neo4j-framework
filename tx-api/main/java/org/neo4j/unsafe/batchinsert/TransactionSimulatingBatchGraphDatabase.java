@@ -19,7 +19,7 @@ package org.neo4j.unsafe.batchinsert;
 import com.graphaware.tx.event.batch.data.BatchTransactionData;
 import com.graphaware.tx.event.batch.propertycontainer.database.BatchDatabaseNode;
 import com.graphaware.tx.event.batch.propertycontainer.database.BatchDatabaseRelationship;
-import com.graphaware.wrapper.Wrapper;
+import com.graphaware.common.wrapper.Wrapper;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.graphdb.event.TransactionEventHandler;

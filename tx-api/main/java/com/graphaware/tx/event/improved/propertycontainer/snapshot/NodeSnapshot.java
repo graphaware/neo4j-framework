@@ -18,7 +18,7 @@ package com.graphaware.tx.event.improved.propertycontainer.snapshot;
 
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
-import com.graphaware.wrapper.NodeWrapper;
+import com.graphaware.common.wrapper.NodeWrapper;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;

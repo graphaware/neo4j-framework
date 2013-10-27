@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.graphaware.util.PropertyContainerUtils.id;
+import static com.graphaware.common.util.PropertyContainerUtils.id;
 
 /**
  * {@link com.graphaware.tx.event.improved.data.PropertyContainerTransactionData} that lazily initializes its internal structures (indexed transaction data)

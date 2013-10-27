@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.graphaware.util.DirectionUtils.matches;
+import static com.graphaware.common.util.DirectionUtils.matches;
 import static org.neo4j.graphdb.Direction.BOTH;
 
 /**

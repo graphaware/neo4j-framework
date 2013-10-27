@@ -17,7 +17,7 @@
 package com.graphaware.demo.tx.event.improved;
 
 import com.graphaware.common.change.Change;
-import com.graphaware.description.property.LiteralPropertiesDescription;
+import com.graphaware.common.description.property.LiteralPropertiesDescription;
 import com.graphaware.framework.strategy.IncludeAllBusinessNodes;
 import com.graphaware.framework.strategy.InclusionStrategiesImpl;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;

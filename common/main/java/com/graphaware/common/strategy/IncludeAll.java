@@ -28,4 +28,12 @@ public final class IncludeAll<T> implements InclusionStrategy<T> {
     public boolean include(T object) {
         return true;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String asString() {
+        return "INCLUDE_ALL";
+    }
 }
