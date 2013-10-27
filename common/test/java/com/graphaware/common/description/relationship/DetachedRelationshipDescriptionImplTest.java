@@ -50,7 +50,7 @@ public class DetachedRelationshipDescriptionImplTest {
             tx.success();
         }
         finally {
-            tx.failure();
+            tx.finish();
         }
     }
 

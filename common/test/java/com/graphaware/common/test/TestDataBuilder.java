@@ -45,7 +45,7 @@ public class TestDataBuilder {
             lastNode = database.createNode();
             tx.success();
         } finally {
-            tx.failure();
+            tx.finish();
         }
 
         return this;
@@ -70,7 +70,7 @@ public class TestDataBuilder {
             lastRelationship = node.createRelationshipTo(database.getNodeById(nodeId), type);
             tx.success();
         } finally {
-            tx.failure();
+            tx.finish();
         }
 
         return this;
@@ -95,7 +95,7 @@ public class TestDataBuilder {
             lastRelationship = node.createRelationshipTo(database.getNodeById(nodeId), DynamicRelationshipType.withName(type));
             tx.success();
         } finally {
-            tx.failure();
+            tx.finish();
         }
 
         return this;
@@ -120,7 +120,7 @@ public class TestDataBuilder {
             lastRelationship = database.getNodeById(nodeId).createRelationshipTo(node, type);
             tx.success();
         } finally {
-            tx.failure();
+            tx.finish();
         }
 
         return this;
@@ -145,7 +145,7 @@ public class TestDataBuilder {
             lastRelationship =database.getNodeById(nodeId).createRelationshipTo(node, DynamicRelationshipType.withName(type));
             tx.success();
         } finally {
-            tx.failure();
+            tx.finish();
         }
 
         return this;
@@ -170,7 +170,7 @@ public class TestDataBuilder {
             propertyContainer.setProperty(key, value);
             tx.success();
         } finally {
-            tx.failure();
+            tx.finish();
         }
 
         return this;

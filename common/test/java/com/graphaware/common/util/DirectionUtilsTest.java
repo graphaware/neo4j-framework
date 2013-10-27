@@ -52,7 +52,7 @@ public class DirectionUtilsTest {
             node3.createRelationshipTo(node3, withName("test"));
             tx.success();
         } finally {
-            tx.failure();
+            tx.finish();
         }
     }
 

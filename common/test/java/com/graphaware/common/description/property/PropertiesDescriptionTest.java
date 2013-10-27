@@ -40,7 +40,7 @@ public abstract class PropertiesDescriptionTest {
             root.setProperty("array", new int[]{4, 5});
             tx.success();
         } finally {
-            tx.failure();
+            tx.finish();
         }
 
         propertyContainer = database.getNodeById(0);

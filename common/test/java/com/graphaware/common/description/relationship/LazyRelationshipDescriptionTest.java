@@ -47,7 +47,7 @@ public class LazyRelationshipDescriptionTest {
             root.createRelationshipTo(one, withName("TEST")).setProperty("k", new int[]{2, 3, 4});
             tx.success();
         } finally {
-            tx.failure();
+            tx.finish();
         }
     }
 

@@ -45,7 +45,7 @@ public class IterableUtilsTest {
             database.createNode();
             tx.success();
         } finally {
-            tx.failure();
+            tx.finish();
         }
 
         assertEquals(2, IterableUtils.countNodes(database));
@@ -60,7 +60,7 @@ public class IterableUtilsTest {
             database.getNodeById(0).delete();
             tx.success();
         } finally {
-            tx.failure();
+            tx.finish();
         }
 
         assertEquals(0, IterableUtils.countNodes(database));
@@ -87,7 +87,7 @@ public class IterableUtilsTest {
             node = database.createNode();
             tx.success();
         } finally {
-            tx.failure();
+            tx.finish();
         }
 
         Iterable<Node> nodes = GlobalGraphOperations.at(database).getAllNodes();
@@ -99,7 +99,7 @@ public class IterableUtilsTest {
             database.getNodeById(1).delete();
             tx.success();
         } finally {
-            tx.failure();
+            tx.finish();
         }
 
         assertFalse(IterableUtils.contains(nodes, node));
@@ -114,7 +114,7 @@ public class IterableUtilsTest {
             database.createNode();
             tx.success();
         } finally {
-            tx.failure();
+            tx.finish();
         }
 
         assertTrue(asList(0L, 1L).contains(IterableUtils.random(database.getAllNodes()).getId()));

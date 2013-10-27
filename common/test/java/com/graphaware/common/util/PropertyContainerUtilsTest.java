@@ -187,6 +187,11 @@ public class PropertyContainerUtilsTest {
             public boolean include(String object) {
                 return !"key".equals(object);
             }
+
+            @Override
+            public String asString() {
+                return "custom";
+            }
         }));
     }
 
@@ -207,6 +212,11 @@ public class PropertyContainerUtilsTest {
             @Override
             public boolean include(String object) {
                 return !"key".equals(object);
+            }
+
+            @Override
+            public String asString() {
+                return "custom";
             }
         }));
     }
