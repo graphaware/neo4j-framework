@@ -16,7 +16,7 @@
 
 package com.graphaware.tx.event.batch;
 
-import com.graphaware.test.IterableUtils;
+import com.graphaware.common.test.IterableUtils;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserterImpl;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;

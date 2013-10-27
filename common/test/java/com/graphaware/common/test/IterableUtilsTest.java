@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.test;
+package com.graphaware.common.test;
 
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;

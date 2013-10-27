@@ -36,7 +36,7 @@ import java.util.HashMap;
 
 import static com.graphaware.framework.GraphAwareFramework.*;
 import static com.graphaware.framework.config.FrameworkConfiguration.GA_PREFIX;
-import static com.graphaware.test.IterableUtils.count;
+import static com.graphaware.common.test.IterableUtils.count;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;

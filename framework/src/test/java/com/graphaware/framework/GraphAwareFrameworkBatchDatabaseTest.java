@@ -16,9 +16,6 @@
 
 package com.graphaware.framework;
 
-import com.graphaware.framework.GraphAwareFramework;
-import com.graphaware.framework.GraphAwareModule;
-import com.graphaware.framework.NeedsInitializationException;
 import com.graphaware.framework.config.DefaultFrameworkConfiguration;
 import com.graphaware.framework.strategy.InclusionStrategiesImpl;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -38,7 +35,7 @@ import java.io.IOException;
 
 import static com.graphaware.framework.GraphAwareFramework.*;
 import static com.graphaware.framework.config.FrameworkConfiguration.GA_PREFIX;
-import static com.graphaware.test.IterableUtils.count;
+import static com.graphaware.common.test.IterableUtils.count;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;

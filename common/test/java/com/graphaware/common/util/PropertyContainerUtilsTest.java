@@ -18,7 +18,7 @@ package com.graphaware.common.util;
 
 import com.graphaware.common.change.Change;
 import com.graphaware.common.strategy.InclusionStrategy;
-import com.graphaware.test.TestDataBuilder;
+import com.graphaware.common.test.TestDataBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

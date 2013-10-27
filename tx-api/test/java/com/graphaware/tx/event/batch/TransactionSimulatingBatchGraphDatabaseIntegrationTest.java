@@ -16,10 +16,10 @@
 
 package com.graphaware.tx.event.batch;
 
-import com.graphaware.test.IterableUtils;
+import com.graphaware.common.test.IterableUtils;
 import com.graphaware.tx.executor.single.*;
 import junit.framework.Assert;
-import com.graphaware.test.TestDataBuilder;
+import com.graphaware.common.test.TestDataBuilder;
 import com.graphaware.common.change.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;

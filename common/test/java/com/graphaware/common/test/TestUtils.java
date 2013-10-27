@@ -14,33 +14,36 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.test;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.test.TestGraphDatabaseFactory;
+package com.graphaware.common.test;
 
 /**
- * Test template for quick copy-paste start of an integration test.
+ * Utilities mainly intended for testing.
  */
-public class DummyTest {
+public final class TestUtils {
 
-    private GraphDatabaseService database;
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+    /**
+     * Measure the time of the timed callback.
+     *
+     * @param timed callback.
+     * @return time in microseconds
+     */
+    public static long time(Timed timed) {
+        long start = System.nanoTime();
+        timed.time();
+        return (System.nanoTime() - start) / 1000;
     }
 
-    @After
-    public void tearDown() {
-        database.shutdown();
+    /**
+     * Timed operation.
+     */
+    public interface Timed {
+
+        /**
+         * Perform the operation to be timed.
+         */
+        void time();
     }
 
-    @Test
-    public void testSomething() {
-
+    private TestUtils() {
     }
 }

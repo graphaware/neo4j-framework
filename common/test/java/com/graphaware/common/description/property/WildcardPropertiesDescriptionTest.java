@@ -16,7 +16,7 @@
 
 package com.graphaware.common.description.property;
 
-import com.graphaware.test.IterableUtils;
+import com.graphaware.common.test.IterableUtils;
 import org.junit.Test;
 
 import java.util.List;

@@ -16,8 +16,8 @@
 
 package com.graphaware.tx.event.improved;
 
-import com.graphaware.test.IterableUtils;
-import com.graphaware.test.TestDataBuilder;
+import com.graphaware.common.test.IterableUtils;
+import com.graphaware.common.test.TestDataBuilder;
 import com.graphaware.tx.executor.single.*;
 import junit.framework.Assert;
 import com.graphaware.common.change.Change;

@@ -16,7 +16,7 @@
 
 package com.graphaware.tx.executor.single;
 
-import com.graphaware.test.IterableUtils;
+import com.graphaware.common.test.IterableUtils;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +26,6 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.TransactionFailureException;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.test.IterableUtils.countNodes;
 import static junit.framework.Assert.assertEquals;
 
 /**
