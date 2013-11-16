@@ -14,24 +14,39 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.performance;
+package com.graphaware.framework.performance;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
- *
+ * Linear {@link Parameter} generating an integer.
  */
-public abstract class NamedParameter<T> implements Parameter<T> {
+public class LinearParameter extends NamedParameter<Integer> {
 
-    private final String name;
+    private final List<Integer> values = new LinkedList<>();
 
-    protected NamedParameter(String name) {
-        this.name = name;
+    /**
+     * Create a new parameter.
+     *
+     * @param name         param name.
+     * @param min  minimum value of the parameter (inclusive).
+     * @param max  maximum value of the parameter (inclusive).
+     * @param step increment.
+     */
+    public LinearParameter(String name, int min, int max, int step) {
+        super(name);
+
+        for (int i = min; i <= max; i += step) {
+            values.add(i);
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getName() {
-        return name;
+    public List<Integer> getValues() {
+        return values;
     }
 }

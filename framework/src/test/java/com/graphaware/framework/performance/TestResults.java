@@ -14,35 +14,28 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.performance;
+package com.graphaware.framework.performance;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
 
 /**
- * {@link Parameter} whose value is represented by any object.
+ * Test results.
  */
-public class ObjectParameter<T> extends NamedParameter<T> {
-
-    private final List<T> values = new LinkedList<>();
+public interface TestResults {
 
     /**
-     * Construct a new parameter.
+     * Acknowledge the result of a test.
      *
-     * @param name   of the parameter.
-     * @param values of the parameter.
+     * @param params the test was run with.
+     * @param result time in microseconds.
      */
-    public ObjectParameter(String name, T... values) {
-        super(name);
-        this.values.addAll(Arrays.asList(values));
-    }
+    void acceptResult(Map<String, Object> params, long result);
 
     /**
-     * {@inheritDoc}
+     * Print the test results to a file.
+     *
+     * @param title    heading of the file.
+     * @param fileName file name.
      */
-    @Override
-    public List<T> getValues() {
-        return values;
-    }
+    void printToFile(String title, String fileName);
 }

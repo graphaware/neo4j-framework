@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.demo.framework;
+package com.graphaware.framework.demo;
 
 import com.graphaware.framework.GraphAwareFramework;
 import com.graphaware.framework.config.BaseFrameworkConfiguration;

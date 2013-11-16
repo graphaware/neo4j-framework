@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.demo.tx.event.improved;
+package com.graphaware.tx.event.demo;
 
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;

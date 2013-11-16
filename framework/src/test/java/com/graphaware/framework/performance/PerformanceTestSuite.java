@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.performance;
+package com.graphaware.framework.performance;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;

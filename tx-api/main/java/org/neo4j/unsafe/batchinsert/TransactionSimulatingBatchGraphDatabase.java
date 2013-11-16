@@ -239,6 +239,11 @@ public class TransactionSimulatingBatchGraphDatabase implements GraphDatabaseSer
     }
 
     @Override
+    public boolean isAvailable(long timeout) {
+        return wrapped.isAvailable(timeout);
+    }
+
+    @Override
     public GraphDatabaseService getWrapped() {
         return wrapped;
     }

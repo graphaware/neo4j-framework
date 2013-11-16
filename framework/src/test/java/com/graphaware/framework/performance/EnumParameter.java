@@ -14,28 +14,34 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.performance;
+package com.graphaware.framework.performance;
 
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * Test results.
+ * Enumerated {@link Parameter}.
  */
-public interface TestResults {
+public class EnumParameter extends NamedParameter<Enum> {
+
+    private final Class<? extends Enum> enumClass;
 
     /**
-     * Acknowledge the result of a test.
+     * Construct a new parameter with values taken from the enum constants (order preserved).
      *
-     * @param params the test was run with.
-     * @param result time in microseconds.
+     * @param name      of the parameter.
+     * @param enumClass enum.
      */
-    void acceptResult(Map<String, Object> params, long result);
+    public EnumParameter(String name, Class<? extends Enum> enumClass) {
+        super(name);
+        this.enumClass = enumClass;
+    }
 
     /**
-     * Print the test results to a file.
-     *
-     * @param title    heading of the file.
-     * @param fileName file name.
+     * {@inheritDoc}
      */
-    void printToFile(String title, String fileName);
+    @Override
+    public List<Enum> getValues() {
+        return Arrays.asList(enumClass.getEnumConstants());
+    }
 }

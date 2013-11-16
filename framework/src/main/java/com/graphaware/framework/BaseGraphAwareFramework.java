@@ -367,6 +367,11 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
             public boolean include(String s) {
                 return s.startsWith(configuration.createPrefix(CORE));
             }
+
+            @Override
+            public String asString() {
+                return "not used"; //todo remove
+            }
         });
     }
 

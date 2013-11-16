@@ -29,4 +29,11 @@
     <description>Bootstrapper for automatic framework registration</description>
     <url>http://graphaware.com</url>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>server-api</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>

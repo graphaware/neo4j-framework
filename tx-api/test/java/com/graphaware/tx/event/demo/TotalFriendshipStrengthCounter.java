@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.demo.tx.event.improved;
+package com.graphaware.tx.event.demo;
 
 import com.graphaware.common.change.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;

@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.demo.tx.event.improved;
+package com.graphaware.tx.event.demo;
 
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
@@ -25,7 +25,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.demo.tx.event.improved.TotalFriendshipStrengthCounter.*;
+import static com.graphaware.tx.event.demo.TotalFriendshipStrengthCounter.*;
 import static org.junit.Assert.assertEquals;
 
 /**

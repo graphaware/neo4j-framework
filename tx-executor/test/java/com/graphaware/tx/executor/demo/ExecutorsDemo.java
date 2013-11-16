@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.demo.tx.executor;
+package com.graphaware.tx.executor.demo;
 
 import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.batch.BatchTransactionExecutor;

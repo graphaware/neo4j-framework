@@ -14,12 +14,10 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.demo.tx.event.improved;
+package com.graphaware.tx.event.demo;
 
 import com.graphaware.common.change.Change;
 import com.graphaware.common.description.property.LiteralPropertiesDescription;
-import com.graphaware.framework.strategy.IncludeAllBusinessNodes;
-import com.graphaware.framework.strategy.InclusionStrategiesImpl;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
@@ -76,7 +74,7 @@ public class ChangeLoggingDemo {
     public void demonstrateLoggingSomeChanges() {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
-        database.registerTransactionEventHandler(new SelectiveChangeLogger());
+        //database.registerTransactionEventHandler(new SelectiveChangeLogger());
 
         performMutations(database);
     }
@@ -91,29 +89,29 @@ public class ChangeLoggingDemo {
         }
     }
 
-    private class SelectiveChangeLogger extends TransactionEventHandler.Adapter<Void> {
-
-        @Override
-        public void afterCommit(TransactionData data, Void state) {
-            InclusionStrategies inclusionStrategies = InclusionStrategiesImpl.all()
-                    .with(new IncludeAllBusinessNodes() {
-                        @Override
-                        protected boolean doInclude(Node node) {
-                            return node.getProperty("name", "default").equals("Two");
-                        }
-
-                        @Override
-                        public String asString() {
-                            return "includeOnlyNodeWithNameEqualToTwo";
-                        }
-                    })
-                    .with(IncludeNoRelationships.getInstance());
-
-            ImprovedTransactionData improvedData = new FilteredTransactionData(new LazyTransactionData(data), inclusionStrategies);
-
-            logChanges(improvedData);
-        }
-    }
+//    private class SelectiveChangeLogger extends TransactionEventHandler.Adapter<Void> {
+//
+//        @Override
+//        public void afterCommit(TransactionData data, Void state) {
+//            InclusionStrategies inclusionStrategies = InclusionStrategiesImpl.all()
+//                    .with(new IncludeAllBusinessNodes() {
+//                        @Override
+//                        protected boolean doInclude(Node node) {
+//                            return node.getProperty("name", "default").equals("Two");
+//                        }
+//
+//                        @Override
+//                        public String asString() {
+//                            return "includeOnlyNodeWithNameEqualToTwo";
+//                        }
+//                    })
+//                    .with(IncludeNoRelationships.getInstance());
+//
+//            ImprovedTransactionData improvedData = new FilteredTransactionData(new LazyTransactionData(data), inclusionStrategies);
+//
+//            logChanges(improvedData);
+//        }
+//    }
 
     private void logChanges(ImprovedTransactionData improvedData) {
         for (Node createdNode : improvedData.getAllCreatedNodes()) {

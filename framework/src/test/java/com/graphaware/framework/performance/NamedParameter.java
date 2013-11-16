@@ -14,26 +14,24 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.performance;
-
-import java.util.List;
+package com.graphaware.framework.performance;
 
 /**
- * Parameter of a {@link PerformanceTest}. This can be anything, batch size, number of queries, type of queries,...
+ *
  */
-public interface Parameter<T> {
+public abstract class NamedParameter<T> implements Parameter<T> {
+
+    private final String name;
+
+    protected NamedParameter(String name) {
+        this.name = name;
+    }
 
     /**
-     * Get the name of this parameter. Appears in the results as column heading.
-     *
-     * @return parameter name.
+     * {@inheritDoc}
      */
-    String getName();
-
-    /**
-     * Get the values this parameter takes on. These are tested and reported in the order they are returned.
-     *
-     * @return parameter values.
-     */
-    List<T> getValues();
+    @Override
+    public String getName() {
+        return name;
+    }
 }

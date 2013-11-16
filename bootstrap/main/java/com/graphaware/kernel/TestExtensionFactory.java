@@ -22,7 +22,7 @@ import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.extension.KernelExtensionFactory;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 
-@Service.Implementation(TestExtensionFactory.class)
+//@Service.Implementation(KernelExtensionFactory.class)
 public class TestExtensionFactory extends KernelExtensionFactory<TestExtensionFactory.Dependencies> {
 
     public interface Dependencies {
@@ -30,7 +30,6 @@ public class TestExtensionFactory extends KernelExtensionFactory<TestExtensionFa
 
         GraphDatabaseService getDatabase();
     }
-
 
     public static final String KEY = "graphaware";
 

@@ -111,7 +111,7 @@
     <properties>
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>1.9.4</neo4j.version>
+        <neo4j.version>1.9.5</neo4j.version>
     </properties>
 
     <dependencyManagement>

@@ -14,39 +14,26 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.performance;
+package com.graphaware.framework.performance;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Linear {@link Parameter} generating an integer.
+ * Parameter of a {@link PerformanceTest}. This can be anything, batch size, number of queries, type of queries,...
  */
-public class LinearParameter extends NamedParameter<Integer> {
-
-    private final List<Integer> values = new LinkedList<>();
+public interface Parameter<T> {
 
     /**
-     * Create a new parameter.
+     * Get the name of this parameter. Appears in the results as column heading.
      *
-     * @param name         param name.
-     * @param min  minimum value of the parameter (inclusive).
-     * @param max  maximum value of the parameter (inclusive).
-     * @param step increment.
+     * @return parameter name.
      */
-    public LinearParameter(String name, int min, int max, int step) {
-        super(name);
-
-        for (int i = min; i <= max; i += step) {
-            values.add(i);
-        }
-    }
+    String getName();
 
     /**
-     * {@inheritDoc}
+     * Get the values this parameter takes on. These are tested and reported in the order they are returned.
+     *
+     * @return parameter values.
      */
-    @Override
-    public List<Integer> getValues() {
-        return values;
-    }
+    List<T> getValues();
 }

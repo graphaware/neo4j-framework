@@ -14,15 +14,15 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.performance;
+package com.graphaware.framework.performance;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * {@link CacheConfiguration} representing high-level (strong) cache available.
+ * {@link CacheConfiguration} representing low-level cache available, but not high-level cache.
  */
-public class HighLevelCache implements CacheConfiguration {
+public class LowLevelCache implements CacheConfiguration {
 
     /**
      * {@inheritDoc}
@@ -47,7 +47,7 @@ public class HighLevelCache implements CacheConfiguration {
         result.put("neostore.propertystore.db.arrays.mapped_memory", "130M");
 
         //high level cache
-        result.put("cache_type", "strong");
+        result.put("cache_type", "none");
 
         return result;
     }
@@ -57,6 +57,6 @@ public class HighLevelCache implements CacheConfiguration {
      */
     @Override
     public String toString() {
-        return "highcache";
+        return "lowcache";
     }
 }

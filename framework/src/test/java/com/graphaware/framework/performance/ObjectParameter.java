@@ -14,34 +14,35 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.performance;
+package com.graphaware.framework.performance;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Enumerated {@link Parameter}.
+ * {@link Parameter} whose value is represented by any object.
  */
-public class EnumParameter extends NamedParameter<Enum> {
+public class ObjectParameter<T> extends NamedParameter<T> {
 
-    private final Class<? extends Enum> enumClass;
+    private final List<T> values = new LinkedList<>();
 
     /**
-     * Construct a new parameter with values taken from the enum constants (order preserved).
+     * Construct a new parameter.
      *
-     * @param name      of the parameter.
-     * @param enumClass enum.
+     * @param name   of the parameter.
+     * @param values of the parameter.
      */
-    public EnumParameter(String name, Class<? extends Enum> enumClass) {
+    public ObjectParameter(String name, T... values) {
         super(name);
-        this.enumClass = enumClass;
+        this.values.addAll(Arrays.asList(values));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<Enum> getValues() {
-        return Arrays.asList(enumClass.getEnumConstants());
+    public List<T> getValues() {
+        return values;
     }
 }
