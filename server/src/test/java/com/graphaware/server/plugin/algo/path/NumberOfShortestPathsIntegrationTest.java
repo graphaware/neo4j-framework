@@ -40,7 +40,6 @@ import static org.junit.Assert.assertEquals;
 /**
  * Unit test for {@link com.graphaware.server.plugin.algo.path.NumberOfShortestPaths}.
  */
-@Ignore //todo
 public class NumberOfShortestPathsIntegrationTest {
 
     private static final String COST = "cost";
