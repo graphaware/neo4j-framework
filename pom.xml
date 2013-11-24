@@ -33,6 +33,7 @@
         <module>bootstrap</module>
         <module>common</module>
         <module>framework</module>
+        <module>module</module>
         <module>server</module>
         <module>tx-api</module>
         <module>tx-executor</module>
@@ -147,6 +148,14 @@
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>framework</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>framework</artifactId>
+                <version>${project.version}</version>
+                <classifier>tests</classifier>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
