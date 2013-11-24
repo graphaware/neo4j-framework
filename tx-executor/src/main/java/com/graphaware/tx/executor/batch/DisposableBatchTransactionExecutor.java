@@ -14,38 +14,32 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.framework.strategy;
+package com.graphaware.tx.executor.batch;
 
-import com.graphaware.common.strategy.NodePropertyInclusionStrategy;
-import org.neo4j.graphdb.Node;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Strategy that includes all (non-internal) node properties. Singleton.
+ * {@link BatchTransactionExecutor} which expects the {@link #execute()} method to only ever be called at most once.
+ * After that, it must be discarded.
  */
-public final class IncludeAllNodeProperties extends IncludeAllBusinessProperties<Node> implements NodePropertyInclusionStrategy {
+public abstract class DisposableBatchTransactionExecutor implements BatchTransactionExecutor {
 
-    private static final IncludeAllNodeProperties INSTANCE = new IncludeAllNodeProperties();
-
-    public static IncludeAllNodeProperties getInstance() {
-        return INSTANCE;
-    }
-
-    private IncludeAllNodeProperties() {
-    }
+    private final AtomicBoolean alreadyExecuted = new AtomicBoolean(false);
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected boolean doInclude(String key, Node node) {
-        return true;
+    public void execute() {
+        if (alreadyExecuted.compareAndSet(false, true)) {
+            doExecute();
+        } else {
+            throw new IllegalStateException("DisposableBatchExecutor must only ever be executed once!");
+        }
     }
 
     /**
-     * {@inheritDoc}
+     * Execute work in batches.
      */
-    @Override
-    public String asString() {
-        return this.getClass().getCanonicalName();
-    }
+    protected abstract void doExecute();
 }
