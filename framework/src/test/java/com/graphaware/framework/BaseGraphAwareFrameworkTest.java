@@ -16,15 +16,14 @@
 
 package com.graphaware.framework;
 
-import com.graphaware.framework.GraphAwareModule;
 import com.graphaware.framework.config.BaseFrameworkConfiguration;
 import com.graphaware.framework.config.BaseFrameworkConfigured;
 import com.graphaware.framework.config.FrameworkConfiguration;
 import com.graphaware.framework.config.FrameworkConfigured;
-import com.graphaware.framework.strategy.InclusionStrategiesImpl;
+import com.graphaware.common.strategy.InclusionStrategiesImpl;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import com.graphaware.tx.event.improved.strategy.InclusionStrategies;
+import com.graphaware.common.strategy.InclusionStrategies;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import static org.mockito.Mockito.mock;

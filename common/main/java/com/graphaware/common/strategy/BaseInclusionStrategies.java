@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.strategy;
+package com.graphaware.common.strategy;
 
 import com.graphaware.common.strategy.NodeInclusionStrategy;
 import com.graphaware.common.strategy.NodePropertyInclusionStrategy;
@@ -128,7 +128,7 @@ public abstract class BaseInclusionStrategies<T extends BaseInclusionStrategies<
     }
 
     /**
-     * @see {@link com.graphaware.framework.config.ConfigurationAsString#asString()}.
+     * @see {@link com.graphaware.common.config.ConfigurationAsString#asString()}.
      */
     public String asString() {
         return nodeInclusionStrategy.asString() + ";"

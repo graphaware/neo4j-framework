@@ -16,14 +16,16 @@
 
 package com.graphaware.framework.strategy;
 
-import com.graphaware.tx.event.improved.strategy.IncludeNoNodeProperties;
+import com.graphaware.common.strategy.IncludeAllNodeProperties;
+import com.graphaware.common.strategy.InclusionStrategiesImpl;
+import com.graphaware.common.strategy.IncludeNoNodeProperties;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 
 /**
- * Unit test for {@link InclusionStrategiesImpl}.
+ * Unit test for {@link com.graphaware.common.strategy.InclusionStrategiesImpl}.
  */
 public class InclusionStrategiesImplTest {
 

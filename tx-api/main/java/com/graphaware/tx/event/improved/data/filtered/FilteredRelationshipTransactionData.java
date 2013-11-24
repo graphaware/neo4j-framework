@@ -19,7 +19,7 @@ package com.graphaware.tx.event.improved.data.filtered;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import com.graphaware.tx.event.improved.data.RelationshipTransactionData;
 import com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredRelationship;
-import com.graphaware.tx.event.improved.strategy.InclusionStrategies;
+import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.common.strategy.PropertyContainerInclusionStrategy;
 import com.graphaware.common.strategy.PropertyInclusionStrategy;
 import org.neo4j.graphdb.Direction;

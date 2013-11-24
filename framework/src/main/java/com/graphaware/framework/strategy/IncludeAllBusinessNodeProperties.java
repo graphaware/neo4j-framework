@@ -16,38 +16,38 @@
 
 package com.graphaware.framework.strategy;
 
-import com.graphaware.common.strategy.IncludeAllRelationships;
-import com.graphaware.common.strategy.RelationshipInclusionStrategy;
+import com.graphaware.common.strategy.IncludeAllNodeProperties;
+import com.graphaware.common.strategy.NodePropertyInclusionStrategy;
+import com.graphaware.common.strategy.PropertyInclusionStrategy;
 import com.graphaware.framework.GraphAwareFramework;
 import com.graphaware.framework.config.FrameworkConfiguration;
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Node;
 
 /**
- * Base-class for all {@link RelationshipInclusionStrategy} that include
- * arbitrary business / application level
- * relationships (up to subclasses to decide which ones), but exclude any {@link GraphAwareFramework}/{@link com.graphaware.framework.GraphAwareModule}
- * internal relationships.
+ * {@link Node} {@link PropertyInclusionStrategy} that includes arbitrary business / application level
+ * properties (up to subclasses to decide which ones), but excludes any
+ * {@link GraphAwareFramework}/{@link com.graphaware.framework.GraphAwareModule} internal properties.
  */
-public class IncludeAllBusinessRelationships extends IncludeAllRelationships {
+public class IncludeAllBusinessNodeProperties extends IncludeAllNodeProperties {
 
-    private static final RelationshipInclusionStrategy INSTANCE = new IncludeAllBusinessRelationships();
+    private static final NodePropertyInclusionStrategy INSTANCE = new IncludeAllBusinessNodeProperties();
 
-    public static RelationshipInclusionStrategy getInstance() {
+    public static NodePropertyInclusionStrategy getInstance() {
         return INSTANCE;
     }
 
-    protected IncludeAllBusinessRelationships() {
+    protected IncludeAllBusinessNodeProperties() {
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final boolean include(Relationship relationship) {
-        if (relationship.getType().name().startsWith(FrameworkConfiguration.GA_PREFIX)) {
+    public boolean include(String key, Node node) {
+        if (key.startsWith(FrameworkConfiguration.GA_PREFIX)) {
             return false;
         }
 
-        return super.include(relationship);
+        return super.include(key, node);
     }
 }

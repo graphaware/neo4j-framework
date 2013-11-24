@@ -16,7 +16,7 @@
 
 package com.graphaware.tx.event.improved.propertycontainer.filtered;
 
-import com.graphaware.tx.event.improved.strategy.InclusionStrategies;
+import com.graphaware.common.strategy.InclusionStrategies;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.helpers.collection.PrefetchingIterator;
 
@@ -25,7 +25,7 @@ import java.util.Iterator;
 /**
  * A {@link org.neo4j.graphdb.Relationship} {@link java.util.Iterator} decorator that filters out {@link org.neo4j.graphdb.Relationship}s not needed by the
  * {@link com.graphaware.common.strategy.RelationshipInclusionStrategy} contained in the provided
- * {@link com.graphaware.tx.event.improved.strategy.InclusionStrategies}.
+ * {@link com.graphaware.common.strategy.InclusionStrategies}.
  */
 public class FilteredRelationshipIterator extends PrefetchingIterator<Relationship> implements Iterator<Relationship>, Iterable<Relationship> {
 

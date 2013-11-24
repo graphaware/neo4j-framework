@@ -16,6 +16,7 @@
 
 package com.graphaware.framework.strategy;
 
+import com.graphaware.common.strategy.IncludeAllNodes;
 import com.graphaware.common.strategy.NodeInclusionStrategy;
 import com.graphaware.framework.config.FrameworkConfiguration;
 import org.neo4j.graphdb.Node;
@@ -25,7 +26,16 @@ import org.neo4j.graphdb.Node;
  * that include arbitrary business / application level nodes (up to subclasses to decide which ones), but exclude any
  * {@link com.graphaware.framework.GraphAwareFramework}/{@link com.graphaware.framework.GraphAwareModule} internal nodes.
  */
-public abstract class IncludeAllBusinessNodes implements NodeInclusionStrategy {
+public class IncludeAllBusinessNodes extends IncludeAllNodes {
+
+    private static final NodeInclusionStrategy INSTANCE = new IncludeAllBusinessNodes();
+
+    public static NodeInclusionStrategy getInstance() {
+        return INSTANCE;
+    }
+
+    protected IncludeAllBusinessNodes() {
+    }
 
     /**
      * {@inheritDoc}
@@ -36,14 +46,6 @@ public abstract class IncludeAllBusinessNodes implements NodeInclusionStrategy {
             return false;
         }
 
-        return doInclude(node);
+        return super.include(node);
     }
-
-    /**
-     * Should this node be included?
-     *
-     * @param node to check.
-     * @return true iff the node should be included.
-     */
-    protected abstract boolean doInclude(Node node);
 }

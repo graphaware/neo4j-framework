@@ -16,14 +16,14 @@
 
 package com.graphaware.tx.event.improved.propertycontainer.filtered;
 
-import com.graphaware.tx.event.improved.strategy.InclusionStrategies;
+import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.common.strategy.PropertyInclusionStrategy;
 import com.graphaware.common.wrapper.BasePropertyContainerWrapper;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
  * A {@link org.neo4j.graphdb.PropertyContainer} decorator that transparently filters out properties and (where relevant) other containers
- * according to the provided {@link com.graphaware.tx.event.improved.strategy.InclusionStrategies}. Mutating operations are passed through to the decorated
+ * according to the provided {@link com.graphaware.common.strategy.InclusionStrategies}. Mutating operations are passed through to the decorated
  * {@link org.neo4j.graphdb.PropertyContainer} without modifications.
  */
 public abstract class FilteredPropertyContainer<T extends PropertyContainer> extends BasePropertyContainerWrapper<T> {

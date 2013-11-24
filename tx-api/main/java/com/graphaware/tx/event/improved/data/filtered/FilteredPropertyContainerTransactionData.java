@@ -16,11 +16,9 @@
 
 package com.graphaware.tx.event.improved.data.filtered;
 
-import com.graphaware.common.strategy.PropertyContainerInclusionStrategy;
-import com.graphaware.common.strategy.PropertyInclusionStrategy;
+import com.graphaware.common.strategy.*;
 import com.graphaware.common.change.Change;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
-import com.graphaware.tx.event.improved.strategy.*;
 import org.neo4j.graphdb.PropertyContainer;
 
 import java.util.*;
@@ -40,7 +38,7 @@ import java.util.*;
  * return true for more of them, as it ignores the filtering.
  * <p/>
  * When traversing the graph using an object returned by this API (such as {@link com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode}),
- * nodes, properties, and relationships not included by the {@link com.graphaware.tx.event.improved.strategy.InclusionStrategies} will be excluded. The only exception
+ * nodes, properties, and relationships not included by the {@link com.graphaware.common.strategy.InclusionStrategies} will be excluded. The only exception
  * to this are relationship start and end nodes - they are returned even if they would normally be filtered out. This is
  * a design decision in order to honor the requirement that relationships must have start and end node.
  */
@@ -102,7 +100,7 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      * @return read-only collection of all created property containers. Filtered according to provided strategies.
      */
     public Collection<T> getAllCreated() {
-        if (getPropertyContainerInclusionStrategy() instanceof IncludeNoPropertyContainers) {
+        if (getPropertyContainerInclusionStrategy() instanceof IncludeNo) {
             return Collections.emptySet();
         }
         return filterPropertyContainers(getWrapped().getAllCreated());
@@ -138,7 +136,7 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      *         (snapshots). Filtered according to provided strategies.
      */
     public Collection<T> getAllDeleted() {
-        if (getPropertyContainerInclusionStrategy() instanceof IncludeNoPropertyContainers) {
+        if (getPropertyContainerInclusionStrategy() instanceof IncludeNo) {
             return Collections.emptySet();
         }
         return filterPropertyContainers(getWrapped().getAllDeleted());
@@ -174,7 +172,7 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      *         as they are now. Filtered according to provided strategies.
      */
     public Collection<Change<T>> getAllChanged() {
-        if (getPropertyContainerInclusionStrategy() instanceof IncludeNoPropertyContainers) {
+        if (getPropertyContainerInclusionStrategy() instanceof IncludeNo) {
             return Collections.emptySet();
         }
         return filterChangedPropertyContainers(getWrapped().getAllChanged());

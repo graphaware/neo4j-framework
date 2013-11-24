@@ -17,7 +17,7 @@
 package com.graphaware.framework;
 
 import com.graphaware.framework.config.DefaultFrameworkConfiguration;
-import com.graphaware.framework.strategy.InclusionStrategiesImpl;
+import com.graphaware.common.strategy.InclusionStrategiesImpl;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserterImpl;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;

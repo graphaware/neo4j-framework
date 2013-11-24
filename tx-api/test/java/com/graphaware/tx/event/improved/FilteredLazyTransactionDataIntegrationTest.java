@@ -16,12 +16,8 @@
 
 package com.graphaware.tx.event.improved;
 
-import com.graphaware.common.strategy.NodeInclusionStrategy;
-import com.graphaware.common.strategy.NodePropertyInclusionStrategy;
-import com.graphaware.common.strategy.RelationshipInclusionStrategy;
-import com.graphaware.common.strategy.RelationshipPropertyInclusionStrategy;
+import com.graphaware.common.strategy.*;
 import com.graphaware.common.test.IterableUtils;
-import com.graphaware.tx.event.improved.strategy.*;
 import com.graphaware.tx.executor.single.*;
 import junit.framework.Assert;
 import com.graphaware.common.test.TestDataBuilder;

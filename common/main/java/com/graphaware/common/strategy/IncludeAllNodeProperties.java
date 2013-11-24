@@ -16,18 +16,19 @@
 
 package com.graphaware.common.strategy;
 
-import com.graphaware.common.config.ClassBasedConfigurationAsString;
+import org.neo4j.graphdb.Node;
 
 /**
- * {@link InclusionStrategy} that includes all objects.
+ * Strategy that includes all node properties. Singleton.
  */
-public class IncludeAll<T> extends ClassBasedConfigurationAsString implements InclusionStrategy<T> {
+public class IncludeAllNodeProperties extends IncludeAllProperties<Node> implements NodePropertyInclusionStrategy {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean include(T object) {
-        return true;
+    private static final NodePropertyInclusionStrategy INSTANCE = new IncludeAllNodeProperties();
+
+    public static NodePropertyInclusionStrategy getInstance() {
+        return INSTANCE;
+    }
+
+    protected IncludeAllNodeProperties() {
     }
 }

@@ -16,16 +16,16 @@
 
 package com.graphaware.tx.event.improved.api;
 
+import com.graphaware.common.strategy.*;
 import com.graphaware.tx.event.improved.data.BaseImprovedTransactionData;
 import com.graphaware.tx.event.improved.data.NodeTransactionData;
 import com.graphaware.tx.event.improved.data.RelationshipTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import com.graphaware.tx.event.improved.data.filtered.FilteredNodeTransactionData;
 import com.graphaware.tx.event.improved.data.filtered.FilteredRelationshipTransactionData;
-import com.graphaware.tx.event.improved.strategy.*;
 
 /**
- * {@link ImprovedTransactionData} with filtering capabilities defined by {@link com.graphaware.tx.event.improved.strategy.InclusionStrategies}, delegating to
+ * {@link ImprovedTransactionData} with filtering capabilities defined by {@link com.graphaware.common.strategy.InclusionStrategies}, delegating to
  * {@link com.graphaware.tx.event.improved.data.filtered.FilteredNodeTransactionData} and {@link com.graphaware.tx.event.improved.data.filtered.FilteredRelationshipTransactionData}.
  * <p/>
  * Results of methods returning {@link java.util.Collection}s and {@link java.util.Map}s will be filtered. <code>boolean</code>
@@ -35,7 +35,7 @@ import com.graphaware.tx.event.improved.strategy.*;
  * return true for more of them, as it ignores the filtering.
  * <p/>
  * When traversing the graph using an object returned by this API (such as {@link com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode}),
- * nodes, properties, and relationships not included by the {@link com.graphaware.tx.event.improved.strategy.InclusionStrategies} will be excluded. The only exception
+ * nodes, properties, and relationships not included by the {@link com.graphaware.common.strategy.InclusionStrategies} will be excluded. The only exception
  * to this are relationship start and end nodes - they are returned even if they would normally be filtered out. This is
  * a design decision in order to honor the requirement that relationships must have start and end node.
  */

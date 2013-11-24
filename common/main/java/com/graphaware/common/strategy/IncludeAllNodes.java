@@ -14,33 +14,22 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.strategy;
+package com.graphaware.common.strategy;
 
 
-import com.graphaware.common.strategy.PropertyInclusionStrategy;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Node;
 
 /**
- * Strategy that ignores all properties.
+ * Strategy that includes all nodes. Singleton.
  */
-public abstract class IncludeNoProperties<T extends PropertyContainer> implements PropertyInclusionStrategy<T> {
+public class IncludeAllNodes extends IncludeAll<Node> implements NodeInclusionStrategy {
 
-    protected IncludeNoProperties() {
+    private static final NodeInclusionStrategy INSTANCE = new IncludeAllNodes();
+
+    public static NodeInclusionStrategy getInstance() {
+        return INSTANCE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final boolean include(String key, T propertyContainer) {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String asString() {
-        return this.getClass().getCanonicalName();
+    protected IncludeAllNodes() {
     }
 }

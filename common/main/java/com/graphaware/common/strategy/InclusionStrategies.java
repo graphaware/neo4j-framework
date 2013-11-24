@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.strategy;
+package com.graphaware.common.strategy;
 
 import com.graphaware.common.config.ConfigurationAsString;
 import com.graphaware.common.strategy.NodeInclusionStrategy;
@@ -23,7 +23,7 @@ import com.graphaware.common.strategy.RelationshipInclusionStrategy;
 import com.graphaware.common.strategy.RelationshipPropertyInclusionStrategy;
 
 /**
- * Container for {@link com.graphaware.common.strategy.InclusionStrategy}s related to this project.
+ * Container for {@link com.graphaware.common.strategy.InclusionStrategy}s.
  */
 public interface InclusionStrategies extends ConfigurationAsString {
 

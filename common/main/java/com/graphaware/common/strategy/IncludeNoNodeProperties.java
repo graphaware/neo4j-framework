@@ -14,23 +14,22 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.strategy;
+package com.graphaware.common.strategy;
 
 
-import com.graphaware.common.strategy.NodeInclusionStrategy;
 import org.neo4j.graphdb.Node;
 
 /**
- * Strategy that ignores all nodes. Singleton.
+ * Strategy that ignores all node properties. Singleton.
  */
-public final class IncludeNoNodes extends IncludeNoPropertyContainers<Node> implements NodeInclusionStrategy {
+public final class IncludeNoNodeProperties extends IncludeNoProperties<Node> implements NodePropertyInclusionStrategy {
 
-    private static final NodeInclusionStrategy INSTANCE = new IncludeNoNodes();
+    private static final NodePropertyInclusionStrategy INSTANCE = new IncludeNoNodeProperties();
 
-    public static NodeInclusionStrategy getInstance() {
+    public static NodePropertyInclusionStrategy getInstance() {
         return INSTANCE;
     }
 
-    private IncludeNoNodes() {
+    private IncludeNoNodeProperties() {
     }
 }

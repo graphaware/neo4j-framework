@@ -16,18 +16,22 @@
 
 package com.graphaware.common.strategy;
 
+
 import com.graphaware.common.config.ClassBasedConfigurationAsString;
+import com.graphaware.common.strategy.RelationshipInclusionStrategy;
+import org.neo4j.graphdb.Relationship;
 
 /**
- * {@link InclusionStrategy} that includes all objects.
+ * Strategy that includes all relationships. Singleton.
  */
-public class IncludeAll<T> extends ClassBasedConfigurationAsString implements InclusionStrategy<T> {
+public class IncludeAllRelationships extends IncludeAll<Relationship> implements RelationshipInclusionStrategy {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean include(T object) {
-        return true;
+    private static final RelationshipInclusionStrategy INSTANCE = new IncludeAllRelationships();
+
+    public static RelationshipInclusionStrategy getInstance() {
+        return INSTANCE;
+    }
+
+    protected IncludeAllRelationships() {
     }
 }

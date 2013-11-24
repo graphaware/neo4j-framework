@@ -14,20 +14,19 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.common.strategy;
-
-import com.graphaware.common.config.ClassBasedConfigurationAsString;
+package com.graphaware.common.config;
 
 /**
- * {@link InclusionStrategy} that includes all objects.
+ * {@link ConfigurationAsString} implementation that generates the string representation of the configuration purely
+ * from its most concrete class name.
  */
-public class IncludeAll<T> extends ClassBasedConfigurationAsString implements InclusionStrategy<T> {
+public abstract class ClassBasedConfigurationAsString implements ConfigurationAsString {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean include(T object) {
-        return true;
+    public String asString() {
+        return this.getClass().getCanonicalName();
     }
 }

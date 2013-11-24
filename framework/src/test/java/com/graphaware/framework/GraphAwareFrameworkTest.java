@@ -17,7 +17,7 @@
 package com.graphaware.framework;
 
 import com.graphaware.framework.config.DefaultFrameworkConfiguration;
-import com.graphaware.framework.strategy.InclusionStrategiesImpl;
+import com.graphaware.common.strategy.InclusionStrategiesImpl;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;

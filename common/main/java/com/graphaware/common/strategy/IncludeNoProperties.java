@@ -16,18 +16,24 @@
 
 package com.graphaware.common.strategy;
 
+
 import com.graphaware.common.config.ClassBasedConfigurationAsString;
+import com.graphaware.common.strategy.PropertyInclusionStrategy;
+import org.neo4j.graphdb.PropertyContainer;
 
 /**
- * {@link InclusionStrategy} that includes all objects.
+ * Strategy that ignores all properties.
  */
-public class IncludeAll<T> extends ClassBasedConfigurationAsString implements InclusionStrategy<T> {
+public abstract class IncludeNoProperties<T extends PropertyContainer> extends ClassBasedConfigurationAsString implements PropertyInclusionStrategy<T> {
+
+    protected IncludeNoProperties() {
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean include(T object) {
-        return true;
+    public final boolean include(String key, T propertyContainer) {
+        return false;
     }
 }

@@ -19,7 +19,7 @@ package com.graphaware.framework;
 import com.graphaware.common.config.ConfigurationAsString;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import com.graphaware.tx.event.improved.strategy.InclusionStrategies;
+import com.graphaware.common.strategy.InclusionStrategies;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**

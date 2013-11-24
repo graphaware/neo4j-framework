@@ -14,14 +14,8 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.framework.strategy;
+package com.graphaware.common.strategy;
 
-
-import com.graphaware.common.strategy.NodeInclusionStrategy;
-import com.graphaware.common.strategy.NodePropertyInclusionStrategy;
-import com.graphaware.common.strategy.RelationshipInclusionStrategy;
-import com.graphaware.common.strategy.RelationshipPropertyInclusionStrategy;
-import com.graphaware.tx.event.improved.strategy.*;
 
 /**
  * {@link InclusionStrategies}, providing static factory method for default
