@@ -18,39 +18,31 @@ package com.graphaware.kernel;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.configuration.Config;
+import org.neo4j.kernel.extension.KernelExtensionFactory;
+import org.neo4j.kernel.extension.KernelExtensionListener;
+import org.neo4j.kernel.extension.KernelExtensions;
+import org.neo4j.kernel.lifecycle.LifeSupport;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 
 /**
- *
+ * {@link KernelExtensionFactory} that initializes the {@link GraphAwareExtension}.
  */
-public class TestExtension implements Lifecycle {
+public class GraphAwareExtensionFactory extends KernelExtensionFactory<GraphAwareExtensionFactory.Dependencies> {
 
-    private final Config config;
-    private final GraphDatabaseService database;
+    public interface Dependencies {
+        Config getConfig();
 
-    public TestExtension(Config config, GraphDatabaseService database) {
-        this.config = config;
-        this.database = database;
+        GraphDatabaseService getDatabase();
+    }
+
+    public static final String KEY = "graphaware";
+
+    public GraphAwareExtensionFactory() {
+        super(KEY);
     }
 
     @Override
-    public void init() throws Throwable {
-        System.out.println(config.getParams().toString());
-        System.out.println("INIT");
-    }
-
-    @Override
-    public void start() throws Throwable {
-        System.out.println("START");
-    }
-
-    @Override
-    public void stop() throws Throwable {
-        System.out.println("STOP");
-    }
-
-    @Override
-    public void shutdown() throws Throwable {
-        System.out.println("SHUTDOWN");
+    public Lifecycle newKernelExtension(Dependencies dependencies) throws Throwable {
+        return new GraphAwareExtension(dependencies.getConfig(), dependencies.getDatabase());
     }
 }
