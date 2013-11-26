@@ -51,6 +51,11 @@
             <artifactId>common</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>bootstrap</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
