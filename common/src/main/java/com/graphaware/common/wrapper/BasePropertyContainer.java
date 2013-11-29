@@ -41,20 +41,6 @@ public abstract class BasePropertyContainer implements PropertyContainer {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<Object> getPropertyValues() {
-        Collection<Object> result = new HashSet<>();
-
-        for (String key : getPropertyKeys()) {
-            result.add(getProperty(key));
-        }
-
-        return result;
-    }
-
-    /**
      * @throws UnsupportedOperationException always.
      */
     @SuppressWarnings("deprecation")

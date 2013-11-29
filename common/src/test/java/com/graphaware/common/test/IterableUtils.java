@@ -17,6 +17,7 @@
 package com.graphaware.common.test;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public final class IterableUtils {
      * @param database in which to count nodes.
      * @return all nodes in the database (including root with ID 0, i.e. an brand new database will have 1 node).
      */
-    public static int countNodes(GraphDatabaseService database) {
+    public static long countNodes(GraphDatabaseService database) {
         return count(GlobalGraphOperations.at(database).getAllNodes());
     }
 
@@ -47,16 +48,12 @@ public final class IterableUtils {
      * @param iterable to count items in.
      * @return number of items in the iterable.
      */
-    public static int count(Iterable iterable) {
+    public static long count(Iterable iterable) {
         if (iterable instanceof Collection) {
             return ((Collection) iterable).size();
         }
 
-        int result = 0;
-        for (Object ignored : iterable) {
-            result++;
-        }
-        return result;
+        return Iterables.count(iterable);
     }
 
     /**

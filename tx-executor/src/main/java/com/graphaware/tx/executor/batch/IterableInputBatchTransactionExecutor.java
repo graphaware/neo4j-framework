@@ -29,7 +29,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * {@link BatchTransactionExecutor} which executes a {@link UnitOfWork} for each input item. Input items are  provided
+ * {@link BatchTransactionExecutor} which executes a {@link UnitOfWork} for each input item. Input items are provided
  * in the form of an {@link Iterable}.
  *
  * @param <T> type of the input item, on which steps are executed.

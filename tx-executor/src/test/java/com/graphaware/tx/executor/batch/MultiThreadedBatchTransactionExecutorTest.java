@@ -21,6 +21,7 @@ import org.junit.*;
 import com.graphaware.common.test.TestUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.test.ImpermanentGraphDatabase;
+import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -34,7 +35,7 @@ public class MultiThreadedBatchTransactionExecutorTest {
 
     @Before
     public void setUp() {
-        database = new ImpermanentGraphDatabase();
+        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
     }
 
     @After
@@ -52,7 +53,7 @@ public class MultiThreadedBatchTransactionExecutorTest {
     }
 
     @Test
-    @Ignore("Multi-threaded not faster for some reason in CI") //todo investigate
+//    @Ignore("Multi-threaded not faster for some reason in CI") //todo investigate
     public void executionShouldBeFasterWhenExecutedInMultipleThreads() {
         final BatchTransactionExecutor singleThreadedBatchExecutor = new NoInputBatchTransactionExecutor(database, 100, 40000, CreateNode.getInstance());
         final BatchTransactionExecutor multiThreadedBatchExecutor = new MultiThreadedBatchTransactionExecutor(new NoInputBatchTransactionExecutor(database, 100, 40000, CreateNode.getInstance()), 4);

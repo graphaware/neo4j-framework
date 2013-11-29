@@ -18,6 +18,7 @@ package com.graphaware.tx.executor.single;
 
 import com.graphaware.common.test.IterableUtils;
 import junit.framework.Assert;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -42,6 +43,11 @@ public class SimpleTransactionExecutorTest {
         executor = new SimpleTransactionExecutor(database);
     }
 
+    @After
+    public void tearDown() {
+        database.shutdown();
+    }
+
     @Test
     public void nodeShouldBeSuccessfullyCreatedInTransaction() {
         executor.executeInTransaction(new VoidReturningCallback() {
@@ -51,7 +57,7 @@ public class SimpleTransactionExecutorTest {
             }
         });
 
-        Assert.assertEquals(2, IterableUtils.countNodes(database));
+        assertEquals(2, IterableUtils.countNodes(database));
     }
 
     @Test
@@ -63,7 +69,7 @@ public class SimpleTransactionExecutorTest {
             }
         });
 
-        Assert.assertEquals(0, IterableUtils.countNodes(database));
+        assertEquals(0, IterableUtils.countNodes(database));
     }
 
     @Test(expected = TransactionFailureException.class)
@@ -83,7 +89,7 @@ public class SimpleTransactionExecutorTest {
     public void deletingNodeWithRelationshipsShouldNotSucceed() {
         createNodeAndRelationship();
 
-        Assert.assertEquals(2, IterableUtils.countNodes(database));
+        assertEquals(2, IterableUtils.countNodes(database));
 
         executor.executeInTransaction(new TransactionCallback<Void>() {
             @Override
@@ -93,7 +99,7 @@ public class SimpleTransactionExecutorTest {
             }
         }, KeepCalmAndCarryOn.getInstance());
 
-        Assert.assertEquals(2, IterableUtils.countNodes(database));
+        assertEquals(2, IterableUtils.countNodes(database));
     }
 
     private void createNodeAndRelationship() {

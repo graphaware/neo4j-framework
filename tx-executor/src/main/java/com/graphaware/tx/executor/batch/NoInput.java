@@ -19,8 +19,8 @@ package com.graphaware.tx.executor.batch;
 import com.graphaware.tx.executor.NullItem;
 
 /**
- * Dummy generated input that is intended for {@link BatchTransactionExecutor}s that use {@link UnitOfWork} but generate their own
- * input. Thus the only thing this class does is signal when enough units of work have been executed by returning
+ * Dummy generated input that is intended for {@link BatchTransactionExecutor}s that use {@link UnitOfWork} but generate
+ * their own input. Thus the only thing this class does is signal when enough units of work have been executed by returning
  * {@code false} from {@link #hasNext()}.
  */
 public final class NoInput extends GeneratedInput<NullItem> {

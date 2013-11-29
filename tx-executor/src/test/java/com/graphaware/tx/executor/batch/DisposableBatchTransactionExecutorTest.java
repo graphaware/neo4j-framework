@@ -16,7 +16,6 @@
 
 package com.graphaware.tx.executor.batch;
 
-import com.graphaware.tx.executor.batch.DisposableBatchTransactionExecutor;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;

@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.test.ImpermanentGraphDatabase;
+import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +40,7 @@ public class IterableInputBatchTransactionExecutorTest {
 
     @Before
     public void setUp() {
-        database = new ImpermanentGraphDatabase();
+        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
     }
 
     @After
@@ -61,7 +62,7 @@ public class IterableInputBatchTransactionExecutorTest {
 
         executor.execute();
 
-        Assert.assertEquals(4, IterableUtils.countNodes(database));  //3 + root
+        assertEquals(4, IterableUtils.countNodes(database));  //3 + root
         assertEquals("Name111", database.getNodeById(1).getProperty("name"));
         assertEquals("Name212", database.getNodeById(2).getProperty("name"));
         assertEquals("Name321", database.getNodeById(3).getProperty("name"));
