@@ -9,7 +9,6 @@ import com.graphaware.tx.executor.single.VoidReturningCallback;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.helpers.collection.MapUtil;
@@ -19,9 +18,8 @@ import java.util.Map;
 
 import static com.graphaware.common.description.relationship.RelationshipDescriptionFactory.wildcard;
 import static org.junit.Assert.assertEquals;
-import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.graphdb.DynamicRelationshipType.*;
+import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
  * Integration test for {@link RelcountModuleBootstrapper}.
