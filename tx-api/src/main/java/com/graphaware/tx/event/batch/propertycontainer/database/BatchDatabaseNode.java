@@ -18,10 +18,17 @@ package com.graphaware.tx.event.batch.propertycontainer.database;
 
 import com.graphaware.tx.event.batch.data.BatchTransactionData;
 import com.graphaware.common.wrapper.NodeWrapper;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.neo4j.helpers.collection.Iterables.*;
 
 /**
  * {@link org.neo4j.graphdb.Node} proxy to be used in {@link com.graphaware.tx.event.batch.data.BatchTransactionData}
@@ -81,6 +88,38 @@ public class BatchDatabaseNode extends BatchDatabasePropertyContainer<Node> impl
         }
         transactionData.nodePropertyRemoved(this, key);
         return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addLabel(Label label) {
+        List<Label> newLabels = new LinkedList<>(toList(append(label, toList(getLabels()))));
+        Label[] labels = newLabels.toArray(new Label[newLabels.size()]);
+
+        transactionData.nodeLabelsToBeSet(this, labels);
+        super.addLabel(label);
+        transactionData.nodeLabelsSet(this, labels);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeLabel(Label label) {
+        List<Label> newLabels = new LinkedList<>();
+        for (Label existingLabel : getLabels()) {
+            if (!existingLabel.name().equals(label.name())) {
+                newLabels.add(existingLabel);
+            }
+        }
+
+        Label[] labels = newLabels.toArray(new Label[newLabels.size()]);
+
+        transactionData.nodeLabelsToBeSet(this, labels);
+        super.removeLabel(label);
+        transactionData.nodeLabelsSet(this, labels);
     }
 
     /**

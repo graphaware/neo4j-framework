@@ -16,13 +16,11 @@
 
 package com.graphaware.tx.event.batch;
 
-import com.graphaware.common.test.IterableUtils;
-import com.graphaware.tx.executor.single.*;
-import junit.framework.Assert;
-import com.graphaware.common.test.TestDataBuilder;
 import com.graphaware.common.change.Change;
+import com.graphaware.common.test.TestDataBuilder;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
+import com.graphaware.tx.executor.single.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +35,6 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.kernel.Uniqueness;
-import org.neo4j.kernel.impl.traversal.TraversalDescriptionImpl;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
 
@@ -48,8 +45,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.graphaware.common.test.IterableUtils.count;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
@@ -116,11 +114,11 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
                         long r1Id = database.getNodeById(5).getSingleRelationship(withName("R5"), OUTGOING).getId();
                         Relationship r1 = created.get(r1Id);
                         assertEquals(4, r1.getProperty("time"));
-                        Assert.assertEquals(1, IterableUtils.count(r1.getPropertyKeys()));
+                        assertEquals(1, count(r1.getPropertyKeys()));
 
                         long r2Id = database.getNodeById(1).getSingleRelationship(withName("R4"), OUTGOING).getId();
                         Relationship r2 = created.get(r2Id);
-                        Assert.assertEquals(0, IterableUtils.count(r2.getPropertyKeys()));
+                        assertEquals(0, count(r2.getPropertyKeys()));
 
                         assertTrue(transactionData.hasBeenCreated(r1));
                         assertTrue(transactionData.hasBeenCreated(r2));
@@ -191,14 +189,12 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
                         assertEquals(1, changed.size());
 
                         Relationship previous = changed.entrySet().iterator().next().getValue().getPrevious();
-                        Assert.assertEquals(2, IterableUtils.count(previous.getPropertyKeys()));
-                        Assert.assertEquals(2, IterableUtils.count(previous.getPropertyValues()));
+                        assertEquals(2, count(previous.getPropertyKeys()));
                         assertEquals(3, previous.getProperty("time"));
                         assertEquals("cool", previous.getProperty("tag"));
 
                         Relationship current = changed.entrySet().iterator().next().getValue().getCurrent();
-                        Assert.assertEquals(2, IterableUtils.count(current.getPropertyKeys()));
-                        Assert.assertEquals(2, IterableUtils.count(current.getPropertyValues()));
+                        assertEquals(2, count(current.getPropertyKeys()));
                         assertEquals(4, current.getProperty("time"));
                         assertEquals("cool", current.getProperty("tags"));
 
@@ -225,13 +221,11 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
                         assertEquals("One", previous.getEndNode().getProperty("name"));
                         assertEquals(1, previous.getEndNode().getProperty("count", 2));
                         assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) previous.getEndNode().getProperty("tags")));
-                        Assert.assertEquals(4, IterableUtils.count(previous.getEndNode().getPropertyKeys()));
-                        Assert.assertEquals(4, IterableUtils.count(previous.getEndNode().getPropertyValues()));
+                        assertEquals(4, count(previous.getEndNode().getPropertyKeys()));
 
                         assertEquals("Three", previous.getStartNode().getProperty("name"));
                         assertEquals("London", previous.getStartNode().getProperty("place"));
                         assertEquals("nothing", previous.getStartNode().getProperty("tags", "nothing"));
-                        Assert.assertEquals(2, IterableUtils.count(previous.getStartNode().getPropertyValues()));
 
                         Node endNode = previous.getEndNode();
                         Relationship r1 = endNode.getSingleRelationship(withName("R1"), OUTGOING);
@@ -254,14 +248,14 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
                         Map<Long, Change<Relationship>> changed = changesToMap(transactionData.getAllChangedRelationships());
                         Relationship previous = changed.entrySet().iterator().next().getValue().getPrevious();
 
-                        TraversalDescription traversalDescription = new TraversalDescriptionImpl()
+                        TraversalDescription traversalDescription = database.traversalDescription()
                                 .relationships(withName("R1"), OUTGOING)
                                 .relationships(withName("R2"), OUTGOING)
                                 .depthFirst()
                                 .uniqueness(Uniqueness.NODE_GLOBAL)
                                 .evaluator(Evaluators.toDepth(3));
 
-                        Assert.assertEquals(4, IterableUtils.count(traversalDescription.traverse(previous.getEndNode()).nodes()));
+                        assertEquals(4, count(traversalDescription.traverse(previous.getEndNode()).nodes()));
                     }
                 }
         );
@@ -285,8 +279,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
                         assertEquals(2, current.getEndNode().getProperty("count", 2));
                         assertFalse(current.getEndNode().hasProperty("count"));
                         assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) current.getEndNode().getProperty("tags")));
-                        Assert.assertEquals(2, IterableUtils.count(current.getEndNode().getPropertyKeys()));
-                        Assert.assertEquals(2, IterableUtils.count(current.getEndNode().getPropertyValues()));
+                        assertEquals(2, count(current.getEndNode().getPropertyKeys()));
 
                         assertEquals("Three", current.getStartNode().getProperty("name"));
                         assertEquals("London", current.getStartNode().getProperty("place"));
@@ -308,13 +301,13 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
                         Map<Long, Change<Relationship>> changed = changesToMap(transactionData.getAllChangedRelationships());
                         Relationship current = changed.entrySet().iterator().next().getValue().getCurrent();
 
-                        TraversalDescription traversalDescription = new TraversalDescriptionImpl()
+                        TraversalDescription traversalDescription = database.traversalDescription()
                                 .relationships(withName("R1"), OUTGOING)
                                 .relationships(withName("R2"), OUTGOING)
                                 .depthFirst()
                                 .uniqueness(Uniqueness.NODE_GLOBAL);
 
-                        Assert.assertEquals(4, IterableUtils.count(traversalDescription.traverse(current.getEndNode()).nodes()));
+                        assertEquals(4, count(traversalDescription.traverse(current.getEndNode()).nodes()));
                     }
                 }
         );
@@ -433,7 +426,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
                         Node createdNode = createdNodes.get(5L);
                         assertEquals("Five", createdNode.getProperty("name"));
                         assertEquals(4L, createdNode.getProperty("size"));
-                        Assert.assertEquals(2, IterableUtils.count(createdNode.getPropertyKeys()));
+                        assertEquals(2, count(createdNode.getPropertyKeys()));
                         try {
                             createdNode.getProperty("non-existing");
                             fail();
@@ -479,28 +472,24 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
                         assertEquals(2, changed.size());
 
                         Node previous1 = changed.get(1L).getPrevious();
-                        Assert.assertEquals(4, IterableUtils.count(previous1.getPropertyKeys()));
-                        Assert.assertEquals(4, IterableUtils.count(previous1.getPropertyValues()));
+                        assertEquals(4, count(previous1.getPropertyKeys()));
                         assertEquals("One", previous1.getProperty("name"));
                         assertEquals(1, previous1.getProperty("count"));
                         assertEquals("something", previous1.getProperty("something"));
                         assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) previous1.getProperty("tags")));
 
                         Node current1 = changed.get(1L).getCurrent();
-                        Assert.assertEquals(2, IterableUtils.count(current1.getPropertyKeys()));
-                        Assert.assertEquals(2, IterableUtils.count(current1.getPropertyValues()));
+                        assertEquals(2, count(current1.getPropertyKeys()));
                         assertEquals("NewOne", current1.getProperty("name"));
                         assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) current1.getProperty("tags")));
 
                         Node previous2 = changed.get(3L).getPrevious();
-                        Assert.assertEquals(2, IterableUtils.count(previous2.getPropertyKeys()));
-                        Assert.assertEquals(2, IterableUtils.count(previous2.getPropertyValues()));
+                        assertEquals(2, count(previous2.getPropertyKeys()));
                         assertEquals("Three", previous2.getProperty("name"));
                         assertEquals("London", previous2.getProperty("place"));
 
                         Node current2 = changed.get(3L).getCurrent();
-                        Assert.assertEquals(3, IterableUtils.count(current2.getPropertyKeys()));
-                        Assert.assertEquals(3, IterableUtils.count(current2.getPropertyValues()));
+                        assertEquals(3, count(current2.getPropertyKeys()));
                         assertEquals("Three", current2.getProperty("name"));
                         assertEquals("London", current2.getProperty("place"));
                         assertEquals("one", current2.getProperty("tags"));
@@ -536,14 +525,14 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
                         assertEquals(2L, previous.getRelationships(withName("R1")).iterator().next().getEndNode().getProperty("size"));
 
                         assertNull(previous.getSingleRelationship(withName("R1"), INCOMING));
-                        Assert.assertEquals(4, IterableUtils.count(previous.getRelationships()));
-                        Assert.assertEquals(3, IterableUtils.count(previous.getRelationships(withName("R1"), withName("R3"))));
-                        Assert.assertEquals(1, IterableUtils.count(previous.getRelationships(withName("R1"))));
-                        Assert.assertEquals(3, IterableUtils.count(previous.getRelationships(OUTGOING)));
-                        Assert.assertEquals(1, IterableUtils.count(previous.getRelationships(INCOMING)));
-                        Assert.assertEquals(1, IterableUtils.count(previous.getRelationships(OUTGOING, withName("R3"))));
-                        Assert.assertEquals(2, IterableUtils.count(previous.getRelationships(OUTGOING, withName("R1"), withName("R3"))));
-                        Assert.assertEquals(1, IterableUtils.count(previous.getRelationships(withName("R3"), OUTGOING)));
+                        assertEquals(4, count(previous.getRelationships()));
+                        assertEquals(3, count(previous.getRelationships(withName("R1"), withName("R3"))));
+                        assertEquals(1, count(previous.getRelationships(withName("R1"))));
+                        assertEquals(3, count(previous.getRelationships(OUTGOING)));
+                        assertEquals(1, count(previous.getRelationships(INCOMING)));
+                        assertEquals(1, count(previous.getRelationships(OUTGOING, withName("R3"))));
+                        assertEquals(2, count(previous.getRelationships(OUTGOING, withName("R1"), withName("R3"))));
+                        assertEquals(1, count(previous.getRelationships(withName("R3"), OUTGOING)));
 
                         assertTrue(previous.hasRelationship());
                         assertTrue(previous.hasRelationship(withName("R1"), withName("R3")));
@@ -582,14 +571,14 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
 
                         Node previous = changed.get(1L).getPrevious();
 
-                        TraversalDescription traversalDescription = new TraversalDescriptionImpl()
+                        TraversalDescription traversalDescription = database.traversalDescription()
                                 .relationships(withName("R1"), OUTGOING)
                                 .relationships(withName("R2"), OUTGOING)
                                 .depthFirst()
                                 .uniqueness(Uniqueness.NODE_GLOBAL)
                                 .evaluator(Evaluators.toDepth(3));
 
-                        Assert.assertEquals(4, IterableUtils.count(traversalDescription.traverse(previous).nodes()));
+                        assertEquals(4, count(traversalDescription.traverse(previous).nodes()));
                     }
                 }
         );
@@ -627,13 +616,13 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
                         Map<Long, Change<Node>> changed = changesToMap(transactionData.getAllChangedNodes());
                         Node current = changed.get(1L).getCurrent();
 
-                        TraversalDescription traversalDescription = new TraversalDescriptionImpl()
+                        TraversalDescription traversalDescription = database.traversalDescription()
                                 .relationships(withName("R1"), OUTGOING)
                                 .relationships(withName("R2"), OUTGOING)
                                 .depthFirst()
                                 .uniqueness(Uniqueness.NODE_GLOBAL);
 
-                        Assert.assertEquals(4, IterableUtils.count(traversalDescription.traverse(current).nodes()));
+                        assertEquals(4, count(traversalDescription.traverse(current).nodes()));
 
                     }
                 }
@@ -696,8 +685,8 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
                         assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) transactionData.changedProperties(changed.getCurrent()).get("tags").getCurrent()));
                         assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) transactionData.changedProperties(changed.getPrevious()).get("tags").getPrevious()));
 
-                        Assert.assertEquals(4, IterableUtils.count(changed.getPrevious().getPropertyKeys()));
-                        Assert.assertEquals(2, IterableUtils.count(changed.getCurrent().getPropertyKeys()));
+                        assertEquals(4, count(changed.getPrevious().getPropertyKeys()));
+                        assertEquals(2, count(changed.getCurrent().getPropertyKeys()));
 
                         changed = changesToMap(transactionData.getAllChangedNodes()).get(3L);
                         assertEquals(0, transactionData.changedProperties(changed.getCurrent()).size());
@@ -711,14 +700,13 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
 
                         assertFalse(transactionData.hasPropertyBeenChanged(transactionData.getAllCreatedNodes().iterator().next(), "name"));
 
-                        Assert.assertEquals(2, IterableUtils.count(changed.getPrevious().getPropertyKeys()));
-                        Assert.assertEquals(3, IterableUtils.count(changed.getCurrent().getPropertyKeys()));
+                        assertEquals(2, count(changed.getPrevious().getPropertyKeys()));
+                        assertEquals(3, count(changed.getCurrent().getPropertyKeys()));
 
                         //one that isn't changed
                         Node unchanged = changesToMap(transactionData.getAllChangedNodes()).get(1L).getPrevious().getSingleRelationship(withName("R3"), OUTGOING).getEndNode().getSingleRelationship(withName("R1"), OUTGOING).getEndNode();
-                        Assert.assertEquals(1, IterableUtils.count(unchanged.getPropertyKeys()));
+                        assertEquals(1, count(unchanged.getPropertyKeys()));
                         assertEquals("name", unchanged.getPropertyKeys().iterator().next());
-                        assertEquals("Four", unchanged.getPropertyValues().iterator().next());
                         assertEquals("Four", unchanged.getProperty("name"));
                         assertEquals("Four", unchanged.getProperty("name", "nothing"));
                         assertEquals("nothing", unchanged.getProperty("non-existing", "nothing"));
@@ -791,7 +779,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
 
         Relationship r1 = database.getNodeById(5).getSingleRelationship(withName("R5"), OUTGOING);
-        Assert.assertEquals(1, IterableUtils.count(r1.getPropertyKeys()));
+        assertEquals(1, count(r1.getPropertyKeys()));
         assertEquals("someValue", r1.getProperty("additional"));
         assertFalse(r1.hasProperty("time"));
     }
@@ -820,7 +808,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
 
         assertEquals("NewFive", createdNode.getProperty("name"));
         assertEquals("something", createdNode.getProperty("additional"));
-        Assert.assertEquals(2, IterableUtils.count(createdNode.getPropertyKeys()));
+        assertEquals(2, count(createdNode.getPropertyKeys()));
         assertFalse(createdNode.hasProperty("size"));
     }
 
@@ -847,8 +835,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
 
         Relationship r = database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING);
 
-        Assert.assertEquals(2, IterableUtils.count(r.getPropertyKeys()));
-        Assert.assertEquals(2, IterableUtils.count(r.getPropertyValues()));
+        assertEquals(2, count(r.getPropertyKeys()));
         assertEquals(5, r.getProperty("time"));
         assertEquals("something", r.getProperty("additional"));
         assertFalse(r.hasProperty("tags"));
@@ -877,8 +864,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
 
         Relationship r = database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING);
 
-        Assert.assertEquals(2, IterableUtils.count(r.getPropertyKeys()));
-        Assert.assertEquals(2, IterableUtils.count(r.getPropertyValues()));
+        assertEquals(2, count(r.getPropertyKeys()));
         assertEquals(5, r.getProperty("time"));
         assertEquals("something", r.getProperty("additional"));
         assertFalse(r.hasProperty("tags"));
@@ -907,8 +893,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
 
         Node node = database.getNodeById(1L);
 
-        Assert.assertEquals(2, IterableUtils.count(node.getPropertyKeys()));
-        Assert.assertEquals(2, IterableUtils.count(node.getPropertyValues()));
+        assertEquals(2, count(node.getPropertyKeys()));
         assertEquals("YetAnotherOne", node.getProperty("name"));
         assertEquals("something", node.getProperty("additional"));
         assertFalse(node.hasProperty("tags"));
@@ -937,8 +922,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
 
         Node node = database.getNodeById(1L);
 
-        Assert.assertEquals(2, IterableUtils.count(node.getPropertyKeys()));
-        Assert.assertEquals(2, IterableUtils.count(node.getPropertyValues()));
+        assertEquals(2, count(node.getPropertyKeys()));
         assertEquals("YetAnotherOne", node.getProperty("name"));
         assertEquals("something", node.getProperty("additional"));
         assertFalse(node.hasProperty("tags"));
@@ -1057,12 +1041,12 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
                 new BeforeCommitCallback() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        Assert.assertEquals(5, IterableUtils.count(database.getNodeById(1).getRelationships()));
-                        Assert.assertEquals(2, IterableUtils.count(database.getNodeById(1).getRelationships(withName("R3"))));
-                        Assert.assertEquals(3, IterableUtils.count(database.getNodeById(1).getRelationships(withName("R3"), withName("R1"))));
-                        Assert.assertEquals(4, IterableUtils.count(database.getNodeById(1).getRelationships(OUTGOING)));
-                        Assert.assertEquals(1, IterableUtils.count(database.getNodeById(1).getRelationships(OUTGOING, withName("R3"))));
-                        Assert.assertEquals(1, IterableUtils.count(database.getNodeById(1).getRelationships(withName("R3"), OUTGOING)));
+                        assertEquals(5, count(database.getNodeById(1).getRelationships()));
+                        assertEquals(2, count(database.getNodeById(1).getRelationships(withName("R3"))));
+                        assertEquals(3, count(database.getNodeById(1).getRelationships(withName("R3"), withName("R1"))));
+                        assertEquals(4, count(database.getNodeById(1).getRelationships(OUTGOING)));
+                        assertEquals(1, count(database.getNodeById(1).getRelationships(OUTGOING, withName("R3"))));
+                        assertEquals(1, count(database.getNodeById(1).getRelationships(withName("R3"), OUTGOING)));
 
                         assertTrue(database.getNodeById(1).hasRelationship());
                         assertTrue(database.getNodeById(1).hasRelationship(withName("R3")));
@@ -1131,7 +1115,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         node2.setProperty("name", "Two");
 
         Iterable<Node> allNodes = database.getAllNodes();
-        Assert.assertEquals(2, IterableUtils.count(allNodes));
+        assertEquals(2, count(allNodes));
 
         Iterator<Node> iterator = database.getAllNodes().iterator();
         assertEquals("One", iterator.next().getProperty("name"));
@@ -1163,17 +1147,11 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(dir));
 
         Iterable<Node> allNodes = database.getAllNodes();
-        Assert.assertEquals(2, IterableUtils.count(allNodes));
+        assertEquals(2, count(allNodes));
 
         Iterator<Node> iterator = database.getAllNodes().iterator();
         assertEquals("One", iterator.next().getProperty("name"));
         assertEquals("Three", iterator.next().getProperty("name"));
-    }
-
-    @Test
-    public void shouldGetRoot() {
-        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
-        assertEquals(0, database.getReferenceNode().getId());
     }
 
     //test helpers

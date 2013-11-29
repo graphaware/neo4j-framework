@@ -136,13 +136,4 @@ public class BatchInserterRelationship extends BatchInserterPropertyContainer<Re
     public Iterable<String> getPropertyKeys() {
         return batchInserter.getRelationshipProperties(id).keySet();
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Deprecated
-    public Iterable<Object> getPropertyValues() {
-        return batchInserter.getRelationshipProperties(id).values();
-    }
 }

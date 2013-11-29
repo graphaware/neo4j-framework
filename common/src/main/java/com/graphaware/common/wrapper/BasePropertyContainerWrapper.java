@@ -107,62 +107,56 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
     //The following methods intentionally break object-orientation a bit to keep the rest of the codebase DRY:
 
     /**
+     * @see {@link Node#addLabel(org.neo4j.graphdb.Label)}.
+     */
+    public void addLabel(Label label) {
+        getWrappedNode().addLabel(label);
+    }
+
+    /**
+     * @see {@link Node#removeLabel(org.neo4j.graphdb.Label)}.
+     */
+    public void removeLabel(Label label) {
+        getWrappedNode().removeLabel(label);
+    }
+
+    /**
      * @see {@link org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.Direction, org.neo4j.graphdb.RelationshipType...)}.
      */
     public Iterable<Relationship> getRelationships(Direction direction, RelationshipType... types) {
-        if (!(getWrapped() instanceof Node)) {
-            throw new IllegalStateException("Not a node, this is a bug");
-        }
-
         if (types == null || types.length == 0) {
-            return wrapRelationships(((Node) getWrapped()).getRelationships(direction), direction);
+            return wrapRelationships(getWrappedNode().getRelationships(direction), direction);
         }
 
-        return wrapRelationships(((Node) getWrapped()).getRelationships(direction, types), direction, types);
+        return wrapRelationships(getWrappedNode().getRelationships(direction, types), direction, types);
     }
 
     /**
      * @see {@link org.neo4j.graphdb.Node#createRelationshipTo(org.neo4j.graphdb.Node, org.neo4j.graphdb.RelationshipType)}.
      */
     public Relationship createRelationshipTo(Node otherNode, RelationshipType type) {
-        if (!(getWrapped() instanceof Node)) {
-            throw new IllegalStateException("Not a node, this is a bug");
-        }
-
-        return wrapRelationship(((Node) getWrapped()).createRelationshipTo(otherNode, type));
+        return wrapRelationship(getWrappedNode().createRelationshipTo(otherNode, type));
     }
 
     /**
      * @see {@link org.neo4j.graphdb.Relationship#getType()}.
      */
     public RelationshipType getType() {
-        if (!(getWrapped() instanceof Relationship)) {
-            throw new IllegalStateException("Not a relationship, this is a bug");
-        }
-
-        return ((Relationship) getWrapped()).getType();
+        return getWrappedRelationship().getType();
     }
 
     /**
      * @see {@link org.neo4j.graphdb.Relationship#getStartNode()}.
      */
     public Node getStartNode() {
-        if (!(getWrapped() instanceof Relationship)) {
-            throw new IllegalStateException("Not a relationship, this is a bug");
-        }
-
-        return wrapNode(((Relationship) getWrapped()).getStartNode());
+        return wrapNode(getWrappedRelationship().getStartNode());
     }
 
     /**
      * @see {@link org.neo4j.graphdb.Relationship#getEndNode()}.
      */
     public Node getEndNode() {
-        if (!(getWrapped() instanceof Relationship)) {
-            throw new IllegalStateException("Not a relationship, this is a bug");
-        }
-
-        return wrapNode(((Relationship) getWrapped()).getEndNode());
+        return wrapNode(getWrappedRelationship().getEndNode());
     }
 
     /**
@@ -214,11 +208,11 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
      */
     public long getId() {
         if (getWrapped() instanceof Node) {
-            return ((Node) getWrapped()).getId();
+            return getWrappedNode().getId();
         }
 
         if (getWrapped() instanceof Relationship) {
-            return ((Relationship) getWrapped()).getId();
+            return getWrappedRelationship().getId();
         }
 
         throw new IllegalStateException(this + " is not a Node or Relationship");
@@ -229,12 +223,12 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
      */
     public void delete() {
         if (getWrapped() instanceof Node) {
-            ((Node) getWrapped()).delete();
+            getWrappedNode().delete();
             return;
         }
 
         if (getWrapped() instanceof Relationship) {
-            ((Relationship) getWrapped()).delete();
+            getWrappedRelationship().delete();
             return;
         }
 
@@ -270,5 +264,31 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
     @Override
     public int hashCode() {
         return getWrapped().hashCode();
+    }
+
+    //private helpers
+
+    private Node getWrappedNode() {
+        checkIsNode();
+
+        return (Node) getWrapped();
+    }
+
+    private Relationship getWrappedRelationship() {
+        checkIsRelationship();
+
+        return (Relationship) getWrapped();
+    }
+
+    private void checkIsNode() {
+        if (!(getWrapped() instanceof Node)) {
+            throw new IllegalStateException("Not a node, this is a bug");
+        }
+    }
+
+    private void checkIsRelationship() {
+        if (!(getWrapped() instanceof Relationship)) {
+            throw new IllegalStateException("Not a relationship, this is a bug");
+        }
     }
 }

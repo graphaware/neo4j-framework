@@ -24,6 +24,9 @@ import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.graphdb.index.IndexManager;
+import org.neo4j.graphdb.schema.Schema;
+import org.neo4j.graphdb.traversal.BidirectionalTraversalDescription;
+import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.helpers.collection.PrefetchingIterator;
 import org.neo4j.kernel.impl.nioneo.store.NeoStore;
 
@@ -115,6 +118,18 @@ public class TransactionSimulatingBatchGraphDatabase implements GraphDatabaseSer
      * {@inheritDoc}
      */
     @Override
+    public Node createNode(Label... labels) {
+        BatchDatabaseNode result = new BatchDatabaseNode(wrapped.createNode(labels).getId(), this, batchTransactionData);
+        batchTransactionData.nodeCreated(result);
+        batchTransactionData.nodeLabelsToBeSet(result, labels);
+        batchTransactionData.nodeLabelsSet(result, labels);
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Node getNodeById(long id) {
         return new BatchDatabaseNode(getNodeByIdInternal(id).getId(), this, batchTransactionData);
     }
@@ -127,14 +142,6 @@ public class TransactionSimulatingBatchGraphDatabase implements GraphDatabaseSer
      */
     public Node getNodeByIdInternal(long id) {
         return wrapped.getNodeById(id);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Node getReferenceNode() {
-        return new BatchDatabaseNode(wrapped.getReferenceNode().getId(), this, batchTransactionData);
     }
 
     /**
@@ -222,6 +229,25 @@ public class TransactionSimulatingBatchGraphDatabase implements GraphDatabaseSer
 
     //pure delegates
 
+    @Override
+    public ResourceIterable<Node> findNodesByLabelAndProperty(Label label, String key, Object value) {
+        return wrapped.findNodesByLabelAndProperty(label, key, value);
+    }
+
+    @Override
+    public Schema schema() {
+        return wrapped.schema();
+    }
+
+    @Override
+    public TraversalDescription traversalDescription() {
+        return wrapped.traversalDescription();
+    }
+
+    @Override
+    public BidirectionalTraversalDescription bidirectionalTraversalDescription() {
+        return wrapped.bidirectionalTraversalDescription();
+    }
 
     @Override
     public Iterable<RelationshipType> getRelationshipTypes() {

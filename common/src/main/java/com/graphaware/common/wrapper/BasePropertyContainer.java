@@ -95,6 +95,20 @@ public abstract class BasePropertyContainer implements PropertyContainer {
     }
 
     /**
+     * @see {@link Node#hasLabel(org.neo4j.graphdb.Label)}.
+     */
+    public boolean hasLabel(Label label) {
+        return node().hasLabel(label);
+    }
+
+    /**
+     * @see {@link Node#hasLabel(org.neo4j.graphdb.Label)}.
+     */
+    public Iterable<Label> getLabels() {
+        return node().getLabels();
+    }
+
+    /**
      * @see {@link org.neo4j.graphdb.Node#getSingleRelationship(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction)}.
      */
     public Relationship getSingleRelationship(RelationshipType type, Direction dir) {

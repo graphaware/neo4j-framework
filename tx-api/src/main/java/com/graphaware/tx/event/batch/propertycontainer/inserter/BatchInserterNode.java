@@ -95,14 +95,6 @@ public class BatchInserterNode extends BatchInserterPropertyContainer<Node> impl
      * {@inheritDoc}
      */
     @Override
-    public Iterable<Object> getPropertyValues() {
-        return batchInserter.getNodeProperties(id).values();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Iterable<Relationship> getRelationships(Direction direction, RelationshipType... types) {
         return new BatchInserterRelationshipIterator(id, batchInserter, direction, types);
     }
