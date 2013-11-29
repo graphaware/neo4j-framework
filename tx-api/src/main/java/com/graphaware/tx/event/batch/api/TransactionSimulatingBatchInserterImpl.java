@@ -280,7 +280,7 @@ public class TransactionSimulatingBatchInserterImpl implements TransactionSimula
     private class AllNodeIdsIterator extends PrefetchingIterator<Long> implements Iterable<Long> {
 
         private final long highId;
-        private long lastId = 0;
+        private long lastId = -1;
 
         private AllNodeIdsIterator(long highId) {
             this.highId = highId;

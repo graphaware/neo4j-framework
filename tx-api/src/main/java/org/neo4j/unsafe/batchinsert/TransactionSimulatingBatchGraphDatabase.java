@@ -29,6 +29,7 @@ import org.neo4j.graphdb.traversal.BidirectionalTraversalDescription;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.helpers.collection.PrefetchingIterator;
 import org.neo4j.kernel.impl.nioneo.store.NeoStore;
+import org.neo4j.kernel.impl.traversal.MonoDirectionalTraversalDescription;
 
 import java.lang.reflect.Field;
 import java.util.Iterator;
@@ -198,6 +199,14 @@ public class TransactionSimulatingBatchGraphDatabase implements GraphDatabaseSer
         wrapped.shutdown();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TraversalDescription traversalDescription() {
+        return new MonoDirectionalTraversalDescription();
+    }
+
     private class AllNodesIterator extends PrefetchingIterator<Node> implements Iterable<Node> {
 
         private final long highId;
@@ -237,11 +246,6 @@ public class TransactionSimulatingBatchGraphDatabase implements GraphDatabaseSer
     @Override
     public Schema schema() {
         return wrapped.schema();
-    }
-
-    @Override
-    public TraversalDescription traversalDescription() {
-        return wrapped.traversalDescription();
     }
 
     @Override

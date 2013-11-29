@@ -78,6 +78,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
     public void shouldBeAbleToSetPropertyOnRoot() {
         String dir = temporaryFolder.getRoot().getAbsolutePath();
         database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(dir));
+        database.createNode();
 
         Node root = database.getNodeById(0);
         root.setProperty("test", "test");
@@ -1103,7 +1104,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
     public void shouldReturnNoNodesWhenNothingInTheDatabase() {
         database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
 
-        assertFalse(at(database).getAllNodes().iterator().hasNext());
+        assertFalse(database.getAllNodes().iterator().hasNext());
     }
 
     @Test
@@ -1116,7 +1117,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         node1.setProperty("name", "One");
         node2.setProperty("name", "Two");
 
-        Iterable<Node> allNodes = at(database).getAllNodes();
+        Iterable<Node> allNodes = database.getAllNodes();
         assertEquals(2, count(allNodes));
 
         Iterator<Node> iterator = at(database).getAllNodes().iterator();
@@ -1148,7 +1149,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
 
         database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(dir));
 
-        Iterable<Node> allNodes = at(database).getAllNodes();
+        Iterable<Node> allNodes = database.getAllNodes();
         assertEquals(2, count(allNodes));
 
         Iterator<Node> iterator = at(database).getAllNodes().iterator();
@@ -1223,6 +1224,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
 
     private void populateDatabase() {
         new TestDataBuilder(database)
+                .node()
                 .node().setProp("name", "One").setProp("count", 1).setProp("tags", new String[]{"one", "two"}).setProp("something", "something")
                 .node().setProp("name", "Two").setProp("size", 2L)
                 .relationshipFrom(1, "R1").setProp("time", 1)

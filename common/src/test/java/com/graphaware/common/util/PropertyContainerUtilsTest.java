@@ -54,7 +54,7 @@ public class PropertyContainerUtilsTest {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         new TestDataBuilder(database)
                 .node()
-                .node().setProp("", "e").setProp("key", "value")
+                .node().setProp("key", "value")
                 .relationshipTo(0, "test")
                 .node().setProp("key", "value");
     }
@@ -66,36 +66,38 @@ public class PropertyContainerUtilsTest {
 
     @Test
     public void shouldConvertContainersToMap() {
-        Map<Long, Node> nodeMap = propertyContainersToMap(Iterables.toList(GlobalGraphOperations.at(database).getAllNodes()));
-        assertEquals(0, nodeMap.get(0L).getId());
-        assertEquals(1, nodeMap.get(1L).getId());
-        assertEquals(2, nodeMap.get(2L).getId());
-        assertEquals(3, nodeMap.size());
+        try (Transaction tx = database.beginTx()) {
+            Map<Long, Node> nodeMap = propertyContainersToMap(Iterables.toList(GlobalGraphOperations.at(database).getAllNodes()));
+            assertEquals(0, nodeMap.get(0L).getId());
+            assertEquals(1, nodeMap.get(1L).getId());
+            assertEquals(2, nodeMap.get(2L).getId());
+            assertEquals(3, nodeMap.size());
+        }
     }
 
     @Test
     public void shouldConvertChangesToMap() {
-        Change<Node> nodeChange = new Change<>(database.getNodeById(0), database.getNodeById(0));
-        Map<Long, Change<Node>> changeMap = changesToMap(asList(nodeChange));
-        assertEquals(0, changeMap.get(0L).getCurrent().getId());
-        assertEquals(0, changeMap.get(0L).getPrevious().getId());
-        assertEquals(1, changeMap.size());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldThrowExceptionWhenConvertingInvalidChanges() {
-        Change<Node> nodeChange = new Change<>(database.getNodeById(0), database.getNodeById(1));
-        changesToMap(asList(nodeChange));
+        try (Transaction tx = database.beginTx()) {
+            Change<Node> nodeChange = new Change<>(database.getNodeById(0), database.getNodeById(0));
+            Map<Long, Change<Node>> changeMap = changesToMap(asList(nodeChange));
+            assertEquals(0, changeMap.get(0L).getCurrent().getId());
+            assertEquals(0, changeMap.get(0L).getPrevious().getId());
+            assertEquals(1, changeMap.size());
+        }
     }
 
     @Test
     public void shouldFindNodeId() {
-        assertEquals(1L, id(database.getNodeById(1)));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(1L, id(database.getNodeById(1)));
+        }
     }
 
     @Test
     public void shouldFindRelationshipId() {
-        assertEquals(0L, id(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(0L, id(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
+        }
     }
 
     @Test(expected = IllegalStateException.class)
@@ -173,14 +175,8 @@ public class PropertyContainerUtilsTest {
 
     @Test
     public void verifyPropertiesToStringMap() {
+        try (Transaction tx = database.beginTx()) {
         assertEquals(Collections.<String, String>emptyMap(), propertiesToStringMap(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
-
-        try {
-            propertiesToStringMap(database.getNodeById(1));
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
 
         assertEquals(stringMap("key", "value"), propertiesToStringMap(database.getNodeById(2)));
 
@@ -195,18 +191,13 @@ public class PropertyContainerUtilsTest {
                 return "custom";
             }
         }));
+        }
     }
 
     @Test
     public void verifyPropertiesToObjectMap() {
+        try (Transaction tx = database.beginTx()) {
         assertEquals(Collections.<String, Object>emptyMap(), propertiesToObjectMap(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
-
-        try {
-            propertiesToObjectMap(database.getNodeById(1));
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
 
         assertEquals(Collections.singletonMap("key", (Object) "value"), propertiesToObjectMap(database.getNodeById(2)));
 
@@ -221,22 +212,22 @@ public class PropertyContainerUtilsTest {
                 return "custom";
             }
         }));
+        }
     }
 
     @Test
     public void shouldDeleteNodeWithAllRelationships() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         new TestDataBuilder(database)
+                .node()
                 .node().setProp("name", "node1")
                 .node().setProp("name", "node2")
                 .relationshipTo(1, "test").setProp("key1", "value1")
                 .relationshipTo(0, "test").setProp("key1", "value1");
 
-        Transaction tx = database.beginTx();
-        try {
+        try (Transaction tx = database.beginTx()) {
             assertEquals(2, deleteNodeAndRelationships(database.getNodeById(2)));
-        } finally {
-            tx.finish();
+            tx.success();
         }
     }
 }
