@@ -23,8 +23,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import static com.graphaware.common.test.IterableUtils.*;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -50,7 +52,9 @@ public class NoInputBatchTransactionExecutorTest {
 
         batchExecutor.execute();
 
-        Assert.assertEquals(7, IterableUtils.countNodes(database));  //6 + root
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(6, countNodes(database));
+        }
     }
 
     @Test
@@ -59,7 +63,9 @@ public class NoInputBatchTransactionExecutorTest {
 
         batchExecutor.execute();
 
-        Assert.assertEquals(7, IterableUtils.countNodes(database));  //6 + root
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(6, countNodes(database));
+        }
     }
 
     @Test
@@ -68,7 +74,9 @@ public class NoInputBatchTransactionExecutorTest {
 
         batchExecutor.execute();
 
-        Assert.assertEquals(7, IterableUtils.countNodes(database));  //6 + root
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(6, countNodes(database));
+        }
     }
 
     @Test
@@ -77,7 +85,9 @@ public class NoInputBatchTransactionExecutorTest {
 
         batchExecutor.execute();
 
-        Assert.assertEquals(8, IterableUtils.countNodes(database));  //root + 1,2,3,7,8,9,10 (batch 4,5,6 is rolled back)
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(7, countNodes(database));  //1,2,3,7,8,9,10 (batch 4,5,6 is rolled back)
+        }
     }
 
     @Test
@@ -86,7 +96,9 @@ public class NoInputBatchTransactionExecutorTest {
 
         batchExecutor.execute();
 
-        Assert.assertEquals(9, IterableUtils.countNodes(database));  //root + 1,2,3,5,6,7,9,10
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(8, countNodes(database));  //1,2,3,5,6,7,9,10
+        }
     }
 
     private static class ExceptionThrowingUnitOfWork implements UnitOfWork<NullItem> {

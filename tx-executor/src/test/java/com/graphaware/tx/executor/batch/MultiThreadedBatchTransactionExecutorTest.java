@@ -20,9 +20,11 @@ import com.graphaware.common.test.IterableUtils;
 import org.junit.*;
 import com.graphaware.common.test.TestUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.ImpermanentGraphDatabase;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import static com.graphaware.common.test.IterableUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -49,7 +51,9 @@ public class MultiThreadedBatchTransactionExecutorTest {
 
         batchExecutor.execute();
 
-        Assert.assertEquals(40001, IterableUtils.countNodes(database));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(40000, countNodes(database));
+        }
     }
 
     @Test
@@ -73,6 +77,7 @@ public class MultiThreadedBatchTransactionExecutorTest {
         });
 
         System.out.println("Multi threaded execution faster by " + Math.round(100.00 * multiThreadedTime / singleThreadedTime) + "%");
+
         assertTrue(singleThreadedTime > multiThreadedTime);
     }
 }

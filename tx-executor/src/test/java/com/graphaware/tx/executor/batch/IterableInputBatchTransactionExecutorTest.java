@@ -23,12 +23,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.ImpermanentGraphDatabase;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static com.graphaware.common.test.IterableUtils.*;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -62,9 +64,11 @@ public class IterableInputBatchTransactionExecutorTest {
 
         executor.execute();
 
-        assertEquals(4, IterableUtils.countNodes(database));  //3 + root
-        assertEquals("Name111", database.getNodeById(1).getProperty("name"));
-        assertEquals("Name212", database.getNodeById(2).getProperty("name"));
-        assertEquals("Name321", database.getNodeById(3).getProperty("name"));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(3, countNodes(database));
+            assertEquals("Name111", database.getNodeById(0).getProperty("name"));
+            assertEquals("Name212", database.getNodeById(1).getProperty("name"));
+            assertEquals("Name321", database.getNodeById(2).getProperty("name"));
+        }
     }
 }

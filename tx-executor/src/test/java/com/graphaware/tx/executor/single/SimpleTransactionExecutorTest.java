@@ -21,12 +21,10 @@ import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.TransactionFailureException;
+import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import static com.graphaware.common.test.IterableUtils.*;
 import static junit.framework.Assert.assertEquals;
 
 /**
@@ -40,6 +38,12 @@ public class SimpleTransactionExecutorTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+
+        try (Transaction tx = database.beginTx()) {
+            database.createNode();
+            tx.success();
+        }
+
         executor = new SimpleTransactionExecutor(database);
     }
 
@@ -57,7 +61,9 @@ public class SimpleTransactionExecutorTest {
             }
         });
 
-        assertEquals(2, IterableUtils.countNodes(database));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(2, countNodes(database));
+        }
     }
 
     @Test
@@ -69,7 +75,9 @@ public class SimpleTransactionExecutorTest {
             }
         });
 
-        assertEquals(0, IterableUtils.countNodes(database));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(0, countNodes(database));
+        }
     }
 
     @Test(expected = TransactionFailureException.class)
@@ -89,7 +97,9 @@ public class SimpleTransactionExecutorTest {
     public void deletingNodeWithRelationshipsShouldNotSucceed() {
         createNodeAndRelationship();
 
-        assertEquals(2, IterableUtils.countNodes(database));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(2, countNodes(database));
+        }
 
         executor.executeInTransaction(new TransactionCallback<Void>() {
             @Override
@@ -99,7 +109,9 @@ public class SimpleTransactionExecutorTest {
             }
         }, KeepCalmAndCarryOn.getInstance());
 
-        assertEquals(2, IterableUtils.countNodes(database));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(2, countNodes(database));
+        }
     }
 
     private void createNodeAndRelationship() {
