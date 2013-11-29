@@ -29,6 +29,7 @@ import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Collections;
 import java.util.Map;
@@ -52,6 +53,7 @@ public class PropertyContainerUtilsTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         new TestDataBuilder(database)
+                .node()
                 .node().setProp("", "e").setProp("key", "value")
                 .relationshipTo(0, "test")
                 .node().setProp("key", "value");
@@ -64,7 +66,7 @@ public class PropertyContainerUtilsTest {
 
     @Test
     public void shouldConvertContainersToMap() {
-        Map<Long, Node> nodeMap = propertyContainersToMap(Iterables.toList(database.getAllNodes()));
+        Map<Long, Node> nodeMap = propertyContainersToMap(Iterables.toList(GlobalGraphOperations.at(database).getAllNodes()));
         assertEquals(0, nodeMap.get(0L).getId());
         assertEquals(1, nodeMap.get(1L).getId());
         assertEquals(2, nodeMap.get(2L).getId());

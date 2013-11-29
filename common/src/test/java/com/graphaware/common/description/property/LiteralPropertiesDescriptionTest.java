@@ -24,6 +24,7 @@ import java.util.List;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
+import static com.graphaware.common.test.IterableUtils.*;
 import static org.junit.Assert.*;
 
 /**
@@ -35,7 +36,7 @@ public class LiteralPropertiesDescriptionTest extends com.graphaware.common.desc
     public void shouldContainCorrectKeys() {
         PropertiesDescription description = literal();
 
-        List<String> keys = IterableUtils.toList(description.getKeys());
+        List<String> keys = toList(description.getKeys());
 
         assertEquals(3, keys.size());
         assertTrue(keys.contains("two"));

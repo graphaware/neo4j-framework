@@ -40,14 +40,11 @@ public class LazyRelationshipDescriptionTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
-        Transaction tx = database.beginTx();
-        try {
-            Node root = database.getNodeById(0);
+        try (Transaction tx = database.beginTx()) {
+            Node root = database.createNode();
             Node one = database.createNode();
             root.createRelationshipTo(one, withName("TEST")).setProperty("k", new int[]{2, 3, 4});
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
@@ -58,12 +55,14 @@ public class LazyRelationshipDescriptionTest {
 
     @Test
     public void shouldReturnCorrectTypeDirectionAndProps() {
-        RelationshipDescription relationshipDescription = new LazyRelationshipDescription(
-                database.getNodeById(0).getSingleRelationship(withName("TEST"), OUTGOING),
-                database.getNodeById(0));
+        try (Transaction tx = database.beginTx()) {
+            RelationshipDescription relationshipDescription = new LazyRelationshipDescription(
+                    database.getNodeById(0).getSingleRelationship(withName("TEST"), OUTGOING),
+                    database.getNodeById(0));
 
-        assertEquals("TEST", relationshipDescription.getType().name());
-        assertEquals(OUTGOING, relationshipDescription.getDirection());
-        assertEquals(new LazyPropertiesDescription(database.getNodeById(0).getSingleRelationship(withName("TEST"), OUTGOING)), relationshipDescription.getPropertiesDescription());
+            assertEquals("TEST", relationshipDescription.getType().name());
+            assertEquals(OUTGOING, relationshipDescription.getDirection());
+            assertEquals(new LazyPropertiesDescription(database.getNodeById(0).getSingleRelationship(withName("TEST"), OUTGOING)), relationshipDescription.getPropertiesDescription());
+        }
     }
 }

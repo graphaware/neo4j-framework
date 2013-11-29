@@ -17,6 +17,7 @@
 package com.graphaware.common.description.property;
 
 import com.graphaware.common.description.TestMapUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -26,24 +27,31 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 
 public abstract class PropertiesDescriptionTest {
 
+    private GraphDatabaseService database;
+    private Transaction tx;
+
     protected PropertyContainer propertyContainer;
 
     @Before
     public void setUp() {
-        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
-        Transaction tx = database.beginTx();
-        try {
-            Node root = database.getNodeById(0);
+        try (Transaction tx = database.beginTx()) {
+            Node root = database.createNode();
             root.setProperty("two", 2);
             root.setProperty("three", "3");
             root.setProperty("array", new int[]{4, 5});
             tx.success();
-        } finally {
-            tx.finish();
         }
 
+        tx = database.beginTx();
         propertyContainer = database.getNodeById(0);
+    }
+
+    @After
+    public void tearDown() {
+        tx.close();
+        database.shutdown();
     }
 
     protected LazyPropertiesDescription lazy() {

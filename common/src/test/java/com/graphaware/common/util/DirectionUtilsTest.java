@@ -42,8 +42,7 @@ public class DirectionUtilsTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
-        Transaction tx = database.beginTx();
-        try {
+        try (Transaction tx = database.beginTx()) {
             Node node1 = database.createNode();
             Node node2 = database.createNode();
             node1.createRelationshipTo(node2, withName("test"));
@@ -51,8 +50,6 @@ public class DirectionUtilsTest {
             Node node3 = database.createNode();
             node3.createRelationshipTo(node3, withName("test"));
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
@@ -63,53 +60,65 @@ public class DirectionUtilsTest {
 
     @Test
     public void outgoingShouldBeCorrectlyIdentified() {
-        assertEquals(OUTGOING, resolveDirection(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING), database.getNodeById(1)));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(OUTGOING, resolveDirection(database.getNodeById(0).getSingleRelationship(withName("test"), OUTGOING), database.getNodeById(0)));
+        }
     }
 
     @Test
     public void incomingShouldBeCorrectlyIdentified() {
-        assertEquals(INCOMING, resolveDirection(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING), database.getNodeById(2)));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(INCOMING, resolveDirection(database.getNodeById(0).getSingleRelationship(withName("test"), OUTGOING), database.getNodeById(1)));
+        }
     }
 
     @Test
     public void relationshipToSelfShouldBeBoth() {
-        assertEquals(BOTH, resolveDirection(database.getNodeById(3).getSingleRelationship(withName("test"), OUTGOING), database.getNodeById(3)));
-        assertEquals(BOTH, resolveDirection(database.getNodeById(3).getSingleRelationship(withName("test"), INCOMING), database.getNodeById(3)));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(BOTH, resolveDirection(database.getNodeById(2).getSingleRelationship(withName("test"), OUTGOING), database.getNodeById(2)));
+            assertEquals(BOTH, resolveDirection(database.getNodeById(2).getSingleRelationship(withName("test"), INCOMING), database.getNodeById(2)));
+        }
     }
 
     @Test
     public void relationshipToSelfShouldHonourDefault() {
-        assertEquals(OUTGOING, resolveDirection(database.getNodeById(3).getSingleRelationship(withName("test"), OUTGOING), database.getNodeById(3), OUTGOING));
-        assertEquals(OUTGOING, resolveDirection(database.getNodeById(3).getSingleRelationship(withName("test"), INCOMING), database.getNodeById(3), OUTGOING));
-        assertEquals(INCOMING, resolveDirection(database.getNodeById(3).getSingleRelationship(withName("test"), OUTGOING), database.getNodeById(3), INCOMING));
-        assertEquals(INCOMING, resolveDirection(database.getNodeById(3).getSingleRelationship(withName("test"), INCOMING), database.getNodeById(3), INCOMING));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(OUTGOING, resolveDirection(database.getNodeById(2).getSingleRelationship(withName("test"), OUTGOING), database.getNodeById(2), OUTGOING));
+            assertEquals(OUTGOING, resolveDirection(database.getNodeById(2).getSingleRelationship(withName("test"), INCOMING), database.getNodeById(2), OUTGOING));
+            assertEquals(INCOMING, resolveDirection(database.getNodeById(2).getSingleRelationship(withName("test"), OUTGOING), database.getNodeById(2), INCOMING));
+            assertEquals(INCOMING, resolveDirection(database.getNodeById(2).getSingleRelationship(withName("test"), INCOMING), database.getNodeById(2), INCOMING));
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void invalidResolutionShouldThrowException() {
-        resolveDirection((database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)), database.getNodeById(0));
+        try (Transaction tx = database.beginTx()) {
+            resolveDirection((database.getNodeById(0).getSingleRelationship(withName("test"), OUTGOING)), database.getNodeById(2));
+        }
     }
 
     @Test
     public void verifyMatching() {
-        Node nodeThree = database.getNodeById(3);
-        Relationship selfRelationship = nodeThree.getSingleRelationship(withName("test"), OUTGOING);
+        try (Transaction tx = database.beginTx()) {
+            Node nodeThree = database.getNodeById(2);
+            Relationship selfRelationship = nodeThree.getSingleRelationship(withName("test"), OUTGOING);
 
-        assertTrue(matches(selfRelationship, nodeThree, OUTGOING));
-        assertTrue(matches(selfRelationship, nodeThree, INCOMING));
-        assertTrue(matches(selfRelationship, nodeThree, BOTH));
+            assertTrue(matches(selfRelationship, nodeThree, OUTGOING));
+            assertTrue(matches(selfRelationship, nodeThree, INCOMING));
+            assertTrue(matches(selfRelationship, nodeThree, BOTH));
 
-        Node nodeOne = database.getNodeById(1);
-        Node nodeTwo = database.getNodeById(2);
-        Relationship relationship = nodeOne.getSingleRelationship(withName("test"), OUTGOING);
+            Node nodeOne = database.getNodeById(0);
+            Node nodeTwo = database.getNodeById(1);
+            Relationship relationship = nodeOne.getSingleRelationship(withName("test"), OUTGOING);
 
-        assertTrue(matches(relationship, nodeOne, OUTGOING));
-        assertTrue(matches(relationship, nodeOne, BOTH));
-        assertFalse(matches(relationship, nodeOne, INCOMING));
+            assertTrue(matches(relationship, nodeOne, OUTGOING));
+            assertTrue(matches(relationship, nodeOne, BOTH));
+            assertFalse(matches(relationship, nodeOne, INCOMING));
 
-        assertTrue(matches(relationship, nodeTwo, INCOMING));
-        assertTrue(matches(relationship, nodeTwo, BOTH));
-        assertFalse(matches(relationship, nodeTwo, OUTGOING));
+            assertTrue(matches(relationship, nodeTwo, INCOMING));
+            assertTrue(matches(relationship, nodeTwo, BOTH));
+            assertFalse(matches(relationship, nodeTwo, OUTGOING));
+        }
     }
 
     @Test
@@ -127,8 +136,10 @@ public class DirectionUtilsTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void verifyIncorrectMatching() {
-        Relationship relationship = database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING);
+        try (Transaction tx = database.beginTx()) {
+            Relationship relationship = database.getNodeById(0).getSingleRelationship(withName("test"), OUTGOING);
 
-        matches(relationship, database.getNodeById(3), OUTGOING);
+            matches(relationship, database.getNodeById(2), OUTGOING);
+        }
     }
 }

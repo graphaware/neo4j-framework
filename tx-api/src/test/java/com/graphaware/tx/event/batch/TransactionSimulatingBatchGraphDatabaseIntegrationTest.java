@@ -35,6 +35,7 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.kernel.Uniqueness;
+import org.neo4j.tooling.GlobalGraphOperations;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
 
@@ -51,6 +52,7 @@ import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
+import static org.neo4j.tooling.GlobalGraphOperations.*;
 
 /**
  * Integration test for {@link org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase}.
@@ -1101,7 +1103,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
     public void shouldReturnNoNodesWhenNothingInTheDatabase() {
         database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()));
 
-        assertFalse(database.getAllNodes().iterator().hasNext());
+        assertFalse(at(database).getAllNodes().iterator().hasNext());
     }
 
     @Test
@@ -1114,10 +1116,10 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         node1.setProperty("name", "One");
         node2.setProperty("name", "Two");
 
-        Iterable<Node> allNodes = database.getAllNodes();
+        Iterable<Node> allNodes = at(database).getAllNodes();
         assertEquals(2, count(allNodes));
 
-        Iterator<Node> iterator = database.getAllNodes().iterator();
+        Iterator<Node> iterator = at(database).getAllNodes().iterator();
         assertEquals("One", iterator.next().getProperty("name"));
         assertEquals("Two", iterator.next().getProperty("name"));
     }
@@ -1146,10 +1148,10 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
 
         database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(dir));
 
-        Iterable<Node> allNodes = database.getAllNodes();
+        Iterable<Node> allNodes = at(database).getAllNodes();
         assertEquals(2, count(allNodes));
 
-        Iterator<Node> iterator = database.getAllNodes().iterator();
+        Iterator<Node> iterator = at(database).getAllNodes().iterator();
         assertEquals("One", iterator.next().getProperty("name"));
         assertEquals("Three", iterator.next().getProperty("name"));
     }

@@ -142,7 +142,7 @@ public class TestDataBuilder {
 
         Transaction tx = database.beginTx();
         try {
-            lastRelationship =database.getNodeById(nodeId).createRelationshipTo(node, DynamicRelationshipType.withName(type));
+            lastRelationship = database.getNodeById(nodeId).createRelationshipTo(node, DynamicRelationshipType.withName(type));
             tx.success();
         } finally {
             tx.finish();
@@ -165,12 +165,9 @@ public class TestDataBuilder {
 
         final PropertyContainer propertyContainer = lastRelationship != null ? lastRelationship : lastNode;
 
-        Transaction tx = database.beginTx();
-        try {
+        try (Transaction tx = database.beginTx()) {
             propertyContainer.setProperty(key, value);
             tx.success();
-        } finally {
-            tx.finish();
         }
 
         return this;

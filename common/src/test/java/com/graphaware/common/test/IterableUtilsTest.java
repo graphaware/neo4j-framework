@@ -16,118 +16,113 @@
 
 package com.graphaware.common.test;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
+import static com.graphaware.common.test.IterableUtils.*;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
+import static org.neo4j.tooling.GlobalGraphOperations.*;
 
 /**
  * Unit test for {@link IterableUtils}.
  */
 public class IterableUtilsTest {
 
-    @Test
-    public void newDatabaseShouldHaveOneNode() {
-        assertEquals(1, IterableUtils.countNodes(new TestGraphDatabaseFactory().newImpermanentDatabase()));
+    private GraphDatabaseService database;
+
+    @Before
+    public void setUp() {
+        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+    }
+
+    @After
+    public void tearDown() {
+        database.shutdown();
     }
 
     @Test
-    public void afterCreatingANodeDatabaseShouldHaveTwoNodes() {
-        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        
-        Transaction tx = database.beginTx();
-        try {
+    public void newDatabaseShouldHaveNoNodes() {
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(0, countNodes(database));
+        }
+    }
+
+    @Test
+    public void afterCreatingANodeDatabaseShouldHaveOneNode() {
+        try (Transaction tx = database.beginTx()) {
             database.createNode();
             tx.success();
-        } finally {
-            tx.finish();
         }
 
-        assertEquals(2, IterableUtils.countNodes(database));
-    }
-
-    @Test
-    public void emptyDatabaseShouldHaveZeroNodes() {
-        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-
-        Transaction tx = database.beginTx();
-        try {
-            database.getNodeById(0).delete();
-            tx.success();
-        } finally {
-            tx.finish();
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(1, countNodes(database));
         }
-
-        assertEquals(0, IterableUtils.countNodes(database));
     }
 
     @Test
     public void listWithOneItemShouldHaveOneItem() {
-        assertEquals(1, IterableUtils.count(asList("test")));
+        assertEquals(1, count(asList("test")));
     }
 
     @Test
     public void checkContainsCollections() {
-        assertTrue(IterableUtils.contains(asList("a", "b"), "b"));
-        assertFalse(IterableUtils.contains(asList("a", "b"), "c"));
+        assertTrue(contains(asList("a", "b"), "b"));
+        assertFalse(contains(asList("a", "b"), "c"));
     }
 
     @Test
     public void checkContainsRealIterables() {
-        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         Node node;
 
-        Transaction tx = database.beginTx();
-        try {
+        try (Transaction tx = database.beginTx()) {
             node = database.createNode();
             tx.success();
-        } finally {
-            tx.finish();
         }
 
-        Iterable<Node> nodes = GlobalGraphOperations.at(database).getAllNodes();
+        try (Transaction tx = database.beginTx()) {
+            assertTrue(contains(at(database).getAllNodes(), node));
+        }
 
-        assertTrue(IterableUtils.contains(nodes, node));
-
-        tx = database.beginTx();
-        try {
-            database.getNodeById(1).delete();
+        try (Transaction tx = database.beginTx()) {
+            database.getNodeById(0).delete();
             tx.success();
-        } finally {
-            tx.finish();
         }
 
-        assertFalse(IterableUtils.contains(nodes, node));
+        try (Transaction tx = database.beginTx()) {
+            assertFalse(contains(at(database).getAllNodes(), node));
+        }
     }
 
     @Test
     public void testRandom() {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
-        Transaction tx = database.beginTx();
-        try {
+        try (Transaction tx = database.beginTx()) {
             database.createNode();
             tx.success();
-        } finally {
-            tx.finish();
         }
 
-        assertTrue(asList(0L, 1L).contains(IterableUtils.random(database.getAllNodes()).getId()));
-        assertTrue(asList(0L, 1L).contains(IterableUtils.random(database.getAllNodes()).getId()));
-        assertTrue(asList(0L, 1L).contains(IterableUtils.random(database.getAllNodes()).getId()));
-        assertTrue(asList(0L, 1L).contains(IterableUtils.random(database.getAllNodes()).getId()));
-        assertTrue(asList(0L, 1L).contains(IterableUtils.random(database.getAllNodes()).getId()));
+        try (Transaction tx = database.beginTx()) {
+            assertTrue(asList(0L, 1L).contains(random(at(database).getAllNodes()).getId()));
+            assertTrue(asList(0L, 1L).contains(random(at(database).getAllNodes()).getId()));
+            assertTrue(asList(0L, 1L).contains(random(at(database).getAllNodes()).getId()));
+            assertTrue(asList(0L, 1L).contains(random(at(database).getAllNodes()).getId()));
+            assertTrue(asList(0L, 1L).contains(random(at(database).getAllNodes()).getId()));
+        }
     }
 
     @Test
     public void testRandomCollection() {
-        assertTrue(asList(0L, 1L).contains(IterableUtils.random(asList(0L, 1L))));
-        assertTrue(asList(0L, 1L).contains(IterableUtils.random(asList(0L, 1L))));
-        assertTrue(asList(0L, 1L).contains(IterableUtils.random(asList(0L, 1L))));
+        assertTrue(asList(0L, 1L).contains(random(asList(0L, 1L))));
+        assertTrue(asList(0L, 1L).contains(random(asList(0L, 1L))));
+        assertTrue(asList(0L, 1L).contains(random(asList(0L, 1L))));
     }
 }
