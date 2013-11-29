@@ -16,6 +16,8 @@
 
 package com.graphaware.tx.event.batch.data;
 
+import org.apache.commons.collections4.*;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.event.PropertyEntry;
@@ -35,6 +37,8 @@ public class BatchTransactionData implements TransactionData {
     private final Set<Node> createdNodes = new HashSet<>();
     private final Map<IdAndKey, PropertyEntry<Node>> assignedNodeProperties = new HashMap<>();
     private final Map<IdAndKey, PropertyEntry<Node>> removedNodeProperties = new HashMap<>();
+    private final Map<Node, Set<String>> assignedNodeLabels = new HashMap<>();
+    private final Map<Node, Set<String>> removedNodeLabels = new HashMap<>();
 
     private final Set<Relationship> createdRelationships = new HashSet<>();
     private final Map<IdAndKey, PropertyEntry<Relationship>> assignedRelationshipProperties = new HashMap<>();
@@ -102,6 +106,8 @@ public class BatchTransactionData implements TransactionData {
         return createdNodes.isEmpty()
                 && assignedNodeProperties.isEmpty()
                 && removedNodeProperties.isEmpty()
+                && assignedNodeLabels.isEmpty()
+                && removedNodeLabels.isEmpty()
                 && createdRelationships.isEmpty()
                 && assignedRelationshipProperties.isEmpty()
                 && removedRelationshipProperties.isEmpty();
@@ -124,6 +130,8 @@ public class BatchTransactionData implements TransactionData {
         createdNodes.clear();
         assignedNodeProperties.clear();
         removedNodeProperties.clear();
+        assignedNodeLabels.clear();
+        removedNodeLabels.clear();
         createdRelationships.clear();
         assignedRelationshipProperties.clear();
         removedRelationshipProperties.clear();
@@ -167,6 +175,24 @@ public class BatchTransactionData implements TransactionData {
     @Override
     public Iterable<PropertyEntry<Node>> removedNodeProperties() {
         return Collections.unmodifiableCollection(removedNodeProperties.values());
+    }
+
+    /**
+     * An API call that's missing in Neo4j (see https://github.com/neo4j/neo4j/issues/1065).
+     *
+     * @return all labels assigned to nodes in this transaction, keyed by {@link Node}.
+     */
+    public Map<Node, Set<String>> assignedNodeLabels() {
+        return Collections.unmodifiableMap(assignedNodeLabels);
+    }
+
+    /**
+     * An API call that's missing in Neo4j (see https://github.com/neo4j/neo4j/issues/1065).
+     *
+     * @return all labels removed from nodes in this transaction, keyed by {@link Node}.
+     */
+    public Map<Node, Set<String>> removedNodeLabels() {
+        return Collections.unmodifiableMap(removedNodeLabels);
     }
 
     /**
@@ -286,6 +312,71 @@ public class BatchTransactionData implements TransactionData {
      * @param value of the property set.
      */
     public void nodePropertySet(Node node, String key, Object value) {
+        if (commitInProgress) {
+            return;
+        }
+
+        incrementMutationsAndCommitIfNeeded();
+    }
+
+    /**
+     * Inform this object about a new set of labels about to be assigned to a node. After it has been done,
+     * {@link #nodeLabelsSet(org.neo4j.graphdb.Node, org.neo4j.graphdb.Label...)} must be called.
+     *
+     * @param node   to which a new set of labels is about to be assigned.
+     * @param labels new labels.
+     */
+    public void nodeLabelsToBeSet(Node node, Label... labels) {
+        if (commitInProgress) {
+            return;
+        }
+
+        Set<String> newLabels = new HashSet<>();
+        for (Label label : labels) {
+            newLabels.add(label.name());
+        }
+
+        Set<String> existingLabels = new HashSet<>();
+        for (Label label : node.getLabels()) {
+            existingLabels.add(label.name());
+        }
+
+        Collection<String> removedLabels = CollectionUtils.subtract(existingLabels, newLabels);
+        Collection<String> assignedLabels = CollectionUtils.subtract(newLabels, existingLabels);
+
+        for (String removedLabel : removedLabels) {
+            if (assignedNodeLabels.containsKey(node)) {
+                assignedNodeLabels.get(node).remove(removedLabel);
+            }
+
+            if (!removedNodeLabels.containsKey(node)) {
+                removedNodeLabels.put(node, new HashSet<String>());
+            }
+
+            removedNodeLabels.get(node).add(removedLabel);
+        }
+
+        for (String assignedLabel : assignedLabels) {
+            if (removedNodeLabels.containsKey(node)) {
+                removedNodeLabels.get(node).remove(assignedLabel);
+            }
+
+            if (!assignedNodeLabels.containsKey(node)) {
+                assignedNodeLabels.put(node, new HashSet<String>());
+            }
+
+            assignedNodeLabels.get(node).add(assignedLabel);
+        }
+    }
+
+    /**
+     * Inform this object about a new set of labels assigned to a node. Before this is called,
+     * {@link #nodeLabelsToBeSet(org.neo4j.graphdb.Node, org.neo4j.graphdb.Label...)} must be called.
+     *
+     * @param node   to which a new set of labels has been assigned.
+     * @param labels new labels.
+     */
+    public void nodeLabelsSet(Node node, Label... labels) {
         if (commitInProgress) {
             return;
         }

@@ -20,11 +20,14 @@ import com.graphaware.tx.event.batch.data.BatchTransactionData;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterRelationship;
 import com.graphaware.common.wrapper.Wrapper;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.graphdb.event.TransactionEventHandler;
+import org.neo4j.graphdb.schema.ConstraintCreator;
+import org.neo4j.graphdb.schema.IndexCreator;
 import org.neo4j.helpers.collection.PrefetchingIterator;
 import org.neo4j.kernel.impl.nioneo.store.NeoStore;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
@@ -90,10 +93,19 @@ public class TransactionSimulatingBatchInserterImpl implements TransactionSimula
      * {@inheritDoc}
      */
     @Override
-    public long createNode(Map<String, Object> properties) {
-        long nodeId = wrapped.createNode(properties);
+    public long createNode(Map<String, Object> properties, Label... labels) {
+        long nodeId = wrapped.createNode(properties, labels);
         transactionData.nodeCreated(nodeById(nodeId));
         return nodeId;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void createNode(long nodeId, Map<String, Object> properties, Label... labels) {
+        wrapped.createNode(nodeId, properties, labels);
+        transactionData.nodeCreated(nodeById(nodeId));
     }
 
     /**
@@ -128,6 +140,16 @@ public class TransactionSimulatingBatchInserterImpl implements TransactionSimula
      * {@inheritDoc}
      */
     @Override
+    public void setNodeLabels(long nodeId, Label... labels) {
+        transactionData.nodeLabelsToBeSet(nodeById(nodeId), labels);
+        wrapped.setNodeLabels(nodeId, labels);
+        transactionData.nodeLabelsSet(nodeById(nodeId), labels);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setNodeProperty(long nodeId, String propertyName, Object propertyValue) {
         transactionData.nodePropertyToBeSet(nodeById(nodeId), propertyName, propertyValue);
         wrapped.setNodeProperty(nodeId, propertyName, propertyValue);
@@ -142,15 +164,6 @@ public class TransactionSimulatingBatchInserterImpl implements TransactionSimula
         transactionData.relationshipPropertyToBeSet(relationshipById(relationshipId), propertyName, propertyValue);
         wrapped.setRelationshipProperty(relationshipId, propertyName, propertyValue);
         transactionData.relationshipPropertySet(relationshipById(relationshipId), propertyName, propertyValue);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void createNode(long nodeId, Map<String, Object> properties) {
-        wrapped.createNode(nodeId, properties);
-        transactionData.nodeCreated(nodeById(nodeId));
     }
 
     /**
@@ -313,6 +326,16 @@ public class TransactionSimulatingBatchInserterImpl implements TransactionSimula
     }
 
     @Override
+    public Iterable<Label> getNodeLabels(long node) {
+        return wrapped.getNodeLabels(node);
+    }
+
+    @Override
+    public boolean nodeHasLabel(long node, Label label) {
+        return wrapped.nodeHasLabel(node, label);
+    }
+
+    @Override
     public Iterable<Long> getRelationshipIds(long nodeId) {
         return wrapped.getRelationshipIds(nodeId);
     }
@@ -333,13 +356,18 @@ public class TransactionSimulatingBatchInserterImpl implements TransactionSimula
     }
 
     @Override
-    public String getStoreDir() {
-        return wrapped.getStoreDir();
+    public IndexCreator createDeferredSchemaIndex(Label label) {
+        return wrapped.createDeferredSchemaIndex(label);
     }
 
     @Override
-    public long getReferenceNode() {
-        return wrapped.getReferenceNode();
+    public ConstraintCreator createDeferredConstraint(Label label) {
+        return wrapped.createDeferredConstraint(label);
+    }
+
+    @Override
+    public String getStoreDir() {
+        return wrapped.getStoreDir();
     }
 
     @Override
