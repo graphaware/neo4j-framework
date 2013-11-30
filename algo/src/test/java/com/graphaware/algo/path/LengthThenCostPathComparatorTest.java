@@ -56,6 +56,8 @@ public class LengthThenCostPathComparatorTest {
 
         Transaction tx = database.beginTx();
         try {
+            database.createNode(); //id=0
+
             one = database.createNode();
             Node two = database.createNode();
             three = database.createNode();
@@ -87,13 +89,15 @@ public class LengthThenCostPathComparatorTest {
 
     @Test
     public void shouldCorrectlyOrderPaths() {
-        List<Path> paths = Iterables.toList(new AllPaths(10, Traversal.expanderForAllTypes(Direction.OUTGOING)).findAllPaths(one, three));
-        Collections.sort(paths, new LengthThenCostPathComparator(COST));
+        try (Transaction tx = database.beginTx()) {
+            List<Path> paths = Iterables.toList(new AllPaths(10, Traversal.expanderForAllTypes(Direction.OUTGOING)).findAllPaths(one, three));
+            Collections.sort(paths, new LengthThenCostPathComparator(COST));
 
-        assertEquals(4, paths.size());
-        assertEquals("(1)--[TEST,0]-->(2)--[TEST,1]-->(3)", paths.get(0).toString());
-        assertEquals("(1)--[TEST,2]-->(4)--[TEST,5]-->(2)--[TEST,1]-->(3)", paths.get(1).toString());
-        assertEquals("(1)--[TEST,2]-->(4)--[TEST,3]-->(5)--[TEST,4]-->(3)", paths.get(2).toString());
-        assertEquals("(1)--[TEST,6]-->(6)--[TEST,7]-->(7)--[TEST,8]-->(3)", paths.get(3).toString());
+            assertEquals(4, paths.size());
+            assertEquals("(1)--[TEST,0]-->(2)--[TEST,1]-->(3)", paths.get(0).toString());
+            assertEquals("(1)--[TEST,2]-->(4)--[TEST,5]-->(2)--[TEST,1]-->(3)", paths.get(1).toString());
+            assertEquals("(1)--[TEST,2]-->(4)--[TEST,3]-->(5)--[TEST,4]-->(3)", paths.get(2).toString());
+            assertEquals("(1)--[TEST,6]-->(6)--[TEST,7]-->(7)--[TEST,8]-->(3)", paths.get(3).toString());
+        }
     }
 }
