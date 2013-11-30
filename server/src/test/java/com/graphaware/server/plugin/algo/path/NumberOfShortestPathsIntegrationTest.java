@@ -65,8 +65,8 @@ public class NumberOfShortestPathsIntegrationTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
-        Transaction tx = database.beginTx();
-        try {
+        try (Transaction tx = database.beginTx()) {
+            database.createNode(); //ID = 0
             one = database.createNode();
             Node two = database.createNode();
             three = database.createNode();
@@ -82,8 +82,6 @@ public class NumberOfShortestPathsIntegrationTest {
             four.createRelationshipTo(two, RelTypes.R1).setProperty(COST, 1);
 
             tx.success();
-        } finally {
-            tx.finish();
         }
 
         bootstrapper = new WrappingNeoServerBootstrapper((AbstractGraphDatabase) database);

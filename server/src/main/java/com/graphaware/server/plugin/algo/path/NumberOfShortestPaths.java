@@ -59,25 +59,27 @@ public class NumberOfShortestPaths extends ServerPlugin {
             @Description("The name of relationship property indicating its weight/cost. If omitted, result isn't sorted by total path weights. If the property is missing for a relationship, Integer.MAX_VALUE is used.")
             @Parameter(name = "weight", optional = true) String weightProperty) {
 
-        PathExpander expander;
-        if (types == null) {
-            expander = Traversal.pathExpanderForAllTypes();
-        } else {
-            Expander relationshipExpander = Traversal.emptyExpander();
-            for (String type : types) {
-                relationshipExpander = relationshipExpander.add(DynamicRelationshipType.withName(type));
+        try (Transaction tx = source.getGraphDatabase().beginTx()) {
+            PathExpander expander;
+            if (types == null) {
+                expander = PathExpanders.allTypesAndDirections();
+            } else {
+                Expander relationshipExpander = Traversal.emptyExpander();
+                for (String type : types) {
+                    relationshipExpander = relationshipExpander.add(DynamicRelationshipType.withName(type));
+                }
+                expander = StandardExpander.toPathExpander(relationshipExpander);
             }
-            expander = StandardExpander.toPathExpander(relationshipExpander);
+
+            noResults = noResults == null ? 10 : noResults;
+
+            List<Path> paths = new NumberOfShortestPathsFinder(depth == null ? 3 : depth, noResults, expander).findPaths(source, target);
+
+            if (weightProperty != null) {
+                Collections.sort(paths, new LengthThenCostPathComparator(weightProperty));
+            }
+
+            return paths.subList(0, Math.min(noResults, paths.size()));
         }
-
-        noResults = noResults == null ? 10 : noResults;
-
-        List<Path> paths = new NumberOfShortestPathsFinder(depth == null ? 3 : depth, noResults, expander).findPaths(source, target);
-
-        if (weightProperty != null) {
-            Collections.sort(paths, new LengthThenCostPathComparator(weightProperty));
-        }
-
-        return paths.subList(0, Math.min(noResults, paths.size()));
     }
 }

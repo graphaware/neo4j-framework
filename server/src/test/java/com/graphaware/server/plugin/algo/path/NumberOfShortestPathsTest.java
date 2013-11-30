@@ -27,6 +27,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.neo4j.helpers.collection.Iterables.*;
 
 /**
  * Unit test for {@link com.graphaware.server.plugin.algo.path.NumberOfShortestPaths}.
@@ -55,8 +56,9 @@ public class NumberOfShortestPathsTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
-        Transaction tx = database.beginTx();
-        try {
+        try (Transaction tx = database.beginTx()) {
+            database.createNode(); //ID = 0
+
             one = database.createNode();
             Node two = database.createNode();
             three = database.createNode();
@@ -71,8 +73,6 @@ public class NumberOfShortestPathsTest {
             four.createRelationshipTo(two, RelTypes.R1).setProperty(COST, 1);
 
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
@@ -83,37 +83,45 @@ public class NumberOfShortestPathsTest {
 
     @Test
     public void noPathsShouldBeReturnedWhenThereIsNoPath() {
-        assertEquals(0, Iterables.toList(plugin.paths(one, three, new String[]{"R2"}, 5, null, null)).size());
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(0, toList(plugin.paths(one, three, new String[]{"R2"}, 5, null, null)).size());
+        }
     }
 
     @Test
     public void noPathsShouldBeFoundWhenTraversalDepthIsTooSmall() {
-        assertEquals(0, Iterables.toList(plugin.paths(one, three, new String[]{"R1"}, 2, 10, null)).size());
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(0, toList(plugin.paths(one, three, new String[]{"R1"}, 2, 10, null)).size());
+        }
     }
 
     @Test
     public void allShortestPathsShouldBeReturned() {
-        List<Path> paths = Iterables.toList(plugin.paths(one, three, new String[]{"R1"}, 3, 10, null));
-        assertEquals(2, paths.size());
-        assertEquals(3, paths.get(0).length());
-        assertEquals(3, paths.get(1).length());
+        try (Transaction tx = database.beginTx()) {
+            List<Path> paths = toList(plugin.paths(one, three, new String[]{"R1"}, 3, 10, null));
+            assertEquals(2, paths.size());
+            assertEquals(3, paths.get(0).length());
+            assertEquals(3, paths.get(1).length());
 
-        paths = Iterables.toList(plugin.paths(one, three, new String[]{"R1", "R2"}, 3, 10, null));
-        assertEquals(2, paths.size());
-        assertEquals(2, paths.get(0).length());
-        assertEquals(3, paths.get(1).length());
+            paths = toList(plugin.paths(one, three, new String[]{"R1", "R2"}, 3, 10, null));
+            assertEquals(2, paths.size());
+            assertEquals(2, paths.get(0).length());
+            assertEquals(3, paths.get(1).length());
 
-        paths = Iterables.toList(plugin.paths(one, three, null, 3, 10, null));
-        assertEquals(2, paths.size());
-        assertEquals(2, paths.get(0).length());
-        assertEquals(3, paths.get(1).length());
+            paths = toList(plugin.paths(one, three, null, 3, 10, null));
+            assertEquals(2, paths.size());
+            assertEquals(2, paths.get(0).length());
+            assertEquals(3, paths.get(1).length());
+        }
     }
 
     @Test
     public void shouldLimitPaths() {
-        List<Path> paths = Iterables.toList(plugin.paths(one, three, null, 3, 1, null));
-        assertEquals(1, paths.size());
-        assertEquals(2, paths.get(0).length());
+        try (Transaction tx = database.beginTx()) {
+            List<Path> paths = toList(plugin.paths(one, three, null, 3, 1, null));
+            assertEquals(1, paths.size());
+            assertEquals(2, paths.get(0).length());
+        }
     }
 
     /**
@@ -126,8 +134,7 @@ public class NumberOfShortestPathsTest {
      */
     @Test
     public void shouldCorrectlyOrderPaths() {
-        Transaction tx = database.beginTx();
-        try {
+        try (Transaction tx = database.beginTx()) {
             Node six = database.createNode();
             Node seven = database.createNode();
             Node eight = database.createNode();
@@ -142,23 +149,23 @@ public class NumberOfShortestPathsTest {
             nine.createRelationshipTo(three, RelTypes.R1).setProperty(COST, 1);
 
             tx.success();
-        } finally {
-            tx.finish();
         }
 
-        List<Path> paths = Iterables.toList(plugin.paths(one, three, null, null, null, COST));
-        assertEquals(4, paths.size());
-        assertEquals(2, paths.get(0).length());
-        assertEquals(3, paths.get(1).length());
-        assertEquals(3, paths.get(2).length());
-        assertEquals(3, paths.get(3).length());
+        try (Transaction tx = database.beginTx()) {
+            List<Path> paths = toList(plugin.paths(one, three, null, null, null, COST));
+            assertEquals(4, paths.size());
+            assertEquals(2, paths.get(0).length());
+            assertEquals(3, paths.get(1).length());
+            assertEquals(3, paths.get(2).length());
+            assertEquals(3, paths.get(3).length());
 
-        for (Path p : paths) {
-            System.out.println(p.toString());
+            for (Path p : paths) {
+                System.out.println(p.toString());
+            }
+
+            assertEquals(8, toList(paths.get(1).nodes()).get(1).getId());
+            assertEquals(4, toList(paths.get(2).nodes()).get(1).getId());
+            assertEquals(6, toList(paths.get(3).nodes()).get(1).getId());
         }
-
-        assertEquals(8, Iterables.toList(paths.get(1).nodes()).get(1).getId());
-        assertEquals(4, Iterables.toList(paths.get(2).nodes()).get(1).getId());
-        assertEquals(6, Iterables.toList(paths.get(3).nodes()).get(1).getId());
     }
 }
