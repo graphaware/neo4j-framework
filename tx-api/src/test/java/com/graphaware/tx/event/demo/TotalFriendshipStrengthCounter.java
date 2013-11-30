@@ -65,8 +65,10 @@ public class TotalFriendshipStrengthCounter implements TransactionEventHandler<V
             }
         }
 
-        Node root = database.getNodeById(0);
-        root.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (int) root.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0) + delta);
+        if (delta != 0) {  //todo investigate why this is needed!
+            Node root = database.getNodeById(0);
+            root.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (int) root.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0) + delta);
+        }
 
         return null;
     }

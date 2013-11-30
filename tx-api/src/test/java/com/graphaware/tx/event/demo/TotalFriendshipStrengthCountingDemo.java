@@ -19,10 +19,7 @@ package com.graphaware.tx.event.demo;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
 import org.junit.Test;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.tx.event.demo.TotalFriendshipStrengthCounter.*;
@@ -41,6 +38,8 @@ public class TotalFriendshipStrengthCountingDemo {
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
+                database.createNode(); //ID = 0
+
                 Node person1 = database.createNode();
                 Node person2 = database.createNode();
                 Node person3 = database.createNode();
@@ -66,7 +65,9 @@ public class TotalFriendshipStrengthCountingDemo {
             }
         });
 
-        assertEquals(9, database.getNodeById(0).getProperty(TOTAL_FRIENDSHIP_STRENGTH));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(9, database.getNodeById(0).getProperty(TOTAL_FRIENDSHIP_STRENGTH));
+        }
 
         //delete and change some friendships
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
@@ -82,6 +83,8 @@ public class TotalFriendshipStrengthCountingDemo {
             }
         });
 
-        assertEquals(8, database.getNodeById(0).getProperty(TOTAL_FRIENDSHIP_STRENGTH));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(8, database.getNodeById(0).getProperty(TOTAL_FRIENDSHIP_STRENGTH));
+        }
     }
 }

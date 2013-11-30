@@ -210,7 +210,7 @@ public class TransactionSimulatingBatchGraphDatabase implements GraphDatabaseSer
     private class AllNodesIterator extends PrefetchingIterator<Node> implements Iterable<Node> {
 
         private final long highId;
-        private long lastId = 0;
+        private long lastId = -1;
 
         private AllNodesIterator(long highId) {
             this.highId = highId;

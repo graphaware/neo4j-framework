@@ -1098,6 +1098,8 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         database.shutdown();
 
         assertEquals(1, numberOfCommits.get());
+
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(dir));
     }
 
     @Test
@@ -1120,7 +1122,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         Iterable<Node> allNodes = database.getAllNodes();
         assertEquals(2, count(allNodes));
 
-        Iterator<Node> iterator = at(database).getAllNodes().iterator();
+        Iterator<Node> iterator = database.getAllNodes().iterator();
         assertEquals("One", iterator.next().getProperty("name"));
         assertEquals("Two", iterator.next().getProperty("name"));
     }
@@ -1152,7 +1154,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         Iterable<Node> allNodes = database.getAllNodes();
         assertEquals(2, count(allNodes));
 
-        Iterator<Node> iterator = at(database).getAllNodes().iterator();
+        Iterator<Node> iterator = database.getAllNodes().iterator();
         assertEquals("One", iterator.next().getProperty("name"));
         assertEquals("Three", iterator.next().getProperty("name"));
     }

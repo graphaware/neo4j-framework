@@ -160,6 +160,8 @@ public class ChangeLoggingDemo {
         executor.executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(GraphDatabaseService database) {
+                database.createNode(); //ID = 0
+
                 Node node1 = database.createNode();
                 node1.setProperty("name", "One");
 

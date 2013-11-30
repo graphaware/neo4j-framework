@@ -29,6 +29,7 @@ import com.graphaware.tx.executor.single.VoidReturningCallback;
 import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.neo4j.graphdb.*;
@@ -54,7 +55,6 @@ import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 /**
  * Integration test for {@link org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase}.
  */
-@SuppressWarnings("deprecation")
 public class TransactionSimulatingBatchInserterIntegrationTest {
 
     private TransactionSimulatingBatchInserter batchInserter;
@@ -871,12 +871,17 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
     }
 
     @Test
+    @Ignore ("Issue #1595") //todo remove when fixed
     public void shouldBeAbleToChangeCurrentChangedNodeBeforeCommit() {
         createBatchInserter();
         mutateGraph(
                 new BeforeCommitCallback() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
+                        if (!transactionData.mutationsOccurred()) {
+                            return;
+                        }
+
                         Map<Long, Change<Node>> changed = changesToMap(transactionData.getAllChangedNodes());
 
                         Node node = changed.get(1L).getCurrent();
@@ -899,6 +904,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
     }
 
     @Test
+    @Ignore ("Issue #1595") //todo remove when fixed
     public void shouldBeAbleToChangePreviousChangedNodeBeforeCommit() {
         createBatchInserter();
         mutateGraph(

@@ -71,6 +71,11 @@ public class BlogPostDemo {
     public void attemptLoggingDeletedNodes() {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
+        try (Transaction tx = database.beginTx()) {
+            database.createNode();
+            tx.success();
+        }
+
         database.registerTransactionEventHandler(new TransactionEventHandler.Adapter<Void>() {
             @Override
             public Void beforeCommit(TransactionData data) throws Exception {
@@ -91,20 +96,14 @@ public class BlogPostDemo {
             }
         });
 
-        Transaction tx = database.beginTx();
-        try {
+        try (Transaction tx = database.beginTx()) {
             database.getNodeById(0).setProperty("test key", "test value");
             tx.success();
-        } finally {
-            tx.finish();
         }
 
-        tx = database.beginTx();
-        try {
+        try (Transaction tx = database.beginTx()) {
             database.getNodeById(0).delete();
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 }
