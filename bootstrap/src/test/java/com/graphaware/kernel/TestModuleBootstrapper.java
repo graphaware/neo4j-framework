@@ -1,16 +1,16 @@
 package com.graphaware.kernel;
 
-import com.graphaware.framework.GraphAwareFramework;
-import com.graphaware.framework.GraphAwareModuleBootstrapper;
+import com.graphaware.framework.GraphAwareRuntime;
+import com.graphaware.framework.GraphAwareRuntimeModuleBootstrapper;
 import org.neo4j.kernel.configuration.Config;
 
 /**
- * {@link GraphAwareModuleBootstrapper} for {@link TestModule}.
+ * {@link com.graphaware.framework.GraphAwareRuntimeModuleBootstrapper} for {@link TestRuntimeModule}.
  */
-public class TestModuleBootstrapper implements GraphAwareModuleBootstrapper {
+public class TestModuleBootstrapper implements GraphAwareRuntimeModuleBootstrapper {
 
     @Override
-    public void bootstrap(GraphAwareFramework framework, Config config) {
-        framework.registerModule(new TestModule());
+    public void bootstrap(GraphAwareRuntime framework, Config config) {
+        framework.registerModule(new TestRuntimeModule());
     }
 }

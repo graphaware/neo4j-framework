@@ -23,13 +23,13 @@ import com.graphaware.common.strategy.InclusionStrategies;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
- * A {@link GraphAwareFramework} module performing some useful work based on about-to-be-committed transaction data.
+ * A {@link GraphAwareRuntime} module performing some useful work based on about-to-be-committed transaction data.
  */
-public interface GraphAwareModule extends ConfigurationAsString {
+public interface GraphAwareRuntimeModule extends ConfigurationAsString {
 
     /**
-     * Get a human-readable (ideally short) ID of this module. This ID must be unique across all {@link GraphAwareModule}s
-     * used in a single {@link GraphAwareFramework} instance.
+     * Get a human-readable (ideally short) ID of this module. This ID must be unique across all {@link GraphAwareRuntimeModule}s
+     * used in a single {@link GraphAwareRuntime} instance.
      *
      * @return short ID of this module.
      */
@@ -81,7 +81,7 @@ public interface GraphAwareModule extends ConfigurationAsString {
      *
      * @param transactionData data about the soon-to-be-committed transaction. It is already filtered based on {@link #getInclusionStrategies()}.
      * @throws NeedsInitializationException if it detects data is out of sync. {@link #initialize(org.neo4j.graphdb.GraphDatabaseService)}  will be called next
-     *                                      time the {@link GraphAwareFramework} is started. Until then, the module
+     *                                      time the {@link GraphAwareRuntime} is started. Until then, the module
      *                                      should perform on best-effort basis.
      */
     void beforeCommit(ImprovedTransactionData transactionData);

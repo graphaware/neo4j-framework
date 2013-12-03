@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 
 /**
- * Unit test for {@link RelationshipCountModule}. These miscellaneous tests, most of the core logic tests are in
+ * Unit test for {@link RelationshipCountRuntimeModule}. These miscellaneous tests, most of the core logic tests are in
  * {@link com.graphaware.relcount.count.RelationshipCountIntegrationTest}.
  */
 public class RelationshipCountModuleTest {
@@ -32,8 +32,8 @@ public class RelationshipCountModuleTest {
     @Test
     public void sameConfigShouldProduceSameString() {
         RelationshipCountStrategiesImpl strategies = RelationshipCountStrategiesImpl.defaultStrategies();
-        RelationshipCountModule module1 = new RelationshipCountModule(strategies.with(new ThresholdBasedCompactionStrategy(5)).with(IncludeNoNodes.getInstance()));
-        RelationshipCountModule module2 = new RelationshipCountModule(strategies.with(new ThresholdBasedCompactionStrategy(5)).with(IncludeNoNodes.getInstance()));
+        RelationshipCountRuntimeModule module1 = new RelationshipCountRuntimeModule(strategies.with(new ThresholdBasedCompactionStrategy(5)).with(IncludeNoNodes.getInstance()));
+        RelationshipCountRuntimeModule module2 = new RelationshipCountRuntimeModule(strategies.with(new ThresholdBasedCompactionStrategy(5)).with(IncludeNoNodes.getInstance()));
 
         assertEquals(module1.asString(), module2.asString());
     }
@@ -41,8 +41,8 @@ public class RelationshipCountModuleTest {
     @Test
     public void differentConfigShouldProduceDifferentString() {
         RelationshipCountStrategiesImpl strategies = RelationshipCountStrategiesImpl.defaultStrategies();
-        RelationshipCountModule module1 = new RelationshipCountModule(strategies.with(new ThresholdBasedCompactionStrategy(5)));
-        RelationshipCountModule module2 = new RelationshipCountModule(strategies.with(new ThresholdBasedCompactionStrategy(6)));
+        RelationshipCountRuntimeModule module1 = new RelationshipCountRuntimeModule(strategies.with(new ThresholdBasedCompactionStrategy(5)));
+        RelationshipCountRuntimeModule module2 = new RelationshipCountRuntimeModule(strategies.with(new ThresholdBasedCompactionStrategy(6)));
 
         assertNotSame(module1.asString(), module2.asString());
     }

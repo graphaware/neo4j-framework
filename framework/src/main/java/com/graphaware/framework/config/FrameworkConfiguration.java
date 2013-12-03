@@ -16,8 +16,11 @@
 
 package com.graphaware.framework.config;
 
+import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.Label;
+
 /**
- * {@link com.graphaware.framework.GraphAwareFramework} configuration.
+ * {@link com.graphaware.framework.GraphAwareRuntime} configuration.
  */
 public interface FrameworkConfiguration {
 
@@ -26,6 +29,11 @@ public interface FrameworkConfiguration {
      * that users would have a reason to change it.
      */
     public static final String GA_PREFIX = "_GA_";
+
+    /**
+     * Label of the framework root node.
+     */
+    public static final Label GA_ROOT = DynamicLabel.label(GA_PREFIX + "ROOT");
 
     /**
      * Key of a property present on GraphAware internal nodes. This is fixed as there is little chance

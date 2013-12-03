@@ -36,18 +36,18 @@ public class BootstrapIntegrationTest {
 
     @Before
     public void setUp() {
-        TestModule.reset();
+        TestRuntimeModule.reset();
     }
 
     @Test
     public void moduleShouldNotBeInitializedWhenNoConfigProvided() throws InterruptedException {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
-        assertFalse(TestModule.isInitialized());
+        assertFalse(TestRuntimeModule.isInitialized());
 
         database.shutdown();
 
-        assertFalse(TestModule.isInitialized());
+        assertFalse(TestRuntimeModule.isInitialized());
     }
 
     @Test
@@ -59,11 +59,11 @@ public class BootstrapIntegrationTest {
 
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().setConfig(config).newGraphDatabase();
 
-        assertFalse(TestModule.isInitialized());
+        assertFalse(TestRuntimeModule.isInitialized());
 
         database.shutdown();
 
-        assertFalse(TestModule.isInitialized());
+        assertFalse(TestRuntimeModule.isInitialized());
     }
 
     @Test
@@ -75,11 +75,11 @@ public class BootstrapIntegrationTest {
 
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().setConfig(config).newGraphDatabase();
 
-        assertFalse(TestModule.isInitialized());
+        assertFalse(TestRuntimeModule.isInitialized());
 
         database.shutdown();
 
-        assertFalse(TestModule.isInitialized());
+        assertFalse(TestRuntimeModule.isInitialized());
     }
 
     @Test
@@ -91,11 +91,11 @@ public class BootstrapIntegrationTest {
 
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().setConfig(config).newGraphDatabase();
 
-        assertTrue(TestModule.isInitialized());
+        assertTrue(TestRuntimeModule.isInitialized());
 
         database.shutdown();
 
-        assertFalse(TestModule.isInitialized());
+        assertFalse(TestRuntimeModule.isInitialized());
     }
 
     @Test
@@ -107,11 +107,11 @@ public class BootstrapIntegrationTest {
 
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().setConfig(config).newGraphDatabase();
 
-        assertTrue(TestModule.isInitialized());
+        assertTrue(TestRuntimeModule.isInitialized());
 
         database.shutdown();
 
-        assertFalse(TestModule.isInitialized());
+        assertFalse(TestRuntimeModule.isInitialized());
     }
 
     @Test
@@ -124,10 +124,10 @@ public class BootstrapIntegrationTest {
 
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().setConfig(config).newGraphDatabase();
 
-        assertTrue(TestModule.isInitialized());
+        assertTrue(TestRuntimeModule.isInitialized());
 
         database.shutdown();
 
-        assertFalse(TestModule.isInitialized());
+        assertFalse(TestRuntimeModule.isInitialized());
     }
 }

@@ -19,14 +19,14 @@ package com.graphaware.framework.strategy;
 import com.graphaware.common.strategy.IncludeAllNodeProperties;
 import com.graphaware.common.strategy.NodePropertyInclusionStrategy;
 import com.graphaware.common.strategy.PropertyInclusionStrategy;
-import com.graphaware.framework.GraphAwareFramework;
+import com.graphaware.framework.GraphAwareRuntime;
 import com.graphaware.framework.config.FrameworkConfiguration;
 import org.neo4j.graphdb.Node;
 
 /**
  * {@link Node} {@link PropertyInclusionStrategy} that includes arbitrary business / application level
  * properties (up to subclasses to decide which ones), but excludes any
- * {@link GraphAwareFramework}/{@link com.graphaware.framework.GraphAwareModule} internal properties.
+ * {@link com.graphaware.framework.GraphAwareRuntime}/{@link com.graphaware.framework.GraphAwareRuntimeModule} internal properties.
  */
 public class IncludeAllBusinessNodeProperties extends IncludeAllNodeProperties {
 

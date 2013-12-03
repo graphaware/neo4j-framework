@@ -2,11 +2,13 @@ package com.graphaware.relcount.perf;
 
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
 import com.graphaware.common.test.TestUtils;
-import com.graphaware.framework.GraphAwareFramework;
+import com.graphaware.framework.GraphAwareRuntime;
+import com.graphaware.framework.GraphAwareRuntime;
 import com.graphaware.framework.performance.*;
 import com.graphaware.relcount.cache.NodePropertiesDegreeCachingStrategy;
 import com.graphaware.relcount.count.RelationshipCounter;
-import com.graphaware.relcount.module.RelationshipCountModule;
+import com.graphaware.relcount.module.RelationshipCountRuntimeModule;
+import com.graphaware.relcount.module.RelationshipCountRuntimeModule;
 import com.graphaware.relcount.module.RelationshipCountStrategiesImpl;
 import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor;
@@ -37,7 +39,7 @@ public class CountRelationships extends RelcountPerformanceTest {
     private static final int COUNT_NO = 10;
 
     private int lastAvgDegree = 10;
-    private RelationshipCountModule module;
+    private RelationshipCountRuntimeModule module;
 
     enum Serialization {
         SINGLE_PROP,
@@ -100,8 +102,8 @@ public class CountRelationships extends RelcountPerformanceTest {
             strategies = strategies.with(new NodePropertiesDegreeCachingStrategy());
         }
 
-        GraphAwareFramework framework = new GraphAwareFramework(database);
-        module = new RelationshipCountModule(strategies);
+        GraphAwareRuntime framework = new GraphAwareRuntime(database);
+        module = new RelationshipCountRuntimeModule(strategies);
         framework.registerModule(module);
         framework.start();
 

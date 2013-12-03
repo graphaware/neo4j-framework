@@ -28,7 +28,10 @@ import org.neo4j.graphdb.schema.Schema;
 import org.neo4j.graphdb.traversal.BidirectionalTraversalDescription;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.helpers.collection.PrefetchingIterator;
+import org.neo4j.kernel.GraphDatabaseAPI;
+import org.neo4j.kernel.TransactionBuilder;
 import org.neo4j.kernel.impl.nioneo.store.NeoStore;
+import org.neo4j.kernel.impl.nioneo.store.StoreId;
 import org.neo4j.kernel.impl.traversal.MonoDirectionalTraversalDescription;
 
 import java.lang.reflect.Field;
@@ -55,7 +58,7 @@ public class TransactionSimulatingBatchGraphDatabase implements GraphDatabaseSer
 
     public TransactionSimulatingBatchGraphDatabase(GraphDatabaseService database) {
         if (!(database instanceof BatchGraphDatabaseImpl)) {
-            throw new IllegalArgumentException("This wrapper is only intended for BatchGraphDatabaseServiceImpl");
+            throw new IllegalArgumentException("This wrapper is only intended for BatchGraphDatabaseImpl");
         }
         this.wrapped = database;
         batchTransactionData = new BatchTransactionData();
@@ -63,7 +66,7 @@ public class TransactionSimulatingBatchGraphDatabase implements GraphDatabaseSer
 
     public TransactionSimulatingBatchGraphDatabase(GraphDatabaseService database, int commitTxAfterMutations) {
         if (!(database instanceof BatchGraphDatabaseImpl)) {
-            throw new IllegalArgumentException("This wrapper is only intended for BatchGraphDatabaseServiceImpl");
+            throw new IllegalArgumentException("This wrapper is only intended for BatchGraphDatabaseImpl");
         }
         this.wrapped = database;
         batchTransactionData = new BatchTransactionData(commitTxAfterMutations);

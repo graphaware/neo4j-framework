@@ -18,14 +18,14 @@ package com.graphaware.framework.strategy;
 
 import com.graphaware.common.strategy.IncludeAllRelationships;
 import com.graphaware.common.strategy.RelationshipInclusionStrategy;
-import com.graphaware.framework.GraphAwareFramework;
+import com.graphaware.framework.GraphAwareRuntime;
 import com.graphaware.framework.config.FrameworkConfiguration;
 import org.neo4j.graphdb.Relationship;
 
 /**
  * Base-class for all {@link RelationshipInclusionStrategy} that include
  * arbitrary business / application level
- * relationships (up to subclasses to decide which ones), but exclude any {@link GraphAwareFramework}/{@link com.graphaware.framework.GraphAwareModule}
+ * relationships (up to subclasses to decide which ones), but exclude any {@link com.graphaware.framework.GraphAwareRuntime}/{@link com.graphaware.framework.GraphAwareRuntimeModule}
  * internal relationships.
  */
 public class IncludeAllBusinessRelationships extends IncludeAllRelationships {

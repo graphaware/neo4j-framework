@@ -17,7 +17,7 @@
 package com.graphaware.framework;
 
 /**
- * {@link RuntimeException} indicating a {@link GraphAwareModule} needs to be (re-)initialized.
+ * {@link RuntimeException} indicating a {@link GraphAwareRuntimeModule} needs to be (re-)initialized.
  */
 public class NeedsInitializationException extends RuntimeException {
 

@@ -17,7 +17,7 @@
 package com.graphaware.framework.config;
 
 /**
- * Component configurable by {@link com.graphaware.framework.GraphAwareFramework}.
+ * Component configurable by {@link com.graphaware.framework.GraphAwareRuntime}.
  */
 public interface FrameworkConfigured {
 

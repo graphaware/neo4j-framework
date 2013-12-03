@@ -20,21 +20,24 @@ import com.graphaware.framework.config.FrameworkConfiguration;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
 import org.apache.log4j.Logger;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.NotFoundException;
+import org.neo4j.graphdb.*;
+import org.neo4j.kernel.PlaceboTransaction;
 
 import java.util.Collection;
+import java.util.HashMap;
+
+import static com.graphaware.framework.config.FrameworkConfiguration.*;
 
 
 /**
- * {@link BaseGraphAwareFramework} that operates on a {@link org.neo4j.unsafe.batchinsert.BatchInserter}
+ * {@link BaseGraphAwareRuntime} that operates on a {@link org.neo4j.unsafe.batchinsert.BatchInserter}
  * (or more precisely {@link TransactionSimulatingBatchInserter}) rather than {@link org.neo4j.graphdb.GraphDatabaseService}.
  *
- * @see BaseGraphAwareFramework
+ * @see BaseGraphAwareRuntime
  * @see org.neo4j.unsafe.batchinsert.BatchInserter - same limitations apply.
  */
-public class BatchGraphAwareFramework extends BaseGraphAwareFramework {
-    private static final Logger LOG = Logger.getLogger(BatchGraphAwareFramework.class);
+public class BatchGraphAwareRuntime extends BaseGraphAwareRuntime {
+    private static final Logger LOG = Logger.getLogger(BatchGraphAwareRuntime.class);
 
     private final TransactionSimulatingBatchInserter batchInserter;
 
@@ -43,9 +46,8 @@ public class BatchGraphAwareFramework extends BaseGraphAwareFramework {
      *
      * @param batchInserter that the framework should use.
      */
-    public BatchGraphAwareFramework(TransactionSimulatingBatchInserter batchInserter) {
+    public BatchGraphAwareRuntime(TransactionSimulatingBatchInserter batchInserter) {
         this.batchInserter = batchInserter;
-        findRootOrThrowException();
     }
 
     /**
@@ -54,10 +56,9 @@ public class BatchGraphAwareFramework extends BaseGraphAwareFramework {
      * @param batchInserter that the framework should use.
      * @param configuration of the framework.
      */
-    public BatchGraphAwareFramework(TransactionSimulatingBatchInserter batchInserter, FrameworkConfiguration configuration) {
+    public BatchGraphAwareRuntime(TransactionSimulatingBatchInserter batchInserter, FrameworkConfiguration configuration) {
         super(configuration);
         this.batchInserter = batchInserter;
-        findRootOrThrowException();
     }
 
     /**
@@ -73,7 +74,45 @@ public class BatchGraphAwareFramework extends BaseGraphAwareFramework {
      * {@inheritDoc}
      */
     @Override
-    protected void doInitialize(GraphAwareModule module) {
+    protected Transaction startTransaction() {
+        return new Transaction() {
+            @Override
+            public void failure() {
+                //intentionally do nothing, this is a fake tx
+            }
+
+            @Override
+            public void success() {
+                //intentionally do nothing, this is a fake tx
+            }
+
+            @Override
+            public void finish() {
+                //intentionally do nothing, this is a fake tx
+            }
+
+            @Override
+            public void close() {
+                //intentionally do nothing, this is a fake tx
+            }
+
+            @Override
+            public Lock acquireWriteLock(PropertyContainer entity) {
+                throw new UnsupportedOperationException("Fake tx!");
+            }
+
+            @Override
+            public Lock acquireReadLock(PropertyContainer entity) {
+                throw new UnsupportedOperationException("Fake tx!");
+            }
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doInitialize(GraphAwareRuntimeModule module) {
         module.initialize(batchInserter);
     }
 
@@ -81,7 +120,7 @@ public class BatchGraphAwareFramework extends BaseGraphAwareFramework {
      * {@inheritDoc}
      */
     @Override
-    protected void doReinitialize(GraphAwareModule module) {
+    protected void doReinitialize(GraphAwareRuntimeModule module) {
         module.reinitialize(batchInserter);
     }
 
@@ -89,8 +128,8 @@ public class BatchGraphAwareFramework extends BaseGraphAwareFramework {
      * {@inheritDoc}
      */
     @Override
-    protected void doRecordInitialization(final GraphAwareModule module, final String key) {
-        findRootOrThrowException().setProperty(key, CONFIG + module.asString());
+    protected void doRecordInitialization(final GraphAwareRuntimeModule module, final String key) {
+        getOrCreateRoot().setProperty(key, CONFIG + module.asString());
     }
 
     /**
@@ -100,7 +139,7 @@ public class BatchGraphAwareFramework extends BaseGraphAwareFramework {
     protected void removeUnusedModules(final Collection<String> unusedModules) {
         for (String toRemove : unusedModules) {
             LOG.info("Removing unused module " + toRemove + ".");
-            findRootOrThrowException().removeProperty(toRemove);
+            getOrCreateRoot().removeProperty(toRemove);
         }
     }
 
@@ -108,18 +147,21 @@ public class BatchGraphAwareFramework extends BaseGraphAwareFramework {
      * {@inheritDoc}
      */
     @Override
-    protected void forceInitialization(final GraphAwareModule module) {
-        findRootOrThrowException().setProperty(moduleKey(module), FORCE_INITIALIZATION + System.currentTimeMillis());
+    protected void forceInitialization(final GraphAwareRuntimeModule module) {
+        getOrCreateRoot().setProperty(moduleKey(module), FORCE_INITIALIZATION + System.currentTimeMillis());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Node getRoot() {
-        if (!batchInserter.nodeExists(0)) {
-            throw new NotFoundException();
+    protected Node getOrCreateRoot() {
+        for (long candidate : batchInserter.getAllNodes()) {
+            if (batchInserter.nodeHasLabel(candidate, GA_ROOT)) {
+                return new BatchInserterNode(candidate, batchInserter);
+            }
         }
-        return new BatchInserterNode(0, batchInserter);
+
+        return new BatchInserterNode(batchInserter.createNode(new HashMap<String, Object>(), GA_ROOT), batchInserter);
     }
 }

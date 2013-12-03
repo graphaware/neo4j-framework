@@ -17,7 +17,7 @@
 package com.graphaware.framework.config;
 
 /**
- * Default {@link FrameworkConfiguration} for {@link com.graphaware.framework.GraphAwareFramework}. Singleton.
+ * Default {@link FrameworkConfiguration} for {@link com.graphaware.framework.GraphAwareRuntime}. Singleton.
  */
 public final class DefaultFrameworkConfiguration extends BaseFrameworkConfiguration {
 

@@ -2,7 +2,7 @@ package com.graphaware.relcount.module;
 
 import com.graphaware.common.change.Change;
 import com.graphaware.common.strategy.InclusionStrategies;
-import com.graphaware.framework.GraphAwareModule;
+import com.graphaware.framework.GraphAwareRuntimeModule;
 import com.graphaware.framework.config.BaseFrameworkConfigured;
 import com.graphaware.framework.config.FrameworkConfiguration;
 import com.graphaware.framework.config.FrameworkConfigured;
@@ -29,15 +29,15 @@ import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
 /**
- * {@link com.graphaware.framework.GraphAwareModule} providing caching capabilities for full relationship counting.
+ * {@link com.graphaware.framework.GraphAwareRuntimeModule} providing caching capabilities for full relationship counting.
  * "Full" means it cares about {@link org.neo4j.graphdb.RelationshipType}s, {@link org.neo4j.graphdb.Direction}s,
  * and properties.
  * <p/>
- * Once registered with {@link com.graphaware.framework.GraphAwareFramework}, relationship
+ * Once registered with {@link com.graphaware.framework.GraphAwareRuntime}, relationship
  * counts will be cached on nodes properties. {@link com.graphaware.relcount.count.CachedRelationshipCounter} or {@link com.graphaware.relcount.count.FallbackRelationshipCounter} can then be used to
  * count relationships by querying these cached counts.
  */
-public class RelationshipCountModule extends BaseFrameworkConfigured implements GraphAwareModule, FrameworkConfigured {
+public class RelationshipCountRuntimeModule extends BaseFrameworkConfigured implements GraphAwareRuntimeModule, FrameworkConfigured {
 
     /**
      * Default ID of this module used to identify metadata written by this module.
@@ -50,33 +50,33 @@ public class RelationshipCountModule extends BaseFrameworkConfigured implements 
 
     /**
      * Create a module with default ID and configuration. Use this constructor when you wish to register a single
-     * instance of the module with {@link com.graphaware.framework.GraphAwareFramework} and you are happy with
+     * instance of the module with {@link com.graphaware.framework.GraphAwareRuntime} and you are happy with
      * the default configuration (see {@link RelationshipCountStrategiesImpl#defaultStrategies()}).
      */
-    public RelationshipCountModule() {
+    public RelationshipCountRuntimeModule() {
         this(FULL_RELCOUNT_DEFAULT_ID, RelationshipCountStrategiesImpl.defaultStrategies());
     }
 
     /**
      * Create a module with default ID and custom configuration. Use this constructor when you wish to register a single
-     * instance of the module with {@link com.graphaware.framework.GraphAwareFramework} and you want to provide
+     * instance of the module with {@link com.graphaware.framework.GraphAwareRuntime} and you want to provide
      * custom {@link RelationshipCountStrategies}. This could be the case, for instance, when you would like to exclude
      * certain {@link org.neo4j.graphdb.Relationship}s from being counted at all ({@link com.graphaware.common.strategy.RelationshipInclusionStrategy}),
      * certain properties from being considered at all ({@link com.graphaware.common.strategy.RelationshipPropertyInclusionStrategy}),
      * weigh each relationship differently ({@link com.graphaware.relcount.count.WeighingStrategy},
      * or use a custom threshold for compaction.
      */
-    public RelationshipCountModule(RelationshipCountStrategies relationshipCountStrategies) {
+    public RelationshipCountRuntimeModule(RelationshipCountStrategies relationshipCountStrategies) {
         this(FULL_RELCOUNT_DEFAULT_ID, relationshipCountStrategies);
     }
 
     /**
      * Create a module with a custom ID and configuration. Use this constructor when you wish to register a multiple
-     * instances of the module with {@link com.graphaware.framework.GraphAwareFramework} and you want to provide
+     * instances of the module with {@link com.graphaware.framework.GraphAwareRuntime} and you want to provide
      * custom {@link RelationshipCountStrategies} for each one of them. This could be the case, for instance, when you
      * would like to keep two different kinds of relationships, weighted and unweighted.
      */
-    public RelationshipCountModule(String id, RelationshipCountStrategies relationshipCountStrategies) {
+    public RelationshipCountRuntimeModule(String id, RelationshipCountStrategies relationshipCountStrategies) {
         this.id = id;
         this.relationshipCountStrategies = relationshipCountStrategies;
         this.relationshipCountCache = new NodeBasedDegreeCache(id, relationshipCountStrategies);

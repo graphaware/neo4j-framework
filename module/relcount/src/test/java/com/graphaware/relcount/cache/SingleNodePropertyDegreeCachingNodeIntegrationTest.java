@@ -21,7 +21,7 @@ import com.graphaware.relcount.count.CachedRelationshipCounter;
 import com.graphaware.relcount.count.RelationshipCounter;
 import com.graphaware.relcount.module.RelationshipCountStrategiesImpl;
 
-import static com.graphaware.relcount.module.RelationshipCountModule.FULL_RELCOUNT_DEFAULT_ID;
+import static com.graphaware.relcount.module.RelationshipCountRuntimeModule.FULL_RELCOUNT_DEFAULT_ID;
 
 /**
  * Integration test for {@link com.graphaware.relcount.cache.DegreeCachingNode} with {@link SingleNodePropertyDegreeCachingStrategy}.

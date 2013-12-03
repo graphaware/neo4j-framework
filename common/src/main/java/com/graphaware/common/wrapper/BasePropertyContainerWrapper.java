@@ -107,6 +107,20 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
     //The following methods intentionally break object-orientation a bit to keep the rest of the codebase DRY:
 
     /**
+     * @see {@link Node#hasLabel(org.neo4j.graphdb.Label)}.
+     */
+    public boolean hasLabel(Label label) {
+        return getWrappedNode().hasLabel(label);
+    }
+
+    /**
+     * @see {@link Node#hasLabel(org.neo4j.graphdb.Label)}.
+     */
+    public Iterable<Label> getLabels() {
+        return getWrappedNode().getLabels();
+    }
+
+    /**
      * @see {@link Node#addLabel(org.neo4j.graphdb.Label)}.
      */
     public void addLabel(Label label) {

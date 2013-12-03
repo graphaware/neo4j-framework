@@ -16,28 +16,20 @@
 
 package com.graphaware.kernel;
 
-import com.graphaware.framework.GraphAwareFramework;
-import com.graphaware.framework.GraphAwareModuleBootstrapper;
-import com.graphaware.framework.config.DefaultFrameworkConfiguration;
+import com.graphaware.framework.GraphAwareRuntime;
+import com.graphaware.framework.GraphAwareRuntimeModuleBootstrapper;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.AvailabilityGuard;
 import org.neo4j.kernel.InternalAbstractGraphDatabase;
 import org.neo4j.kernel.configuration.Config;
-import org.neo4j.kernel.extension.KernelExtensionListener;
-import org.neo4j.kernel.extension.KernelExtensions;
-import org.neo4j.kernel.impl.core.NodeManager;
-import org.neo4j.kernel.lifecycle.LifeSupport;
 import org.neo4j.kernel.lifecycle.Lifecycle;
-import org.neo4j.kernel.lifecycle.LifecycleListener;
-import org.neo4j.kernel.lifecycle.LifecycleStatus;
 
 import java.lang.reflect.Field;
 import java.util.Map;
-import java.util.concurrent.Executors;
 
 /**
- * Extension that initializes the {@link com.graphaware.framework.GraphAwareFramework}.
+ * Extension that initializes the {@link com.graphaware.framework.GraphAwareRuntime}.
  */
 public class GraphAwareExtension implements Lifecycle {
     private static final Logger LOG = Logger.getLogger(GraphAwareExtension.class);
@@ -48,7 +40,7 @@ public class GraphAwareExtension implements Lifecycle {
     private final Config config;
     private final GraphDatabaseService database;
 
-    private GraphAwareFramework framework;
+    private GraphAwareRuntime framework;
 
     public GraphAwareExtension(Config config, GraphDatabaseService database) {
         this.config = config;
@@ -71,7 +63,7 @@ public class GraphAwareExtension implements Lifecycle {
 
         LOG.info("GraphAware Framework enabled, bootstrapping...");
 
-        framework = new GraphAwareFramework(database, DefaultFrameworkConfiguration.getInstance());
+        framework = new GraphAwareRuntime(database);
 
         for (String paramKey : params.keySet()) {
             if (paramKey.matches(MODULE_ENABLE_REGEX)) {
@@ -79,7 +71,7 @@ public class GraphAwareExtension implements Lifecycle {
                 LOG.info("Bootstrapping module with key " + paramKey + ", using " + paramValue);
 
                 try {
-                    GraphAwareModuleBootstrapper bootstrapper = (GraphAwareModuleBootstrapper) Class.forName(paramValue).newInstance();
+                    GraphAwareRuntimeModuleBootstrapper bootstrapper = (GraphAwareRuntimeModuleBootstrapper) Class.forName(paramValue).newInstance();
                     bootstrapper.bootstrap(framework, config);
                 } catch (Exception e) {
                     LOG.error("Unable to bootstrap module " + paramKey, e);

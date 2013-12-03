@@ -32,23 +32,24 @@ import static org.mockito.Mockito.when;
 /**
  * Base-class for framework tests.
  */
-public abstract class BaseGraphAwareFrameworkTest {
+public abstract class BaseGraphAwareRuntimeTest {
 
     protected static final String TEST_CONFIG = "test config";
     protected static final String MOCK = "MOCK";
 
-    protected GraphAwareModule createMockModule() {
-        GraphAwareModule mockModule = mock(GraphAwareModule.class);
+    protected GraphAwareRuntimeModule createMockModule() {
+        GraphAwareRuntimeModule mockModule = mock(GraphAwareRuntimeModule.class);
         when(mockModule.getId()).thenReturn(MOCK);
         when(mockModule.asString()).thenReturn(TEST_CONFIG);
+        when(mockModule.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
         return mockModule;
     }
 
-    protected interface FrameworkConfiguredModule extends GraphAwareModule, FrameworkConfigured {
+    protected interface FrameworkConfiguredRuntimeModule extends GraphAwareRuntimeModule, FrameworkConfigured {
 
     }
 
-    protected class RealFrameworkConfiguredModule extends BaseFrameworkConfigured implements FrameworkConfiguredModule {
+    protected class RealFrameworkConfiguredRuntimeModule extends BaseFrameworkConfigured implements FrameworkConfiguredRuntimeModule {
 
         //make public
         @Override
@@ -100,10 +101,5 @@ public abstract class BaseGraphAwareFrameworkTest {
         public InclusionStrategies getInclusionStrategies() {
             return InclusionStrategiesImpl.all();
         }
-    }
-
-    protected class CustomConfig extends BaseFrameworkConfiguration implements FrameworkConfiguration {
-
-      //todo pointless
     }
 }

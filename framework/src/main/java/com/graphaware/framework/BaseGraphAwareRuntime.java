@@ -24,8 +24,9 @@ import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import com.graphaware.common.util.PropertyContainerUtils;
 import org.apache.log4j.Logger;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.NotFoundException;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.ErrorState;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.graphdb.event.TransactionData;
@@ -33,20 +34,22 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
 
 import java.util.*;
 
+import static com.graphaware.framework.config.FrameworkConfiguration.*;
+
 
 /**
- * Framework that delegates to registered {@link GraphAwareModule}s to perform useful work.
+ * Framework that delegates to registered {@link GraphAwareRuntimeModule}s to perform useful work.
  * There must be exactly one instance of this framework for a single {@link org.neo4j.graphdb.GraphDatabaseService}.
  * <p/>
  * The framework registers itself as a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler},
  * translates {@link org.neo4j.graphdb.event.TransactionData} into {@link com.graphaware.tx.event.improved.api.ImprovedTransactionData}
- * and lets registered {@link GraphAwareModule}s deal with the data before each transaction
+ * and lets registered {@link GraphAwareRuntimeModule}s deal with the data before each transaction
  * commits, in the order the modules were registered.
  * <p/>
  * After all desired modules have been registered, {@link #start()} must be called before anything gets written into the
  * database. No more modules can be registered thereafter.
  * <p/>
- * Every new {@link GraphAwareModule} and every {@link GraphAwareModule}
+ * Every new {@link GraphAwareRuntimeModule} and every {@link GraphAwareRuntimeModule}
  * whose configuration has changed since the last run will be forced to (re-)initialize, which can lead to very long
  * startup times, as (re-)initialization could be a global graph operation. Re-initialization will also be automatically
  * performed for all modules, for which it has been detected that something is out-of-sync
@@ -56,23 +59,23 @@ import java.util.*;
  * need to be used by the application, nor does it need to be connected to any other node, but it needs to be present
  * in the database.
  */
-public abstract class BaseGraphAwareFramework implements TransactionEventHandler<Void>, KernelEventHandler {
+public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<Void>, KernelEventHandler {
     static final String FORCE_INITIALIZATION = "FORCE_INIT:";
     static final String CONFIG = "CONFIG:";
 
-    public static final String CORE = "CORE";
+    public static final String RUNTIME = "RUNTIME";
 
-    private static final Logger LOG = Logger.getLogger(BaseGraphAwareFramework.class);
+    private static final Logger LOG = Logger.getLogger(BaseGraphAwareRuntime.class);
 
     private final FrameworkConfiguration configuration;
-    private final List<GraphAwareModule> modules = new LinkedList<>();
+    private final List<GraphAwareRuntimeModule> modules = new LinkedList<>();
 
     private volatile boolean started;
 
     /**
      * Create a new instance of the framework with {@link DefaultFrameworkConfiguration}.
      */
-    public BaseGraphAwareFramework() {
+    public BaseGraphAwareRuntime() {
         this(DefaultFrameworkConfiguration.getInstance());
     }
 
@@ -81,22 +84,22 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
      *
      * @param configuration of the framework.
      */
-    public BaseGraphAwareFramework(FrameworkConfiguration configuration) {
+    public BaseGraphAwareRuntime(FrameworkConfiguration configuration) {
         this.configuration = configuration;
     }
 
     /**
-     * Register a {@link GraphAwareModule}. Note that modules are delegated to in the order
+     * Register a {@link GraphAwareRuntimeModule}. Note that modules are delegated to in the order
      * they are registered.
      *
      * @param module to register.
      */
-    public final synchronized void registerModule(GraphAwareModule module) {
+    public final synchronized void registerModule(GraphAwareRuntimeModule module) {
         registerModule(module, false);
     }
 
     /**
-     * Register a {@link GraphAwareModule} and optionally force its (re-)initialization.
+     * Register a {@link GraphAwareRuntimeModule} and optionally force its (re-)initialization.
      * <p/>
      * Forcing re-initialization should only be necessary in exceptional circumstances, such as that the database has
      * been written to without the module being registered / framework running. Re-initialization can be a very
@@ -111,7 +114,7 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
      * @param module              to register.
      * @param forceInitialization true to force (re-)initialization.
      */
-    public final synchronized void registerModule(GraphAwareModule module, boolean forceInitialization) {
+    public final synchronized void registerModule(GraphAwareRuntimeModule module, boolean forceInitialization) {
         if (started) {
             LOG.error("Modules must be registered before GraphAware is started!");
             throw new IllegalStateException("Modules must be registered before GraphAware is started!");
@@ -137,12 +140,12 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
      * @param module to check.
      * @throws IllegalStateException in case the module is already registered.
      */
-    private void checkNotAlreadyRegistered(GraphAwareModule module) {
+    private void checkNotAlreadyRegistered(GraphAwareRuntimeModule module) {
         if (modules.contains(module)) {
             throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
         }
 
-        for (GraphAwareModule existing : modules) {
+        for (GraphAwareRuntimeModule existing : modules) {
             if (existing.getId().equals(module.getId())) {
                 throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
             }
@@ -199,13 +202,13 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
             return null;
         }
 
-        if (data.isDeleted(getRoot())) {
-            throw new IllegalStateException("Deleting node with ID=0 is not allowed by GraphAware!");
+        if (data.isDeleted(getOrCreateRoot())) {
+            throw new IllegalStateException("Attempted to delete GraphAware Runtime root node!");
         }
 
         LazyTransactionData lazyTransactionData = new LazyTransactionData(data);
 
-        for (GraphAwareModule module : modules) {
+        for (GraphAwareRuntimeModule module : modules) {
             FilteredTransactionData filteredTransactionData = new FilteredTransactionData(lazyTransactionData, module.getInclusionStrategies());
 
             if (!filteredTransactionData.mutationsOccurred()) {
@@ -216,7 +219,7 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
                 module.beforeCommit(filteredTransactionData);
             } catch (NeedsInitializationException e) {
                 LOG.warn("Module " + module.getId() + " seems to have a problem and will be re-initialized next time the database is started. ");
-                if (!findRootOrThrowException().getProperty(moduleKey(module)).toString().startsWith(FORCE_INITIALIZATION)) {
+                if (!getOrCreateRoot().getProperty(moduleKey(module)).toString().startsWith(FORCE_INITIALIZATION)) {
                     forceInitialization(module);
                 }
             } catch (RuntimeException e) {
@@ -244,56 +247,67 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
     }
 
     /**
+     * Start a database transaction.
+     *
+     * @return tx.
+     */
+    protected abstract Transaction startTransaction();
+
+    /**
      * Initialize modules if needed.
      * <p/>
      * Metadata about modules is stored as properties on the root node (node with ID = 0) in the form of
-     * {@link com.graphaware.framework.config.FrameworkConfiguration#GA_PREFIX}{@link #CORE}_{@link GraphAwareModule#getId()}
+     * {@link com.graphaware.framework.config.FrameworkConfiguration#GA_PREFIX}{@link #RUNTIME}_{@link GraphAwareRuntimeModule#getId()}
      * as key and one of the following as value:
-     * - {@link #CONFIG} + {@link GraphAwareModule#asString()} capturing the last configuration
+     * - {@link #CONFIG} + {@link GraphAwareRuntimeModule#asString()} capturing the last configuration
      * the module has been run with
      * - {@link #FORCE_INITIALIZATION} + timestamp indicating the module should be re-initialized.
      */
     private void initializeModules() {
-        final Node root = findRootOrThrowException();
-        final Map<String, Object> moduleMetadata = getInternalProperties(root);
-        final Collection<String> unusedModules = new HashSet<>(moduleMetadata.keySet());
+        try (Transaction tx = startTransaction()) {
+            final Node root = getOrCreateRoot();
+            final Map<String, Object> moduleMetadata = getInternalProperties(root);
+            final Collection<String> unusedModules = new HashSet<>(moduleMetadata.keySet());
 
-        for (final GraphAwareModule module : modules) {
-            final String key = moduleKey(module);
-            unusedModules.remove(key);
+            for (final GraphAwareRuntimeModule module : modules) {
+                final String key = moduleKey(module);
+                unusedModules.remove(key);
 
-            if (!moduleMetadata.containsKey(key)) {
-                LOG.info("Module " + module.getId() + " seems to have been registered for the first time, will initialize...");
-                initializeModule(module);
-                continue;
+                if (!moduleMetadata.containsKey(key)) {
+                    LOG.info("Module " + module.getId() + " seems to have been registered for the first time, will initialize...");
+                    initializeModule(module);
+                    continue;
 
-            }
-
-            String value = (String) moduleMetadata.get(key);
-
-            if (value.startsWith(CONFIG)) {
-                if (!value.replaceFirst(CONFIG, "").equals(module.asString())) {
-                    LOG.info("Module " + module.getId() + " seems to have changed configuration since last run, will re-initialize...");
-                    reinitializeModule(module);
-                } else {
-                    LOG.info("Module " + module.getId() + " has not changed configuration since last run, already initialized.");
                 }
-                continue;
+
+                String value = (String) moduleMetadata.get(key);
+
+                if (value.startsWith(CONFIG)) {
+                    if (!value.replaceFirst(CONFIG, "").equals(module.asString())) {
+                        LOG.info("Module " + module.getId() + " seems to have changed configuration since last run, will re-initialize...");
+                        reinitializeModule(module);
+                    } else {
+                        LOG.info("Module " + module.getId() + " has not changed configuration since last run, already initialized.");
+                    }
+                    continue;
+                }
+
+                if (value.startsWith(FORCE_INITIALIZATION)) {
+                    LOG.info("Module " + module.getId() + " has been marked for re-initialization on "
+                            + new Date(Long.valueOf(value.replace(FORCE_INITIALIZATION, ""))).toString() + ". Will re-initialize...");
+                    reinitializeModule(module);
+                    continue;
+
+                }
+
+                LOG.fatal("Corrupted module info: " + value + " is not a valid value!");
+                throw new IllegalStateException("Corrupted module info: " + value + " is not a valid value");
             }
 
-            if (value.startsWith(FORCE_INITIALIZATION)) {
-                LOG.info("Module " + module.getId() + " has been marked for re-initialization on "
-                        + new Date(Long.valueOf(value.replace(FORCE_INITIALIZATION, ""))).toString() + ". Will re-initialize...");
-                reinitializeModule(module);
-                continue;
+            removeUnusedModules(unusedModules);
 
-            }
-
-            LOG.fatal("Corrupted module info: " + value + " is not a valid value!");
-            throw new IllegalStateException("Corrupted module info: " + value + " is not a valid value");
+            tx.success();
         }
-
-        removeUnusedModules(unusedModules);
     }
 
     /**
@@ -301,7 +315,7 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
      *
      * @param module to initialize.
      */
-    private void initializeModule(final GraphAwareModule module) {
+    private void initializeModule(final GraphAwareRuntimeModule module) {
         doInitialize(module);
         recordInitialization(module);
     }
@@ -311,14 +325,14 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
      *
      * @param module to initialize.
      */
-    protected abstract void doInitialize(GraphAwareModule module);
+    protected abstract void doInitialize(GraphAwareRuntimeModule module);
 
     /**
      * Re-initialize a module and capture that fact on the as a root node's property.
      *
      * @param module to initialize.
      */
-    private void reinitializeModule(final GraphAwareModule module) {
+    private void reinitializeModule(final GraphAwareRuntimeModule module) {
         doReinitialize(module);
         recordInitialization(module);
     }
@@ -328,14 +342,14 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
      *
      * @param module to initialize.
      */
-    protected abstract void doReinitialize(GraphAwareModule module);
+    protected abstract void doReinitialize(GraphAwareRuntimeModule module);
 
     /**
      * Capture the fact the a module has been (re-)initialized as a root node's property.
      *
      * @param module that has been initialized.
      */
-    private void recordInitialization(final GraphAwareModule module) {
+    private void recordInitialization(final GraphAwareRuntimeModule module) {
         final String key = moduleKey(module);
         doRecordInitialization(module, key);
     }
@@ -346,7 +360,7 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
      * @param module that has been initialized.
      * @param key    of the property to set.
      */
-    protected abstract void doRecordInitialization(final GraphAwareModule module, final String key);
+    protected abstract void doRecordInitialization(final GraphAwareRuntimeModule module, final String key);
 
     /**
      * Remove unused modules.
@@ -356,7 +370,7 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
     protected abstract void removeUnusedModules(final Collection<String> unusedModules);
 
     /**
-     * Get properties starting with {@link com.graphaware.framework.config.FrameworkConfiguration#GA_PREFIX} + {@link #CORE} from a node.
+     * Get properties starting with {@link com.graphaware.framework.config.FrameworkConfiguration#GA_PREFIX} + {@link #RUNTIME} from a node.
      *
      * @param node to get properties from.
      * @return map of properties (key-value).
@@ -365,7 +379,7 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
         return PropertyContainerUtils.propertiesToObjectMap(node, new InclusionStrategy<String>() {
             @Override
             public boolean include(String s) {
-                return s.startsWith(configuration.createPrefix(CORE));
+                return s.startsWith(configuration.createPrefix(RUNTIME));
             }
 
             @Override
@@ -381,8 +395,8 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
      * @param module to build a key for.
      * @return module key.
      */
-    protected final String moduleKey(GraphAwareModule module) {
-        return configuration.createPrefix(CORE) + module.getId();
+    protected final String moduleKey(GraphAwareRuntimeModule module) {
+        return configuration.createPrefix(RUNTIME) + module.getId();
     }
 
     /**
@@ -390,23 +404,7 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
      *
      * @param module to be (re-)initialized next time.
      */
-    protected abstract void forceInitialization(final GraphAwareModule module);
-
-    /**
-     * Find node with ID = 0, or throw an exception.
-     *
-     * @return root node.
-     * @throws IllegalStateException if the node doesn't exist.
-     */
-    protected final Node findRootOrThrowException() {
-        try {
-            return getRoot();
-        } catch (NotFoundException e) {
-            throw new IllegalStateException("GraphAware Framework needs the root node (ID=0) for its operation. Please" +
-                    " re-create the database and do not delete the root node. There is no need for it to be used in" +
-                    " the application, but it must be present in the database.");
-        }
-    }
+    protected abstract void forceInitialization(final GraphAwareRuntimeModule module);
 
     /**
      * Get the root node.
@@ -415,7 +413,7 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
      * @throws org.neo4j.graphdb.NotFoundException
      *          if root not found.
      */
-    protected abstract Node getRoot();
+    protected abstract Node getOrCreateRoot();
 
     /**
      * {@inheritDoc}
@@ -423,7 +421,7 @@ public abstract class BaseGraphAwareFramework implements TransactionEventHandler
     @Override
     public final void beforeShutdown() {
         LOG.info("Shutting down GraphAware... ");
-        for (GraphAwareModule module : modules) {
+        for (GraphAwareRuntimeModule module : modules) {
             module.shutdown();
         }
         LOG.info("GraphAware shut down.");

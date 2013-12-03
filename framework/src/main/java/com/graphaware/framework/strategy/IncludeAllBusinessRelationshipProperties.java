@@ -25,7 +25,7 @@ import org.neo4j.graphdb.Relationship;
 /**
  * {@link org.neo4j.graphdb.Node} {@link com.graphaware.common.strategy.PropertyInclusionStrategy} that includes arbitrary business / application level
  * properties (up to subclasses to decide which ones), but excludes any
- * {@link com.graphaware.framework.GraphAwareFramework}/{@link com.graphaware.framework.GraphAwareModule} internal properties.
+ * {@link com.graphaware.framework.GraphAwareRuntime}/{@link com.graphaware.framework.GraphAwareRuntimeModule} internal properties.
  */
 public class IncludeAllBusinessRelationshipProperties extends IncludeAllRelationshipProperties {
 

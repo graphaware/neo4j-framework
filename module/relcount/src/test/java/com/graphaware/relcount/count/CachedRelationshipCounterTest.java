@@ -21,10 +21,12 @@ import com.graphaware.common.description.serialize.Serializer;
 import com.graphaware.common.strategy.IncludeNoRelationships;
 import com.graphaware.common.test.TestDataBuilder;
 import com.graphaware.common.util.PropertyContainerUtils;
-import com.graphaware.framework.GraphAwareFramework;
+import com.graphaware.framework.GraphAwareRuntime;
+import com.graphaware.framework.GraphAwareRuntime;
 import com.graphaware.framework.config.DefaultFrameworkConfiguration;
 import com.graphaware.relcount.compact.ThresholdBasedCompactionStrategy;
-import com.graphaware.relcount.module.RelationshipCountModule;
+import com.graphaware.relcount.module.RelationshipCountRuntimeModule;
+import com.graphaware.relcount.module.RelationshipCountRuntimeModule;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.TransactionCallback;
 import com.graphaware.tx.executor.single.TransactionExecutor;
@@ -63,8 +65,8 @@ public class CachedRelationshipCounterTest {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         txExecutor = new SimpleTransactionExecutor(database);
 
-        GraphAwareFramework framework = new GraphAwareFramework(database);
-        framework.registerModule(new RelationshipCountModule(defaultStrategies().with(new ThresholdBasedCompactionStrategy(5))));
+        GraphAwareRuntime framework = new GraphAwareRuntime(database);
+        framework.registerModule(new RelationshipCountRuntimeModule(defaultStrategies().with(new ThresholdBasedCompactionStrategy(5))));
         framework.start();
     }
 
@@ -448,8 +450,8 @@ public class CachedRelationshipCounterTest {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         txExecutor = new SimpleTransactionExecutor(database);
 
-        GraphAwareFramework framework = new GraphAwareFramework(database);
-        framework.registerModule(new RelationshipCountModule(defaultStrategies()
+        GraphAwareRuntime framework = new GraphAwareRuntime(database);
+        framework.registerModule(new RelationshipCountRuntimeModule(defaultStrategies()
                 .with(new ThresholdBasedCompactionStrategy(5))
                 .with(IncludeNoRelationships.getInstance())));
 
@@ -610,6 +612,6 @@ public class CachedRelationshipCounterTest {
     }
 
     private String serialize(RelationshipDescription description) {
-        return Serializer.toString(description, DefaultFrameworkConfiguration.getInstance().createPrefix(RelationshipCountModule.FULL_RELCOUNT_DEFAULT_ID));
+        return Serializer.toString(description, DefaultFrameworkConfiguration.getInstance().createPrefix(RelationshipCountRuntimeModule.FULL_RELCOUNT_DEFAULT_ID));
     }
 }
