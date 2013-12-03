@@ -2,8 +2,8 @@ package com.graphaware.relcount.module;
 
 
 import com.graphaware.common.strategy.*;
-import com.graphaware.framework.strategy.IncludeAllBusinessRelationshipProperties;
-import com.graphaware.framework.strategy.IncludeAllBusinessRelationships;
+import com.graphaware.runtime.strategy.IncludeAllBusinessRelationshipProperties;
+import com.graphaware.runtime.strategy.IncludeAllBusinessRelationships;
 import com.graphaware.relcount.cache.DegreeCachingStrategy;
 import com.graphaware.relcount.cache.SingleNodePropertyDegreeCachingStrategy;
 import com.graphaware.relcount.compact.CompactionStrategy;

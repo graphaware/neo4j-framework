@@ -2,7 +2,7 @@ package com.graphaware.relcount.cache;
 
 import com.graphaware.common.description.predicate.Predicates;
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
-import com.graphaware.framework.NeedsInitializationException;
+import com.graphaware.runtime.NeedsInitializationException;
 import com.graphaware.relcount.compact.CompactionStrategy;
 import com.graphaware.relcount.module.RelationshipCountStrategies;
 import org.junit.Before;

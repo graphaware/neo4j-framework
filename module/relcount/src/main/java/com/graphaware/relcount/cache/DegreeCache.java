@@ -16,7 +16,7 @@
 
 package com.graphaware.relcount.cache;
 
-import com.graphaware.framework.config.FrameworkConfigured;
+import com.graphaware.runtime.config.FrameworkConfigured;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;

@@ -16,13 +16,13 @@
 
 package com.graphaware.relcount.bootstrap;
 
-import com.graphaware.framework.GraphAwareRuntime;
-import com.graphaware.framework.GraphAwareRuntimeModuleBootstrapper;
+import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.GraphAwareRuntimeModuleBootstrapper;
 import com.graphaware.relcount.module.RelationshipCountRuntimeModule;
 import org.neo4j.kernel.configuration.Config;
 
 /**
- * {@link com.graphaware.framework.GraphAwareRuntimeModuleBootstrapper} for {@link com.graphaware.relcount.module.RelationshipCountRuntimeModule}.
+ * {@link com.graphaware.runtime.GraphAwareRuntimeModuleBootstrapper} for {@link com.graphaware.relcount.module.RelationshipCountRuntimeModule}.
  */
 public class RelcountModuleBootstrapper implements GraphAwareRuntimeModuleBootstrapper {
 

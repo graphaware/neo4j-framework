@@ -2,14 +2,12 @@ package com.graphaware.relcount.perf;
 
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
 import com.graphaware.common.test.TestUtils;
-import com.graphaware.framework.GraphAwareRuntime;
-import com.graphaware.framework.GraphAwareRuntime;
-import com.graphaware.framework.performance.*;
+import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.relcount.cache.NodePropertiesDegreeCachingStrategy;
 import com.graphaware.relcount.count.RelationshipCounter;
 import com.graphaware.relcount.module.RelationshipCountRuntimeModule;
-import com.graphaware.relcount.module.RelationshipCountRuntimeModule;
 import com.graphaware.relcount.module.RelationshipCountStrategiesImpl;
+import com.graphaware.runtime.performance.*;
 import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.UnitOfWork;

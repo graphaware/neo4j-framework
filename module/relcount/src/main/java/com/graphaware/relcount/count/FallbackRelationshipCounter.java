@@ -17,8 +17,8 @@
 package com.graphaware.relcount.count;
 
 import com.graphaware.common.description.relationship.RelationshipDescription;
-import com.graphaware.framework.config.DefaultFrameworkConfiguration;
-import com.graphaware.framework.config.FrameworkConfiguration;
+import com.graphaware.runtime.config.DefaultFrameworkConfiguration;
+import com.graphaware.runtime.config.FrameworkConfiguration;
 import com.graphaware.relcount.module.RelationshipCountRuntimeModule;
 import com.graphaware.relcount.module.RelationshipCountStrategies;
 import com.graphaware.relcount.module.RelationshipCountStrategiesImpl;
@@ -30,7 +30,7 @@ import org.neo4j.graphdb.Node;
  * and if that fails (i.e., throws a {@link UnableToCountException}), resorts to {@link NaiveRelationshipCounter}.
  * <p/>
  * It should be used in conjunction with {@link com.graphaware.relcount.module.RelationshipCountRuntimeModule}
- * registered with {@link com.graphaware.framework.GraphAwareRuntime}. The easiest and recommended way to create
+ * registered with {@link com.graphaware.runtime.GraphAwareRuntime}. The easiest and recommended way to create
  * and instance of this counter is by calling {@link com.graphaware.relcount.module.RelationshipCountRuntimeModule#fallbackCounter()}.
  * <p/>
  * This counter always returns a count, never throws {@link UnableToCountException}.
@@ -51,7 +51,7 @@ public class FallbackRelationshipCounter implements RelationshipCounter {
 
     /**
      * Construct a new relationship counter with default settings. Use this constructor when
-     * {@link com.graphaware.framework.GraphAwareRuntime} is used with default configuration, only a single
+     * {@link com.graphaware.runtime.GraphAwareRuntime} is used with default configuration, only a single
      * instance of {@link com.graphaware.relcount.module.RelationshipCountRuntimeModule} is registered, and
      * no custom {@link com.graphaware.relcount.module.RelationshipCountStrategies} are in use. If unsure, it is always easy and correct to instantiate
      * this counter through {@link com.graphaware.relcount.module.RelationshipCountRuntimeModule#fallbackCounter()} .
@@ -65,7 +65,7 @@ public class FallbackRelationshipCounter implements RelationshipCounter {
      * {@link com.graphaware.relcount.module.RelationshipCountRuntimeModule#fallbackCounter()} instead.
      *
      * @param id         of the {@link com.graphaware.relcount.module.RelationshipCountRuntimeModule} used to cache relationship counts.
-     * @param config     used with the {@link com.graphaware.framework.GraphAwareRuntime}.
+     * @param config     used with the {@link com.graphaware.runtime.GraphAwareRuntime}.
      * @param strategies for counting relationships, provided to the {@link com.graphaware.relcount.module.RelationshipCountRuntimeModule}.
      */
     public FallbackRelationshipCounter(String id, FrameworkConfiguration config, RelationshipCountStrategies strategies) {

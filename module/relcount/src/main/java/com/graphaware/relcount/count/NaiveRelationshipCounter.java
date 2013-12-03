@@ -30,7 +30,7 @@ import static org.neo4j.graphdb.Direction.BOTH;
  * A naive {@link RelationshipCounter} that counts matching relationships by inspecting all {@link org.neo4j.graphdb.Node}'s {@link org.neo4j.graphdb.Relationship}s.
  * <p/>
  * Because relationships are counted on the fly (no caching performed), this can be used without the
- * {@link com.graphaware.framework.GraphAwareRuntime} and/or any {@link com.graphaware.framework.GraphAwareRuntimeModule}s.
+ * {@link com.graphaware.runtime.GraphAwareRuntime} and/or any {@link com.graphaware.runtime.GraphAwareRuntimeModule}s.
  * <p/>
  * This counter always returns a count, never throws {@link UnableToCountException}.
  */

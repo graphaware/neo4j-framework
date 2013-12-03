@@ -1,8 +1,8 @@
 package com.graphaware.relcount.cache;
 
 import com.graphaware.common.wrapper.NodeWrapper;
-import com.graphaware.framework.config.DefaultFrameworkConfiguration;
-import com.graphaware.framework.config.FrameworkConfiguration;
+import com.graphaware.runtime.config.DefaultFrameworkConfiguration;
+import com.graphaware.runtime.config.FrameworkConfiguration;
 import com.graphaware.relcount.count.WeighingStrategy;
 import com.graphaware.relcount.module.RelationshipCountStrategies;
 import com.graphaware.relcount.module.RelationshipCountStrategiesImpl;

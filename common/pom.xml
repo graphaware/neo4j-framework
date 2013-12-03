@@ -25,7 +25,7 @@
     <artifactId>common</artifactId>
     <packaging>jar</packaging>
 
-    <name>GraphAware Common Library</name>
+    <name>GraphAware Commons</name>
     <description>Library of useful tested GraphAware code</description>
     <url>http://graphaware.com</url>
 

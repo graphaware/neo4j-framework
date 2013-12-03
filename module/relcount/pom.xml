@@ -36,12 +36,12 @@
         <!-- GraphAware -->
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>framework</artifactId>
+            <artifactId>runtime</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>framework</artifactId>
+            <artifactId>runtime</artifactId>
             <scope>test</scope>
             <classifier>tests</classifier>
         </dependency>

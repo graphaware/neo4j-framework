@@ -1,13 +1,13 @@
 package com.graphaware.kernel;
 
 import com.graphaware.common.strategy.InclusionStrategies;
-import com.graphaware.framework.GraphAwareRuntimeModule;
+import com.graphaware.runtime.GraphAwareRuntimeModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
- * {@link com.graphaware.framework.GraphAwareRuntimeModule} that can tell whether it has been initialized for testing.
+ * {@link com.graphaware.runtime.GraphAwareRuntimeModule} that can tell whether it has been initialized for testing.
  */
 public class TestRuntimeModule implements GraphAwareRuntimeModule {
 

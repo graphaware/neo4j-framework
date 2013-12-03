@@ -1,7 +1,6 @@
 package com.graphaware.relcount.perf;
 
-import com.graphaware.framework.GraphAwareRuntime;
-import com.graphaware.framework.GraphAwareRuntime;
+import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.relcount.module.RelationshipCountRuntimeModule;
 import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor;

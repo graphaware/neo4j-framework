@@ -2,7 +2,7 @@ package com.graphaware.relcount.count;
 
 import com.graphaware.common.strategy.RelationshipInclusionStrategy;
 import com.graphaware.common.strategy.RelationshipPropertyInclusionStrategy;
-import com.graphaware.framework.BatchGraphAwareRuntime;
+import com.graphaware.runtime.BatchGraphAwareRuntime;
 import com.graphaware.relcount.compact.ThresholdBasedCompactionStrategy;
 import com.graphaware.relcount.module.RelationshipCountRuntimeModule;
 import com.graphaware.relcount.module.RelationshipCountStrategiesImpl;

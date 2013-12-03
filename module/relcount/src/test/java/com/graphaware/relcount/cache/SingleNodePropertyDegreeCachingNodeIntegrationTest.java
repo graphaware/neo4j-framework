@@ -16,7 +16,7 @@
 
 package com.graphaware.relcount.cache;
 
-import com.graphaware.framework.config.DefaultFrameworkConfiguration;
+import com.graphaware.runtime.config.DefaultFrameworkConfiguration;
 import com.graphaware.relcount.count.CachedRelationshipCounter;
 import com.graphaware.relcount.count.RelationshipCounter;
 import com.graphaware.relcount.module.RelationshipCountStrategiesImpl;

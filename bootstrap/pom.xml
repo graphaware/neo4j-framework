@@ -25,7 +25,7 @@
     <artifactId>bootstrap</artifactId>
     <packaging>jar</packaging>
 
-    <name>GraphAware Bootstrap</name>
+    <name>GraphAware Runtime Bootstrap</name>
     <description>Bootstrapper for automatic framework registration</description>
     <url>http://graphaware.com</url>
 
@@ -36,7 +36,7 @@
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>framework</artifactId>
+            <artifactId>runtime</artifactId>
         </dependency>
     </dependencies>
 

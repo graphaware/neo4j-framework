@@ -1,7 +1,7 @@
 package com.graphaware.relcount.cache;
 
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
-import com.graphaware.framework.NeedsInitializationException;
+import com.graphaware.runtime.NeedsInitializationException;
 import com.graphaware.relcount.module.RelationshipCountStrategies;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Node;
@@ -94,7 +94,7 @@ public class DegreeCachingNode {
      *
      * @param description of a relationship.
      * @param delta       by how many to decrement.
-     * @throws com.graphaware.framework.NeedsInitializationException
+     * @throws com.graphaware.runtime.NeedsInitializationException
      *          if the total degree of this node with respect to the given relationships becomes negative.
      */
     public void decrementDegree(DetachedRelationshipDescription description, int delta) {

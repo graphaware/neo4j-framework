@@ -16,8 +16,8 @@
 
 package com.graphaware.kernel;
 
-import com.graphaware.framework.GraphAwareRuntime;
-import com.graphaware.framework.GraphAwareRuntimeModuleBootstrapper;
+import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.GraphAwareRuntimeModuleBootstrapper;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.AvailabilityGuard;
@@ -29,7 +29,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
- * Extension that initializes the {@link com.graphaware.framework.GraphAwareRuntime}.
+ * Extension that initializes the {@link com.graphaware.runtime.GraphAwareRuntime}.
  */
 public class GraphAwareExtension implements Lifecycle {
     private static final Logger LOG = Logger.getLogger(GraphAwareExtension.class);

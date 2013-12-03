@@ -32,14 +32,14 @@
         <module>algo</module>
         <module>bootstrap</module>
         <module>common</module>
-        <module>framework</module>
+        <module>runtime</module>
         <module>module</module>
         <module>server</module>
         <module>tx-api</module>
         <module>tx-executor</module>
     </modules>
 
-    <name>GraphAware Neo4j Framework Parent</name>
+    <name>GraphAware Framework</name>
     <description>Parent Project for GraphAware Neo4j Framework</description>
     <url>http://graphaware.com</url>
 
@@ -146,13 +146,13 @@
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
-                <artifactId>framework</artifactId>
+                <artifactId>runtime</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
-                <artifactId>framework</artifactId>
+                <artifactId>runtime</artifactId>
                 <version>${project.version}</version>
                 <classifier>tests</classifier>
                 <scope>test</scope>

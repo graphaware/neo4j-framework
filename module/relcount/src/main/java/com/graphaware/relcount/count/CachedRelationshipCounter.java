@@ -18,10 +18,9 @@ package com.graphaware.relcount.count;
 
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
 import com.graphaware.common.description.relationship.RelationshipDescription;
-import com.graphaware.framework.config.DefaultFrameworkConfiguration;
-import com.graphaware.framework.config.FrameworkConfiguration;
+import com.graphaware.runtime.config.DefaultFrameworkConfiguration;
+import com.graphaware.runtime.config.FrameworkConfiguration;
 import com.graphaware.relcount.cache.DegreeCachingNode;
-import com.graphaware.relcount.module.RelationshipCountRuntimeModule;
 import com.graphaware.relcount.module.RelationshipCountRuntimeModule;
 import com.graphaware.relcount.module.RelationshipCountStrategies;
 import com.graphaware.relcount.module.RelationshipCountStrategiesImpl;
@@ -31,7 +30,7 @@ import org.neo4j.graphdb.Node;
  * {@link RelationshipCounter} that counts matching relationships by looking them up cached in {@link org.neo4j.graphdb.Node}'s properties.
  * <p/>
  * It must be used in conjunction with {@link com.graphaware.relcount.module.RelationshipCountRuntimeModule}
- * registered with {@link com.graphaware.framework.GraphAwareRuntime}. The easiest and recommended way to create
+ * registered with {@link com.graphaware.runtime.GraphAwareRuntime}. The easiest and recommended way to create
  * and instance of this counter is by calling {@link com.graphaware.relcount.module.RelationshipCountRuntimeModule#cachedCounter()}.
  * <p/>
  * This counter throws {@link UnableToCountException} if it detects it can not
@@ -48,7 +47,7 @@ public class CachedRelationshipCounter implements RelationshipCounter {
     private final RelationshipCountStrategies relationshipCountStrategies;
 
     /**
-     * Construct a new relationship counter. Use this constructor when {@link com.graphaware.framework.GraphAwareRuntime}
+     * Construct a new relationship counter. Use this constructor when {@link com.graphaware.runtime.GraphAwareRuntime}
      * is used with default configuration and only a single instance of {@link com.graphaware.relcount.module.RelationshipCountRuntimeModule}
      * is registered. This will be the case for most use cases.
      */
@@ -58,12 +57,12 @@ public class CachedRelationshipCounter implements RelationshipCounter {
 
     /**
      * Construct a new relationship counter. Use this constructor when multiple instances of {@link com.graphaware.relcount.module.RelationshipCountRuntimeModule}
-     * have been registered with the {@link com.graphaware.framework.GraphAwareRuntime}, when the
-     * {@link com.graphaware.framework.GraphAwareRuntime} is used with custom configuration, or when custom {@link RelationshipCountStrategies} are used.
+     * have been registered with the {@link com.graphaware.runtime.GraphAwareRuntime}, when the
+     * {@link com.graphaware.runtime.GraphAwareRuntime} is used with custom configuration, or when custom {@link RelationshipCountStrategies} are used.
      * This should rarely be the case. Alternatively, use {@link com.graphaware.relcount.module.RelationshipCountRuntimeModule#cachedCounter()}.
      *
      * @param id                          of the {@link com.graphaware.relcount.module.RelationshipCountRuntimeModule} used to cache relationship counts.
-     * @param config                      used with the {@link com.graphaware.framework.GraphAwareRuntime}.
+     * @param config                      used with the {@link com.graphaware.runtime.GraphAwareRuntime}.
      * @param relationshipCountStrategies strategies used for relationship counting.
      */
     public CachedRelationshipCounter(String id, FrameworkConfiguration config, RelationshipCountStrategies relationshipCountStrategies) {

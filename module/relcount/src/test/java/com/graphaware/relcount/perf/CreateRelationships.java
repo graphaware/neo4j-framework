@@ -2,11 +2,10 @@ package com.graphaware.relcount.perf;
 
 import com.graphaware.common.strategy.IncludeNoRelationshipProperties;
 import com.graphaware.common.test.TestUtils;
-import com.graphaware.framework.GraphAwareRuntime;
-import com.graphaware.framework.GraphAwareRuntime;
-import com.graphaware.framework.performance.EnumParameter;
-import com.graphaware.framework.performance.ExponentialParameter;
-import com.graphaware.framework.performance.Parameter;
+import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.performance.EnumParameter;
+import com.graphaware.runtime.performance.ExponentialParameter;
+import com.graphaware.runtime.performance.Parameter;
 import com.graphaware.relcount.cache.NodePropertiesDegreeCachingStrategy;
 import com.graphaware.relcount.module.RelationshipCountRuntimeModule;
 import com.graphaware.relcount.module.RelationshipCountStrategiesImpl;

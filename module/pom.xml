@@ -25,7 +25,7 @@
     <artifactId>module</artifactId>
     <packaging>pom</packaging>
 
-    <name>GraphAware Modules</name>
+    <name>GraphAware Runtime Modules</name>
     <description>Graph Algorithms</description>
     <url>http://graphaware.com</url>
 
