@@ -32,7 +32,7 @@ public class RuntimeKernelExtensionFactory extends KernelExtensionFactory<Runtim
         GraphDatabaseService getDatabase();
     }
 
-    public static final String KEY = "graphaware";
+    public static final String KEY = "GraphAware Runtime";
 
     public RuntimeKernelExtensionFactory() {
         super(KEY);
