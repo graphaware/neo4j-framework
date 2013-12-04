@@ -108,7 +108,7 @@ public class NumberOfShortestPathsFinderTest {
     @Test
     public void shouldLimitPaths() {
         try (Transaction tx = database.beginTx()) {
-            List<Path> paths = new NumberOfShortestPathsFinder(3, 1, pathExpanderForAllTypes(OUTGOING)).findPaths(one, three);
+            List<Path> paths = new NumberOfShortestPathsFinder(3, 1, forDirection(OUTGOING)).findPaths(one, three);
             assertEquals(1, paths.size());
             assertEquals(2, paths.get(0).length());
         }

@@ -23,6 +23,8 @@ import java.util.Comparator;
 
 /**
  * A comparator for paths, taking into account their lengths at first, then their costs (in case the lengths are the same).
+ *
+ * todo: make it possible to order cost descending
  */
 public class LengthThenCostPathComparator implements Comparator<Path> {
 

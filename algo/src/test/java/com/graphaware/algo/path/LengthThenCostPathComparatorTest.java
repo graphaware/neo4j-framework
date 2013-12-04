@@ -30,6 +30,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.neo4j.graphdb.Direction.*;
+import static org.neo4j.graphdb.PathExpanders.*;
+import static org.neo4j.helpers.collection.Iterables.*;
 
 /**
  * Unit test for {@link LengthThenCostPathComparator}.
@@ -54,8 +57,7 @@ public class LengthThenCostPathComparatorTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
-        Transaction tx = database.beginTx();
-        try {
+        try (Transaction tx = database.beginTx()) {
             database.createNode(); //id=0
 
             one = database.createNode();
@@ -77,8 +79,6 @@ public class LengthThenCostPathComparatorTest {
             seven.createRelationshipTo(three, TEST).setProperty(COST, 1);
 
             tx.success();
-        } finally {
-            tx.finish();
         }
     }
 
@@ -90,7 +90,7 @@ public class LengthThenCostPathComparatorTest {
     @Test
     public void shouldCorrectlyOrderPaths() {
         try (Transaction tx = database.beginTx()) {
-            List<Path> paths = Iterables.toList(new AllPaths(10, Traversal.expanderForAllTypes(Direction.OUTGOING)).findAllPaths(one, three));
+            List<Path> paths = toList(new AllPaths(10, forDirection(OUTGOING)).findAllPaths(one, three));
             Collections.sort(paths, new LengthThenCostPathComparator(COST));
 
             assertEquals(4, paths.size());
