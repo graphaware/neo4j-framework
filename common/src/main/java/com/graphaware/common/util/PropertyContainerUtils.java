@@ -191,39 +191,6 @@ public final class PropertyContainerUtils {
     }
 
     /**
-     * Convert properties from a {@link java.util.Map} to a {@link java.util.Map} of "clean properties", where the key is the
-     * property key and value is the property value converted to {@link String}. Keys must not be <code>null</code>
-     * (not allowed by Neo4j anyway) or empty (not allowed by GraphAware). <code>Null</code> values will be converted
-     * to empty {@link String}s.
-     *
-     * @param properties to cleanup
-     * @return cleaned properties.
-     */
-    public static Map<String, String> cleanStringProperties(Map<String, ?> properties) {
-        Map<String, String> result = new HashMap<>();
-        for (String key : properties.keySet()) {
-            result.put(cleanKey(key), valueToString(properties.get(key)));
-        }
-        return result;
-    }
-
-    /**
-     * Convert properties from a {@link java.util.Map} to a {@link java.util.Map} of "clean properties", where the key is the
-     * property key and value is the property value. Keys must not be <code>null</code>
-     * (not allowed by Neo4j anyway) or empty (not allowed by GraphAware).
-     *
-     * @param properties to cleanup
-     * @return cleaned properties.
-     */
-    public static Map<String, Object> cleanObjectProperties(Map<String, ?> properties) {
-        Map<String, Object> result = new HashMap<>();
-        for (String key : properties.keySet()) {
-            result.put(cleanKey(key), properties.get(key));
-        }
-        return result;
-    }
-
-    /**
      * Delete a node, but delete all its relationships first.
      * This method assumes a transaction is in progress.
      *

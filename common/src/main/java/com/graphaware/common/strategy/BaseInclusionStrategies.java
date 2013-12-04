@@ -16,11 +16,6 @@
 
 package com.graphaware.common.strategy;
 
-import com.graphaware.common.strategy.NodeInclusionStrategy;
-import com.graphaware.common.strategy.NodePropertyInclusionStrategy;
-import com.graphaware.common.strategy.RelationshipInclusionStrategy;
-import com.graphaware.common.strategy.RelationshipPropertyInclusionStrategy;
-
 /**
  * Base-class for {@link InclusionStrategies} implementations.
  */

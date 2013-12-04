@@ -22,11 +22,11 @@ import com.graphaware.common.strategy.PropertyContainerInclusionStrategy;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
- * Strategy that ignores all property containers.
+ * Strategy that ignores everything.
  */
-public abstract class IncludeNo<T> extends ClassBasedConfigurationAsString {
+public abstract class IncludeNone<T> extends ClassBasedConfigurationAsString {
 
-    protected IncludeNo() {
+    protected IncludeNone() {
     }
 
     /**

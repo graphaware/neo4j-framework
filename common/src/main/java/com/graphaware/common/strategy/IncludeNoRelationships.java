@@ -22,7 +22,7 @@ import org.neo4j.graphdb.Relationship;
 /**
  * Strategy that ignores all relationships. Singleton.
  */
-public final class IncludeNoRelationships extends IncludeNo<Relationship> implements RelationshipInclusionStrategy {
+public final class IncludeNoRelationships extends IncludeNone<Relationship> implements RelationshipInclusionStrategy {
 
     private static final RelationshipInclusionStrategy INSTANCE = new IncludeNoRelationships();
 

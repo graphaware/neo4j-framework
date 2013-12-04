@@ -100,7 +100,7 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      * @return read-only collection of all created property containers. Filtered according to provided strategies.
      */
     public Collection<T> getAllCreated() {
-        if (getPropertyContainerInclusionStrategy() instanceof IncludeNo) {
+        if (getPropertyContainerInclusionStrategy() instanceof IncludeNone) {
             return Collections.emptySet();
         }
         return filterPropertyContainers(getWrapped().getAllCreated());
@@ -136,7 +136,7 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      *         (snapshots). Filtered according to provided strategies.
      */
     public Collection<T> getAllDeleted() {
-        if (getPropertyContainerInclusionStrategy() instanceof IncludeNo) {
+        if (getPropertyContainerInclusionStrategy() instanceof IncludeNone) {
             return Collections.emptySet();
         }
         return filterPropertyContainers(getWrapped().getAllDeleted());
@@ -172,7 +172,7 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      *         as they are now. Filtered according to provided strategies.
      */
     public Collection<Change<T>> getAllChanged() {
-        if (getPropertyContainerInclusionStrategy() instanceof IncludeNo) {
+        if (getPropertyContainerInclusionStrategy() instanceof IncludeNone) {
             return Collections.emptySet();
         }
         return filterChangedPropertyContainers(getWrapped().getAllChanged());

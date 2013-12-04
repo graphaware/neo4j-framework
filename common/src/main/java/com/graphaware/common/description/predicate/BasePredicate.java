@@ -42,6 +42,9 @@ abstract class BasePredicate extends BasePartiallyComparable<Predicate> implemen
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isMutuallyExclusive(Predicate other) {
         if (other instanceof Or) {

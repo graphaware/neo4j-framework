@@ -22,7 +22,7 @@ import org.neo4j.graphdb.Node;
 /**
  * Strategy that ignores all nodes. Singleton.
  */
-public final class IncludeNoNodes extends IncludeNo<Node> implements NodeInclusionStrategy {
+public final class IncludeNoNodes extends IncludeNone<Node> implements NodeInclusionStrategy {
 
     private static final NodeInclusionStrategy INSTANCE = new IncludeNoNodes();
 

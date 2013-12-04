@@ -144,36 +144,6 @@ public class PropertyContainerUtilsTest {
     }
 
     @Test
-    public void verifyStringPropertyCleaning() {
-        assertEquals(Collections.<String, String>emptyMap(), cleanStringProperties(Collections.<String, String>emptyMap()));
-        assertEquals(stringMap("key", "value"), cleanStringProperties(stringMap("key", "value")));
-        assertEquals(stringMap("key", ""), cleanStringProperties(stringMap("key", "")));
-        assertEquals(stringMap("key", ""), cleanStringProperties(stringMap("key", null)));
-
-        try {
-            cleanStringProperties(stringMap(" ", "value"));
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
-    }
-
-    @Test
-    public void verifyObjectPropertyCleaning() {
-        assertEquals(Collections.<String, Object>emptyMap(), cleanObjectProperties(Collections.<String, Object>emptyMap()));
-        assertEquals(Collections.singletonMap("key", (Object) "value"), cleanObjectProperties(Collections.singletonMap("key", (Object) "value")));
-        assertEquals(Collections.singletonMap("key", null), cleanObjectProperties(Collections.singletonMap("key", null)));
-        assertEquals(Collections.singletonMap("key", (Object) 3L), cleanObjectProperties(Collections.singletonMap("key", (Object) 3L)));
-
-        try {
-            cleanStringProperties(stringMap(" ", "value"));
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
-    }
-
-    @Test
     public void verifyPropertiesToStringMap() {
         try (Transaction tx = database.beginTx()) {
         assertEquals(Collections.<String, String>emptyMap(), propertiesToStringMap(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
@@ -195,7 +165,7 @@ public class PropertyContainerUtilsTest {
     }
 
     @Test
-    public void verifyPropertiesToObjectMap() {
+    public void verifyPropertiesToMap() {
         try (Transaction tx = database.beginTx()) {
         assertEquals(Collections.<String, Object>emptyMap(), propertiesToObjectMap(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
 
