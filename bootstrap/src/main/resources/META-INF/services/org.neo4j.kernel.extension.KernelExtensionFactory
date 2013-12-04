@@ -1,1 +1,1 @@
-com.graphaware.kernel.GraphAwareExtensionFactory
+com.graphaware.bootstrap.RuntimeKernelExtensionFactory
