@@ -66,7 +66,7 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
      */
     @Override
     public void execute() {
-        while (iterator.hasNext()) {
+        while (hasNext()) {
             batches.incrementAndGet();
 
             if (LOG.isTraceEnabled()) {
@@ -109,5 +109,14 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
         if (successfulSteps.get() != totalSteps.get()) {
             LOG.warn("Failed to execute " + (totalSteps.get() - successfulSteps.get()) + " steps!");
         }
+    }
+
+    private Boolean hasNext() {
+        return executor.executeInTransaction(new TransactionCallback<Boolean>() {
+            @Override
+            public Boolean doInTransaction(GraphDatabaseService database) {
+                return iterator.hasNext();
+            }
+        });
     }
 }

@@ -15,6 +15,7 @@ import com.graphaware.relcount.module.RelationshipCountStrategiesImpl;
 import org.junit.Test;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.relationship.RelationshipDescriptionFactory.literal;
@@ -43,14 +44,19 @@ public class DocumentationDemo extends BaseDocumentationDemo {
         //alternatively:
 //        RelationshipCounter counter = new CachedRelationshipCounter();
 
-        Node tracy = database.getNodeById(2);
+        try (Transaction tx = database.beginTx()) {
 
-        assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
-        assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
-        assertEquals(1, counter.count(tracy, literal(FOLLOWS, INCOMING)));
+            Node tracy = database.getNodeById(2);
 
-        assertEquals(4, counter.count(tracy, wildcard(FOLLOWS, OUTGOING).with(STRENGTH, equalTo(1))));
-        assertEquals(3, counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2))));
+            assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
+            assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
+            assertEquals(1, counter.count(tracy, literal(FOLLOWS, INCOMING)));
+
+            assertEquals(4, counter.count(tracy, wildcard(FOLLOWS, OUTGOING).with(STRENGTH, equalTo(1))));
+            assertEquals(3, counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2))));
+
+            tx.success();
+        }
     }
 
     @Test
@@ -67,14 +73,19 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
         RelationshipCounter counter = module.cachedCounter();
 
-        Node tracy = database.getNodeById(2);
+        try (Transaction tx = database.beginTx()) {
 
-        RelationshipDescription followers = RelationshipDescriptionFactory.wildcard(FOLLOWS, INCOMING);
-        assertEquals(9, counter.count(tracy, followers));
-        assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
+            Node tracy = database.getNodeById(2);
 
-        assertEquals(4, counter.count(tracy, wildcard(FOLLOWS, OUTGOING).with(STRENGTH, equalTo(1))));
-        assertEquals(3, counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2))));
+            RelationshipDescription followers = RelationshipDescriptionFactory.wildcard(FOLLOWS, INCOMING);
+            assertEquals(9, counter.count(tracy, followers));
+            assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
+
+            assertEquals(4, counter.count(tracy, wildcard(FOLLOWS, OUTGOING).with(STRENGTH, equalTo(1))));
+            assertEquals(3, counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2))));
+
+            tx.success();
+        }
     }
 
     @Test
@@ -89,19 +100,24 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
         populateDatabase();
 
-        Node tracy = database.getNodeById(2);
+        try (Transaction tx = database.beginTx()) {
 
-        RelationshipCounter counter = module.cachedCounter();
-        assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
+            Node tracy = database.getNodeById(2);
 
-        try {
-            counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2)));
-            fail();
-        } catch (UnableToCountException e) {
-            //ok
+            RelationshipCounter counter = module.cachedCounter();
+            assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
+
+            try {
+                counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2)));
+                fail();
+            } catch (UnableToCountException e) {
+                //ok
+            }
+
+            assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
+
+            tx.success();
         }
-
-        assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
     }
 
     @Test
@@ -131,15 +147,21 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
         populateDatabase();
 
-        Node tracy = database.getNodeById(2);
+        try (Transaction tx = database.beginTx()) {
 
-        RelationshipCounter counter = module.cachedCounter();
+            Node tracy = database.getNodeById(2);
 
-        assertEquals(12, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
-        assertEquals(11, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
+            RelationshipCounter counter = module.cachedCounter();
 
-        assertEquals(4, counter.count(tracy, wildcard(FOLLOWS, OUTGOING).with(STRENGTH, equalTo(1))));
-        assertEquals(6, counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2))));
+            assertEquals(12, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
+            assertEquals(11, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
+
+            assertEquals(4, counter.count(tracy, wildcard(FOLLOWS, OUTGOING).with(STRENGTH, equalTo(1))));
+            assertEquals(6, counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2))));
+
+
+            tx.success();
+        }
     }
 
     @Test
@@ -168,15 +190,20 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
         populateDatabase();
 
-        Node tracy = database.getNodeById(2);
+        try (Transaction tx = database.beginTx()) {
 
-        RelationshipCounter counter = module.cachedCounter();
+            Node tracy = database.getNodeById(2);
 
-        assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
-        assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
+            RelationshipCounter counter = module.cachedCounter();
 
-        assertEquals(4, counter.count(tracy, wildcard(FOLLOWS, OUTGOING).with(STRENGTH, equalTo(1))));
-        assertEquals(3, counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2))));
+            assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
+            assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
+
+            assertEquals(4, counter.count(tracy, wildcard(FOLLOWS, OUTGOING).with(STRENGTH, equalTo(1))));
+            assertEquals(3, counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2))));
+
+            tx.success();
+        }
     }
 
     @Test
@@ -205,15 +232,20 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
         populateDatabase();
 
-        Node tracy = database.getNodeById(2);
+        try (Transaction tx = database.beginTx()) {
 
-        RelationshipCounter counter = module.cachedCounter();
+            Node tracy = database.getNodeById(2);
 
-        assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
-        assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
+            RelationshipCounter counter = module.cachedCounter();
 
-        assertEquals(4, counter.count(tracy, wildcard(FOLLOWS, OUTGOING).with(STRENGTH, equalTo(1))));
-        assertEquals(3, counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2))));
+            assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
+            assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
+
+            assertEquals(4, counter.count(tracy, wildcard(FOLLOWS, OUTGOING).with(STRENGTH, equalTo(1))));
+            assertEquals(3, counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2))));
+
+            tx.success();
+        }
     }
 
     @Test
@@ -222,15 +254,20 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
         RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
 
-        Node tracy = database.getNodeById(2);
+        try (Transaction tx = database.beginTx()) {
 
-        RelationshipCounter counter = module.naiveCounter();
+            Node tracy = database.getNodeById(2);
 
-        assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
-        assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
+            RelationshipCounter counter = module.naiveCounter();
 
-        assertEquals(4, counter.count(tracy, wildcard(FOLLOWS, OUTGOING).with(STRENGTH, equalTo(1))));
-        assertEquals(3, counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2))));
+            assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
+            assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
+
+            assertEquals(4, counter.count(tracy, wildcard(FOLLOWS, OUTGOING).with(STRENGTH, equalTo(1))));
+            assertEquals(3, counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2))));
+
+            tx.success();
+        }
     }
 
     @Test
@@ -245,11 +282,16 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
         populateDatabase();
 
-        Node tracy = database.getNodeById(2);
+        try (Transaction tx = database.beginTx()) {
 
-        RelationshipCounter counter = module.fallbackCounter();
+            Node tracy = database.getNodeById(2);
 
-        assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING))); //uses cache
-        assertEquals(3, counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2)))); //falls back to naive
+            RelationshipCounter counter = module.fallbackCounter();
+
+            assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING))); //uses cache
+            assertEquals(3, counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2)))); //falls back to naive
+
+            tx.success();
+        }
     }
 }

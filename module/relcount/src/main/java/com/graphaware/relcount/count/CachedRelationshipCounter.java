@@ -25,6 +25,7 @@ import com.graphaware.relcount.module.RelationshipCountRuntimeModule;
 import com.graphaware.relcount.module.RelationshipCountStrategies;
 import com.graphaware.relcount.module.RelationshipCountStrategiesImpl;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * {@link RelationshipCounter} that counts matching relationships by looking them up cached in {@link org.neo4j.graphdb.Node}'s properties.

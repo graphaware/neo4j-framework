@@ -26,6 +26,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Map;
@@ -48,6 +49,12 @@ public abstract class DegreeCachingNodeIntegrationTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+
+        try (Transaction tx = database.beginTx()) {
+            database.createNode(); //ID = 0
+            tx.success();
+        }
+
         txExecutor = new SimpleTransactionExecutor(database);
     }
 
@@ -62,14 +69,19 @@ public abstract class DegreeCachingNodeIntegrationTest {
 
     @Test
     public void correctNodeIdShouldBeReturned() {
-        assertEquals(0L, cachingNode().getId());
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(0L, cachingNode().getId());
+        }
     }
 
     @Test
     public void shouldCorrectlyReturnAllCachedCounts() {
         setUpRelationshipCounts();
 
-        Map<DetachedRelationshipDescription, Integer> relationshipCounts = cachingNode().getCachedDegrees();
+        Map<DetachedRelationshipDescription, Integer> relationshipCounts;
+        try (Transaction tx = database.beginTx()) {
+            relationshipCounts = cachingNode().getCachedDegrees();
+        }
 
         assertEquals(3, (int) relationshipCounts.get(literal("test", OUTGOING).with("key1", equalTo("value1")).with("key2", equalTo("value2"))));
         assertEquals(11, (int) relationshipCounts.get(literal("test", OUTGOING).with("key1", equalTo("value2"))));
@@ -94,7 +106,10 @@ public abstract class DegreeCachingNodeIntegrationTest {
             }
         });
 
-        Map<DetachedRelationshipDescription, Integer> relationshipCounts = cachingNode().getCachedDegrees();
+        Map<DetachedRelationshipDescription, Integer> relationshipCounts;
+        try (Transaction tx = database.beginTx()) {
+            relationshipCounts = cachingNode().getCachedDegrees();
+        }
 
         assertEquals(1, (int) relationshipCounts.get(literal("test", OUTGOING).with("key1", equalTo("value3"))));
     }
@@ -112,7 +127,9 @@ public abstract class DegreeCachingNodeIntegrationTest {
             }
         });
 
-        assertEquals(5, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value3"))));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(5, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value3"))));
+        }
     }
 
     @Test
@@ -128,7 +145,9 @@ public abstract class DegreeCachingNodeIntegrationTest {
             }
         });
 
-        assertEquals(4, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value2"))));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(4, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value2"))));
+        }
     }
 
     @Test
@@ -144,7 +163,9 @@ public abstract class DegreeCachingNodeIntegrationTest {
             }
         });
 
-        assertEquals(7, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value1"))));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(7, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value1"))));
+        }
     }
 
     @Test
@@ -160,8 +181,10 @@ public abstract class DegreeCachingNodeIntegrationTest {
             }
         });
 
-        assertEquals(12, (int) cachingNode().getCachedDegrees().get(literal("test", OUTGOING).with("key1", equalTo("value1"))));
-        assertEquals(13, (int) cachingNode().getCachedDegrees().get(literal("test", OUTGOING)));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(12, (int) cachingNode().getCachedDegrees().get(literal("test", OUTGOING).with("key1", equalTo("value1"))));
+            assertEquals(13, (int) cachingNode().getCachedDegrees().get(literal("test", OUTGOING)));
+        }
     }
 
     @Test
@@ -211,7 +234,9 @@ public abstract class DegreeCachingNodeIntegrationTest {
             }
         });
 
-        assertEquals(2, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value2"))));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(2, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value2"))));
+        }
     }
 
     @Test
@@ -227,7 +252,9 @@ public abstract class DegreeCachingNodeIntegrationTest {
             }
         });
 
-        assertEquals(2, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key2", equalTo("value2"))));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(2, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key2", equalTo("value2"))));
+        }
     }
 
     @Test
@@ -243,8 +270,10 @@ public abstract class DegreeCachingNodeIntegrationTest {
             }
         });
 
-        assertEquals(2, (int) cachingNode().getCachedDegrees().get(literal("test", OUTGOING).with("key1", equalTo("value1"))));
-        assertEquals(13, (int) cachingNode().getCachedDegrees().get(literal("test", OUTGOING)));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(2, (int) cachingNode().getCachedDegrees().get(literal("test", OUTGOING).with("key1", equalTo("value1"))));
+            assertEquals(13, (int) cachingNode().getCachedDegrees().get(literal("test", OUTGOING)));
+        }
     }
 
     @Test
@@ -277,9 +306,13 @@ public abstract class DegreeCachingNodeIntegrationTest {
             }
         });
 
-        assertFalse(cachingNode().getCachedDegrees().containsKey(literal("test", OUTGOING).with("key1", equalTo("value1"))));
-        assertEquals(8, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value1"))));
-        assertEquals(13, (int) cachingNode().getCachedDegrees().get(literal("test", OUTGOING)));
+        try (Transaction tx = database.beginTx()) {
+            assertFalse(cachingNode().getCachedDegrees().containsKey(literal("test", OUTGOING).with("key1", equalTo("value1"))));
+            assertEquals(8, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value1"))));
+            assertEquals(13, (int) cachingNode().getCachedDegrees().get(literal("test", OUTGOING)));
+
+            tx.success();
+        }
     }
 
     @Test
@@ -295,12 +328,16 @@ public abstract class DegreeCachingNodeIntegrationTest {
             }
         });
 
-        assertEquals(26, counter().count(database.getNodeById(0), wildcard("test", OUTGOING)));
-        assertFalse(cachingNode().getCachedDegrees().containsKey(literal("test", OUTGOING)));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(26, counter().count(database.getNodeById(0), wildcard("test", OUTGOING)));
+            assertFalse(cachingNode().getCachedDegrees().containsKey(literal("test", OUTGOING)));
 
-        assertEquals(11, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value2"))));
-        assertEquals(15, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value1"))));
-        assertEquals(3, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value1")).with("key2", equalTo("value2"))));
+            assertEquals(11, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value2"))));
+            assertEquals(15, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value1"))));
+            assertEquals(3, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value1")).with("key2", equalTo("value2"))));
+
+            tx.success();
+        }
 
         txExecutor.executeInTransaction(new VoidReturningCallback() {
             @Override
@@ -311,11 +348,15 @@ public abstract class DegreeCachingNodeIntegrationTest {
             }
         });
 
-        assertFalse(cachingNode().getCachedDegrees().containsKey(literal("test", OUTGOING)));
-        assertFalse(cachingNode().getCachedDegrees().containsKey(literal("test", OUTGOING).with("key1", equalTo("value2"))));
+        try (Transaction tx = database.beginTx()) {
+            assertFalse(cachingNode().getCachedDegrees().containsKey(literal("test", OUTGOING)));
+            assertFalse(cachingNode().getCachedDegrees().containsKey(literal("test", OUTGOING).with("key1", equalTo("value2"))));
 
-        assertEquals(15, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value1"))));
-        assertEquals(3, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value1")).with("key2", equalTo("value2"))));
+            assertEquals(15, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value1"))));
+            assertEquals(3, counter().count(database.getNodeById(0), wildcard("test", OUTGOING).with("key1", equalTo("value1")).with("key2", equalTo("value2"))));
+
+            tx.success();
+        }
     }
 
     private void setUpBasicRelationshipCounts() {

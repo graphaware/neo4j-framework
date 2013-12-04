@@ -17,6 +17,8 @@ import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode;
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.UnitOfWork;
+import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
+import com.graphaware.tx.executor.single.TransactionCallback;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -27,6 +29,7 @@ import java.util.Collection;
 
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
+import static org.neo4j.tooling.GlobalGraphOperations.*;
 
 /**
  * {@link com.graphaware.runtime.GraphAwareRuntimeModule} providing caching capabilities for full relationship counting.
@@ -244,13 +247,18 @@ public class RelationshipCountRuntimeModule extends BaseFrameworkConfigured impl
      * Clear all cached counts. NOTE: This is a potentially very expensive operation as it traverses the
      * entire graph! Use with care.
      *
-     * @param databaseService to perform the operation on.
+     * @param database to perform the operation on.
      */
-    private void clearCachedCounts(GraphDatabaseService databaseService) {
+    private void clearCachedCounts(GraphDatabaseService database) {
         new IterableInputBatchTransactionExecutor<>(
-                databaseService,
+                database,
                 500,
-                GlobalGraphOperations.at(databaseService).getAllNodes(),
+                new SimpleTransactionExecutor(database).executeInTransaction(new TransactionCallback<Iterable<Node>>() {
+                    @Override
+                    public Iterable<Node> doInTransaction(GraphDatabaseService database) {
+                        return at(database).getAllNodes();
+                    }
+                }),
                 new UnitOfWork<Node>() {
                     @Override
                     public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
@@ -284,13 +292,18 @@ public class RelationshipCountRuntimeModule extends BaseFrameworkConfigured impl
      * Clear and rebuild all cached counts. NOTE: This is a potentially very expensive operation as it traverses the
      * entire graph! Use with care.
      *
-     * @param databaseService to perform the operation on.
+     * @param database to perform the operation on.
      */
-    private void buildCachedCounts(GraphDatabaseService databaseService) {
+    private void buildCachedCounts(GraphDatabaseService database) {
         new IterableInputBatchTransactionExecutor<>(
-                databaseService,
+                database,
                 100,
-                GlobalGraphOperations.at(databaseService).getAllNodes(),
+                new SimpleTransactionExecutor(database).executeInTransaction(new TransactionCallback<Iterable<Node>>() {
+                    @Override
+                    public Iterable<Node> doInTransaction(GraphDatabaseService database) {
+                        return at(database).getAllNodes();
+                    }
+                }),
                 new UnitOfWork<Node>() {
                     @Override
                     public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {

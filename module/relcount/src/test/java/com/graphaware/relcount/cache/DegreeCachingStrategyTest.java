@@ -8,6 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.HashMap;
@@ -33,6 +34,12 @@ public abstract class DegreeCachingStrategyTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+
+        try (Transaction tx = database.beginTx()) {
+            database.createNode(); //ID=0
+            tx.success();
+        }
+
         txExecutor = new SimpleTransactionExecutor(database);
     }
 
@@ -43,7 +50,9 @@ public abstract class DegreeCachingStrategyTest {
 
     @Test
     public void shouldReadEmptyDegreesWhenNoDegreesHaveBeenWritten() {
-        assertTrue(strategy().readDegrees(database.getNodeById(0), "TEST").isEmpty());
+        try (Transaction tx = database.beginTx()) {
+            assertTrue(strategy().readDegrees(database.getNodeById(0), "TEST").isEmpty());
+        }
     }
 
     @Test
@@ -55,7 +64,9 @@ public abstract class DegreeCachingStrategyTest {
             }
         });
 
-        assertTrue(strategy().readDegrees(database.getNodeById(0), "TEST").isEmpty());
+        try (Transaction tx = database.beginTx()) {
+            assertTrue(strategy().readDegrees(database.getNodeById(0), "TEST").isEmpty());
+        }
     }
 
     @Test
@@ -77,7 +88,9 @@ public abstract class DegreeCachingStrategyTest {
             }
         });
 
-        assertEquals(cachedDegrees, strategy().readDegrees(database.getNodeById(0), "TEST"));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(cachedDegrees, strategy().readDegrees(database.getNodeById(0), "TEST"));
+        }
 
         final Map<DetachedRelationshipDescription, Integer> cachedDegrees2 = new HashMap<>();
         cachedDegrees2.put(literal("TEST", OUTGOING).with("k1", equalTo("v1")), 1);
@@ -96,7 +109,9 @@ public abstract class DegreeCachingStrategyTest {
             }
         });
 
-        assertEquals(cachedDegrees2, strategy().readDegrees(database.getNodeById(0), "TEST"));
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(cachedDegrees2, strategy().readDegrees(database.getNodeById(0), "TEST"));
+        }
     }
 
     @Test

@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
@@ -82,7 +83,14 @@ public class CachedRelationshipCounterTest {
     }
 
     private int count(RelationshipDescription description, long nodeId) {
-        return new CachedRelationshipCounter().count(database.getNodeById(nodeId), description);
+        int count;
+
+        try (Transaction tx = database.beginTx()) {
+            count = new CachedRelationshipCounter().count(database.getNodeById(nodeId), description);
+            tx.success();
+        }
+
+        return count;
     }
 
     @Test
