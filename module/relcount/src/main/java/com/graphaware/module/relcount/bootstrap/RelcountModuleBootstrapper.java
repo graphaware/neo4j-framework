@@ -19,18 +19,24 @@ package com.graphaware.module.relcount.bootstrap;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeModuleBootstrapper;
 import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
+import org.neo4j.graphdb.config.Setting;
 import org.neo4j.kernel.configuration.Config;
+
+import static org.neo4j.helpers.Settings.STRING;
+import static org.neo4j.helpers.Settings.setting;
 
 /**
  * {@link com.graphaware.runtime.GraphAwareRuntimeModuleBootstrapper} for {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule}.
  */
 public class RelcountModuleBootstrapper implements GraphAwareRuntimeModuleBootstrapper {
 
+    public static final Setting<String> MODULE_ENABLED = setting("com.graphaware.module.relcount.enabled", STRING, RelcountModuleBootstrapper.class.getCanonicalName());
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void bootstrap(GraphAwareRuntime framework, Config config) {
-        framework.registerModule(new RelationshipCountRuntimeModule());
+    public void bootstrap(GraphAwareRuntime runtime, Config config) {
+        runtime.registerModule(new RelationshipCountRuntimeModule());
     }
 }

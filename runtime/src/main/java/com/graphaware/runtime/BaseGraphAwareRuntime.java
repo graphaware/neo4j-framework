@@ -373,7 +373,7 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
      * @return map of properties (key-value).
      */
     private Map<String, Object> getInternalProperties(Node node) {
-        return PropertyContainerUtils.propertiesToObjectMap(node, new InclusionStrategy<String>() {
+        return PropertyContainerUtils.propertiesToMap(node, new InclusionStrategy<String>() {
             @Override
             public boolean include(String s) {
                 return s.startsWith(configuration.createPrefix(RUNTIME));

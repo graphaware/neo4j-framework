@@ -96,20 +96,6 @@ public final class PropertyContainerUtils {
     }
 
     /**
-     * Make sure a key is not null or empty.
-     *
-     * @param key the key to check.
-     * @return the same key.
-     * @throws IllegalArgumentException if null or empty String.
-     */
-    public static String cleanKey(String key) {
-        if (key == null || "".equals(key.trim())) {
-            throw new IllegalArgumentException("Key must not be null or empty!");
-        }
-        return key;
-    }
-
-    /**
      * Convert a property value to String. If the value is <code>null</code>, then it will be converted to an empty String.
      *
      * @param value to convert.
@@ -127,39 +113,6 @@ public final class PropertyContainerUtils {
     }
 
     /**
-     * Convert all properties from a {@link org.neo4j.graphdb.PropertyContainer} to a {@link java.util.Map} of {@link String}s, where the key is the
-     * property key and value is the property value converted to {@link String}. Keys must not be <code>null</code>
-     * (not allowed by Neo4j anyway) or empty (not allowed by GraphAware). <code>Null</code> values will be converted
-     * to empty {@link String}s.
-     *
-     * @param propertyContainer to convert properties from.
-     * @return converted properties.
-     */
-    public static Map<String, String> propertiesToStringMap(PropertyContainer propertyContainer) {
-        return propertiesToStringMap(propertyContainer, new IncludeAll<String>());
-    }
-
-    /**
-     * Convert selected properties from a {@link org.neo4j.graphdb.PropertyContainer} to a {@link java.util.Map} of {@link String}s, where the key is the
-     * property key and value is the property value converted to {@link String}. Keys must not be <code>null</code>
-     * (not allowed by Neo4j anyway) or empty (not allowed by GraphAware). <code>Null</code> values will be converted
-     * to empty {@link String}s.
-     *
-     * @param propertyContainer         to convert properties from.
-     * @param propertyInclusionStrategy strategy to select which properties to include. Decides based on the property key.
-     * @return converted properties.
-     */
-    public static Map<String, String> propertiesToStringMap(PropertyContainer propertyContainer, InclusionStrategy<String> propertyInclusionStrategy) {
-        Map<String, String> result = new HashMap<>();
-        for (String key : propertyContainer.getPropertyKeys()) {
-            if (propertyInclusionStrategy.include(key)) {
-                result.put(cleanKey(key), valueToString(propertyContainer.getProperty(key)));
-            }
-        }
-        return result;
-    }
-
-    /**
      * Convert all properties from a {@link org.neo4j.graphdb.PropertyContainer} to a {@link java.util.Map}, where the key is the
      * property key and value is the property value. Keys must not be <code>null</code>
      * (not allowed by Neo4j anyway) or empty (not allowed by GraphAware). <code>Null</code> values are fine.
@@ -167,8 +120,8 @@ public final class PropertyContainerUtils {
      * @param propertyContainer to convert properties from.
      * @return converted properties.
      */
-    public static Map<String, Object> propertiesToObjectMap(PropertyContainer propertyContainer) {
-        return propertiesToObjectMap(propertyContainer, new IncludeAll<String>());
+    public static Map<String, Object> propertiesToMap(PropertyContainer propertyContainer) {
+        return propertiesToMap(propertyContainer, new IncludeAll<String>());
     }
 
     /**
@@ -180,11 +133,11 @@ public final class PropertyContainerUtils {
      * @param propertyInclusionStrategy strategy to select which properties to include. Decides based on the property key.
      * @return converted properties.
      */
-    public static Map<String, Object> propertiesToObjectMap(PropertyContainer propertyContainer, InclusionStrategy<String> propertyInclusionStrategy) {
+    public static Map<String, Object> propertiesToMap(PropertyContainer propertyContainer, InclusionStrategy<String> propertyInclusionStrategy) {
         Map<String, Object> result = new HashMap<>();
         for (String key : propertyContainer.getPropertyKeys()) {
             if (propertyInclusionStrategy.include(key)) {
-                result.put(cleanKey(key), propertyContainer.getProperty(key));
+                result.put(key, propertyContainer.getProperty(key));
             }
         }
         return result;

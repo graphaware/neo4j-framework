@@ -1352,16 +1352,16 @@ public class LazyTransactionDataIntegrationTest {
                         Relationship previous = transactionData.getAllChangedRelationships().iterator().next().getPrevious();
                         Relationship current = transactionData.getAllChangedRelationships().iterator().next().getCurrent();
 
-                        Map<String, String> previousProps = new OtherNodeNameIncludingRelationshipPropertiesExtractor().extractProperties(previous, previous.getStartNode());
+                        Map<String, Object> previousProps = new OtherNodeNameIncludingRelationshipPropertiesExtractor().extractProperties(previous, previous.getStartNode());
                         assertEquals(3, previousProps.size());
                         assertEquals("One", previousProps.get("otherNodeName"));
-                        assertEquals("3", previousProps.get("time"));
+                        assertEquals(3, previousProps.get("time"));
                         assertEquals("cool", previousProps.get("tag"));
 
-                        Map<String, String> currentProps = new OtherNodeNameIncludingRelationshipPropertiesExtractor().extractProperties(current, current.getStartNode());
+                        Map<String, Object> currentProps = new OtherNodeNameIncludingRelationshipPropertiesExtractor().extractProperties(current, current.getStartNode());
                         assertEquals(3, currentProps.size());
                         assertEquals("NewOne", currentProps.get("otherNodeName"));
-                        assertEquals("4", currentProps.get("time"));
+                        assertEquals(4, currentProps.get("time"));
                         assertEquals("cool", currentProps.get("tags"));
                     }
                 }
@@ -1435,9 +1435,9 @@ public class LazyTransactionDataIntegrationTest {
 
     private class OtherNodeNameIncludingRelationshipPropertiesExtractor {
 
-        public Map<String, String> extractProperties(Relationship relationship, Node pointOfView) {
-            Map<String, String> result = new HashMap<>();
-            result.putAll(propertiesToStringMap(relationship));
+        public Map<String, Object> extractProperties(Relationship relationship, Node pointOfView) {
+            Map<String, Object> result = new HashMap<>();
+            result.putAll(propertiesToMap(relationship));
             result.put("otherNodeName", relationship.getOtherNode(pointOfView).getProperty("name").toString());
             return result;
         }

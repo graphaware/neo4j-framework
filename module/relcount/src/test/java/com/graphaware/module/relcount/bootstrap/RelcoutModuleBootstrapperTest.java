@@ -17,7 +17,9 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Map;
 
+import static com.graphaware.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
 import static com.graphaware.common.description.relationship.RelationshipDescriptionFactory.wildcard;
+import static com.graphaware.module.relcount.bootstrap.RelcountModuleBootstrapper.*;
 import static org.junit.Assert.assertEquals;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
@@ -31,12 +33,11 @@ public class RelcoutModuleBootstrapperTest {
 
     @Before
     public void setUp() {
-        Map<String, String> config = MapUtil.stringMap(
-                "com.graphaware.framework.enabled", "true",
-                "com.graphaware.module.relcount.enabled", "com.graphaware.relcount.bootstrap.RelcountModuleBootstrapper"
-        );
-
-        database = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder().setConfig(config).newGraphDatabase();
+        database = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig(RUNTIME_ENABLED, "true")
+                .setConfig(MODULE_ENABLED, MODULE_ENABLED.getDefaultValue())
+                .newGraphDatabase();
     }
 
     @After

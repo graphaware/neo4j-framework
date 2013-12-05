@@ -107,32 +107,6 @@ public class PropertyContainerUtilsTest {
     }
 
     @Test
-    public void verifyKeyCleaning() {
-        assertEquals("R", cleanKey("R"));
-
-        try {
-            cleanKey(null);
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
-
-        try {
-            cleanKey("");
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
-
-        try {
-            cleanKey(" ");
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
-    }
-
-    @Test
     public void verifyValueToString() {
         assertEquals("", valueToString(null));
         assertEquals("", valueToString(""));
@@ -144,34 +118,13 @@ public class PropertyContainerUtilsTest {
     }
 
     @Test
-    public void verifyPropertiesToStringMap() {
-        try (Transaction tx = database.beginTx()) {
-        assertEquals(Collections.<String, String>emptyMap(), propertiesToStringMap(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
-
-        assertEquals(stringMap("key", "value"), propertiesToStringMap(database.getNodeById(2)));
-
-        assertEquals(Collections.<String, String>emptyMap(), propertiesToStringMap(database.getNodeById(2), new InclusionStrategy<String>() {
-            @Override
-            public boolean include(String object) {
-                return !"key".equals(object);
-            }
-
-            @Override
-            public String asString() {
-                return "custom";
-            }
-        }));
-        }
-    }
-
-    @Test
     public void verifyPropertiesToMap() {
         try (Transaction tx = database.beginTx()) {
-        assertEquals(Collections.<String, Object>emptyMap(), propertiesToObjectMap(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
+        assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
 
-        assertEquals(Collections.singletonMap("key", (Object) "value"), propertiesToObjectMap(database.getNodeById(2)));
+        assertEquals(Collections.singletonMap("key", (Object) "value"), propertiesToMap(database.getNodeById(2)));
 
-        assertEquals(Collections.<String, Object>emptyMap(), propertiesToObjectMap(database.getNodeById(2), new InclusionStrategy<String>() {
+        assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(database.getNodeById(2), new InclusionStrategy<String>() {
             @Override
             public boolean include(String object) {
                 return !"key".equals(object);
