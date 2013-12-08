@@ -17,7 +17,7 @@
 package com.graphaware.runtime.strategy;
 
 import com.graphaware.common.strategy.PropertyInclusionStrategy;
-import com.graphaware.runtime.config.FrameworkConfiguration;
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
@@ -33,7 +33,7 @@ public abstract class IncludeAllBusinessProperties<T extends PropertyContainer> 
      */
     @Override
     public boolean include(String key, T propertyContainer) {
-        if (key.startsWith(FrameworkConfiguration.GA_PREFIX)) {
+        if (key.startsWith(RuntimeConfiguration.GA_PREFIX)) {
             return false;
         }
 

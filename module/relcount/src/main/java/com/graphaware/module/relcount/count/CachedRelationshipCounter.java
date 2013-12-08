@@ -18,8 +18,8 @@ package com.graphaware.module.relcount.count;
 
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
 import com.graphaware.common.description.relationship.RelationshipDescription;
-import com.graphaware.runtime.config.DefaultFrameworkConfiguration;
-import com.graphaware.runtime.config.FrameworkConfiguration;
+import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.module.relcount.cache.DegreeCachingNode;
 import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
 import com.graphaware.module.relcount.RelationshipCountStrategies;
@@ -43,7 +43,7 @@ import org.neo4j.graphdb.Node;
 public class CachedRelationshipCounter implements RelationshipCounter {
 
     private final String id;
-    private final FrameworkConfiguration config;
+    private final RuntimeConfiguration config;
     private final RelationshipCountStrategies relationshipCountStrategies;
 
     /**
@@ -52,7 +52,7 @@ public class CachedRelationshipCounter implements RelationshipCounter {
      * is registered. This will be the case for most use cases.
      */
     public CachedRelationshipCounter() {
-        this(RelationshipCountRuntimeModule.FULL_RELCOUNT_DEFAULT_ID, DefaultFrameworkConfiguration.getInstance(), RelationshipCountStrategiesImpl.defaultStrategies());
+        this(RelationshipCountRuntimeModule.FULL_RELCOUNT_DEFAULT_ID, DefaultRuntimeConfiguration.getInstance(), RelationshipCountStrategiesImpl.defaultStrategies());
     }
 
     /**
@@ -65,7 +65,7 @@ public class CachedRelationshipCounter implements RelationshipCounter {
      * @param config                      used with the {@link com.graphaware.runtime.GraphAwareRuntime}.
      * @param relationshipCountStrategies strategies used for relationship counting.
      */
-    public CachedRelationshipCounter(String id, FrameworkConfiguration config, RelationshipCountStrategies relationshipCountStrategies) {
+    public CachedRelationshipCounter(String id, RuntimeConfiguration config, RelationshipCountStrategies relationshipCountStrategies) {
         this.id = id;
         this.config = config;
         this.relationshipCountStrategies = relationshipCountStrategies;

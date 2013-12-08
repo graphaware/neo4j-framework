@@ -20,8 +20,8 @@ import com.graphaware.common.description.relationship.RelationshipDescription;
 import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
 import com.graphaware.module.relcount.RelationshipCountStrategies;
 import com.graphaware.module.relcount.RelationshipCountStrategiesImpl;
-import com.graphaware.runtime.config.DefaultFrameworkConfiguration;
-import com.graphaware.runtime.config.FrameworkConfiguration;
+import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Node;
 
@@ -46,7 +46,7 @@ public class FallbackRelationshipCounter implements RelationshipCounter {
     private static final Logger LOG = Logger.getLogger(FallbackRelationshipCounter.class);
 
     private final String id;
-    private final FrameworkConfiguration config;
+    private final RuntimeConfiguration config;
     private final RelationshipCountStrategies strategies;
 
     /**
@@ -57,7 +57,7 @@ public class FallbackRelationshipCounter implements RelationshipCounter {
      * this counter through {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule#fallbackCounter()} .
      */
     public FallbackRelationshipCounter() {
-        this(RelationshipCountRuntimeModule.FULL_RELCOUNT_DEFAULT_ID, DefaultFrameworkConfiguration.getInstance(), RelationshipCountStrategiesImpl.defaultStrategies());
+        this(RelationshipCountRuntimeModule.FULL_RELCOUNT_DEFAULT_ID, DefaultRuntimeConfiguration.getInstance(), RelationshipCountStrategiesImpl.defaultStrategies());
     }
 
     /**
@@ -68,7 +68,7 @@ public class FallbackRelationshipCounter implements RelationshipCounter {
      * @param config     used with the {@link com.graphaware.runtime.GraphAwareRuntime}.
      * @param strategies for counting relationships, provided to the {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule}.
      */
-    public FallbackRelationshipCounter(String id, FrameworkConfiguration config, RelationshipCountStrategies strategies) {
+    public FallbackRelationshipCounter(String id, RuntimeConfiguration config, RelationshipCountStrategies strategies) {
         this.id = id;
         this.strategies = strategies;
         this.config = config;

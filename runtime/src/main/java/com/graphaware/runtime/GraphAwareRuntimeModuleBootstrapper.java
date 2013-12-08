@@ -11,8 +11,8 @@ public interface GraphAwareRuntimeModuleBootstrapper {
     /**
      * Bootstrap a module.
      *
-     * @param framework GraphAware framework.
-     * @param config    passed to Neo4j.
+     * @param runtime GraphAware runtime
+     * @param config  passed to Neo4j.
      */
-    void bootstrap(GraphAwareRuntime framework, Config config);
+    void bootstrap(GraphAwareRuntime runtime, Config config);
 }

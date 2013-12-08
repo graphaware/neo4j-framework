@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.DefaultFrameworkConfiguration;
+import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
 import org.apache.log4j.Logger;
@@ -27,7 +27,7 @@ import org.neo4j.kernel.GraphDatabaseAPI;
 import java.util.Collection;
 import java.util.Iterator;
 
-import static com.graphaware.runtime.config.FrameworkConfiguration.*;
+import static com.graphaware.runtime.config.RuntimeConfiguration.*;
 import static org.neo4j.tooling.GlobalGraphOperations.*;
 
 
@@ -43,12 +43,12 @@ public class GraphAwareRuntime extends BaseGraphAwareRuntime {
     private Node root; //only here until https://github.com/neo4j/neo4j/issues/1065 is resolved
 
     /**
-     * Create a new instance of the framework.
+     * Create a new instance of the runtime.
      *
-     * @param database on which the framework should operate.
+     * @param database on which the runtime should operate.
      */
     public GraphAwareRuntime(GraphDatabaseService database) {
-        super(DefaultFrameworkConfiguration.getInstance());
+        super(DefaultRuntimeConfiguration.getInstance());
         this.database = database;
     }
 
@@ -147,15 +147,15 @@ public class GraphAwareRuntime extends BaseGraphAwareRuntime {
         }
 
         if (!roots.hasNext()) {
-            LOG.info("GraphAware Framework has never been run before on this database. Creating framework root node...");
+            LOG.info("GraphAware Runtime has never been run before on this database. Creating runtime root node...");
             root = database.createNode(GA_ROOT);
         }
         else {
             root = roots.next();
 
             if (roots.hasNext()) {
-                LOG.fatal("There is more than 1 framework root node! Cannot start GraphAware Framework.");
-                throw new IllegalStateException("There is more than 1 framework root node! Cannot start GraphAware Framework.");
+                LOG.fatal("There is more than 1 runtime root node! Cannot start GraphAware Runtime.");
+                throw new IllegalStateException("There is more than 1 runtime root node! Cannot start GraphAware Runtime.");
             }
         }
 

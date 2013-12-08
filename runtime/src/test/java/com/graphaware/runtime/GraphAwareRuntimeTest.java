@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.DefaultFrameworkConfiguration;
+import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.common.strategy.InclusionStrategiesImpl;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
@@ -34,9 +34,9 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import java.util.Iterator;
 
 import static com.graphaware.runtime.GraphAwareRuntime.*;
-import static com.graphaware.runtime.config.FrameworkConfiguration.GA_PREFIX;
+import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
 import static com.graphaware.common.test.IterableUtils.count;
-import static com.graphaware.runtime.config.FrameworkConfiguration.GA_ROOT;
+import static com.graphaware.runtime.config.RuntimeConfiguration.GA_ROOT;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
@@ -362,7 +362,7 @@ public class GraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
     }
 
     @Test
-    public void noRegisteredInterestedModulesShouldBeDelegatedToBeforeFrameworkStarts() {
+    public void noRegisteredInterestedModulesShouldBeDelegatedToBeforeRuntimeStarts() {
         GraphAwareRuntimeModule mockModule1 = mock(GraphAwareRuntimeModule.class);
         when(mockModule1.getId()).thenReturn(MOCK + "1");
         when(mockModule1.asString()).thenReturn(TEST_CONFIG);
@@ -474,59 +474,59 @@ public class GraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void frameworkCanOnlyBeStartedOnce() {
+    public void runtimeCanOnlyBeStartedOnce() {
         GraphAwareRuntime runtime = new GraphAwareRuntime(database);
         runtime.start();
         runtime.start();
     }
 
     @Test
-    public void frameworkConfiguredModulesShouldBeConfigured() {
-        FrameworkConfiguredRuntimeModule mockModule = mock(FrameworkConfiguredRuntimeModule.class);
+    public void runtimeConfiguredModulesShouldBeConfigured() {
+        RuntimeConfiguredRuntimeModule mockModule = mock(RuntimeConfiguredRuntimeModule.class);
         when(mockModule.getId()).thenReturn(MOCK);
         when(mockModule.asString()).thenReturn(TEST_CONFIG);
 
         GraphAwareRuntime runtime = new GraphAwareRuntime(database);
         runtime.registerModule(mockModule);
 
-        verify(mockModule).configurationChanged(DefaultFrameworkConfiguration.getInstance());
+        verify(mockModule).configurationChanged(DefaultRuntimeConfiguration.getInstance());
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
     }
 
     @Test
-    public void frameworkConfiguredModulesShouldBeConfigured2() {
-        FrameworkConfiguredRuntimeModule mockModule = mock(FrameworkConfiguredRuntimeModule.class);
+    public void runtimeConfiguredModulesShouldBeConfigured2() {
+        RuntimeConfiguredRuntimeModule mockModule = mock(RuntimeConfiguredRuntimeModule.class);
         when(mockModule.getId()).thenReturn(MOCK);
         when(mockModule.asString()).thenReturn(TEST_CONFIG);
 
         GraphAwareRuntime runtime = new GraphAwareRuntime(database);
         runtime.registerModule(mockModule, true);
 
-        verify(mockModule).configurationChanged(DefaultFrameworkConfiguration.getInstance());
+        verify(mockModule).configurationChanged(DefaultRuntimeConfiguration.getInstance());
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
     }
 
     @Test
-    public void realFrameworkConfiguredModulesShouldBeConfigured() {
-        RealFrameworkConfiguredRuntimeModule module = new RealFrameworkConfiguredRuntimeModule();
+    public void realRuntimeConfiguredModulesShouldBeConfigured() {
+        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule();
 
         GraphAwareRuntime runtime = new GraphAwareRuntime(database);
         runtime.registerModule(module, true);
 
-        assertEquals(DefaultFrameworkConfiguration.getInstance(), module.getConfig());
+        assertEquals(DefaultRuntimeConfiguration.getInstance(), module.getConfig());
     }
 
     @Test(expected = IllegalStateException.class)
     public void unConfiguredModuleShouldThrowException() {
-        RealFrameworkConfiguredRuntimeModule module = new RealFrameworkConfiguredRuntimeModule();
+        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule();
         module.getConfig();
     }
 
     @Test
     public void shutdownShouldBeCalledBeforeShutdown() {
-        FrameworkConfiguredRuntimeModule mockModule = mock(FrameworkConfiguredRuntimeModule.class);
+        RuntimeConfiguredRuntimeModule mockModule = mock(RuntimeConfiguredRuntimeModule.class);
         when(mockModule.getId()).thenReturn(MOCK);
         when(mockModule.asString()).thenReturn(TEST_CONFIG);
 

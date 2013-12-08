@@ -72,7 +72,7 @@ public class RelationshipCountBatchIntegrationTest {
     }
 
     @Test
-    public void noFramework() {
+    public void noRuntime() {
         setUpTwoNodes();
         simulateInserts();
         startDatabase();
@@ -83,7 +83,7 @@ public class RelationshipCountBatchIntegrationTest {
     }
 
     @Test
-    public void noFramework2() {
+    public void noRuntime2() {
         setUpTwoNodes();
         simulateInserts();
         simulateInserts();
@@ -96,10 +96,10 @@ public class RelationshipCountBatchIntegrationTest {
 
     @Test
     public void cachedCountsCanBeRebuilt() {
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         setUpTwoNodes();
         simulateInserts();
@@ -107,10 +107,10 @@ public class RelationshipCountBatchIntegrationTest {
         batchInserter.shutdown();
 
         batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        framework = new BatchGraphAwareRuntime(batchInserter);
+        runtime = new BatchGraphAwareRuntime(batchInserter);
         module = new RelationshipCountRuntimeModule();
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         module.reinitialize(batchInserter);
 
@@ -122,11 +122,11 @@ public class RelationshipCountBatchIntegrationTest {
     }
 
     @Test
-    public void defaultFrameworkOnNewDatabase() {
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+    public void defaultRuntimeOnNewDatabase() {
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         setUpTwoNodes();
         simulateInserts();
@@ -138,11 +138,11 @@ public class RelationshipCountBatchIntegrationTest {
     }
 
     @Test
-    public void defaultFrameworkWithChangedModule() throws IOException {
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+    public void defaultRuntimeWithChangedModule() throws IOException {
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         setUpTwoNodes();
         simulateInserts();
@@ -156,10 +156,10 @@ public class RelationshipCountBatchIntegrationTest {
 
         batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
 
-        framework = new BatchGraphAwareRuntime(batchInserter);
+        runtime = new BatchGraphAwareRuntime(batchInserter);
         module = new RelationshipCountRuntimeModule(RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(4)));
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         startDatabase();
 
@@ -171,10 +171,10 @@ public class RelationshipCountBatchIntegrationTest {
 
         batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
 
-        framework = new BatchGraphAwareRuntime(batchInserter);
+        runtime = new BatchGraphAwareRuntime(batchInserter);
         module = new RelationshipCountRuntimeModule(RelationshipCountStrategiesImpl.defaultStrategies().withThreshold(20));
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         startDatabase();
 
@@ -184,14 +184,14 @@ public class RelationshipCountBatchIntegrationTest {
     }
 
     @Test
-    public void defaultFrameworkOnExistingDatabase() {
+    public void defaultRuntimeOnExistingDatabase() {
         setUpTwoNodes();
         simulateInserts();
 
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         startDatabase();
 
@@ -201,11 +201,11 @@ public class RelationshipCountBatchIntegrationTest {
     }
 
     @Test
-    public void customFrameworkOnNewDatabase() {
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+    public void customRuntimeOnNewDatabase() {
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         setUpTwoNodes();
         simulateInserts();
@@ -217,14 +217,14 @@ public class RelationshipCountBatchIntegrationTest {
     }
 
     @Test
-    public void customFrameworkOnExistingDatabase() {
+    public void customRuntimeOnExistingDatabase() {
         setUpTwoNodes();
         simulateInserts();
 
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         startDatabase();
 
@@ -235,7 +235,7 @@ public class RelationshipCountBatchIntegrationTest {
 
     @Test
     public void weightedRelationships() {
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(
                 RelationshipCountStrategiesImpl.defaultStrategies()
                         .with(new WeighingStrategy() {
@@ -250,8 +250,8 @@ public class RelationshipCountBatchIntegrationTest {
                             }
                         }));
 
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         setUpTwoNodes();
         simulateInserts();
@@ -265,12 +265,12 @@ public class RelationshipCountBatchIntegrationTest {
 
     @Test
     public void defaultStrategiesWithLowerThreshold() {
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(
                 RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(4))
         );
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         setUpTwoNodes();
         simulateInserts();
@@ -283,12 +283,12 @@ public class RelationshipCountBatchIntegrationTest {
 
     @Test
     public void defaultStrategiesWithLowerThreshold2() {
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(
                 RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(4))
         );
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         setUpTwoNodes();
         simulateInserts();
@@ -302,12 +302,12 @@ public class RelationshipCountBatchIntegrationTest {
 
     @Test
     public void defaultStrategiesWithLowerThreshold3() {
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(
                 RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(3))
         );
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         setUpTwoNodes();
         simulateInserts();
@@ -328,7 +328,7 @@ public class RelationshipCountBatchIntegrationTest {
 
     @Test
     public void weightedRelationshipsWithCompaction() {
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(
                 RelationshipCountStrategiesImpl.defaultStrategies()
                         .with(new WeighingStrategy() {
@@ -344,8 +344,8 @@ public class RelationshipCountBatchIntegrationTest {
                         })
                         .with(new ThresholdBasedCompactionStrategy(10)));
 
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         setUpTwoNodes();
         simulateInserts();
@@ -360,7 +360,7 @@ public class RelationshipCountBatchIntegrationTest {
 
     @Test
     public void twoSimultaneousModules() {
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         final RelationshipCountRuntimeModule module1 = new RelationshipCountRuntimeModule("M1", RelationshipCountStrategiesImpl.defaultStrategies());
         final RelationshipCountRuntimeModule module2 = new RelationshipCountRuntimeModule("M2",
                 RelationshipCountStrategiesImpl.defaultStrategies()
@@ -376,9 +376,9 @@ public class RelationshipCountBatchIntegrationTest {
                             }
                         }));
 
-        framework.registerModule(module1);
-        framework.registerModule(module2);
-        framework.start();
+        runtime.registerModule(module1);
+        runtime.registerModule(module2);
+        runtime.start();
 
         setUpTwoNodes();
         simulateInserts();
@@ -396,7 +396,7 @@ public class RelationshipCountBatchIntegrationTest {
 
     @Test
     public void customRelationshipInclusionStrategy() {
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(
                 RelationshipCountStrategiesImpl.defaultStrategies()
                         .with(new RelationshipInclusionStrategy() {
@@ -411,8 +411,8 @@ public class RelationshipCountBatchIntegrationTest {
                             }
                         }));
 
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         setUpTwoNodes();
         simulateInserts();
@@ -433,7 +433,7 @@ public class RelationshipCountBatchIntegrationTest {
 
     @Test
     public void customRelationshipPropertiesInclusionStrategy() {
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(
                 RelationshipCountStrategiesImpl.defaultStrategies()
                         .with(new RelationshipPropertyInclusionStrategy() {
@@ -448,8 +448,8 @@ public class RelationshipCountBatchIntegrationTest {
                             }
                         }));
 
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         setUpTwoNodes();
         simulateInserts();
@@ -473,10 +473,10 @@ public class RelationshipCountBatchIntegrationTest {
     @Test
     @Ignore("bug in neo4j") //https://github.com/neo4j/neo4j/issues/1304
     public void batchTest() {
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         setUpTwoNodes();
 
@@ -493,12 +493,12 @@ public class RelationshipCountBatchIntegrationTest {
 
     @Test
     public void batchTestWithMultipleModulesAndLowerThreshold() {
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         final RelationshipCountRuntimeModule module1 = new RelationshipCountRuntimeModule("M1", RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(4)));
         final RelationshipCountRuntimeModule module2 = new RelationshipCountRuntimeModule("M2", RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(4)));
-        framework.registerModule(module1);
-        framework.registerModule(module2);
-        framework.start();
+        runtime.registerModule(module1);
+        runtime.registerModule(module2);
+        runtime.start();
 
         setUpTwoNodes();
 

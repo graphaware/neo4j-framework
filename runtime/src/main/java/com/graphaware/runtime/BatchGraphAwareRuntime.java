@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.FrameworkConfiguration;
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
 import org.apache.log4j.Logger;
@@ -25,7 +25,7 @@ import org.neo4j.graphdb.*;
 import java.util.Collection;
 import java.util.HashMap;
 
-import static com.graphaware.runtime.config.FrameworkConfiguration.*;
+import static com.graphaware.runtime.config.RuntimeConfiguration.*;
 
 
 /**
@@ -41,21 +41,21 @@ public class BatchGraphAwareRuntime extends BaseGraphAwareRuntime {
     private final TransactionSimulatingBatchInserter batchInserter;
 
     /**
-     * Create a new instance of the framework.
+     * Create a new instance of the runtime.
      *
-     * @param batchInserter that the framework should use.
+     * @param batchInserter that the runtime should use.
      */
     public BatchGraphAwareRuntime(TransactionSimulatingBatchInserter batchInserter) {
         this.batchInserter = batchInserter;
     }
 
     /**
-     * Create a new instance of the framework.
+     * Create a new instance of the runtime.
      *
-     * @param batchInserter that the framework should use.
-     * @param configuration of the framework.
+     * @param batchInserter that the runtime should use.
+     * @param configuration of the runtime.
      */
-    public BatchGraphAwareRuntime(TransactionSimulatingBatchInserter batchInserter, FrameworkConfiguration configuration) {
+    public BatchGraphAwareRuntime(TransactionSimulatingBatchInserter batchInserter, RuntimeConfiguration configuration) {
         super(configuration);
         this.batchInserter = batchInserter;
     }

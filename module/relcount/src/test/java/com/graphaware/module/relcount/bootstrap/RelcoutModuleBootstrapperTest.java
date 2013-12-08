@@ -46,7 +46,7 @@ public class RelcoutModuleBootstrapperTest {
     }
 
     @Test
-    public void defaultFrameworkOnExistingDatabase() {
+    public void defaultRuntimeOnExistingDatabase() {
         simulateUsage();
 
         verifyCounts(new NaiveRelationshipCounter());

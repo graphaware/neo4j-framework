@@ -20,8 +20,8 @@ import com.graphaware.common.description.property.LiteralPropertiesDescription;
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
 import com.graphaware.common.description.relationship.DetachedRelationshipDescriptionImpl;
 import com.graphaware.common.wrapper.NodeWrapper;
-import com.graphaware.runtime.config.BaseFrameworkConfigured;
-import com.graphaware.runtime.config.FrameworkConfigured;
+import com.graphaware.runtime.config.BaseRuntimeConfigured;
+import com.graphaware.runtime.config.RuntimeConfigured;
 import com.graphaware.module.relcount.RelationshipCountStrategies;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Direction;
@@ -38,7 +38,7 @@ import static com.graphaware.common.util.DirectionUtils.*;
  * <p/>
  * It has its own "cache" of {@link DegreeCachingNode}s in order to optimize database reads/writes.
  */
-public class NodeBasedDegreeCache extends BaseFrameworkConfigured implements DegreeCache, FrameworkConfigured {
+public class NodeBasedDegreeCache extends BaseRuntimeConfigured implements DegreeCache, RuntimeConfigured {
 
     private static final Logger LOG = Logger.getLogger(NodeBasedDegreeCache.class);
 

@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.DefaultFrameworkConfiguration;
+import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.common.strategy.InclusionStrategiesImpl;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserterImpl;
@@ -40,9 +40,9 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import static com.graphaware.runtime.GraphAwareRuntime.*;
-import static com.graphaware.runtime.config.FrameworkConfiguration.GA_PREFIX;
+import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
 import static com.graphaware.common.test.IterableUtils.count;
-import static com.graphaware.runtime.config.FrameworkConfiguration.GA_ROOT;
+import static com.graphaware.runtime.config.RuntimeConfiguration.GA_ROOT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
@@ -88,10 +88,10 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         final GraphAwareRuntimeModule mockModule = createMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule);
 
-        framework.start();
+        runtime.start();
 
         verify(mockModule).initialize(batchInserter);
         verify(mockModule).asString();
@@ -108,10 +108,10 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         long root = batchInserter.createNode(Collections.<String, Object>singletonMap(GA_PREFIX + RUNTIME + "_" + MOCK, CONFIG + TEST_CONFIG), GA_ROOT);
 
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule);
 
-        framework.start();
+        runtime.start();
 
         verify(mockModule, atLeastOnce()).getId();
         verify(mockModule).asString();
@@ -128,10 +128,10 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         long root = batchInserter.createNode(Collections.<String, Object>singletonMap(GA_PREFIX + RUNTIME + "_" + MOCK, CONFIG + "123"), GA_ROOT);
 
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule);
 
-        framework.start();
+        runtime.start();
 
         verify(mockModule).reinitialize(batchInserter);
         verify(mockModule, times(2)).asString();
@@ -150,10 +150,10 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         long root = batchInserter.createNode(new HashMap<String, Object>(), GA_ROOT);
         batchInserter.setNodeProperty(root, GA_PREFIX + RUNTIME + "_" + MOCK, FORCE_INITIALIZATION + "123");
 
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule);
 
-        framework.start();
+        runtime.start();
 
         verify(mockModule).reinitialize(batchInserter);
         verify(mockModule).asString();
@@ -171,10 +171,10 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         long root = batchInserter.createNode(Collections.<String, Object>singletonMap(GA_PREFIX + RUNTIME + "_" + MOCK, CONFIG + TEST_CONFIG), GA_ROOT);
 
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule, true);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule, true);
 
-        framework.start();
+        runtime.start();
 
         verify(mockModule).reinitialize(batchInserter);
         verify(mockModule).asString();
@@ -191,10 +191,10 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         long root = batchInserter.createNode(Collections.<String, Object>singletonMap(GA_PREFIX + RUNTIME + "_" + MOCK, CONFIG + "123"), GA_ROOT);
 
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule);
 
-        framework.start(true);
+        runtime.start(true);
 
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
@@ -207,9 +207,9 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         final GraphAwareRuntimeModule mockModule = createMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule);
-        framework.registerModule(mockModule);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule);
+        runtime.registerModule(mockModule);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -220,9 +220,9 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         when(mockModule2.getId()).thenReturn("ID");
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule1);
-        framework.registerModule(mockModule2);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule1);
+        runtime.registerModule(mockModule2);
     }
 
     @Test
@@ -234,10 +234,10 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         batchInserter.setNodeProperty(root, GA_PREFIX + RUNTIME + "_" + MOCK, CONFIG + TEST_CONFIG);
         batchInserter.setNodeProperty(root, GA_PREFIX + RUNTIME + "_UNUSED", CONFIG + "123");
 
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule);
 
-        framework.start();
+        runtime.start();
 
         verify(mockModule, atLeastOnce()).getId();
         verify(mockModule).asString();
@@ -253,10 +253,10 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         batchInserter.createNode(Collections.<String, Object>singletonMap(GA_PREFIX + RUNTIME + "_" + MOCK, "CORRUPT"), GA_ROOT);
 
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule);
 
-        framework.start();
+        runtime.start();
     }
 
     @Test
@@ -268,10 +268,10 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         batchInserter.setNodeProperty(root, GA_PREFIX + RUNTIME + "_" + MOCK, CONFIG + TEST_CONFIG);
         batchInserter.setNodeProperty(root, GA_PREFIX + RUNTIME + "_UNUSED", "CORRUPT");
 
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule);
 
-        framework.start();
+        runtime.start();
 
         verify(mockModule, atLeastOnce()).getId();
         verify(mockModule).asString();
@@ -298,12 +298,12 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         when(mockModule3.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.none());
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule1);
-        framework.registerModule(mockModule2);
-        framework.registerModule(mockModule3);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule1);
+        runtime.registerModule(mockModule2);
+        runtime.registerModule(mockModule3);
 
-        framework.start();
+        runtime.start();
 
         verify(mockModule1).initialize(batchInserter);
         verify(mockModule2).initialize(batchInserter);
@@ -332,7 +332,7 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
     }
 
     @Test
-    public void noRegisteredInterestedModulesShouldBeDelegatedToBeforeFrameworkStarts() {
+    public void noRegisteredInterestedModulesShouldBeDelegatedToBeforeRuntimeStarts() {
         GraphAwareRuntimeModule mockModule1 = mock(GraphAwareRuntimeModule.class);
         when(mockModule1.getId()).thenReturn("MOCK1");
         when(mockModule1.asString()).thenReturn(TEST_CONFIG);
@@ -349,10 +349,10 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         when(mockModule3.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.none());
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule1);
-        framework.registerModule(mockModule2);
-        framework.registerModule(mockModule3);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule1);
+        runtime.registerModule(mockModule2);
+        runtime.registerModule(mockModule3);
 
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
@@ -372,10 +372,10 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         Mockito.doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule);
 
-        framework.start();
+        runtime.start();
 
         assertTrue(batchInserter.getNodeProperties(0).get(GA_PREFIX + RUNTIME + "_" + MOCK).toString().startsWith(CONFIG));
 
@@ -394,10 +394,10 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()), 0);
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule);
 
-        framework.start();
+        runtime.start();
 
         batchInserter.createNode(null);
 
@@ -419,76 +419,76 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         final GraphAwareRuntimeModule mockModule = createMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.start(true);
-        framework.registerModule(mockModule);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.start(true);
+        runtime.registerModule(mockModule);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void frameworkCanOnlyBeStartedOnce() {
+    public void runtimeCanOnlyBeStartedOnce() {
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.start();
-        framework.start();
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.start();
+        runtime.start();
     }
 
     @Test
-    public void frameworkConfiguredModulesShouldBeConfigured() {
-        FrameworkConfiguredRuntimeModule mockModule = mock(FrameworkConfiguredRuntimeModule.class);
+    public void runtimeConfiguredModulesShouldBeConfigured() {
+        RuntimeConfiguredRuntimeModule mockModule = mock(RuntimeConfiguredRuntimeModule.class);
         when(mockModule.getId()).thenReturn(MOCK);
         when(mockModule.asString()).thenReturn(TEST_CONFIG);
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule);
 
-        verify(mockModule).configurationChanged(DefaultFrameworkConfiguration.getInstance());
+        verify(mockModule).configurationChanged(DefaultRuntimeConfiguration.getInstance());
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
     }
 
     @Test
-    public void frameworkConfiguredModulesShouldBeConfigured2() {
-        FrameworkConfiguredRuntimeModule mockModule = mock(FrameworkConfiguredRuntimeModule.class);
+    public void runtimeConfiguredModulesShouldBeConfigured2() {
+        RuntimeConfiguredRuntimeModule mockModule = mock(RuntimeConfiguredRuntimeModule.class);
         when(mockModule.getId()).thenReturn(MOCK);
         when(mockModule.asString()).thenReturn(TEST_CONFIG);
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule, true);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule, true);
 
-        verify(mockModule).configurationChanged(DefaultFrameworkConfiguration.getInstance());
+        verify(mockModule).configurationChanged(DefaultRuntimeConfiguration.getInstance());
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
     }
 
     @Test
-    public void realFrameworkConfiguredModulesShouldBeConfigured() {
-        RealFrameworkConfiguredRuntimeModule module = new RealFrameworkConfiguredRuntimeModule();
+    public void realRuntimeConfiguredModulesShouldBeConfigured() {
+        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(module);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(module);
 
-        assertEquals(DefaultFrameworkConfiguration.getInstance(), module.getConfig());
+        assertEquals(DefaultRuntimeConfiguration.getInstance(), module.getConfig());
     }
 
     @Test(expected = IllegalStateException.class)
     public void unConfiguredModuleShouldThrowException() {
-        RealFrameworkConfiguredRuntimeModule module = new RealFrameworkConfiguredRuntimeModule();
+        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule();
         module.getConfig();
     }
 
     @Test
     public void shutdownShouldBeCalledBeforeShutdown() {
-        FrameworkConfiguredRuntimeModule mockModule = mock(FrameworkConfiguredRuntimeModule.class);
+        RuntimeConfiguredRuntimeModule mockModule = mock(RuntimeConfiguredRuntimeModule.class);
         when(mockModule.getId()).thenReturn(MOCK);
         when(mockModule.asString()).thenReturn(TEST_CONFIG);
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule);
-        framework.start();
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule);
+        runtime.start();
 
         batchInserter.shutdown();
 
@@ -509,11 +509,11 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         when(mockModule2.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        BatchGraphAwareRuntime framework = new BatchGraphAwareRuntime(batchInserter);
-        framework.registerModule(mockModule1);
-        framework.registerModule(mockModule2);
+        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.registerModule(mockModule1);
+        runtime.registerModule(mockModule2);
 
-        framework.start();
+        runtime.start();
 
         verify(mockModule1).initialize(batchInserter);
         verify(mockModule2).initialize(batchInserter);

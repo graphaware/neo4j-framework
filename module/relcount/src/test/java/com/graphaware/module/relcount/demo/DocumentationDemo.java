@@ -33,10 +33,10 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
     @Test
     public void demonstrateCachedRelationshipCounter() {
-        GraphAwareRuntime framework = new GraphAwareRuntime(database);
+        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
         RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         populateDatabase();
 
@@ -61,13 +61,13 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
     @Test
     public void demonstrateFullCachedRelationshipCounterWithCustomThreshold() {
-        GraphAwareRuntime framework = new GraphAwareRuntime(database);
+        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
 
         RelationshipCountStrategies relationshipCountStrategies = RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(7));
         RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountStrategies);
 
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         populateDatabase();
 
@@ -90,13 +90,13 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
     @Test
     public void demonstrateFullCachedRelationshipCounterWithCustomLowerThreshold() {
-        GraphAwareRuntime framework = new GraphAwareRuntime(database);
+        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
 
         RelationshipCountStrategies relationshipCountStrategies = RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(3));
         RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountStrategies);
 
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         populateDatabase();
 
@@ -122,7 +122,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
     @Test
     public void demonstrateFullCachedRelationshipCounterWithCustomThresholdAndWeighingStrategy() {
-        GraphAwareRuntime framework = new GraphAwareRuntime(database);
+        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
 
         WeighingStrategy customWeighingStrategy = new WeighingStrategy() {
             @Override
@@ -142,8 +142,8 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
         RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountStrategies);
 
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         populateDatabase();
 
@@ -166,7 +166,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
     @Test
     public void demonstrateFullCachedRelationshipCounterWithCustomRelationshipInclusionStrategy() {
-        GraphAwareRuntime framework = new GraphAwareRuntime(database);
+        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
 
         RelationshipInclusionStrategy customRelationshipInclusionStrategy = new RelationshipInclusionStrategy() {
             @Override
@@ -185,8 +185,8 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
         RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountStrategies);
 
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         populateDatabase();
 
@@ -208,7 +208,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
     @Test
     public void demonstrateFullCachedRelationshipCounterWithCustomRelationshipPropertyInclusionStrategy() {
-        GraphAwareRuntime framework = new GraphAwareRuntime(database);
+        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
 
         RelationshipPropertyInclusionStrategy customRelationshipPropertyInclusionStrategy = new RelationshipPropertyInclusionStrategy() {
             @Override
@@ -227,8 +227,8 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
         RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountStrategies);
 
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         populateDatabase();
 
@@ -272,13 +272,13 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
     @Test
     public void demonstrateFullFallingBackRelationshipCounterWithCustomLowerThreshold() {
-        GraphAwareRuntime framework = new GraphAwareRuntime(database);
+        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
 
         RelationshipCountStrategies relationshipCountStrategies = RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(3));
         RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountStrategies);
 
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         populateDatabase();
 

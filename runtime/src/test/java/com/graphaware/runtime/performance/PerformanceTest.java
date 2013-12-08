@@ -75,7 +75,7 @@ public interface PerformanceTest {
     Map<String, String> databaseParameters(Map<String, Object> params);
 
     /**
-     * Prepare the database for performance test, for instance, register the framework, pre-populate with data, etc.
+     * Prepare the database for performance test, for instance, register the runtime, pre-populate with data, etc.
      *
      * @param database to prepare.
      * @param params   test parameters.

@@ -1,8 +1,8 @@
 package com.graphaware.module.relcount.cache;
 
 import com.graphaware.common.wrapper.NodeWrapper;
-import com.graphaware.runtime.config.DefaultFrameworkConfiguration;
-import com.graphaware.runtime.config.FrameworkConfiguration;
+import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.module.relcount.count.WeighingStrategy;
 import com.graphaware.module.relcount.RelationshipCountStrategies;
 import com.graphaware.module.relcount.RelationshipCountStrategiesImpl;
@@ -33,7 +33,7 @@ public class NodeBasedDegreeCacheTest {
     @Before
     public void setUp() {
         cache = new TestNodeBasedDegreeCache("TEST_ID", RelationshipCountStrategiesImpl.defaultStrategies());
-        cache.configurationChanged(DefaultFrameworkConfiguration.getInstance());
+        cache.configurationChanged(DefaultRuntimeConfiguration.getInstance());
 
         mockDegreeCachingNode = mock(DegreeCachingNode.class);
     }
@@ -140,7 +140,7 @@ public class NodeBasedDegreeCacheTest {
                     }
                 }
         ), true);
-        cache.configurationChanged(DefaultFrameworkConfiguration.getInstance());
+        cache.configurationChanged(DefaultRuntimeConfiguration.getInstance());
 
         Node mockStartNode = mock(Node.class);
         when(mockStartNode.getId()).thenReturn(123L);
@@ -213,7 +213,7 @@ public class NodeBasedDegreeCacheTest {
                     }
                 }
         ), true);
-        cache.configurationChanged(DefaultFrameworkConfiguration.getInstance());
+        cache.configurationChanged(DefaultRuntimeConfiguration.getInstance());
 
         Node mockStartNode = mock(Node.class);
         when(mockStartNode.getId()).thenReturn(123L);
@@ -286,7 +286,7 @@ public class NodeBasedDegreeCacheTest {
             long id = node.getId();
             when(mockDegreeCachingNode.getId()).thenReturn(id);
 
-            assertEquals(prefix, FrameworkConfiguration.GA_PREFIX + "TEST_ID" + "_");
+            assertEquals(prefix, RuntimeConfiguration.GA_PREFIX + "TEST_ID" + "_");
             if (!doNotCheckStrategies) {
                 assertEquals(strategies.asString(), RelationshipCountStrategiesImpl.defaultStrategies().asString());
             }

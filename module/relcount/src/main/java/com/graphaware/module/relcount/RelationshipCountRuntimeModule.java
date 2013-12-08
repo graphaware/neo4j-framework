@@ -3,9 +3,9 @@ package com.graphaware.module.relcount;
 import com.graphaware.common.change.Change;
 import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.runtime.GraphAwareRuntimeModule;
-import com.graphaware.runtime.config.BaseFrameworkConfigured;
-import com.graphaware.runtime.config.FrameworkConfiguration;
-import com.graphaware.runtime.config.FrameworkConfigured;
+import com.graphaware.runtime.config.BaseRuntimeConfigured;
+import com.graphaware.runtime.config.RuntimeConfiguration;
+import com.graphaware.runtime.config.RuntimeConfigured;
 import com.graphaware.module.relcount.cache.NodeBasedDegreeCache;
 import com.graphaware.module.relcount.count.CachedRelationshipCounter;
 import com.graphaware.module.relcount.count.FallbackRelationshipCounter;
@@ -39,7 +39,7 @@ import static org.neo4j.tooling.GlobalGraphOperations.*;
  * counts will be cached on nodes properties. {@link com.graphaware.module.relcount.count.CachedRelationshipCounter} or {@link com.graphaware.module.relcount.count.FallbackRelationshipCounter} can then be used to
  * count relationships by querying these cached counts.
  */
-public class RelationshipCountRuntimeModule extends BaseFrameworkConfigured implements GraphAwareRuntimeModule, FrameworkConfigured {
+public class RelationshipCountRuntimeModule extends BaseRuntimeConfigured implements GraphAwareRuntimeModule, RuntimeConfigured {
 
     /**
      * Default ID of this module used to identify metadata written by this module.
@@ -198,7 +198,7 @@ public class RelationshipCountRuntimeModule extends BaseFrameworkConfigured impl
      * {@inheritDoc}
      */
     @Override
-    public void configurationChanged(FrameworkConfiguration configuration) {
+    public void configurationChanged(RuntimeConfiguration configuration) {
         super.configurationChanged(configuration);
         relationshipCountCache.configurationChanged(configuration);
     }

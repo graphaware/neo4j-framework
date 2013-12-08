@@ -19,7 +19,7 @@ package com.graphaware.runtime.strategy;
 import com.graphaware.common.strategy.IncludeAllNodeProperties;
 import com.graphaware.common.strategy.NodePropertyInclusionStrategy;
 import com.graphaware.common.strategy.PropertyInclusionStrategy;
-import com.graphaware.runtime.config.FrameworkConfiguration;
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.neo4j.graphdb.Node;
 
 /**
@@ -43,7 +43,7 @@ public class IncludeAllBusinessNodeProperties extends IncludeAllNodeProperties {
      */
     @Override
     public boolean include(String key, Node node) {
-        if (key.startsWith(FrameworkConfiguration.GA_PREFIX)) {
+        if (key.startsWith(RuntimeConfiguration.GA_PREFIX)) {
             return false;
         }
 

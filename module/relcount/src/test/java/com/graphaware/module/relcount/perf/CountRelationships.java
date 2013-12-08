@@ -44,7 +44,7 @@ public class CountRelationships extends RelcountPerformanceTest {
         MULTI_PROP
     }
 
-    enum FrameworkInvolvement {
+    enum RuntimeInvolvement {
         NO_FRAMEWORK,
         NAIVE,
         CACHED
@@ -72,7 +72,7 @@ public class CountRelationships extends RelcountPerformanceTest {
         result.add(new EnumParameter(SERIALIZATION, Serialization.class));
         result.add(new CacheParameter(CACHE));
         result.add(new ExponentialParameter(DEGREE, 10, 1, 4, 0.25));
-        result.add(new EnumParameter(FW, FrameworkInvolvement.class));
+        result.add(new EnumParameter(FW, RuntimeInvolvement.class));
         result.add(new EnumParameter(PROPS, Properties.class));
 
         return result;
@@ -100,10 +100,10 @@ public class CountRelationships extends RelcountPerformanceTest {
             strategies = strategies.with(new NodePropertiesDegreeCachingStrategy());
         }
 
-        GraphAwareRuntime framework = new GraphAwareRuntime(database);
+        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
         module = new RelationshipCountRuntimeModule(strategies);
-        framework.registerModule(module);
-        framework.start();
+        runtime.registerModule(module);
+        runtime.start();
 
         new NoInputBatchTransactionExecutor(database, 1000, NO_NODES, new UnitOfWork<NullItem>() {
             @Override
@@ -136,16 +136,16 @@ public class CountRelationships extends RelcountPerformanceTest {
             time += TestUtils.time(new TestUtils.Timed() {
                 @Override
                 public void time() {
-                    FrameworkInvolvement frameworkInvolvement = ((FrameworkInvolvement) params.get(FW));
-                    switch (frameworkInvolvement) {
+                    RuntimeInvolvement runtimeInvolvement = ((RuntimeInvolvement) params.get(FW));
+                    switch (runtimeInvolvement) {
                         case NO_FRAMEWORK:
-                            countAsIfThereWasNoFramework(database, params);
+                            countAsIfThereWasNoRuntime(database, params);
                             break;
                         case CACHED:
-                            countUsingFramework(database, params, module.cachedCounter());
+                            countUsingRuntime(database, params, module.cachedCounter());
                             break;
                         case NAIVE:
-                            countUsingFramework(database, params, module.naiveCounter());
+                            countUsingRuntime(database, params, module.naiveCounter());
                             break;
                         default:
                             throw new RuntimeException("unknown option");
@@ -157,7 +157,7 @@ public class CountRelationships extends RelcountPerformanceTest {
         return time;
     }
 
-    private long countAsIfThereWasNoFramework(final GraphDatabaseService database, Map<String, Object> params) {
+    private long countAsIfThereWasNoRuntime(final GraphDatabaseService database, Map<String, Object> params) {
         final AtomicLong result = new AtomicLong(0);
 
         final Node node = randomNode(database, NO_NODES);
@@ -174,7 +174,7 @@ public class CountRelationships extends RelcountPerformanceTest {
         return result.get();
     }
 
-    protected long countUsingFramework(final GraphDatabaseService database, Map<String, Object> params, RelationshipCounter counter) {
+    protected long countUsingRuntime(final GraphDatabaseService database, Map<String, Object> params, RelationshipCounter counter) {
         final Node node = randomNode(database, NO_NODES);
         DetachedRelationshipDescription description = wildcard(randomType(), randomDirection());
         if (Properties.TWO_PROPS.equals(params.get(PROPS))) {

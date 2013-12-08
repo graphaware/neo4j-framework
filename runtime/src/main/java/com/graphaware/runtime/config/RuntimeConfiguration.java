@@ -22,7 +22,7 @@ import org.neo4j.graphdb.Label;
 /**
  * {@link com.graphaware.runtime.GraphAwareRuntime} configuration.
  */
-public interface FrameworkConfiguration {
+public interface RuntimeConfiguration {
 
     /**
      * Prefix for GraphAware internal nodes, relationships, and properties. This is fixed as there is little chance
@@ -31,7 +31,7 @@ public interface FrameworkConfiguration {
     public static final String GA_PREFIX = "_GA_";
 
     /**
-     * Label of the framework root node.
+     * Label of the runtime root node.
      */
     public static final Label GA_ROOT = DynamicLabel.label(GA_PREFIX + "ROOT");
 

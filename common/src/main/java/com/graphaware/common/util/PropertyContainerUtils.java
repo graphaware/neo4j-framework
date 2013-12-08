@@ -115,7 +115,7 @@ public final class PropertyContainerUtils {
     /**
      * Convert all properties from a {@link org.neo4j.graphdb.PropertyContainer} to a {@link java.util.Map}, where the key is the
      * property key and value is the property value. Keys must not be <code>null</code>
-     * (not allowed by Neo4j anyway) or empty (not allowed by GraphAware). <code>Null</code> values are fine.
+     * or empty. <code>Null</code> values are fine.
      *
      * @param propertyContainer to convert properties from.
      * @return converted properties.
@@ -127,7 +127,7 @@ public final class PropertyContainerUtils {
     /**
      * Convert selected properties from a {@link org.neo4j.graphdb.PropertyContainer} to a {@link java.util.Map}, where the key is the
      * property key and value is the property value. Keys must not be <code>null</code>
-     * (not allowed by Neo4j anyway) or empty (not allowed by GraphAware). <code>Null</code> values are fine.
+     * or empty. <code>Null</code> values are fine.
      *
      * @param propertyContainer         to convert properties from.
      * @param propertyInclusionStrategy strategy to select which properties to include. Decides based on the property key.

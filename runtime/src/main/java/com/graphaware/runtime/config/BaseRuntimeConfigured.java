@@ -17,18 +17,18 @@
 package com.graphaware.runtime.config;
 
 /**
- * Convenience base-class for {@link FrameworkConfigured} components.
+ * Convenience base-class for {@link RuntimeConfigured} components.
  */
 @SuppressWarnings("UnusedDeclaration") //used by GraphAware modules
-public abstract class BaseFrameworkConfigured implements FrameworkConfigured {
+public abstract class BaseRuntimeConfigured implements RuntimeConfigured {
 
-    private FrameworkConfiguration configuration;
+    private RuntimeConfiguration configuration;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void configurationChanged(FrameworkConfiguration configuration) {
+    public void configurationChanged(RuntimeConfiguration configuration) {
         this.configuration = configuration;
     }
 
@@ -38,10 +38,10 @@ public abstract class BaseFrameworkConfigured implements FrameworkConfigured {
      * @return current configuration.
      * @throws IllegalStateException if it hasn't been configured yet.
      */
-    protected FrameworkConfiguration getConfig() {
+    protected RuntimeConfiguration getConfig() {
         if (configuration == null) {
             throw new IllegalStateException("Component hasn't been configured. Has it been registered with the " +
-                    "GraphAware framework?");
+                    "GraphAware runtime?");
         }
 
         return configuration;

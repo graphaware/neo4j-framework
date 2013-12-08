@@ -17,15 +17,14 @@
 package com.graphaware.runtime.config;
 
 /**
- * Base-class for {@link FrameworkConfiguration} implementations.
+ * Component configurable by {@link com.graphaware.runtime.GraphAwareRuntime}.
  */
-public abstract class BaseFrameworkConfiguration implements FrameworkConfiguration {
+public interface RuntimeConfigured {
 
     /**
-     * {@inheritDoc}
+     * Acknowledge a configuration change.
+     *
+     * @param configuration new configuration.
      */
-    @Override
-    public String createPrefix(String id) {
-        return GA_PREFIX + id + "_";
-    }
+    void configurationChanged(RuntimeConfiguration configuration);
 }

@@ -17,16 +17,16 @@
 package com.graphaware.runtime.config;
 
 /**
- * Default {@link FrameworkConfiguration} for {@link com.graphaware.runtime.GraphAwareRuntime}. Singleton.
+ * Default {@link RuntimeConfiguration} for {@link com.graphaware.runtime.GraphAwareRuntime}. Singleton.
  */
-public final class DefaultFrameworkConfiguration extends BaseFrameworkConfiguration {
+public final class DefaultRuntimeConfiguration extends BaseRuntimeConfiguration {
 
-    public static final DefaultFrameworkConfiguration INSTANCE = new DefaultFrameworkConfiguration();
+    public static final DefaultRuntimeConfiguration INSTANCE = new DefaultRuntimeConfiguration();
 
-    public static DefaultFrameworkConfiguration getInstance() {
+    public static DefaultRuntimeConfiguration getInstance() {
         return INSTANCE;
     }
 
-    private DefaultFrameworkConfiguration() {
+    private DefaultRuntimeConfiguration() {
     }
 }

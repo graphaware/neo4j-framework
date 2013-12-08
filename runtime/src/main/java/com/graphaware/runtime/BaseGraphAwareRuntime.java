@@ -17,9 +17,9 @@
 package com.graphaware.runtime;
 
 import com.graphaware.common.strategy.InclusionStrategy;
-import com.graphaware.runtime.config.DefaultFrameworkConfiguration;
-import com.graphaware.runtime.config.FrameworkConfiguration;
-import com.graphaware.runtime.config.FrameworkConfigured;
+import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
+import com.graphaware.runtime.config.RuntimeConfiguration;
+import com.graphaware.runtime.config.RuntimeConfigured;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import com.graphaware.common.util.PropertyContainerUtils;
@@ -35,10 +35,10 @@ import java.util.*;
 
 
 /**
- * Framework that delegates to registered {@link GraphAwareRuntimeModule}s to perform useful work.
- * There must be exactly one instance of this framework for a single {@link org.neo4j.graphdb.GraphDatabaseService}.
+ * Runtime that delegates to registered {@link GraphAwareRuntimeModule}s to perform useful work.
+ * There must be exactly one instance of this runtime for a single {@link org.neo4j.graphdb.GraphDatabaseService}.
  * <p/>
- * The framework registers itself as a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler},
+ * The runtime registers itself as a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler},
  * translates {@link org.neo4j.graphdb.event.TransactionData} into {@link com.graphaware.tx.event.improved.api.ImprovedTransactionData}
  * and lets registered {@link GraphAwareRuntimeModule}s deal with the data before each transaction
  * commits, in the order the modules were registered.
@@ -52,7 +52,7 @@ import java.util.*;
  * performed for all modules, for which it has been detected that something is out-of-sync
  * (module threw a {@link NeedsInitializationException}).
  * <p/>
- * The root node (node with ID = 0) needs to be present in the database in order for this framework to work. It does not
+ * The root node (node with ID = 0) needs to be present in the database in order for this runtime to work. It does not
  * need to be used by the application, nor does it need to be connected to any other node, but it needs to be present
  * in the database.
  */
@@ -64,24 +64,24 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
 
     private static final Logger LOG = Logger.getLogger(BaseGraphAwareRuntime.class);
 
-    private final FrameworkConfiguration configuration;
+    private final RuntimeConfiguration configuration;
     private final List<GraphAwareRuntimeModule> modules = new LinkedList<>();
 
     private volatile boolean started;
 
     /**
-     * Create a new instance of the framework with {@link DefaultFrameworkConfiguration}.
+     * Create a new instance of the runtime with {@link com.graphaware.runtime.config.DefaultRuntimeConfiguration}.
      */
     public BaseGraphAwareRuntime() {
-        this(DefaultFrameworkConfiguration.getInstance());
+        this(DefaultRuntimeConfiguration.getInstance());
     }
 
     /**
-     * Create a new instance of the framework.
+     * Create a new instance of the runtime.
      *
-     * @param configuration of the framework.
+     * @param configuration of the runtime.
      */
-    public BaseGraphAwareRuntime(FrameworkConfiguration configuration) {
+    public BaseGraphAwareRuntime(RuntimeConfiguration configuration) {
         this.configuration = configuration;
     }
 
@@ -99,7 +99,7 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
      * Register a {@link GraphAwareRuntimeModule} and optionally force its (re-)initialization.
      * <p/>
      * Forcing re-initialization should only be necessary in exceptional circumstances, such as that the database has
-     * been written to without the module being registered / framework running. Re-initialization can be a very
+     * been written to without the module being registered / runtime running. Re-initialization can be a very
      * expensive, graph-global operation, should only be run once, database stopped and started again without forcing
      * re-initialization.
      * <p/>
@@ -121,8 +121,8 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
         checkNotAlreadyRegistered(module);
         modules.add(module);
 
-        if (module instanceof FrameworkConfigured) {
-            ((FrameworkConfigured) module).configurationChanged(configuration);
+        if (module instanceof RuntimeConfigured) {
+            ((RuntimeConfigured) module).configurationChanged(configuration);
         }
 
         if (forceInitialization) {
@@ -132,7 +132,7 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
     }
 
     /**
-     * Check that the given module isn't already registered with the framework.
+     * Check that the given module isn't already registered with the runtime.
      *
      * @param module to check.
      * @throws IllegalStateException in case the module is already registered.
@@ -150,14 +150,14 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
     }
 
     /**
-     * Start the framework. Must be called before anything gets written into the database.
+     * Start the runtime. Must be called before anything gets written into the database.
      */
     public final synchronized void start() {
         start(false);
     }
 
     /**
-     * Start the framework, optionally skipping the initialization phase. It is not recommended to skip initialization;
+     * Start the runtime, optionally skipping the initialization phase. It is not recommended to skip initialization;
      * un-initialized modules might not behave correctly.
      *
      * @param skipInitialization true for skipping initialization.
@@ -254,7 +254,7 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
      * Initialize modules if needed.
      * <p/>
      * Metadata about modules is stored as properties on the root node (node with ID = 0) in the form of
-     * {@link com.graphaware.runtime.config.FrameworkConfiguration#GA_PREFIX}{@link #RUNTIME}_{@link GraphAwareRuntimeModule#getId()}
+     * {@link com.graphaware.runtime.config.RuntimeConfiguration#GA_PREFIX}{@link #RUNTIME}_{@link GraphAwareRuntimeModule#getId()}
      * as key and one of the following as value:
      * - {@link #CONFIG} + {@link GraphAwareRuntimeModule#asString()} capturing the last configuration
      * the module has been run with
@@ -367,7 +367,7 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
     protected abstract void removeUnusedModules(final Collection<String> unusedModules);
 
     /**
-     * Get properties starting with {@link com.graphaware.runtime.config.FrameworkConfiguration#GA_PREFIX} + {@link #RUNTIME} from a node.
+     * Get properties starting with {@link com.graphaware.runtime.config.RuntimeConfiguration#GA_PREFIX} + {@link #RUNTIME} from a node.
      *
      * @param node to get properties from.
      * @return map of properties (key-value).
@@ -397,7 +397,7 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
     }
 
     /**
-     * Force a module to be (re-)initialized next time the database (and framework) are started.
+     * Force a module to be (re-)initialized next time the database (and runtime) are started.
      *
      * @param module to be (re-)initialized next time.
      */

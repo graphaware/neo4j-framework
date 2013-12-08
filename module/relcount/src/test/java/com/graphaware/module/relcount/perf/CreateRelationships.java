@@ -31,7 +31,7 @@ public class CreateRelationships extends RelcountPerformanceTest {
     private static final int NO_NODES = 100;
     private static final int NO_RELATIONSHIPS = 1000;
 
-    enum FrameworkInvolvement {
+    enum RuntimeInvolvement {
         NO_FRAMEWORK,
         EMPTY_FRAMEWORK,
         RELCOUNT_NO_PROPS_SINGLE_PROP_STORAGE,
@@ -62,7 +62,7 @@ public class CreateRelationships extends RelcountPerformanceTest {
         List<Parameter> result = new LinkedList<>();
 
         result.add(new EnumParameter(PROPS, Properties.class));
-        result.add(new EnumParameter(FW, FrameworkInvolvement.class));
+        result.add(new EnumParameter(FW, RuntimeInvolvement.class));
         result.add(new ExponentialParameter(BATCH_SIZE, 10, 0, 3, 0.25));
 
         return result;
@@ -85,36 +85,36 @@ public class CreateRelationships extends RelcountPerformanceTest {
 
     @Override
     public void prepareDatabase(GraphDatabaseService database, Map<String, Object> params) {
-        FrameworkInvolvement frameworkInvolvement = (FrameworkInvolvement) params.get(FW);
+        RuntimeInvolvement runtimeInvolvement = (RuntimeInvolvement) params.get(FW);
 
-        switch (frameworkInvolvement) {
+        switch (runtimeInvolvement) {
             case EMPTY_FRAMEWORK:
-                GraphAwareRuntime framework = new GraphAwareRuntime(database);
-                framework.start();
+                GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+                runtime.start();
                 break;
             case RELCOUNT_NO_PROPS_SINGLE_PROP_STORAGE:
-                framework = new GraphAwareRuntime(database);
-                framework.registerModule(new RelationshipCountRuntimeModule(RelationshipCountStrategiesImpl.defaultStrategies()
+                runtime = new GraphAwareRuntime(database);
+                runtime.registerModule(new RelationshipCountRuntimeModule(RelationshipCountStrategiesImpl.defaultStrategies()
                         .with(IncludeNoRelationshipProperties.getInstance())));
-                framework.start();
+                runtime.start();
                 break;
             case RELCOUNT_NO_PROPS_MULTI_PROP_STORAGE:
-                framework = new GraphAwareRuntime(database);
-                framework.registerModule(new RelationshipCountRuntimeModule(RelationshipCountStrategiesImpl.defaultStrategies()
+                runtime = new GraphAwareRuntime(database);
+                runtime.registerModule(new RelationshipCountRuntimeModule(RelationshipCountStrategiesImpl.defaultStrategies()
                         .with(IncludeNoRelationshipProperties.getInstance())
                         .with(new NodePropertiesDegreeCachingStrategy())));
-                framework.start();
+                runtime.start();
                 break;
             case FULL_RELCOUNT_SINGLE_PROP_STORAGE:
-                framework = new GraphAwareRuntime(database);
-                framework.registerModule(new RelationshipCountRuntimeModule());
-                framework.start();
+                runtime = new GraphAwareRuntime(database);
+                runtime.registerModule(new RelationshipCountRuntimeModule());
+                runtime.start();
                 break;
             case FULL_RELCOUNT_MULTI_PROP_STORAGE:
-                framework = new GraphAwareRuntime(database);
-                framework.registerModule(new RelationshipCountRuntimeModule(RelationshipCountStrategiesImpl.defaultStrategies()
+                runtime = new GraphAwareRuntime(database);
+                runtime.registerModule(new RelationshipCountRuntimeModule(RelationshipCountStrategiesImpl.defaultStrategies()
                         .with(new NodePropertiesDegreeCachingStrategy())));
-                framework.start();
+                runtime.start();
                 break;
             default:
                 //nothing

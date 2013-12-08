@@ -16,9 +16,9 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.BaseFrameworkConfigured;
-import com.graphaware.runtime.config.FrameworkConfiguration;
-import com.graphaware.runtime.config.FrameworkConfigured;
+import com.graphaware.runtime.config.BaseRuntimeConfigured;
+import com.graphaware.runtime.config.RuntimeConfiguration;
+import com.graphaware.runtime.config.RuntimeConfigured;
 import com.graphaware.common.strategy.InclusionStrategiesImpl;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Base-class for framework tests.
+ * Base-class for runtime tests.
  */
 public abstract class BaseGraphAwareRuntimeTest {
 
@@ -44,15 +44,15 @@ public abstract class BaseGraphAwareRuntimeTest {
         return mockModule;
     }
 
-    protected interface FrameworkConfiguredRuntimeModule extends GraphAwareRuntimeModule, FrameworkConfigured {
+    protected interface RuntimeConfiguredRuntimeModule extends GraphAwareRuntimeModule, RuntimeConfigured {
 
     }
 
-    protected class RealFrameworkConfiguredRuntimeModule extends BaseFrameworkConfigured implements FrameworkConfiguredRuntimeModule {
+    protected class RealRuntimeConfiguredRuntimeModule extends BaseRuntimeConfigured implements RuntimeConfiguredRuntimeModule {
 
         //make public
         @Override
-        protected FrameworkConfiguration getConfig() {
+        protected RuntimeConfiguration getConfig() {
             return super.getConfig();
         }
 

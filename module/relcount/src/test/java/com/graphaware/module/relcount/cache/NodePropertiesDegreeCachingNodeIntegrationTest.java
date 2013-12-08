@@ -16,7 +16,7 @@
 
 package com.graphaware.module.relcount.cache;
 
-import com.graphaware.runtime.config.DefaultFrameworkConfiguration;
+import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.module.relcount.count.CachedRelationshipCounter;
 import com.graphaware.module.relcount.count.RelationshipCounter;
 import com.graphaware.module.relcount.RelationshipCountStrategiesImpl;
@@ -32,7 +32,7 @@ public class NodePropertiesDegreeCachingNodeIntegrationTest extends DegreeCachin
     protected DegreeCachingNode cachingNode() {
         return new DegreeCachingNode(
                 database.getNodeById(0),
-                DefaultFrameworkConfiguration.getInstance().createPrefix(FULL_RELCOUNT_DEFAULT_ID),
+                DefaultRuntimeConfiguration.getInstance().createPrefix(FULL_RELCOUNT_DEFAULT_ID),
                 RelationshipCountStrategiesImpl.defaultStrategies().with(new NodePropertiesDegreeCachingStrategy()));
     }
 
@@ -40,7 +40,7 @@ public class NodePropertiesDegreeCachingNodeIntegrationTest extends DegreeCachin
     protected RelationshipCounter counter() {
         return new CachedRelationshipCounter(
                 FULL_RELCOUNT_DEFAULT_ID,
-                DefaultFrameworkConfiguration.getInstance(),
+                DefaultRuntimeConfiguration.getInstance(),
                 RelationshipCountStrategiesImpl.defaultStrategies().with(new NodePropertiesDegreeCachingStrategy()));
     }
 }

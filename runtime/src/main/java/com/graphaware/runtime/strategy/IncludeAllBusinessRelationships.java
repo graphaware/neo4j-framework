@@ -18,7 +18,7 @@ package com.graphaware.runtime.strategy;
 
 import com.graphaware.common.strategy.IncludeAllRelationships;
 import com.graphaware.common.strategy.RelationshipInclusionStrategy;
-import com.graphaware.runtime.config.FrameworkConfiguration;
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.neo4j.graphdb.Relationship;
 
 /**
@@ -43,7 +43,7 @@ public class IncludeAllBusinessRelationships extends IncludeAllRelationships {
      */
     @Override
     public final boolean include(Relationship relationship) {
-        if (relationship.getType().name().startsWith(FrameworkConfiguration.GA_PREFIX)) {
+        if (relationship.getType().name().startsWith(RuntimeConfiguration.GA_PREFIX)) {
             return false;
         }
 

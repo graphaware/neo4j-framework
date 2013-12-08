@@ -28,9 +28,9 @@ public class SpaceComparison {
         one.shutdown();
 
         GraphDatabaseService two = new GraphDatabaseFactory().newEmbeddedDatabase("/tmp/space/two");
-        GraphAwareRuntime framework = new GraphAwareRuntime(two);
-        framework.registerModule(new RelationshipCountRuntimeModule());
-        framework.start();
+        GraphAwareRuntime runtime = new GraphAwareRuntime(two);
+        runtime.registerModule(new RelationshipCountRuntimeModule());
+        runtime.start();
         populateDatabase(two);
         two.shutdown();
     }

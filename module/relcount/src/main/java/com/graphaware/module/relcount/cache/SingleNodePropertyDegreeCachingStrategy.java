@@ -12,7 +12,7 @@ import static com.graphaware.common.description.serialize.Serializer.toByteArray
 
 /**
  * {@link DegreeCachingStrategy} that caches degrees as a single node property on the node that the degrees are for.
- * The key of the property is the prefix (framework identifier + module prefix) and the value is the entire map of
+ * The key of the property is the prefix (runtime identifier + module prefix) and the value is the entire map of
  * degrees serialized to a byte array.
  */
 public class SingleNodePropertyDegreeCachingStrategy implements DegreeCachingStrategy {
