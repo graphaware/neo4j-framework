@@ -3,43 +3,51 @@ GraphAware Neo4j Framework
 
 [![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework)
 
-The aim of the GraphAware Framework is to speed-up development with Neo4j and provide useful generic and domain-specific
-modules, analytical capabilities, [graph algorithms](#algos), etc.
+The aim of the GraphAware Framework is to speed-up development with Neo4j by providing useful generic as well domain-specific
+functionality, analytical capabilities, [graph algorithms](#algos), etc.
 
-The framework can be used in two ways: as a [library of useful tested code](#lib) that simplifies tasks commonly needed when
-developing with Neo4j, or as a [real framework with modules](#fw), which perform some (behind-the-scenes) mutations on the graph
-as transactions occur. In the latter case, you get the benefit of the "library" as well.
+When using Neo4j in the <a href="http://docs.neo4j.org/chunked/stable/server-installation.html" target="_blank">standalone server</a> mode,
+deploying the GraphAware Framework is a matter of [downloading](http://search.maven.org/remotecontent?filepath=com/graphaware/neo4j-framework/2.0-1.0/neo4j-framework-2.0-1.0.jar)
+a single file, copying it to a specific location (`plugins` directory in your Neo4j installation), and restarting the server.
+The framework is then used via calls to its REST API.
+
+Java developers that use Neo4j in <a href="http://docs.neo4j.org/chunked/stable/tutorials-java-embedded.html" target="_blank">embedded mode</a>
+and those developing Neo4j <a href="http://docs.neo4j.org/chunked/stable/server-plugins.html" target="_blank">server plugins</a>
+and/or <a href="http://docs.neo4j.org/chunked/stable/server-unmanaged-extensions.html" target="_blank">unmanaged extensions</a>
+can include use the framework as a dependency for their Java project and use it as a library
+of useful tested code, in addition to the functionality provided for standalone deployments.
 
 Download
 --------
 
 ### Releases
 
-Releases are synced to Maven Central repository. To use the latest release, [download it](http://search.maven.org/remotecontent?filepath=com/graphaware/neo4j-framework/1.9-1.7/neo4j-framework-1.9-1.7.jar)
-and put it on your classpath. When using Maven, include the following snippet in your pom.xml:
+Releases are synced to Maven Central repository. To use the latest release for your Neo4j server, [download it](http://search.maven.org/remotecontent?filepath=com/graphaware/neo4j-framework/2.0-1.0/neo4j-framework-2.0-1.0.jar)
+and put it the `plugins` directory in your Neo4j installation. For embedded mode usage and/or plugin Java development,
+put the downloaded .jar file on your classpath. When using Maven for dependency management, include the following snippet in your pom.xml:
 
     <dependencies>
         ...
         <dependency>
             <groupId>com.graphaware</groupId>
             <artifactId>neo4j-framework</artifactId>
-            <version>1.9-1.8</version>
+            <version>2.0-1.0</version>
         </dependency>
         ...
     </dependencies>
 
 ### Snapshots
 
-To use the latest development version, just clone this repository, run `mvn clean install` and put the produced .jar
-file (found in target) into your classpath. If using Maven for your own development, include the following snippet in
-your pom.xml instead of copying the .jar:
+To use the latest development version, just clone this repository, run `mvn clean install` and use the produced .jar
+file (found in target). If using Maven for your own development, include the following snippet in
+your pom.xml instead of using the .jar:
 
     <dependencies>
         ...
         <dependency>
             <groupId>com.graphaware</groupId>
             <artifactId>neo4j-framework</artifactId>
-            <version>1.9-1.9-SNAPSHOT</version>
+            <version>2.0-1.1-SNAPSHOT</version>
         </dependency>
         ...
     </dependencies>
@@ -47,8 +55,24 @@ your pom.xml instead of copying the .jar:
 ### Note on Versioning Scheme
 
 The version number has two parts, separated by a dash. The first part indicates compatibility with a Neo4j version.
- The second part is the version of the framework. For example, version 1.9-1.2 is a 1.2 version of the framework
- compatible with Neo4j 1.9.x
+ The second part is the version of the framework. For example, version 2.0-1.0 is a 1.0 version of the framework
+ compatible with Neo4j 2.0.x
+
+Functionality
+-------------
+
+GraphAware Framework provides the following functionality:
+
+* Graph Algorithms
+    * Increasingly Longer Shortest Path Discovery
+* GraphAware Runtime with the following Runtime Modules
+    * Relationship Counter
+
+Additionally, for Java developers only (i.e., for embedded mode and/or plugin development)
+
+* Transaction Executor
+* Batch Transaction Executor
+* Improved Transaction API
 
 <a name="fw"/>
 Framework Usage
