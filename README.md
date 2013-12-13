@@ -4,7 +4,8 @@ GraphAware Neo4j Framework
 [![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework)
 
 The aim of the GraphAware Framework is to speed-up development with Neo4j by providing useful generic as well domain-specific
-functionality, analytical capabilities, [graph algorithms](#algos), etc.
+functionality, analytical capabilities, [graph algorithms](#algos), etc. All code in this repository is licensed under the
+GPL license.
 
 When using Neo4j in the <a href="http://docs.neo4j.org/chunked/stable/server-installation.html" target="_blank">standalone server</a> mode,
 deploying the GraphAware Framework is a matter of [downloading](http://search.maven.org/remotecontent?filepath=com/graphaware/neo4j-framework/2.0-1.0/neo4j-framework-2.0-1.0.jar)
@@ -17,13 +18,13 @@ and/or <a href="http://docs.neo4j.org/chunked/stable/server-unmanaged-extensions
 can include use the framework as a dependency for their Java project and use it as a library
 of useful tested code, in addition to the functionality provided for standalone deployments.
 
-Download
---------
+Getting GraphAware Framework
+----------------------------
 
 ### Releases
 
 Releases are synced to Maven Central repository. To use the latest release for your Neo4j server, [download it](http://search.maven.org/remotecontent?filepath=com/graphaware/neo4j-framework/2.0-1.0/neo4j-framework-2.0-1.0.jar)
-and put it the `plugins` directory in your Neo4j installation. For embedded mode usage and/or plugin Java development,
+and put it the `plugins` directory in your Neo4j installation. Then restart the server. For embedded mode usage and/or plugin Java development,
 put the downloaded .jar file on your classpath. When using Maven for dependency management, include the following snippet in your pom.xml:
 
     <dependencies>
@@ -64,7 +65,7 @@ Functionality
 GraphAware Framework provides the following functionality:
 
 * Graph Algorithms
-    * Increasingly Longer Shortest Path Discovery
+    * Increasingly Longer Shortest Path
 * GraphAware Runtime with the following Runtime Modules
     * Relationship Counter
 

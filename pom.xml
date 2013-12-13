@@ -112,7 +112,7 @@
     <properties>
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>2.0.0-RC1</neo4j.version>
+        <neo4j.version>2.0.0</neo4j.version>
     </properties>
 
     <dependencyManagement>
