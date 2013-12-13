@@ -55,6 +55,7 @@ import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 /**
  * Integration test for {@link org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase}.
  */
+@Ignore ("until Issue #1697 is fixed")
 public class TransactionSimulatingBatchInserterIntegrationTest {
 
     private TransactionSimulatingBatchInserter batchInserter;
