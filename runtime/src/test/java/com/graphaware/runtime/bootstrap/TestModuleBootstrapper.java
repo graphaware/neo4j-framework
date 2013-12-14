@@ -1,9 +1,8 @@
-package com.graphaware.bootstrap;
+package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeModuleBootstrapper;
 import org.neo4j.graphdb.config.Setting;
-import org.neo4j.helpers.Settings;
 import org.neo4j.kernel.configuration.Config;
 
 import static org.neo4j.helpers.Settings.*;

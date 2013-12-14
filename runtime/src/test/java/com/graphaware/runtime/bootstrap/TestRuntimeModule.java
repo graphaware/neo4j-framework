@@ -1,4 +1,4 @@
-package com.graphaware.bootstrap;
+package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.runtime.GraphAwareRuntimeModule;

@@ -12,12 +12,9 @@ import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
-import java.util.Map;
-
-import static com.graphaware.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
+import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
 import static com.graphaware.common.description.relationship.RelationshipDescriptionFactory.wildcard;
 import static com.graphaware.module.relcount.bootstrap.RelcountModuleBootstrapper.*;
 import static org.junit.Assert.assertEquals;

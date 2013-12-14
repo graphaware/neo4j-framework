@@ -14,15 +14,14 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.bootstrap;
+package com.graphaware.runtime.bootstrap;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
-import static com.graphaware.bootstrap.TestModuleBootstrapper.MODULE_ENABLED;
+import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -52,7 +51,7 @@ public class BootstrapIntegrationTest {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(RUNTIME_ENABLED, "false")
-                .setConfig(MODULE_ENABLED, MODULE_ENABLED.getDefaultValue())
+                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newGraphDatabase();
 
         assertFalse(TestRuntimeModule.isInitialized());
@@ -67,7 +66,7 @@ public class BootstrapIntegrationTest {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(RUNTIME_ENABLED, "whatever")
-                .setConfig(MODULE_ENABLED, MODULE_ENABLED.getDefaultValue())
+                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newGraphDatabase();
 
         assertFalse(TestRuntimeModule.isInitialized());
@@ -82,7 +81,7 @@ public class BootstrapIntegrationTest {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(RUNTIME_ENABLED, null)
-                .setConfig(MODULE_ENABLED, MODULE_ENABLED.getDefaultValue())
+                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newGraphDatabase();
 
         assertFalse(TestRuntimeModule.isInitialized());
@@ -97,7 +96,7 @@ public class BootstrapIntegrationTest {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(RUNTIME_ENABLED, "true")
-                .setConfig(MODULE_ENABLED, MODULE_ENABLED.getDefaultValue())
+                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newGraphDatabase();
 
         assertTrue(TestRuntimeModule.isInitialized());
@@ -112,7 +111,7 @@ public class BootstrapIntegrationTest {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(RUNTIME_ENABLED, "true")
-                .setConfig(MODULE_ENABLED, null)
+                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, null)
                 .newGraphDatabase();
 
         assertFalse(TestRuntimeModule.isInitialized());
@@ -128,7 +127,7 @@ public class BootstrapIntegrationTest {
                 .newImpermanentDatabaseBuilder()
                 .setConfig(RUNTIME_ENABLED, "true")
                 .setConfig("com.graphaware.module.wrong.enabled", "com.not.existent.Bootstrapper")
-                .setConfig(MODULE_ENABLED, MODULE_ENABLED.getDefaultValue())
+                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newGraphDatabase();
 
         assertTrue(TestRuntimeModule.isInitialized());
