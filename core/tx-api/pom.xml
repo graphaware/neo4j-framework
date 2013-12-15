@@ -18,14 +18,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>framework-parent</artifactId>
+        <artifactId>core</artifactId>
         <version>1.9-1.9-SNAPSHOT</version>
     </parent>
-    <artifactId>runtime</artifactId>
+    <artifactId>tx-api</artifactId>
     <packaging>jar</packaging>
 
-    <name>GraphAware Runtime</name>
-    <description>Runtime for GraphAware Runtime Modules</description>
+    <name>GraphAware Transaction API</name>
+    <description>Improved Transaction API with Graph Snapshotting</description>
     <url>http://graphaware.com</url>
 
     <dependencies>
@@ -40,24 +40,12 @@
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>tx-api</artifactId>
+            <artifactId>tx-executor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

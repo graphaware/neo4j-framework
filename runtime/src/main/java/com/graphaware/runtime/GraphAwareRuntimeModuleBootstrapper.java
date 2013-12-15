@@ -1,6 +1,5 @@
 package com.graphaware.runtime;
 
-import org.neo4j.graphdb.config.Setting;
 import org.neo4j.kernel.configuration.Config;
 
 /**

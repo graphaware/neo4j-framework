@@ -14,48 +14,51 @@
   ~ <http://www.gnu.org/licenses/>.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>framework-parent</artifactId>
+        <artifactId>build</artifactId>
         <version>1.9-1.9-SNAPSHOT</version>
     </parent>
-    <artifactId>runtime</artifactId>
+    <artifactId>graphaware-server-enterprise</artifactId>
     <packaging>jar</packaging>
 
-    <name>GraphAware Runtime</name>
-    <description>Runtime for GraphAware Runtime Modules</description>
+    <name>GraphAware Framework Server Build (Enterprise)</name>
+    <description>Technical Maven Module for Building the Framework for Standalone Use (Enterprise)</description>
     <url>http://graphaware.com</url>
 
     <dependencies>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>graphaware-server-community</artifactId>
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>common</artifactId>
-            <classifier>tests</classifier>
-        </dependency>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>tx-api</artifactId>
+            <artifactId>server-enterprise</artifactId>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
+                <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
+                        <phase>package</phase>
                         <goals>
-                            <goal>test-jar</goal>
+                            <goal>attached</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <finalName>graphaware-server-enterprise-all-${project.version}</finalName>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -14,31 +14,23 @@
   ~ <http://www.gnu.org/licenses/>.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>framework-parent</artifactId>
         <version>1.9-1.9-SNAPSHOT</version>
     </parent>
-    <artifactId>server-parent</artifactId>
+    <artifactId>modules</artifactId>
     <packaging>pom</packaging>
 
-    <name>GraphAware Server</name>
-    <description>Parent Project for GraphAware Neo4j Server Extensions</description>
+    <name>GraphAware Runtime Modules</name>
+    <description>Parent Project for Graph Runtime Modules</description>
     <url>http://graphaware.com</url>
 
     <modules>
-        <module>server-common</module>
-        <module>server-community</module>
-        <module>server-enterprise</module>
+        <module>relcount</module>
     </modules>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.neo4j.app</groupId>
-            <artifactId>neo4j-server</artifactId>
-        </dependency>
-    </dependencies>
 
 </project>

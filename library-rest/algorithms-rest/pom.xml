@@ -18,46 +18,22 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>framework-parent</artifactId>
+        <artifactId>library-rest</artifactId>
         <version>1.9-1.9-SNAPSHOT</version>
     </parent>
-    <artifactId>runtime</artifactId>
+    <artifactId>algorithms-rest</artifactId>
     <packaging>jar</packaging>
 
-    <name>GraphAware Runtime</name>
-    <description>Runtime for GraphAware Runtime Modules</description>
+    <name>GraphAware Algorithms REST API</name>
+    <description>REST API for Custom Graph Algorithms</description>
     <url>http://graphaware.com</url>
 
     <dependencies>
+
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>common</artifactId>
+            <artifactId>algorithms</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>common</artifactId>
-            <classifier>tests</classifier>
-        </dependency>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>tx-api</artifactId>
-        </dependency>
+
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>
