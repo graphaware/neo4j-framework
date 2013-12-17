@@ -16,14 +16,21 @@
 
 package com.graphaware.server.web;
 
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.util.ArrayUtil;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle;
+import org.eclipse.jetty.webapp.WebAppContext;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.server.database.InjectableProvider;
 import org.neo4j.server.web.Jetty9WebServer;
+import org.springframework.web.context.AbstractContextLoaderInitializer;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import java.util.Collection;
 
 /**
@@ -35,7 +42,10 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
 
     @Override
     protected void startJetty() {
-        additionalSetup();
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/graphaware");
+        context.addLifeCycleListener(new JettyStartingListener(context.getServletContext()));
+        ((HandlerList) getJetty().getHandler()).setHandlers(ArrayUtil.prependToArray(context, ((HandlerList) getJetty().getHandler()).getHandlers(), Handler.class));
 
         super.startJetty();
     }
@@ -60,40 +70,11 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
 
         @Override
         public void lifeCycleStarting(LifeCycle event) {
-            new WebAppInitializer(database).onStartup(sc);
+            try {
+                new WebAppInitializer(database).onStartup(sc);
+            } catch (ServletException e) {
+                throw new RuntimeException(e);
+            }
         }
-
-    }
-
-    protected void additionalSetup() {
-
-
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/graphaware");
-        getJetty().setHandler(context);
-        context.addLifeCycleListener(new JettyStartingListener(context.getServletContext()));
-
-
-//        ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
-//        contextHandler.setContextPath("/");
-
-//        AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
-//        appContext.register(AppConfig.class);
-//        appContext.refresh();
-
-//        contextHandler.addEventListener(new ContextLoaderListener(appContext));
-
-        // ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(appContext));
-        // dispatcher.setLoadOnStartup(1);
-        // dispatcher.addMapping("/");
-
-//        contextHandler.addEventListener(new ContextLoaderListener());
-//        contextHandler.setInitParameter("contextConfigLocation", "classpath*:**/testContext.xml");
-
-        // server.setHandler(contextHandler);
-
-        //contextHandler.addServlet(new ServletHolder(new BatchReceiver()), "/receiver/*");
-        //contextHandler.addServlet(new ServletHolder(new BatchSender()), "/sender/*");
-//        getJetty().getHandlers();
     }
 }

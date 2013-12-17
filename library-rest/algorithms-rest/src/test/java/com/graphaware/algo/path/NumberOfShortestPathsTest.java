@@ -44,7 +44,7 @@ public class NumberOfShortestPathsTest {
     private Node one;
     private Node three;
 
-    private NumberOfShortestPaths plugin = new NumberOfShortestPaths();
+    private NumberOfShortestPaths plugin;
 
     /**
      * Graph:
@@ -55,6 +55,7 @@ public class NumberOfShortestPathsTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        plugin = new NumberOfShortestPaths(database);
 
         try (Transaction tx = database.beginTx()) {
             database.createNode(); //ID = 0

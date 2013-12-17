@@ -38,9 +38,10 @@
         <module>runtime</module>
         <module>runtime-rest</module>
         <module>server</module>
+        <module>integration-tests</module>
     </modules>
 
-    <name>GraphAware Neo4j Framework</name>
+    <name>*** GraphAware Neo4j Framework ***</name>
     <description>Parent Project for GraphAware Neo4j Framework</description>
     <url>http://graphaware.com</url>
 
@@ -336,6 +337,12 @@
             </dependency>
 
             <!-- Spring -->
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.springframework</groupId>

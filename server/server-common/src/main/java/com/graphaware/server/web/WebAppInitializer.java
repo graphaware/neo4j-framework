@@ -17,10 +17,13 @@
 package com.graphaware.server.web;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.support.AbstractDispatcherServletInitializer;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
@@ -28,30 +31,39 @@ import javax.servlet.ServletRegistration;
 /**
  * Servlet 3.0+ web application initializer, no need for XML.
  */
-public class WebAppInitializer implements WebApplicationInitializer {
+public class WebAppInitializer extends AbstractDispatcherServletInitializer {
 
-    private final GraphDatabaseService databaseService;
+    private GraphDatabaseService database;
 
-    public WebAppInitializer(GraphDatabaseService databaseService) {
-        this.databaseService = databaseService;
+    public WebAppInitializer(GraphDatabaseService database) {
+        this.database = database;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void onStartup(ServletContext servletContext) {
+    protected WebApplicationContext createServletApplicationContext() {
+        GenericApplicationContext parent = new GenericApplicationContext();
+        parent.getBeanFactory().registerSingleton("database", database);
+        parent.refresh();
+
         AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
-//        appContext.register(AppConfig.class);
-        appContext.refresh();
-        appContext.getBeanFactory().registerSingleton("database", databaseService);
-        appContext.refresh();
+        appContext.setParent(parent);
+        appContext.register(AppConfig.class);
 
-        servletContext.addListener(new ContextLoaderListener(appContext));
-
-        ServletRegistration.Dynamic dispatcher = servletContext.addServlet("dispatcher", new DispatcherServlet(appContext));
-        dispatcher.setLoadOnStartup(1);
-        dispatcher.addMapping("/");
+        return appContext;
     }
 
+    @Override
+    protected String getServletName() {
+        return "graphaware";
+    }
+
+    @Override
+    protected String[] getServletMappings() {
+        return new String[]{"/"};
+    }
+
+    @Override
+    protected WebApplicationContext createRootApplicationContext() {
+        return null;
+    }
 }

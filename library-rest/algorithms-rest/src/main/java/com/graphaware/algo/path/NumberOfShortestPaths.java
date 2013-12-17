@@ -16,6 +16,19 @@
 
 package com.graphaware.algo.path;
 
+import com.graphaware.common.util.DirectionUtils;
+import org.neo4j.graphdb.*;
+import org.neo4j.helpers.collection.Iterables;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * A managed plugin that finds finds a given number of shortest paths between two nodes. It is different from
  * standard shortest path finding, because it allows to specify the desired number of results.
@@ -33,44 +46,117 @@ package com.graphaware.algo.path;
  * returned will be (1)->(4)->(5)->(3) with a length of 3. Note that there is another path of length 3:
  * (1)->(4)->(2)->(3), but it is not returned, since (2)->(3) is contained in a shorter path.
  */
-public class NumberOfShortestPaths {//extends ServerPlugin {
+@Controller
+@RequestMapping("/api/library/algorithm/path")
+public class NumberOfShortestPaths {
 
-//    @Description("Find a number shortest path between two nodes, with increasing path length and optionally path cost.")
-//    @PluginTarget(Node.class)
-//    public Iterable<Path> paths(
-//            @Source Node source,
-//            @Description("The node to find the shortest paths to.")
-//            @Parameter(name = "target") Node target,
-//            @Description("The relationship types to follow when searching for the shortest paths. If omitted all types are followed.")
-//            @Parameter(name = "types", optional = true) String[] types,
-//            @Description("The maximum path length to search for, default value (if omitted) is 3.")
-//            @Parameter(name = "depth", optional = true) Integer depth,
-//            @Description("The desired number of results, default value (if omitted) is 10. The actual number of results can be smaller (if no other paths exist).")
-//            @Parameter(name = "noResults", optional = true) Integer noResults,
-//            @Description("The name of relationship property indicating its weight/cost. If omitted, result isn't sorted by total path weights. If the property is missing for a relationship, Integer.MAX_VALUE is used.")
-//            @Parameter(name = "weight", optional = true) String weightProperty) {
-//
-//        try (Transaction tx = source.getGraphDatabase().beginTx()) {
-//            PathExpander expander;
-//            if (types == null) {
-//                expander = PathExpanders.allTypesAndDirections();
-//            } else {
-//                Expander relationshipExpander = Traversal.emptyExpander();
-//                for (String type : types) {
-//                    relationshipExpander = relationshipExpander.add(DynamicRelationshipType.withName(type));
-//                }
-//                expander = StandardExpander.toPathExpander(relationshipExpander);
-//            }
-//
-//            noResults = noResults == null ? 10 : noResults;
-//
-//            List<Path> paths = new NumberOfShortestPathsFinder(depth == null ? 3 : depth, noResults, expander).findPaths(source, target);
-//
-//            if (weightProperty != null) {
-//                Collections.sort(paths, new LengthThenCostPathComparator(weightProperty));
-//            }
-//
-//            return paths.subList(0, Math.min(noResults, paths.size()));
-//        }
-//    }
+    private final GraphDatabaseService database;
+
+    private NumberOfShortestPathFinder pathFinder = new NumberOfShortestPathFinder();
+
+    @Autowired
+    public NumberOfShortestPaths(GraphDatabaseService database) {
+        this.database = database;
+    }
+
+    @RequestMapping(value = "hello", method = RequestMethod.GET)
+    @ResponseBody
+    public String hello() {
+        return "Cau pico";
+    }
+
+    @RequestMapping(value = "increasinglyLongerShortestPath", method = RequestMethod.POST)
+    @ResponseBody
+    public List<JsonPath> numberOfShortestPaths(@RequestBody JsonPathFinderInput jsonInput) {
+        try (Transaction tx = database.beginTx()) {
+            PathFinderInput input = createInput(jsonInput);
+
+            List<Path> paths = pathFinder.findPaths(input);
+
+            return convertPaths(paths, jsonInput);
+        }
+    }
+
+    private List<JsonPath> convertPaths(List<Path> paths, JsonPathFinderInput jsonInput) {
+        List<JsonPath> result = new LinkedList<>();
+        for (Path path : paths) {
+            List<Node> nodes = Iterables.toList(path.nodes());
+            List<JsonNode> jsonNodes = new LinkedList<>();
+            for (Node node : path.nodes()) {
+                JsonNode jsonNode = new JsonNode(node.getId());
+                for (String property : jsonInput.getNodeProperties()) {
+                    jsonNode.putProperty(property, node.getProperty(property, "unknown"));
+                }
+
+                if (jsonInput.getIncludeNodeLabels()) {
+                    jsonNode.setLabels(labelsToStringArray(node.getLabels()));
+                }
+
+                jsonNodes.add(jsonNode);
+            }
+
+            List<JsonRelationship> jsonRelationships = new LinkedList<>();
+            int i = 0;
+            for (Relationship relationship : path.relationships()) {
+                JsonRelationship jsonRelationship = new JsonRelationship(relationship.getId());
+                for (String property : jsonInput.getRelationshipProperties()) {
+                    jsonRelationship.putProperty(property, relationship.getProperty(property, "unknown"));
+                }
+
+                jsonRelationship.setType(relationship.getType().name());
+                jsonRelationship.setDirection(DirectionUtils.resolveDirection(relationship, nodes.get(i)));
+
+                jsonRelationships.add(jsonRelationship);
+                i++;
+            }
+
+            JsonPath jsonPath = new JsonPath();
+            jsonPath.setNodes(jsonNodes.toArray(new JsonNode[jsonNodes.size()]));
+            jsonPath.setRelationships(jsonRelationships.toArray(new JsonRelationship[jsonRelationships.size()]));
+
+            result.add(jsonPath);
+        }
+
+        return result;
+    }
+
+    private String[] labelsToStringArray(Iterable<Label> labels) {
+        List<String> labelsAsList = new LinkedList<>();
+        for (Label label : labels) {
+            labelsAsList.add(label.name());
+        }
+        return labelsAsList.toArray(new String[labelsAsList.size()]);
+    }
+
+    private PathFinderInput createInput(JsonPathFinderInput jsonInput) {
+        PathFinderInput input = new PathFinderInput(database.getNodeById(jsonInput.getStartNode()), database.getNodeById(jsonInput.getEndNode()));
+
+        if (jsonInput.getSortOrder() != null) {
+            input.setSortOrder(jsonInput.getSortOrder());
+        }
+
+        if (jsonInput.getCostProperty() != null) {
+            input.setCostProperty(jsonInput.getCostProperty());
+        }
+
+        if (jsonInput.getMaxResults() != null) {
+            input.setMaxDepth(jsonInput.getMaxResults());
+        }
+
+        if (jsonInput.getDirection() != null) {
+            input.setDirection(jsonInput.getDirection());
+        }
+
+        if (jsonInput.getMaxDepth() != null) {
+            input.setMaxDepth(jsonInput.getMaxDepth());
+        }
+
+        if (jsonInput.getRelationshipsAndDirections() != null) {
+            for (JsonRelationshipTypeAndDirection jsonRelationshipTypeAndDirection : jsonInput.getRelationshipsAndDirections()) {
+                input.addTypeAndDirection(DynamicRelationshipType.withName(jsonRelationshipTypeAndDirection.getRelationshipType()), jsonRelationshipTypeAndDirection.getDirection());
+            }
+        }
+        return input;
+    }
+
 }

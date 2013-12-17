@@ -31,14 +31,17 @@ import static org.neo4j.kernel.Traversal.pathExpanderForAllTypes;
 import static org.neo4j.kernel.Traversal.pathExpanderForTypes;
 
 /**
- * Unit test for {@link NumberOfShortestPathsFinder}.
+ * Unit test for {@link NumberOfShortestPathFinder}.
+ *
+ * //todo many more tests needed here
  */
-public class NumberOfShortestPathsFinderTest {
+public class NumberOfShortestPathFinderTest {
 
     private enum RelTypes implements RelationshipType {
         R1, R2
     }
 
+    private NumberOfShortestPathFinder pathFinder = new NumberOfShortestPathFinder();
     private GraphDatabaseService database;
     private Node one;
     private Node three;
@@ -78,27 +81,47 @@ public class NumberOfShortestPathsFinderTest {
 
     @Test
     public void noPathsShouldBeReturnedWhenThereIsNoPath() {
+        PathFinderInput input = new PathFinderInput(one, three)
+                .setMaxDepth(5)
+                .setMaxResults(10)
+                .addTypeAndDirection(RelTypes.R2, OUTGOING);
+
         try (Transaction tx = database.beginTx()) {
-            assertEquals(0, new NumberOfShortestPathsFinder(5, 10, forTypeAndDirection(RelTypes.R2, OUTGOING)).findPaths(one, three).size());
+            assertEquals(0, pathFinder.findPaths(input).size());
         }
     }
 
     @Test
     public void noPathsShouldBeFoundWhenTraversalDepthIsTooSmall() {
+        PathFinderInput input = new PathFinderInput(one, three)
+                .setMaxDepth(2)
+                .setMaxResults(10)
+                .addTypeAndDirection(RelTypes.R1, OUTGOING);
+
         try (Transaction tx = database.beginTx()) {
-            assertEquals(0, new NumberOfShortestPathsFinder(2, 10, forTypeAndDirection(RelTypes.R1, OUTGOING)).findPaths(one, three).size());
+            assertEquals(0, pathFinder.findPaths(input).size());
         }
     }
 
     @Test
     public void allShortestPathsShouldBeReturned() {
+        PathFinderInput input1 = new PathFinderInput(one, three)
+                .setMaxDepth(3)
+                .setMaxResults(10)
+                .addTypeAndDirection(RelTypes.R1, OUTGOING);
+
+        PathFinderInput input2 = new PathFinderInput(one, three)
+                .setMaxDepth(3)
+                .setMaxResults(10)
+                .setDirection(OUTGOING);
+
         try (Transaction tx = database.beginTx()) {
-            List<Path> paths = new NumberOfShortestPathsFinder(3, 10, forTypeAndDirection(RelTypes.R1, OUTGOING)).findPaths(one, three);
+            List<Path> paths = pathFinder.findPaths(input1);
             assertEquals(2, paths.size());
             assertEquals(3, paths.get(0).length());
             assertEquals(3, paths.get(1).length());
 
-            paths = new NumberOfShortestPathsFinder(3, 10, forDirection(OUTGOING)).findPaths(one, three);
+            paths = pathFinder.findPaths(input2);
             assertEquals(2, paths.size());
             assertEquals(2, paths.get(0).length());
             assertEquals(3, paths.get(1).length());
@@ -107,8 +130,13 @@ public class NumberOfShortestPathsFinderTest {
 
     @Test
     public void shouldLimitPaths() {
+        PathFinderInput input = new PathFinderInput(one, three)
+                .setMaxDepth(3)
+                .setMaxResults(1)
+                .setDirection(OUTGOING);
+
         try (Transaction tx = database.beginTx()) {
-            List<Path> paths = new NumberOfShortestPathsFinder(3, 1, forDirection(OUTGOING)).findPaths(one, three);
+            List<Path> paths = pathFinder.findPaths(input);
             assertEquals(1, paths.size());
             assertEquals(2, paths.get(0).length());
         }

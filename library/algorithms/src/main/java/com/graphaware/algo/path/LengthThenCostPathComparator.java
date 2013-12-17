@@ -23,20 +23,26 @@ import java.util.Comparator;
 
 /**
  * A comparator for paths, taking into account their lengths at first, then their costs (in case the lengths are the same).
- *
- * todo: make it possible to order cost descending
  */
 public class LengthThenCostPathComparator implements Comparator<Path> {
 
     private final String costPropertyKey;
+    private final SortOrder sortOrder;
+
+    public enum SortOrder {
+        ASC,
+        DESC
+    }
 
     /**
      * Construct a new comparator.
      *
      * @param costPropertyKey the key of the (integer) property that defines relationship cost in the path.
+     * @param sortOrder       asc/desc.
      */
-    public LengthThenCostPathComparator(String costPropertyKey) {
+    public LengthThenCostPathComparator(String costPropertyKey, SortOrder sortOrder) {
         this.costPropertyKey = costPropertyKey;
+        this.sortOrder = sortOrder;
     }
 
     /**
@@ -50,7 +56,14 @@ public class LengthThenCostPathComparator implements Comparator<Path> {
             return result;
         }
 
-        return cost(path1).compareTo(cost(path2));
+        switch (sortOrder) {
+            case ASC:
+                return cost(path1).compareTo(cost(path2));
+            case DESC:
+                return cost(path2).compareTo(cost(path1));
+            default:
+                throw new IllegalStateException("Unknown sort order " + sortOrder + ". This is a bug");
+        }
     }
 
     /**
@@ -63,7 +76,15 @@ public class LengthThenCostPathComparator implements Comparator<Path> {
         int result = 0;
         for (Relationship r : path.relationships()) {
             if (!r.hasProperty(costPropertyKey)) {
-                return Integer.MAX_VALUE;
+                switch (sortOrder) {
+                    case ASC:
+                        return Integer.MAX_VALUE;
+                    case DESC:
+                        //add nothing to the cost
+                        continue;
+                    default:
+                        throw new IllegalStateException("Unknown sort order " + sortOrder + ". This is a bug");
+                }
             }
             result += (Integer) r.getProperty(costPropertyKey);
         }

@@ -29,6 +29,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import java.util.Collections;
 import java.util.List;
 
+import static com.graphaware.algo.path.LengthThenCostPathComparator.SortOrder.*;
 import static org.junit.Assert.assertEquals;
 import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.PathExpanders.*;
@@ -51,7 +52,7 @@ public class LengthThenCostPathComparatorTest {
      * (1)-(cost=5)->(2)-->(3)
      * (1)-->(4)-(cost=2)->(5)-->(3)
      * (4)-->(2)
-     * (1)-->(6)-(cost=INFINITY)->(7)-->(3)
+     * (1)-->(6)-(cost=UNDEFINED)->(7)-->(3)
      */
     @Before
     public void setUp() {
@@ -88,15 +89,29 @@ public class LengthThenCostPathComparatorTest {
     }
 
     @Test
-    public void shouldCorrectlyOrderPaths() {
+    public void shouldCorrectlyOrderPathsAsc() {
         try (Transaction tx = database.beginTx()) {
             List<Path> paths = toList(new AllPaths(10, forDirection(OUTGOING)).findAllPaths(one, three));
-            Collections.sort(paths, new LengthThenCostPathComparator(COST));
+            Collections.sort(paths, new LengthThenCostPathComparator(COST, ASC));
 
             assertEquals(4, paths.size());
             assertEquals("(1)--[TEST,0]-->(2)--[TEST,1]-->(3)", paths.get(0).toString());
             assertEquals("(1)--[TEST,2]-->(4)--[TEST,5]-->(2)--[TEST,1]-->(3)", paths.get(1).toString());
             assertEquals("(1)--[TEST,2]-->(4)--[TEST,3]-->(5)--[TEST,4]-->(3)", paths.get(2).toString());
+            assertEquals("(1)--[TEST,6]-->(6)--[TEST,7]-->(7)--[TEST,8]-->(3)", paths.get(3).toString());
+        }
+    }
+
+    @Test
+    public void shouldCorrectlyOrderPathsDesc() {
+        try (Transaction tx = database.beginTx()) {
+            List<Path> paths = toList(new AllPaths(10, forDirection(OUTGOING)).findAllPaths(one, three));
+            Collections.sort(paths, new LengthThenCostPathComparator(COST, DESC));
+
+            assertEquals(4, paths.size());
+            assertEquals("(1)--[TEST,0]-->(2)--[TEST,1]-->(3)", paths.get(0).toString());
+            assertEquals("(1)--[TEST,2]-->(4)--[TEST,5]-->(2)--[TEST,1]-->(3)", paths.get(2).toString());
+            assertEquals("(1)--[TEST,2]-->(4)--[TEST,3]-->(5)--[TEST,4]-->(3)", paths.get(1).toString());
             assertEquals("(1)--[TEST,6]-->(6)--[TEST,7]-->(7)--[TEST,8]-->(3)", paths.get(3).toString());
         }
     }

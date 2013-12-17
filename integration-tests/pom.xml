@@ -20,34 +20,40 @@
 
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>server-parent</artifactId>
+        <artifactId>framework-parent</artifactId>
         <version>1.9-1.9-SNAPSHOT</version>
     </parent>
 
-    <artifactId>server-common</artifactId>
+    <artifactId>integration-tests</artifactId>
     <packaging>jar</packaging>
 
-    <name>GraphAware Server (Common)</name>
-    <description>Neo4j Server - Spring Framework Integration</description>
+    <name>GraphAware Integration Tests</name>
+    <description>GraphAware Integration Tests</description>
     <url>http://graphaware.com</url>
 
     <dependencies>
 
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>server-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>graphaware-server-community</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.neo4j.app</groupId>
+            <artifactId>neo4j-server</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
+            <artifactId>spring-core</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>
