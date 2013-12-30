@@ -16,7 +16,6 @@
 
 package com.graphaware.test;
 
-import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.server.Bootstrapper;
@@ -25,7 +24,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertTrue;
 
 /**
  *

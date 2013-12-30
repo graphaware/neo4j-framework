@@ -34,6 +34,7 @@
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>algorithms</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>common</artifactId>
@@ -43,5 +44,30 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
         </dependency>
+
+        <!-- test -->
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+        </dependency>
+
     </dependencies>
 </project>
