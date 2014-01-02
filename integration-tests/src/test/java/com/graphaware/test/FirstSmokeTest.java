@@ -16,7 +16,9 @@
 
 package com.graphaware.test;
 
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.server.Bootstrapper;
 import org.neo4j.server.configuration.Configurator;
@@ -29,6 +31,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  *
  */
+@Ignore
 public class FirstSmokeTest {
 
     private Thread thread;
@@ -36,6 +39,7 @@ public class FirstSmokeTest {
     @Before
     public void setUp() throws IOException {
         ClassPathResource classPathResource = new ClassPathResource("neo4j-server.properties");
+
         assertTrue(classPathResource.exists());
 
         String path = classPathResource.getFile().getCanonicalPath();
@@ -51,6 +55,13 @@ public class FirstSmokeTest {
 
         thread.run();
     }
+
+    @After
+    public void tearDown() {
+        thread.stop();
+    }
+
+    //public void
 
     @Test
     public void testNothing() throws InterruptedException {

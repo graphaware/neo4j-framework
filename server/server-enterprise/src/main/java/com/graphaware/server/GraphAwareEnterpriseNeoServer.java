@@ -19,15 +19,13 @@ package com.graphaware.server;
 import com.graphaware.server.web.GraphAwareJetty9WebServer;
 import org.neo4j.server.CommunityNeoServer;
 import org.neo4j.server.configuration.Configurator;
+import org.neo4j.server.enterprise.EnterpriseNeoServer;
 import org.neo4j.server.web.WebServer;
 
 /**
  *  {@link org.neo4j.server.CommunityNeoServer} that uses {@link com.graphaware.server.web.GraphAwareJetty9WebServer}.
  */
-public class GraphAwareEnterpriseNeoServer extends CommunityNeoServer {
-
-    public GraphAwareEnterpriseNeoServer() {
-    }
+public class GraphAwareEnterpriseNeoServer extends EnterpriseNeoServer {
 
     public GraphAwareEnterpriseNeoServer(Configurator configurator) {
         super(configurator);

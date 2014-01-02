@@ -34,7 +34,7 @@ import javax.servlet.ServletException;
 import java.util.Collection;
 
 /**
- *
+ * GraphAware extension to {@link org.neo4j.server.web.Jetty9WebServer} that mounts the framework APIs under "/graphaware".
  */
 public class GraphAwareJetty9WebServer extends Jetty9WebServer {
 

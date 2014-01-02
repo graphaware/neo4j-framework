@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2014 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -14,18 +14,27 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server.web;
-
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+package com.graphaware.api.library.algo.path;
 
 /**
- * Spring application config.
+ * {@link com.graphaware.api.library.algo.path.PropertyBasedRelationshipCostFinder} which returns 0 as default cost.
  */
-@Configuration
-@ComponentScan(basePackages = "com.graphaware")
-@EnableWebMvc
-public class AppConfig {
+public class ZeroDefaultingRelationshipCostFinder extends PropertyBasedRelationshipCostFinder {
 
+    /**
+     * Construct a new cost finder.
+     *
+     * @param costPropertyKey key of the relationship property that defines cost.
+     */
+    public ZeroDefaultingRelationshipCostFinder(String costPropertyKey) {
+        super(costPropertyKey);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected long getDefaultCost() {
+        return 0;
+    }
 }

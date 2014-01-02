@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2014 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -14,18 +14,20 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server.web;
+package com.graphaware.api.library.algo.path;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.neo4j.graphdb.Path;
 
 /**
- * Spring application config.
+ * Calculator of path costs.
  */
-@Configuration
-@ComponentScan(basePackages = "com.graphaware")
-@EnableWebMvc
-public class AppConfig {
+public interface PathCostCalculator {
 
+    /**
+     * Calculate cost of the given path.
+     *
+     * @param path to calculate cost for.
+     * @return cost.
+     */
+    long calculateCost(Path path);
 }
