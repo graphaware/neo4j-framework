@@ -118,10 +118,10 @@ public class PathFinderInput {
 
     /**
      * Set the cost property on relationships on the found paths. Only relevant when
-     * {@link com.graphaware.algo.path.PathFinderInput.SortOrder#LENGTH_ASC_THEN_COST_ASC} or
-     * {@link com.graphaware.algo.path.PathFinderInput.SortOrder#LENGTH_ASC_THEN_COST_DESC} is used.
+     * {@link com.graphaware.algo.path.SortOrder#LENGTH_ASC_THEN_COST_ASC} or
+     * {@link com.graphaware.algo.path.SortOrder#LENGTH_ASC_THEN_COST_DESC} is used.
      *
-     * @param costProperty name of the numberical property on relationships representing cost.
+     * @param costProperty name of the numerical property on relationships representing cost.
      * @return self.
      */
     public PathFinderInput setCostProperty(String costProperty) {
@@ -149,7 +149,7 @@ public class PathFinderInput {
 
     public PathExpander getExpander() {
         if (relationshipsAndDirections.isEmpty()) {
-            return PathExpanders.forDirection(direction);
+            return PathExpanders.forDirection(direction == null ? Direction.BOTH : direction);
         }
 
         //Maybe there's a less ugly way of doing this using Neo4j APIs, who knows:
@@ -165,7 +165,7 @@ public class PathFinderInput {
                 (Direction) relationshipsAndDirections.get(1),
                 (RelationshipType) relationshipsAndDirections.get(2),
                 (Direction) relationshipsAndDirections.get(3),
-                relationshipsAndDirections.size() > 3 ? relationshipsAndDirections.subList(4, relationshipsAndDirections.size()) : new Object[0]
+                relationshipsAndDirections.size() > 3 ? relationshipsAndDirections.subList(4, relationshipsAndDirections.size()).toArray() : new Object[0]
         );
     }
 

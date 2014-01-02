@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2014 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -16,24 +16,18 @@
 
 package com.graphaware.algo.path;
 
-import java.util.Map;
+import org.neo4j.graphdb.Path;
 
 /**
- *
+ * Calculator of path costs.
  */
-public class JsonNode extends JsonPropertyContainer{
+public interface PathCostCalculator {
 
-    private String[] labels;
-
-    public JsonNode(long id) {
-        super(id);
-    }
-
-    public String[] getLabels() {
-        return labels;
-    }
-
-    public void setLabels(String[] labels) {
-        this.labels = labels;
-    }
+    /**
+     * Calculate cost of the given path.
+     *
+     * @param path to calculate cost for.
+     * @return cost.
+     */
+    long calculateCost(Path path);
 }

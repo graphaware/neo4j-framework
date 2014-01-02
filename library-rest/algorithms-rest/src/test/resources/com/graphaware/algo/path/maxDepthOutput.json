@@ -1,0 +1,27 @@
+[
+    {
+        "nodes": [
+            {
+                "id": 0
+            },
+            {
+                "id": 1
+            },
+            {
+                "id": 2
+            }
+        ],
+        "relationships": [
+            {
+                "id": 0,
+                "type": "R2",
+                "direction": "OUTGOING"
+            },
+            {
+                "id": 1,
+                "type": "R1",
+                "direction": "OUTGOING"
+            }
+        ]
+    }
+]

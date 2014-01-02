@@ -1,0 +1,104 @@
+[
+    {
+        "nodes": [
+            {
+                "id": 0,
+                "labels": ["L1", "L2"]
+            },
+            {
+                "id": 1,
+                "labels": ["L2"]
+            },
+            {
+                "id": 2,
+                "labels": ["L1", "L2"]
+            }
+        ],
+        "relationships": [
+            {
+                "id": 0,
+                "type": "R2",
+                "direction": "OUTGOING"
+            },
+            {
+                "id": 1,
+                "type": "R1",
+                "direction": "OUTGOING"
+            }
+        ]
+    },
+    {
+        "nodes": [
+            {
+                "id": 0,
+                "labels": ["L1", "L2"]
+            },
+            {
+                "id": 3,
+                "labels": ["L2"]
+            },
+            {
+                "id": 4,
+                "labels": ["L1"]
+            },
+            {
+                "id": 2,
+                "labels": ["L1", "L2"]
+            }
+        ],
+        "relationships": [
+            {
+                "id": 2,
+                "type": "R1",
+                "direction": "OUTGOING"
+            },
+            {
+                "id": 3,
+                "type": "R1",
+                "direction": "OUTGOING"
+            },
+            {
+                "id": 4,
+                "type": "R1",
+                "direction": "OUTGOING"
+            }
+        ]
+    },
+    {
+        "nodes": [
+            {
+                "id": 0,
+                "labels": ["L1", "L2"]
+            },
+            {
+                "id": 5,
+                "labels": ["L1"]
+            },
+            {
+                "id": 6,
+                "labels": ["L1"]
+            },
+            {
+                "id": 2,
+                "labels": ["L1", "L2"]
+            }
+        ],
+        "relationships": [
+            {
+                "id": 6,
+                "type": "R1",
+                "direction": "OUTGOING"
+            },
+            {
+                "id": 7,
+                "type": "R1",
+                "direction": "OUTGOING"
+            },
+            {
+                "id": 8,
+                "type": "R1",
+                "direction": "OUTGOING"
+            }
+        ]
+    }
+]

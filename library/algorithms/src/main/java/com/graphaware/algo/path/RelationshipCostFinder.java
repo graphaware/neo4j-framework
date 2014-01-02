@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2014 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -16,24 +16,17 @@
 
 package com.graphaware.algo.path;
 
-import java.util.Map;
+import org.neo4j.graphdb.Relationship;
 
 /**
- *
+ * Component that finds the cost of a relationship.
  */
-public class JsonNode extends JsonPropertyContainer{
+public interface RelationshipCostFinder {
 
-    private String[] labels;
-
-    public JsonNode(long id) {
-        super(id);
-    }
-
-    public String[] getLabels() {
-        return labels;
-    }
-
-    public void setLabels(String[] labels) {
-        this.labels = labels;
-    }
+    /**
+     * Get cost of the given relationship.
+     *
+     * @return cost.
+     */
+    long getCost(Relationship relationship);
 }

@@ -1,0 +1,81 @@
+[
+    {
+        "nodes": [
+            {
+                "id": 0,
+                "properties": {},
+                "labels": null
+            },
+            {
+                "id": 1,
+                "properties": {},
+                "labels": null
+            },
+            {
+                "id": 2,
+                "properties": {},
+                "labels": null
+            }
+        ],
+        "relationships": [
+            {
+                "id": 0,
+                "properties": {},
+                "type": "R2",
+                "direction": "OUTGOING"
+            },
+            {
+                "id": 1,
+                "properties": {},
+                "type": "R1",
+                "direction": "OUTGOING"
+            }
+        ],
+        "cost": null
+    },
+    {
+        "nodes": [
+            {
+                "id": 0,
+                "properties": {},
+                "labels": null
+            },
+            {
+                "id": 3,
+                "properties": {},
+                "labels": null
+            },
+            {
+                "id": 4,
+                "properties": {},
+                "labels": null
+            },
+            {
+                "id": 2,
+                "properties": {},
+                "labels": null
+            }
+        ],
+        "relationships": [
+            {
+                "id": 2,
+                "properties": {},
+                "type": "R1",
+                "direction": "OUTGOING"
+            },
+            {
+                "id": 3,
+                "properties": {},
+                "type": "R1",
+                "direction": "OUTGOING"
+            },
+            {
+                "id": 4,
+                "properties": {},
+                "type": "R1",
+                "direction": "OUTGOING"
+            }
+        ],
+        "cost": null
+    }
+]

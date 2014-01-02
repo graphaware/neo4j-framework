@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * A path finder that finds a given number of shortest paths between two nodes. It is different from {@link ShortestPath}
  * because it allows to specify the desired number of results and path ordering.
- *
+ * <p/>
  * Provided that there are enough paths between the two nodes in the graph, this path finder will first return all the
  * shortest paths, then all the paths one hop longer, then two hops longer, etc., until enough paths have been returned.
  * <p/>
@@ -50,33 +50,31 @@ public class NumberOfShortestPathFinder {
      * @param input path finder input.
      * @return paths between the two nodes.
      */
-    public List<Path> findPaths(PathFinderInput input) {
-        List<Path> result = findPathsSortedByLength(input);
+    public List<? extends Path> findPaths(PathFinderInput input) {
+        List<Path> paths = findPathsSortedByLength(input);
 
         if (SortOrder.LENGTH_ASC.equals(input.getSortOrder())) {
-            return result;
+            return paths;
         }
 
         if (input.getCostProperty() == null) {
             throw new IllegalArgumentException("Cost property is null, but sort order is " + input.getSortOrder());
         }
 
-        LengthThenCostPathComparator.SortOrder sortOrder;
+        List<WeightedPath> weightedPaths;
 
         switch (input.getSortOrder()) {
             case LENGTH_ASC_THEN_COST_ASC:
-                sortOrder = LengthThenCostPathComparator.SortOrder.ASC;
-                break;
+                weightedPaths = calculateCost(paths, new PathCostCalculatorImpl(new MaxLongDefaultingRelationshipCostFinder(input.getCostProperty())));
+                Collections.sort(weightedPaths, new LengthThenCostWeightedPathComparator(LengthThenCostWeightedPathComparator.SortOrder.ASC));
+                return weightedPaths;
             case LENGTH_ASC_THEN_COST_DESC:
-                sortOrder = LengthThenCostPathComparator.SortOrder.DESC;
-                break;
+                weightedPaths = calculateCost(paths, new PathCostCalculatorImpl(new ZeroDefaultingRelationshipCostFinder(input.getCostProperty())));
+                Collections.sort(weightedPaths, new LengthThenCostWeightedPathComparator(LengthThenCostWeightedPathComparator.SortOrder.DESC));
+                return weightedPaths;
             default:
                 throw new IllegalStateException("Illegal sort order " + input.getSortOrder() + ". This is a bug");
         }
-
-        Collections.sort(result, new LengthThenCostPathComparator(input.getCostProperty(), sortOrder));
-
-        return result;
     }
 
     /**
@@ -102,6 +100,20 @@ public class NumberOfShortestPathFinder {
             result.addAll(Iterables.toList(new ShortestPath(depth, input.getExpander(), Integer.MAX_VALUE, true).findAllPaths(input.getStart(), input.getEnd())));
         }
 
+        return result;
+    }
+
+    /**
+     * Convert paths to weighted paths.
+     *
+     * @param paths to convert.
+     * @return weighted paths.
+     */
+    private List<WeightedPath> calculateCost(List<Path> paths, PathCostCalculator costCalculator) {
+        List<WeightedPath> result = new LinkedList<>();
+        for (Path path : paths) {
+            result.add(new WeightedPathImpl(path, costCalculator.calculateCost(path)));
+        }
         return result;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2014 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -16,24 +16,25 @@
 
 package com.graphaware.algo.path;
 
-import java.util.Map;
-
 /**
- *
+ * {@link PropertyBasedRelationshipCostFinder} which returns {@link Long#MAX_VALUE} as default cost.
  */
-public class JsonNode extends JsonPropertyContainer{
+public class MaxLongDefaultingRelationshipCostFinder extends PropertyBasedRelationshipCostFinder {
 
-    private String[] labels;
-
-    public JsonNode(long id) {
-        super(id);
+    /**
+     * Construct a new cost finder.
+     *
+     * @param costPropertyKey key of the relationship property that defines cost.
+     */
+    public MaxLongDefaultingRelationshipCostFinder(String costPropertyKey) {
+        super(costPropertyKey);
     }
 
-    public String[] getLabels() {
-        return labels;
-    }
-
-    public void setLabels(String[] labels) {
-        this.labels = labels;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected long getDefaultCost() {
+        return Long.MAX_VALUE;
     }
 }

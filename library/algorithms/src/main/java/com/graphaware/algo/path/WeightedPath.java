@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2014 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -16,24 +16,17 @@
 
 package com.graphaware.algo.path;
 
-import java.util.Map;
+import org.neo4j.graphdb.Path;
 
 /**
- *
+ * {@link Path} with a weight/cost.
  */
-public class JsonNode extends JsonPropertyContainer{
+public interface WeightedPath extends Path {
 
-    private String[] labels;
-
-    public JsonNode(long id) {
-        super(id);
-    }
-
-    public String[] getLabels() {
-        return labels;
-    }
-
-    public void setLabels(String[] labels) {
-        this.labels = labels;
-    }
+    /**
+     * Get weight/cost of this path.
+     *
+     * @return weight/cost.
+     */
+    long getCost();
 }

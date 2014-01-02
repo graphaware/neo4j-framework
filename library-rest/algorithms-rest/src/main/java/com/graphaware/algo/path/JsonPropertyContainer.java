@@ -16,12 +16,17 @@
 
 package com.graphaware.algo.path;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  *
  */
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public abstract class JsonPropertyContainer {
 
     private long id;
@@ -46,6 +51,7 @@ public abstract class JsonPropertyContainer {
         this.id = id;
     }
 
+    @JsonAnyGetter
     public Map<String, Object> getProperties() {
         return properties;
     }

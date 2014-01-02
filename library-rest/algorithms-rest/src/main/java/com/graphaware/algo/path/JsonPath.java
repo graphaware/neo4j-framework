@@ -16,14 +16,17 @@
 
 package com.graphaware.algo.path;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 /**
  *
  */
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class JsonPath {
 
     private JsonNode[] nodes;
     private JsonRelationship[] relationships;
-    private Integer cost;
+    private Long cost;
 
     public JsonNode[] getNodes() {
         return nodes;
@@ -41,11 +44,11 @@ public class JsonPath {
         this.relationships = relationships;
     }
 
-    public Integer getCost() {
+    public Long getCost() {
         return cost;
     }
 
-    public void setCost(Integer cost) {
+    public void setCost(Long cost) {
         this.cost = cost;
     }
 }

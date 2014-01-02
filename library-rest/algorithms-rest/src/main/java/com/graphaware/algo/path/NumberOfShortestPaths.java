@@ -71,24 +71,29 @@ public class NumberOfShortestPaths {
         try (Transaction tx = database.beginTx()) {
             PathFinderInput input = createInput(jsonInput);
 
-            List<Path> paths = pathFinder.findPaths(input);
+            List<? extends Path> paths = pathFinder.findPaths(input);
 
             return convertPaths(paths, jsonInput);
         }
     }
 
-    private List<JsonPath> convertPaths(List<Path> paths, JsonPathFinderInput jsonInput) {
+    private List<JsonPath> convertPaths(List<? extends Path> paths, JsonPathFinderInput jsonInput) {
         List<JsonPath> result = new LinkedList<>();
         for (Path path : paths) {
             List<Node> nodes = Iterables.toList(path.nodes());
             List<JsonNode> jsonNodes = new LinkedList<>();
             for (Node node : path.nodes()) {
                 JsonNode jsonNode = new JsonNode(node.getId());
-                for (String property : jsonInput.getNodeProperties()) {
-                    jsonNode.putProperty(property, node.getProperty(property, "unknown"));
+
+                if (jsonInput.getNodeProperties() != null) {
+                    for (String property : jsonInput.getNodeProperties()) {
+                        if (node.hasProperty(property)) {
+                            jsonNode.putProperty(property, node.getProperty(property));
+                        }
+                    }
                 }
 
-                if (jsonInput.getIncludeNodeLabels()) {
+                if (Boolean.TRUE.equals(jsonInput.getIncludeNodeLabels())) {
                     jsonNode.setLabels(labelsToStringArray(node.getLabels()));
                 }
 
@@ -99,8 +104,13 @@ public class NumberOfShortestPaths {
             int i = 0;
             for (Relationship relationship : path.relationships()) {
                 JsonRelationship jsonRelationship = new JsonRelationship(relationship.getId());
-                for (String property : jsonInput.getRelationshipProperties()) {
-                    jsonRelationship.putProperty(property, relationship.getProperty(property, "unknown"));
+
+                if (jsonInput.getRelationshipProperties() != null) {
+                    for (String property : jsonInput.getRelationshipProperties()) {
+                        if (relationship.hasProperty(property)) {
+                            jsonRelationship.putProperty(property, relationship.getProperty(property));
+                        }
+                    }
                 }
 
                 jsonRelationship.setType(relationship.getType().name());
@@ -113,6 +123,10 @@ public class NumberOfShortestPaths {
             JsonPath jsonPath = new JsonPath();
             jsonPath.setNodes(jsonNodes.toArray(new JsonNode[jsonNodes.size()]));
             jsonPath.setRelationships(jsonRelationships.toArray(new JsonRelationship[jsonRelationships.size()]));
+
+            if (path instanceof WeightedPath) {
+                jsonPath.setCost(((WeightedPath) path).getCost());
+            }
 
             result.add(jsonPath);
         }
@@ -140,7 +154,7 @@ public class NumberOfShortestPaths {
         }
 
         if (jsonInput.getMaxResults() != null) {
-            input.setMaxDepth(jsonInput.getMaxResults());
+            input.setMaxResults(jsonInput.getMaxResults());
         }
 
         if (jsonInput.getDirection() != null) {

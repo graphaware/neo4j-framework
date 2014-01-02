@@ -1,0 +1,6 @@
+{
+    "startNode": 0,
+    "endNode": 2,
+    "costProperty": "non-existing",
+    "sortOrder":"LENGTH_ASC_THEN_COST_DESC"
+}
