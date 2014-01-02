@@ -29,7 +29,8 @@ import java.util.List;
  * <p/>
  * The default sorting for paths is by increasing length, where the sorting of paths with the same length is undefined.
  * This can be overridden by explicitly setting a different ordering (which sorts paths with the same length using a cost
- * defined on each relationship), in which case the relationship property representing that cost must also be defined (using {@link com.graphaware.algo.path.PathFinderInput#setCostProperty(String)}).
+ * defined on each relationship), in which case the relationship property representing that cost must also be defined
+ * (using {@link com.graphaware.algo.path.PathFinderInput#setCostProperty(String)}).
  * <p/>
  * This class is not thread-safe, it should not be shared among threads (there should be no reason to do so).
  */
@@ -147,6 +148,11 @@ public class PathFinderInput {
         return maxResults;
     }
 
+    /**
+     * Get a path expander representing this input.
+     *
+     * @return path expander.
+     */
     public PathExpander getExpander() {
         if (relationshipsAndDirections.isEmpty()) {
             return PathExpanders.forDirection(direction == null ? Direction.BOTH : direction);

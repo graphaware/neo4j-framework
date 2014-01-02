@@ -26,10 +26,14 @@ import java.util.List;
 
 /**
  * A path finder that finds a given number of shortest paths between two nodes. It is different from {@link ShortestPath}
- * because it allows to specify the desired number of results and path ordering.
+ * because it allows to specify the desired number of results and path ordering, optionally based on a total path cost.
  * <p/>
  * Provided that there are enough paths between the two nodes in the graph, this path finder will first return all the
  * shortest paths, then all the paths one hop longer, then two hops longer, etc., until enough paths have been returned.
+ * <p/>
+ * If {@link PathFinderInput#getSortOrder()} is {@link com.graphaware.algo.path.SortOrder#LENGTH_ASC_THEN_COST_ASC} or
+ * {@link com.graphaware.algo.path.SortOrder#LENGTH_ASC_THEN_COST_DESC}, then {@link PathFinderInput#getCostProperty()}
+ * must also be provided and paths with the same length are ordered by total cost ascending or descending, respectively.
  * <p/>
  * Please note that nodes that are on a path with certain length will not be considered for paths with greater lengths.
  * For example, given the following graph:

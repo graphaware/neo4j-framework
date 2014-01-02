@@ -29,6 +29,7 @@ public abstract class PropertyBasedRelationshipCostFinder implements Relationshi
 
     /**
      * Construct a new cost finder.
+     *
      * @param costPropertyKey key of the relationship property that defines cost.
      */
     protected PropertyBasedRelationshipCostFinder(String costPropertyKey) {
@@ -47,6 +48,12 @@ public abstract class PropertyBasedRelationshipCostFinder implements Relationshi
         return objectToLong(relationship.getProperty(costPropertyKey));
     }
 
+    /**
+     * Get the value of a numerical property, or default (if not a number).
+     *
+     * @param value to covert to long.
+     * @return long value or default.
+     */
     private long objectToLong(Object value) {
         if (value instanceof Integer) {
             return new Integer((int) value).longValue();
