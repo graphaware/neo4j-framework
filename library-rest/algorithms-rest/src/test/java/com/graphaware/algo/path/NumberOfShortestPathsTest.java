@@ -16,157 +16,261 @@
 
 package com.graphaware.algo.path;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.graphaware.server.web.WebAppInitializer;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.eclipse.jetty.http.HttpStatus;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.util.component.AbstractLifeCycle;
+import org.eclipse.jetty.util.component.LifeCycle;
+import org.junit.*;
 import org.neo4j.graphdb.*;
-import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.test.TestGraphDatabaseFactory;
+import org.springframework.core.io.ClassPathResource;
 
-import java.util.List;
+import javax.servlet.ServletException;
+import java.io.IOException;
 
 import static org.junit.Assert.*;
-import static org.neo4j.helpers.collection.Iterables.*;
 
 /**
- * Unit test for {@link com.graphaware.server.plugin.algo.path.NumberOfShortestPaths}.
+ * Integration test for {@link com.graphaware.algo.path.NumberOfShortestPaths}.
  */
 public class NumberOfShortestPathsTest {
 
+    private static final int PORT = 8082;
+    public static final String POST_URL = "http://localhost:" + PORT + "/graphaware/api/library/algorithm/path/increasinglyLongerShortestPath";
+
+    private static final String NAME = "name";
     private static final String COST = "cost";
+
+    private Server server;
+    private GraphDatabaseService database;
 
     private enum RelTypes implements RelationshipType {
         R1, R2
     }
 
-    private GraphDatabaseService database;
-    private Node one;
-    private Node three;
+    private enum Labels implements Label {
+        L1, L2
+    }
 
-    private NumberOfShortestPaths plugin;
-
-    /**
-     * Graph:
-     * (1)-[:R2 {cost:1}]->(2)-[:R1 {cost:1}]->(3)
-     * (1)-[:R1 {cost:1}]->(4)-[:R1 {cost:2}]->(5)-[:R1 {cost:1}]->(3)
-     * (4)-[:R1 {cost:1}]->(2)
-     */
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        plugin = new NumberOfShortestPaths(database);
 
+        populateDatabase();
+
+        startJetty();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        database.shutdown();
+        server.stop();
+    }
+
+    @Test
+    public void minimalOutputShouldBeProducedWithLegalMinimalInput() {
+        assertJsonEquals(post(jsonAsString("minimalInput")), jsonAsString("minimalOutput"));
+    }
+
+    @Test
+    public void nodePropertiesShouldBeIncludedWhenRequested() {
+        assertJsonEquals(post(jsonAsString("requestNodePropsInput")), jsonAsString("requestNodePropsOutput"));
+    }
+
+    @Test
+    public void nonExistingNodePropertiesShouldNotBeIncluded() {
+        assertJsonEquals(post(jsonAsString("requestNonExistingNodePropsInput")), jsonAsString("minimalOutput"));
+    }
+
+    @Test
+    public void relationshipPropertiesShouldBeIncludedWhenRequested() {
+        assertJsonEquals(post(jsonAsString("requestRelationshipPropsInput")), jsonAsString("requestRelationshipPropsOutput"));
+    }
+
+    @Test
+    public void nonExistingRelationshipPropertiesShouldNotBeIncluded() {
+        assertJsonEquals(post(jsonAsString("requestNonExistingRelationshipPropsInput")), jsonAsString("minimalOutput"));
+    }
+
+    @Test
+    public void nodeLabelsShouldOnlyBeIncludedWhenRequested() {
+        assertJsonEquals(post(jsonAsString("requestNoNodeLabelsInput")), jsonAsString("minimalOutput"));
+        assertJsonEquals(post(jsonAsString("requestNodeLabelsInput")), jsonAsString("requestNodeLabelsOutput"));
+    }
+
+    @Test
+    public void maxDepthAndMaxResultsShouldBeRespected() {
+        assertJsonEquals(post(jsonAsString("maxDepthInput")), jsonAsString("maxDepthOutput"));
+        assertJsonEquals(post(jsonAsString("maxResultsInput")), jsonAsString("maxResultsOutput"));
+    }
+
+    @Test
+    public void nonExistingCostPropertyShouldNotChangeOrder() {
+        assertJsonEquals(post(jsonAsString("nonExistingCostPropertyInput")), jsonAsString("nonExistingCostPropertyOutput"));
+    }
+
+    @Test
+    public void costPropertyShouldBeTakenIntoAccount() {
+        assertJsonEquals(post(jsonAsString("costPropertyInput")), jsonAsString("costPropertyOutput"));
+    }
+
+    @Test
+    public void directionShouldBeTakenIntoAccount() {
+        assertJsonEquals(post(jsonAsString("singleDirectionInput")), jsonAsString("singleDirectionOutput"));
+    }
+
+    @Test
+    public void relationshipTypesAndDirectionsShouldBeTakenIntoAccount() {
+        assertJsonEquals(post(jsonAsString("typesAndDirectionsInput")), jsonAsString("typesAndDirectionsOutput"));
+    }
+
+    @Test
+    public void inputWithTypesAndGlobalDirectionShouldBeInvalid() {
+        post(jsonAsString("invalidInput1"), HttpStatus.BAD_REQUEST_400);
+    }
+
+    @Test
+    public void invalidInputShouldCause4xxError() {
+        post(jsonAsString("invalidInput2"), HttpStatus.BAD_REQUEST_400);
+    }
+
+    @Test
+    public void invalidInputShouldCause4xxError2() {
+        post(jsonAsString("invalidInput3"), HttpStatus.BAD_REQUEST_400);
+    }
+
+
+    private void assertJsonEquals(String one, String two) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            assertTrue(mapper.readTree(one).equals(mapper.readTree(two)));
+        } catch (IOException e) {
+            fail();
+        }
+    }
+
+    private String jsonAsString(String fileName) {
+        try {
+            return IOUtils.toString(new ClassPathResource("com/graphaware/algo/path/"+fileName+".json").getInputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void populateDatabase() {
         try (Transaction tx = database.beginTx()) {
-            database.createNode(); //ID = 0
-
-            one = database.createNode();
+            Node one = database.createNode();
             Node two = database.createNode();
-            three = database.createNode();
+            Node three = database.createNode();
             Node four = database.createNode();
             Node five = database.createNode();
+            Node six = database.createNode();
+            Node seven = database.createNode();
 
-            one.createRelationshipTo(two, RelTypes.R2).setProperty(COST, 1);
-            two.createRelationshipTo(three, RelTypes.R1).setProperty(COST, 1);
-            one.createRelationshipTo(four, RelTypes.R1).setProperty(COST, 1);
+            one.setProperty(NAME, "one");
+            one.addLabel(Labels.L1);
+            one.addLabel(Labels.L2);
+
+            two.setProperty(NAME, "two");
+            two.addLabel(Labels.L2);
+
+            three.setProperty(NAME, "three");
+            three.addLabel(Labels.L1);
+            three.addLabel(Labels.L2);
+
+            four.setProperty(NAME, "four");
+            four.addLabel(Labels.L2);
+
+            five.setProperty(NAME, "five");
+            five.addLabel(Labels.L1);
+
+            six.setProperty(NAME, "six");
+            six.addLabel(Labels.L1);
+
+            seven.setProperty(NAME, "seven");
+            seven.addLabel(Labels.L1);
+
+            one.createRelationshipTo(two, RelTypes.R1).setProperty(COST, 5);
+            two.createRelationshipTo(three, RelTypes.R2).setProperty(COST, 1);
+            one.createRelationshipTo(four, RelTypes.R2).setProperty(COST, 1);
             four.createRelationshipTo(five, RelTypes.R1).setProperty(COST, 2);
             five.createRelationshipTo(three, RelTypes.R1).setProperty(COST, 1);
-            four.createRelationshipTo(two, RelTypes.R1).setProperty(COST, 1);
+            two.createRelationshipTo(four, RelTypes.R2).setProperty(COST, 1);
+            one.createRelationshipTo(six, RelTypes.R1).setProperty(COST, 1);
+            six.createRelationshipTo(seven, RelTypes.R1);
+            three.createRelationshipTo(seven, RelTypes.R1).setProperty(COST, 1);
 
             tx.success();
         }
     }
 
-    @After
-    public void tearDown() {
-        database.shutdown();
+
+    private void startJetty() {
+        server = new Server(PORT);
+
+        final ServletContextHandler handler = new ServletContextHandler(null, "/graphaware", ServletContextHandler.SESSIONS);
+
+        handler.addLifeCycleListener(new AbstractLifeCycle.AbstractLifeCycleListener() {
+            @Override
+            public void lifeCycleStarting(LifeCycle event) {
+                try {
+                    new WebAppInitializer(database).onStartup(handler.getServletContext());
+                } catch (ServletException e) {
+                    throw new RuntimeException();
+                }
+            }
+        });
+
+        server.setHandler(handler);
+
+        try {
+            server.start();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-//    @Test
-//    public void noPathsShouldBeReturnedWhenThereIsNoPath() {
-//        try (Transaction tx = database.beginTx()) {
-//            assertEquals(0, Iterables.toList(plugin.paths(one, three, new String[]{"R2"}, 5, null, null)).size());
-//        }
-//    }
-//
-//    @Test
-//    public void noPathsShouldBeFoundWhenTraversalDepthIsTooSmall() {
-//        try (Transaction tx = database.beginTx()) {
-//            assertEquals(0, Iterables.toList(plugin.paths(one, three, new String[]{"R1"}, 2, 10, null)).size());
-//        }
-//    }
-//
-//    @Test
-//    public void allShortestPathsShouldBeReturned() {
-//        try (Transaction tx = database.beginTx()) {
-//            List<Path> paths = Iterables.toList(plugin.paths(one, three, new String[]{"R1"}, 3, 10, null));
-//            assertEquals(2, paths.size());
-//            assertEquals(3, paths.get(0).length());
-//            assertEquals(3, paths.get(1).length());
-//
-//            paths = Iterables.toList(plugin.paths(one, three, new String[]{"R1", "R2"}, 3, 10, null));
-//            assertEquals(2, paths.size());
-//            assertEquals(2, paths.get(0).length());
-//            assertEquals(3, paths.get(1).length());
-//
-//            paths = Iterables.toList(plugin.paths(one, three, null, 3, 10, null));
-//            assertEquals(2, paths.size());
-//            assertEquals(2, paths.get(0).length());
-//            assertEquals(3, paths.get(1).length());
-//        }
-//    }
-//
-//    @Test
-//    public void shouldLimitPaths() {
-//        try (Transaction tx = database.beginTx()) {
-//            List<Path> paths = Iterables.toList(plugin.paths(one, three, null, 3, 1, null));
-//            assertEquals(1, paths.size());
-//            assertEquals(2, paths.get(0).length());
-//        }
-//    }
-//
-//    /**
-//     * Graph:
-//     * (1)-[:R2 {cost:1}]->(2)-[:R1 {cost:1}]->(3)
-//     * (1)-[:R1 {cost:1}]->(4)-[:R1 {cost:2}]->(5)-[:R1 {cost:1}]->(3)
-//     * (4)-[:R1 {cost:1}]->(2)
-//     * (1)-[:R1 {cost:1}]->(6)-[:R2 {cost:N/A}]-(7)-[:R1 {cost:1}]->(3)
-//     * (1)-[:R1 {cost:1}]->(8)-[:R2 {cost:1}]-(9)-[:R1 {cost:1}]->(3)
-//     */
-//    @Test
-//    public void shouldCorrectlyOrderPaths() {
-//        try (Transaction tx = database.beginTx()) {
-//            Node six = database.createNode();
-//            Node seven = database.createNode();
-//            Node eight = database.createNode();
-//            Node nine = database.createNode();
-//
-//            one.createRelationshipTo(six, RelTypes.R1).setProperty(COST, 1);
-//            six.createRelationshipTo(seven, RelTypes.R2);
-//            seven.createRelationshipTo(three, RelTypes.R1).setProperty(COST, 1);
-//
-//            one.createRelationshipTo(eight, RelTypes.R1).setProperty(COST, 1);
-//            eight.createRelationshipTo(nine, RelTypes.R2).setProperty(COST, 1);
-//            nine.createRelationshipTo(three, RelTypes.R1).setProperty(COST, 1);
-//
-//            tx.success();
-//        }
-//
-//        try (Transaction tx = database.beginTx()) {
-//            List<Path> paths = Iterables.toList(plugin.paths(one, three, null, null, null, COST));
-//            assertEquals(4, paths.size());
-//            assertEquals(2, paths.get(0).length());
-//            assertEquals(3, paths.get(1).length());
-//            assertEquals(3, paths.get(2).length());
-//            assertEquals(3, paths.get(3).length());
-//
-//            for (Path p : paths) {
-//                System.out.println(p.toString());
-//            }
-//
-//            assertEquals(8, Iterables.toList(paths.get(1).nodes()).get(1).getId());
-//            assertEquals(4, Iterables.toList(paths.get(2).nodes()).get(1).getId());
-//            assertEquals(6, Iterables.toList(paths.get(3).nodes()).get(1).getId());
-//        }
-//    }
+    private String post(String json) {
+        return post(json, HttpStatus.OK_200);
+    }
+
+    private String post(String json, final int expectedStatusCode) {
+        try {
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                HttpPost httpPost = new HttpPost(POST_URL);
+                httpPost.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
+
+                ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
+                    public String handleResponse(final HttpResponse response) throws IOException {
+                        assertEquals(expectedStatusCode, response.getStatusLine().getStatusCode());
+                        if (response.getEntity() != null) {
+                            return EntityUtils.toString(response.getEntity());
+                        } else {
+                            return null;
+                        }
+                    }
+                };
+
+                String execute = httpClient.execute(httpPost, responseHandler);
+                System.out.println(execute);
+                return execute;
+
+            }
+        } catch (IOException e) {
+            fail();
+            return null;
+        }
+    }
 }

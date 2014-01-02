@@ -20,11 +20,9 @@ import com.graphaware.common.util.DirectionUtils;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.Iterables;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -59,12 +57,6 @@ public class NumberOfShortestPaths {
         this.database = database;
     }
 
-    @RequestMapping(value = "hello", method = RequestMethod.GET)
-    @ResponseBody
-    public String hello() {
-        return "Cau pico";
-    }
-
     @RequestMapping(value = "increasinglyLongerShortestPath", method = RequestMethod.POST)
     @ResponseBody
     public List<JsonPath> numberOfShortestPaths(@RequestBody JsonPathFinderInput jsonInput) {
@@ -75,6 +67,12 @@ public class NumberOfShortestPaths {
 
             return convertPaths(paths, jsonInput);
         }
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public void handleException() {
+
     }
 
     private List<JsonPath> convertPaths(List<? extends Path> paths, JsonPathFinderInput jsonInput) {
@@ -143,6 +141,10 @@ public class NumberOfShortestPaths {
     }
 
     private PathFinderInput createInput(JsonPathFinderInput jsonInput) {
+        if (jsonInput.getStartNode() == null || jsonInput.getEndNode() == null) {
+            throw new IllegalArgumentException("Must specify at least start and end nodes!");
+        }
+
         PathFinderInput input = new PathFinderInput(database.getNodeById(jsonInput.getStartNode()), database.getNodeById(jsonInput.getEndNode()));
 
         if (jsonInput.getSortOrder() != null) {
@@ -165,9 +167,12 @@ public class NumberOfShortestPaths {
             input.setMaxDepth(jsonInput.getMaxDepth());
         }
 
-        if (jsonInput.getRelationshipsAndDirections() != null) {
-            for (JsonRelationshipTypeAndDirection jsonRelationshipTypeAndDirection : jsonInput.getRelationshipsAndDirections()) {
-                input.addTypeAndDirection(DynamicRelationshipType.withName(jsonRelationshipTypeAndDirection.getRelationshipType()), jsonRelationshipTypeAndDirection.getDirection());
+        if (jsonInput.getTypesAndDirections() != null) {
+            if (jsonInput.getDirection() != null) {
+                throw new IllegalArgumentException("Must specify either global direction, or specific types and directions, not both!");
+            }
+            for (JsonRelationshipTypeAndDirection jsonRelationshipTypeAndDirection : jsonInput.getTypesAndDirections()) {
+                input.addTypeAndDirection(DynamicRelationshipType.withName(jsonRelationshipTypeAndDirection.getType()), jsonRelationshipTypeAndDirection.getDirection());
             }
         }
         return input;

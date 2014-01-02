@@ -22,8 +22,7 @@
                 "type": "R2",
                 "direction": "OUTGOING"
             }
-        ],
-        "cost": 0
+        ]
     },
     {
         "nodes": [
@@ -56,41 +55,6 @@
                 "type": "R1",
                 "direction": "OUTGOING"
             }
-        ],
-        "cost": 0
-    },
-    {
-        "nodes": [
-            {
-                "id": 0
-            },
-            {
-                "id": 5
-            },
-            {
-                "id": 6
-            },
-            {
-                "id": 2
-            }
-        ],
-        "relationships": [
-            {
-                "id": 6,
-                "type": "R1",
-                "direction": "OUTGOING"
-            },
-            {
-                "id": 7,
-                "type": "R1",
-                "direction": "OUTGOING"
-            },
-            {
-                "id": 8,
-                "type": "R1",
-                "direction": "INCOMING"
-            }
-        ],
-        "cost": 0
+        ]
     }
 ]

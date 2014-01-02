@@ -26,9 +26,6 @@ public class JsonRelationship extends JsonPropertyContainer {
     private String type;
     private Direction direction;
 
-    public JsonRelationship() {
-    }
-
     public JsonRelationship(long id) {
         super(id);
     }

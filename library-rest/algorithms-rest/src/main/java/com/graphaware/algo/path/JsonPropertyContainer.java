@@ -32,9 +32,6 @@ public abstract class JsonPropertyContainer {
     private long id;
     private Map<String, Object> properties = new HashMap<>();
 
-    protected JsonPropertyContainer() {
-    }
-
     protected JsonPropertyContainer(long id) {
         this.id = id;
     }

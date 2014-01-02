@@ -18,18 +18,17 @@ package com.graphaware.algo.path;
 
 import org.neo4j.graphdb.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class JsonPathFinderInput extends JsonInput {
 
-    private long startNode;
-    private long endNode;
+    private Long startNode;
+    private Long endNode;
     private Integer maxDepth;
     private Integer maxResults;
 
     //either concrete relationship types and directions
-    private List<JsonRelationshipTypeAndDirection> relationshipsAndDirections;
+    private List<JsonRelationshipTypeAndDirection> typesAndDirections;
 
     //or all relationship types and direction
     private Direction direction;
@@ -39,19 +38,19 @@ public class JsonPathFinderInput extends JsonInput {
 
     //getters & setters
 
-    public long getStartNode() {
+    public Long getStartNode() {
         return startNode;
     }
 
-    public void setStartNode(long startNode) {
+    public void setStartNode(Long startNode) {
         this.startNode = startNode;
     }
 
-    public long getEndNode() {
+    public Long getEndNode() {
         return endNode;
     }
 
-    public void setEndNode(long endNode) {
+    public void setEndNode(Long endNode) {
         this.endNode = endNode;
     }
 
@@ -71,12 +70,12 @@ public class JsonPathFinderInput extends JsonInput {
         this.maxResults = maxResults;
     }
 
-    public List<JsonRelationshipTypeAndDirection> getRelationshipsAndDirections() {
-        return relationshipsAndDirections;
+    public List<JsonRelationshipTypeAndDirection> getTypesAndDirections() {
+        return typesAndDirections;
     }
 
-    public void setRelationshipsAndDirections(List<JsonRelationshipTypeAndDirection> relationshipsAndDirections) {
-        this.relationshipsAndDirections = relationshipsAndDirections;
+    public void setTypesAndDirections(List<JsonRelationshipTypeAndDirection> typesAndDirections) {
+        this.typesAndDirections = typesAndDirections;
     }
 
     public Direction getDirection() {

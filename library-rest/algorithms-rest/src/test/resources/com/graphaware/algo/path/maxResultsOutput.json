@@ -14,12 +14,12 @@
         "relationships": [
             {
                 "id": 0,
-                "type": "R2",
+                "type": "R1",
                 "direction": "OUTGOING"
             },
             {
                 "id": 1,
-                "type": "R1",
+                "type": "R2",
                 "direction": "OUTGOING"
             }
         ]

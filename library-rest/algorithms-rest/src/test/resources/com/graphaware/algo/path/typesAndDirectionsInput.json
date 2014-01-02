@@ -1,0 +1,14 @@
+{
+    "startNode": 0,
+    "endNode": 2,
+    "typesAndDirections": [
+        {
+            "type": "R1"
+        },
+        {
+            "type": "R2",
+            "direction": "INCOMING"
+        }
+
+    ]
+}

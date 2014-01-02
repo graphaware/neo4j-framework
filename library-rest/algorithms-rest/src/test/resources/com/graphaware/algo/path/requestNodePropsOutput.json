@@ -17,12 +17,12 @@
         "relationships": [
             {
                 "id": 0,
-                "type": "R2",
+                "type": "R1",
                 "direction": "OUTGOING"
             },
             {
                 "id": 1,
-                "type": "R1",
+                "type": "R2",
                 "direction": "OUTGOING"
             }
         ]
@@ -49,7 +49,7 @@
         "relationships": [
             {
                 "id": 2,
-                "type": "R1",
+                "type": "R2",
                 "direction": "OUTGOING"
             },
             {
@@ -97,7 +97,7 @@
             {
                 "id": 8,
                 "type": "R1",
-                "direction": "OUTGOING"
+                "direction": "INCOMING"
             }
         ]
     }

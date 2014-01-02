@@ -23,15 +23,15 @@ import org.neo4j.graphdb.Direction;
  */
 public class JsonRelationshipTypeAndDirection {
 
-    private String relationshipType;
-    private Direction direction;
+    private String type;
+    private Direction direction = Direction.BOTH;
 
-    public String getRelationshipType() {
-        return relationshipType;
+    public String getType() {
+        return type;
     }
 
-    public void setRelationshipType(String relationshipType) {
-        this.relationshipType = relationshipType;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public Direction getDirection() {

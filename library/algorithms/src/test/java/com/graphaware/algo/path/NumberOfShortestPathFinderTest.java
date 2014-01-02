@@ -34,7 +34,7 @@ import static org.neo4j.kernel.Traversal.pathExpanderForAllTypes;
 import static org.neo4j.kernel.Traversal.pathExpanderForTypes;
 
 /**
- * Integration test for {@link NumberOfShortestPathFinder}.
+ * Test for {@link NumberOfShortestPathFinder}.
  */
 public class NumberOfShortestPathFinderTest {
 
