@@ -93,7 +93,9 @@ public class IntegrationSmokeTest {
                         "\"}",
                 HttpStatus.OK_200);
 
-        assertJsonEquals(TestUtils.post("http://localhost:7474/graphaware/api/library/algorithm/path/increasinglyLongerShortestPath", jsonAsString("minimalInput"), HttpStatus.OK_200), jsonAsString("minimalOutput"));
+        assertJsonEquals(TestUtils.post("http://localhost:7474/graphaware/api/library/algorithm/path/increasinglyLongerShortestPath",
+                jsonAsString("minimalInput"), HttpStatus.OK_200),
+                jsonAsString("minimalOutput"));
     }
 
     private String jsonAsString(String fileName) {
