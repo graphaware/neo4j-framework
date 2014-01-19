@@ -17,6 +17,7 @@
 package com.graphaware.api.library.algo.path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.graphaware.common.test.TestUtils;
 import com.graphaware.server.web.WebAppInitializer;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -40,6 +41,7 @@ import org.springframework.core.io.ClassPathResource;
 import javax.servlet.ServletException;
 import java.io.IOException;
 
+import static com.graphaware.common.test.TestUtils.*;
 import static org.junit.Assert.*;
 
 /**
@@ -156,18 +158,9 @@ public class NumberOfShortestPathsFinderApiTest {
         post(jsonAsString("invalidInput4"), HttpStatus.NOT_FOUND_404);
     }
 
-    private void assertJsonEquals(String one, String two) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            assertTrue(mapper.readTree(one).equals(mapper.readTree(two)));
-        } catch (IOException e) {
-            fail();
-        }
-    }
-
     private String jsonAsString(String fileName) {
         try {
-            return IOUtils.toString(new ClassPathResource("com/graphaware/api/library/algo/path/"+fileName+".json").getInputStream());
+            return IOUtils.toString(new ClassPathResource("com/graphaware/api/library/algo/path/" + fileName + ".json").getInputStream());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -249,31 +242,7 @@ public class NumberOfShortestPathsFinderApiTest {
         return post(json, HttpStatus.OK_200);
     }
 
-    private String post(String json, final int expectedStatusCode) {
-        try {
-            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                HttpPost httpPost = new HttpPost(POST_URL);
-                httpPost.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
-
-                ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
-                    public String handleResponse(final HttpResponse response) throws IOException {
-                        assertEquals(expectedStatusCode, response.getStatusLine().getStatusCode());
-                        if (response.getEntity() != null) {
-                            return EntityUtils.toString(response.getEntity());
-                        } else {
-                            return null;
-                        }
-                    }
-                };
-
-                String execute = httpClient.execute(httpPost, responseHandler);
-                System.out.println(execute);
-                return execute;
-
-            }
-        } catch (IOException e) {
-            fail();
-            return null;
-        }
+    private String post(String json, int expectedStatus) {
+        return TestUtils.post(POST_URL, json, expectedStatus);
     }
 }

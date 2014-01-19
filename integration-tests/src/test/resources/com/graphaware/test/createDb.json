@@ -1,0 +1,3 @@
+{
+    "query" : "CREATE (one:L1:L2 { name:\"one\" }) CREATE (two:L2 { name:\"two\" }) CREATE (three:L1:L2 { name:\"three\" }) CREATE (four:L2 { name:\"four\" }) CREATE (five:L1 { name:\"five\" }) CREATE (six:L1 { name:\"six\" }) CREATE (seven:L1 { name:\"seven\" }) CREATE (one)-[:R1 {cost:5}]->(two)-[:R2 {cost:1}]->(three) CREATE (one)-[:R2 {cost:1}]->(four)-[:R1 {cost:2}]->(five)-[:R1 {cost:1}]->(three) CREATE (two)-[:R2 {cost:1}]->(four) CREATE (one)-[:R1 {cost:1}]->(six)-[:R1]->(seven)<-[:R1 {cost:1}]-(three)"
+}

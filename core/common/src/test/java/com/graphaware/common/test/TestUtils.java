@@ -16,10 +16,63 @@
 
 package com.graphaware.common.test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 /**
  * Utilities mainly intended for testing.
  */
 public final class TestUtils {
+
+    public static void assertJsonEquals(String one, String two) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            assertTrue(mapper.readTree(one).equals(mapper.readTree(two)));
+        } catch (IOException e) {
+            fail();
+        }
+    }
+
+    public static String post(String url, String json, final int expectedStatusCode) {
+        try {
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                HttpPost httpPost = new HttpPost(url);
+                httpPost.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
+
+                ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
+                    public String handleResponse(final HttpResponse response) throws IOException {
+                        assertEquals(expectedStatusCode, response.getStatusLine().getStatusCode());
+                        if (response.getEntity() != null) {
+                            return EntityUtils.toString(response.getEntity());
+                        } else {
+                            return null;
+                        }
+                    }
+                };
+
+                String execute = httpClient.execute(httpPost, responseHandler);
+                System.out.println(execute);
+                return execute;
+
+            }
+        } catch (IOException e) {
+            fail();
+            return null;
+        }
+    }
 
     /**
      * Measure the time of the timed callback.
