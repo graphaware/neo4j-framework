@@ -35,7 +35,7 @@ import java.util.List;
  * {@link com.graphaware.api.library.algo.path.SortOrder#LENGTH_ASC_THEN_COST_DESC}, then {@link PathFinderInput#getCostProperty()}
  * must also be provided and paths with the same length are ordered by total cost ascending or descending, respectively.
  * <p/>
- * Please note that nodes that are on a path with certain length will not be considered for paths with greater lengths.
+ * Please note that relationships that are on a path with certain length will not be considered for paths with greater lengths.
  * For example, given the following graph:
  * <p/>
  * (1)->(2)->(3)
