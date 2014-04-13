@@ -28,23 +28,47 @@ public enum Resolution {
         this.dateTimeFieldType = dateTimeFieldType;
     }
 
+    /**
+     * Get the label corresponding to this resolution level. Nodes representing the level will get this label.
+     *
+     * @return label.
+     */
     public Label getLabel() {
         return label;
     }
 
+    /**
+     * Get the {@link DateTimeFieldType} corresponding to this resolution level.
+     *
+     * @return field type.
+     */
     public DateTimeFieldType getDateTimeFieldType() {
         return dateTimeFieldType;
     }
 
+    /**
+     * Get the resolution one level below this resolution.
+     *
+     * @return child resolution.
+     * @throws IllegalStateException if this resolution does not have children.
+     */
     public Resolution getChild() {
         if (this.ordinal() >= values().length - 1) {
             LOG.error("Parent resolution " + this.toString() + " does not have children. This is a bug.");
-            throw new IllegalArgumentException("Parent resolution " + this.toString() + " does not have children. This is a bug.");
+            throw new IllegalStateException("Parent resolution " + this.toString() + " does not have children. This is a bug.");
         }
 
         return values()[this.ordinal() + 1];
     }
 
+    /**
+     * Find the resolution level that the given node corresponds to. The node must be from a GraphAware TimeTree and must
+     * not be the root of the tree.
+     *
+     * @param node to find resolution for.
+     * @return resolution.
+     * @throws IllegalArgumentException in case the given node is not from GraphAware TimeTree or is the root.
+     */
     public static Resolution findForNode(Node node) {
         for (Label label : node.getLabels()) {
             Resolution resolution = findForLabel(label);
@@ -57,6 +81,12 @@ public enum Resolution {
         throw new IllegalArgumentException("Node " + node.toString() + " does not have a corresponding resolution. This is a bug.");
     }
 
+    /**
+     * Find the resolution corresponding to the given label.
+     *
+     * @param label to find the resolution for.
+     * @return resolution for label, null if there is no corresponding resolution.
+     */
     private static Resolution findForLabel(Label label) {
         for (Resolution resolution : values()) {
             if (resolution.getLabel().name().equals(label.name())) {

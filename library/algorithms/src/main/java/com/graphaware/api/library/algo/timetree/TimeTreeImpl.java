@@ -19,7 +19,9 @@ import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 
 /**
- * Default implementation of {@link TimeTree}.
+ * Default implementation of {@link TimeTree}. The default {@link Resolution}, if one is not explicitly provided using
+ * the constructor or one of the public methods, is {@link Resolution#DAY}. The default {@link DateTimeZone}, if one
+ * is not explicitly provided, is UTC.
  */
 public class TimeTreeImpl implements TimeTree {
     private static final Logger LOG = Logger.getLogger(TimeTreeImpl.class);
@@ -146,10 +148,10 @@ public class TimeTreeImpl implements TimeTree {
      * Get a node representing a specific time instant. If one doesn't exist, it will be created as well as any missing
      * nodes on the way down from parent (recursively).
      *
-     * @param parent            parent node on path to desired instant node.
-     * @param dateTime          time instant.
-     * @param targetResolution
-     * @return
+     * @param parent           parent node on path to desired instant node.
+     * @param dateTime         time instant.
+     * @param targetResolution target child resolution. Recursion stops when at this level.
+     * @return node representing the time instant at the desired resolution level.
      */
     private Node getInstant(Node parent, DateTime dateTime, Resolution targetResolution) {
         Resolution currentResolution = findForNode(parent);
@@ -160,6 +162,7 @@ public class TimeTreeImpl implements TimeTree {
 
         Node child = findOrCreateChild(parent, dateTime.get(currentResolution.getChild().getDateTimeFieldType()));
 
+        //recursion
         return getInstant(child, dateTime, targetResolution);
     }
 
@@ -372,10 +375,4 @@ public class TimeTreeImpl implements TimeTree {
 
         return parentRelationship.getStartNode();
     }
-
-
-
-
-
-
 }

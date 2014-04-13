@@ -4,8 +4,9 @@ import org.joda.time.DateTimeZone;
 import org.neo4j.graphdb.Node;
 
 /**
- * API for representing time as a tree. Provides methods for creating and retrieving nodes that represent instances of
- * time, making sure that a tree of time is maintained with each created node. There is no support for changes or deletes.
+ * API for representing time as a tree (also called GraphAware TimeTree). Provides methods for creating and retrieving
+ * nodes that represent instances of time, making sure that a tree of time is maintained with each created node.
+ * There is no support for changes or deletes.
  */
 public interface TimeTree {
 
