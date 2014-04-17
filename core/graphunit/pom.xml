@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2013 GraphAware
+  ~ Copyright (c) 2014 GraphAware
   ~
   ~ This file is part of GraphAware.
   ~
@@ -19,21 +19,27 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>framework-parent</artifactId>
+        <artifactId>core</artifactId>
         <version>1.9-1.9-SNAPSHOT</version>
     </parent>
-    <artifactId>core</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>graphunit</artifactId>
+    <packaging>jar</packaging>
 
-    <name>GraphAware Framework Core</name>
-    <description>GraphAware Framework Code Useful for Java Developers</description>
+    <name>GraphAware GraphUnit</name>
+    <description>Simplified Unit Testing for Neo4j</description>
     <url>http://graphaware.com</url>
 
-    <modules>
-        <module>common</module>
-        <module>graphunit</module>
-        <module>tx-api</module>
-        <module>tx-executor</module>
-    </modules>
-
+    <dependencies>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-kernel</artifactId>
+            <type>test-jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 </project>
