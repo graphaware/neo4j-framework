@@ -20,6 +20,7 @@ import static com.graphaware.api.library.algo.timetree.TimeTreeRelationshipTypes
 import static com.graphaware.graphunit.GraphUnit.*;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.helpers.collection.Iterables.count;
@@ -53,7 +54,7 @@ public class TimeTreeImplTest {
         //When
         Node dayNode;
         try (Transaction tx = database.beginTx()) {
-            dayNode = timeTree.getInstant(dateInMillis, Resolution.DAY);
+            dayNode = timeTree.getInstant(dateInMillis);
             tx.success();
         }
 
@@ -77,6 +78,50 @@ public class TimeTreeImplTest {
     }
 
     @Test
+    public void trivialTreeShouldBeCreatedWhenFirstMilliInstantIsRequested() {
+        //Given
+        long dateInMillis = new DateTime(2014, 4, 5, 13, 56, 22, 123, UTC).getMillis();
+        timeTree = new TimeTreeImpl(database, DateTimeZone.forTimeZone(TimeZone.getTimeZone("GMT+1")), Resolution.MILLISECOND);
+
+        //When
+        Node instantNode;
+        try (Transaction tx = database.beginTx()) {
+            instantNode = timeTree.getInstant(dateInMillis);
+            tx.success();
+        }
+
+        //Then
+        assertSameGraph(database, "CREATE" +
+                "(root:TimeTreeRoot)," +
+                "(root)-[:FIRST]->(year:Year {value:2014})," +
+                "(root)-[:CHILD]->(year)," +
+                "(root)-[:LAST]->(year)," +
+                "(year)-[:FIRST]->(month:Month {value:4})," +
+                "(year)-[:CHILD]->(month)," +
+                "(year)-[:LAST]->(month)," +
+                "(month)-[:FIRST]->(day:Day {value:5})," +
+                "(month)-[:CHILD]->(day)," +
+                "(month)-[:LAST]->(day),"+
+                "(day)-[:FIRST]->(hour:Hour {value:14})," + //1 hour more!
+                "(day)-[:CHILD]->(hour)," +
+                "(day)-[:LAST]->(hour),"+
+                "(hour)-[:FIRST]->(minute:Minute {value:56})," +
+                "(hour)-[:CHILD]->(minute)," +
+                "(hour)-[:LAST]->(minute),"+
+                "(minute)-[:FIRST]->(second:Second {value:22})," +
+                "(minute)-[:CHILD]->(second)," +
+                "(minute)-[:LAST]->(second),"+
+                "(second)-[:FIRST]->(milli:Millisecond {value:123})," +
+                "(second)-[:CHILD]->(milli)," +
+                "(second)-[:LAST]->(milli)");
+
+        try (Transaction tx = database.beginTx()) {
+            assertTrue(instantNode.hasLabel(TimeTreeLabels.Millisecond));
+            assertEquals(123, instantNode.getProperty(VALUE_PROPERTY));
+        }
+    }
+
+    @Test
     public void trivialTreeShouldBeCreatedWhenTodayIsRequested() {
         //Given
         DateTime now = DateTime.now(UTC);
@@ -89,75 +134,57 @@ public class TimeTreeImplTest {
         }
 
         //Then
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(4, count(GlobalGraphOperations.at(database).getAllNodes()));
+        assertSameGraph(database, "CREATE" +
+                "(root:TimeTreeRoot)," +
+                "(root)-[:FIRST]->(year:Year {value:" + now.getYear() + "})," +
+                "(root)-[:CHILD]->(year)," +
+                "(root)-[:LAST]->(year)," +
+                "(year)-[:FIRST]->(month:Month {value:" + now.getMonthOfYear() + "})," +
+                "(year)-[:CHILD]->(month)," +
+                "(year)-[:LAST]->(month)," +
+                "(month)-[:FIRST]->(day:Day {value:" + now.getDayOfMonth() + "})," +
+                "(month)-[:CHILD]->(day)," +
+                "(month)-[:LAST]->(day)");
 
+        try (Transaction tx = database.beginTx()) {
             assertTrue(dayNode.hasLabel(TimeTreeLabels.Day));
             assertEquals(now.getDayOfMonth(), dayNode.getProperty(VALUE_PROPERTY));
-
-            Node monthNode = dayNode.getSingleRelationship(CHILD, INCOMING).getStartNode();
-            assertEquals(monthNode, dayNode.getSingleRelationship(FIRST, INCOMING).getStartNode());
-            assertEquals(monthNode, dayNode.getSingleRelationship(LAST, INCOMING).getStartNode());
-            assertTrue(monthNode.hasLabel(TimeTreeLabels.Month));
-            assertEquals(now.getMonthOfYear(), monthNode.getProperty(VALUE_PROPERTY));
-            assertNull(dayNode.getSingleRelationship(NEXT, INCOMING));
-            assertNull(dayNode.getSingleRelationship(NEXT, OUTGOING));
-
-            Node yearNode = monthNode.getSingleRelationship(CHILD, INCOMING).getStartNode();
-            assertEquals(yearNode, monthNode.getSingleRelationship(FIRST, INCOMING).getStartNode());
-            assertEquals(yearNode, monthNode.getSingleRelationship(LAST, INCOMING).getStartNode());
-            assertTrue(yearNode.hasLabel(TimeTreeLabels.Year));
-            assertEquals(now.getYear(), yearNode.getProperty(VALUE_PROPERTY));
-            assertNull(yearNode.getSingleRelationship(NEXT, INCOMING));
-            assertNull(yearNode.getSingleRelationship(NEXT, OUTGOING));
-
-            Node rootNode = yearNode.getSingleRelationship(CHILD, INCOMING).getStartNode();
-            assertEquals(rootNode, yearNode.getSingleRelationship(FIRST, INCOMING).getStartNode());
-            assertEquals(rootNode, yearNode.getSingleRelationship(LAST, INCOMING).getStartNode());
-            assertTrue(rootNode.hasLabel(TimeTreeLabels.TimeTreeRoot));
-            assertEquals("GraphAware TimeTree Root", rootNode.getProperty(VALUE_PROPERTY));
-            assertNull(rootNode.getSingleRelationship(NEXT, INCOMING));
-            assertNull(rootNode.getSingleRelationship(NEXT, OUTGOING));
-            assertNull(rootNode.getSingleRelationship(FIRST, INCOMING));
-            assertNull(rootNode.getSingleRelationship(LAST, INCOMING));
         }
     }
 
     @Test
     public void graphShouldNotBeMutatedWhenExistingDayIsRequested() {
         //Given
-        DateTime today = DateTime.now(UTC).withTimeAtStartOfDay();
+        DateTime now = DateTime.now(UTC);
 
         //When
         try (Transaction tx = database.beginTx()) {
-            timeTree.getInstant(today.getMillis(), Resolution.DAY);
+            timeTree.getInstant(now.getMillis(), Resolution.DAY);
             tx.success();
         }
 
         Node dayNode;
         try (Transaction tx = database.beginTx()) {
-            dayNode = timeTree.getInstant(today.getMillis(), Resolution.DAY);
+            dayNode = timeTree.getInstant(now.getMillis(), Resolution.DAY);
             tx.success();
         }
 
         //Then
+        assertSameGraph(database, "CREATE" +
+                "(root:TimeTreeRoot)," +
+                "(root)-[:FIRST]->(year:Year {value:" + now.getYear() + "})," +
+                "(root)-[:CHILD]->(year)," +
+                "(root)-[:LAST]->(year)," +
+                "(year)-[:FIRST]->(month:Month {value:" + now.getMonthOfYear() + "})," +
+                "(year)-[:CHILD]->(month)," +
+                "(year)-[:LAST]->(month)," +
+                "(month)-[:FIRST]->(day:Day {value:" + now.getDayOfMonth() + "})," +
+                "(month)-[:CHILD]->(day)," +
+                "(month)-[:LAST]->(day)");
+
         try (Transaction tx = database.beginTx()) {
-            assertEquals(4, count(GlobalGraphOperations.at(database).getAllNodes()));
-
             assertTrue(dayNode.hasLabel(TimeTreeLabels.Day));
-            assertEquals(today.getDayOfMonth(), dayNode.getProperty(VALUE_PROPERTY));
-
-            Node monthNode = dayNode.getSingleRelationship(CHILD, INCOMING).getStartNode();
-            assertTrue(monthNode.hasLabel(TimeTreeLabels.Month));
-            assertEquals(today.getMonthOfYear(), monthNode.getProperty(VALUE_PROPERTY));
-
-            Node yearNode = monthNode.getSingleRelationship(CHILD, INCOMING).getStartNode();
-            assertTrue(yearNode.hasLabel(TimeTreeLabels.Year));
-            assertEquals(today.getYear(), yearNode.getProperty(VALUE_PROPERTY));
-
-            Node rootNode = yearNode.getSingleRelationship(CHILD, INCOMING).getStartNode();
-            assertTrue(rootNode.hasLabel(TimeTreeLabels.TimeTreeRoot));
-            assertEquals("GraphAware TimeTree Root", rootNode.getProperty(VALUE_PROPERTY));
+            assertEquals(now.getDayOfMonth(), dayNode.getProperty(VALUE_PROPERTY));
         }
     }
 
@@ -216,78 +243,44 @@ public class TimeTreeImplTest {
     }
 
     private void verifyFullTree() {
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(14, count(database.getAllNodes()));
+        assertSameGraph(database, "CREATE" +
+                "(root:TimeTreeRoot)," +
+                "(root)-[:FIRST]->(year2012:Year {value:2012})," +
+                "(root)-[:LAST]->(year2013:Year {value:2013})," +
+                "(root)-[:CHILD]->(year2012)," +
+                "(root)-[:CHILD]->(year2013)," +
+                "(year2012)-[:NEXT]->(year2013)," +
 
-            Node root = database.findNodesByLabelAndProperty(TimeTreeLabels.TimeTreeRoot, VALUE_PROPERTY, "GraphAware TimeTree Root").iterator().next();
+                "(year2012)-[:FIRST]->(month112012:Month {value:11})," +
+                "(year2012)-[:LAST]->(month112012)," +
+                "(year2012)-[:CHILD]->(month112012)," +
 
-            //year level
-            Node year2012 = root.getSingleRelationship(FIRST, OUTGOING).getEndNode();
-            Node year2013 = root.getSingleRelationship(LAST, OUTGOING).getEndNode();
-            Iterator<Relationship> childRels = root.getRelationships(CHILD, OUTGOING).iterator();
-            assertTrue(asList(year2012, year2013).contains(childRels.next().getEndNode()));
-            assertTrue(asList(year2012, year2013).contains(childRels.next().getEndNode()));
-            assertFalse(childRels.hasNext());
-            assertEquals(year2013, year2012.getSingleRelationship(NEXT, OUTGOING).getEndNode());
-            assertNull(year2013.getSingleRelationship(NEXT, OUTGOING));
-            assertNull(year2012.getSingleRelationship(NEXT, INCOMING));
+                "(year2013)-[:CHILD]->(month012013:Month {value:1})," +
+                "(year2013)-[:CHILD]->(month022013:Month {value:2})," +
+                "(year2013)-[:CHILD]->(month032013:Month {value:3})," +
+                "(year2013)-[:FIRST]->(month012013)," +
+                "(year2013)-[:LAST]->(month032013)," +
+                "(month112012)-[:NEXT]->(month012013)-[:NEXT]->(month022013)-[:NEXT]->(month032013), " +
 
-            //month level
-            Node month112012 = year2012.getSingleRelationship(FIRST, OUTGOING).getEndNode();
-            assertEquals(month112012, year2012.getSingleRelationship(LAST, OUTGOING).getEndNode());
-            assertEquals(month112012, year2012.getSingleRelationship(CHILD, OUTGOING).getEndNode());
+                "(month112012)-[:CHILD]->(day01112012:Day {value:1})," +
+                "(month112012)-[:CHILD]->(day10112012:Day {value:10})," +
+                "(month112012)-[:FIRST]->(day01112012)," +
+                "(month112012)-[:LAST]->(day10112012)," +
+                "(day01112012)-[:NEXT]->(day10112012)-[:NEXT]->(day01012013:Day {value:1})-[:NEXT]->(day02012013:Day {value:2})-[:NEXT]->(day04012013:Day {value:4})-[:NEXT]->(day01022013:Day {value:1})-[:NEXT]->(day10032013:Day {value:10})," +
 
-            Node month012013 = year2013.getSingleRelationship(FIRST, OUTGOING).getEndNode();
-            assertEquals(month012013, month112012.getSingleRelationship(NEXT, OUTGOING).getEndNode());
+                "(month012013)-[:FIRST]->(day01012013)," +
+                "(month012013)-[:CHILD]->(day01012013)," +
+                "(month012013)-[:LAST]->(day04012013)," +
+                "(month012013)-[:CHILD]->(day04012013)," +
+                "(month012013)-[:CHILD]->(day02012013)," +
 
-            Node month022013 = month012013.getSingleRelationship(NEXT, OUTGOING).getEndNode();
-            Node month032013 = month022013.getSingleRelationship(NEXT, OUTGOING).getEndNode();
-            childRels = year2013.getRelationships(CHILD, OUTGOING).iterator();
-            assertTrue(asList(month012013, month022013, month032013).contains(childRels.next().getEndNode()));
-            assertTrue(asList(month012013, month022013, month032013).contains(childRels.next().getEndNode()));
-            assertTrue(asList(month012013, month022013, month032013).contains(childRels.next().getEndNode()));
-            assertFalse(childRels.hasNext());
-            assertEquals(month032013, year2013.getSingleRelationship(LAST, OUTGOING).getEndNode());
-            assertNull(month032013.getSingleRelationship(NEXT, OUTGOING));
+                "(month022013)-[:FIRST]->(day01022013)," +
+                "(month022013)-[:LAST]->(day01022013)," +
+                "(month022013)-[:CHILD]->(day01022013)," +
 
-            //day level
-            Node day01112012 = month112012.getSingleRelationship(FIRST, OUTGOING).getEndNode();
-            Node day10112012 = month112012.getSingleRelationship(LAST, OUTGOING).getEndNode();
-            childRels = month112012.getRelationships(CHILD, OUTGOING).iterator();
-            assertTrue(asList(day01112012, day10112012).contains(childRels.next().getEndNode()));
-            assertTrue(asList(day01112012, day10112012).contains(childRels.next().getEndNode()));
-            assertFalse(childRels.hasNext());
-
-            Node day01012013 = day10112012.getSingleRelationship(NEXT, OUTGOING).getEndNode();
-            Node day02012013 = day01012013.getSingleRelationship(NEXT, OUTGOING).getEndNode();
-            Node day04012013 = day02012013.getSingleRelationship(NEXT, OUTGOING).getEndNode();
-            Node day01022013 = day04012013.getSingleRelationship(NEXT, OUTGOING).getEndNode();
-            Node day10032013 = day01022013.getSingleRelationship(NEXT, OUTGOING).getEndNode();
-
-            assertEquals(day01012013, month012013.getSingleRelationship(FIRST, OUTGOING).getEndNode());
-            assertEquals(day04012013, month012013.getSingleRelationship(LAST, OUTGOING).getEndNode());
-            childRels = month012013.getRelationships(CHILD, OUTGOING).iterator();
-            assertTrue(asList(day01012013, day02012013, day04012013).contains(childRels.next().getEndNode()));
-            assertTrue(asList(day01012013, day02012013, day04012013).contains(childRels.next().getEndNode()));
-            assertTrue(asList(day01012013, day02012013, day04012013).contains(childRels.next().getEndNode()));
-            assertFalse(childRels.hasNext());
-
-            assertEquals(day01022013, month022013.getSingleRelationship(FIRST, OUTGOING).getEndNode());
-            assertEquals(day01022013, month022013.getSingleRelationship(LAST, OUTGOING).getEndNode());
-            assertEquals(day01022013, month022013.getSingleRelationship(CHILD, OUTGOING).getEndNode());
-
-            assertEquals(day10032013, month032013.getSingleRelationship(FIRST, OUTGOING).getEndNode());
-            assertEquals(day10032013, month032013.getSingleRelationship(LAST, OUTGOING).getEndNode());
-            assertEquals(day10032013, month032013.getSingleRelationship(CHILD, OUTGOING).getEndNode());
-
-            assertNull(day01112012.getSingleRelationship(CHILD, OUTGOING));
-            assertNull(day10112012.getSingleRelationship(CHILD, OUTGOING));
-            assertNull(day01012013.getSingleRelationship(CHILD, OUTGOING));
-            assertNull(day02012013.getSingleRelationship(CHILD, OUTGOING));
-            assertNull(day04012013.getSingleRelationship(CHILD, OUTGOING));
-            assertNull(day01022013.getSingleRelationship(CHILD, OUTGOING));
-            assertNull(day10032013.getSingleRelationship(CHILD, OUTGOING));
-        }
+                "(month032013)-[:CHILD]->(day10032013)," +
+                "(month032013)-[:FIRST]->(day10032013)," +
+                "(month032013)-[:LAST]->(day10032013)");
     }
 
     private long dateToMillis(int year, int month, int day) {

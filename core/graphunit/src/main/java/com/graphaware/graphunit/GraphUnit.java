@@ -1,6 +1,7 @@
 package com.graphaware.graphunit;
 
 import com.graphaware.common.util.PropertyContainerUtils;
+import org.apache.log4j.Logger;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -24,6 +25,8 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
  * quite hard!
  */
 public final class GraphUnit {
+
+    private static final Logger LOG = Logger.getLogger(GraphUnit.class);
 
     /**
      * Assert that the graph in the given database is exactly the same as the graph that would be created by the given
@@ -94,16 +97,21 @@ public final class GraphUnit {
     }
 
     private static void assertSameNumbersOfElements(GraphDatabaseService database, GraphDatabaseService otherDatabase) {
-        assertEquals("There are different numbers of nodes in the two graphs", count(at(database).getAllNodes()), count(at(otherDatabase).getAllNodes()));
-        assertEquals("There are different numbers of labels in the two graphs", count(at(database).getAllLabels()), count(at(otherDatabase).getAllLabels()));
-        assertEquals("There are different numbers of property keys in the two graphs", count(at(database).getAllPropertyKeys()), count(at(otherDatabase).getAllPropertyKeys()));
-        assertEquals("There are different numbers of relationships in the two graphs", count(at(database).getAllRelationships()), count(at(otherDatabase).getAllRelationships()));
-        assertEquals("There are different numbers of relationship types in the two graphs", count(at(database).getAllRelationshipTypes()), count(at(otherDatabase).getAllRelationshipTypes()));
+        assertEquals("There are different numbers of nodes in the two graphs", count(at(otherDatabase).getAllNodes()), count(at(database).getAllNodes()));
+        assertEquals("There are different numbers of labels in the two graphs", count(at(otherDatabase).getAllLabels()), count(at(database).getAllLabels()));
+        assertEquals("There are different numbers of property keys in the two graphs", count(at(otherDatabase).getAllPropertyKeys()), count(at(database).getAllPropertyKeys()));
+        assertEquals("There are different numbers of relationships in the two graphs", count(at(otherDatabase).getAllRelationships()), count(at(database).getAllRelationships()));
+        assertEquals("There are different numbers of relationship types in the two graphs", count(at(otherDatabase).getAllRelationshipTypes()), count(at(database).getAllRelationshipTypes()));
     }
 
     private static void doAssertSubgraph(GraphDatabaseService database, GraphDatabaseService otherDatabase) {
         Map<Long, Long[]> sameNodesMap = buildSameNodesMap(database, otherDatabase);
-        Set<Map<Long, Long>> nodeMappings = buildNodeMappingPermutations(sameNodesMap);
+        Set<Map<Long, Long>> nodeMappings = buildNodeMappingPermutations(sameNodesMap, database, otherDatabase);
+
+        if (nodeMappings.size() == 1) {
+            assertRelationshipsMappingExistsForSingleNodeMapping(database, otherDatabase, nodeMappings.iterator().next());
+            return;
+        }
 
         for (Map<Long, Long> nodeMapping : nodeMappings) {
             if (relationshipsMappingExists(database, otherDatabase, nodeMapping)) {
@@ -122,7 +130,7 @@ public final class GraphUnit {
 
             //fail fast
             if (!sameNodes.iterator().hasNext()) {
-                fail("There is no corresponding node to " + node.toString());
+                fail("There is no corresponding node to " + nodeToString(node));
             }
 
             Set<Long> sameNodeIds = new HashSet<>();
@@ -135,7 +143,7 @@ public final class GraphUnit {
         return sameNodesMap;
     }
 
-    private static Set<Map<Long, Long>> buildNodeMappingPermutations(Map<Long, Long[]> sameNodesMap) {
+    private static Set<Map<Long, Long>> buildNodeMappingPermutations(Map<Long, Long[]> sameNodesMap, GraphDatabaseService database, GraphDatabaseService otherDatabase) {
         Set<Map<Long, Long>> result = new HashSet<>();
         result.add(new HashMap<Long, Long>());
 
@@ -153,6 +161,12 @@ public final class GraphUnit {
                 }
             }
 
+            if (newResult.isEmpty()) {
+                fail("Could not find a node corresponding to: " + nodeToString(otherDatabase.getNodeById(entry.getKey()))
+                        + ". There are most likely more nodes with the same characteristics (labels, properties) in your " +
+                        "cypher CREATE statement but fewer in the database.");
+            }
+
             result = newResult;
         }
 
@@ -160,13 +174,24 @@ public final class GraphUnit {
     }
 
     private static boolean relationshipsMappingExists(GraphDatabaseService database, GraphDatabaseService otherDatabase, Map<Long, Long> mapping) {
+        LOG.debug("Attempting a node mapping...");
         for (Relationship relationship : at(otherDatabase).getAllRelationships()) {
             if (!relationshipMappingExists(database, relationship, mapping)) {
+                LOG.debug("Failure... No corresponding relationship found to: " + relationshipToString(relationship));
                 return false;
             }
         }
 
+        LOG.debug("Success...");
         return true;
+    }
+
+    private static void assertRelationshipsMappingExistsForSingleNodeMapping(GraphDatabaseService database, GraphDatabaseService otherDatabase, Map<Long, Long> mapping) {
+        for (Relationship relationship : at(otherDatabase).getAllRelationships()) {
+            if (!relationshipMappingExists(database, relationship, mapping)) {
+                fail("No corresponding relationship found to: " + relationshipToString(relationship));
+            }
+        }
     }
 
     private static boolean relationshipMappingExists(GraphDatabaseService database, Relationship relationship, Map<Long, Long> nodeMapping) {
@@ -273,4 +298,48 @@ public final class GraphUnit {
 
         return true;
     }
+
+    private static String nodeToString(Node node) {
+        StringBuilder string = new StringBuilder("(");
+
+        for (Label label : node.getLabels()) {
+            string.append(":").append(label.name());
+        }
+
+        string.append(propertiesToString(node));
+
+        string.append(")");
+
+        return string.toString();
+    }
+
+    private static String relationshipToString(Relationship relationship) {
+        StringBuilder string = new StringBuilder();
+
+        string.append(nodeToString(relationship.getStartNode()));
+        string.append("-[:").append(relationship.getType().name());
+        string.append(propertiesToString(relationship));
+        string.append("]->");
+        string.append(nodeToString(relationship.getEndNode()));
+
+        return string.toString();
+    }
+
+    private static String propertiesToString(PropertyContainer propertyContainer) {
+        if (!propertyContainer.getPropertyKeys().iterator().hasNext()) {
+            return "";
+        }
+
+        StringBuilder string = new StringBuilder(" {");
+
+        for (String key : propertyContainer.getPropertyKeys()) {
+            string.append(key).append(":").append(valueToString(propertyContainer.getProperty(key)));
+        }
+
+        string.append("}");
+
+        return string.toString();
+    }
+
+
 }

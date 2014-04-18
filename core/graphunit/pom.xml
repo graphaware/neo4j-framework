@@ -45,5 +45,9 @@
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
     </dependencies>
 </project>

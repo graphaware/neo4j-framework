@@ -236,8 +236,8 @@ public class TimeTreeImpl implements TimeTree {
      */
     private Node createFirstChildEver(Node parent, int value) {
         if (parent.getSingleRelationship(LAST, OUTGOING) != null) { //sanity check
-            LOG.error("Node ID " + parent.toString() + " has no " + FIRST.name() + " relationship, but has a " + LAST.name() + " one!");
-            throw new IllegalStateException("Node ID " + parent.toString() + " has no " + FIRST.name() + " relationship, but has a " + LAST.name() + " one!");
+            LOG.error(parent.toString() + " has no " + FIRST.name() + " relationship, but has a " + LAST.name() + " one!");
+            throw new IllegalStateException(parent.toString() + " has no " + FIRST.name() + " relationship, but has a " + LAST.name() + " one!");
         }
 
         Node previousChild = null;
@@ -281,8 +281,8 @@ public class TimeTreeImpl implements TimeTree {
         Relationship firstRelationship = parent.getSingleRelationship(FIRST, OUTGOING);
 
         if (nextChild.getId() != firstRelationship.getEndNode().getId()) { //sanity check
-            LOG.error("Node " + nextChild.toString() + " seems to be the first child of node " + parent.toString() + ", but there is no " + FIRST.name() + " relationship between the two!");
-            throw new IllegalStateException("Node " + nextChild.toString() + " seems to be the first child of node " + parent.toString() + ", but there is no " + FIRST.name() + " relationship between the two!");
+            LOG.error(nextChild.toString() + " seems to be the first child of node " + parent.toString() + ", but there is no " + FIRST.name() + " relationship between the two!");
+            throw new IllegalStateException(nextChild.toString() + " seems to be the first child of node " + parent.toString() + ", but there is no " + FIRST.name() + " relationship between the two!");
         }
 
         firstRelationship.delete();
@@ -308,8 +308,8 @@ public class TimeTreeImpl implements TimeTree {
 
         Node endNode = lastRelationship.getEndNode();
         if (previousChild.getId() != endNode.getId()) { //sanity check
-            LOG.error("Node " + previousChild.toString() + " seems to be the last child of node " + parent.toString() + ", but there is no " + LAST.name() + " relationship between the two!");
-            throw new IllegalStateException("Node " + previousChild.toString() + " seems to be the last child of node " + parent.toString() + ", but there is no " + LAST.name() + " relationship between the two!");
+            LOG.error(previousChild.toString() + " seems to be the last child of node " + parent.toString() + ", but there is no " + LAST.name() + " relationship between the two!");
+            throw new IllegalStateException(previousChild.toString() + " seems to be the last child of node " + parent.toString() + ", but there is no " + LAST.name() + " relationship between the two!");
         }
 
         lastRelationship.delete();
@@ -332,8 +332,8 @@ public class TimeTreeImpl implements TimeTree {
      */
     private Node createChild(Node parent, Node previous, Node next, int value) {
         if (previous != null && next != null && next.getId() != previous.getSingleRelationship(NEXT, OUTGOING).getEndNode().getId()) {
-            LOG.error("Nodes " + previous.toString() + " and " + next.toString() + " are not connected with a " + NEXT.name() + " relationship!");
-            throw new IllegalArgumentException("Nodes " + previous.toString() + " and " + next.toString() + " are not connected with a " + NEXT.name() + " relationship!");
+            LOG.error(previous.toString() + " and " + next.toString() + " are not connected with a " + NEXT.name() + " relationship!");
+            throw new IllegalArgumentException(previous.toString() + " and " + next.toString() + " are not connected with a " + NEXT.name() + " relationship!");
         }
 
         Node child = database.createNode(TimeTreeLabels.getChild(parent));
@@ -366,8 +366,8 @@ public class TimeTreeImpl implements TimeTree {
         Relationship parentRelationship = node.getSingleRelationship(CHILD, INCOMING);
 
         if (parentRelationship == null) {
-            LOG.error("Node ID " + node.toString() + " has no parent!");
-            throw new IllegalStateException("Node ID " + node.toString() + " has no parent!");
+            LOG.error(node.toString() + " has no parent!");
+            throw new IllegalStateException(node.toString() + " has no parent!");
         }
 
         return parentRelationship.getStartNode();
