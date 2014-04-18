@@ -103,5 +103,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>graphunit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 </project>

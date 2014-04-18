@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2014 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -14,23 +14,19 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server.web;
+package com.graphaware.library.algo.path;
 
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.neo4j.graphdb.Relationship;
 
 /**
- * Spring application config.
+ * Component that finds the cost of a relationship.
  */
-//@Configuration
-public class DbConfig {
+public interface RelationshipCostFinder {
 
-    @Bean
-    public GraphDatabaseService database() {
-        return null;
-    }
-
+    /**
+     * Get cost of the given relationship.
+     *
+     * @return cost.
+     */
+    long getCost(Relationship relationship);
 }

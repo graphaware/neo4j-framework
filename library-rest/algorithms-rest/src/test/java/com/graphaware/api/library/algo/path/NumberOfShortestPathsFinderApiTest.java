@@ -16,18 +16,10 @@
 
 package com.graphaware.api.library.algo.path;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.graphaware.api.common.GraphAwareApiTest;
 import com.graphaware.common.test.TestUtils;
 import com.graphaware.server.web.WebAppInitializer;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -42,21 +34,16 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 
 import static com.graphaware.common.test.TestUtils.*;
-import static org.junit.Assert.*;
 
 /**
  * Integration test for {@link com.graphaware.api.library.algo.path.NumberOfShortestPathsFinderApi}.
  */
-public class NumberOfShortestPathsFinderApiTest {
+public class NumberOfShortestPathsFinderApiTest extends GraphAwareApiTest {
 
-    private static final int PORT = 8082;
     public static final String POST_URL = "http://localhost:" + PORT + "/graphaware/api/library/algorithm/path/increasinglyLongerShortestPath";
 
     private static final String NAME = "name";
     private static final String COST = "cost";
-
-    private Server server;
-    private GraphDatabaseService database;
 
     private enum RelTypes implements RelationshipType {
         R1, R2
@@ -64,21 +51,6 @@ public class NumberOfShortestPathsFinderApiTest {
 
     private enum Labels implements Label {
         L1, L2
-    }
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-
-        populateDatabase();
-
-        startJetty();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        database.shutdown();
-        server.stop();
     }
 
     @Test
@@ -158,15 +130,7 @@ public class NumberOfShortestPathsFinderApiTest {
         post(jsonAsString("invalidInput4"), HttpStatus.NOT_FOUND_404);
     }
 
-    private String jsonAsString(String fileName) {
-        try {
-            return IOUtils.toString(new ClassPathResource("com/graphaware/api/library/algo/path/" + fileName + ".json").getInputStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void populateDatabase() {
+    protected void populateDatabase() {
         try (Transaction tx = database.beginTx()) {
             Node one = database.createNode();
             Node two = database.createNode();
@@ -213,36 +177,12 @@ public class NumberOfShortestPathsFinderApiTest {
         }
     }
 
-    private void startJetty() {
-        server = new Server(PORT);
-
-        final ServletContextHandler handler = new ServletContextHandler(null, "/graphaware", ServletContextHandler.SESSIONS);
-
-        handler.addLifeCycleListener(new AbstractLifeCycle.AbstractLifeCycleListener() {
-            @Override
-            public void lifeCycleStarting(LifeCycle event) {
-                try {
-                    new WebAppInitializer(database).onStartup(handler.getServletContext());
-                } catch (ServletException e) {
-                    throw new RuntimeException();
-                }
-            }
-        });
-
-        server.setHandler(handler);
-
-        try {
-            server.start();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private String post(String json) {
+    protected final String post(String json) {
         return post(json, HttpStatus.OK_200);
     }
 
-    private String post(String json, int expectedStatus) {
+    protected final String post(String json, int expectedStatus) {
         return TestUtils.post(POST_URL, json, expectedStatus);
     }
+
 }

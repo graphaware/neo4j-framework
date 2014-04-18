@@ -14,23 +14,22 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server.web;
+package com.graphaware.api.library.algo.path;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.test.TestGraphDatabaseFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-/**
- * Spring application config.
- */
-//@Configuration
-public class DbConfig {
+@Configuration
+@ComponentScan(basePackages = "com.graphaware.api.library")
+@EnableWebMvc
+public class AppConfig {
 
     @Bean
     public GraphDatabaseService database() {
-        return null;
+        return new TestGraphDatabaseFactory().newImpermanentDatabase();
     }
-
 }

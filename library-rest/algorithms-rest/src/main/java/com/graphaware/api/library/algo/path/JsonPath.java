@@ -17,8 +17,9 @@
 package com.graphaware.api.library.algo.path;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.graphaware.api.library.common.JsonNode;
-import com.graphaware.api.library.common.JsonRelationship;
+import com.graphaware.library.algo.path.WeightedPath;
+import com.graphaware.api.common.JsonNode;
+import com.graphaware.api.common.JsonRelationship;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Relationship;

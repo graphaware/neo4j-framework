@@ -19,6 +19,7 @@ package com.graphaware.common.test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -64,6 +65,33 @@ public final class TestUtils {
                 };
 
                 String execute = httpClient.execute(httpPost, responseHandler);
+                System.out.println(execute);
+                return execute;
+
+            }
+        } catch (IOException e) {
+            fail();
+            return null;
+        }
+    }
+
+    public static String get(String url, final int expectedStatusCode) {
+        try {
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                HttpGet httpGet = new HttpGet(url);
+
+                ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
+                    public String handleResponse(final HttpResponse response) throws IOException {
+                        assertEquals(expectedStatusCode, response.getStatusLine().getStatusCode());
+                        if (response.getEntity() != null) {
+                            return EntityUtils.toString(response.getEntity());
+                        } else {
+                            return null;
+                        }
+                    }
+                };
+
+                String execute = httpClient.execute(httpGet, responseHandler);
                 System.out.println(execute);
                 return execute;
 

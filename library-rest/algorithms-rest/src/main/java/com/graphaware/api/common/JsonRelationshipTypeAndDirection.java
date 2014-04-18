@@ -14,23 +14,32 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server.web;
+package com.graphaware.api.common;
 
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.neo4j.graphdb.Direction;
 
 /**
- * Spring application config.
+ * JSON-serializable representation of a Neo4j relationship type and direction. Direction defaults to BOTH, type must
+ * be specified.
  */
-//@Configuration
-public class DbConfig {
+public class JsonRelationshipTypeAndDirection {
 
-    @Bean
-    public GraphDatabaseService database() {
-        return null;
+    private String type;
+    private Direction direction = Direction.BOTH;
+
+    public String getType() {
+        return type;
     }
 
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
 }

@@ -14,23 +14,25 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server.web;
-
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+package com.graphaware.library.algo.path;
 
 /**
- * Spring application config.
+ * How to sort the paths?
  */
-//@Configuration
-public class DbConfig {
+public enum SortOrder {
 
-    @Bean
-    public GraphDatabaseService database() {
-        return null;
-    }
+    /**
+     * By increasing length. Ordering of paths with the same lengths is unspecified.
+     */
+    LENGTH_ASC,
 
+    /**
+     * By increasing length, then by increasing cost. The cost property must be specified.
+     */
+    LENGTH_ASC_THEN_COST_ASC,
+
+    /**
+     * By increasing length, then by decreasing cost. The cost property must be specified.
+     */
+    LENGTH_ASC_THEN_COST_DESC
 }
