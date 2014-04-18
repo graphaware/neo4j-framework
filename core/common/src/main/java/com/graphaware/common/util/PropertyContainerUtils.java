@@ -102,7 +102,7 @@ public final class PropertyContainerUtils {
      * @return property value as String.
      */
     public static String valueToString(Object value) {
-        if (value == null) {
+        if (value == null) { //this will not happen as of Neo4j 2.0
             return "";
         }
 

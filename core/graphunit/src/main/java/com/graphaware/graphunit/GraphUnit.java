@@ -1,5 +1,6 @@
 package com.graphaware.graphunit;
 
+import com.graphaware.common.util.PropertyContainerUtils;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -7,6 +8,7 @@ import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.*;
 
+import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.neo4j.graphdb.Direction.OUTGOING;
@@ -26,6 +28,8 @@ public final class GraphUnit {
     /**
      * Assert that the graph in the given database is exactly the same as the graph that would be created by the given
      * Cypher query. The only thing that can be different in those two graphs are IDs of nodes and relationships.
+     * Properties values are converted to {@link String} before comparison, which means 123L (long) is equal to 123 (int),
+     * but also "123" (String) is considered equal to 123 (int).
      *
      * @param database        first graph, typically the one that has been created by some code that is being tested by this
      *                        method.
@@ -48,7 +52,8 @@ public final class GraphUnit {
      * <p/>
      * Nodes are considered equal if they have the exact same labels and properties. Relationships
      * are considered equal if they have the same type and properties. IDs of nodes and relationships are not taken
-     * into account.
+     * into account. Properties values are converted to {@link String} before comparison, which means 123L (long) is
+     * equal to 123 (int), but also "123" (String) is considered equal to 123 (int).
      * <p/>
      * This method is useful for testing that some portion of a graph has been created correctly without the need to
      * express the entire graph structure in Cypher.
@@ -257,7 +262,11 @@ public final class GraphUnit {
         }
 
         for (String key : pc1.getPropertyKeys()) {
-            if (!pc2.hasProperty(key) || !pc2.getProperty(key).equals(pc1.getProperty(key))) {
+            if (!pc2.hasProperty(key)) {
+                return false;
+            }
+
+            if (!valueToString(pc1.getProperty(key)).equals(valueToString(pc2.getProperty(key)))) {
                 return false;
             }
         }

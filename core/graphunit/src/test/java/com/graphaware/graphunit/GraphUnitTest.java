@@ -408,4 +408,28 @@ public class GraphUnitTest {
 
         assertSameGraph(database, assertCypher);
     }
+
+    @Test
+    public void equalNumbersWithDifferentTypeShouldBeEqual() {
+        try (Transaction tx = database.beginTx()) {
+            database.createNode().setProperty("number", 123);
+            tx.success();
+        }
+
+        String cypher = "CREATE (n {number:123})";
+
+        assertSameGraph(database, cypher);
+    }
+
+    @Test
+    public void equalArraysWithDifferentTypeShouldBeEqual() {
+        try (Transaction tx = database.beginTx()) {
+            database.createNode().setProperty("number", new int[]{123,124});
+            tx.success();
+        }
+
+        String cypher = "CREATE (n {number:[123,124]})";
+
+        assertSameGraph(database, cypher);
+    }
 }

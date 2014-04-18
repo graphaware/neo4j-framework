@@ -153,6 +153,13 @@
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>graphunit</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
