@@ -10,13 +10,13 @@ import org.neo4j.graphdb.Node;
  */
 public enum Resolution {
 
-    YEAR(TimeTreeLabels.YEAR, DateTimeFieldType.year()),
-    MONTH(TimeTreeLabels.MONTH, DateTimeFieldType.monthOfYear()),
-    DAY(TimeTreeLabels.DAY, DateTimeFieldType.dayOfMonth()),
-    HOUR(TimeTreeLabels.HOUR, DateTimeFieldType.hourOfDay()),
-    MINUTE(TimeTreeLabels.MINUTE, DateTimeFieldType.minuteOfHour()),
-    SECOND(TimeTreeLabels.SECOND, DateTimeFieldType.secondOfMinute()),
-    MILLISECOND(TimeTreeLabels.MILLISECOND, DateTimeFieldType.millisOfSecond());
+    YEAR(TimeTreeLabels.Year, DateTimeFieldType.year()),
+    MONTH(TimeTreeLabels.Month, DateTimeFieldType.monthOfYear()),
+    DAY(TimeTreeLabels.Day, DateTimeFieldType.dayOfMonth()),
+    HOUR(TimeTreeLabels.Hour, DateTimeFieldType.hourOfDay()),
+    MINUTE(TimeTreeLabels.Minute, DateTimeFieldType.minuteOfHour()),
+    SECOND(TimeTreeLabels.Second, DateTimeFieldType.secondOfMinute()),
+    MILLISECOND(TimeTreeLabels.Millisecond, DateTimeFieldType.millisOfSecond());
 
     private static final Logger LOG = Logger.getLogger(Resolution.class);
 

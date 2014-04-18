@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.tooling.GlobalGraphOperations;
@@ -13,7 +12,7 @@ import java.util.Iterator;
 import java.util.TimeZone;
 
 import static com.graphaware.api.library.algo.timetree.Resolution.*;
-import static com.graphaware.api.library.algo.timetree.TimeTreeLabels.ROOT;
+import static com.graphaware.api.library.algo.timetree.TimeTreeLabels.TimeTreeRoot;
 import static com.graphaware.api.library.algo.timetree.TimeTreeRelationshipTypes.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
@@ -174,7 +173,7 @@ public class TimeTreeImpl implements TimeTree {
     private Node getTimeRoot() {
         Node result;
 
-        Iterator<Node> nodeIterator = GlobalGraphOperations.at(database).getAllNodesWithLabel(ROOT).iterator();
+        Iterator<Node> nodeIterator = GlobalGraphOperations.at(database).getAllNodesWithLabel(TimeTreeRoot).iterator();
         if (nodeIterator.hasNext()) {
             result = nodeIterator.next();
             if (nodeIterator.hasNext()) {
@@ -186,9 +185,7 @@ public class TimeTreeImpl implements TimeTree {
 
         LOG.info("Creating time tree root");
 
-        result = database.createNode(ROOT);
-        result.setProperty(VALUE_PROPERTY, "GraphAware TimeTree Root");
-        return result;
+        return database.createNode(TimeTreeRoot);
     }
 
     /**

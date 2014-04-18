@@ -33,6 +33,10 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>graphunit</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

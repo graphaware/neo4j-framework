@@ -10,7 +10,7 @@ import org.neo4j.helpers.collection.Iterables;
  */
 public enum TimeTreeLabels implements Label {
 
-    ROOT, YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, MILLISECOND;
+    TimeTreeRoot, Year, Month, Day, Hour, Minute, Second, Millisecond;
 
     private static final Logger LOG = Logger.getLogger(TimeTreeLabels.class);
 
