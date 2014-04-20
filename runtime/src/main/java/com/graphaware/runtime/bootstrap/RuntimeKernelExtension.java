@@ -17,48 +17,84 @@
 package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeModuleBootstrapper;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
-import org.neo4j.kernel.AvailabilityGuard;
-import org.neo4j.kernel.InternalAbstractGraphDatabase;
+import org.neo4j.helpers.Pair;
 import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 
-import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.neo4j.helpers.Settings.*;
 
 /**
- * Extension that initializes the {@link com.graphaware.runtime.GraphAwareRuntime}.
+ * Neo4j kernel extension that automatically creates the {@link com.graphaware.runtime.ProductionGraphAwareRuntime} and
+ * registers {@link com.graphaware.runtime.GraphAwareRuntimeModule}s with it.
+ * <p/>
+ * The mechanism of this extension is as follows. Of course, the GraphAware Framework .jar file must be present on
+ * classpath (embedded mode), or in the "plugins" directory (server mode).
+ * <p/>
+ * The Runtime is only created when a setting called "com.graphaware.runtime.enabled" with value equal to "true" or "1"
+ * is passed as a configuration to the database. This can be achieved by any of the standard mechanisms of passing
+ * configuration to the database, for example programmaticaly using {@link org.neo4j.graphdb.factory.GraphDatabaseFactory}
+ * (embedded mode), or declaratively using neo4j.properties (typically server mode).
+ * <p/>
+ * Modules are registered similarly. For each module that should be registered, there must be an entry in the configuration
+ * passed to the database. The key of the entry should be "com.graphaware.module.X.Y", where X becomes the ID
+ * of the module ({@link com.graphaware.runtime.GraphAwareRuntimeModule#getId()}) and Y becomes the order in which the
+ * module gets registered with respect to other modules. The value of the configuration entry must be a fully qualified
+ * class name of a {@link GraphAwareRuntimeModuleBootstrapper} present on the classpath or as a .jar file in the "plugins"
+ * directory. Of course, third party modules can be registered as well.
+ * <p/>
+ * Custom configuration to the modules can be also passed via database configuration in the form of
+ * "com.graphaware.module.X.A = B", where X is the module ID, A is the configuration key, and B is the configuration value.
+ * <p/>
+ * For instance, if you develop a {@link com.graphaware.runtime.GraphAwareRuntimeModule} that is bootstrapped by
+ * com.mycompany.mymodule.MyBootstrapper and want to register it as the first module of the runtime with MyModuleID as
+ * the module ID, with an extra configuration called "threshold" equal to 20, then there should be the two following
+ * configuration entries passed to the database:
+ * <p/>
+ * com.graphaware.runtime.enabled=true
+ * com.graphaware.module.MyModuleID.1=com.mycompany.mymodule.MyBootstrapper
+ * com.graphaware.module.MyModuleID.threshold=20
+ *
+ * @see GraphAwareRuntimeModuleBootstrapper
  */
 public class RuntimeKernelExtension implements Lifecycle {
     private static final Logger LOG = Logger.getLogger(RuntimeKernelExtension.class);
 
     public static final Setting<Boolean> RUNTIME_ENABLED = setting("com.graphaware.runtime.enabled", BOOLEAN, "false");
-    private static final String MODULE_ENABLED_KEY = "com\\.graphaware\\.module\\.[a-z]*\\.enabled";
+    public static final String MODULE_CONFIG_KEY = "com.graphaware.module"; //.ID.Order = fully qualified class name of bootstrapper
+    private static final Pattern MODULE_ENABLED_KEY = Pattern.compile("com\\.graphaware\\.module\\.([a-zA-Z0-9]{1,})\\.([0-9]{1,})");
 
     private final Config config;
     private final GraphDatabaseService database;
-
-    private GraphAwareRuntime runtime;
 
     public RuntimeKernelExtension(Config config, GraphDatabaseService database) {
         this.config = config;
         this.database = database;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void init() throws Throwable {
-
+        //do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void start() throws Throwable {
-        Map<String, String> params = config.getParams();
-
         if (!config.get(RUNTIME_ENABLED)) {
             LOG.info("GraphAware Runtime disabled.");
             return;
@@ -66,50 +102,69 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         LOG.info("GraphAware Runtime enabled, bootstrapping...");
 
-        runtime = new GraphAwareRuntime(database);
+        registerModules(new ProductionGraphAwareRuntime(database));
 
-        for (String paramKey : params.keySet()) {
-            if (paramKey.matches(MODULE_ENABLED_KEY)) {
-                String paramValue = config.get(setting(paramKey, STRING, MANDATORY));
-                LOG.info("Bootstrapping module with key " + paramKey + ", using " + paramValue);
+        LOG.info("GraphAware Runtime bootstrapped.");
+    }
 
-                try {
-                    GraphAwareRuntimeModuleBootstrapper bootstrapper
-                            = (GraphAwareRuntimeModuleBootstrapper) Class.forName(paramValue).newInstance();
-                    bootstrapper.bootstrap(runtime, config);
-                } catch (Exception e) {
-                    LOG.error("Unable to bootstrap module " + paramKey, e);
-                }
+    private void registerModules(GraphAwareRuntime runtime) {
+        Map<Integer, Pair<String, String>> orderedBootstrappers = findOrderedBootstrappers();
+
+        for (Pair<String, String> bootstrapperPair : orderedBootstrappers.values()) {
+            LOG.info("Bootstrapping module with ID " + bootstrapperPair.first() + ", using " + bootstrapperPair.other());
+
+            try {
+                GraphAwareRuntimeModuleBootstrapper bootstrapper = (GraphAwareRuntimeModuleBootstrapper) Class.forName(bootstrapperPair.other()).newInstance();
+                bootstrapper.bootstrap(runtime, bootstrapperPair.first(), findModuleConfig(bootstrapperPair.first()));
+            } catch (Exception e) {
+                LOG.error("Unable to bootstrap module " + bootstrapperPair.first(), e);
+            }
+        }
+    }
+
+    private Map<Integer, Pair<String, String>> findOrderedBootstrappers() {
+        Map<Integer, Pair<String, String>> orderedBootstrappers = new TreeMap<>();
+
+        for (String paramKey : config.getParams().keySet()) {
+            Matcher matcher = MODULE_ENABLED_KEY.matcher(paramKey);
+
+            if (matcher.find()) {
+                String moduleId = matcher.group(1);
+                Integer moduleOrder = Integer.valueOf(matcher.group(2));
+                String bootstrapperClass = config.get(setting(paramKey, STRING, MANDATORY));
+                orderedBootstrappers.put(moduleOrder, Pair.of(moduleId, bootstrapperClass));
             }
         }
 
-        LOG.info("GraphAware Runtime bootstrapped.");
-
-        //Extremely ugly (for the lack of a better way of doing this):
-        Field availabilityGuardField = InternalAbstractGraphDatabase.class.getDeclaredField("availabilityGuard");
-        availabilityGuardField.setAccessible(true);
-        AvailabilityGuard availabilityGuard = (AvailabilityGuard) availabilityGuardField.get(database);
-        availabilityGuard.addListener(new AvailabilityGuard.AvailabilityListener() {
-            @Override
-            public void available() {
-                LOG.info("Database available, starting GraphAware Runtime...");
-
-                runtime.start();
-
-                LOG.info("GraphAware Runtime started.");
-            }
-
-            @Override
-            public void unavailable() {
-            }
-        });
+        return orderedBootstrappers;
     }
 
+    private Map<String, String> findModuleConfig(String moduleId) {
+        Map<String, String> moduleConfig = new HashMap<>();
+
+        String moduleConfigKeyPrefix = MODULE_CONFIG_KEY + "." + moduleId + ".";
+        for (String paramKey : config.getParams().keySet()) {
+            if (paramKey.startsWith(moduleConfigKeyPrefix) || !MODULE_ENABLED_KEY.matcher(paramKey).find()) {
+                moduleConfig.put(paramKey.replace(moduleConfigKeyPrefix, ""), config.getParams().get(paramKey));
+            }
+        }
+
+        return moduleConfig;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void stop() throws Throwable {
+        //do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void shutdown() throws Throwable {
+        //do nothing
     }
 }

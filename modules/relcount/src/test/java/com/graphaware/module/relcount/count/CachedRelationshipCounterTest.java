@@ -20,7 +20,7 @@ import com.graphaware.common.description.relationship.RelationshipDescription;
 import com.graphaware.common.description.serialize.Serializer;
 import com.graphaware.common.strategy.IncludeNoRelationships;
 import com.graphaware.common.test.TestDataBuilder;
-import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.module.relcount.compact.ThresholdBasedCompactionStrategy;
 import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
@@ -63,7 +63,7 @@ public class CachedRelationshipCounterTest {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         txExecutor = new SimpleTransactionExecutor(database);
 
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         runtime.registerModule(new RelationshipCountRuntimeModule(defaultStrategies().with(new ThresholdBasedCompactionStrategy(5))));
         runtime.start();
     }
@@ -455,7 +455,7 @@ public class CachedRelationshipCounterTest {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         txExecutor = new SimpleTransactionExecutor(database);
 
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         runtime.registerModule(new RelationshipCountRuntimeModule(defaultStrategies()
                 .with(new ThresholdBasedCompactionStrategy(5))
                 .with(IncludeNoRelationships.getInstance())));

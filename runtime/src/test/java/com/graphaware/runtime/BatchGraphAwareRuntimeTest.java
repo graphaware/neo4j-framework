@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 
-import static com.graphaware.runtime.GraphAwareRuntime.*;
+import static com.graphaware.runtime.ProductionGraphAwareRuntime.*;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
 import static com.graphaware.common.test.IterableUtils.count;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_ROOT;
@@ -48,9 +48,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit test for {@link GraphAwareRuntime}.
+ * Unit test for {@link ProductionGraphAwareRuntime}.
  */
-public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
+public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
 
     private final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
@@ -332,39 +332,6 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
     }
 
     @Test
-    public void noRegisteredInterestedModulesShouldBeDelegatedToBeforeRuntimeStarts() {
-        GraphAwareRuntimeModule mockModule1 = mock(GraphAwareRuntimeModule.class);
-        when(mockModule1.getId()).thenReturn("MOCK1");
-        when(mockModule1.asString()).thenReturn(TEST_CONFIG);
-        when(mockModule1.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
-
-        GraphAwareRuntimeModule mockModule2 = mock(GraphAwareRuntimeModule.class);
-        when(mockModule2.getId()).thenReturn("MOCK2");
-        when(mockModule2.asString()).thenReturn(TEST_CONFIG);
-        when(mockModule2.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
-
-        GraphAwareRuntimeModule mockModule3 = mock(GraphAwareRuntimeModule.class);
-        when(mockModule3.getId()).thenReturn("MOCK3");
-        when(mockModule3.asString()).thenReturn(TEST_CONFIG);
-        when(mockModule3.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.none());
-
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
-        runtime.registerModule(mockModule1);
-        runtime.registerModule(mockModule2);
-        runtime.registerModule(mockModule3);
-
-        verify(mockModule1, atLeastOnce()).getId();
-        verify(mockModule2, atLeastOnce()).getId();
-        verify(mockModule3, atLeastOnce()).getId();
-        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
-
-        batchInserter.shutdown();
-
-        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
-    }
-
-    @Test
     @Ignore("Issue 1595")
     public void moduleThrowingInitExceptionShouldBeMarkedForReinitialization() {
         final GraphAwareRuntimeModule mockModule = createMockModule();
@@ -424,10 +391,12 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         runtime.registerModule(mockModule);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void runtimeCanOnlyBeStartedOnce() {
+    @Test
+    public void multipleCallsToStartFrameworkHaveNoEffect() {
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
+        runtime.start();
+        runtime.start();
         runtime.start();
         runtime.start();
     }
@@ -484,6 +453,7 @@ public class BatchGraphAwareRuntimeTest extends BaseGraphAwareRuntimeTest {
         RuntimeConfiguredRuntimeModule mockModule = mock(RuntimeConfiguredRuntimeModule.class);
         when(mockModule.getId()).thenReturn(MOCK);
         when(mockModule.asString()).thenReturn(TEST_CONFIG);
+        when(mockModule.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);

@@ -29,7 +29,7 @@ import static com.graphaware.runtime.config.RuntimeConfiguration.*;
 
 
 /**
- * {@link BaseGraphAwareRuntime} that operates on a {@link org.neo4j.unsafe.batchinsert.BatchInserter}
+ * {@link GraphAwareRuntime} that operates on a {@link org.neo4j.unsafe.batchinsert.BatchInserter}
  * (or more precisely {@link TransactionSimulatingBatchInserter}) rather than {@link org.neo4j.graphdb.GraphDatabaseService}.
  *
  * @see BaseGraphAwareRuntime
@@ -46,18 +46,9 @@ public class BatchGraphAwareRuntime extends BaseGraphAwareRuntime {
      * @param batchInserter that the runtime should use.
      */
     public BatchGraphAwareRuntime(TransactionSimulatingBatchInserter batchInserter) {
+        super();
         this.batchInserter = batchInserter;
-    }
-
-    /**
-     * Create a new instance of the runtime.
-     *
-     * @param batchInserter that the runtime should use.
-     * @param configuration of the runtime.
-     */
-    public BatchGraphAwareRuntime(TransactionSimulatingBatchInserter batchInserter, RuntimeConfiguration configuration) {
-        super(configuration);
-        this.batchInserter = batchInserter;
+        registerSelfAsHandler();
     }
 
     /**
@@ -67,6 +58,14 @@ public class BatchGraphAwareRuntime extends BaseGraphAwareRuntime {
     protected void registerSelfAsHandler() {
         batchInserter.registerTransactionEventHandler(this);
         batchInserter.registerKernelEventHandler(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean databaseAvailable() {
+        return true;
     }
 
     /**

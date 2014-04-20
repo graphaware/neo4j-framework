@@ -33,30 +33,10 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
 
 import java.util.*;
 
-
 /**
- * Runtime that delegates to registered {@link GraphAwareRuntimeModule}s to perform useful work.
- * There must be exactly one instance of this runtime for a single {@link org.neo4j.graphdb.GraphDatabaseService}.
- * <p/>
- * The runtime registers itself as a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler},
- * translates {@link org.neo4j.graphdb.event.TransactionData} into {@link com.graphaware.tx.event.improved.api.ImprovedTransactionData}
- * and lets registered {@link GraphAwareRuntimeModule}s deal with the data before each transaction
- * commits, in the order the modules were registered.
- * <p/>
- * After all desired modules have been registered, {@link #start()} must be called before anything gets written into the
- * database. No more modules can be registered thereafter.
- * <p/>
- * Every new {@link GraphAwareRuntimeModule} and every {@link GraphAwareRuntimeModule}
- * whose configuration has changed since the last run will be forced to (re-)initialize, which can lead to very long
- * startup times, as (re-)initialization could be a global graph operation. Re-initialization will also be automatically
- * performed for all modules, for which it has been detected that something is out-of-sync
- * (module threw a {@link NeedsInitializationException}).
- * <p/>
- * The root node (node with ID = 0) needs to be present in the database in order for this runtime to work. It does not
- * need to be used by the application, nor does it need to be connected to any other node, but it needs to be present
- * in the database.
+ * Abstract base-class for {@link GraphAwareRuntime} implementations.
  */
-public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<Void>, KernelEventHandler {
+public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
     static final String FORCE_INITIALIZATION = "FORCE_INIT:";
     static final String CONFIG = "CONFIG:";
 
@@ -66,8 +46,15 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
 
     private final RuntimeConfiguration configuration;
     private final List<GraphAwareRuntimeModule> modules = new LinkedList<>();
+    private final List<GraphAwareRuntimeModule> modulesToForce = new LinkedList<>();
 
-    private volatile boolean started;
+    private State state = State.NONE;
+
+    private enum State {
+        NONE,
+        STARTING,
+        STARTED
+    }
 
     /**
      * Create a new instance of the runtime with {@link com.graphaware.runtime.config.DefaultRuntimeConfiguration}.
@@ -86,38 +73,24 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
     }
 
     /**
-     * Register a {@link GraphAwareRuntimeModule}. Note that modules are delegated to in the order
-     * they are registered.
-     *
-     * @param module to register.
+     * {@inheritDoc}
      */
+    @Override
     public final synchronized void registerModule(GraphAwareRuntimeModule module) {
         registerModule(module, false);
     }
 
     /**
-     * Register a {@link GraphAwareRuntimeModule} and optionally force its (re-)initialization.
-     * <p/>
-     * Forcing re-initialization should only be necessary in exceptional circumstances, such as that the database has
-     * been written to without the module being registered / runtime running. Re-initialization can be a very
-     * expensive, graph-global operation, should only be run once, database stopped and started again without forcing
-     * re-initialization.
-     * <p/>
-     * New modules and modules with changed configuration will be (re-)initialized automatically; there is no need to use
-     * this method for that purpose.
-     * <p/>
-     * Note that modules are delegated to in the order they are registered.
-     *
-     * @param module              to register.
-     * @param forceInitialization true to force (re-)initialization.
+     * {@inheritDoc}
      */
+    @Override
     public final synchronized void registerModule(GraphAwareRuntimeModule module, boolean forceInitialization) {
-        if (started) {
-            LOG.error("Modules must be registered before GraphAware is started!");
-            throw new IllegalStateException("Modules must be registered before GraphAware is started!");
+        if (!State.NONE.equals(state)) {
+            LOG.error("Modules must be registered before GraphAware Runtime is started!");
+            throw new IllegalStateException("Modules must be registered before GraphAware Runtime is started!");
         }
 
-        LOG.info("Registering module " + module.getId() + " with GraphAware.");
+        LOG.info("Registering module " + module.getId() + " with GraphAware Runtime.");
         checkNotAlreadyRegistered(module);
         modules.add(module);
 
@@ -127,7 +100,7 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
 
         if (forceInitialization) {
             LOG.info("Forcing module " + module.getId() + " to be initialized.");
-            forceInitialization(module);
+            modulesToForce.add(module);
         }
     }
 
@@ -150,25 +123,31 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
     }
 
     /**
-     * Start the runtime. Must be called before anything gets written into the database.
+     * {@inheritDoc}
      */
+    @Override
     public final synchronized void start() {
         start(false);
     }
 
     /**
-     * Start the runtime, optionally skipping the initialization phase. It is not recommended to skip initialization;
-     * un-initialized modules might not behave correctly.
-     *
-     * @param skipInitialization true for skipping initialization.
+     * {@inheritDoc}
      */
+    @Override
     public final synchronized void start(boolean skipInitialization) {
-        if (started) {
-            LOG.error("GraphAware already started!");
-            throw new IllegalStateException("GraphAware already started!");
+        if (State.STARTED.equals(state)) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("GraphAware already started");
+            }
+            return;
+        }
+
+        if (State.STARTING.equals(state)) {
+            throw new IllegalStateException("Attempt to start GraphAware from multiple different threads. This is a bug");
         }
 
         LOG.info("Starting GraphAware...");
+        state = State.STARTING;
 
         if (skipInitialization) {
             LOG.info("Initialization skipped.");
@@ -178,25 +157,43 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
             LOG.info("Modules initialized.");
         }
 
-        registerSelfAsHandler();
-
-        started = true;
-
+        state = State.STARTED;
         LOG.info("GraphAware started.");
     }
 
     /**
-     * Register itself as transaction (and kernel) event handler.
+     * Register itself as transaction (and kernel) event handler. Should be called in the constructor of implementations.
      */
     protected abstract void registerSelfAsHandler();
+
+    /**
+     * Find out whether the database is available and ready for use.
+     *
+     * @return true iff the database is ready.
+     */
+    protected abstract boolean databaseAvailable();
 
     /**
      * {@inheritDoc}
      */
     @Override
     public final Void beforeCommit(TransactionData data) throws Exception {
-        if (!started) {
+        if (!databaseAvailable()) {
             return null;
+        }
+
+        synchronized (this) {
+            switch (state) {
+                case NONE:
+                    start();
+                    break;
+                case STARTING:
+                    return null;
+                case STARTED:
+                    break;
+                default:
+                    throw new IllegalStateException("Unknown GraphAware Runtime state. This is a bug.");
+            }
         }
 
         if (data.isDeleted(getOrCreateRoot())) {
@@ -253,7 +250,7 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
     /**
      * Initialize modules if needed.
      * <p/>
-     * Metadata about modules is stored as properties on the root node (node with ID = 0) in the form of
+     * Metadata about modules is stored as properties on the GraphAware Runtime Root Node in the form of
      * {@link com.graphaware.runtime.config.RuntimeConfiguration#GA_PREFIX}{@link #RUNTIME}_{@link GraphAwareRuntimeModule#getId()}
      * as key and one of the following as value:
      * - {@link #CONFIG} + {@link GraphAwareRuntimeModule#asString()} capturing the last configuration
@@ -262,6 +259,10 @@ public abstract class BaseGraphAwareRuntime implements TransactionEventHandler<V
      */
     private void initializeModules() {
         try (Transaction tx = startTransaction()) {
+            for (final GraphAwareRuntimeModule module : modulesToForce) {
+                forceInitialization(module);
+            }
+
             final Node root = getOrCreateRoot();
             final Map<String, Object> moduleMetadata = getInternalProperties(root);
             final Collection<String> unusedModules = new HashSet<>(moduleMetadata.keySet());

@@ -30,7 +30,7 @@ import org.neo4j.graphdb.Node;
  * {@link RelationshipCounter} that counts matching relationships by looking them up cached in {@link org.neo4j.graphdb.Node}'s properties.
  * <p/>
  * It must be used in conjunction with {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule}
- * registered with {@link com.graphaware.runtime.GraphAwareRuntime}. The easiest and recommended way to create
+ * registered with {@link com.graphaware.runtime.ProductionGraphAwareRuntime}. The easiest and recommended way to create
  * and instance of this counter is by calling {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule#cachedCounter()}.
  * <p/>
  * This counter throws {@link UnableToCountException} if it detects it can not
@@ -47,7 +47,7 @@ public class CachedRelationshipCounter implements RelationshipCounter {
     private final RelationshipCountStrategies relationshipCountStrategies;
 
     /**
-     * Construct a new relationship counter. Use this constructor when {@link com.graphaware.runtime.GraphAwareRuntime}
+     * Construct a new relationship counter. Use this constructor when {@link com.graphaware.runtime.ProductionGraphAwareRuntime}
      * is used with default configuration and only a single instance of {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule}
      * is registered. This will be the case for most use cases.
      */
@@ -57,12 +57,12 @@ public class CachedRelationshipCounter implements RelationshipCounter {
 
     /**
      * Construct a new relationship counter. Use this constructor when multiple instances of {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule}
-     * have been registered with the {@link com.graphaware.runtime.GraphAwareRuntime}, when the
-     * {@link com.graphaware.runtime.GraphAwareRuntime} is used with custom configuration, or when custom {@link RelationshipCountStrategies} are used.
+     * have been registered with the {@link com.graphaware.runtime.ProductionGraphAwareRuntime}, when the
+     * {@link com.graphaware.runtime.ProductionGraphAwareRuntime} is used with custom configuration, or when custom {@link RelationshipCountStrategies} are used.
      * This should rarely be the case. Alternatively, use {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule#cachedCounter()}.
      *
      * @param id                          of the {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule} used to cache relationship counts.
-     * @param config                      used with the {@link com.graphaware.runtime.GraphAwareRuntime}.
+     * @param config                      used with the {@link com.graphaware.runtime.ProductionGraphAwareRuntime}.
      * @param relationshipCountStrategies strategies used for relationship counting.
      */
     public CachedRelationshipCounter(String id, RuntimeConfiguration config, RelationshipCountStrategies relationshipCountStrategies) {

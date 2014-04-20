@@ -2,7 +2,7 @@ package com.graphaware.module.relcount.perf;
 
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
 import com.graphaware.common.test.TestUtils;
-import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import com.graphaware.module.relcount.cache.NodePropertiesDegreeCachingStrategy;
 import com.graphaware.module.relcount.count.RelationshipCounter;
 import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
@@ -100,7 +100,7 @@ public class CountRelationships extends RelcountPerformanceTest {
             strategies = strategies.with(new NodePropertiesDegreeCachingStrategy());
         }
 
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         module = new RelationshipCountRuntimeModule(strategies);
         runtime.registerModule(module);
         runtime.start();

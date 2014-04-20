@@ -23,7 +23,7 @@ import com.graphaware.common.strategy.InclusionStrategies;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
- * A {@link GraphAwareRuntime} module performing some useful work based on about-to-be-committed transaction data.
+ * A {@link ProductionGraphAwareRuntime} module performing some useful work based on about-to-be-committed transaction data.
  */
 public interface GraphAwareRuntimeModule extends ConfigurationAsString {
 
@@ -87,7 +87,7 @@ public interface GraphAwareRuntimeModule extends ConfigurationAsString {
     void beforeCommit(ImprovedTransactionData transactionData);
 
     /**
-     * Get the inclusion strategies used by this module. If unsure, return {@link com.graphaware.tx.event.improved.strategy.InclusionStrategiesImpl#all()},
+     * Get the inclusion strategies used by this module. If unsure, return {@link com.graphaware.common.strategy.InclusionStrategiesImpl#all()},
      * which includes all non-internal nodes, properties, and relationships.
      *
      * @return strategy.

@@ -4,7 +4,7 @@ import com.graphaware.common.description.relationship.RelationshipDescription;
 import com.graphaware.common.description.relationship.RelationshipDescriptionFactory;
 import com.graphaware.common.strategy.RelationshipInclusionStrategy;
 import com.graphaware.common.strategy.RelationshipPropertyInclusionStrategy;
-import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import com.graphaware.module.relcount.compact.ThresholdBasedCompactionStrategy;
 import com.graphaware.module.relcount.count.RelationshipCounter;
 import com.graphaware.module.relcount.count.UnableToCountException;
@@ -33,7 +33,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
     @Test
     public void demonstrateCachedRelationshipCounter() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
         runtime.registerModule(module);
         runtime.start();
@@ -61,7 +61,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
     @Test
     public void demonstrateFullCachedRelationshipCounterWithCustomThreshold() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
 
         RelationshipCountStrategies relationshipCountStrategies = RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(7));
         RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountStrategies);
@@ -90,7 +90,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
     @Test
     public void demonstrateFullCachedRelationshipCounterWithCustomLowerThreshold() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
 
         RelationshipCountStrategies relationshipCountStrategies = RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(3));
         RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountStrategies);
@@ -122,7 +122,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
     @Test
     public void demonstrateFullCachedRelationshipCounterWithCustomThresholdAndWeighingStrategy() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
 
         WeighingStrategy customWeighingStrategy = new WeighingStrategy() {
             @Override
@@ -166,7 +166,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
     @Test
     public void demonstrateFullCachedRelationshipCounterWithCustomRelationshipInclusionStrategy() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
 
         RelationshipInclusionStrategy customRelationshipInclusionStrategy = new RelationshipInclusionStrategy() {
             @Override
@@ -208,7 +208,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
     @Test
     public void demonstrateFullCachedRelationshipCounterWithCustomRelationshipPropertyInclusionStrategy() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
 
         RelationshipPropertyInclusionStrategy customRelationshipPropertyInclusionStrategy = new RelationshipPropertyInclusionStrategy() {
             @Override
@@ -272,7 +272,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
     @Test
     public void demonstrateFullFallingBackRelationshipCounterWithCustomLowerThreshold() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
 
         RelationshipCountStrategies relationshipCountStrategies = RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(3));
         RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountStrategies);

@@ -2,7 +2,7 @@ package com.graphaware.module.relcount.count;
 
 import com.graphaware.common.strategy.RelationshipInclusionStrategy;
 import com.graphaware.common.strategy.RelationshipPropertyInclusionStrategy;
-import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import com.graphaware.module.relcount.compact.ThresholdBasedCompactionStrategy;
 import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
@@ -86,7 +86,7 @@ public class RelationshipCountIntegrationTest {
 
     @Test
     public void cachedCountsCanBeRebuilt() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
         runtime.registerModule(module);
         runtime.start();
@@ -103,7 +103,7 @@ public class RelationshipCountIntegrationTest {
 
     @Test
     public void defaultRuntimeOnNewDatabase() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
         runtime.registerModule(module);
         runtime.start();
@@ -122,7 +122,7 @@ public class RelationshipCountIntegrationTest {
         temporaryFolder.create();
         database = new GraphDatabaseFactory().newEmbeddedDatabase(temporaryFolder.getRoot().getAbsolutePath());
 
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
         runtime.registerModule(module);
         runtime.start();
@@ -138,7 +138,7 @@ public class RelationshipCountIntegrationTest {
 
         database = new GraphDatabaseFactory().newEmbeddedDatabase(temporaryFolder.getRoot().getAbsolutePath());
 
-        runtime = new GraphAwareRuntime(database);
+        runtime = new ProductionGraphAwareRuntime(database);
         module = new RelationshipCountRuntimeModule(defaultStrategies().with(new ThresholdBasedCompactionStrategy(4)));
         runtime.registerModule(module);
         runtime.start();
@@ -151,7 +151,7 @@ public class RelationshipCountIntegrationTest {
 
         database = new GraphDatabaseFactory().newEmbeddedDatabase(temporaryFolder.getRoot().getAbsolutePath());
 
-        runtime = new GraphAwareRuntime(database);
+        runtime = new ProductionGraphAwareRuntime(database);
         module = new RelationshipCountRuntimeModule(defaultStrategies().with(new ThresholdBasedCompactionStrategy(20)));
         runtime.registerModule(module);
         runtime.start();
@@ -166,7 +166,7 @@ public class RelationshipCountIntegrationTest {
         setUpTwoNodes();
         simulateUsage();
 
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
         runtime.registerModule(module);
         runtime.start();
@@ -178,7 +178,7 @@ public class RelationshipCountIntegrationTest {
 
     @Test
     public void customRuntimeOnNewDatabase() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
         runtime.registerModule(module);
         runtime.start();
@@ -196,7 +196,7 @@ public class RelationshipCountIntegrationTest {
         setUpTwoNodes();
         simulateUsage();
 
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
         runtime.registerModule(module);
         runtime.start();
@@ -211,7 +211,7 @@ public class RelationshipCountIntegrationTest {
         for (int numberOfRounds = 1; numberOfRounds <= 10; numberOfRounds++) {
             setUp();
 
-            GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+            ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
             final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(
                     defaultStrategies()
                             .with(new WeighingStrategy() {
@@ -245,7 +245,7 @@ public class RelationshipCountIntegrationTest {
 
     @Test
     public void defaultStrategiesWithLowerThreshold() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(
                 defaultStrategies().with(new ThresholdBasedCompactionStrategy(4))
         );
@@ -262,7 +262,7 @@ public class RelationshipCountIntegrationTest {
 
     @Test
     public void defaultStrategiesWithLowerThreshold2() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(
                 defaultStrategies().with(new ThresholdBasedCompactionStrategy(4))
         );
@@ -280,7 +280,7 @@ public class RelationshipCountIntegrationTest {
 
     @Test
     public void defaultStrategiesWithLowerThreshold3() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(
                 defaultStrategies().with(new ThresholdBasedCompactionStrategy(3))
         );
@@ -307,7 +307,7 @@ public class RelationshipCountIntegrationTest {
         for (int threshold = 3; threshold <= 20; threshold++) {
             setUp();
 
-            GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+            ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
             final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(
                     defaultStrategies().with(new ThresholdBasedCompactionStrategy(threshold))
             );
@@ -328,7 +328,7 @@ public class RelationshipCountIntegrationTest {
 
     @Test
     public void weightedRelationshipsWithCompaction() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(
                 defaultStrategies()
                         .with(new WeighingStrategy() {
@@ -359,7 +359,7 @@ public class RelationshipCountIntegrationTest {
 
     @Test
     public void twoSimultaneousModules() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         final RelationshipCountRuntimeModule module1 = new RelationshipCountRuntimeModule("M1", defaultStrategies());
         final RelationshipCountRuntimeModule module2 = new RelationshipCountRuntimeModule("M2",
                 defaultStrategies()
@@ -394,7 +394,7 @@ public class RelationshipCountIntegrationTest {
 
     @Test
     public void customRelationshipInclusionStrategy() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(
                 defaultStrategies()
                         .with(new RelationshipInclusionStrategy() {
@@ -428,7 +428,7 @@ public class RelationshipCountIntegrationTest {
 
     @Test
     public void customRelationshipPropertiesInclusionStrategy() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(
                 defaultStrategies()
                         .with(new RelationshipPropertyInclusionStrategy() {
@@ -465,7 +465,7 @@ public class RelationshipCountIntegrationTest {
 
     @Test
     public void batchTest() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule();
         runtime.registerModule(module);
         runtime.start();
@@ -488,7 +488,7 @@ public class RelationshipCountIntegrationTest {
 
     @Test
     public void batchTestWithMultipleModulesAndLowerThreshold() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         final RelationshipCountRuntimeModule module1 = new RelationshipCountRuntimeModule("M1", defaultStrategies().with(new ThresholdBasedCompactionStrategy(4)));
         final RelationshipCountRuntimeModule module2 = new RelationshipCountRuntimeModule("M2", defaultStrategies().with(new ThresholdBasedCompactionStrategy(4)));
         runtime.registerModule(module1);
@@ -517,7 +517,7 @@ public class RelationshipCountIntegrationTest {
 
     @Test
     public void carefullySetupScenarioThatCouldResultInInaccurateCounts() {
-        GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+        ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         final RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(defaultStrategies().with(new ThresholdBasedCompactionStrategy(2)));
         runtime.registerModule(module);
         runtime.start();

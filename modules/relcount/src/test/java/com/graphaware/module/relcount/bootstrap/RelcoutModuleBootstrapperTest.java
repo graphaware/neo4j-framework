@@ -1,9 +1,11 @@
 package com.graphaware.module.relcount.bootstrap;
 
+import com.graphaware.module.relcount.RelationshipCountStrategiesImpl;
 import com.graphaware.module.relcount.count.CachedRelationshipCounter;
 import com.graphaware.module.relcount.count.FallbackRelationshipCounter;
 import com.graphaware.module.relcount.count.NaiveRelationshipCounter;
 import com.graphaware.module.relcount.count.RelationshipCounter;
+import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
 import org.junit.After;
@@ -47,15 +49,18 @@ public class RelcoutModuleBootstrapperTest {
         simulateUsage();
 
         verifyCounts(new NaiveRelationshipCounter());
-        verifyCounts(new CachedRelationshipCounter());
-        verifyCounts(new FallbackRelationshipCounter());
+        //todo there is no way the users will know the config => store serialised on root
+        verifyCounts(new CachedRelationshipCounter("relcount", DefaultRuntimeConfiguration.getInstance(), RelationshipCountStrategiesImpl.defaultStrategies()));
+        verifyCounts(new FallbackRelationshipCounter("relcount", DefaultRuntimeConfiguration.getInstance(), RelationshipCountStrategiesImpl.defaultStrategies()));
     }
 
     private void verifyCounts(RelationshipCounter counter) {
         try (Transaction tx = database.beginTx()) {
-            Node one = database.getNodeById(1);
+            Node one = database.getNodeById(0);
 
             assertEquals(1, counter.count(one, wildcard(withName("ONE"), OUTGOING)));
+
+            tx.success();
         }
     }
 
@@ -66,8 +71,8 @@ public class RelcoutModuleBootstrapperTest {
                 database.createNode();
                 database.createNode();
 
-                Node one = database.getNodeById(1);
-                Node two = database.getNodeById(2);
+                Node one = database.getNodeById(0);
+                Node two = database.getNodeById(1);
 
                 one.createRelationshipTo(two, withName("ONE"));
             }

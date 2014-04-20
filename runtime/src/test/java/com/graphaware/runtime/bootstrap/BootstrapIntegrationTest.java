@@ -19,9 +19,12 @@ package com.graphaware.runtime.bootstrap;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
+import static com.graphaware.runtime.bootstrap.TestRuntimeModule.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -32,18 +35,18 @@ public class BootstrapIntegrationTest {
 
     @Before
     public void setUp() {
-        TestRuntimeModule.reset();
+        TEST_RUNTIME_MODULES.clear();
     }
 
     @Test
     public void moduleShouldNotBeInitializedWhenNoConfigProvided() throws InterruptedException {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
-        assertFalse(TestRuntimeModule.isInitialized());
+        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
         database.shutdown();
 
-        assertFalse(TestRuntimeModule.isInitialized());
+        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
     }
 
     @Test
@@ -54,11 +57,11 @@ public class BootstrapIntegrationTest {
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newGraphDatabase();
 
-        assertFalse(TestRuntimeModule.isInitialized());
+        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
         database.shutdown();
 
-        assertFalse(TestRuntimeModule.isInitialized());
+        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -69,11 +72,11 @@ public class BootstrapIntegrationTest {
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newGraphDatabase();
 
-        assertFalse(TestRuntimeModule.isInitialized());
+        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
         database.shutdown();
 
-        assertFalse(TestRuntimeModule.isInitialized());
+        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
     }
 
     @Test
@@ -84,11 +87,11 @@ public class BootstrapIntegrationTest {
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newGraphDatabase();
 
-        assertFalse(TestRuntimeModule.isInitialized());
+        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
         database.shutdown();
 
-        assertFalse(TestRuntimeModule.isInitialized());
+        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
     }
 
     @Test
@@ -97,13 +100,21 @@ public class BootstrapIntegrationTest {
                 .newImpermanentDatabaseBuilder()
                 .setConfig(RUNTIME_ENABLED, "true")
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
                 .newGraphDatabase();
 
-        assertTrue(TestRuntimeModule.isInitialized());
+        try (Transaction tx = database.beginTx()) {
+            database.createNode(); //tx just to kick off Runtime init
+            tx.success();
+        }
+
+        assertEquals(1, TEST_RUNTIME_MODULES.size());
+        assertTrue(TEST_RUNTIME_MODULES.get(0).isInitialized());
+        assertEquals("configValue", TEST_RUNTIME_MODULES.get(0).getConfig().get("configKey"));
 
         database.shutdown();
 
-        assertFalse(TestRuntimeModule.isInitialized());
+        assertFalse(TEST_RUNTIME_MODULES.get(0).isInitialized());
     }
 
     @Test
@@ -114,11 +125,11 @@ public class BootstrapIntegrationTest {
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, null)
                 .newGraphDatabase();
 
-        assertFalse(TestRuntimeModule.isInitialized());
+        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
         database.shutdown();
 
-        assertFalse(TestRuntimeModule.isInitialized());
+        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
     }
 
     @Test
@@ -126,14 +137,44 @@ public class BootstrapIntegrationTest {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(RUNTIME_ENABLED, "true")
-                .setConfig("com.graphaware.module.wrong.enabled", "com.not.existent.Bootstrapper")
+                .setConfig("com.graphaware.module.wrong1.enabled", "com.not.existent.Bootstrapper")
+                .setConfig("com.graphaware.module.wrong2.1", "com.not.existent.Bootstrapper")
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
                 .newGraphDatabase();
 
-        assertTrue(TestRuntimeModule.isInitialized());
+        try (Transaction tx = database.beginTx()) {
+            database.createNode();
+            tx.success();
+        }
+
+        assertEquals(1, TEST_RUNTIME_MODULES.size());
+        assertTrue(TEST_RUNTIME_MODULES.get(0).isInitialized());
+        assertEquals("configValue", TEST_RUNTIME_MODULES.get(0).getConfig().get("configKey"));
 
         database.shutdown();
 
-        assertFalse(TestRuntimeModule.isInitialized());
+        assertFalse(TEST_RUNTIME_MODULES.get(0).isInitialized());
+    }
+
+    @Test
+    public void modulesShouldBeDelegatedToInCorrectOrder() throws InterruptedException {
+        GraphDatabaseService database = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig(RUNTIME_ENABLED, "true")
+                .setConfig("com.graphaware.module.test1.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .setConfig("com.graphaware.module.test3.3", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .setConfig("com.graphaware.module.test2.2", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .newGraphDatabase();
+
+        try (Transaction tx = database.beginTx()) {
+            database.createNode();
+            tx.success();
+        }
+
+        assertEquals(3, TEST_RUNTIME_MODULES.size());
+        assertEquals("test1", TEST_RUNTIME_MODULES.get(0).getId());
+        assertEquals("test2", TEST_RUNTIME_MODULES.get(1).getId());
+        assertEquals("test3", TEST_RUNTIME_MODULES.get(2).getId());
     }
 }

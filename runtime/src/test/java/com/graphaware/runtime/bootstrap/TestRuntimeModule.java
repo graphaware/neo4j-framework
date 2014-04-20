@@ -1,35 +1,50 @@
 package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.common.strategy.InclusionStrategies;
+import com.graphaware.common.strategy.InclusionStrategiesImpl;
 import com.graphaware.runtime.GraphAwareRuntimeModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.GraphDatabaseService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * {@link com.graphaware.runtime.GraphAwareRuntimeModule} that can tell whether it has been initialized for testing.
  */
 public class TestRuntimeModule implements GraphAwareRuntimeModule {
 
-    private static boolean initialized = false;
+    public static final List<TestRuntimeModule> TEST_RUNTIME_MODULES = new ArrayList<>();
 
-    public static boolean isInitialized() {
+    private final String id;
+    private final Map<String, String> config;
+    private boolean initialized = false;
+
+    public TestRuntimeModule(String id, Map<String, String> config) {
+        this.id = id;
+        this.config = config;
+        TEST_RUNTIME_MODULES.add(this);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public Map<String, String> getConfig() {
+        return config;
+    }
+
+    public boolean isInitialized() {
         return initialized;
     }
 
-    public static void reset() {
-        initialized = false;
-    }
-
-    @Override
-    public String getId() {
-        return "test";
-    }
 
     @Override
     public void initialize(GraphDatabaseService database) {
         try {
-            Thread.sleep(1000); //takes some time to initialize
+            Thread.sleep(200); //takes some time to initialize
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -58,16 +73,16 @@ public class TestRuntimeModule implements GraphAwareRuntimeModule {
 
     @Override
     public void beforeCommit(ImprovedTransactionData transactionData) {
-        throw new UnsupportedOperationException();
+        //do nothing
     }
 
     @Override
     public InclusionStrategies getInclusionStrategies() {
-        throw new UnsupportedOperationException();
+        return InclusionStrategiesImpl.all();
     }
 
     @Override
     public String asString() {
-        return "testModule";
+        return "testModule ID " + getId();
     }
 }

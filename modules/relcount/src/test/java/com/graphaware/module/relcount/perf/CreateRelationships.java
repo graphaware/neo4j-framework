@@ -2,7 +2,7 @@ package com.graphaware.module.relcount.perf;
 
 import com.graphaware.common.strategy.IncludeNoRelationshipProperties;
 import com.graphaware.common.test.TestUtils;
-import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import com.graphaware.runtime.performance.EnumParameter;
 import com.graphaware.runtime.performance.ExponentialParameter;
 import com.graphaware.runtime.performance.Parameter;
@@ -89,29 +89,29 @@ public class CreateRelationships extends RelcountPerformanceTest {
 
         switch (runtimeInvolvement) {
             case EMPTY_FRAMEWORK:
-                GraphAwareRuntime runtime = new GraphAwareRuntime(database);
+                ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
                 runtime.start();
                 break;
             case RELCOUNT_NO_PROPS_SINGLE_PROP_STORAGE:
-                runtime = new GraphAwareRuntime(database);
+                runtime = new ProductionGraphAwareRuntime(database);
                 runtime.registerModule(new RelationshipCountRuntimeModule(RelationshipCountStrategiesImpl.defaultStrategies()
                         .with(IncludeNoRelationshipProperties.getInstance())));
                 runtime.start();
                 break;
             case RELCOUNT_NO_PROPS_MULTI_PROP_STORAGE:
-                runtime = new GraphAwareRuntime(database);
+                runtime = new ProductionGraphAwareRuntime(database);
                 runtime.registerModule(new RelationshipCountRuntimeModule(RelationshipCountStrategiesImpl.defaultStrategies()
                         .with(IncludeNoRelationshipProperties.getInstance())
                         .with(new NodePropertiesDegreeCachingStrategy())));
                 runtime.start();
                 break;
             case FULL_RELCOUNT_SINGLE_PROP_STORAGE:
-                runtime = new GraphAwareRuntime(database);
+                runtime = new ProductionGraphAwareRuntime(database);
                 runtime.registerModule(new RelationshipCountRuntimeModule());
                 runtime.start();
                 break;
             case FULL_RELCOUNT_MULTI_PROP_STORAGE:
-                runtime = new GraphAwareRuntime(database);
+                runtime = new ProductionGraphAwareRuntime(database);
                 runtime.registerModule(new RelationshipCountRuntimeModule(RelationshipCountStrategiesImpl.defaultStrategies()
                         .with(new NodePropertiesDegreeCachingStrategy())));
                 runtime.start();
