@@ -18,22 +18,14 @@ package com.graphaware.api.library.algo.path;
 
 import com.graphaware.api.common.GraphAwareApiTest;
 import com.graphaware.common.test.TestUtils;
-import com.graphaware.server.web.WebAppInitializer;
-import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.http.HttpStatus;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.util.component.AbstractLifeCycle;
-import org.eclipse.jetty.util.component.LifeCycle;
-import org.junit.*;
-import org.neo4j.graphdb.*;
-import org.neo4j.test.TestGraphDatabaseFactory;
-import org.springframework.core.io.ClassPathResource;
+import org.junit.Test;
+import org.neo4j.graphdb.Label;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.Transaction;
 
-import javax.servlet.ServletException;
-import java.io.IOException;
-
-import static com.graphaware.common.test.TestUtils.*;
+import static com.graphaware.common.test.TestUtils.assertJsonEquals;
 
 /**
  * Integration test for {@link com.graphaware.api.library.algo.path.NumberOfShortestPathsFinderApi}.

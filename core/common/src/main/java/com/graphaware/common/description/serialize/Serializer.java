@@ -43,7 +43,7 @@ public final class Serializer {
 
     static {
         kryo = new Kryo();
-        kryo.setRegistrationRequired(true);
+        kryo.setRegistrationRequired(false);
         kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
 
         kryo.register(DynamicRelationshipType.class, 10);
@@ -66,9 +66,15 @@ public final class Serializer {
         kryo.register(short[].class, 106);
         kryo.register(float[].class, 107);
         kryo.register(String[].class, 108);
+
+        //todo do we need to register anything else?
     }
 
     private Serializer() {
+    }
+
+    public static void register(Class type) {
+        kryo.register(type);
     }
 
     /**

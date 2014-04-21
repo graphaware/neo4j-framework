@@ -37,10 +37,8 @@ import java.util.Map;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
-import static org.neo4j.helpers.collection.MapUtil.stringMap;
 
 /**
  * Unit test for {@link com.graphaware.common.util.PropertyContainerUtils}.
@@ -128,11 +126,6 @@ public class PropertyContainerUtilsTest {
             @Override
             public boolean include(String object) {
                 return !"key".equals(object);
-            }
-
-            @Override
-            public String asString() {
-                return "custom";
             }
         }));
         }

@@ -16,16 +16,16 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.common.config.ConfigurationAsString;
+import com.graphaware.common.strategy.InclusionStrategies;
+import com.graphaware.runtime.config.RuntimeModuleConfiguration;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import com.graphaware.common.strategy.InclusionStrategies;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  * A {@link ProductionGraphAwareRuntime} module performing some useful work based on about-to-be-committed transaction data.
  */
-public interface GraphAwareRuntimeModule extends ConfigurationAsString {
+public interface GraphAwareRuntimeModule {
 
     /**
      * Get a human-readable (ideally short) ID of this module. This ID must be unique across all {@link GraphAwareRuntimeModule}s
@@ -34,6 +34,15 @@ public interface GraphAwareRuntimeModule extends ConfigurationAsString {
      * @return short ID of this module.
      */
     String getId();
+
+    /**
+     * Return the configuration of this module. Each module must encapsulate its entire configuration in an instance of
+     * a {@link RuntimeModuleConfiguration} implementation. Use {@link com.graphaware.runtime.config.NullRuntimeModuleConfiguration}
+     * if this module needs no configuration.
+     *
+     * @return module configuration.
+     */
+    RuntimeModuleConfiguration getConfiguration();
 
     /**
      * Initialize this module. This method must bring the module to a state equivalent to a state of the same module that
@@ -85,12 +94,4 @@ public interface GraphAwareRuntimeModule extends ConfigurationAsString {
      *                                      should perform on best-effort basis.
      */
     void beforeCommit(ImprovedTransactionData transactionData);
-
-    /**
-     * Get the inclusion strategies used by this module. If unsure, return {@link com.graphaware.common.strategy.InclusionStrategiesImpl#all()},
-     * which includes all non-internal nodes, properties, and relationships.
-     *
-     * @return strategy.
-     */
-    InclusionStrategies getInclusionStrategies();
 }

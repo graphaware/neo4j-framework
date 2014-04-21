@@ -17,6 +17,7 @@
 package com.graphaware.server.plugin.algo.path;
 
 import com.graphaware.server.GraphAwareWrappingNeoServer;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.GraphDatabaseAPI;
@@ -28,6 +29,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 public class WildTest {
 
     @Test
+    @Ignore
     public void execute() {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         new GraphAwareWrappingNeoServer((GraphDatabaseAPI) database).start();

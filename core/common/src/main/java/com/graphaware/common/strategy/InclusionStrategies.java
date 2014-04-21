@@ -16,34 +16,148 @@
 
 package com.graphaware.common.strategy;
 
-import com.graphaware.common.config.ConfigurationAsString;
-import com.graphaware.common.strategy.NodeInclusionStrategy;
-import com.graphaware.common.strategy.NodePropertyInclusionStrategy;
-import com.graphaware.common.strategy.RelationshipInclusionStrategy;
-import com.graphaware.common.strategy.RelationshipPropertyInclusionStrategy;
-
 /**
- * Container for {@link com.graphaware.common.strategy.InclusionStrategy}s.
+ * Base-class for {@link InclusionStrategies} implementations.
  */
-public interface InclusionStrategies extends ConfigurationAsString {
+public class InclusionStrategies {
+
+    private final NodeInclusionStrategy nodeInclusionStrategy;
+    private final NodePropertyInclusionStrategy nodePropertyInclusionStrategy;
+    private final RelationshipInclusionStrategy relationshipInclusionStrategy;
+    private final RelationshipPropertyInclusionStrategy relationshipPropertyInclusionStrategy;
+
+    /**
+     * Create all-including strategies.
+     *
+     * @return all-including strategies.
+     */
+    public static InclusionStrategies all() {
+        return new InclusionStrategies(
+                IncludeAllNodes.getInstance(),
+                IncludeAllNodeProperties.getInstance(),
+                IncludeAllRelationships.getInstance(),
+                IncludeAllRelationshipProperties.getInstance());
+    }
+
+    /**
+     * Create nothing-including strategies.
+     *
+     * @return nothing-including strategies.
+     */
+    public static InclusionStrategies none() {
+        return new InclusionStrategies(
+                IncludeNoNodes.getInstance(),
+                IncludeNoNodeProperties.getInstance(),
+                IncludeNoRelationships.getInstance(),
+                IncludeNoRelationshipProperties.getInstance());
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param nodeInclusionStrategy         strategy.
+     * @param nodePropertyInclusionStrategy strategy.
+     * @param relationshipInclusionStrategy strategy.
+     * @param relationshipPropertyInclusionStrategy
+     *                                      strategy.
+     */
+    public InclusionStrategies(NodeInclusionStrategy nodeInclusionStrategy, NodePropertyInclusionStrategy nodePropertyInclusionStrategy, RelationshipInclusionStrategy relationshipInclusionStrategy, RelationshipPropertyInclusionStrategy relationshipPropertyInclusionStrategy) {
+        this.nodeInclusionStrategy = nodeInclusionStrategy;
+        this.nodePropertyInclusionStrategy = nodePropertyInclusionStrategy;
+        this.relationshipInclusionStrategy = relationshipInclusionStrategy;
+        this.relationshipPropertyInclusionStrategy = relationshipPropertyInclusionStrategy;
+    }
+
+    /**
+     * Reconfigure this instance to use a custom node inclusion strategy.
+     *
+     * @param nodeInclusionStrategy to use.
+     * @return reconfigured strategies.
+     */
+    public InclusionStrategies with(NodeInclusionStrategy nodeInclusionStrategy) {
+        return new InclusionStrategies(nodeInclusionStrategy, getNodePropertyInclusionStrategy(), getRelationshipInclusionStrategy(), getRelationshipPropertyInclusionStrategy());
+    }
+
+    /**
+     * Reconfigure this instance to use a custom node property inclusion strategy.
+     *
+     * @param nodePropertyInclusionStrategy to use.
+     * @return reconfigured strategies.
+     */
+    public InclusionStrategies with(NodePropertyInclusionStrategy nodePropertyInclusionStrategy) {
+        return new InclusionStrategies(getNodeInclusionStrategy(), nodePropertyInclusionStrategy, getRelationshipInclusionStrategy(), getRelationshipPropertyInclusionStrategy());
+    }
+
+    /**
+     * Reconfigure this instance to use a custom relationship inclusion strategy.
+     *
+     * @param relationshipInclusionStrategy to use.
+     * @return reconfigured strategies.
+     */
+    public InclusionStrategies with(RelationshipInclusionStrategy relationshipInclusionStrategy) {
+        return new InclusionStrategies(getNodeInclusionStrategy(), getNodePropertyInclusionStrategy(), relationshipInclusionStrategy, getRelationshipPropertyInclusionStrategy());
+    }
+
+    /**
+     * Reconfigure this instance to use a custom relationship property inclusion strategy.
+     *
+     * @param relationshipPropertyInclusionStrategy
+     *         to use.
+     * @return reconfigured strategies.
+     */
+    public InclusionStrategies with(RelationshipPropertyInclusionStrategy relationshipPropertyInclusionStrategy) {
+        return new InclusionStrategies(getNodeInclusionStrategy(), getNodePropertyInclusionStrategy(), getRelationshipInclusionStrategy(), relationshipPropertyInclusionStrategy);
+    }
 
     /**
      * @return contained node inclusion strategy.
      */
-    NodeInclusionStrategy getNodeInclusionStrategy();
+    public NodeInclusionStrategy getNodeInclusionStrategy() {
+        return nodeInclusionStrategy;
+    }
 
     /**
      * @return contained node property inclusion strategy.
      */
-    NodePropertyInclusionStrategy getNodePropertyInclusionStrategy();
+    public NodePropertyInclusionStrategy getNodePropertyInclusionStrategy() {
+        return nodePropertyInclusionStrategy;
+    }
 
     /**
      * @return contained relationship inclusion strategy.
      */
-    RelationshipInclusionStrategy getRelationshipInclusionStrategy();
+    public RelationshipInclusionStrategy getRelationshipInclusionStrategy() {
+        return relationshipInclusionStrategy;
+    }
 
     /**
      * @return contained relationship property inclusion strategy.
      */
-    RelationshipPropertyInclusionStrategy getRelationshipPropertyInclusionStrategy();
+    public RelationshipPropertyInclusionStrategy getRelationshipPropertyInclusionStrategy() {
+        return relationshipPropertyInclusionStrategy;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        InclusionStrategies that = (InclusionStrategies) o;
+
+        if (!nodeInclusionStrategy.equals(that.nodeInclusionStrategy)) return false;
+        if (!nodePropertyInclusionStrategy.equals(that.nodePropertyInclusionStrategy)) return false;
+        if (!relationshipInclusionStrategy.equals(that.relationshipInclusionStrategy)) return false;
+        if (!relationshipPropertyInclusionStrategy.equals(that.relationshipPropertyInclusionStrategy)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = nodeInclusionStrategy.hashCode();
+        result = 31 * result + nodePropertyInclusionStrategy.hashCode();
+        result = 31 * result + relationshipInclusionStrategy.hashCode();
+        result = 31 * result + relationshipPropertyInclusionStrategy.hashCode();
+        return result;
+    }
 }

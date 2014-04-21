@@ -17,24 +17,19 @@
 package com.graphaware.api.library.algo.timetree;
 
 import com.graphaware.api.common.GraphAwareApi;
-import com.graphaware.api.library.algo.path.JsonPath;
-import com.graphaware.api.library.algo.path.JsonPathFinderInput;
-import com.graphaware.library.algo.path.NumberOfShortestPathsFinder;
 import com.graphaware.library.algo.timetree.Resolution;
 import com.graphaware.library.algo.timetree.TimeTree;
 import com.graphaware.library.algo.timetree.TimeTreeImpl;
 import org.joda.time.DateTimeZone;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.TimeZone;
 
 /**

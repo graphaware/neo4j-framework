@@ -2,9 +2,9 @@ package com.graphaware.module.relcount.cache;
 
 import com.graphaware.common.description.predicate.Predicates;
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
-import com.graphaware.runtime.NeedsInitializationException;
+import com.graphaware.module.relcount.RelationshipCountConfiguration;
 import com.graphaware.module.relcount.compact.CompactionStrategy;
-import com.graphaware.module.relcount.RelationshipCountStrategies;
+import com.graphaware.runtime.NeedsInitializationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.Node;
@@ -25,14 +25,14 @@ public class DegreeCachingNodeTest {
     private static final String TEST_PREFIX = "test_prefix";
 
     private Node mockNode;
-    private RelationshipCountStrategies mockStrategies;
+    private RelationshipCountConfiguration mockStrategies;
     private DegreeCachingStrategy mockDegreeCachingStrategy;
     private CompactionStrategy mockCompactionStrategy;
 
     @Before
     public void setUp() {
         mockNode = mock(Node.class);
-        mockStrategies = mock(RelationshipCountStrategies.class);
+        mockStrategies = mock(RelationshipCountConfiguration.class);
 
         mockDegreeCachingStrategy = mock(DegreeCachingStrategy.class);
         mockCompactionStrategy = mock(CompactionStrategy.class);

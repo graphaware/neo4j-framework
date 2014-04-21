@@ -1,11 +1,12 @@
 package com.graphaware.module.relcount.cache;
 
+import com.graphaware.common.description.serialize.Serializer;
 import com.graphaware.common.wrapper.NodeWrapper;
+import com.graphaware.module.relcount.RelationshipCountConfiguration;
+import com.graphaware.module.relcount.RelationshipCountConfigurationImpl;
+import com.graphaware.module.relcount.count.WeighingStrategy;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.module.relcount.count.WeighingStrategy;
-import com.graphaware.module.relcount.RelationshipCountStrategies;
-import com.graphaware.module.relcount.RelationshipCountStrategiesImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +33,7 @@ public class NodeBasedDegreeCacheTest {
 
     @Before
     public void setUp() {
-        cache = new TestNodeBasedDegreeCache("TEST_ID", RelationshipCountStrategiesImpl.defaultStrategies());
+        cache = new TestNodeBasedDegreeCache("TEST_ID", RelationshipCountConfigurationImpl.defaultConfiguration());
         cache.configurationChanged(DefaultRuntimeConfiguration.getInstance());
 
         mockDegreeCachingNode = mock(DegreeCachingNode.class);
@@ -127,16 +128,11 @@ public class NodeBasedDegreeCacheTest {
 
     @Test
     public void handlingCreatedRelationshipShouldResultInDegreeIncrementTakingIntoAccountWeights() {
-        cache = new TestNodeBasedDegreeCache("TEST_ID", RelationshipCountStrategiesImpl.defaultStrategies().with(
+        cache = new TestNodeBasedDegreeCache("TEST_ID", RelationshipCountConfigurationImpl.defaultConfiguration().with(
                 new WeighingStrategy() {
                     @Override
                     public int getRelationshipWeight(Relationship relationship, Node pointOfView) {
                         return 100;
-                    }
-
-                    @Override
-                    public String asString() {
-                        return "whatever";
                     }
                 }
         ), true);
@@ -200,16 +196,11 @@ public class NodeBasedDegreeCacheTest {
 
     @Test
     public void handlingDeletedRelationshipShouldResultInDegreeDecrementTakingIntoAccountWeights() {
-        cache = new TestNodeBasedDegreeCache("TEST_ID", RelationshipCountStrategiesImpl.defaultStrategies().with(
+        cache = new TestNodeBasedDegreeCache("TEST_ID", RelationshipCountConfigurationImpl.defaultConfiguration().with(
                 new WeighingStrategy() {
                     @Override
                     public int getRelationshipWeight(Relationship relationship, Node pointOfView) {
                         return 100;
-                    }
-
-                    @Override
-                    public String asString() {
-                        return "whatever";
                     }
                 }
         ), true);
@@ -269,26 +260,26 @@ public class NodeBasedDegreeCacheTest {
 
     private class TestNodeBasedDegreeCache extends NodeBasedDegreeCache {
 
-        private final boolean doNotCheckStrategies;
+        private final boolean doNotCheckConfiguration;
 
-        private TestNodeBasedDegreeCache(String id, RelationshipCountStrategies relationshipCountStrategies) {
-            this(id, relationshipCountStrategies, false);
+        private TestNodeBasedDegreeCache(String id, RelationshipCountConfiguration relationshipCountConfiguration) {
+            this(id, relationshipCountConfiguration, false);
         }
 
-        private TestNodeBasedDegreeCache(String id, RelationshipCountStrategies relationshipCountStrategies, boolean doNotCheckStrategies) {
-            super(id, relationshipCountStrategies);
-            this.doNotCheckStrategies = doNotCheckStrategies;
+        private TestNodeBasedDegreeCache(String id, RelationshipCountConfiguration relationshipCountConfiguration, boolean doNotCheckConfiguration) {
+            super(id, relationshipCountConfiguration);
+            this.doNotCheckConfiguration = doNotCheckConfiguration;
         }
 
         @Override
-        protected DegreeCachingNode newDegreeCachingNode(Node node, String prefix, RelationshipCountStrategies strategies) {
+        protected DegreeCachingNode newDegreeCachingNode(Node node, String prefix, RelationshipCountConfiguration configuration) {
             mockDegreeCachingNode = mock(DegreeCachingNode.class);
             long id = node.getId();
             when(mockDegreeCachingNode.getId()).thenReturn(id);
 
             assertEquals(prefix, RuntimeConfiguration.GA_PREFIX + "TEST_ID" + "_");
-            if (!doNotCheckStrategies) {
-                assertEquals(strategies.asString(), RelationshipCountStrategiesImpl.defaultStrategies().asString());
+            if (!doNotCheckConfiguration) {
+                assertEquals(Serializer.toString(configuration, "test"), Serializer.toString(RelationshipCountConfigurationImpl.defaultConfiguration(), "test"));
             }
 
             return mockDegreeCachingNode;

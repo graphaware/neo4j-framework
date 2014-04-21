@@ -16,10 +16,10 @@
 
 package org.neo4j.unsafe.batchinsert;
 
+import com.graphaware.common.wrapper.Wrapper;
 import com.graphaware.tx.event.batch.data.BatchTransactionData;
 import com.graphaware.tx.event.batch.propertycontainer.database.BatchDatabaseNode;
 import com.graphaware.tx.event.batch.propertycontainer.database.BatchDatabaseRelationship;
-import com.graphaware.common.wrapper.Wrapper;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.graphdb.event.TransactionEventHandler;
@@ -28,10 +28,7 @@ import org.neo4j.graphdb.schema.Schema;
 import org.neo4j.graphdb.traversal.BidirectionalTraversalDescription;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.helpers.collection.PrefetchingIterator;
-import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.TransactionBuilder;
 import org.neo4j.kernel.impl.nioneo.store.NeoStore;
-import org.neo4j.kernel.impl.nioneo.store.StoreId;
 import org.neo4j.kernel.impl.traversal.MonoDirectionalTraversalDescription;
 
 import java.lang.reflect.Field;

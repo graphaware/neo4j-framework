@@ -1,11 +1,9 @@
 import com.fasterxml.jackson.databind.util.LRUMap;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.Node;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 

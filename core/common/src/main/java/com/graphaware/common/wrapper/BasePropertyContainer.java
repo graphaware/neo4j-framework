@@ -18,8 +18,6 @@ package com.graphaware.common.wrapper;
 
 import org.neo4j.graphdb.*;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 
 /**

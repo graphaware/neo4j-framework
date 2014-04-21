@@ -5,11 +5,12 @@ import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.module.relcount.cache.DegreeCachingStrategy;
 import com.graphaware.module.relcount.compact.CompactionStrategy;
 import com.graphaware.module.relcount.count.WeighingStrategy;
+import com.graphaware.runtime.config.RuntimeModuleConfiguration;
 
 /**
  * Container for strategies and configuration related to relationship counting.
  */
-public interface RelationshipCountStrategies extends InclusionStrategies {
+public interface RelationshipCountConfiguration extends RuntimeModuleConfiguration {
 
     /**
      * @return contained caching strategy.

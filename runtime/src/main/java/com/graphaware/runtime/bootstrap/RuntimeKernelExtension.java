@@ -17,8 +17,8 @@
 package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.runtime.GraphAwareRuntime;
-import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeModuleBootstrapper;
+import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;

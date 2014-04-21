@@ -18,15 +18,9 @@ package com.graphaware.server.web;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.web.WebApplicationInitializer;
-import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
-import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.support.AbstractDispatcherServletInitializer;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
 
 /**
  * Servlet 3.0+ web application initializer, no need for XML.

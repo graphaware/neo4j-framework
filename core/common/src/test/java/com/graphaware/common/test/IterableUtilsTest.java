@@ -19,17 +19,15 @@ package com.graphaware.common.test;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import static com.graphaware.common.test.IterableUtils.*;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.neo4j.tooling.GlobalGraphOperations.*;
+import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
  * Unit test for {@link IterableUtils}.

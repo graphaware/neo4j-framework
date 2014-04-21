@@ -1,8 +1,8 @@
 package com.graphaware.module.relcount.cache;
 
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
+import com.graphaware.module.relcount.RelationshipCountConfiguration;
 import com.graphaware.runtime.NeedsInitializationException;
-import com.graphaware.module.relcount.RelationshipCountStrategies;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Node;
 
@@ -17,7 +17,7 @@ public class DegreeCachingNode {
 
     private final Node node;
     private final String prefix;
-    private final RelationshipCountStrategies strategies;
+    private final RelationshipCountConfiguration configuration;
 
     private final Map<DetachedRelationshipDescription, Integer> cachedDegrees = new HashMap<>();
     private final Set<DetachedRelationshipDescription> updatedDegrees = new HashSet<>();
@@ -28,14 +28,14 @@ public class DegreeCachingNode {
      *
      * @param node       represented Neo4j node.
      * @param prefix     of the metadata written to the graph.
-     * @param strategies for caching degrees.
+     * @param configuration for caching degrees.
      */
-    public DegreeCachingNode(Node node, String prefix, RelationshipCountStrategies strategies) {
+    public DegreeCachingNode(Node node, String prefix, RelationshipCountConfiguration configuration) {
         this.node = node;
         this.prefix = prefix;
-        this.strategies = strategies;
+        this.configuration = configuration;
 
-        cachedDegrees.putAll(strategies.getDegreeCachingStrategy().readDegrees(node, prefix));
+        cachedDegrees.putAll(configuration.getDegreeCachingStrategy().readDegrees(node, prefix));
     }
 
     /**
@@ -85,7 +85,7 @@ public class DegreeCachingNode {
         put(description, delta);
 
         if (!preventCompaction) {
-            strategies.getCompactionStrategy().compactRelationshipCounts(this);
+            configuration.getCompactionStrategy().compactRelationshipCounts(this);
         }
     }
 
@@ -124,7 +124,7 @@ public class DegreeCachingNode {
      * Apply all the changes to cached degrees to persistent storage.
      */
     public void flush() {
-        strategies.getDegreeCachingStrategy().writeDegrees(node, prefix, cachedDegrees, updatedDegrees, removedDegrees);
+        configuration.getDegreeCachingStrategy().writeDegrees(node, prefix, cachedDegrees, updatedDegrees, removedDegrees);
     }
 
     /**

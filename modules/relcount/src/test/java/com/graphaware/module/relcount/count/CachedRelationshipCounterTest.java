@@ -20,10 +20,10 @@ import com.graphaware.common.description.relationship.RelationshipDescription;
 import com.graphaware.common.description.serialize.Serializer;
 import com.graphaware.common.strategy.IncludeNoRelationships;
 import com.graphaware.common.test.TestDataBuilder;
+import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
+import com.graphaware.module.relcount.compact.ThresholdBasedCompactionStrategy;
 import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
-import com.graphaware.module.relcount.compact.ThresholdBasedCompactionStrategy;
-import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.TransactionCallback;
 import com.graphaware.tx.executor.single.TransactionExecutor;
@@ -39,9 +39,9 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.relationship.RelationshipDescriptionFactory.literal;
 import static com.graphaware.common.description.relationship.RelationshipDescriptionFactory.wildcard;
-import static com.graphaware.common.util.PropertyContainerUtils.*;
+import static com.graphaware.common.util.PropertyContainerUtils.deleteNodeAndRelationships;
+import static com.graphaware.module.relcount.RelationshipCountConfigurationImpl.defaultConfiguration;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
-import static com.graphaware.module.relcount.RelationshipCountStrategiesImpl.defaultStrategies;
 import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
 import static junit.framework.Assert.assertEquals;
@@ -64,7 +64,7 @@ public class CachedRelationshipCounterTest {
         txExecutor = new SimpleTransactionExecutor(database);
 
         ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
-        runtime.registerModule(new RelationshipCountRuntimeModule(defaultStrategies().with(new ThresholdBasedCompactionStrategy(5))));
+        runtime.registerModule(new RelationshipCountRuntimeModule(defaultConfiguration().with(new ThresholdBasedCompactionStrategy(5))));
         runtime.start();
     }
 
@@ -456,7 +456,7 @@ public class CachedRelationshipCounterTest {
         txExecutor = new SimpleTransactionExecutor(database);
 
         ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
-        runtime.registerModule(new RelationshipCountRuntimeModule(defaultStrategies()
+        runtime.registerModule(new RelationshipCountRuntimeModule(defaultConfiguration()
                 .with(new ThresholdBasedCompactionStrategy(5))
                 .with(IncludeNoRelationships.getInstance())));
 

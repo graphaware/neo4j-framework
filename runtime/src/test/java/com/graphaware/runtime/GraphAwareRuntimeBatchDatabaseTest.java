@@ -16,11 +16,12 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.common.description.serialize.Serializer;
+import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
-import com.graphaware.common.strategy.InclusionStrategiesImpl;
+import com.graphaware.runtime.config.MinimalRuntimeModuleConfiguration;
+import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
-import com.graphaware.tx.executor.single.VoidReturningCallback;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,9 +35,9 @@ import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
 
 import java.io.IOException;
 
+import static com.graphaware.common.test.IterableUtils.count;
 import static com.graphaware.runtime.ProductionGraphAwareRuntime.*;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
-import static com.graphaware.common.test.IterableUtils.count;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_ROOT;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -89,28 +90,28 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
         runtime.start();
 
         verify(mockModule).initialize(database);
-        verify(mockModule).asString();
+        verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(CONFIG + TEST_CONFIG, getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
+        assertEquals(Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG), getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
     }
 
     @Test
     public void moduleAlreadyRegisteredShouldNotBeInitialized() {
         final GraphAwareRuntimeModule mockModule = createMockModule();
 
-        createRuntimeRoot().setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, CONFIG + TEST_CONFIG);
+        createRuntimeRoot().setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG));
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         runtime.registerModule(mockModule);
 
         runtime.start();
 
         verify(mockModule, atLeastOnce()).getId();
-        verify(mockModule).asString();
+        verify(mockModule, atLeastOnce()).getConfiguration();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(CONFIG + TEST_CONFIG, getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
+        assertEquals(Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG), getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
     }
 
     @Test
@@ -124,11 +125,11 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
         runtime.start();
 
         verify(mockModule).reinitialize(database);
-        verify(mockModule, times(2)).asString();
+        verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(CONFIG + TEST_CONFIG, getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
+        assertEquals(Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG), getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
     }
 
     @Test
@@ -143,18 +144,18 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
         runtime.start();
 
         verify(mockModule).reinitialize(database);
-        verify(mockModule).asString();
+        verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(CONFIG + TEST_CONFIG, getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
+        assertEquals(Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG), getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
     }
 
     @Test
     public void moduleAlreadyRegisteredShouldBeInitializedWhenForced() {
         final GraphAwareRuntimeModule mockModule = createMockModule();
 
-        createRuntimeRoot().setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, CONFIG + TEST_CONFIG);
+        createRuntimeRoot().setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG));
 
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         runtime.registerModule(mockModule, true);
@@ -162,11 +163,11 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
         runtime.start();
 
         verify(mockModule).reinitialize(database);
-        verify(mockModule).asString();
+        verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
-        assertEquals(CONFIG + TEST_CONFIG, getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
+        assertEquals(Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG), getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
     }
 
     @Test
@@ -212,7 +213,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
         final GraphAwareRuntimeModule mockModule = createMockModule();
 
         Node root = createRuntimeRoot();
-        root.setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, CONFIG + TEST_CONFIG);
+        root.setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG));
         root.setProperty(GA_PREFIX + RUNTIME + "_UNUSED", CONFIG + "123");
 
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
@@ -221,7 +222,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
         runtime.start();
 
         verify(mockModule, atLeastOnce()).getId();
-        verify(mockModule).asString();
+        verify(mockModule, atLeastOnce()).getConfiguration();
         verifyNoMoreInteractions(mockModule);
 
         assertEquals(1, count(getRuntimeRoot().getPropertyKeys()));
@@ -245,7 +246,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
         final GraphAwareRuntimeModule mockModule = createMockModule();
 
         Node root = createRuntimeRoot();
-        root.setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, CONFIG + TEST_CONFIG);
+        root.setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG));
         root.setProperty(GA_PREFIX + RUNTIME + "_UNUSED", "CORRUPT");
 
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
@@ -254,7 +255,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
         runtime.start();
 
         verify(mockModule, atLeastOnce()).getId();
-        verify(mockModule).asString();
+        verify(mockModule, atLeastOnce()).getConfiguration();
         verifyNoMoreInteractions(mockModule);
 
         assertEquals(1, count(getRuntimeRoot().getPropertyKeys()));
@@ -267,18 +268,15 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
         GraphAwareRuntimeModule mockModule1 = mock(GraphAwareRuntimeModule.class);
         when(mockModule1.getId()).thenReturn("MOCK1");
-        when(mockModule1.asString()).thenReturn(TEST_CONFIG);
-        when(mockModule1.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+        when(mockModule1.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
 
         GraphAwareRuntimeModule mockModule2 = mock(GraphAwareRuntimeModule.class);
         when(mockModule2.getId()).thenReturn("MOCK2");
-        when(mockModule2.asString()).thenReturn(TEST_CONFIG);
-        when(mockModule2.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+        when(mockModule2.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
 
         GraphAwareRuntimeModule mockModule3 = mock(GraphAwareRuntimeModule.class);
         when(mockModule3.getId()).thenReturn("MOCK3");
-        when(mockModule3.asString()).thenReturn(TEST_CONFIG);
-        when(mockModule3.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.none());
+        when(mockModule3.getConfiguration()).thenReturn(new MinimalRuntimeModuleConfiguration(InclusionStrategies.none()));
 
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         runtime.registerModule(mockModule1);
@@ -290,9 +288,9 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
         verify(mockModule1).initialize(database);
         verify(mockModule2).initialize(database);
         verify(mockModule3).initialize(database);
-        verify(mockModule1).asString();
-        verify(mockModule2).asString();
-        verify(mockModule3).asString();
+        verify(mockModule1, atLeastOnce()).getConfiguration();
+        verify(mockModule2, atLeastOnce()).getConfiguration();
+        verify(mockModule3, atLeastOnce()).getConfiguration();
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule3, atLeastOnce()).getId();
@@ -300,12 +298,12 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
         database.createNode();
 
-
-        verify(mockModule1).getInclusionStrategies();
-        verify(mockModule2).getInclusionStrategies();
-        verify(mockModule3).getInclusionStrategies();
         verify(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
         verify(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
+        verify(mockModule1, atLeastOnce()).getConfiguration();
+        verify(mockModule2, atLeastOnce()).getConfiguration();
+        verify(mockModule3, atLeastOnce()).getConfiguration();
+
         //no interaction with module3, it is not interested!
         verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
     }
@@ -314,18 +312,15 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
     public void noRegisteredInterestedModulesShouldBeDelegatedToBeforeRuntimeStarts() {
         GraphAwareRuntimeModule mockModule1 = mock(GraphAwareRuntimeModule.class);
         when(mockModule1.getId()).thenReturn("MOCK1");
-        when(mockModule1.asString()).thenReturn(TEST_CONFIG);
-        when(mockModule1.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+        when(mockModule1.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
 
         GraphAwareRuntimeModule mockModule2 = mock(GraphAwareRuntimeModule.class);
         when(mockModule2.getId()).thenReturn("MOCK2");
-        when(mockModule2.asString()).thenReturn(TEST_CONFIG);
-        when(mockModule2.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+        when(mockModule2.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
 
         GraphAwareRuntimeModule mockModule3 = mock(GraphAwareRuntimeModule.class);
         when(mockModule3.getId()).thenReturn("MOCK3");
-        when(mockModule3.asString()).thenReturn(TEST_CONFIG);
-        when(mockModule3.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.none());
+        when(mockModule3.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
 
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         runtime.registerModule(mockModule1);
@@ -345,7 +340,6 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
     @Test
     public void moduleThrowingInitExceptionShouldBeMarkedForReinitialization() {
         final GraphAwareRuntimeModule mockModule = createMockModule();
-        when(mockModule.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
         Mockito.doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
         database.shutdown();
@@ -366,7 +360,6 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
     @Test
     public void moduleThrowingInitExceptionShouldBeMarkedForReinitializationOnlyTheFirstTime() throws InterruptedException {
         final GraphAwareRuntimeModule mockModule = createMockModule();
-        when(mockModule.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
         doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
@@ -464,7 +457,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
     public void shutdownShouldBeCalledBeforeShutdown() {
         RuntimeConfiguredRuntimeModule mockModule = mock(RuntimeConfiguredRuntimeModule.class);
         when(mockModule.getId()).thenReturn("MOCK");
-        when(mockModule.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+        when(mockModule.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
 
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         runtime.registerModule(mockModule);

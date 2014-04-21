@@ -16,15 +16,12 @@
 
 package com.graphaware.common.strategy;
 
-import com.graphaware.common.config.ClassBasedConfigurationAsString;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
-import org.neo4j.graphdb.Relationship;
 
 /**
  * Base-class for {@link PropertyInclusionStrategy}s that includes all properties.
  */
-public abstract class IncludeAllProperties<T extends PropertyContainer> extends ClassBasedConfigurationAsString implements PropertyInclusionStrategy<T> {
+public abstract class IncludeAllProperties<T extends PropertyContainer> implements PropertyInclusionStrategy<T> {
 
     protected IncludeAllProperties() {
     }

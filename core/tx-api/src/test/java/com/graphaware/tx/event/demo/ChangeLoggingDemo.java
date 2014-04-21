@@ -18,11 +18,8 @@ package com.graphaware.tx.event.demo;
 
 import com.graphaware.common.change.Change;
 import com.graphaware.common.description.property.LiteralPropertiesDescription;
-import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
-import com.graphaware.common.strategy.IncludeNoRelationships;
-import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
 import org.junit.Test;

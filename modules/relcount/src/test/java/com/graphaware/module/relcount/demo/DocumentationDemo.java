@@ -4,14 +4,14 @@ import com.graphaware.common.description.relationship.RelationshipDescription;
 import com.graphaware.common.description.relationship.RelationshipDescriptionFactory;
 import com.graphaware.common.strategy.RelationshipInclusionStrategy;
 import com.graphaware.common.strategy.RelationshipPropertyInclusionStrategy;
-import com.graphaware.runtime.ProductionGraphAwareRuntime;
+import com.graphaware.module.relcount.RelationshipCountConfiguration;
+import com.graphaware.module.relcount.RelationshipCountConfigurationImpl;
+import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
 import com.graphaware.module.relcount.compact.ThresholdBasedCompactionStrategy;
 import com.graphaware.module.relcount.count.RelationshipCounter;
 import com.graphaware.module.relcount.count.UnableToCountException;
 import com.graphaware.module.relcount.count.WeighingStrategy;
-import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
-import com.graphaware.module.relcount.RelationshipCountStrategies;
-import com.graphaware.module.relcount.RelationshipCountStrategiesImpl;
+import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import org.junit.Test;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -63,8 +63,8 @@ public class DocumentationDemo extends BaseDocumentationDemo {
     public void demonstrateFullCachedRelationshipCounterWithCustomThreshold() {
         ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
 
-        RelationshipCountStrategies relationshipCountStrategies = RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(7));
-        RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountStrategies);
+        RelationshipCountConfiguration relationshipCountConfiguration = RelationshipCountConfigurationImpl.defaultConfiguration().with(new ThresholdBasedCompactionStrategy(7));
+        RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountConfiguration);
 
         runtime.registerModule(module);
         runtime.start();
@@ -92,8 +92,8 @@ public class DocumentationDemo extends BaseDocumentationDemo {
     public void demonstrateFullCachedRelationshipCounterWithCustomLowerThreshold() {
         ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
 
-        RelationshipCountStrategies relationshipCountStrategies = RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(3));
-        RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountStrategies);
+        RelationshipCountConfiguration relationshipCountConfiguration = RelationshipCountConfigurationImpl.defaultConfiguration().with(new ThresholdBasedCompactionStrategy(3));
+        RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountConfiguration);
 
         runtime.registerModule(module);
         runtime.start();
@@ -129,18 +129,13 @@ public class DocumentationDemo extends BaseDocumentationDemo {
             public int getRelationshipWeight(Relationship relationship, Node pointOfView) {
                 return (int) relationship.getProperty(STRENGTH, 1);
             }
-
-            @Override
-            public String asString() {
-                return "custom";
-            }
         };
 
-        RelationshipCountStrategies relationshipCountStrategies = RelationshipCountStrategiesImpl.defaultStrategies()
+        RelationshipCountConfiguration relationshipCountConfiguration = RelationshipCountConfigurationImpl.defaultConfiguration()
                 .with(new ThresholdBasedCompactionStrategy(7))
                 .with(customWeighingStrategy);
 
-        RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountStrategies);
+        RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountConfiguration);
 
         runtime.registerModule(module);
         runtime.start();
@@ -173,17 +168,12 @@ public class DocumentationDemo extends BaseDocumentationDemo {
             public boolean include(Relationship relationship) {
                 return relationship.isType(FOLLOWS);
             }
-
-            @Override
-            public String asString() {
-                return "followsOnly";
-            }
         };
 
-        RelationshipCountStrategies relationshipCountStrategies = RelationshipCountStrategiesImpl.defaultStrategies()
+        RelationshipCountConfiguration relationshipCountConfiguration = RelationshipCountConfigurationImpl.defaultConfiguration()
                 .with(customRelationshipInclusionStrategy);
 
-        RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountStrategies);
+        RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountConfiguration);
 
         runtime.registerModule(module);
         runtime.start();
@@ -215,17 +205,12 @@ public class DocumentationDemo extends BaseDocumentationDemo {
             public boolean include(String key, Relationship propertyContainer) {
                 return !"timestamp".equals(key);
             }
-
-            @Override
-            public String asString() {
-                return "noTimestamp";
-            }
         };
 
-        RelationshipCountStrategies relationshipCountStrategies = RelationshipCountStrategiesImpl.defaultStrategies()
+        RelationshipCountConfiguration relationshipCountConfiguration = RelationshipCountConfigurationImpl.defaultConfiguration()
                 .with(customRelationshipPropertyInclusionStrategy);
 
-        RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountStrategies);
+        RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountConfiguration);
 
         runtime.registerModule(module);
         runtime.start();
@@ -274,8 +259,8 @@ public class DocumentationDemo extends BaseDocumentationDemo {
     public void demonstrateFullFallingBackRelationshipCounterWithCustomLowerThreshold() {
         ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
 
-        RelationshipCountStrategies relationshipCountStrategies = RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(3));
-        RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountStrategies);
+        RelationshipCountConfiguration relationshipCountConfiguration = RelationshipCountConfigurationImpl.defaultConfiguration().with(new ThresholdBasedCompactionStrategy(3));
+        RelationshipCountRuntimeModule module = new RelationshipCountRuntimeModule(relationshipCountConfiguration);
 
         runtime.registerModule(module);
         runtime.start();

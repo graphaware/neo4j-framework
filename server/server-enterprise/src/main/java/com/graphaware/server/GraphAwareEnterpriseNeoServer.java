@@ -17,7 +17,6 @@
 package com.graphaware.server;
 
 import com.graphaware.server.web.GraphAwareJetty9WebServer;
-import org.neo4j.server.CommunityNeoServer;
 import org.neo4j.server.configuration.Configurator;
 import org.neo4j.server.enterprise.EnterpriseNeoServer;
 import org.neo4j.server.web.WebServer;

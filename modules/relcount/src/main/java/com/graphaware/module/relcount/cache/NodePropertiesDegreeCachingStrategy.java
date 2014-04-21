@@ -45,12 +45,4 @@ public class NodePropertiesDegreeCachingStrategy implements DegreeCachingStrateg
 
         return cachedCounts;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String asString() {
-        return "NP";
-    }
 }

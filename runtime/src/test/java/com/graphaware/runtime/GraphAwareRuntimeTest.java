@@ -16,13 +16,11 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.BaseRuntimeConfigured;
-import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.config.RuntimeConfigured;
-import com.graphaware.common.strategy.InclusionStrategiesImpl;
+import com.graphaware.common.strategy.InclusionStrategies;
+import com.graphaware.common.strategy.InclusionStrategies;
+import com.graphaware.runtime.config.*;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import com.graphaware.common.strategy.InclusionStrategies;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import static org.mockito.Mockito.mock;
@@ -33,14 +31,12 @@ import static org.mockito.Mockito.when;
  */
 public abstract class GraphAwareRuntimeTest {
 
-    protected static final String TEST_CONFIG = "test config";
     protected static final String MOCK = "MOCK";
 
     protected GraphAwareRuntimeModule createMockModule() {
         GraphAwareRuntimeModule mockModule = mock(GraphAwareRuntimeModule.class);
         when(mockModule.getId()).thenReturn(MOCK);
-        when(mockModule.asString()).thenReturn(TEST_CONFIG);
-        when(mockModule.getInclusionStrategies()).thenReturn(InclusionStrategiesImpl.all());
+        when(mockModule.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
         return mockModule;
     }
 
@@ -62,8 +58,8 @@ public abstract class GraphAwareRuntimeTest {
         }
 
         @Override
-        public String asString() {
-            return "someConfig";
+        public RuntimeModuleConfiguration getConfiguration() {
+            return NullRuntimeModuleConfiguration.getInstance();
         }
 
         @Override
@@ -94,11 +90,6 @@ public abstract class GraphAwareRuntimeTest {
         @Override
         public void beforeCommit(ImprovedTransactionData transactionData) {
             //do nothing
-        }
-
-        @Override
-        public InclusionStrategies getInclusionStrategies() {
-            return InclusionStrategiesImpl.all();
         }
     }
 }

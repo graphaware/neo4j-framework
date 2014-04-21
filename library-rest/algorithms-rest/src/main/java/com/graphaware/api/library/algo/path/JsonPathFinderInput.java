@@ -16,11 +16,13 @@
 
 package com.graphaware.api.library.algo.path;
 
-import com.graphaware.library.algo.path.PathFinderInput;
-import com.graphaware.library.algo.path.SortOrder;
 import com.graphaware.api.common.JsonInput;
 import com.graphaware.api.common.JsonRelationshipTypeAndDirection;
-import org.neo4j.graphdb.*;
+import com.graphaware.library.algo.path.PathFinderInput;
+import com.graphaware.library.algo.path.SortOrder;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.GraphDatabaseService;
 
 import java.util.List;
 

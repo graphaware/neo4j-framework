@@ -16,20 +16,20 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.common.description.serialize.Serializer;
 import com.graphaware.common.strategy.InclusionStrategy;
+import com.graphaware.common.util.PropertyContainerUtils;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfigured;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
-import com.graphaware.common.util.PropertyContainerUtils;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.ErrorState;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.graphdb.event.TransactionData;
-import org.neo4j.graphdb.event.TransactionEventHandler;
 
 import java.util.*;
 
@@ -203,7 +203,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
         LazyTransactionData lazyTransactionData = new LazyTransactionData(data);
 
         for (GraphAwareRuntimeModule module : modules) {
-            FilteredTransactionData filteredTransactionData = new FilteredTransactionData(lazyTransactionData, module.getInclusionStrategies());
+            FilteredTransactionData filteredTransactionData = new FilteredTransactionData(lazyTransactionData, module.getConfiguration().getInclusionStrategies());
 
             if (!filteredTransactionData.mutationsOccurred()) {
                 continue;
@@ -253,7 +253,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
      * Metadata about modules is stored as properties on the GraphAware Runtime Root Node in the form of
      * {@link com.graphaware.runtime.config.RuntimeConfiguration#GA_PREFIX}{@link #RUNTIME}_{@link GraphAwareRuntimeModule#getId()}
      * as key and one of the following as value:
-     * - {@link #CONFIG} + {@link GraphAwareRuntimeModule#asString()} capturing the last configuration
+     * - {@link #CONFIG} + {@link com.graphaware.runtime.GraphAwareRuntimeModule#getConfiguration()} (serialized) capturing the last configuration
      * the module has been run with
      * - {@link #FORCE_INITIALIZATION} + timestamp indicating the module should be re-initialized.
      */
@@ -271,6 +271,8 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
                 final String key = moduleKey(module);
                 unusedModules.remove(key);
 
+                Serializer.register(module.getConfiguration().getClass());
+
                 if (!moduleMetadata.containsKey(key)) {
                     LOG.info("Module " + module.getId() + " seems to have been registered for the first time, will initialize...");
                     initializeModule(module);
@@ -281,7 +283,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
                 String value = (String) moduleMetadata.get(key);
 
                 if (value.startsWith(CONFIG)) {
-                    if (!value.replaceFirst(CONFIG, "").equals(module.asString())) {
+                    if (!value.equals(Serializer.toString(module.getConfiguration(), CONFIG))) {
                         LOG.info("Module " + module.getId() + " seems to have changed configuration since last run, will re-initialize...");
                         reinitializeModule(module);
                     } else {
@@ -378,11 +380,6 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
             @Override
             public boolean include(String s) {
                 return s.startsWith(configuration.createPrefix(RUNTIME));
-            }
-
-            @Override
-            public String asString() {
-                return "not used"; //todo remove
             }
         });
     }

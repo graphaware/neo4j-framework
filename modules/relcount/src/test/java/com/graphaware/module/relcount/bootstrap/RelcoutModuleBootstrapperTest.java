@@ -1,6 +1,6 @@
 package com.graphaware.module.relcount.bootstrap;
 
-import com.graphaware.module.relcount.RelationshipCountStrategiesImpl;
+import com.graphaware.module.relcount.RelationshipCountConfigurationImpl;
 import com.graphaware.module.relcount.count.CachedRelationshipCounter;
 import com.graphaware.module.relcount.count.FallbackRelationshipCounter;
 import com.graphaware.module.relcount.count.NaiveRelationshipCounter;
@@ -16,9 +16,9 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
 import static com.graphaware.common.description.relationship.RelationshipDescriptionFactory.wildcard;
-import static com.graphaware.module.relcount.bootstrap.RelcountModuleBootstrapper.*;
+import static com.graphaware.module.relcount.bootstrap.RelcountModuleBootstrapper.MODULE_ENABLED;
+import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
 import static org.junit.Assert.assertEquals;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
@@ -50,8 +50,8 @@ public class RelcoutModuleBootstrapperTest {
 
         verifyCounts(new NaiveRelationshipCounter());
         //todo there is no way the users will know the config => store serialised on root
-        verifyCounts(new CachedRelationshipCounter("relcount", DefaultRuntimeConfiguration.getInstance(), RelationshipCountStrategiesImpl.defaultStrategies()));
-        verifyCounts(new FallbackRelationshipCounter("relcount", DefaultRuntimeConfiguration.getInstance(), RelationshipCountStrategiesImpl.defaultStrategies()));
+        verifyCounts(new CachedRelationshipCounter("relcount", DefaultRuntimeConfiguration.getInstance(), RelationshipCountConfigurationImpl.defaultConfiguration()));
+        verifyCounts(new FallbackRelationshipCounter("relcount", DefaultRuntimeConfiguration.getInstance(), RelationshipCountConfigurationImpl.defaultConfiguration()));
     }
 
     private void verifyCounts(RelationshipCounter counter) {

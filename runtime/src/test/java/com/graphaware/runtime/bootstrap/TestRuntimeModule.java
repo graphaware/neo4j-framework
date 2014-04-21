@@ -1,8 +1,10 @@
 package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.common.strategy.InclusionStrategies;
-import com.graphaware.common.strategy.InclusionStrategiesImpl;
+import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.runtime.GraphAwareRuntimeModule;
+import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
+import com.graphaware.runtime.config.RuntimeModuleConfiguration;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -30,6 +32,11 @@ public class TestRuntimeModule implements GraphAwareRuntimeModule {
 
     public String getId() {
         return id;
+    }
+
+    @Override
+    public RuntimeModuleConfiguration getConfiguration() {
+        return NullRuntimeModuleConfiguration.getInstance();
     }
 
     public Map<String, String> getConfig() {
@@ -74,15 +81,5 @@ public class TestRuntimeModule implements GraphAwareRuntimeModule {
     @Override
     public void beforeCommit(ImprovedTransactionData transactionData) {
         //do nothing
-    }
-
-    @Override
-    public InclusionStrategies getInclusionStrategies() {
-        return InclusionStrategiesImpl.all();
-    }
-
-    @Override
-    public String asString() {
-        return "testModule ID " + getId();
     }
 }

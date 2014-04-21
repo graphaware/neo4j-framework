@@ -16,10 +16,6 @@
 
 package com.graphaware.common.strategy;
 
-import com.graphaware.common.config.ClassBasedConfigurationAsString;
-import com.graphaware.common.strategy.NodePropertyInclusionStrategy;
-import com.graphaware.common.strategy.RelationshipPropertyInclusionStrategy;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 /**

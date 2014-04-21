@@ -2,15 +2,16 @@ package com.graphaware.module.relcount;
 
 import com.graphaware.common.change.Change;
 import com.graphaware.common.strategy.InclusionStrategies;
-import com.graphaware.runtime.GraphAwareRuntimeModule;
-import com.graphaware.runtime.config.BaseRuntimeConfigured;
-import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.config.RuntimeConfigured;
 import com.graphaware.module.relcount.cache.NodeBasedDegreeCache;
 import com.graphaware.module.relcount.count.CachedRelationshipCounter;
 import com.graphaware.module.relcount.count.FallbackRelationshipCounter;
 import com.graphaware.module.relcount.count.NaiveRelationshipCounter;
 import com.graphaware.module.relcount.count.RelationshipCounter;
+import com.graphaware.runtime.GraphAwareRuntimeModule;
+import com.graphaware.runtime.config.BaseRuntimeConfigured;
+import com.graphaware.runtime.config.RuntimeConfiguration;
+import com.graphaware.runtime.config.RuntimeConfigured;
+import com.graphaware.runtime.config.RuntimeModuleConfiguration;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -28,7 +29,7 @@ import java.util.Collection;
 
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.tooling.GlobalGraphOperations.*;
+import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
  * {@link com.graphaware.runtime.GraphAwareRuntimeModule} providing caching capabilities for full relationship counting.
@@ -47,41 +48,41 @@ public class RelationshipCountRuntimeModule extends BaseRuntimeConfigured implem
     public static final String FULL_RELCOUNT_DEFAULT_ID = "FRC";
 
     private final String id;
-    private final RelationshipCountStrategies relationshipCountStrategies;
+    private final RelationshipCountConfiguration relationshipCountConfiguration;
     private final NodeBasedDegreeCache relationshipCountCache;
 
     /**
      * Create a module with default ID and configuration. Use this constructor when you wish to register a single
      * instance of the module with {@link com.graphaware.runtime.ProductionGraphAwareRuntime} and you are happy with
-     * the default configuration (see {@link RelationshipCountStrategiesImpl#defaultStrategies()}).
+     * the default configuration (see {@link RelationshipCountConfigurationImpl#defaultConfiguration()}).
      */
     public RelationshipCountRuntimeModule() {
-        this(FULL_RELCOUNT_DEFAULT_ID, RelationshipCountStrategiesImpl.defaultStrategies());
+        this(FULL_RELCOUNT_DEFAULT_ID, RelationshipCountConfigurationImpl.defaultConfiguration());
     }
 
     /**
      * Create a module with default ID and custom configuration. Use this constructor when you wish to register a single
      * instance of the module with {@link com.graphaware.runtime.ProductionGraphAwareRuntime} and you want to provide
-     * custom {@link RelationshipCountStrategies}. This could be the case, for instance, when you would like to exclude
+     * custom {@link RelationshipCountConfiguration}. This could be the case, for instance, when you would like to exclude
      * certain {@link org.neo4j.graphdb.Relationship}s from being counted at all ({@link com.graphaware.common.strategy.RelationshipInclusionStrategy}),
      * certain properties from being considered at all ({@link com.graphaware.common.strategy.RelationshipPropertyInclusionStrategy}),
      * weigh each relationship differently ({@link com.graphaware.module.relcount.count.WeighingStrategy},
      * or use a custom threshold for compaction.
      */
-    public RelationshipCountRuntimeModule(RelationshipCountStrategies relationshipCountStrategies) {
-        this(FULL_RELCOUNT_DEFAULT_ID, relationshipCountStrategies);
+    public RelationshipCountRuntimeModule(RelationshipCountConfiguration relationshipCountConfiguration) {
+        this(FULL_RELCOUNT_DEFAULT_ID, relationshipCountConfiguration);
     }
 
     /**
      * Create a module with a custom ID and configuration. Use this constructor when you wish to register a multiple
      * instances of the module with {@link com.graphaware.runtime.ProductionGraphAwareRuntime} and you want to provide
-     * custom {@link RelationshipCountStrategies} for each one of them. This could be the case, for instance, when you
+     * custom {@link RelationshipCountConfiguration} for each one of them. This could be the case, for instance, when you
      * would like to keep two different kinds of relationships, weighted and unweighted.
      */
-    public RelationshipCountRuntimeModule(String id, RelationshipCountStrategies relationshipCountStrategies) {
+    public RelationshipCountRuntimeModule(String id, RelationshipCountConfiguration relationshipCountConfiguration) {
         this.id = id;
-        this.relationshipCountStrategies = relationshipCountStrategies;
-        this.relationshipCountCache = new NodeBasedDegreeCache(id, relationshipCountStrategies);
+        this.relationshipCountConfiguration = relationshipCountConfiguration;
+        this.relationshipCountCache = new NodeBasedDegreeCache(id, relationshipCountConfiguration);
     }
 
     /**
@@ -90,7 +91,7 @@ public class RelationshipCountRuntimeModule extends BaseRuntimeConfigured implem
      * @return counter.
      */
     public RelationshipCounter cachedCounter() {
-        return new CachedRelationshipCounter(getId(), getConfig(), relationshipCountStrategies);
+        return new CachedRelationshipCounter(getId(), getConfig(), relationshipCountConfiguration);
     }
 
     /**
@@ -99,7 +100,7 @@ public class RelationshipCountRuntimeModule extends BaseRuntimeConfigured implem
      * @return counter.
      */
     public RelationshipCounter fallbackCounter() {
-        return new FallbackRelationshipCounter(getId(), getConfig(), relationshipCountStrategies);
+        return new FallbackRelationshipCounter(getId(), getConfig(), relationshipCountConfiguration);
     }
 
     /**
@@ -109,15 +110,7 @@ public class RelationshipCountRuntimeModule extends BaseRuntimeConfigured implem
      * @return counter.
      */
     public RelationshipCounter naiveCounter() {
-        return new NaiveRelationshipCounter(relationshipCountStrategies);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public InclusionStrategies getInclusionStrategies() {
-        return relationshipCountStrategies;
+        return new NaiveRelationshipCounter(relationshipCountConfiguration);
     }
 
     /**
@@ -132,16 +125,16 @@ public class RelationshipCountRuntimeModule extends BaseRuntimeConfigured implem
      * {@inheritDoc}
      */
     @Override
-    public String asString() {
-        return id + ";" + relationshipCountStrategies.asString();
+    public String getId() {
+        return id;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getId() {
-        return id;
+    public RuntimeModuleConfiguration getConfiguration() {
+        return relationshipCountConfiguration;
     }
 
     /**
@@ -306,7 +299,7 @@ public class RelationshipCountRuntimeModule extends BaseRuntimeConfigured implem
                 new UnitOfWork<Node>() {
                     @Override
                     public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
-                        Node filteredNode = new FilteredNode(node, getInclusionStrategies());
+                        Node filteredNode = new FilteredNode(node, getConfiguration().getInclusionStrategies());
 
                         buildCachedCounts(filteredNode);
 
@@ -322,7 +315,7 @@ public class RelationshipCountRuntimeModule extends BaseRuntimeConfigured implem
      */
     private void buildCachedCounts(TransactionSimulatingBatchInserter batchInserter) {
         for (long nodeId : batchInserter.getAllNodes()) {
-            Node filteredNode = new FilteredNode(new BatchInserterNode(nodeId, batchInserter), getInclusionStrategies());
+            Node filteredNode = new FilteredNode(new BatchInserterNode(nodeId, batchInserter), getConfiguration().getInclusionStrategies());
 
             buildCachedCounts(filteredNode);
         }

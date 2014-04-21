@@ -17,7 +17,6 @@
 package com.graphaware.tx.executor.batch;
 
 import com.graphaware.tx.executor.NullItem;
-import com.graphaware.tx.executor.batch.UnitOfWork;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**

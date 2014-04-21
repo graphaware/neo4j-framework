@@ -17,7 +17,6 @@
 package com.graphaware.common.strategy;
 
 
-import com.graphaware.common.strategy.RelationshipPropertyInclusionStrategy;
 import org.neo4j.graphdb.Relationship;
 
 /**

@@ -3,11 +3,11 @@ package com.graphaware.runtime.bootstrap;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeModuleBootstrapper;
 import org.neo4j.graphdb.config.Setting;
-import org.neo4j.kernel.configuration.Config;
 
 import java.util.Map;
 
-import static org.neo4j.helpers.Settings.*;
+import static org.neo4j.helpers.Settings.STRING;
+import static org.neo4j.helpers.Settings.setting;
 
 /**
  * {@link com.graphaware.runtime.GraphAwareRuntimeModuleBootstrapper} for {@link TestRuntimeModule}.

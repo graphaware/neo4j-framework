@@ -18,12 +18,12 @@ package com.graphaware.module.relcount.count;
 
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
 import com.graphaware.common.description.relationship.RelationshipDescription;
+import com.graphaware.module.relcount.RelationshipCountConfiguration;
+import com.graphaware.module.relcount.RelationshipCountConfigurationImpl;
+import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
+import com.graphaware.module.relcount.cache.DegreeCachingNode;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.module.relcount.cache.DegreeCachingNode;
-import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
-import com.graphaware.module.relcount.RelationshipCountStrategies;
-import com.graphaware.module.relcount.RelationshipCountStrategiesImpl;
 import org.neo4j.graphdb.Node;
 
 /**
@@ -44,7 +44,7 @@ public class CachedRelationshipCounter implements RelationshipCounter {
 
     private final String id;
     private final RuntimeConfiguration config;
-    private final RelationshipCountStrategies relationshipCountStrategies;
+    private final RelationshipCountConfiguration relationshipCountConfiguration;
 
     /**
      * Construct a new relationship counter. Use this constructor when {@link com.graphaware.runtime.ProductionGraphAwareRuntime}
@@ -52,23 +52,23 @@ public class CachedRelationshipCounter implements RelationshipCounter {
      * is registered. This will be the case for most use cases.
      */
     public CachedRelationshipCounter() {
-        this(RelationshipCountRuntimeModule.FULL_RELCOUNT_DEFAULT_ID, DefaultRuntimeConfiguration.getInstance(), RelationshipCountStrategiesImpl.defaultStrategies());
+        this(RelationshipCountRuntimeModule.FULL_RELCOUNT_DEFAULT_ID, DefaultRuntimeConfiguration.getInstance(), RelationshipCountConfigurationImpl.defaultConfiguration());
     }
 
     /**
      * Construct a new relationship counter. Use this constructor when multiple instances of {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule}
      * have been registered with the {@link com.graphaware.runtime.ProductionGraphAwareRuntime}, when the
-     * {@link com.graphaware.runtime.ProductionGraphAwareRuntime} is used with custom configuration, or when custom {@link RelationshipCountStrategies} are used.
+     * {@link com.graphaware.runtime.ProductionGraphAwareRuntime} is used with custom configuration, or when custom {@link com.graphaware.module.relcount.RelationshipCountConfiguration} are used.
      * This should rarely be the case. Alternatively, use {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule#cachedCounter()}.
      *
      * @param id                          of the {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule} used to cache relationship counts.
      * @param config                      used with the {@link com.graphaware.runtime.ProductionGraphAwareRuntime}.
-     * @param relationshipCountStrategies strategies used for relationship counting.
+     * @param relationshipCountConfiguration strategies used for relationship counting.
      */
-    public CachedRelationshipCounter(String id, RuntimeConfiguration config, RelationshipCountStrategies relationshipCountStrategies) {
+    public CachedRelationshipCounter(String id, RuntimeConfiguration config, RelationshipCountConfiguration relationshipCountConfiguration) {
         this.id = id;
         this.config = config;
-        this.relationshipCountStrategies = relationshipCountStrategies;
+        this.relationshipCountConfiguration = relationshipCountConfiguration;
     }
 
     /**
@@ -78,7 +78,7 @@ public class CachedRelationshipCounter implements RelationshipCounter {
     public int count(Node node, RelationshipDescription description) {
         int result = 0;
 
-        DegreeCachingNode cachingNode = new DegreeCachingNode(node, config.createPrefix(id), relationshipCountStrategies);
+        DegreeCachingNode cachingNode = new DegreeCachingNode(node, config.createPrefix(id), relationshipCountConfiguration);
 
         for (DetachedRelationshipDescription candidate : cachingNode.getCachedDegrees().keySet()) {
 

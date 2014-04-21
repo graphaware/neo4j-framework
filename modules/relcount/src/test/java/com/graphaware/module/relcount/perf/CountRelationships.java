@@ -2,11 +2,11 @@ package com.graphaware.module.relcount.perf;
 
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
 import com.graphaware.common.test.TestUtils;
-import com.graphaware.runtime.ProductionGraphAwareRuntime;
+import com.graphaware.module.relcount.RelationshipCountConfigurationImpl;
+import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
 import com.graphaware.module.relcount.cache.NodePropertiesDegreeCachingStrategy;
 import com.graphaware.module.relcount.count.RelationshipCounter;
-import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
-import com.graphaware.module.relcount.RelationshipCountStrategiesImpl;
+import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import com.graphaware.runtime.performance.*;
 import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor;
@@ -95,13 +95,13 @@ public class CountRelationships extends RelcountPerformanceTest {
 
     @Override
     public void prepareDatabase(GraphDatabaseService database, Map<String, Object> params) {
-        RelationshipCountStrategiesImpl strategies = RelationshipCountStrategiesImpl.defaultStrategies();
+        RelationshipCountConfigurationImpl configuration = RelationshipCountConfigurationImpl.defaultConfiguration();
         if (Serialization.MULTI_PROP.equals(params.get(SERIALIZATION))) {
-            strategies = strategies.with(new NodePropertiesDegreeCachingStrategy());
+            configuration = configuration.with(new NodePropertiesDegreeCachingStrategy());
         }
 
         ProductionGraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
-        module = new RelationshipCountRuntimeModule(strategies);
+        module = new RelationshipCountRuntimeModule(configuration);
         runtime.registerModule(module);
         runtime.start();
 

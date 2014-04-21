@@ -17,8 +17,6 @@
 package com.graphaware.common.strategy;
 
 
-import com.graphaware.common.config.ClassBasedConfigurationAsString;
-import com.graphaware.common.strategy.RelationshipInclusionStrategy;
 import org.neo4j.graphdb.Relationship;
 
 /**

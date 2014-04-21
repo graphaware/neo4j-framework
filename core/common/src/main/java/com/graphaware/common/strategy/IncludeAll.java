@@ -16,12 +16,10 @@
 
 package com.graphaware.common.strategy;
 
-import com.graphaware.common.config.ClassBasedConfigurationAsString;
-
 /**
  * {@link InclusionStrategy} that includes all objects.
  */
-public class IncludeAll<T> extends ClassBasedConfigurationAsString implements InclusionStrategy<T> {
+public class IncludeAll<T> implements InclusionStrategy<T> {
 
     /**
      * {@inheritDoc}

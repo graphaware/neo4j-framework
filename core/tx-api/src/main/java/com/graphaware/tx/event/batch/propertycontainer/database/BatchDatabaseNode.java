@@ -16,19 +16,19 @@
 
 package com.graphaware.tx.event.batch.propertycontainer.database;
 
-import com.graphaware.tx.event.batch.data.BatchTransactionData;
 import com.graphaware.common.wrapper.NodeWrapper;
+import com.graphaware.tx.event.batch.data.BatchTransactionData;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.neo4j.helpers.collection.Iterables.*;
+import static org.neo4j.helpers.collection.Iterables.append;
+import static org.neo4j.helpers.collection.Iterables.toList;
 
 /**
  * {@link org.neo4j.graphdb.Node} proxy to be used in {@link com.graphaware.tx.event.batch.data.BatchTransactionData}

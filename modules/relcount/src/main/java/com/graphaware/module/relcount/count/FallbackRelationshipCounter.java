@@ -17,9 +17,9 @@
 package com.graphaware.module.relcount.count;
 
 import com.graphaware.common.description.relationship.RelationshipDescription;
+import com.graphaware.module.relcount.RelationshipCountConfiguration;
+import com.graphaware.module.relcount.RelationshipCountConfigurationImpl;
 import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
-import com.graphaware.module.relcount.RelationshipCountStrategies;
-import com.graphaware.module.relcount.RelationshipCountStrategiesImpl;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.apache.log4j.Logger;
@@ -47,17 +47,17 @@ public class FallbackRelationshipCounter implements RelationshipCounter {
 
     private final String id;
     private final RuntimeConfiguration config;
-    private final RelationshipCountStrategies strategies;
+    private final RelationshipCountConfiguration strategies;
 
     /**
      * Construct a new relationship counter with default settings. Use this constructor when
      * {@link com.graphaware.runtime.ProductionGraphAwareRuntime} is used with default configuration, only a single
      * instance of {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule} is registered, and
-     * no custom {@link com.graphaware.module.relcount.RelationshipCountStrategies} are in use. If unsure, it is always easy and correct to instantiate
+     * no custom {@link com.graphaware.module.relcount.RelationshipCountConfiguration} are in use. If unsure, it is always easy and correct to instantiate
      * this counter through {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule#fallbackCounter()} .
      */
     public FallbackRelationshipCounter() {
-        this(RelationshipCountRuntimeModule.FULL_RELCOUNT_DEFAULT_ID, DefaultRuntimeConfiguration.getInstance(), RelationshipCountStrategiesImpl.defaultStrategies());
+        this(RelationshipCountRuntimeModule.FULL_RELCOUNT_DEFAULT_ID, DefaultRuntimeConfiguration.getInstance(), RelationshipCountConfigurationImpl.defaultConfiguration());
     }
 
     /**
@@ -68,7 +68,7 @@ public class FallbackRelationshipCounter implements RelationshipCounter {
      * @param config     used with the {@link com.graphaware.runtime.ProductionGraphAwareRuntime}.
      * @param strategies for counting relationships, provided to the {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule}.
      */
-    public FallbackRelationshipCounter(String id, RuntimeConfiguration config, RelationshipCountStrategies strategies) {
+    public FallbackRelationshipCounter(String id, RuntimeConfiguration config, RelationshipCountConfiguration strategies) {
         this.id = id;
         this.strategies = strategies;
         this.config = config;

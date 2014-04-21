@@ -16,12 +16,12 @@
 
 package com.graphaware.tx.event.improved.data.filtered;
 
-import com.graphaware.tx.event.improved.data.NodeTransactionData;
-import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
-import com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode;
 import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.common.strategy.PropertyContainerInclusionStrategy;
 import com.graphaware.common.strategy.PropertyInclusionStrategy;
+import com.graphaware.tx.event.improved.data.NodeTransactionData;
+import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
+import com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode;
 import org.neo4j.graphdb.Node;
 
 /**

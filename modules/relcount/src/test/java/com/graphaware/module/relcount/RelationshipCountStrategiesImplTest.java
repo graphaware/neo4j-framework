@@ -16,7 +16,7 @@
 
 package com.graphaware.module.relcount;
 
-import com.graphaware.module.relcount.RelationshipCountStrategiesImpl;
+import com.graphaware.common.description.serialize.Serializer;
 import com.graphaware.module.relcount.compact.ThresholdBasedCompactionStrategy;
 import org.junit.Test;
 
@@ -24,19 +24,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 
 /**
- * Unit test for {@link com.graphaware.module.relcount.RelationshipCountStrategiesImpl}.
+ * Unit test for {@link RelationshipCountConfigurationImpl}.
  */
 public class RelationshipCountStrategiesImplTest {
 
     @Test
     public void sameStrategiesShouldProduceSameString() {
-        assertEquals(RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(2)).asString(),
-                RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(2)).asString());
+        assertEquals(Serializer.toString(RelationshipCountConfigurationImpl.defaultConfiguration().with(new ThresholdBasedCompactionStrategy(2)), "test"),
+                Serializer.toString(RelationshipCountConfigurationImpl.defaultConfiguration().with(new ThresholdBasedCompactionStrategy(2)), "test"));
     }
 
     @Test
     public void differentStrategiesShouldHaveADifferentHashCode() {
-        assertNotSame(RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(2)).asString(),
-                RelationshipCountStrategiesImpl.defaultStrategies().with(new ThresholdBasedCompactionStrategy(3)).asString());
+        assertNotSame(Serializer.toString(RelationshipCountConfigurationImpl.defaultConfiguration().with(new ThresholdBasedCompactionStrategy(2)), "test"),
+                Serializer.toString(RelationshipCountConfigurationImpl.defaultConfiguration().with(new ThresholdBasedCompactionStrategy(3)), "test"));
     }
 }

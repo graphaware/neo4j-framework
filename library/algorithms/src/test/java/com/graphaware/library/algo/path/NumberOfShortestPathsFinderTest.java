@@ -26,11 +26,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.neo4j.graphdb.Direction.BOTH;
-import static org.neo4j.graphdb.Direction.INCOMING;
-import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.kernel.Traversal.pathExpanderForAllTypes;
-import static org.neo4j.kernel.Traversal.pathExpanderForTypes;
+import static org.neo4j.graphdb.Direction.*;
 
 /**
  * Test for {@link NumberOfShortestPathsFinder}.

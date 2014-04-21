@@ -2,13 +2,13 @@ package com.graphaware.module.relcount.perf;
 
 import com.graphaware.common.strategy.IncludeNoRelationshipProperties;
 import com.graphaware.common.test.TestUtils;
+import com.graphaware.module.relcount.RelationshipCountConfigurationImpl;
+import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
+import com.graphaware.module.relcount.cache.NodePropertiesDegreeCachingStrategy;
 import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import com.graphaware.runtime.performance.EnumParameter;
 import com.graphaware.runtime.performance.ExponentialParameter;
 import com.graphaware.runtime.performance.Parameter;
-import com.graphaware.module.relcount.cache.NodePropertiesDegreeCachingStrategy;
-import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
-import com.graphaware.module.relcount.RelationshipCountStrategiesImpl;
 import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.batch.BatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor;
@@ -94,13 +94,13 @@ public class CreateRelationships extends RelcountPerformanceTest {
                 break;
             case RELCOUNT_NO_PROPS_SINGLE_PROP_STORAGE:
                 runtime = new ProductionGraphAwareRuntime(database);
-                runtime.registerModule(new RelationshipCountRuntimeModule(RelationshipCountStrategiesImpl.defaultStrategies()
+                runtime.registerModule(new RelationshipCountRuntimeModule(RelationshipCountConfigurationImpl.defaultConfiguration()
                         .with(IncludeNoRelationshipProperties.getInstance())));
                 runtime.start();
                 break;
             case RELCOUNT_NO_PROPS_MULTI_PROP_STORAGE:
                 runtime = new ProductionGraphAwareRuntime(database);
-                runtime.registerModule(new RelationshipCountRuntimeModule(RelationshipCountStrategiesImpl.defaultStrategies()
+                runtime.registerModule(new RelationshipCountRuntimeModule(RelationshipCountConfigurationImpl.defaultConfiguration()
                         .with(IncludeNoRelationshipProperties.getInstance())
                         .with(new NodePropertiesDegreeCachingStrategy())));
                 runtime.start();
@@ -112,7 +112,7 @@ public class CreateRelationships extends RelcountPerformanceTest {
                 break;
             case FULL_RELCOUNT_MULTI_PROP_STORAGE:
                 runtime = new ProductionGraphAwareRuntime(database);
-                runtime.registerModule(new RelationshipCountRuntimeModule(RelationshipCountStrategiesImpl.defaultStrategies()
+                runtime.registerModule(new RelationshipCountRuntimeModule(RelationshipCountConfigurationImpl.defaultConfiguration()
                         .with(new NodePropertiesDegreeCachingStrategy())));
                 runtime.start();
                 break;

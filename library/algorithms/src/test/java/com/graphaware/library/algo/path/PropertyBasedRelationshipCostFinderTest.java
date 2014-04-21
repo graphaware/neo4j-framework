@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Unit test for {@link com.graphaware.library.algo.path.PropertyBasedRelationshipCostFinder} implementations.

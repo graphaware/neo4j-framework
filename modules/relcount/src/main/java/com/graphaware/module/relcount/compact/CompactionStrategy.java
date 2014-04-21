@@ -1,6 +1,5 @@
 package com.graphaware.module.relcount.compact;
 
-import com.graphaware.common.config.ConfigurationAsString;
 import com.graphaware.module.relcount.cache.DegreeCachingNode;
 
 /**
@@ -14,7 +13,7 @@ import com.graphaware.module.relcount.cache.DegreeCachingNode;
  * The strategy might decide to compact this into:
  * - FRIEND_OF, OUTGOING, timestamp=anything - 9x
  */
-public interface CompactionStrategy extends ConfigurationAsString {
+public interface CompactionStrategy {
 
     /**
      * Compact cached degrees if needed.

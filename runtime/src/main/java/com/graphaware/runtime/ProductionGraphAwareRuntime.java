@@ -16,19 +16,19 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
-import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
-import com.graphaware.tx.executor.single.VoidReturningCallback;
+import com.graphaware.common.description.serialize.Serializer;
 import org.apache.log4j.Logger;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.PrefetchingIterator;
 import org.neo4j.kernel.GraphDatabaseAPI;
 
 import java.util.Collection;
 import java.util.Iterator;
 
-import static com.graphaware.runtime.config.RuntimeConfiguration.*;
-import static org.neo4j.tooling.GlobalGraphOperations.*;
+import static com.graphaware.runtime.config.RuntimeConfiguration.GA_ROOT;
+import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 
 /**
@@ -97,12 +97,10 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
      */
     @Override
     protected void doRecordInitialization(final GraphAwareRuntimeModule module, final String key) {
-        new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
-            @Override
-            protected void doInTx(GraphDatabaseService database) {
-                getOrCreateRoot().setProperty(key, CONFIG + module.asString());
-            }
-        });
+        try (Transaction tx = database.beginTx()) {
+            getOrCreateRoot().setProperty(key, Serializer.toString(module.getConfiguration(), CONFIG));
+            tx.success();
+        }
     }
 
     /**
@@ -110,15 +108,13 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
      */
     @Override
     protected void removeUnusedModules(final Collection<String> unusedModules) {
-        new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
-            @Override
-            protected void doInTx(GraphDatabaseService database) {
-                for (String toRemove : unusedModules) {
-                    LOG.info("Removing unused module " + toRemove + ".");
-                    getOrCreateRoot().removeProperty(toRemove);
-                }
+        try (Transaction tx = database.beginTx()) {
+            for (String toRemove : unusedModules) {
+                LOG.info("Removing unused module " + toRemove + ".");
+                getOrCreateRoot().removeProperty(toRemove);
             }
-        });
+            tx.success();
+        }
     }
 
     /**
@@ -145,8 +141,7 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
 
         if (database instanceof GraphDatabaseAPI) {
             roots = at(database).getAllNodesWithLabel(GA_ROOT).iterator();
-        }
-        else {
+        } else {
             //this is for Batch Graph Database
             roots = new RootNodeIterator(database);
         }
@@ -154,8 +149,7 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
         if (!roots.hasNext()) {
             LOG.info("GraphAware Runtime has never been run before on this database. Creating runtime root node...");
             root = database.createNode(GA_ROOT);
-        }
-        else {
+        } else {
             root = roots.next();
 
             if (roots.hasNext()) {

@@ -17,8 +17,8 @@
 package com.graphaware.module.relcount.cache;
 
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
-import com.graphaware.runtime.NeedsInitializationException;
 import com.graphaware.module.relcount.count.RelationshipCounter;
+import com.graphaware.runtime.NeedsInitializationException;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.TransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;

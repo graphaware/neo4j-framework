@@ -29,9 +29,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * Utilities mainly intended for testing.

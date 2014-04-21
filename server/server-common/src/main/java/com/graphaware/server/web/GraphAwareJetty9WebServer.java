@@ -17,17 +17,14 @@
 package com.graphaware.server.web;
 
 import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ArrayUtil;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle;
-import org.eclipse.jetty.webapp.WebAppContext;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.server.database.InjectableProvider;
 import org.neo4j.server.web.Jetty9WebServer;
-import org.springframework.web.context.AbstractContextLoaderInitializer;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

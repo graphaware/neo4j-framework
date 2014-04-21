@@ -1,6 +1,5 @@
 package com.graphaware.module.relcount.cache;
 
-import com.graphaware.common.config.ConfigurationAsString;
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
 import org.neo4j.graphdb.Node;
 
@@ -10,7 +9,7 @@ import java.util.Set;
 /**
  * A strategy deciding where and how to cache node degrees.
  */
-public interface DegreeCachingStrategy extends ConfigurationAsString {
+public interface DegreeCachingStrategy {
 
     /**
      * Write node degrees to the database (or another persistent store).

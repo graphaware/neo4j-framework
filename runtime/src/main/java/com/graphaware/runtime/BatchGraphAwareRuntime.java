@@ -16,16 +16,19 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.RuntimeConfiguration;
+import com.graphaware.common.description.serialize.Serializer;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
 import org.apache.log4j.Logger;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.Lock;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Transaction;
 
 import java.util.Collection;
 import java.util.HashMap;
 
-import static com.graphaware.runtime.config.RuntimeConfiguration.*;
+import static com.graphaware.runtime.config.RuntimeConfiguration.GA_ROOT;
 
 
 /**
@@ -127,7 +130,7 @@ public class BatchGraphAwareRuntime extends BaseGraphAwareRuntime {
      */
     @Override
     protected void doRecordInitialization(final GraphAwareRuntimeModule module, final String key) {
-        getOrCreateRoot().setProperty(key, CONFIG + module.asString());
+        getOrCreateRoot().setProperty(key, Serializer.toString(module.getConfiguration(), CONFIG));
     }
 
     /**

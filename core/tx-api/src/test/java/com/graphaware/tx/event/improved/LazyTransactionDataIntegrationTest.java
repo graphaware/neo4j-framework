@@ -16,13 +16,12 @@
 
 package com.graphaware.tx.event.improved;
 
-import com.graphaware.common.test.IterableUtils;
-import com.graphaware.common.test.TestDataBuilder;
-import com.graphaware.tx.executor.single.*;
-import junit.framework.Assert;
 import com.graphaware.common.change.Change;
+import com.graphaware.common.test.TestDataBuilder;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
+import com.graphaware.tx.executor.single.*;
+import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Test;
 import org.neo4j.graphdb.*;
@@ -39,7 +38,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static com.graphaware.common.test.IterableUtils.*;
+import static com.graphaware.common.test.IterableUtils.count;
+import static com.graphaware.common.test.IterableUtils.countNodes;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static junit.framework.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;

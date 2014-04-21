@@ -20,9 +20,9 @@ import com.graphaware.common.description.property.LiteralPropertiesDescription;
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
 import com.graphaware.common.description.relationship.DetachedRelationshipDescriptionImpl;
 import com.graphaware.common.wrapper.NodeWrapper;
+import com.graphaware.module.relcount.RelationshipCountConfiguration;
 import com.graphaware.runtime.config.BaseRuntimeConfigured;
 import com.graphaware.runtime.config.RuntimeConfigured;
-import com.graphaware.module.relcount.RelationshipCountStrategies;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
@@ -31,7 +31,7 @@ import org.neo4j.graphdb.Relationship;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.graphaware.common.util.DirectionUtils.*;
+import static com.graphaware.common.util.DirectionUtils.resolveDirection;
 
 /**
  * {@link DegreeCache} that caches degrees using {@link DegreeCachingNode}s.
@@ -45,17 +45,17 @@ public class NodeBasedDegreeCache extends BaseRuntimeConfigured implements Degre
     private static final ThreadLocal<Map<Long, DegreeCachingNode>> nodeCache = new ThreadLocal<>();
 
     private final String id;
-    private final RelationshipCountStrategies relationshipCountStrategies;
+    private final RelationshipCountConfiguration relationshipCountConfiguration;
 
     /**
      * Construct a new cache.
      *
      * @param id                          of the module this cache belongs to.
-     * @param relationshipCountStrategies strategies for degree caching.
+     * @param relationshipCountConfiguration strategies for degree caching.
      */
-    public NodeBasedDegreeCache(String id, RelationshipCountStrategies relationshipCountStrategies) {
+    public NodeBasedDegreeCache(String id, RelationshipCountConfiguration relationshipCountConfiguration) {
         this.id = id;
-        this.relationshipCountStrategies = relationshipCountStrategies;
+        this.relationshipCountConfiguration = relationshipCountConfiguration;
     }
 
     /**
@@ -104,7 +104,7 @@ public class NodeBasedDegreeCache extends BaseRuntimeConfigured implements Degre
                 resolveDirection(relationship, pointOfView, defaultDirection),
                 new LiteralPropertiesDescription(relationship));
 
-        int relationshipWeight = relationshipCountStrategies.getWeighingStrategy().getRelationshipWeight(relationship, pointOfView);
+        int relationshipWeight = relationshipCountConfiguration.getWeighingStrategy().getRelationshipWeight(relationship, pointOfView);
 
         DegreeCachingNode cachingNode = cachingNode(unwrap(pointOfView));
         cachingNode.incrementDegree(createdRelationship, relationshipWeight);
@@ -122,7 +122,7 @@ public class NodeBasedDegreeCache extends BaseRuntimeConfigured implements Degre
                 resolveDirection(relationship, pointOfView, defaultDirection),
                 new LiteralPropertiesDescription(relationship));
 
-        int relationshipWeight = relationshipCountStrategies.getWeighingStrategy().getRelationshipWeight(relationship, pointOfView);
+        int relationshipWeight = relationshipCountConfiguration.getWeighingStrategy().getRelationshipWeight(relationship, pointOfView);
 
         DegreeCachingNode cachingNode = cachingNode(unwrap(pointOfView));
         cachingNode.decrementDegree(deletedRelationship, relationshipWeight);
@@ -142,7 +142,7 @@ public class NodeBasedDegreeCache extends BaseRuntimeConfigured implements Degre
         }
 
         if (!nodeCache.containsKey(node.getId())) {
-            nodeCache.put(node.getId(), newDegreeCachingNode(node, getConfig().createPrefix(id), relationshipCountStrategies));
+            nodeCache.put(node.getId(), newDegreeCachingNode(node, getConfig().createPrefix(id), relationshipCountConfiguration));
         }
 
         return nodeCache.get(node.getId());
@@ -154,8 +154,8 @@ public class NodeBasedDegreeCache extends BaseRuntimeConfigured implements Degre
      * @param node to represent.
      * @return degree caching node.
      */
-    protected DegreeCachingNode newDegreeCachingNode(Node node, String prefix, RelationshipCountStrategies strategies) {
-        return new DegreeCachingNode(node, prefix, strategies);
+    protected DegreeCachingNode newDegreeCachingNode(Node node, String prefix, RelationshipCountConfiguration configuration) {
+        return new DegreeCachingNode(node, prefix, configuration);
     }
 
     /**

@@ -16,7 +16,6 @@
 
 package com.graphaware.common.description.property;
 
-import com.graphaware.common.test.IterableUtils;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -24,7 +23,7 @@ import java.util.List;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
-import static com.graphaware.common.test.IterableUtils.*;
+import static com.graphaware.common.test.IterableUtils.toList;
 import static org.junit.Assert.*;
 
 /**

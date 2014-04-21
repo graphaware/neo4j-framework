@@ -16,15 +16,13 @@
 
 package com.graphaware.tx.event.improved;
 
-import com.graphaware.common.strategy.*;
-import com.graphaware.common.test.IterableUtils;
-import com.graphaware.tx.executor.single.*;
-import junit.framework.Assert;
-import com.graphaware.common.test.TestDataBuilder;
 import com.graphaware.common.change.Change;
+import com.graphaware.common.strategy.*;
+import com.graphaware.common.test.TestDataBuilder;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
+import com.graphaware.tx.executor.single.*;
 import org.junit.After;
 import org.junit.Test;
 import org.neo4j.graphdb.*;
@@ -43,7 +41,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.graphaware.common.test.IterableUtils.*;
+import static com.graphaware.common.test.IterableUtils.count;
+import static com.graphaware.common.test.IterableUtils.countNodes;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
@@ -117,7 +116,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
         database.registerTransactionEventHandler(new TransactionEventHandler.Adapter<Void>() {
             @Override
             public Void beforeCommit(TransactionData data) throws Exception {
-                ImprovedTransactionData improvedTransactionData = new FilteredTransactionData(new LazyTransactionData(data), new IncludeNothing());
+                ImprovedTransactionData improvedTransactionData = new FilteredTransactionData(new LazyTransactionData(data), InclusionStrategies.none());
                 assertFalse(improvedTransactionData.mutationsOccurred());
                 assertTrue(improvedTransactionData.hasBeenChanged(database.getNodeById(1)));
                 assertTrue(improvedTransactionData.changedProperties(database.getNodeById(1)).isEmpty());
@@ -1451,72 +1450,34 @@ public class FilteredLazyTransactionDataIntegrationTest {
         @Override
         public Object beforeCommit(TransactionData data) throws Exception {
             LazyTransactionData lazyTransactionData = new LazyTransactionData(data);
-            beforeCommitCallback.doBeforeCommit(new FilteredTransactionData(lazyTransactionData, new InclusionStrategies() {
-                @Override
-                public NodeInclusionStrategy getNodeInclusionStrategy() {
-                    return new NodeInclusionStrategy() {
+
+            beforeCommitCallback.doBeforeCommit(new FilteredTransactionData(lazyTransactionData, new InclusionStrategies(
+                    new NodeInclusionStrategy() {
                         @Override
                         public boolean include(Node node) {
                             return !node.getProperty("name", "").equals("Four") && !node.hasProperty(INTERNAL_NODE_PROPERTY);
                         }
-
-                        @Override
-                        public String asString() {
-                            return "custom";
-                        }
-                    };
-                }
-
-                @Override
-                public NodePropertyInclusionStrategy getNodePropertyInclusionStrategy() {
-                    return new NodePropertyInclusionStrategy() {
+                    },
+                    new NodePropertyInclusionStrategy() {
                         @Override
                         public boolean include(String key, Node propertyContainer) {
                             return !"place".equals(key) && !key.startsWith(INTERNAL_PREFIX);
                         }
-
-                        @Override
-                        public String asString() {
-                            return "custom";
-                        }
-                    };
-                }
-
-                @Override
-                public RelationshipInclusionStrategy getRelationshipInclusionStrategy() {
-                    return new RelationshipInclusionStrategy() {
+                    },
+                    new RelationshipInclusionStrategy() {
                         @Override
                         public boolean include(Relationship relationship) {
                             return !relationship.isType(withName("R3")) && !relationship.getType().name().startsWith(INTERNAL_PREFIX);
                         }
-
-                        @Override
-                        public String asString() {
-                            return "custom";
-                        }
-                    };
-                }
-
+                    }
+                    , new RelationshipPropertyInclusionStrategy() {
                 @Override
-                public RelationshipPropertyInclusionStrategy getRelationshipPropertyInclusionStrategy() {
-                    return new RelationshipPropertyInclusionStrategy() {
-                        @Override
-                        public boolean include(String key, Relationship propertyContainer) {
-                            return !"time".equals(key) && !key.startsWith(INTERNAL_PREFIX);
-                        }
-
-                        @Override
-                        public String asString() {
-                            return "custom";
-                        }
-                    };
+                public boolean include(String key, Relationship propertyContainer) {
+                    return !"time".equals(key) && !key.startsWith(INTERNAL_PREFIX);
                 }
+            }
+            )));
 
-                @Override
-                public String asString() {
-                    return "custom";
-                }
-            }));
             return null;
         }
 
@@ -1666,34 +1627,6 @@ public class FilteredLazyTransactionDataIntegrationTest {
             Node four = database.getNodeById(4);
             four.setProperty("name", "Three");
             four.setProperty("name", "Four");
-        }
-    }
-
-    private class IncludeNothing implements InclusionStrategies {
-
-        @Override
-        public NodeInclusionStrategy getNodeInclusionStrategy() {
-            return IncludeNoNodes.getInstance();
-        }
-
-        @Override
-        public NodePropertyInclusionStrategy getNodePropertyInclusionStrategy() {
-            return IncludeNoNodeProperties.getInstance();
-        }
-
-        @Override
-        public RelationshipInclusionStrategy getRelationshipInclusionStrategy() {
-            return IncludeNoRelationships.getInstance();
-        }
-
-        @Override
-        public RelationshipPropertyInclusionStrategy getRelationshipPropertyInclusionStrategy() {
-            return IncludeNoRelationshipProperties.getInstance();
-        }
-
-        @Override
-        public String asString() {
-            return "nothing";
         }
     }
 }

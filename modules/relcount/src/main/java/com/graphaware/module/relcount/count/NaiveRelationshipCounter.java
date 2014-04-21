@@ -19,8 +19,8 @@ package com.graphaware.module.relcount.count;
 import com.graphaware.common.description.property.LazyPropertiesDescription;
 import com.graphaware.common.description.property.PropertiesDescription;
 import com.graphaware.common.description.relationship.RelationshipDescription;
-import com.graphaware.module.relcount.RelationshipCountStrategies;
-import com.graphaware.module.relcount.RelationshipCountStrategiesImpl;
+import com.graphaware.module.relcount.RelationshipCountConfiguration;
+import com.graphaware.module.relcount.RelationshipCountConfigurationImpl;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
@@ -36,24 +36,24 @@ import static org.neo4j.graphdb.Direction.BOTH;
  */
 public class NaiveRelationshipCounter implements RelationshipCounter {
 
-    private final RelationshipCountStrategies relationshipCountStrategies;
+    private final RelationshipCountConfiguration relationshipCountConfiguration;
 
     /**
      * Construct a new relationship counter with default strategies.
      */
     public NaiveRelationshipCounter() {
-        this(RelationshipCountStrategiesImpl.defaultStrategies());
+        this(RelationshipCountConfigurationImpl.defaultConfiguration());
     }
 
     /**
-     * Construct a new relationship counter. Use when custom {@link com.graphaware.module.relcount.RelationshipCountStrategies} have been used for the
+     * Construct a new relationship counter. Use when custom {@link com.graphaware.module.relcount.RelationshipCountConfiguration} have been used for the
      * {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule}. Alternatively, it might be easier
      * use {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule#naiveCounter()}.
      *
-     * @param relationshipCountStrategies strategies, of which only {@link WeighingStrategy} is used.
+     * @param relationshipCountConfiguration strategies, of which only {@link WeighingStrategy} is used.
      */
-    public NaiveRelationshipCounter(RelationshipCountStrategies relationshipCountStrategies) {
-        this.relationshipCountStrategies = relationshipCountStrategies;
+    public NaiveRelationshipCounter(RelationshipCountConfiguration relationshipCountConfiguration) {
+        this.relationshipCountConfiguration = relationshipCountConfiguration;
     }
 
     /**
@@ -67,7 +67,7 @@ public class NaiveRelationshipCounter implements RelationshipCounter {
             PropertiesDescription candidate = new LazyPropertiesDescription(candidateRelationship);
 
             if (candidate.isMoreSpecificThan(description.getPropertiesDescription())) {
-                int relationshipWeight = relationshipCountStrategies.getWeighingStrategy().getRelationshipWeight(candidateRelationship, node);
+                int relationshipWeight = relationshipCountConfiguration.getWeighingStrategy().getRelationshipWeight(candidateRelationship, node);
                 result = result + relationshipWeight;
 
                 //double count loops if looking for BOTH

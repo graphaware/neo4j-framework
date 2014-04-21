@@ -16,7 +16,6 @@
 
 package com.graphaware.common.strategy;
 
-import com.graphaware.common.config.ConfigurationAsString;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
@@ -24,7 +23,7 @@ import org.neo4j.graphdb.PropertyContainer;
  *
  * @param <T> type of the property container.
  */
-public interface PropertyInclusionStrategy<T extends PropertyContainer> extends ConfigurationAsString {
+public interface PropertyInclusionStrategy<T extends PropertyContainer> {
 
     /**
      * Should a property with the given key of the given property container be included?

@@ -4,12 +4,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
-import java.util.Date;
-
-import static com.graphaware.graphunit.GraphUnit.*;
+import static com.graphaware.graphunit.GraphUnit.assertSameGraph;
+import static com.graphaware.graphunit.GraphUnit.assertSubgraph;
 
 /**
  * Unit test for {@link GraphUnit}.

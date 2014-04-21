@@ -17,14 +17,12 @@
 package com.graphaware.common.strategy;
 
 
-import com.graphaware.common.config.ClassBasedConfigurationAsString;
-import com.graphaware.common.strategy.PropertyInclusionStrategy;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
  * Strategy that ignores all properties.
  */
-public abstract class IncludeNoProperties<T extends PropertyContainer> extends ClassBasedConfigurationAsString implements PropertyInclusionStrategy<T> {
+public abstract class IncludeNoProperties<T extends PropertyContainer> implements PropertyInclusionStrategy<T> {
 
     protected IncludeNoProperties() {
     }

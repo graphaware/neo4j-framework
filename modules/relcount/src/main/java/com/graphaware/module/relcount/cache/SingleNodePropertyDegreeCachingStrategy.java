@@ -37,12 +37,4 @@ public class SingleNodePropertyDegreeCachingStrategy implements DegreeCachingStr
         //noinspection unchecked
         return fromByteArray((byte[]) node.getProperty(prefix), HashMap.class);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String asString() {
-        return "SNP";
-    }
 }

@@ -92,11 +92,23 @@ public class ThresholdBasedCompactionStrategy implements CompactionStrategy {
         return cachedDegrees.size() <= compactionThreshold || performCompaction(node);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public String asString() {
-        return "T" + compactionThreshold;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ThresholdBasedCompactionStrategy that = (ThresholdBasedCompactionStrategy) o;
+
+        if (compactionThreshold != that.compactionThreshold) return false;
+        if (!generalizationStrategy.equals(that.generalizationStrategy)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = compactionThreshold;
+        result = 31 * result + generalizationStrategy.hashCode();
+        return result;
     }
 }

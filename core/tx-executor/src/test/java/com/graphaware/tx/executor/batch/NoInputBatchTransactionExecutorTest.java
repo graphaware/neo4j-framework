@@ -16,17 +16,15 @@
 
 package com.graphaware.tx.executor.batch;
 
-import com.graphaware.common.test.IterableUtils;
 import com.graphaware.tx.executor.NullItem;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.common.test.IterableUtils.*;
+import static com.graphaware.common.test.IterableUtils.countNodes;
 import static org.junit.Assert.assertEquals;
 
 /**

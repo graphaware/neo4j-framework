@@ -16,14 +16,12 @@
 
 package com.graphaware.module.relcount.bootstrap;
 
-import com.graphaware.module.relcount.RelationshipCountStrategies;
-import com.graphaware.module.relcount.RelationshipCountStrategiesImpl;
+import com.graphaware.module.relcount.RelationshipCountConfigurationImpl;
+import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
 import com.graphaware.module.relcount.compact.ThresholdBasedCompactionStrategy;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeModuleBootstrapper;
-import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
 import org.neo4j.graphdb.config.Setting;
-import org.neo4j.kernel.configuration.Config;
 
 import java.util.Map;
 
@@ -40,7 +38,7 @@ public class RelcountModuleBootstrapper implements GraphAwareRuntimeModuleBootst
 
     @Override
     public void bootstrap(GraphAwareRuntime runtime, String moduleId, Map<String, String> config) {
-        RelationshipCountStrategiesImpl relationshipCountStrategies = RelationshipCountStrategiesImpl.defaultStrategies();
+        RelationshipCountConfigurationImpl relationshipCountStrategies = RelationshipCountConfigurationImpl.defaultConfiguration();
 
         if (config.containsKey(THRESHOLD)) {
             relationshipCountStrategies = relationshipCountStrategies.with(new ThresholdBasedCompactionStrategy(Integer.valueOf(config.get(THRESHOLD))));

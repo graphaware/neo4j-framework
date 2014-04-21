@@ -16,7 +16,7 @@
 
 package com.graphaware.tx.event.batch.data;
 
-import org.apache.commons.collections4.*;
+import org.apache.commons.collections4.CollectionUtils;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;

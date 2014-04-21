@@ -35,12 +35,4 @@ public abstract class IncludeNoPropertyContainers<T extends PropertyContainer> i
     public final boolean include(T propertyContainer) {
         return false;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String asString() {
-        return this.getClass().getCanonicalName();
-    }
 }

@@ -24,12 +24,4 @@ public final class OneForEach implements WeighingStrategy {
     public int getRelationshipWeight(Relationship relationship, Node pointOfView) {
         return 1;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String asString() {
-        return "OFE";
-    }
 }

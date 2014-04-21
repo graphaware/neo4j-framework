@@ -16,17 +16,15 @@
 
 package com.graphaware.tx.event.batch;
 
-import com.graphaware.common.test.IterableUtils;
+import com.graphaware.common.change.Change;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserterImpl;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterRelationship;
-import com.graphaware.common.change.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
-import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -46,7 +44,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.graphaware.common.test.IterableUtils.*;
+import static com.graphaware.common.test.IterableUtils.count;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.*;

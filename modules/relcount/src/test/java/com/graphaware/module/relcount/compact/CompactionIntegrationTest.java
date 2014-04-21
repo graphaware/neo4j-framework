@@ -16,8 +16,8 @@
 
 package com.graphaware.module.relcount.compact;
 
+import com.graphaware.module.relcount.RelationshipCountConfigurationImpl;
 import com.graphaware.module.relcount.cache.DegreeCachingNode;
-import com.graphaware.module.relcount.RelationshipCountStrategiesImpl;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.TransactionCallback;
 import com.graphaware.tx.executor.single.TransactionExecutor;
@@ -70,7 +70,7 @@ public class CompactionIntegrationTest {
             public DegreeCachingNode doInTransaction(GraphDatabaseService database) {
                 DegreeCachingNode node = new DegreeCachingNode(
                         database.getNodeById(0), "TEST",
-                        RelationshipCountStrategiesImpl.defaultStrategies().with(compactionStrategy));
+                        RelationshipCountConfigurationImpl.defaultConfiguration().with(compactionStrategy));
 
                 node.incrementDegree(literal("test", OUTGOING).with("k1", equalTo("v1")), 14, true);
                 node.incrementDegree(literal("test", OUTGOING).with("k1", equalTo("v2")), 1, true);
@@ -101,7 +101,7 @@ public class CompactionIntegrationTest {
             public DegreeCachingNode doInTransaction(GraphDatabaseService database) {
                 DegreeCachingNode node = new DegreeCachingNode(
                         database.getNodeById(0), "TEST",
-                        RelationshipCountStrategiesImpl.defaultStrategies().with(compactionStrategy));
+                        RelationshipCountConfigurationImpl.defaultConfiguration().with(compactionStrategy));
 
                 node.incrementDegree(literal("test", OUTGOING).with("k1", equalTo("v1")), 14, true);
                 node.incrementDegree(literal("test", OUTGOING).with("k1", equalTo("v2")), 1, true);
@@ -130,7 +130,7 @@ public class CompactionIntegrationTest {
             public DegreeCachingNode doInTransaction(GraphDatabaseService database) {
                 DegreeCachingNode node = new DegreeCachingNode(
                         database.getNodeById(0), "TEST",
-                        RelationshipCountStrategiesImpl.defaultStrategies().with(compactionStrategy));
+                        RelationshipCountConfigurationImpl.defaultConfiguration().with(compactionStrategy));
 
                 node.incrementDegree(literal("test", OUTGOING).with("k1", equalTo("v1")).with("k2", equalTo("v1")), 1, true);
                 node.incrementDegree(literal("test", OUTGOING).with("k1", equalTo("v1")).with("k2", equalTo("v2")), 1, true);
@@ -163,7 +163,7 @@ public class CompactionIntegrationTest {
             public DegreeCachingNode doInTransaction(GraphDatabaseService database) {
                 DegreeCachingNode node = new DegreeCachingNode(
                         database.getNodeById(0), "TEST",
-                        RelationshipCountStrategiesImpl.defaultStrategies().with(compactionStrategy));
+                        RelationshipCountConfigurationImpl.defaultConfiguration().with(compactionStrategy));
 
                 node.incrementDegree(literal("test", OUTGOING).with("z1", equalTo("v1")).with("k2", equalTo("v1")).with("k3", equalTo("v1")), 1, true);
                 node.incrementDegree(literal("test", OUTGOING).with("z1", equalTo("v1")).with("k2", equalTo("v2")).with("k3", equalTo("v2")), 1, true);
@@ -192,7 +192,7 @@ public class CompactionIntegrationTest {
             public DegreeCachingNode doInTransaction(GraphDatabaseService database) {
                 DegreeCachingNode node = new DegreeCachingNode(
                         database.getNodeById(0), "TEST",
-                        RelationshipCountStrategiesImpl.defaultStrategies().with(compactionStrategy));
+                        RelationshipCountConfigurationImpl.defaultConfiguration().with(compactionStrategy));
 
                 node.incrementDegree(literal("test", OUTGOING).with("k1", equalTo("v1")).with("k2", equalTo("v1")).with("k3", equalTo("v1")), 1);
                 node.incrementDegree(literal("test", OUTGOING).with("k1", equalTo("v1")).with("k2", equalTo("v2")).with("k3", equalTo("v2")), 1);
@@ -231,7 +231,7 @@ public class CompactionIntegrationTest {
             public DegreeCachingNode doInTransaction(GraphDatabaseService database) {
                 DegreeCachingNode node = new DegreeCachingNode(
                         database.getNodeById(0), "TEST",
-                        RelationshipCountStrategiesImpl.defaultStrategies().with(compactionStrategy));
+                        RelationshipCountConfigurationImpl.defaultConfiguration().with(compactionStrategy));
 
                 node.incrementDegree(literal("ONE", INCOMING).with("k1", equalTo("v1")).with("k2", equalTo("v2")), 1, true);
                 node.incrementDegree(literal("ONE", INCOMING).with("k1", any()).with("w", any()), 2, true);
@@ -257,7 +257,7 @@ public class CompactionIntegrationTest {
             public DegreeCachingNode doInTransaction(GraphDatabaseService database) {
                 DegreeCachingNode node = new DegreeCachingNode(
                         database.getNodeById(0), "TEST",
-                        RelationshipCountStrategiesImpl.defaultStrategies().with(compactionStrategy));
+                        RelationshipCountConfigurationImpl.defaultConfiguration().with(compactionStrategy));
 
                 node.incrementDegree(literal("ONE", INCOMING).with("k1", any()), 1);
                 node.incrementDegree(literal("ONE", INCOMING).with("k2", any()), 2);
@@ -283,7 +283,7 @@ public class CompactionIntegrationTest {
             public DegreeCachingNode doInTransaction(GraphDatabaseService database) {
                 DegreeCachingNode node = new DegreeCachingNode(
                         database.getNodeById(0), "TEST",
-                        RelationshipCountStrategiesImpl.defaultStrategies().with(compactionStrategy));
+                        RelationshipCountConfigurationImpl.defaultConfiguration().with(compactionStrategy));
 
                 node.incrementDegree(literal("ONE", INCOMING).with("level", equalTo(1)).with("timestamp", equalTo(1)), 1, true);
                 node.incrementDegree(literal("ONE", INCOMING).with("level", equalTo(2)).with("timestamp", equalTo(2)), 1, true);
@@ -319,7 +319,7 @@ public class CompactionIntegrationTest {
             public DegreeCachingNode doInTransaction(GraphDatabaseService database) {
                 DegreeCachingNode node = new DegreeCachingNode(
                         database.getNodeById(0), "TEST",
-                        RelationshipCountStrategiesImpl.defaultStrategies().with(compactionStrategy));
+                        RelationshipCountConfigurationImpl.defaultConfiguration().with(compactionStrategy));
 
                 node.incrementDegree(literal("ONE", INCOMING).with("level", equalTo(1)).with("timestamp", equalTo(1)), 1, true);
                 node.incrementDegree(literal("ONE", INCOMING).with("level", equalTo(2)).with("timestamp", equalTo(2)), 1, true);
