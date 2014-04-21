@@ -1,6 +1,5 @@
 package com.graphaware.graphunit;
 
-import com.graphaware.common.util.PropertyContainerUtils;
 import org.apache.log4j.Logger;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.*;
@@ -9,7 +8,7 @@ import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.*;
 
-import static com.graphaware.common.util.PropertyContainerUtils.*;
+import static com.graphaware.common.util.PropertyContainerUtils.valueToString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.neo4j.graphdb.Direction.OUTGOING;
@@ -175,8 +174,10 @@ public final class GraphUnit {
 
     private static boolean relationshipsMappingExists(GraphDatabaseService database, GraphDatabaseService otherDatabase, Map<Long, Long> mapping) {
         LOG.debug("Attempting a node mapping...");
+
+        Set<Long> usedRelationships = new HashSet<>();
         for (Relationship relationship : at(otherDatabase).getAllRelationships()) {
-            if (!relationshipMappingExists(database, relationship, mapping)) {
+            if (!relationshipMappingExists(database, relationship, mapping, usedRelationships)) {
                 LOG.debug("Failure... No corresponding relationship found to: " + relationshipToString(relationship));
                 return false;
             }
@@ -187,17 +188,19 @@ public final class GraphUnit {
     }
 
     private static void assertRelationshipsMappingExistsForSingleNodeMapping(GraphDatabaseService database, GraphDatabaseService otherDatabase, Map<Long, Long> mapping) {
+        Set<Long> usedRelationships = new HashSet<>();
         for (Relationship relationship : at(otherDatabase).getAllRelationships()) {
-            if (!relationshipMappingExists(database, relationship, mapping)) {
+            if (!relationshipMappingExists(database, relationship, mapping, usedRelationships)) {
                 fail("No corresponding relationship found to: " + relationshipToString(relationship));
             }
         }
     }
 
-    private static boolean relationshipMappingExists(GraphDatabaseService database, Relationship relationship, Map<Long, Long> nodeMapping) {
+    private static boolean relationshipMappingExists(GraphDatabaseService database, Relationship relationship, Map<Long, Long> nodeMapping, Set<Long> usedRelationships) {
         for (Relationship candidate : database.getNodeById(nodeMapping.get(relationship.getStartNode().getId())).getRelationships(OUTGOING)) {
             if (nodeMapping.get(relationship.getEndNode().getId()).equals(candidate.getEndNode().getId())) {
-                if (areSame(candidate, relationship)) {
+                if (areSame(candidate, relationship) && !usedRelationships.contains(candidate.getId())) {
+                    usedRelationships.add(candidate.getId());
                     return true;
                 }
             }
