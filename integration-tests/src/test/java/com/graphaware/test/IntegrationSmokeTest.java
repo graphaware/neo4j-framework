@@ -101,7 +101,6 @@ public class IntegrationSmokeTest {
 
     @Test
     public void graphAwareRuntimeWithModulesWorkWhenProperlyConfigured() throws IOException, InterruptedException {
-        System.setProperty("com.graphaware.runtime.enabled", "true");
         setUp("neo4j-server-runtime-and-relcount.properties");
     }
 
