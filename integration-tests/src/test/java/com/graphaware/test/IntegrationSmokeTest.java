@@ -21,8 +21,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.server.Bootstrapper;
 import org.neo4j.server.configuration.Configurator;
@@ -37,16 +35,15 @@ import static junit.framework.Assert.assertTrue;
 /**
  *
  */
-@Ignore
+//@Ignore
 public class IntegrationSmokeTest {
 
-    private Thread thread;
+    private Bootstrapper bootstrapper;
 
-    @Before
-    public void setUp() throws IOException, InterruptedException {
+    private void setUp(String serverConfig) throws IOException, InterruptedException {
         deleteTempDir();
 
-        ClassPathResource classPathResource = new ClassPathResource("neo4j-server.properties");
+        ClassPathResource classPathResource = new ClassPathResource(serverConfig);
 
         assertTrue(classPathResource.exists());
 
@@ -54,10 +51,12 @@ public class IntegrationSmokeTest {
 
         System.setProperty(Configurator.NEO_SERVER_CONFIG_FILE_KEY, path);
 
-        thread = new Thread(new Runnable() {
+        bootstrapper = Bootstrapper.loadMostDerivedBootstrapper();
+
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                Bootstrapper.main(new String[0]);
+                bootstrapper.start(new String[0]);
             }
         });
 
@@ -68,7 +67,7 @@ public class IntegrationSmokeTest {
 
     @After
     public void tearDown() throws IOException, InterruptedException {
-        thread.stop();
+        bootstrapper.stop();
     }
 
     private void deleteTempDir() throws IOException {
@@ -76,7 +75,9 @@ public class IntegrationSmokeTest {
     }
 
     @Test
-    public void testNothing() throws InterruptedException {
+    public void graphAwareApisAreMountedWhenPresentOnClasspath() throws InterruptedException, IOException {
+        setUp("neo4j-server-no-runtime.properties");
+
         TestUtils.post("http://localhost:7474/db/data/cypher",
                 "{\"query\" : \"" +
                         "CREATE (one:L1:L2 { name:\\\"one\\\" }) " +
@@ -96,6 +97,12 @@ public class IntegrationSmokeTest {
         assertJsonEquals(TestUtils.post("http://localhost:7474/graphaware/api/library/algorithm/path/increasinglyLongerShortestPath",
                 jsonAsString("minimalInput"), HttpStatus.OK_200),
                 jsonAsString("minimalOutput"));
+    }
+
+    @Test
+    public void graphAwareRuntimeWithModulesWorkWhenProperlyConfigured() throws IOException, InterruptedException {
+        System.setProperty("com.graphaware.runtime.enabled", "true");
+        setUp("neo4j-server-runtime-and-relcount.properties");
     }
 
     private String jsonAsString(String fileName) {

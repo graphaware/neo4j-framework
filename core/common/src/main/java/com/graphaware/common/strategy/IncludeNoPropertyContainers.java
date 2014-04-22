@@ -14,10 +14,8 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.strategy;
+package com.graphaware.common.strategy;
 
-
-import com.graphaware.common.strategy.PropertyContainerInclusionStrategy;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**

@@ -18,6 +18,8 @@ package com.graphaware.common.description.predicate;
 
 import com.graphaware.common.description.BasePartiallyComparable;
 
+import static com.graphaware.common.util.ArrayUtils.isPrimitiveOrStringArray;
+
 /**
  * Base-class for {@link Predicate} implementations.
  */
@@ -63,48 +65,6 @@ abstract class BasePredicate extends BasePartiallyComparable<Predicate> implemen
         if (!isPrimitiveOrString(value) && !isPrimitiveOrStringArray(value) && !UndefinedValue.getInstance().equals(value)) {
             throw new IllegalArgumentException("Value must be a primitive, a String, an array of primitives, or an array of Strings");
         }
-    }
-
-    /**
-     * Check if the given object is a primitive array.
-     *
-     * @param o to check.
-     * @return true iff o is a primitive array.
-     */
-    private boolean isPrimitiveArray(Object o) {
-        if (o instanceof byte[]) {
-            return true;
-        } else if (o instanceof char[]) {
-            return true;
-        } else if (o instanceof boolean[]) {
-            return true;
-        } else if (o instanceof long[]) {
-            return true;
-        } else if (o instanceof double[]) {
-            return true;
-        } else if (o instanceof int[]) {
-            return true;
-        } else if (o instanceof short[]) {
-            return true;
-        } else if (o instanceof float[]) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Check if the given object is a primitive array or an array of Strings.
-     *
-     * @param o to check.
-     * @return true iff o is a primitive array or an array of Strings.
-     */
-    private boolean isPrimitiveOrStringArray(Object o) {
-        if (isPrimitiveArray(o)) {
-            return true;
-        } else if (o instanceof String[]) {
-            return true;
-        }
-        return false;
     }
 
     /**

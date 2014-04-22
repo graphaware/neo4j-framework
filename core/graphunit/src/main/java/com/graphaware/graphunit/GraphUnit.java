@@ -343,6 +343,4 @@ public final class GraphUnit {
 
         return string.toString();
     }
-
-
 }

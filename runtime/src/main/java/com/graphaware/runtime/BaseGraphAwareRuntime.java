@@ -415,11 +415,11 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
      */
     @Override
     public final void beforeShutdown() {
-        LOG.info("Shutting down GraphAware... ");
+        LOG.info("Shutting down GraphAware Runtime... ");
         for (GraphAwareRuntimeModule module : modules) {
             module.shutdown();
         }
-        LOG.info("GraphAware shut down.");
+        LOG.info("GraphAware Runtime shut down.");
     }
 
     /**
