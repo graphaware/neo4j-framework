@@ -72,26 +72,44 @@ public class RelationshipCountBatchIntegrationTest {
     }
 
     @Test
-    public void noRuntime() {
+    public void naiveCounterShouldWorkWithoutRuntime() {
         setUpTwoNodes();
         simulateInserts();
         startDatabase();
 
-        verifyCounts(1, new NaiveRelationshipCounter());
-        verifyCounts(0, new CachedRelationshipCounter());
-        verifyCounts(0, new FallbackRelationshipCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
     }
 
     @Test
-    public void noRuntime2() {
+    public void naiveCounterShouldRespectWeighingWithoutRuntime() {
         setUpTwoNodes();
-        simulateInserts();
         simulateInserts();
         startDatabase();
 
-        verifyCounts(2, new NaiveRelationshipCounter());
-        verifyCounts(0, new CachedRelationshipCounter());
-        verifyCounts(0, new FallbackRelationshipCounter());
+        verifyCounts(2, new NaiveRelationshipCounter(database, new WeighingStrategy() {
+            @Override
+            public int getRelationshipWeight(Relationship relationship, Node pointOfView) {
+                return 2;
+            }
+        }));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void cachedCounterShouldNotWorkWithoutRuntime() {
+        setUpTwoNodes();
+        simulateInserts();
+        startDatabase();
+
+        verifyCounts(0, new CachedRelationshipCounter(database));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void fallBackCounterShouldNotWorkWithoutRuntime() {
+        setUpTwoNodes();
+        simulateInserts();
+        startDatabase();
+
+        verifyCounts(0, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -116,9 +134,9 @@ public class RelationshipCountBatchIntegrationTest {
 
         startDatabase();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -132,9 +150,9 @@ public class RelationshipCountBatchIntegrationTest {
         simulateInserts();
         startDatabase();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -148,9 +166,9 @@ public class RelationshipCountBatchIntegrationTest {
         simulateInserts();
         startDatabase();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
 
         database.shutdown();
 
@@ -163,9 +181,9 @@ public class RelationshipCountBatchIntegrationTest {
 
         startDatabase();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCompactedCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCompactedCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
 
         database.shutdown();
 
@@ -178,9 +196,9 @@ public class RelationshipCountBatchIntegrationTest {
 
         startDatabase();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -195,9 +213,9 @@ public class RelationshipCountBatchIntegrationTest {
 
         startDatabase();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -211,9 +229,9 @@ public class RelationshipCountBatchIntegrationTest {
         simulateInserts();
         startDatabase();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -228,9 +246,9 @@ public class RelationshipCountBatchIntegrationTest {
 
         startDatabase();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -252,9 +270,9 @@ public class RelationshipCountBatchIntegrationTest {
         simulateInserts();
         startDatabase();
 
-        verifyWeightedCounts(1, module.naiveCounter());
-        verifyWeightedCounts(1, module.cachedCounter());
-        verifyWeightedCounts(1, module.fallbackCounter());
+        verifyWeightedCounts(1, new NaiveRelationshipCounter(database));
+        verifyWeightedCounts(1, new CachedRelationshipCounter(database));
+        verifyWeightedCounts(1, new FallbackRelationshipCounter(database));
     }
 
 
@@ -271,9 +289,9 @@ public class RelationshipCountBatchIntegrationTest {
         simulateInserts();
         startDatabase();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCompactedCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCompactedCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -290,9 +308,9 @@ public class RelationshipCountBatchIntegrationTest {
         simulateInserts();
         startDatabase();
 
-        verifyCounts(2, module.naiveCounter());
-        verifyCompactedCounts(2, module.cachedCounter());
-        verifyCounts(2, module.fallbackCounter());
+        verifyCounts(2, new NaiveRelationshipCounter(database));
+        verifyCompactedCounts(2, new CachedRelationshipCounter(database));
+        verifyCounts(2, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -311,7 +329,7 @@ public class RelationshipCountBatchIntegrationTest {
         try (Transaction tx = database.beginTx()) {
 
             try {
-                module.cachedCounter().count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(2)).with(TIMESTAMP, equalTo("123")).with(K1, equalTo("V1")));
+                new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(2)).with(TIMESTAMP, equalTo("123")).with(K1, equalTo("V1")));
                 fail();
             } catch (UnableToCountException e) {
                 //OK
@@ -344,8 +362,8 @@ public class RelationshipCountBatchIntegrationTest {
         simulateInserts();
         startDatabase();
 
-        verifyWeightedCounts(4, module.fallbackCounter());
-        verifyWeightedCounts(4, module.naiveCounter());
+        verifyWeightedCounts(4, new FallbackRelationshipCounter(database));
+        verifyWeightedCounts(4, new NaiveRelationshipCounter(database));
     }
 
     @Test
@@ -370,13 +388,13 @@ public class RelationshipCountBatchIntegrationTest {
         simulateInserts();
         startDatabase();
 
-        verifyCounts(2, module1.naiveCounter());
-        verifyCounts(2, module1.cachedCounter());
-        verifyCounts(2, module1.fallbackCounter());
+        verifyCounts(2, new NaiveRelationshipCounter(database, "M1"));
+        verifyCounts(2, new CachedRelationshipCounter(database, "M1"));
+        verifyCounts(2, new FallbackRelationshipCounter(database, "M1"));
 
-        verifyWeightedCounts(2, module2.naiveCounter());
-        verifyWeightedCounts(2, module2.cachedCounter());
-        verifyWeightedCounts(2, module2.fallbackCounter());
+        verifyWeightedCounts(2, new NaiveRelationshipCounter(database, "M2"));
+        verifyWeightedCounts(2, new CachedRelationshipCounter(database, "M2"));
+        verifyWeightedCounts(2, new FallbackRelationshipCounter(database, "M2"));
     }
 
     @Test
@@ -402,9 +420,9 @@ public class RelationshipCountBatchIntegrationTest {
         try (Transaction tx = database.beginTx()) {
 
             //naive doesn't care about this strategy
-            assertEquals(2, module.naiveCounter().count(database.getNodeById(1), wildcard(TWO, OUTGOING)));
-            assertEquals(0, module.fallbackCounter().count(database.getNodeById(1), wildcard(TWO, OUTGOING)));
-            assertEquals(0, module.cachedCounter().count(database.getNodeById(1), wildcard(TWO, OUTGOING)));
+            assertEquals(2, new NaiveRelationshipCounter(database).count(database.getNodeById(1), wildcard(TWO, OUTGOING)));
+            assertEquals(0, new FallbackRelationshipCounter(database).count(database.getNodeById(1), wildcard(TWO, OUTGOING)));
+            assertEquals(0, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard(TWO, OUTGOING)));
 
             tx.success();
         }
@@ -434,12 +452,12 @@ public class RelationshipCountBatchIntegrationTest {
         try (Transaction tx = database.beginTx()) {
 
             //naive doesn't care about this strategy
-            assertEquals(2, module.naiveCounter().count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
-            assertEquals(2, module.naiveCounter().count(database.getNodeById(1), literal(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
-            assertEquals(0, module.fallbackCounter().count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
-            assertEquals(0, module.fallbackCounter().count(database.getNodeById(1), literal(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
-            assertEquals(0, module.cachedCounter().count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
-            assertEquals(0, module.cachedCounter().count(database.getNodeById(1), literal(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
+            assertEquals(2, new NaiveRelationshipCounter(database).count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
+            assertEquals(2, new NaiveRelationshipCounter(database).count(database.getNodeById(1), literal(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
+            assertEquals(0, new FallbackRelationshipCounter(database).count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
+            assertEquals(0, new FallbackRelationshipCounter(database).count(database.getNodeById(1), literal(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
+            assertEquals(0, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
+            assertEquals(0, new CachedRelationshipCounter(database).count(database.getNodeById(1), literal(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
 
             tx.success();
         }
@@ -461,9 +479,9 @@ public class RelationshipCountBatchIntegrationTest {
 
         startDatabase();
 
-        verifyCounts(100, module.naiveCounter());
-        verifyCounts(100, module.cachedCounter());
-        verifyCounts(100, module.fallbackCounter());
+        verifyCounts(100, new NaiveRelationshipCounter(database));
+        verifyCounts(100, new CachedRelationshipCounter(database));
+        verifyCounts(100, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -483,13 +501,13 @@ public class RelationshipCountBatchIntegrationTest {
 
         startDatabase();
 
-        verifyCounts(20, module1.naiveCounter());
-        verifyCompactedCounts(20, module1.cachedCounter());
-        verifyCounts(20, module1.fallbackCounter());
+        verifyCounts(20, new NaiveRelationshipCounter(database, "M1"));
+        verifyCompactedCounts(20, new CachedRelationshipCounter(database, "M1"));
+        verifyCounts(20, new FallbackRelationshipCounter(database, "M1"));
 
-        verifyCounts(20, module2.naiveCounter());
-        verifyCompactedCounts(20, module2.cachedCounter());
-        verifyCounts(20, module2.fallbackCounter());
+        verifyCounts(20, new NaiveRelationshipCounter(database, "M2"));
+        verifyCompactedCounts(20, new CachedRelationshipCounter(database, "M2"));
+        verifyCounts(20, new FallbackRelationshipCounter(database, "M2"));
     }
 
     private void verifyCounts(int factor, RelationshipCounter counter) {

@@ -17,8 +17,16 @@
 package com.graphaware.module.relcount.cache;
 
 import com.graphaware.common.description.relationship.DetachedRelationshipDescription;
+import com.graphaware.common.description.serialize.Serializer;
+import com.graphaware.module.relcount.RelationshipCountConfiguration;
+import com.graphaware.module.relcount.RelationshipCountConfigurationImpl;
+import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
+import com.graphaware.module.relcount.count.CachedRelationshipCounter;
 import com.graphaware.module.relcount.count.RelationshipCounter;
+import com.graphaware.runtime.BaseGraphAwareRuntime;
 import com.graphaware.runtime.NeedsInitializationException;
+import com.graphaware.runtime.ProductionGraphAwareRuntime;
+import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.TransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
@@ -26,6 +34,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
@@ -55,6 +64,8 @@ public abstract class DegreeCachingNodeIntegrationTest {
             tx.success();
         }
 
+        setUpModuleConfig();
+
         txExecutor = new SimpleTransactionExecutor(database);
     }
 
@@ -65,7 +76,9 @@ public abstract class DegreeCachingNodeIntegrationTest {
 
     protected abstract DegreeCachingNode cachingNode();
 
-    protected abstract RelationshipCounter counter();
+    protected RelationshipCounter counter() {
+        return new CachedRelationshipCounter(database);
+    }
 
     @Test
     public void correctNodeIdShouldBeReturned() {
@@ -387,4 +400,15 @@ public abstract class DegreeCachingNodeIntegrationTest {
             }
         });
     }
+
+    private void setUpModuleConfig() {
+        try (Transaction tx = database.beginTx()) {
+            Node root = ProductionGraphAwareRuntime.getOrCreateRoot(database);
+            String key = DefaultRuntimeConfiguration.getInstance().createPrefix(BaseGraphAwareRuntime.RUNTIME) + RelationshipCountRuntimeModule.FULL_RELCOUNT_DEFAULT_ID;
+            root.setProperty(key, Serializer.toString(getConfiguration(), BaseGraphAwareRuntime.CONFIG));
+            tx.success();
+        }
+    }
+
+    protected abstract RelationshipCountConfiguration getConfiguration();
 }

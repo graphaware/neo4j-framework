@@ -23,6 +23,7 @@ import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.apache.log4j.Logger;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
 /**
@@ -45,9 +46,8 @@ public class FallbackRelationshipCounter implements RelationshipCounter {
 
     private static final Logger LOG = Logger.getLogger(FallbackRelationshipCounter.class);
 
-    private final String id;
-    private final RuntimeConfiguration config;
-    private final RelationshipCountConfiguration strategies;
+    private final NaiveRelationshipCounter naiveRelationshipCounter;
+    private final CachedRelationshipCounter cachedRelationshipCounter;
 
     /**
      * Construct a new relationship counter with default settings. Use this constructor when
@@ -56,8 +56,8 @@ public class FallbackRelationshipCounter implements RelationshipCounter {
      * no custom {@link com.graphaware.module.relcount.RelationshipCountConfiguration} are in use. If unsure, it is always easy and correct to instantiate
      * this counter through {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule#fallbackCounter()} .
      */
-    public FallbackRelationshipCounter() {
-        this(RelationshipCountRuntimeModule.FULL_RELCOUNT_DEFAULT_ID, DefaultRuntimeConfiguration.getInstance(), RelationshipCountConfigurationImpl.defaultConfiguration());
+    public FallbackRelationshipCounter(GraphDatabaseService database) {
+        this(database, RelationshipCountRuntimeModule.FULL_RELCOUNT_DEFAULT_ID);
     }
 
     /**
@@ -68,10 +68,9 @@ public class FallbackRelationshipCounter implements RelationshipCounter {
      * @param config     used with the {@link com.graphaware.runtime.ProductionGraphAwareRuntime}.
      * @param strategies for counting relationships, provided to the {@link com.graphaware.module.relcount.RelationshipCountRuntimeModule}.
      */
-    public FallbackRelationshipCounter(String id, RuntimeConfiguration config, RelationshipCountConfiguration strategies) {
-        this.id = id;
-        this.strategies = strategies;
-        this.config = config;
+    public FallbackRelationshipCounter(GraphDatabaseService database, String id) {
+        this.naiveRelationshipCounter = new NaiveRelationshipCounter(database, id);
+        this.cachedRelationshipCounter = new CachedRelationshipCounter(database, id);
     }
 
     /**
@@ -80,11 +79,11 @@ public class FallbackRelationshipCounter implements RelationshipCounter {
     @Override
     public int count(Node node, RelationshipDescription description) {
         try {
-            return new CachedRelationshipCounter(id, config, strategies).count(node, description);
+            return cachedRelationshipCounter.count(node, description);
         } catch (UnableToCountException e) {
             LOG.warn("Unable to count relationships with description: " + description.toString() +
                     " for node " + node.toString() + ". Falling back to naive approach");
-            return new NaiveRelationshipCounter(strategies).count(node, description);
+            return naiveRelationshipCounter.count(node, description);
         }
     }
 }

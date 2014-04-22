@@ -5,16 +5,19 @@ import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphalgo.PathFinder;
+import org.neo4j.graphalgo.impl.path.AllSimplePaths;
+import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.traversal.*;
+import org.neo4j.kernel.StandardExpander;
+import org.neo4j.kernel.Traversal;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.TimeZone;
 
 import static com.graphaware.graphunit.GraphUnit.assertSameGraph;
 import static com.graphaware.library.algo.timetree.TimeTreeImpl.VALUE_PROPERTY;
+import static com.graphaware.library.algo.timetree.TimeTreeRelationshipTypes.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

@@ -86,7 +86,7 @@ public class CachedRelationshipCounterTest {
         int count;
 
         try (Transaction tx = database.beginTx()) {
-            count = new CachedRelationshipCounter().count(database.getNodeById(nodeId), description);
+            count = new CachedRelationshipCounter(database).count(database.getNodeById(nodeId), description);
             tx.success();
         }
 

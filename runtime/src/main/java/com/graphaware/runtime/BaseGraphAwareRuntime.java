@@ -38,7 +38,7 @@ import java.util.*;
  */
 public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
     static final String FORCE_INITIALIZATION = "FORCE_INIT:";
-    static final String CONFIG = "CONFIG:";
+    public static final String CONFIG = "CONFIG:";
 
     public static final String RUNTIME = "RUNTIME";
 

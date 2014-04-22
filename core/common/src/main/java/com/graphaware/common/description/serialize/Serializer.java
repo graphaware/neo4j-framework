@@ -25,6 +25,7 @@ import com.graphaware.common.description.relationship.DetachedRelationshipDescri
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
+import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.objenesis.strategy.StdInstantiatorStrategy;
 
 import java.io.ByteArrayOutputStream;
@@ -124,5 +125,4 @@ public final class Serializer {
     public static <T> T fromString(String string, Class<T> clazz, String prefix) {
         return fromByteArray(Base64.decode(string.substring(prefix.length())), clazz);
     }
-
 }

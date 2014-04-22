@@ -86,34 +86,6 @@ public class RelationshipCountRuntimeModule extends BaseRuntimeConfigured implem
     }
 
     /**
-     * Construct a {@link com.graphaware.module.relcount.count.CachedRelationshipCounter} that will count the relationships cached by this module.
-     *
-     * @return counter.
-     */
-    public RelationshipCounter cachedCounter() {
-        return new CachedRelationshipCounter(getId(), getConfig(), relationshipCountConfiguration);
-    }
-
-    /**
-     * Construct a {@link com.graphaware.module.relcount.count.FallbackRelationshipCounter} that will count the relationships cached by this module.
-     *
-     * @return counter.
-     */
-    public RelationshipCounter fallbackCounter() {
-        return new FallbackRelationshipCounter(getId(), getConfig(), relationshipCountConfiguration);
-    }
-
-    /**
-     * Construct a {@link com.graphaware.module.relcount.count.NaiveRelationshipCounter} that will count relationships using the same configuration as
-     * this module.
-     *
-     * @return counter.
-     */
-    public RelationshipCounter naiveCounter() {
-        return new NaiveRelationshipCounter(relationshipCountConfiguration);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override

@@ -19,11 +19,23 @@ package com.graphaware.module.relcount.count;
 import com.graphaware.common.description.property.LazyPropertiesDescription;
 import com.graphaware.common.description.property.PropertiesDescription;
 import com.graphaware.common.description.relationship.RelationshipDescription;
+import com.graphaware.common.description.serialize.Serializer;
 import com.graphaware.module.relcount.RelationshipCountConfiguration;
 import com.graphaware.module.relcount.RelationshipCountConfigurationImpl;
+import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
+import com.graphaware.runtime.BaseGraphAwareRuntime;
+import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
+import com.graphaware.runtime.config.RuntimeConfiguration;
+import org.apache.log4j.Logger;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.tooling.GlobalGraphOperations;
 
+import static com.graphaware.runtime.BaseGraphAwareRuntime.CONFIG;
+import static com.graphaware.runtime.BaseGraphAwareRuntime.RUNTIME;
+import static com.graphaware.runtime.ProductionGraphAwareRuntime.getOrCreateRoot;
 import static org.neo4j.graphdb.Direction.BOTH;
 
 /**
@@ -36,13 +48,23 @@ import static org.neo4j.graphdb.Direction.BOTH;
  */
 public class NaiveRelationshipCounter implements RelationshipCounter {
 
+    private static final Logger LOG = Logger.getLogger(NaiveRelationshipCounter.class);
+
     private final RelationshipCountConfiguration relationshipCountConfiguration;
 
     /**
      * Construct a new relationship counter with default strategies.
      */
-    public NaiveRelationshipCounter() {
-        this(RelationshipCountConfigurationImpl.defaultConfiguration());
+    public NaiveRelationshipCounter(GraphDatabaseService database) {
+        this(database, RelationshipCountRuntimeModule.FULL_RELCOUNT_DEFAULT_ID);
+    }
+
+    public NaiveRelationshipCounter(GraphDatabaseService database, String id) {
+        this(database, id, OneForEach.getInstance());
+    }
+
+    public NaiveRelationshipCounter(GraphDatabaseService database,WeighingStrategy weighingStrategy) {
+        this(database, RelationshipCountRuntimeModule.FULL_RELCOUNT_DEFAULT_ID, weighingStrategy);
     }
 
     /**
@@ -52,8 +74,22 @@ public class NaiveRelationshipCounter implements RelationshipCounter {
      *
      * @param relationshipCountConfiguration strategies, of which only {@link WeighingStrategy} is used.
      */
-    public NaiveRelationshipCounter(RelationshipCountConfiguration relationshipCountConfiguration) {
-        this.relationshipCountConfiguration = relationshipCountConfiguration;
+    protected NaiveRelationshipCounter(GraphDatabaseService database, String id, WeighingStrategy weighingStrategy) {
+        try (Transaction tx = database.beginTx()) {
+            if (!GlobalGraphOperations.at(database).getAllNodesWithLabel(RuntimeConfiguration.GA_ROOT).iterator().hasNext()) {
+                this.relationshipCountConfiguration = RelationshipCountConfigurationImpl.defaultConfiguration().with(weighingStrategy);
+            } else {
+                String key = DefaultRuntimeConfiguration.getInstance().createPrefix(RUNTIME) + id;
+                Node root = getOrCreateRoot(database);
+                if (!root.hasProperty(key)) {
+                    this.relationshipCountConfiguration = RelationshipCountConfigurationImpl.defaultConfiguration().with(weighingStrategy);
+                } else {
+                    String string = getOrCreateRoot(database).getProperty(key).toString();
+                    this.relationshipCountConfiguration = Serializer.fromString(string, RelationshipCountConfigurationImpl.class, CONFIG);
+                }
+            }
+            tx.success();
+        }
     }
 
     /**

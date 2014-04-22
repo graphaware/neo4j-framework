@@ -11,7 +11,6 @@ import com.graphaware.module.relcount.count.WeighingStrategy;
 import com.graphaware.runtime.config.BaseRuntimeModuleConfiguration;
 import com.graphaware.runtime.strategy.IncludeAllBusinessRelationshipProperties;
 import com.graphaware.runtime.strategy.IncludeAllBusinessRelationships;
-import com.sun.org.apache.bcel.internal.generic.GETFIELD;
 
 /**
  * {@link RelationshipCountConfiguration}, providing static factory method for a default configuration and "with"
@@ -53,7 +52,7 @@ public class RelationshipCountConfigurationImpl extends BaseRuntimeModuleConfigu
      *                                      strategy.
      * @param weighingStrategy              strategy.
      */
-    private RelationshipCountConfigurationImpl(InclusionStrategies inclusionStrategies, DegreeCachingStrategy degreeCachingStrategy, CompactionStrategy compactionStrategy, WeighingStrategy weighingStrategy) {
+    protected RelationshipCountConfigurationImpl(InclusionStrategies inclusionStrategies, DegreeCachingStrategy degreeCachingStrategy, CompactionStrategy compactionStrategy, WeighingStrategy weighingStrategy) {
         super(inclusionStrategies);
         this.degreeCachingStrategy = degreeCachingStrategy;
         this.compactionStrategy = compactionStrategy;

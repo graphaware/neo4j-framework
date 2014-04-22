@@ -64,24 +64,40 @@ public class RelationshipCountIntegrationTest {
     }
 
     @Test
-    public void noRuntime() {
+    public void naiveCounterShouldWorkWithoutRuntime() {
         setUpTwoNodes();
         simulateUsage();
 
-        verifyCounts(1, new NaiveRelationshipCounter());
-        verifyCounts(0, new CachedRelationshipCounter());
-        verifyCounts(0, new FallbackRelationshipCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
     }
 
     @Test
-    public void noRuntime2() {
+    public void naiveCounterShouldRespectWeighingWithoutRuntime() {
         setUpTwoNodes();
         simulateUsage();
+
+        verifyCounts(2, new NaiveRelationshipCounter(database, new WeighingStrategy() {
+            @Override
+            public int getRelationshipWeight(Relationship relationship, Node pointOfView) {
+                return 2;
+            }
+        }));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void cachedCounterShouldNotWorkWithoutRuntime() {
+        setUpTwoNodes();
         simulateUsage();
 
-        verifyCounts(2, new NaiveRelationshipCounter());
-        verifyCounts(0, new CachedRelationshipCounter());
-        verifyCounts(0, new FallbackRelationshipCounter());
+        verifyCounts(0, new CachedRelationshipCounter(database));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void fallBackCounterShouldNotWorkWithoutRuntime() {
+        setUpTwoNodes();
+        simulateUsage();
+
+        verifyCounts(0, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -96,9 +112,9 @@ public class RelationshipCountIntegrationTest {
 
         module.reinitialize(database);
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -111,9 +127,9 @@ public class RelationshipCountIntegrationTest {
         setUpTwoNodes();
         simulateUsage();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -130,9 +146,9 @@ public class RelationshipCountIntegrationTest {
         setUpTwoNodes();
         simulateUsage();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
 
         database.shutdown();
 
@@ -143,9 +159,9 @@ public class RelationshipCountIntegrationTest {
         runtime.registerModule(module);
         runtime.start();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCompactedCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCompactedCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
 
         database.shutdown();
 
@@ -156,9 +172,9 @@ public class RelationshipCountIntegrationTest {
         runtime.registerModule(module);
         runtime.start();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -171,9 +187,9 @@ public class RelationshipCountIntegrationTest {
         runtime.registerModule(module);
         runtime.start();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -186,9 +202,9 @@ public class RelationshipCountIntegrationTest {
         setUpTwoNodes();
         simulateUsage();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -201,9 +217,9 @@ public class RelationshipCountIntegrationTest {
         runtime.registerModule(module);
         runtime.start();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -230,9 +246,9 @@ public class RelationshipCountIntegrationTest {
                 simulateUsage();
             }
 
-            verifyWeightedCounts(numberOfRounds, module.naiveCounter());
-            verifyWeightedCounts(numberOfRounds, module.cachedCounter());
-            verifyWeightedCounts(numberOfRounds, module.fallbackCounter());
+            verifyWeightedCounts(numberOfRounds, new NaiveRelationshipCounter(database));
+            verifyWeightedCounts(numberOfRounds, new CachedRelationshipCounter(database));
+            verifyWeightedCounts(numberOfRounds, new FallbackRelationshipCounter(database));
 
             tearDown();
         }
@@ -250,9 +266,9 @@ public class RelationshipCountIntegrationTest {
         setUpTwoNodes();
         simulateUsage();
 
-        verifyCounts(1, module.naiveCounter());
-        verifyCompactedCounts(1, module.cachedCounter());
-        verifyCounts(1, module.fallbackCounter());
+        verifyCounts(1, new NaiveRelationshipCounter(database));
+        verifyCompactedCounts(1, new CachedRelationshipCounter(database));
+        verifyCounts(1, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -268,9 +284,9 @@ public class RelationshipCountIntegrationTest {
         simulateUsage();
         simulateUsage();
 
-        verifyCounts(2, module.naiveCounter());
-        verifyCompactedCounts(2, module.cachedCounter());
-        verifyCounts(2, module.fallbackCounter());
+        verifyCounts(2, new NaiveRelationshipCounter(database));
+        verifyCompactedCounts(2, new CachedRelationshipCounter(database));
+        verifyCounts(2, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -287,7 +303,7 @@ public class RelationshipCountIntegrationTest {
 
         try (Transaction tx = database.beginTx()) {
             try {
-                module.cachedCounter().count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(2)).with(TIMESTAMP, equalTo("123")).with(K1, equalTo("V1")));
+                new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(2)).with(TIMESTAMP, equalTo("123")).with(K1, equalTo("V1")));
                 fail();
             } catch (UnableToCountException e) {
                 //OK
@@ -314,8 +330,8 @@ public class RelationshipCountIntegrationTest {
             simulateUsage();
             simulateUsage();
 
-            verifyCounts(3, module.fallbackCounter());
-            verifyCounts(3, module.naiveCounter());
+            verifyCounts(3, new FallbackRelationshipCounter(database));
+            verifyCounts(3, new NaiveRelationshipCounter(database));
 
             tearDown();
         }
@@ -343,8 +359,8 @@ public class RelationshipCountIntegrationTest {
         simulateUsage();
         simulateUsage();
 
-        verifyWeightedCounts(4, module.fallbackCounter());
-        verifyWeightedCounts(4, module.naiveCounter());
+        verifyWeightedCounts(4, new FallbackRelationshipCounter(database));
+        verifyWeightedCounts(4, new NaiveRelationshipCounter(database));
     }
 
     @Test
@@ -368,13 +384,13 @@ public class RelationshipCountIntegrationTest {
         simulateUsage();
         simulateUsage();
 
-        verifyCounts(2, module1.naiveCounter());
-        verifyCounts(2, module1.cachedCounter());
-        verifyCounts(2, module1.fallbackCounter());
+        verifyCounts(2, new NaiveRelationshipCounter(database, "M1"));
+        verifyCounts(2, new CachedRelationshipCounter(database, "M1"));
+        verifyCounts(2, new FallbackRelationshipCounter(database, "M1"));
 
-        verifyWeightedCounts(2, module2.naiveCounter());
-        verifyWeightedCounts(2, module2.cachedCounter());
-        verifyWeightedCounts(2, module2.fallbackCounter());
+        verifyWeightedCounts(2, new NaiveRelationshipCounter(database, "M2"));
+        verifyWeightedCounts(2, new CachedRelationshipCounter(database, "M2"));
+        verifyWeightedCounts(2, new FallbackRelationshipCounter(database, "M2"));
     }
 
     @Test
@@ -398,9 +414,9 @@ public class RelationshipCountIntegrationTest {
 
         try (Transaction tx = database.beginTx()) {
             //naive doesn't care about this strategy
-            assertEquals(2, module.naiveCounter().count(database.getNodeById(1), wildcard(TWO, OUTGOING)));
-            assertEquals(0, module.fallbackCounter().count(database.getNodeById(1), wildcard(TWO, OUTGOING)));
-            assertEquals(0, module.cachedCounter().count(database.getNodeById(1), wildcard(TWO, OUTGOING)));
+            assertEquals(2, new NaiveRelationshipCounter(database).count(database.getNodeById(1), wildcard(TWO, OUTGOING)));
+            assertEquals(0, new FallbackRelationshipCounter(database).count(database.getNodeById(1), wildcard(TWO, OUTGOING)));
+            assertEquals(0, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard(TWO, OUTGOING)));
 
             tx.success();
         }
@@ -427,12 +443,12 @@ public class RelationshipCountIntegrationTest {
 
         try (Transaction tx = database.beginTx()) {
             //naive doesn't care about this strategy
-            assertEquals(2, module.naiveCounter().count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
-            assertEquals(2, module.naiveCounter().count(database.getNodeById(1), literal(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
-            assertEquals(0, module.fallbackCounter().count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
-            assertEquals(0, module.fallbackCounter().count(database.getNodeById(1), literal(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
-            assertEquals(0, module.cachedCounter().count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
-            assertEquals(0, module.cachedCounter().count(database.getNodeById(1), literal(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
+            assertEquals(2, new NaiveRelationshipCounter(database).count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
+            assertEquals(2, new NaiveRelationshipCounter(database).count(database.getNodeById(1), literal(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
+            assertEquals(0, new FallbackRelationshipCounter(database).count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
+            assertEquals(0, new FallbackRelationshipCounter(database).count(database.getNodeById(1), literal(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
+            assertEquals(0, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
+            assertEquals(0, new CachedRelationshipCounter(database).count(database.getNodeById(1), literal(ONE, OUTGOING).with(WEIGHT, equalTo(7))));
 
             tx.success();
         }
@@ -456,9 +472,9 @@ public class RelationshipCountIntegrationTest {
             }
         });
 
-        verifyCounts(100, module.naiveCounter());
-        verifyCounts(100, module.cachedCounter());
-        verifyCounts(100, module.fallbackCounter());
+        verifyCounts(100, new NaiveRelationshipCounter(database));
+        verifyCounts(100, new CachedRelationshipCounter(database));
+        verifyCounts(100, new FallbackRelationshipCounter(database));
     }
 
     @Test
@@ -481,13 +497,13 @@ public class RelationshipCountIntegrationTest {
             }
         });
 
-        verifyCounts(20, module1.naiveCounter());
-        verifyCompactedCounts(20, module1.cachedCounter());
-        verifyCounts(20, module1.fallbackCounter());
+        verifyCounts(20, new NaiveRelationshipCounter(database, "M1"));
+        verifyCompactedCounts(20, new CachedRelationshipCounter(database, "M1"));
+        verifyCounts(20, new FallbackRelationshipCounter(database, "M1"));
 
-        verifyCounts(20, module2.naiveCounter());
-        verifyCompactedCounts(20, module2.cachedCounter());
-        verifyCounts(20, module2.fallbackCounter());
+        verifyCounts(20, new NaiveRelationshipCounter(database, "M2"));
+        verifyCompactedCounts(20, new CachedRelationshipCounter(database, "M2"));
+        verifyCounts(20, new FallbackRelationshipCounter(database, "M2"));
     }
 
     @Test
@@ -511,9 +527,9 @@ public class RelationshipCountIntegrationTest {
         });
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(1, module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING)));
-            assertEquals(1, module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("a", equalTo(2))));
-            assertEquals(1, module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("b"))));
+            assertEquals(1, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING)));
+            assertEquals(1, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("a", equalTo(2))));
+            assertEquals(1, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("b"))));
 
             tx.success();
         }
@@ -531,11 +547,11 @@ public class RelationshipCountIntegrationTest {
         });
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(2, module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING)));
-            assertEquals(1, module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("a", equalTo(1))));
-            assertEquals(1, module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("a", equalTo(2))));
-            assertEquals(1, module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("b"))));
-            assertEquals(1, module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("c"))));
+            assertEquals(2, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING)));
+            assertEquals(1, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("a", equalTo(1))));
+            assertEquals(1, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("a", equalTo(2))));
+            assertEquals(1, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("b"))));
+            assertEquals(1, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("c"))));
 
             tx.success();
         }
@@ -554,16 +570,16 @@ public class RelationshipCountIntegrationTest {
 
         try (Transaction tx = database.beginTx()) {
             //now we should have 2b, *c
-            assertEquals(3, module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING)));
-            assertEquals(1, module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("b"))));
-            assertEquals(2, module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("c"))));
+            assertEquals(3, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING)));
+            assertEquals(1, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("b"))));
+            assertEquals(2, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("c"))));
 
             tx.success();
         }
 
         try (Transaction tx = database.beginTx()) {
             try {
-                module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("a", equalTo(2)));
+                new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("a", equalTo(2)));
                 fail();
             } catch (UnableToCountException e) {
                 //ok
@@ -588,17 +604,17 @@ public class RelationshipCountIntegrationTest {
 
             //now we should have 2*, *c
 
-            assertEquals(4, module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING)));
+            assertEquals(4, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING)));
 
             try {
-                module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("a", equalTo(2)));
+                new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("a", equalTo(2)));
                 fail();
             } catch (UnableToCountException e) {
                 //ok
             }
 
             try {
-                module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("c")));
+                new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("c")));
                 fail();
             } catch (UnableToCountException e) {
                 //ok
@@ -620,18 +636,18 @@ public class RelationshipCountIntegrationTest {
         });
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(5, module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING)));
+            assertEquals(5, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING)));
 
 
             try {
-                module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("a", equalTo(2)));
+                new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("a", equalTo(2)));
                 fail();
             } catch (UnableToCountException e) {
                 //ok
             }
 
             try {
-                module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("c")));
+                new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("c")));
                 fail();
             } catch (UnableToCountException e) {
                 //ok
@@ -654,17 +670,17 @@ public class RelationshipCountIntegrationTest {
         });
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(6, module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING)));
+            assertEquals(6, new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING)));
 
             try {
-                module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("a", equalTo(2)));
+                new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("a", equalTo(2)));
                 fail();
             } catch (UnableToCountException e) {
                 //ok
             }
 
             try {
-                module.cachedCounter().count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("c")));
+                new CachedRelationshipCounter(database).count(database.getNodeById(1), wildcard("TEST", OUTGOING).with("b", equalTo("c")));
                 fail();
             } catch (UnableToCountException e) {
                 //ok

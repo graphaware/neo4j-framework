@@ -8,9 +8,7 @@ import com.graphaware.module.relcount.RelationshipCountConfiguration;
 import com.graphaware.module.relcount.RelationshipCountConfigurationImpl;
 import com.graphaware.module.relcount.RelationshipCountRuntimeModule;
 import com.graphaware.module.relcount.compact.ThresholdBasedCompactionStrategy;
-import com.graphaware.module.relcount.count.RelationshipCounter;
-import com.graphaware.module.relcount.count.UnableToCountException;
-import com.graphaware.module.relcount.count.WeighingStrategy;
+import com.graphaware.module.relcount.count.*;
 import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import org.junit.Test;
 import org.neo4j.graphdb.Node;
@@ -40,7 +38,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
         populateDatabase();
 
-        RelationshipCounter counter = module.cachedCounter();
+        RelationshipCounter counter = new CachedRelationshipCounter(database);
         //alternatively:
 //        RelationshipCounter counter = new CachedRelationshipCounter();
 
@@ -71,7 +69,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
         populateDatabase();
 
-        RelationshipCounter counter = module.cachedCounter();
+        RelationshipCounter counter = new CachedRelationshipCounter(database);
 
         try (Transaction tx = database.beginTx()) {
 
@@ -104,7 +102,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
             Node tracy = database.getNodeById(2);
 
-            RelationshipCounter counter = module.cachedCounter();
+            RelationshipCounter counter = new CachedRelationshipCounter(database);
             assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
 
             try {
@@ -146,7 +144,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
             Node tracy = database.getNodeById(2);
 
-            RelationshipCounter counter = module.cachedCounter();
+            RelationshipCounter counter = new CachedRelationshipCounter(database);
 
             assertEquals(12, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
             assertEquals(11, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
@@ -184,7 +182,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
             Node tracy = database.getNodeById(2);
 
-            RelationshipCounter counter = module.cachedCounter();
+            RelationshipCounter counter = new CachedRelationshipCounter(database);
 
             assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
             assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
@@ -221,7 +219,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
             Node tracy = database.getNodeById(2);
 
-            RelationshipCounter counter = module.cachedCounter();
+            RelationshipCounter counter = new CachedRelationshipCounter(database);
 
             assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
             assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
@@ -243,7 +241,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
             Node tracy = database.getNodeById(2);
 
-            RelationshipCounter counter = module.naiveCounter();
+            RelationshipCounter counter = new NaiveRelationshipCounter(database);
 
             assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING)));
             assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, OUTGOING)));
@@ -271,7 +269,7 @@ public class DocumentationDemo extends BaseDocumentationDemo {
 
             Node tracy = database.getNodeById(2);
 
-            RelationshipCounter counter = module.fallbackCounter();
+            RelationshipCounter counter = new FallbackRelationshipCounter(database);
 
             assertEquals(9, counter.count(tracy, wildcard(FOLLOWS, INCOMING))); //uses cache
             assertEquals(3, counter.count(tracy, wildcard(FOLLOWS, INCOMING).with(STRENGTH, equalTo(2)))); //falls back to naive

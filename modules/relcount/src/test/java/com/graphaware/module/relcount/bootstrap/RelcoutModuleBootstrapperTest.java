@@ -48,10 +48,9 @@ public class RelcoutModuleBootstrapperTest {
     public void defaultRuntimeOnExistingDatabase() {
         simulateUsage();
 
-        verifyCounts(new NaiveRelationshipCounter());
-        //todo there is no way the users will know the config => store serialised on root
-        verifyCounts(new CachedRelationshipCounter("relcount", DefaultRuntimeConfiguration.getInstance(), RelationshipCountConfigurationImpl.defaultConfiguration()));
-        verifyCounts(new FallbackRelationshipCounter("relcount", DefaultRuntimeConfiguration.getInstance(), RelationshipCountConfigurationImpl.defaultConfiguration()));
+        verifyCounts(new NaiveRelationshipCounter(database, "relcount"));
+        verifyCounts(new CachedRelationshipCounter(database, "relcount"));
+        verifyCounts(new FallbackRelationshipCounter(database, "relcount"));
     }
 
     private void verifyCounts(RelationshipCounter counter) {

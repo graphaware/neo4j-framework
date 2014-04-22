@@ -133,10 +133,14 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
      */
     @Override
     protected Node getOrCreateRoot() {
-        if (root != null) {
-            return root;
+        if (root == null) {
+            root = getOrCreateRoot(database);
         }
 
+        return root;
+    }
+
+    public static Node getOrCreateRoot(GraphDatabaseService database) {
         Iterator<Node> roots;
 
         if (database instanceof GraphDatabaseAPI) {
@@ -148,20 +152,20 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
 
         if (!roots.hasNext()) {
             LOG.info("GraphAware Runtime has never been run before on this database. Creating runtime root node...");
-            root = database.createNode(GA_ROOT);
-        } else {
-            root = roots.next();
-
-            if (roots.hasNext()) {
-                LOG.fatal("There is more than 1 runtime root node! Cannot start GraphAware Runtime.");
-                throw new IllegalStateException("There is more than 1 runtime root node! Cannot start GraphAware Runtime.");
-            }
+            return database.createNode(GA_ROOT);
         }
 
-        return root;
+        Node result = roots.next();
+
+        if (roots.hasNext()) {
+            LOG.fatal("There is more than 1 runtime root node! Cannot start GraphAware Runtime.");
+            throw new IllegalStateException("There is more than 1 runtime root node! Cannot start GraphAware Runtime.");
+        }
+
+        return result;
     }
 
-    private class RootNodeIterator extends PrefetchingIterator<Node> {
+    private static class RootNodeIterator extends PrefetchingIterator<Node> {
 
         private final Iterator<Node> nodes;
 
