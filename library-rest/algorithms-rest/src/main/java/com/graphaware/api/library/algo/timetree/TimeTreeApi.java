@@ -25,10 +25,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.TimeZone;
 
@@ -48,10 +45,10 @@ public class TimeTreeApi extends GraphAwareApi {
         timeTree = new TimeTreeImpl(database);
     }
 
-    @RequestMapping(value = "instant", method = RequestMethod.GET)
+    @RequestMapping(value = "/{time}", method = RequestMethod.GET)
     @ResponseBody
     public long getInstant(
-            @RequestParam(value = "time") long timeParam,
+            @PathVariable(value = "time") long timeParam,
             @RequestParam(value = "resolution", required = false) String resolutionParam,
             @RequestParam(value = "timezone", required = false) String timeZoneParam) {
 
@@ -65,7 +62,7 @@ public class TimeTreeApi extends GraphAwareApi {
         return result;
     }
 
-    @RequestMapping(value = "now", method = RequestMethod.GET)
+    @RequestMapping(value = "/now", method = RequestMethod.GET)
     @ResponseBody
     public long getNow(
             @RequestParam(value = "resolution", required = false) String resolutionParam,

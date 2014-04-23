@@ -17,12 +17,12 @@
 package com.graphaware.api.library.algo.path;
 
 import com.graphaware.api.common.GraphAwareApi;
+import com.graphaware.common.annotation.GraphAwareController;
 import com.graphaware.library.algo.path.NumberOfShortestPathsFinder;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * REST API for {@link com.graphaware.library.algo.path.NumberOfShortestPathsFinder}.
  */
-@Controller
+@GraphAwareController
 @RequestMapping("/api/library/algorithm/path")
 public class NumberOfShortestPathsFinderApi extends GraphAwareApi {
 

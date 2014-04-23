@@ -16,6 +16,7 @@
 
 package com.graphaware.server.web;
 
+import com.graphaware.common.annotation.GraphAwareController;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -24,7 +25,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  * Spring application config.
  */
 @Configuration
-@ComponentScan(basePackages = "com.graphaware")
+@ComponentScan(basePackages = "**", includeFilters = @ComponentScan.Filter(value = GraphAwareController.class))
 @EnableWebMvc
 public class AppConfig {
 

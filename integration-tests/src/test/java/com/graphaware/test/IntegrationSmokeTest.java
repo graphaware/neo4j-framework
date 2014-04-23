@@ -102,6 +102,8 @@ public class IntegrationSmokeTest {
     @Test
     public void graphAwareRuntimeWithModulesWorkWhenProperlyConfigured() throws IOException, InterruptedException {
         setUp("neo4j-server-runtime-and-relcount.properties");
+
+        //todo test relcount API
     }
 
     private String jsonAsString(String fileName) {

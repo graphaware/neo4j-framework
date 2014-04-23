@@ -39,7 +39,7 @@ public class TimeTreeApiTest extends GraphAwareApiTest {
         long dateInMillis = dateToMillis(2013, 5, 4);
 
         //When
-        String result = get(URL + "instant?time=" + dateInMillis, HttpStatus.OK_200);
+        String result = get(URL + dateInMillis, HttpStatus.OK_200);
 
         //Then
         assertSameGraph(database, "CREATE" +
@@ -63,7 +63,7 @@ public class TimeTreeApiTest extends GraphAwareApiTest {
         long dateInMillis = new DateTime(2014, 4, 5, 13, 56, 22, 123, DateTimeZone.UTC).getMillis();
 
         //When
-        String result = get(URL + "instant?time=" + dateInMillis + "&resolution=millisecond&timezone=GMT%2B1", HttpStatus.OK_200);
+        String result = get(URL + dateInMillis + "?resolution=millisecond&timezone=GMT%2B1", HttpStatus.OK_200);
 
         //Then
         assertSameGraph(database, "CREATE" +
