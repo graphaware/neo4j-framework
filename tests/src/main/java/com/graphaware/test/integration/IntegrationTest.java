@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.neo4j.server.Bootstrapper;
 import org.neo4j.server.configuration.Configurator;
@@ -36,28 +37,35 @@ import static junit.framework.Assert.assertTrue;
  * The primary purpose of tests that extend this class should be to verify that given a certain Neo4j configuration,
  * a (possibly runtime) module is bootstrapped and started correctly when the Neo4j server starts.
  * <p/>
- * The configuration is provided using a constructor. Default "neo4j.properties" that ships with Neo4j is the default value.
+ * The configuration is provided using a constructor. It defaults to "neo4j.properties" and if no such file is present
+ * on the classpath of the implementing class, one that ships with Neo4j is used.
  */
 public abstract class IntegrationTest {
 
-    private final File neo4jProperties;
+    private final String neo4jProperties;
     private Bootstrapper bootstrapper;
 
-    protected IntegrationTest() throws IOException {
-        this(new ClassPathResource("neo4j.properties").getFile());
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    protected IntegrationTest() {
+        this("neo4j.properties");
     }
 
-    protected IntegrationTest(File neo4jProperties) {
+    protected IntegrationTest(String neo4jProperties) {
         this.neo4jProperties = neo4jProperties;
     }
 
     @Before
     public void setUp() throws IOException, InterruptedException {
-        TemporaryFolder temporaryFolder = new TemporaryFolder();
+        String serverConfigContents = IOUtils.toString(new ClassPathResource("neo4j-server.properties").getInputStream());
+        serverConfigContents = serverConfigContents.replaceAll("=conf/", "=" + temporaryFolder.getRoot().getAbsolutePath() + "/conf/");
+        serverConfigContents = serverConfigContents.replaceAll("=data/", "=" + temporaryFolder.getRoot().getAbsolutePath() + "/data/");
 
-        File serverConfig = temporaryFolder.newFile("neo4j-server.properties");
-        FileUtils.copyFile(new ClassPathResource("neo4j-server.properties").getFile(), serverConfig);
-        FileUtils.copyFile(neo4jProperties, temporaryFolder.newFile("neo4j.properties"));
+        temporaryFolder.newFolder("conf");
+        File serverConfig = temporaryFolder.newFile("conf/neo4j-server.properties");
+        FileUtils.copyInputStreamToFile(IOUtils.toInputStream(serverConfigContents), serverConfig);
+        FileUtils.copyInputStreamToFile(new ClassPathResource(neo4jProperties).getInputStream(), temporaryFolder.newFile("conf/neo4j.properties"));
 
         System.setProperty(Configurator.NEO_SERVER_CONFIG_FILE_KEY, serverConfig.getAbsolutePath());
 

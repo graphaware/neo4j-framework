@@ -78,6 +78,10 @@ public abstract class ApiTest {
         return database;
     }
 
+    public int getPort() {
+        return port;
+    }
+
     private void startJetty() {
         server = new Server(port);
 
