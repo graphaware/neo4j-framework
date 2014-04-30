@@ -32,7 +32,6 @@
         <module>api</module>
         <module>build</module>
         <module>common</module>
-        <module>integration-tests</module>
         <module>runtime</module>
         <module>server</module>
         <module>tests</module>
