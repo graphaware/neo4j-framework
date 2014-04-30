@@ -32,14 +32,28 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 
 /**
- *
+ * Abstract base-class for API tests. Starts a Neo4j server on the port specified in the constructor (or 8082 by default)
+ * and deploys all {@link com.graphaware.api.GraphAwareController} annotated controllers. Before tests are run, the database
+ * can be populated by overriding the {@link #populateDatabase()} method.
+ * <p/>
+ * The database running within the server can be accessed by calling {@link #getDatabase()}. Therefore, this class is
+ * good for writing API integration tests that want to verify the database state after certain API calls.
  */
 public abstract class ApiTest {
 
-    protected static final int PORT = 8082;
+    private static final int PORT = 8082;
 
+    private final int port;
     private Server server;
-    protected GraphDatabaseService database;
+    private GraphDatabaseService database;
+
+    protected ApiTest() {
+        this(PORT);
+    }
+
+    protected ApiTest(int port) {
+        this.port = port;
+    }
 
     @Before
     public void setUp() {
@@ -60,8 +74,12 @@ public abstract class ApiTest {
         //for subclasses
     }
 
-    protected final void startJetty() {
-        server = new Server(PORT);
+    public GraphDatabaseService getDatabase() {
+        return database;
+    }
+
+    private void startJetty() {
+        server = new Server(port);
 
         final ServletContextHandler handler = new ServletContextHandler(null, "/graphaware", ServletContextHandler.SESSIONS);
 

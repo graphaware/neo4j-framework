@@ -19,6 +19,8 @@ package com.graphaware.test.integration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
+import org.junit.Before;
+import org.junit.rules.TemporaryFolder;
 import org.neo4j.server.Bootstrapper;
 import org.neo4j.server.configuration.Configurator;
 import org.springframework.core.io.ClassPathResource;
@@ -29,26 +31,35 @@ import java.io.IOException;
 import static junit.framework.Assert.assertTrue;
 
 /**
- *
+ * Base class for server mode integration tests that are as close to real Neo4j server deployment as possible.
+ * <p/>
+ * The primary purpose of tests that extend this class should be to verify that given a certain Neo4j configuration,
+ * a (possibly runtime) module is bootstrapped and started correctly when the Neo4j server starts.
+ * <p/>
+ * The configuration is provided using a constructor. Default "neo4j.properties" that ships with Neo4j is the default value.
  */
 public abstract class IntegrationTest {
 
+    private final File neo4jProperties;
     private Bootstrapper bootstrapper;
 
-    protected void setUp() throws IOException, InterruptedException {
-        setUp("neo4-server.properties");
+    protected IntegrationTest() throws IOException {
+        this(new ClassPathResource("neo4j.properties").getFile());
     }
 
-    protected void setUp(String serverConfig) throws IOException, InterruptedException {
-        deleteTempDir();
+    protected IntegrationTest(File neo4jProperties) {
+        this.neo4jProperties = neo4jProperties;
+    }
 
-        ClassPathResource classPathResource = new ClassPathResource(serverConfig);
+    @Before
+    public void setUp() throws IOException, InterruptedException {
+        TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-        assertTrue(classPathResource.exists());
+        File serverConfig = temporaryFolder.newFile("neo4j-server.properties");
+        FileUtils.copyFile(new ClassPathResource("neo4j-server.properties").getFile(), serverConfig);
+        FileUtils.copyFile(neo4jProperties, temporaryFolder.newFile("neo4j.properties"));
 
-        String path = classPathResource.getFile().getCanonicalPath();
-
-        System.setProperty(Configurator.NEO_SERVER_CONFIG_FILE_KEY, path);
+        System.setProperty(Configurator.NEO_SERVER_CONFIG_FILE_KEY, serverConfig.getAbsolutePath());
 
         bootstrapper = Bootstrapper.loadMostDerivedBootstrapper();
         bootstrapper.start(new String[0]);
@@ -57,9 +68,5 @@ public abstract class IntegrationTest {
     @After
     public void tearDown() throws IOException, InterruptedException {
         bootstrapper.stop();
-    }
-
-    private void deleteTempDir() throws IOException {
-        FileUtils.deleteDirectory(new File("/tmp/ga-int-test/"));
     }
 }

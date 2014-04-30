@@ -16,6 +16,15 @@
 
 package com.graphaware.common.change;
 
+import com.graphaware.common.util.PropertyContainerUtils;
+import org.neo4j.graphdb.PropertyContainer;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.graphaware.common.util.PropertyContainerUtils.*;
+
 /**
  * Change in the state of an object, encapsulating the old (previous) and the new (current).
  */
@@ -77,6 +86,30 @@ public class Change<T> {
     public int hashCode() {
         int result = previous.hashCode();
         result = 31 * result + current.hashCode();
+        return result;
+    }
+
+    /**
+     * Convert a collection of {@link Change}s of {@link org.neo4j.graphdb.PropertyContainer} to a map of {@link Change}s keyed by the
+     * {@link org.neo4j.graphdb.PropertyContainer} ID.
+     *
+     * @param changes to convert.
+     * @param <T>     type of the {@link org.neo4j.graphdb.PropertyContainer}.
+     * @return map keyed by {@link org.neo4j.graphdb.PropertyContainer} ID with the actual {@link Change}s as values.
+     * @throws IllegalArgumentException in case the two {@link org.neo4j.graphdb.PropertyContainer}s contained in a {@link Change} do not
+     *                                  have the same IDs.
+     */
+    public static <T extends PropertyContainer> Map<Long, Change<T>> changesToMap(Collection<Change<T>> changes) {
+        Map<Long, Change<T>> result = new HashMap<>();
+
+        for (Change<T> change : changes) {
+            long id = id(change.getPrevious());
+            if (id != id(change.getCurrent())) {
+                throw new IllegalArgumentException("IDs of the Property Containers in Change do not match!");
+            }
+            result.put(id, change);
+        }
+
         return result;
     }
 }

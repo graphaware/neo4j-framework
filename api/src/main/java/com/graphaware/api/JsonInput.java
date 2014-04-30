@@ -17,7 +17,7 @@
 package com.graphaware.api;
 
 /**
- * Base-class for JSON-serializable graph algorithm inputs. Specifies what to include in the output.
+ * Base-class for JSON-serializable API inputs. Specifies what to include in the output.
  */
 public abstract class JsonInput {
 

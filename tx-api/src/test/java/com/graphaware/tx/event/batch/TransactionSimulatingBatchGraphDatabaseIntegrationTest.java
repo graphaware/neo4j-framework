@@ -45,6 +45,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.graphaware.common.change.Change.*;
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static org.junit.Assert.*;

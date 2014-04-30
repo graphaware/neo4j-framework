@@ -74,17 +74,6 @@ public class PropertyContainerUtilsTest {
     }
 
     @Test
-    public void shouldConvertChangesToMap() {
-        try (Transaction tx = database.beginTx()) {
-            Change<Node> nodeChange = new Change<>(database.getNodeById(0), database.getNodeById(0));
-            Map<Long, Change<Node>> changeMap = changesToMap(asList(nodeChange));
-            assertEquals(0, changeMap.get(0L).getCurrent().getId());
-            assertEquals(0, changeMap.get(0L).getPrevious().getId());
-            assertEquals(1, changeMap.size());
-        }
-    }
-
-    @Test
     public void shouldFindNodeId() {
         try (Transaction tx = database.beginTx()) {
             assertEquals(1L, id(database.getNodeById(1)));
