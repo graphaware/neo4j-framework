@@ -19,7 +19,7 @@
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>build</artifactId>
-        <version>2.0.3.1</version>
+        <version>2.0.3.2-SNAPSHOT</version>
     </parent>
     <artifactId>framework-embedded</artifactId>
     <packaging>jar</packaging>
