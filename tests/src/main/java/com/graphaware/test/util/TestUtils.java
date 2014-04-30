@@ -17,6 +17,7 @@
 package com.graphaware.test.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
@@ -26,6 +27,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 
@@ -42,6 +44,22 @@ public final class TestUtils {
             assertTrue(mapper.readTree(one).equals(mapper.readTree(two)));
         } catch (IOException e) {
             fail();
+        }
+    }
+
+    public static String jsonAsString(String fileName) {
+        return jsonAsString("", fileName);
+    }
+
+    public static String jsonAsString(Class caller, String fileName) {
+        return jsonAsString(caller.getClass().getPackage().getName().replace(".", "/") + "/", fileName);
+    }
+
+    public static String jsonAsString(String packagePath, String fileName) {
+        try {
+            return IOUtils.toString(new ClassPathResource(packagePath + fileName + ".json").getInputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -68,7 +86,7 @@ public final class TestUtils {
 
             }
         } catch (IOException e) {
-            fail();
+            fail(e.getMessage());
             return null;
         }
     }
@@ -95,7 +113,7 @@ public final class TestUtils {
 
             }
         } catch (IOException e) {
-            fail();
+            fail(e.getMessage());
             return null;
         }
     }

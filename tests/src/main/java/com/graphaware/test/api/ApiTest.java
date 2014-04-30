@@ -84,13 +84,4 @@ public abstract class ApiTest {
             throw new RuntimeException(e);
         }
     }
-
-    protected String jsonAsString(String fileName) {
-        try {
-            String path = this.getClass().getPackage().getName().replace(".", "/") + "/";
-            return IOUtils.toString(new ClassPathResource(path + fileName + ".json").getInputStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }

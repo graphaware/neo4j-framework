@@ -35,6 +35,10 @@ public abstract class IntegrationTest {
 
     private Bootstrapper bootstrapper;
 
+    protected void setUp() throws IOException, InterruptedException {
+        setUp("neo4-server.properties");
+    }
+
     protected void setUp(String serverConfig) throws IOException, InterruptedException {
         deleteTempDir();
 
@@ -47,17 +51,7 @@ public abstract class IntegrationTest {
         System.setProperty(Configurator.NEO_SERVER_CONFIG_FILE_KEY, path);
 
         bootstrapper = Bootstrapper.loadMostDerivedBootstrapper();
-
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                bootstrapper.start(new String[0]);
-            }
-        });
-
-        thread.run();
-
-        Thread.sleep(1000);
+        bootstrapper.start(new String[0]);
     }
 
     @After
@@ -67,13 +61,5 @@ public abstract class IntegrationTest {
 
     private void deleteTempDir() throws IOException {
         FileUtils.deleteDirectory(new File("/tmp/ga-int-test/"));
-    }
-
-    protected String jsonAsString(String fileName) {
-        try {
-            return IOUtils.toString(new ClassPathResource("com/graphaware/test/" + fileName + ".json").getInputStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
