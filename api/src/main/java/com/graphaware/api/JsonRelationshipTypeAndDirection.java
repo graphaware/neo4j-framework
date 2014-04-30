@@ -14,21 +14,32 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server;
+package com.graphaware.api;
 
-import org.neo4j.server.NeoServer;
-import org.neo4j.server.enterprise.EnterpriseBootstrapper;
+import org.neo4j.graphdb.Direction;
 
 /**
- * {@link org.neo4j.server.CommunityBootstrapper} that uses {@link GraphAwareEnterpriseNeoServer}.
+ * JSON-serializable representation of a Neo4j relationship type and direction. Direction defaults to BOTH, type must
+ * be specified.
  */
-public class GraphAwareEnterpriseBootstrapper extends EnterpriseBootstrapper {
+public class JsonRelationshipTypeAndDirection {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected NeoServer createNeoServer() {
-        return new GraphAwareEnterpriseNeoServer(configurator, logging);
+    private String type;
+    private Direction direction = Direction.BOTH;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 }

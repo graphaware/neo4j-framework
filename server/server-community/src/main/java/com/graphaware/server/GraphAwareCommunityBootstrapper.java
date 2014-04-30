@@ -29,6 +29,6 @@ public class GraphAwareCommunityBootstrapper extends CommunityBootstrapper {
      */
     @Override
     protected NeoServer createNeoServer() {
-        return new GraphAwareCommunityNeoServer(createConfigurator());
+        return new GraphAwareCommunityNeoServer(configurator, logging);
     }
 }

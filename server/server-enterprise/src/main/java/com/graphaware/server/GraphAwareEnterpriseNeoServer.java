@@ -17,6 +17,7 @@
 package com.graphaware.server;
 
 import com.graphaware.server.web.GraphAwareJetty9WebServer;
+import org.neo4j.kernel.logging.Logging;
 import org.neo4j.server.configuration.Configurator;
 import org.neo4j.server.enterprise.EnterpriseNeoServer;
 import org.neo4j.server.web.WebServer;
@@ -26,8 +27,8 @@ import org.neo4j.server.web.WebServer;
  */
 public class GraphAwareEnterpriseNeoServer extends EnterpriseNeoServer {
 
-    public GraphAwareEnterpriseNeoServer(Configurator configurator) {
-        super(configurator);
+    public GraphAwareEnterpriseNeoServer(Configurator configurator, Logging logging) {
+        super(configurator, logging);
     }
 
     /**
@@ -35,6 +36,6 @@ public class GraphAwareEnterpriseNeoServer extends EnterpriseNeoServer {
      */
     @Override
     protected WebServer createWebServer() {
-        return new GraphAwareJetty9WebServer();
+        return new GraphAwareJetty9WebServer(logging);
     }
 }

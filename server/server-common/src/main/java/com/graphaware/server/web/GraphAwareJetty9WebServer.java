@@ -23,6 +23,7 @@ import org.eclipse.jetty.util.ArrayUtil;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.logging.Logging;
 import org.neo4j.server.database.InjectableProvider;
 import org.neo4j.server.web.Jetty9WebServer;
 
@@ -36,6 +37,10 @@ import java.util.Collection;
 public class GraphAwareJetty9WebServer extends Jetty9WebServer {
 
     private GraphDatabaseService database;
+
+    public GraphAwareJetty9WebServer(Logging logging) {
+        super(logging);
+    }
 
     @Override
     protected void startJetty() {

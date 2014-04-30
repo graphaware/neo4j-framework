@@ -22,17 +22,19 @@
         <artifactId>framework-parent</artifactId>
         <version>1.9-1.9-SNAPSHOT</version>
     </parent>
-    <artifactId>build</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>tx-executor</artifactId>
+    <packaging>jar</packaging>
 
-    <name>GraphAware Framework Build</name>
-    <description>Parent Project for Artifact-Building Technical Maven Modules</description>
+    <name>GraphAware Transaction Executor</name>
+    <description>Single and Batch Transaction Executor</description>
     <url>http://graphaware.com</url>
 
-    <modules>
-        <module>framework-embedded</module>
-        <module>framework-server-community</module>
-        <module>framework-server-enterprise</module>
-    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>common</artifactId>
+            <classifier>tests</classifier>
+        </dependency>
+    </dependencies>
 
 </project>

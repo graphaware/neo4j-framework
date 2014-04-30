@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2013 GraphAware
+  ~ Copyright (c) 2014 GraphAware
   ~
   ~ This file is part of GraphAware.
   ~
@@ -22,17 +22,32 @@
         <artifactId>framework-parent</artifactId>
         <version>1.9-1.9-SNAPSHOT</version>
     </parent>
-    <artifactId>build</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>graphunit</artifactId>
+    <packaging>jar</packaging>
 
-    <name>GraphAware Framework Build</name>
-    <description>Parent Project for Artifact-Building Technical Maven Modules</description>
+    <name>GraphAware GraphUnit</name>
+    <description>Simplified Unit Testing for Neo4j</description>
     <url>http://graphaware.com</url>
 
-    <modules>
-        <module>framework-embedded</module>
-        <module>framework-server-community</module>
-        <module>framework-server-enterprise</module>
-    </modules>
-
+    <dependencies>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-kernel</artifactId>
+            <type>test-jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+    </dependencies>
 </project>

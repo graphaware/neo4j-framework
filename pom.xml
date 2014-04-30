@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2013 GraphAware
+  ~ Copyright (c) 2014 GraphAware
   ~
   ~ This file is part of GraphAware.
   ~
@@ -29,16 +29,16 @@
     </parent>
 
     <modules>
+        <module>api</module>
+        <module>api-tests</module>
         <module>build</module>
-        <module>core</module>
-        <module>library</module>
-        <module>library-rest</module>
-        <module>modules</module>
-        <module>modules-rest</module>
-        <module>runtime</module>
-        <module>runtime-rest</module>
-        <module>server</module>
+        <module>common</module>
+        <module>graphunit</module>
         <module>integration-tests</module>
+        <module>runtime</module>
+        <module>server</module>
+        <module>tx-api</module>
+        <module>tx-executor</module>
     </modules>
 
     <name>*** GraphAware Neo4j Framework ***</name>
@@ -114,8 +114,9 @@
     <properties>
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>2.0.1</neo4j.version>
+        <neo4j.version>2.0.2</neo4j.version>
         <spring.version>4.0.0.RELEASE</spring.version>
+        <graphaware.version>1.9-1.9-SNAPSHOT</graphaware.version>
     </properties>
 
     <dependencyManagement>
@@ -126,13 +127,13 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>graphaware-embedded</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>graphaware-server-community</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <!-- GraphAware Core -->
@@ -140,13 +141,13 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>common</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>common</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
                 <classifier>tests</classifier>
                 <scope>test</scope>
             </dependency>
@@ -154,20 +155,20 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>graphunit</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-api</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-executor</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <!-- GraphAware Library -->
@@ -175,7 +176,7 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>algorithms</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <!-- GraphAware Library REST -->
@@ -183,7 +184,15 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>algorithms-rest</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>algorithms-rest</artifactId>
+                <version>${graphaware.version}</version>
+                <classifier>tests</classifier>
+                <scope>test</scope>
             </dependency>
 
             <!-- GraphAware Modules -->
@@ -191,7 +200,7 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>relcount</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <!-- GraphAware Modules REST -->
@@ -199,7 +208,7 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>relcount-rest</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <!-- GraphAware Runtime & Runtime REST -->
@@ -207,7 +216,7 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <!-- todo move perf to a separate project -->
@@ -215,14 +224,14 @@
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime</artifactId>
                 <classifier>tests</classifier>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime-rest</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <!-- GraphAware Server -->
@@ -230,19 +239,19 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>server-common</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>server-community</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>server-enterprise</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <!-- Neo4j -->
