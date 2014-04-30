@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2014 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -14,22 +14,22 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.performance;
+package com.graphaware.test.performance;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * {@link CacheConfiguration} representing no caches available => reading from disk.
+ * {@link CacheConfiguration} representing high-level (strong) cache available.
  */
-public class NoCache implements CacheConfiguration {
+public class HighLevelCache implements CacheConfiguration {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean needsWarmup() {
-        return false;
+        return true;
     }
 
     /**
@@ -40,16 +40,14 @@ public class NoCache implements CacheConfiguration {
         Map<String, String> result = new HashMap<>(existingConfig);
 
         //low level cache
-        result.put("neostore.nodestore.db.mapped_memory", "0");
-        result.put("neostore.relationshipstore.db.mapped_memory", "0");
-        result.put("neostore.propertystore.db.index.keys.mapped_memory", "0");
-        result.put("neostore.propertystore.db.index.mapped_memory", "0");
-        result.put("neostore.propertystore.db.mapped_memory", "0");
-        result.put("neostore.propertystore.db.strings.mapped_memory", "0");
-        result.put("neostore.propertystore.db.arrays.mapped_memory", "0");
+        result.put("neostore.nodestore.db.mapped_memory", "25M");
+        result.put("neostore.relationshipstore.db.mapped_memory", "50M");
+        result.put("neostore.propertystore.db.mapped_memory", "90M");
+        result.put("neostore.propertystore.db.strings.mapped_memory", "130M");
+        result.put("neostore.propertystore.db.arrays.mapped_memory", "130M");
 
         //high level cache
-        result.put("cache_type", "none");
+        result.put("cache_type", "strong");
 
         return result;
     }
@@ -59,6 +57,6 @@ public class NoCache implements CacheConfiguration {
      */
     @Override
     public String toString() {
-        return "nocache";
+        return "highcache";
     }
 }

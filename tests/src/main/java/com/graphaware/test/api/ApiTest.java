@@ -34,7 +34,7 @@ import java.io.IOException;
 /**
  *
  */
-public abstract class GraphAwareApiTest {
+public abstract class ApiTest {
 
     protected static final int PORT = 8082;
 

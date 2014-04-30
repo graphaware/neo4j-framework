@@ -14,26 +14,18 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.test.perf;
-
-import java.util.List;
+package com.graphaware.test.performance;
 
 /**
- * Parameter of a {@link PerformanceTest}. This can be anything, batch size, number of queries, type of queries,...
+ * Parameter with three different cache configurations.
  */
-public interface Parameter<T> {
+public class CacheParameter extends ObjectParameter<CacheConfiguration> {
 
-    /**
-     * Get the name of this parameter. Appears in the results as column heading.
-     *
-     * @return parameter name.
-     */
-    String getName();
+    public CacheParameter() {
+        this("cache");
+    }
 
-    /**
-     * Get the values this parameter takes on. These are tested and reported in the order they are returned.
-     *
-     * @return parameter values.
-     */
-    List<T> getValues();
+    public CacheParameter(String name) {
+        super(name, new NoCache(), new LowLevelCache(), new HighLevelCache());
+    }
 }

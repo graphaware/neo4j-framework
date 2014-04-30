@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2014 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -14,34 +14,27 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.performance;
+package com.graphaware.test.performance;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 
 /**
- * Enumerated {@link Parameter}.
+ * Cache configuration.
  */
-public class EnumParameter extends NamedParameter<Enum> {
-
-    private final Class<? extends Enum> enumClass;
+public interface CacheConfiguration {
 
     /**
-     * Construct a new parameter with values taken from the enum constants (order preserved).
+     * Does cache need to be warmed up?
      *
-     * @param name      of the parameter.
-     * @param enumClass enum.
+     * @return true iff cache needs to be warmed up with this configuration.
      */
-    public EnumParameter(String name, Class<? extends Enum> enumClass) {
-        super(name);
-        this.enumClass = enumClass;
-    }
+    boolean needsWarmup();
 
     /**
-     * {@inheritDoc}
+     * Add the cache configuration to the database configuration.
+     *
+     * @param existingConfig existing config.
+     * @return new config.
      */
-    @Override
-    public List<Enum> getValues() {
-        return Arrays.asList(enumClass.getEnumConstants());
-    }
+    Map<String, String> addToConfig(Map<String, String> existingConfig);
 }

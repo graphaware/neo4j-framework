@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.test.perf;
+package com.graphaware.test.performance;
 
 import java.util.Arrays;
 import java.util.List;
