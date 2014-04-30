@@ -3,14 +3,14 @@ GraphAware Neo4j Framework
 
 [![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework)
 
-The aim of the GraphAware Framework is to speed-up development with Neo4j by providing useful generic as well domain-specific
-functionality, analytical capabilities, [graph algorithms](#algos), etc. All code in this repository is licensed under the
+The aim of the GraphAware Framework is to speed-up development with Neo4j by providing a platform for useful generic as
+well domain-specific functionality, analytical capabilities, graph algorithms, etc. All code in this repository is licensed under the
 GPL license.
 
 When using Neo4j in the <a href="http://docs.neo4j.org/chunked/stable/server-installation.html" target="_blank">standalone server</a> mode,
 deploying the GraphAware Framework is a matter of [downloading](http://search.maven.org/remotecontent?filepath=com/graphaware/neo4j-framework/2.0-1.0/neo4j-framework-2.0-1.0.jar)
 a single file, copying it to a specific location (`plugins` directory in your Neo4j installation), and restarting the server.
-The framework is then used via calls to its REST API.
+The framework and additional plug-in modules are then used via calls to their REST APIs.
 
 Java developers that use Neo4j in <a href="http://docs.neo4j.org/chunked/stable/tutorials-java-embedded.html" target="_blank">embedded mode</a>
 and those developing Neo4j <a href="http://docs.neo4j.org/chunked/stable/server-plugins.html" target="_blank">server plugins</a>
@@ -55,9 +55,9 @@ your pom.xml instead of using the .jar:
 
 ### Note on Versioning Scheme
 
-The version number has two parts, separated by a dash. The first part indicates compatibility with a Neo4j version.
- The second part is the version of the framework. For example, version 2.0-1.0 is a 1.0 version of the framework
- compatible with Neo4j 2.0.x
+The version number has two parts. The first three numbers indicate compatibility with a Neo4j version.
+ The last number is the version of the framework. For example, version 2.0.3.1 is version 1 of the framework
+ compatible with Neo4j 2.0.3
 
 Functionality
 -------------
@@ -570,7 +570,7 @@ The following functionality is also provided:
 License
 -------
 
-Copyright (c) 2013 GraphAware
+Copyright (c) 2014 GraphAware
 
 GraphAware is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
