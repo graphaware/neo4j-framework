@@ -33,47 +33,43 @@
         <module>framework-server-enterprise</module>
     </modules>
 
-    <properties>
-        <graphaware.version>2.0.3.1-SNAPSHOT</graphaware.version>
-    </properties>
-
     <dependencyManagement>
         <dependencies>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>api</artifactId>
-                <version>${graphaware.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime</artifactId>
-                <version>${graphaware.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>server-community</artifactId>
-                <version>${graphaware.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>server-enterprise</artifactId>
-                <version>${graphaware.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>framework-embedded</artifactId>
-                <version>${graphaware.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>framework-server-community</artifactId>
-                <version>${graphaware.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
         </dependencies>
