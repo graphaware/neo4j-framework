@@ -23,7 +23,7 @@ import java.util.List;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
-import static com.graphaware.common.test.IterableUtils.toList;
+import static com.graphaware.common.util.IterableUtils.toList;
 import static org.junit.Assert.*;
 
 /**

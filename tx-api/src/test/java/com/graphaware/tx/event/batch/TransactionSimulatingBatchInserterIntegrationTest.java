@@ -44,7 +44,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.graphaware.common.test.IterableUtils.count;
+import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.*;

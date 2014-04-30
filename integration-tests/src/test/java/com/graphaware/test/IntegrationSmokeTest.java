@@ -16,7 +16,7 @@
 
 package com.graphaware.test;
 
-import com.graphaware.common.test.TestUtils;
+import com.graphaware.test.util.TestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.http.HttpStatus;
@@ -30,7 +30,7 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.File;
 import java.io.IOException;
 
-import static com.graphaware.common.test.TestUtils.assertJsonEquals;
+import static com.graphaware.test.util.TestUtils.*;
 import static junit.framework.Assert.assertTrue;
 
 /**
@@ -79,7 +79,7 @@ public class IntegrationSmokeTest {
     public void graphAwareApisAreMountedWhenPresentOnClasspath() throws InterruptedException, IOException {
         setUp("neo4j-server-no-runtime.properties");
 
-        TestUtils.post("http://localhost:7474/db/data/cypher",
+        post("http://localhost:7474/db/data/cypher",
                 "{\"query\" : \"" +
                         "CREATE (one:L1:L2 { name:\\\"one\\\" }) " +
                         "CREATE (two:L2 { name:\\\"two\\\" }) " +
@@ -95,7 +95,7 @@ public class IntegrationSmokeTest {
                         "\"}",
                 HttpStatus.OK_200);
 
-        assertJsonEquals(TestUtils.post("http://localhost:7474/graphaware/api/library/algorithm/path/increasinglyLongerShortestPath",
+        assertJsonEquals(post("http://localhost:7474/graphaware/api/library/algorithm/path/increasinglyLongerShortestPath",
                 jsonAsString("minimalInput"), HttpStatus.OK_200),
                 jsonAsString("minimalOutput"));
     }

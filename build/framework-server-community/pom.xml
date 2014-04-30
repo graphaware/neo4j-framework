@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>build</artifactId>
-        <version>1.9-1.9-SNAPSHOT</version>
+        <version>2.0.2.v1-SNAPSHOT</version>
     </parent>
     <artifactId>framework-server-community</artifactId>
     <packaging>jar</packaging>
@@ -32,7 +32,7 @@
     <dependencies>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>graphaware-embedded</artifactId>
+            <artifactId>framework-embedded</artifactId>
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
@@ -41,18 +41,6 @@
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>server-community</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>algorithms-rest</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>runtime-rest</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>relcount-rest</artifactId>
         </dependency>
     </dependencies>
 

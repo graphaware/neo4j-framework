@@ -16,7 +16,7 @@
 
 package com.graphaware.tx.executor.batch;
 
-import com.graphaware.common.test.TestUtils;
+import com.graphaware.test.util.TestUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -25,7 +25,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.common.test.IterableUtils.countNodes;
+import static com.graphaware.common.util.IterableUtils.*;
+import static com.graphaware.test.util.TestUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -63,14 +64,14 @@ public class MultiThreadedBatchTransactionExecutorTest {
         final BatchTransactionExecutor singleThreadedBatchExecutor = new NoInputBatchTransactionExecutor(database, 100, 40000, CreateNode.getInstance());
         final BatchTransactionExecutor multiThreadedBatchExecutor = new MultiThreadedBatchTransactionExecutor(new NoInputBatchTransactionExecutor(database, 100, 40000, CreateNode.getInstance()), 4);
 
-        long singleThreadedTime = TestUtils.time(new TestUtils.Timed() {
+        long singleThreadedTime = time(new Timed() {
             @Override
             public void time() {
                 singleThreadedBatchExecutor.execute();
             }
         });
 
-        long multiThreadedTime = TestUtils.time(new TestUtils.Timed() {
+        long multiThreadedTime = time(new Timed() {
             @Override
             public void time() {
                 multiThreadedBatchExecutor.execute();

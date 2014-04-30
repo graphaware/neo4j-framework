@@ -18,11 +18,11 @@ package com.graphaware.common.util;
 
 import com.graphaware.common.change.Change;
 import com.graphaware.common.strategy.InclusionStrategy;
-import com.graphaware.common.test.TestDataBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
@@ -50,11 +50,11 @@ public class PropertyContainerUtilsTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        new TestDataBuilder(database)
-                .node()
-                .node().setProp("key", "value")
-                .relationshipTo(0, "test")
-                .node().setProp("key", "value");
+        new ExecutionEngine(database).execute("CREATE " +
+                "(a), " +
+                "(b {key:'value'})," +
+                "(b)-[:test]->(a)," +
+                "(c {key:'value'})");
     }
 
     @After
@@ -118,28 +118,28 @@ public class PropertyContainerUtilsTest {
     @Test
     public void verifyPropertiesToMap() {
         try (Transaction tx = database.beginTx()) {
-        assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
+            assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
 
-        assertEquals(Collections.singletonMap("key", (Object) "value"), propertiesToMap(database.getNodeById(2)));
+            assertEquals(Collections.singletonMap("key", (Object) "value"), propertiesToMap(database.getNodeById(2)));
 
-        assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(database.getNodeById(2), new InclusionStrategy<String>() {
-            @Override
-            public boolean include(String object) {
-                return !"key".equals(object);
-            }
-        }));
+            assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(database.getNodeById(2), new InclusionStrategy<String>() {
+                @Override
+                public boolean include(String object) {
+                    return !"key".equals(object);
+                }
+            }));
         }
     }
 
     @Test
     public void shouldDeleteNodeWithAllRelationships() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        new TestDataBuilder(database)
-                .node()
-                .node().setProp("name", "node1")
-                .node().setProp("name", "node2")
-                .relationshipTo(1, "test").setProp("key1", "value1")
-                .relationshipTo(0, "test").setProp("key1", "value1");
+        new ExecutionEngine(database).execute("CREATE " +
+                "(a), " +
+                "(b {name:'node1'})," +
+                "(c {name:'node2'})," +
+                "(c)-[:test {key1:'value1'}]->(b)," +
+                "(c)-[:test {key1:'value1'}]->(a)");
 
         try (Transaction tx = database.beginTx()) {
             assertEquals(2, deleteNodeAndRelationships(database.getNodeById(2)));

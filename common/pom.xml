@@ -20,12 +20,12 @@
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>framework-parent</artifactId>
-        <version>1.9-1.9-SNAPSHOT</version>
+        <version>2.0.2.v1-SNAPSHOT</version>
     </parent>
     <artifactId>common</artifactId>
     <packaging>jar</packaging>
 
-    <name>GraphAware Commons</name>
+    <name>GraphAware Common</name>
     <description>General-Purpose Library of Neo4j-Related Code</description>
     <url>http://graphaware.com</url>
 
@@ -34,30 +34,6 @@
             <groupId>com.esotericsoftware.kryo</groupId>
             <artifactId>kryo</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-        </dependency>
-
     </dependencies>
 
     <build>

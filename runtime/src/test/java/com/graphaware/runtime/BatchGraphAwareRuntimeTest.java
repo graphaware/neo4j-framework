@@ -42,7 +42,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 
-import static com.graphaware.common.test.IterableUtils.count;
+import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.runtime.ProductionGraphAwareRuntime.*;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_ROOT;

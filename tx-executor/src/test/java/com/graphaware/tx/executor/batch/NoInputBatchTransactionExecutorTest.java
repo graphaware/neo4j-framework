@@ -24,7 +24,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.common.test.IterableUtils.countNodes;
+import static com.graphaware.common.util.IterableUtils.*;
 import static org.junit.Assert.assertEquals;
 
 /**
