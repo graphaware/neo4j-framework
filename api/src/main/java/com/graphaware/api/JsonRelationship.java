@@ -27,7 +27,7 @@ import org.neo4j.graphdb.Relationship;
 public class JsonRelationship extends JsonPropertyContainer {
 
     private String type;
-    private Direction direction;
+    private Direction direction = Direction.BOTH;
 
     public JsonRelationship(Relationship relationship, JsonInput jsonInput, Node pointOfView) {
         super(relationship.getId());
