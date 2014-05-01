@@ -25,7 +25,6 @@ import com.graphaware.common.description.relationship.DetachedRelationshipDescri
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
-import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.objenesis.strategy.StdInstantiatorStrategy;
 
 import java.io.ByteArrayOutputStream;

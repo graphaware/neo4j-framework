@@ -16,8 +16,8 @@
 
 package com.graphaware.tx.event.demo;
 
-import com.graphaware.common.change.Change;
 import com.graphaware.common.description.property.LiteralPropertiesDescription;
+import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;

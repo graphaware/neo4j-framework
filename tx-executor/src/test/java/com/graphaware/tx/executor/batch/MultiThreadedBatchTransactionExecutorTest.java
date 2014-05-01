@@ -16,7 +16,6 @@
 
 package com.graphaware.tx.executor.batch;
 
-import com.graphaware.test.util.TestUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -25,8 +24,9 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.common.util.IterableUtils.*;
-import static com.graphaware.test.util.TestUtils.*;
+import static com.graphaware.common.util.IterableUtils.countNodes;
+import static com.graphaware.test.util.TestUtils.Timed;
+import static com.graphaware.test.util.TestUtils.time;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

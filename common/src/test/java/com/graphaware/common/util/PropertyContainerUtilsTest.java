@@ -34,7 +34,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import static com.graphaware.common.util.PropertyContainerUtils.*;
-import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;

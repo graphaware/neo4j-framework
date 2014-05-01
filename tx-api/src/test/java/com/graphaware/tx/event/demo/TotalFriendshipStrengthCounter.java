@@ -16,7 +16,7 @@
 
 package com.graphaware.tx.event.demo;
 
-import com.graphaware.common.change.Change;
+import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.neo4j.graphdb.*;

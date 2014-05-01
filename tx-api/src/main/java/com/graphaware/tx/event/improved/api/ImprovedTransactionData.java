@@ -16,7 +16,6 @@
 
 package com.graphaware.tx.event.improved.api;
 
-import com.graphaware.common.change.Change;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -54,7 +53,7 @@ import java.util.Map;
  * Properties of created and deleted containers will not be returned by {@link #changedProperties(org.neo4j.graphdb.Node)} and {@link #changedProperties(org.neo4j.graphdb.Relationship)}
  * as these only return changed properties of changed {@link org.neo4j.graphdb.PropertyContainer}s.
  * <p/>
- * Changed {@link org.neo4j.graphdb.PropertyContainer}s and properties are wrapped in a {@link com.graphaware.common.change.Change} object which holds
+ * Changed {@link org.neo4j.graphdb.PropertyContainer}s and properties are wrapped in a {@link Change} object which holds
  * the previous state of the object before the transaction started, and the current state of the object (when the transaction
  * commits).
  * <p/>

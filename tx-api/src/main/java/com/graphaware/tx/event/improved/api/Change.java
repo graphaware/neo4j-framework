@@ -16,14 +16,13 @@
 
 package com.graphaware.tx.event.improved.api;
 
-import com.graphaware.common.util.PropertyContainerUtils;
 import org.neo4j.graphdb.PropertyContainer;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.graphaware.common.util.PropertyContainerUtils.*;
+import static com.graphaware.common.util.PropertyContainerUtils.id;
 
 /**
  * Change in the state of an object, encapsulating the old (previous) and the new (current).

@@ -16,7 +16,6 @@
 
 package com.graphaware.tx.executor.batch;
 
-import com.graphaware.common.util.IterableUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +27,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.graphaware.common.util.IterableUtils.*;
+import static com.graphaware.common.util.IterableUtils.countNodes;
 import static org.junit.Assert.assertEquals;
 
 /**

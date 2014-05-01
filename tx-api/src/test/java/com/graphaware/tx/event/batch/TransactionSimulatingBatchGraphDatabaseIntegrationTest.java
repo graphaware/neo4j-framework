@@ -16,8 +16,8 @@
 
 package com.graphaware.tx.event.batch;
 
-import com.graphaware.common.change.Change;
 import com.graphaware.test.util.TestDataBuilder;
+import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import com.graphaware.tx.executor.single.*;
@@ -45,9 +45,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.graphaware.common.change.Change.*;
 import static com.graphaware.common.util.IterableUtils.count;
-import static com.graphaware.common.util.PropertyContainerUtils.*;
+import static com.graphaware.common.util.PropertyContainerUtils.propertiesToMap;
+import static com.graphaware.common.util.PropertyContainerUtils.propertyContainersToMap;
+import static com.graphaware.tx.event.improved.api.Change.*;
 import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;

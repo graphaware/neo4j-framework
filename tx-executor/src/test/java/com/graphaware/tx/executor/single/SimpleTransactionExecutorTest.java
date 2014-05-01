@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.common.util.IterableUtils.*;
+import static com.graphaware.common.util.IterableUtils.countNodes;
 import static junit.framework.Assert.assertEquals;
 
 /**

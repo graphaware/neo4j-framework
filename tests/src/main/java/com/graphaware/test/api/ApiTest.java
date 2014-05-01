@@ -17,7 +17,6 @@
 package com.graphaware.test.api;
 
 import com.graphaware.server.web.WebAppInitializer;
-import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
@@ -26,10 +25,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.springframework.core.io.ClassPathResource;
 
 import javax.servlet.ServletException;
-import java.io.IOException;
 
 /**
  * Abstract base-class for API tests. Starts a Neo4j server on the port specified in the constructor (or 8082 by default)

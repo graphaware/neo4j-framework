@@ -29,8 +29,6 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.File;
 import java.io.IOException;
 
-import static junit.framework.Assert.assertTrue;
-
 /**
  * Base class for server mode integration tests that are as close to real Neo4j server deployment as possible.
  * <p/>

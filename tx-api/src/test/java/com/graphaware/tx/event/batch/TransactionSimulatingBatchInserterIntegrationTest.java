@@ -16,11 +16,11 @@
 
 package com.graphaware.tx.event.batch;
 
-import com.graphaware.common.change.Change;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserterImpl;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterRelationship;
+import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
@@ -44,9 +44,10 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.graphaware.common.change.Change.*;
 import static com.graphaware.common.util.IterableUtils.count;
-import static com.graphaware.common.util.PropertyContainerUtils.*;
+import static com.graphaware.common.util.PropertyContainerUtils.propertiesToMap;
+import static com.graphaware.common.util.PropertyContainerUtils.propertyContainersToMap;
+import static com.graphaware.tx.event.improved.api.Change.*;
 import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;

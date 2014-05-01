@@ -16,7 +16,7 @@
 
 package com.graphaware.tx.event.improved.data;
 
-import com.graphaware.common.change.Change;
+import com.graphaware.tx.event.improved.api.Change;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;

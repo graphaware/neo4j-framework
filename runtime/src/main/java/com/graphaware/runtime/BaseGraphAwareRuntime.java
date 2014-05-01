@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.common.description.serialize.Serializer;
+import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.strategy.InclusionStrategy;
 import com.graphaware.common.util.PropertyContainerUtils;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;

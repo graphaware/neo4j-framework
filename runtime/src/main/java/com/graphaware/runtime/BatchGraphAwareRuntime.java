@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.common.description.serialize.Serializer;
+import com.graphaware.common.serialize.Serializer;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
 import org.apache.log4j.Logger;
