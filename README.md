@@ -4,8 +4,8 @@ GraphAware Neo4j Framework
 [![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework)
 
 The aim of the GraphAware Framework is to speed-up development with Neo4j by providing a platform for useful generic as
-well domain-specific functionality, analytical capabilities, graph algorithms, etc. All code in this repository is licensed under the
-GPL license.
+well domain-specific functionality, analytical capabilities, graph algorithms, etc. All code in this repository is
+licensed under the GPL license.
 
 When using Neo4j in the <a href="http://docs.neo4j.org/chunked/stable/server-installation.html" target="_blank">standalone server</a> mode,
 deploying the GraphAware Framework is a matter of [downloading](http://search.maven.org/remotecontent?filepath=com/graphaware/neo4j-framework/2.0-1.0/neo4j-framework-2.0-1.0.jar)

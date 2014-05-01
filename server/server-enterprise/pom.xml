@@ -41,6 +41,11 @@
             <groupId>org.neo4j.app</groupId>
             <artifactId>neo4j-server-enterprise</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>tests</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
