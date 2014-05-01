@@ -340,19 +340,19 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime</artifactId>
-                <version>${graphaware.version</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>server-community</artifactId>
-                <version>${graphaware.version</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>server-enterprise</artifactId>
-                <version>${graphaware.version</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
         </dependencies>
