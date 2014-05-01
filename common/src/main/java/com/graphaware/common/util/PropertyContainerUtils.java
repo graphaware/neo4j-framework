@@ -16,7 +16,6 @@
 
 package com.graphaware.common.util;
 
-import com.graphaware.common.change.Change;
 import com.graphaware.common.strategy.IncludeAll;
 import com.graphaware.common.strategy.InclusionStrategy;
 import org.neo4j.graphdb.Node;

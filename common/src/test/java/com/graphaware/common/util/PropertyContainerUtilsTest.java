@@ -16,7 +16,6 @@
 
 package com.graphaware.common.util;
 
-import com.graphaware.common.change.Change;
 import com.graphaware.common.strategy.InclusionStrategy;
 import org.junit.After;
 import org.junit.Before;

@@ -1,4 +1,4 @@
-package com.graphaware.common.change;
+package com.graphaware.tx.event.improved.api;
 
 import org.junit.After;
 import org.junit.Before;
@@ -11,7 +11,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Map;
 
-import static com.graphaware.common.change.Change.*;
+import static com.graphaware.tx.event.improved.api.Change.*;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 

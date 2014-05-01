@@ -16,7 +16,7 @@
 
 package com.graphaware.common.description.relationship;
 
-import com.graphaware.common.description.serialize.Serializer;
+import com.graphaware.common.serialize.Serializer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
