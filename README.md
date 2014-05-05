@@ -4,76 +4,110 @@ GraphAware Neo4j Framework
 [![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework)
 
 The aim of the GraphAware Framework is to speed-up development with Neo4j by providing a platform for useful generic as
-well domain-specific functionality, analytical capabilities, graph algorithms, etc. All code in this repository is
+well as domain-specific functionality, analytical capabilities, graph algorithms, etc. All code in this repository is
 licensed under the GPL license.
 
 When using Neo4j in the <a href="http://docs.neo4j.org/chunked/stable/server-installation.html" target="_blank">standalone server</a> mode,
-deploying the GraphAware Framework is a matter of [downloading](http://search.maven.org/remotecontent?filepath=com/graphaware/neo4j-framework/2.0-1.0/neo4j-framework-2.0-1.0.jar)
-a single file, copying it to a specific location (`plugins` directory in your Neo4j installation), and restarting the server.
-The framework and additional plug-in modules are then used via calls to their REST APIs.
+deploying the GraphAware Framework (and any of its plug-in modules) is a matter of [downloading](#download) the appropriate .jar files,
+copying them into the `plugins` directory in your Neo4j installation, and restarting the server. The framework and
+additional modules are then used via calls to their REST APIs.
 
 Java developers that use Neo4j in <a href="http://docs.neo4j.org/chunked/stable/tutorials-java-embedded.html" target="_blank">embedded mode</a>
 and those developing Neo4j <a href="http://docs.neo4j.org/chunked/stable/server-plugins.html" target="_blank">server plugins</a>
 and/or <a href="http://docs.neo4j.org/chunked/stable/server-unmanaged-extensions.html" target="_blank">unmanaged extensions</a>
-can include use the framework as a dependency for their Java project and use it as a library
-of useful tested code, in addition to the functionality provided for standalone deployments.
+can include use the framework as a dependency for their Java project and use it as a library of useful tested code,
+in addition to the functionality provided for standalone deployments.
 
+<a name="download"/>
 Getting GraphAware Framework
 ----------------------------
 
 ### Releases
 
-Releases are synced to Maven Central repository. To use the latest release for your Neo4j server, [download it](http://search.maven.org/remotecontent?filepath=com/graphaware/neo4j-framework/2.0-1.0/neo4j-framework-2.0-1.0.jar)
-and put it the `plugins` directory in your Neo4j installation. Then restart the server. For embedded mode usage and/or plugin Java development,
-put the downloaded .jar file on your classpath. When using Maven for dependency management, include the following snippet in your pom.xml:
+Releases are synced to Maven Central repository. To use the latest release, download the appropriate version
+and put it the `plugins` directory in your Neo4j server installation and restart the server (server mode),
+or on the classpath (embedded mode).
+
+The following downloads are available:
+* [GraphAware Framework for Embedded Mode, version 2.0.3.3](http://graphaware.com/downloads/graphaware-embedded-all-2.0.3.3.jar)
+* [GraphAware Framework for Server Mode (Community), version 2.0.3.3](http://graphaware.com/downloads/graphaware-server-community-all-2.0.3.3.jar)
+* [GraphAware Framework for Server Mode (Enterprise), version 2.0.3.3](http://graphaware.com/downloads/graphaware-server-enterprise-all-2.0.3.3.jar)
+
+When using Maven for dependency management, include one of more of the following dependencies in your pom.xml. Read further
+down this page to find out which dependencies you will need.
 
     <dependencies>
         ...
         <dependency>
-            <groupId>com.graphaware</groupId>
-            <artifactId>neo4j-framework</artifactId>
-            <version>2.0-1.0</version>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>api</artifactId>
+            <version>2.0.3.3</version>
         </dependency>
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>common</artifactId>
+            <version>2.0.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>runtime</artifactId>
+            <version>2.0.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>tests</artifactId>
+            <version>2.0.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>tx-api</artifactId>
+            <version>2.0.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>tx-executor</artifactId>
+            <version>2.0.3.3</version>
+        </dependency>
+
         ...
     </dependencies>
 
 ### Snapshots
 
-To use the latest development version, just clone this repository, run `mvn clean install` and use the produced .jar
-file (found in target). If using Maven for your own development, include the following snippet in
-your pom.xml instead of using the .jar:
-
-    <dependencies>
-        ...
-        <dependency>
-            <groupId>com.graphaware</groupId>
-            <artifactId>neo4j-framework</artifactId>
-            <version>2.0-1.1-SNAPSHOT</version>
-        </dependency>
-        ...
-    </dependencies>
+To use the latest development version, just clone this repository, run `mvn clean install` and change the version in the
+dependencies above to 2.0.3.4-SNAPSHOT. You will also need to clone [this repository](https://github.com/graphaware/neo4j-framework-build.git)
+and run `mvn clean install` on that if you want standalone .jar files with all dependencies.
 
 ### Note on Versioning Scheme
 
 The version number has two parts. The first three numbers indicate compatibility with a Neo4j version.
- The last number is the version of the framework. For example, version 2.0.3.1 is version 1 of the framework
+ The last number is the version of the framework. For example, version 2.0.3.3 is version 3 of the framework
  compatible with Neo4j 2.0.3
 
 Functionality
 -------------
 
-GraphAware Framework provides the following functionality:
+There are two key pieces of functionality.
+* [GraphAware Server](#server) is a Neo4j server extension that allows people to develop
+REST APIs on top of Neo4j using Spring MVC, rather than JAX-RS.
+* [GraphAware Runtime](#runtime) is, as the name suggests, a runtime
+environment for both embedded and server deployments, which allows the use of pre-built and development of custom
+ GraphAware Runtime Modules. These modules are pieces of useful functionality that are made aware of transactions
+ executed against the database in real-time.
 
-* Graph Algorithms
-    * Increasingly Longer Shortest Path
-* GraphAware Runtime with the following Runtime Modules
-    * Relationship Counter
+Additionally, for Java developers only (i.e., for embedded mode and/or plugin development), the following functionality
+is provided:
 
-Additionally, for Java developers only (i.e., for embedded mode and/or plugin development)
+* [GraphAware Test](#test) - a testing framework for Neo4j and GraphAware, featuring (among other things) [GraphUnit](#graphunit) - a
+library for simple graph unit-testing
+* [Improved Transaction API](#tx-api)
+* [Transaction Executor](#tx-executor) and [Batch Transaction Executor](#batch-tx)
+* [Miscellaneous Utilities](#utils)
 
-* Transaction Executor
-* Batch Transaction Executor
-* Improved Transaction API
+<a name="server"/>
+GraphAware Server
+-----------------
+
 
 <a name="fw"/>
 Framework Usage
