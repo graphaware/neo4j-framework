@@ -24,6 +24,10 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+
 import static com.graphaware.common.util.IterableUtils.*;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
@@ -122,5 +126,20 @@ public class IterableUtilsTest {
         assertTrue(asList(0L, 1L).contains(random(asList(0L, 1L))));
         assertTrue(asList(0L, 1L).contains(random(asList(0L, 1L))));
         assertTrue(asList(0L, 1L).contains(random(asList(0L, 1L))));
+    }
+
+    @Test
+    public void singleElementShouldBeReturnedWhenIterableHasOneElement() {
+        assertEquals("test", getSingle(Collections.singletonList("test")));
+    }
+
+    @Test
+    public void nullShouldBeReturnedWhenIterableHasNoElements() {
+        assertNull(getSingle(Collections.emptyList()));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void exceptionShouldBeThrownWhenIterableHasMoreThanOneElement() {
+        getSingle(Arrays.asList("test1", "test2"));
     }
 }

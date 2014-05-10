@@ -20,10 +20,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.tooling.GlobalGraphOperations;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Utility methods for dealing with {@link Iterable}s.
@@ -113,6 +110,29 @@ public final class IterableUtils {
         List<T> list = toList(iterable);
         Collections.shuffle(list);
         return list.get(0);
+    }
+
+    /**
+     * Get a single element from iterable.
+     *
+     * @param iterable to find a single element.
+     * @param <T>      type of the element.
+     * @return the element iff there is exactly one, null iff there is 0.
+     * @throws IllegalStateException in case the iterable contains more than 1 element.
+     */
+    public static <T> T getSingle(Iterable<T> iterable) {
+        T result = null;
+
+        Iterator<T> iterator = iterable.iterator();
+        if (iterator.hasNext()) {
+            result = iterator.next();
+        }
+
+        if (iterator.hasNext()) {
+            throw new IllegalStateException("Iterable has more than one element, which is unexpected");
+        }
+
+        return result;
     }
 
     private IterableUtils() {
