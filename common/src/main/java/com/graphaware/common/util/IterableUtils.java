@@ -113,17 +113,16 @@ public final class IterableUtils {
     }
 
     /**
-     * Get a single element from iterable.
+     * Get a single element from iterator.
      *
-     * @param iterable to find a single element.
+     * @param iterator to find a single element.
      * @param <T>      type of the element.
      * @return the element iff there is exactly one, null iff there is 0.
      * @throws IllegalStateException in case the iterable contains more than 1 element.
      */
-    public static <T> T getSingle(Iterable<T> iterable) {
+    public static <T> T getSingle(Iterator<T> iterator) {
         T result = null;
 
-        Iterator<T> iterator = iterable.iterator();
         if (iterator.hasNext()) {
             result = iterator.next();
         }
@@ -133,6 +132,18 @@ public final class IterableUtils {
         }
 
         return result;
+    }
+
+    /**
+     * Get a single element from iterable.
+     *
+     * @param iterable to find a single element.
+     * @param <T>      type of the element.
+     * @return the element iff there is exactly one, null iff there is 0.
+     * @throws IllegalStateException in case the iterable contains more than 1 element.
+     */
+    public static <T> T getSingle(Iterable<T> iterable) {
+        return getSingle(iterable.iterator());
     }
 
     private IterableUtils() {
