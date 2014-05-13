@@ -7,16 +7,42 @@ The aim of the GraphAware Framework is to speed-up development with Neo4j by pro
 well as domain-specific functionality, analytical capabilities, graph algorithms, etc. All code in this repository is
 licensed under the GPL license.
 
+Features Overview
+-----------------
+
+On a high level, there are two key pieces of functionality:
+* [GraphAware Server](#server) is a Neo4j server extension that allows developers to build (REST) APIs on top of Neo4j
+using Spring MVC, rather than JAX-RS.
+* [GraphAware Runtime](#runtime) is a runtime environment for both embedded and server deployments, which allows the use
+of pre-built as well as custom modules called "GraphAware Runtime Modules". These modules typically extend the core
+functionality of the database by transparently enriching/modifying/preventing ongoing transactions in real-time.
+
+Additionally, for Java developers only (i.e., for embedded mode, managed/unmanaged extensions development, and GraphAware Module development),
+the following functionality is provided:
+
+* [GraphAware Test](#test) - a testing framework, featuring (among other things) [GraphUnit](#graphunit) - a library for simple graph unit-testing
+* [Improved Neo4j Transaction API](#tx-api)
+* [Transaction Executor](#tx-executor) and [Batch Transaction Executor](#batch-tx)
+* [Miscellaneous Utilities](#utils)
+
+Framework Usage
+---------------
+
+<a name="servermode"/>
+### Server Mode
+
 When using Neo4j in the <a href="http://docs.neo4j.org/chunked/stable/server-installation.html" target="_blank">standalone server</a> mode,
-deploying the GraphAware Framework (and any of its plug-in modules) is a matter of [downloading](#download) the appropriate .jar files,
-copying them into the `plugins` directory in your Neo4j installation, and restarting the server. The framework and
-additional modules are then used via calls to their REST APIs.
+deploying the GraphAware Framework (and any GraphAware Modules) is a matter of [downloading](#download) the appropriate .jar files,
+copying them into the `plugins` directory in your Neo4j installation, and restarting the server. The framework and modules
+are then used via calls to their REST APIs, if they provide some.
+
+### Embedded Module / Java Development
 
 Java developers that use Neo4j in <a href="http://docs.neo4j.org/chunked/stable/tutorials-java-embedded.html" target="_blank">embedded mode</a>
-and those developing Neo4j <a href="http://docs.neo4j.org/chunked/stable/server-plugins.html" target="_blank">server plugins</a>
-and/or <a href="http://docs.neo4j.org/chunked/stable/server-unmanaged-extensions.html" target="_blank">unmanaged extensions</a>
-can include use the framework as a dependency for their Java project and use it as a library of useful tested code,
-in addition to the functionality provided for standalone deployments.
+and those developing Neo4j <a href="http://docs.neo4j.org/chunked/stable/server-plugins.html" target="_blank">server plugins</a>,
+<a href="http://docs.neo4j.org/chunked/stable/server-unmanaged-extensions.html" target="_blank">unmanaged extensions</a>,
+or GraphAware Modules can include use the framework as a dependency for their Java project and use it as a library of
+useful tested code, in addition to the functionality provided for [server mode](#servermode).
 
 <a name="download"/>
 Getting GraphAware Framework
@@ -24,9 +50,8 @@ Getting GraphAware Framework
 
 ### Releases
 
-Releases are synced to Maven Central repository. To use the latest release, download the appropriate version
-and put it the `plugins` directory in your Neo4j server installation and restart the server (server mode),
-or on the classpath (embedded mode).
+Releases are synced to Maven Central repository. To use the latest release, download the appropriate version and put it
+the `plugins` directory in your Neo4j server installation and restart the server (server mode), or on the classpath (embedded mode).
 
 The following downloads are available:
 * [GraphAware Framework for Embedded Mode, version 2.0.3.3](http://graphaware.com/downloads/graphaware-embedded-all-2.0.3.3.jar)
@@ -34,7 +59,7 @@ The following downloads are available:
 * [GraphAware Framework for Server Mode (Enterprise), version 2.0.3.3](http://graphaware.com/downloads/graphaware-server-enterprise-all-2.0.3.3.jar)
 
 When using Maven for dependency management, include one of more of the following dependencies in your pom.xml. Read further
-down this page to find out which dependencies you will need.
+down this page to find out which dependencies you will need. The available ones are:
 
     <dependencies>
         ...
@@ -84,34 +109,133 @@ The version number has two parts. The first three numbers indicate compatibility
  The last number is the version of the framework. For example, version 2.0.3.3 is version 3 of the framework
  compatible with Neo4j 2.0.3
 
-Functionality
--------------
-
-There are two key pieces of functionality.
-* [GraphAware Server](#server) is a Neo4j server extension that allows people to develop
-REST APIs on top of Neo4j using Spring MVC, rather than JAX-RS.
-* [GraphAware Runtime](#runtime) is, as the name suggests, a runtime
-environment for both embedded and server deployments, which allows the use of pre-built and development of custom
- GraphAware Runtime Modules. These modules are pieces of useful functionality that are made aware of transactions
- executed against the database in real-time.
-
-Additionally, for Java developers only (i.e., for embedded mode and/or plugin development), the following functionality
-is provided:
-
-* [GraphAware Test](#test) - a testing framework for Neo4j and GraphAware, featuring (among other things) [GraphUnit](#graphunit) - a
-library for simple graph unit-testing
-* [Improved Transaction API](#tx-api)
-* [Transaction Executor](#tx-executor) and [Batch Transaction Executor](#batch-tx)
-* [Miscellaneous Utilities](#utils)
-
 <a name="server"/>
 GraphAware Server
 -----------------
 
+With GraphAware Framework in the `plugins` directory of your Neo4j server installation, it is possible to develop Spring
+MVC Controllers that have the `GraphDatabaseService` wired in.
 
-<a name="fw"/>
-Framework Usage
----------------
+For example, to develop an API endpoint that counts all the nodes in the database using Spring MVC, create the following Controller:
+
+```java
+   /**
+    *  Sample REST API for counting all nodes in the database.
+    */
+   @Controller
+   @RequestMapping("count")
+   public class NodeCountApi {
+
+       private final GraphDatabaseService database;
+
+       @Autowired
+       public NodeCountApi(GraphDatabaseService database) {
+           this.database = database;
+       }
+
+       @RequestMapping(method = RequestMethod.GET)
+       @ResponseBody
+       public long count() {
+           try (Transaction tx = database.beginTx()) {
+               return Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
+           }
+       }
+   }
+```
+
+Compile this code into a .jar file (with dependencies) and place it into the `plugins` directory of your Neo4j server
+installation. You will then be able to issue a `GET` request to `http://your-neo4j-url:7474/graphaware/count` and
+receive the number of nodes in the database in the response body. Note that the `graphaware` part of the URL must be
+there and cannot (yet) be configured.
+
+To get started quickly, use the [Neo4j Spring MVC Maven Archetype](#todo).
+
+To get started manually, you will need the following dependencies:
+
+```xml
+    <dependencies>
+
+        <!-- GraphAware Framework -->
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>common</artifactId>
+            <version>2.0.3.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>api</artifactId>
+            <version>2.0.3.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Spring Framework -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>4.0.0.RELEASE</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Neo4j -->
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j</artifactId>
+            <version>2.0.3.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>server-community</artifactId>
+            <version>2.0.3.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <version>2.0.3.3</version>
+            <artifactId>tests</artifactId>
+            <scope>test
+        </dependency>
+
+    </dependencies>
+```
+
+It is also a good idea to use make sure the resulting .jar file includes all the dependencies, if you use any external
+ones that aren't listed above:
+
+```xml
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <finalName>your-api-module-name-${project.version}</finalName>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+```
+
+
+<a name="runtime"/>
+GraphAware Runtime
+------------------
 
 Using the framework is very easy. Instantiate it, register desired modules, and start it. For example:
 
