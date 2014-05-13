@@ -32,5 +32,5 @@ public interface TransactionCallback<T> {
      * @return result of the transaction, can be null in case of a failure (or when no result is expected, in which case
      *         the generic type of the implementation should be {@link Void}.
      */
-    T doInTransaction(final GraphDatabaseService database);
+    T doInTransaction(final GraphDatabaseService database) throws Exception;
 }

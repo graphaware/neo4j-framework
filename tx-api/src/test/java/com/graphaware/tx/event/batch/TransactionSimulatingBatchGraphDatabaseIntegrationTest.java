@@ -1172,7 +1172,11 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
     protected void mutateGraph(TransactionCallback<Void> transactionCallback, BeforeCommitCallback beforeCommitCallback, ExceptionHandlingStrategy exceptionHandlingStrategy) {
         TestingTxEventHandler handler = new TestingTxEventHandler(beforeCommitCallback);
         database.registerTransactionEventHandler(handler);
-        transactionCallback.doInTransaction(database);
+        try {
+            transactionCallback.doInTransaction(database);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private class TestingTxEventHandler implements TransactionEventHandler {

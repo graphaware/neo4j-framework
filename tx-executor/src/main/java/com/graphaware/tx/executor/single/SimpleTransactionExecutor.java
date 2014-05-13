@@ -67,6 +67,9 @@ public class SimpleTransactionExecutor implements TransactionExecutor {
         } catch (RuntimeException e) {
             tx.failure();
             throw e;
+        } catch (Exception e) {
+            tx.failure();
+            throw new RuntimeException(e);
         } finally {
             tx.close(); //can throw a DB exception
         }
