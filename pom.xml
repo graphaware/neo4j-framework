@@ -423,7 +423,7 @@
                         <goals>
                             <goal>aggregate</goal>
                         </goals>
-                        <phase>package</phase>
+                        <phase>install</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -432,7 +432,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5</version>
                 <configuration>
-                    <preparationGoals>clean package</preparationGoals>
+                    <preparationGoals>clean install</preparationGoals>
                 </configuration>
             </plugin>
         </plugins>
