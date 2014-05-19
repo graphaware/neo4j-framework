@@ -1,5 +1,11 @@
 mvn clean install, make sure it is successful
 
+mvn release:update-versions, update to release
+search and replace the last release version with the new one
+search and replace the last snapshot version with the new one
+
+git commit & push
+
 mvn release:prepare
 mvn release:perform
 
