@@ -108,7 +108,7 @@
                                 <goals>
                                     <goal>aggregate</goal>
                                 </goals>
-                                <phase>site</phase>
+                                <phase>package</phase>
                             </execution>
                         </executions>
                     </plugin>
