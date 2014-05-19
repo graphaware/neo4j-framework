@@ -4,7 +4,11 @@ mvn release:update-versions, update to release
 search and replace the last release version with the new one
 search and replace the last snapshot version with the new one
 
-git commit & push
+mvn clean install
+
+mvn javadoc:aggregate, copy the javadoc from top-level target dir to graphaware website
+
+git reset --hard HEAD
 
 mvn release:prepare
 mvn release:perform

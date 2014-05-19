@@ -2,7 +2,7 @@
 GraphAware Neo4j Framework
 ==========================
 
-[![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework) | [Downloads](#todo) | [Javadoc](#todo) | Latest Release: 2.0.3.3
+[![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework) | [Downloads](http://graphaware.com/downloads/) | [Javadoc](#todo) | Latest Release: 2.0.3.3
 
 GraphAware Framework speeds up development with Neo4j by providing a platform for useful generic as
 well as domain-specific functionality, analytical capabilities, graph algorithms, etc.
