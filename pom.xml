@@ -432,7 +432,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5</version>
                 <configuration>
-                    <preparationGoals>clean install</preparationGoals>
+                    <completionGoals>clean install</completionGoals>
                 </configuration>
             </plugin>
         </plugins>
