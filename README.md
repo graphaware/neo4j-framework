@@ -3,9 +3,8 @@ GraphAware Neo4j Framework
 
 [![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework)
 
-The aim of the GraphAware Framework is to speed-up development with Neo4j by providing a platform for useful generic as
-well as domain-specific functionality, analytical capabilities, graph algorithms, etc. All code in this repository is
-licensed under the GPL license.
+The aim of the GraphAware Framework is to speed up development with Neo4j by providing a platform for useful generic as
+well as domain-specific functionality, analytical capabilities, graph algorithms, etc.
 
 Features Overview
 -----------------
@@ -17,7 +16,7 @@ using Spring MVC, rather than JAX-RS.
 of pre-built as well as custom modules called "GraphAware Runtime Modules". These modules typically extend the core
 functionality of the database by transparently enriching/modifying/preventing ongoing transactions in real-time.
 
-Additionally, for Java developers only (i.e., for embedded mode, managed/unmanaged extensions development, and GraphAware Module development),
+Additionally, for Java developers only (i.e., for embedded mode, managed/unmanaged extensions development, and framework-powered Spring MVC Controllers),
 the following functionality is provided:
 
 * [GraphAware Test](#test) - a testing framework, featuring (among other things) [GraphUnit](#graphunit) - a library for simple graph unit-testing
@@ -32,16 +31,16 @@ Framework Usage
 ### Server Mode
 
 When using Neo4j in the <a href="http://docs.neo4j.org/chunked/stable/server-installation.html" target="_blank">standalone server</a> mode,
-deploying the GraphAware Framework (and any GraphAware Modules) is a matter of [downloading](#download) the appropriate .jar files,
+deploying the GraphAware Framework (and any code using it) is a matter of [downloading](#download) the appropriate .jar files,
 copying them into the `plugins` directory in your Neo4j installation, and restarting the server. The framework and modules
-are then used via calls to their REST APIs, if they provide some.
+are then used via calls to their REST APIs, if they provide any.
 
-### Embedded Module / Java Development
+### Embedded Mode / Java Development
 
 Java developers that use Neo4j in <a href="http://docs.neo4j.org/chunked/stable/tutorials-java-embedded.html" target="_blank">embedded mode</a>
 and those developing Neo4j <a href="http://docs.neo4j.org/chunked/stable/server-plugins.html" target="_blank">server plugins</a>,
 <a href="http://docs.neo4j.org/chunked/stable/server-unmanaged-extensions.html" target="_blank">unmanaged extensions</a>,
-or GraphAware Modules can include use the framework as a dependency for their Java project and use it as a library of
+GraphAware Runtime Modules, or Spring MVC Controllers can include use the framework as a dependency for their Java project and use it as a library of
 useful tested code, in addition to the functionality provided for [server mode](#servermode).
 
 <a name="download"/>
@@ -50,7 +49,7 @@ Getting GraphAware Framework
 
 ### Releases
 
-Releases are synced to Maven Central repository. To use the latest release, download the appropriate version and put it
+To use the latest release, download the appropriate version and put it
 the `plugins` directory in your Neo4j server installation and restart the server (server mode), or on the classpath (embedded mode).
 
 The following downloads are available:
@@ -58,7 +57,7 @@ The following downloads are available:
 * [GraphAware Framework for Server Mode (Community), version 2.0.3.3](http://graphaware.com/downloads/graphaware-server-community-all-2.0.3.3.jar)
 * [GraphAware Framework for Server Mode (Enterprise), version 2.0.3.3](http://graphaware.com/downloads/graphaware-server-enterprise-all-2.0.3.3.jar)
 
-When using Maven for dependency management, include one of more of the following dependencies in your pom.xml. Read further
+Releases are synced to <a href="http://search.maven.org/#search%7Cga%7C1%7Ccom.graphaware.neo4j" target="_blank">Maven Central repository</a>. When using Maven for dependency management, include one of more of the following dependencies in your pom.xml. Read further
 down this page to find out which dependencies you will need. The available ones are:
 
     <dependencies>
@@ -101,7 +100,7 @@ down this page to find out which dependencies you will need. The available ones 
 
 To use the latest development version, just clone this repository, run `mvn clean install` and change the version in the
 dependencies above to 2.0.3.4-SNAPSHOT. You will also need to clone [this repository](https://github.com/graphaware/neo4j-framework-build.git)
-and run `mvn clean install` on that if you want standalone .jar files with all dependencies.
+and run `mvn clean install` on that if you want standalone .jar files with all dependencies for server mode.
 
 ### Note on Versioning Scheme
 
@@ -148,7 +147,7 @@ installation. You will then be able to issue a `GET` request to `http://your-neo
 receive the number of nodes in the database in the response body. Note that the `graphaware` part of the URL must be
 there and cannot (yet) be configured.
 
-To get started quickly, use the [Neo4j Spring MVC Maven Archetype](#todo).
+To get started quickly, use the <a href="https://github.com/graphaware/neo4j-springmvc-maven-archetype" target="_blank">Neo4j Spring MVC Maven Archetype</a>.
 
 To get started manually, you will need the following dependencies:
 
@@ -198,7 +197,7 @@ To get started manually, you will need the following dependencies:
             <groupId>com.graphaware.neo4j</groupId>
             <version>2.0.3.3</version>
             <artifactId>tests</artifactId>
-            <scope>test
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
@@ -237,27 +236,107 @@ ones that aren't listed above:
 GraphAware Runtime
 ------------------
 
-Using the framework is very easy. Instantiate it, register desired modules, and start it. For example:
+GraphAware Runtime is useful when you require functionality that transparently alters transactions or prevents them from
+happening at all. For example, you might want to:
+* Enforce specific constraints on the graph schema
+* Use optimistic locking to prevent updates of out-of-date data
+* Improve relationship counting performance by caching relationship counts on nodes
+* Improve performance by building (and keeping in sync) in-graph indices
+* Improve performance of supernodes
+* Prevent certain parts of the graph from being deleted
+* Timestamp modifications
+* Find out what the latest graph modifications that took place were
+* Write trigger-like functionality (which can actually be unit-tested!)
+* ... and much more
 
-```java
-    GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //replace with your own database, probably a permanent one
+### Building a GraphAware Runtime Module
 
-    GraphAwareFramework framework = new GraphAwareFramework(database);
+To get started quickly, use <a href="https://github.com/graphaware/neo4j-graphaware-runtime-module-maven-archetype" target="_blank">GraphAware Runtime Module Maven Archetype</a>.
 
-    framework.registerModule(new SomeModule());
-    framework.registerModule(new SomeOtherModule());
+To start from scratch, you will need the following dependencies in your pom.xml
 
-    framework.start();
+```xml
+<dependencies>
+    ...
+    <!-- needed if the module exposes an API -->
+    <dependency>
+        <groupId>com.graphaware.neo4j</groupId>
+        <artifactId>api</artifactId>
+        <version>2.0.3.3</version>
+    </dependency>
+    <dependency>
+        <groupId>com.graphaware.neo4j</groupId>
+        <artifactId>common</artifactId>
+        <version>2.0.3.3</version>
+    </dependency>
+    <dependency>
+        <groupId>com.graphaware.neo4j</groupId>
+        <artifactId>runtime</artifactId>
+        <version>2.0.3.3</version>
+    </dependency>
+    <dependency>
+        <groupId>com.graphaware.neo4j</groupId>
+        <artifactId>tests</artifactId>
+        <version>2.0.3.3</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.graphaware.neo4j</groupId>
+        <artifactId>tx-api</artifactId>
+        <version>2.0.3.3</version>
+    </dependency>
+    <dependency>
+        <groupId>com.graphaware.neo4j</groupId>
+        <artifactId>tx-executor</artifactId>
+        <version>2.0.3.3</version>
+    </dependency>
 
-    //use database as usual
+    ...
+</dependencies>
 ```
 
-So far, the only production-ready GraphAware module is the [relationship count module](https://github.com/graphaware/neo4j-relcount).
-To write your own module, read the Javadoc on `GraphAwareModule` and `GraphAwareFramework`. It would also be useful to
-read the rest of this page to understand the ideas and design decisions behind the framework better.
+Your module then needs to be build by implementing the `GraphAwareRuntimeModule` interface. Please refer to JavaDoc for details.
+As an example, if we were to build a module that logs all changes performed in a transaction to system out in a human readable
+form, we would write the following code:
 
-Framework Usage (Batch)
------------------------
+```java
+   todo
+```
+
+### Using GraphAware Runtime (Embedded Mode)
+
+Using the GraphAware Runtime only makes sense when there is a GraphAware Runtime Module to go with it. Assuming we want
+to use the runtime with the `ChangeLoggingRuntimeModule` we've built in the previous section in embedded mode, all we
+need to do is instantiate the runtime and register the module with it:
+
+```java
+   todo
+```
+
+The modules are presented with the about-to-be-committed transaction data in the order in which they've been registered.
+
+### Using GraphAware Runtime (Server Mode)
+
+Provided that the GraphAware Framework .jar file is present in the Neo4j `plugins` directory, the following line needs to
+be added to `neo4j.properties` in order for the GraphAware Runtime to be enabled:
+
+`com.graphaware.runtime.enabled=true`
+
+GraphAware Runtime Modules can be registered using the following mechanism. For instance, the `ChangeLoggingRuntimeModule`
+with its `ChangeLoggingRuntimeModuleBootstrapper` (assuming it lives in `com.graphaware.demo` package) can be registered
+with the runtime using the following line
+
+`com.graphaware.module.changelogger.1=com.graphaware.demo.ChangeLoggingRuntimeModuleBootstrapper`
+
+which means that the `ChangeLoggingRuntimeModule` will be the first runtime module registered with the runtime with ID
+equal to "changelogger".
+
+### Existing GraphAware Runtime Modules
+
+So far, the only production-ready GraphAware module is the <a href="https://github.com/graphaware/neo4j-relcount" target="_blank">relationship count module</a>.
+
+### Using GraphAware Runtime (Batch Inserters)
+----------------------------------------------
 
 For populating a database quickly, people sometimes use Neo4j `BatchInserter`s. The framework can be used with those as
 well, in the following fashion:
@@ -276,11 +355,25 @@ well, in the following fashion:
 ```
 
 <a name="lib"/>
-Features
---------
+Features for Java Developers
+----------------------------
 
-Whether or not you use the framework as described above, you can always add it as a dependency and take advantage of its
-useful features.
+Whether or not you use the code in this repository as a framework or runtime as described above, you can always add it
+as a dependency and take advantage of its useful features.
+
+<a name="graphunit"/>
+### GraphUnit
+
+`GraphUnit` is a single class with two `public static` methods intended for easy unit-testing of code that somehow manipulates
+data in the Neo4j graph database. It allows to assert the correct state of the database after the code has been run, using Cypher `CREATE` statements.
+
+The first method `public static void assertSameGraph(GraphDatabaseService database, String sameGraphCypher)` is used to verify
+that the graph in the `database` is exactly the same as the graph created by `sameGraphCypher` statement. This means that
+the nodes, their properties and labels, relationships, and their properties and labels must be exactly the same. Note that
+Neo4j internal node/relationship IDs are ignored. In case the graphs aren't identical, the assertion fails using standard `junit` mechanisms.
+
+The second method `public static void assertSubgraph(GraphDatabaseService database, String subgraphCypher)` is used to
+verify that the graph created by `sameGraphCypher` statement is a subgraph of the graph in the `database`.
 
 <a name="tx"/>
 ### Simplified Transactional Operations
@@ -289,15 +382,25 @@ Every mutating operation in Neo4j must run within the context of a transaction. 
 involves try-catch blocks and looks something like this:
 
  ```java
-     try {
-         //do something useful, can throw a business exception
-         tx.success();
-     } catch (RuntimeException e) {
-         //deal with a business exception
-         tx.failure();
-     } finally {
-         tx.finish(); //can throw a database exception
-     }
+ Transaction tx = database.beginTx();
+ try {
+     //do something useful, can throw a business exception
+     tx.success();
+ } catch (RuntimeException e) {
+     //deal with a business exception
+     tx.failure();
+ } finally {
+     tx.finish(); //can throw a database exception
+ }
+ ```
+
+ As of Neo4j 2.0, this could be simplified to this:
+
+ ```java
+try (Transaction tx = database.beginTx()) {
+    //do something useful, can throw a business exception
+    tx.success();
+}
  ```
 
 GraphAware provides an alternative, callback-based API called `TransactionExecutor` in `com.graphaware.tx.executor`.
@@ -639,64 +742,6 @@ allows `TransactionEventHandler`s to be registered on it. It then simulates a tr
 
 As a `GraphDatabaseService` equivalent for batch inserts, this project provides `TransactionSimulatingBatchGraphDatabase`
 for completeness, but its usage is discouraged.
-
-<a name="algos"/>
-### Graph Algorithms
-
-#### Increasingly Longer (Weighted) Shortest Paths
-
-A managed plugin is provided and accessible via REST API that finds finds a given number of shortest paths between two nodes.
-It is different from standard shortest path finding, because it allows to specify the desired number of results. Provided
-that there are enough paths between the two nodes in the graph, this path finder will first return all the shortest paths,
-then all the paths one hop longer, then two hops longer, etc., until enough paths have been returned.
-
-Please note that nodes that are on a path with certain length will not be considered for paths with greater lengths.
-
-For example, given the following graph:
-
-    (1)->(2)->(3)
-    (1)->(4)->(5)->(3)
-    (4)->(2)
-
-the shortest path from (1) to (3) is (1)->(2)->(3) and has a length of 2. If more paths are needed, the next path
-returned will be (1)->(4)->(5)->(3) with a length of 3. Note that there is another path of length 3:
-(1)->(4)->(2)->(3), but it is not returned, since (2)->(3) is contained in a shorter path.
-
-**API:** `POST` to `{SERVER_URI}/db/data/ext/NumberOfShortestPaths/node/{sourceNodeId}/paths` with the following parameters:
-
-```
-{
-  "extends" : "node",
-  "description" : "Find a number shortest path between two nodes, with increasing path length and optionally path cost.",
-  "name" : "paths",
-  "parameters" : [ {
-    "description" : "The node to find the shortest paths to.",
-    "optional" : false,
-    "name" : "target",
-    "type" : "node"
-  }, {
-    "description" : "The relationship types to follow when searching for the shortest paths. If omitted all types are followed.",
-    "optional" : true,
-    "name" : "types",
-    "type" : "strings"
-  }, {
-    "description" : "The maximum path length to search for, default value (if omitted) is 3.",
-    "optional" : true,
-    "name" : "depth",
-    "type" : "integer"
-  }, {
-    "description" : "The desired number of results, default value (if omitted) is 10. The actual number of results can be smaller (if no other paths exist).",
-    "optional" : true,
-    "name" : "noResults",
-    "type" : "integer"
-  }, {
-    "description" : "The name of relationship property indicating its weight/cost. If omitted, result isn't sorted by total path weights. If the property is missing for a relationship, Integer.MAX_VALUE is used.",
-    "optional" : true,
-    "name" : "weight",
-    "type" : "string"
-  } ]
-}
-```
 
 ### Miscellaneous Utilities
 
