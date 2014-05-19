@@ -138,7 +138,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <neo4j.version>2.0.3</neo4j.version>
         <spring.version>4.0.0.RELEASE</spring.version>
-        <graphaware.version>2.0.3.3-SNAPSHOT</graphaware.version>
     </properties>
 
     <dependencyManagement>
@@ -149,38 +148,38 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>api</artifactId>
-                <version>${graphaware.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>common</artifactId>
-                <version>${graphaware.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>server-common</artifactId>
-                <version>${graphaware.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tests</artifactId>
-                <version>${graphaware.version}</version>
+                <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-api</artifactId>
-                <version>${graphaware.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-executor</artifactId>
-                <version>${graphaware.version}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!-- Neo4j -->
