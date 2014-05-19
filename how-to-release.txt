@@ -1,5 +1,9 @@
 mvn clean install, make sure it is successful
-mvn clean site, to produce javadoc
 
 mvn release:prepare
 mvn release:perform
+
+notes:
+    removing a git tag:
+        git tag -d tag_name
+        git push origin :refs/tags/tag_name
