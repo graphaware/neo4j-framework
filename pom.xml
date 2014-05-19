@@ -117,6 +117,7 @@
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>2.9</version>
                         <configuration>
+                            <aggregate>true</aggregate>
                             <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
                         </configuration>
                     </plugin>
@@ -412,8 +413,25 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.9</version>
                 <configuration>
-                    <aggregate>true</aggregate>
+                    <links>
+                        <link>http://api.neo4j.org/2.0.3/</link>
+                    </links>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>aggregate</id>
+                        <goals>
+                            <goal>aggregate</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
