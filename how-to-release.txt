@@ -13,6 +13,8 @@ git reset --hard HEAD
 mvn release:prepare
 mvn release:perform
 
+go to https://oss.sonatype.org/, login as graphaware, promote released library
+
 notes:
     removing a git tag:
         git tag -d tag_name
