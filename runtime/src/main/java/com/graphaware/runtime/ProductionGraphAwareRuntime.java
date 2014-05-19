@@ -23,7 +23,6 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.PrefetchingIterator;
 import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -171,7 +170,7 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
         private final Iterator<Node> nodes;
 
         private RootNodeIterator(GraphDatabaseService database) {
-            nodes = GlobalGraphOperations.at(database).getAllNodes().iterator();
+            nodes = database.getAllNodes().iterator();
         }
 
         @Override
