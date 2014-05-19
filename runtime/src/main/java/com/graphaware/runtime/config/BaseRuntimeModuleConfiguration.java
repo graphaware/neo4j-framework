@@ -3,9 +3,9 @@ package com.graphaware.runtime.config;
 import com.graphaware.common.strategy.*;
 
 /**
- *
+ * Base-class for {@link RuntimeModuleConfiguration} implementations.
  */
-public abstract class BaseRuntimeModuleConfiguration<T extends BaseRuntimeModuleConfiguration<T>>  {
+public abstract class BaseRuntimeModuleConfiguration<T extends BaseRuntimeModuleConfiguration<T>> {
 
     private final InclusionStrategies inclusionStrategies;
 
@@ -15,6 +15,11 @@ public abstract class BaseRuntimeModuleConfiguration<T extends BaseRuntimeModule
 
     protected abstract T newInstance(InclusionStrategies inclusionStrategies);
 
+    /**
+     * Get inclusion strategies encapsulated by this configuration.
+     *
+     * @return strategies.
+     */
     public InclusionStrategies getInclusionStrategies() {
         return inclusionStrategies;
     }
@@ -35,6 +40,9 @@ public abstract class BaseRuntimeModuleConfiguration<T extends BaseRuntimeModule
         return newInstance(inclusionStrategies.with(relationshipPropertyInclusionStrategy));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -47,6 +55,9 @@ public abstract class BaseRuntimeModuleConfiguration<T extends BaseRuntimeModule
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return inclusionStrategies.hashCode();
