@@ -38,7 +38,7 @@
         <module>tx-executor</module>
     </modules>
 
-    <name>*** GraphAware Neo4j Framework ***</name>
+    <name>GraphAware Neo4j Framework</name>
     <description>Parent Project for GraphAware Neo4j Framework</description>
     <url>http://graphaware.com</url>
 
