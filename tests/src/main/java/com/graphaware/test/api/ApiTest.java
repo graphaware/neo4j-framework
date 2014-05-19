@@ -30,8 +30,8 @@ import javax.servlet.ServletException;
 
 /**
  * Abstract base-class for API tests. Starts a Neo4j server on the port specified in the constructor (or 8082 by default)
- * and deploys all {@link com.graphaware.api.GraphAwareController} annotated controllers. Before tests are run, the database
- * can be populated by overriding the {@link #populateDatabase()} method.
+ * and deploys all {@link org.springframework.stereotype.Controller} annotated controllers. Before tests are run,
+ * the database can be populated by overriding the {@link #populateDatabase()} method.
  * <p/>
  * The database running within the server can be accessed by calling {@link #getDatabase()}. Therefore, this class is
  * good for writing API integration tests that want to verify the database state after certain API calls.

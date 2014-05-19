@@ -1,0 +1,3 @@
+mvn clean install, make sure it is successful
+mvn release:prepare
+mvn release:perform
