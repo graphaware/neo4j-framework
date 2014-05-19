@@ -186,24 +186,10 @@
 
             <dependency>
                 <groupId>org.neo4j</groupId>
-                <artifactId>neo4j-enterprise</artifactId>
-                <version>${neo4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.neo4j</groupId>
                 <artifactId>neo4j-kernel</artifactId>
                 <version>${neo4j.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.neo4j</groupId>
-                <artifactId>server-api</artifactId>
-                <version>${neo4j.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -218,14 +204,6 @@
                 <artifactId>neo4j-server-enterprise</artifactId>
                 <version>${neo4j.version}</version>
                 <scope>provided</scope>
-            </dependency>
-
-            <!-- Time -->
-
-            <dependency>
-                <groupId>joda-time</groupId>
-                <artifactId>joda-time</artifactId>
-                <version>2.3</version>
             </dependency>
 
             <!-- Logging -->
@@ -287,12 +265,6 @@
             </dependency>
 
             <!-- Serialization -->
-
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>1.8</version>
-            </dependency>
 
             <dependency>
                 <groupId>com.esotericsoftware.kryo</groupId>
@@ -424,13 +396,14 @@
                             <goal>jar</goal>
                         </goals>
                     </execution>
-                    <execution>
-                        <id>aggregate</id>
-                        <goals>
-                            <goal>aggregate</goal>
-                        </goals>
-                        <phase>package</phase>
-                    </execution>
+                    <!-- http://jira.codehaus.org/browse/MNG-4618 still seems to be an active bug -->
+                    <!--<execution>-->
+                        <!--<id>aggregate</id>-->
+                        <!--<goals>-->
+                            <!--<goal>aggregate</goal>-->
+                        <!--</goals>-->
+                        <!--<phase>package</phase>-->
+                    <!--</execution>-->
                 </executions>
             </plugin>
         </plugins>
