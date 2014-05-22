@@ -352,7 +352,7 @@ public final class GraphUnit {
         StringBuilder string = new StringBuilder(" {");
 
         for (String key : propertyContainer.getPropertyKeys()) {
-            string.append(key).append(":").append(valueToString(propertyContainer.getProperty(key)));
+            string.append(key).append(":").append(valueToString(propertyContainer.getProperty(key))).append(" ");
         }
 
         string.append("}");
