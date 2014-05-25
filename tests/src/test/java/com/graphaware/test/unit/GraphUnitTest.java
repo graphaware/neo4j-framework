@@ -20,9 +20,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 import static com.graphaware.test.unit.GraphUnit.assertSubgraph;
@@ -501,5 +501,60 @@ public class GraphUnitTest {
                 "(month)-[:FIRST]->(day:Day {value:4})," +
                 "(month)-[:CHILD]->(day)," +
                 "(month)-[:LAST]->(day)");
+    }
+
+    @Test
+    public void deletedRelationshipWithNewTypeShouldNotInfluenceEquality() { //bug test
+        try (Transaction tx = database.beginTx()) {
+            Node node1 = database.createNode();
+            Node node2 = database.createNode();
+            node1.createRelationshipTo(node2, DynamicRelationshipType.withName("ACCIDENT"));
+            tx.success();
+        }
+
+        try (Transaction tx = database.beginTx()) {
+            GlobalGraphOperations.at(database).getAllRelationships().iterator().next().delete();
+            tx.success();
+        }
+
+        String cypher = "CREATE (n), (m)";
+
+        assertSameGraph(database, cypher);
+    }
+
+    @Test
+    public void deletedNewLabelShouldNotInfluenceEquality() { //bug test
+        try (Transaction tx = database.beginTx()) {
+            database.createNode(DynamicLabel.label("Accident"));
+            database.createNode(DynamicLabel.label("RealLabel"));
+            tx.success();
+        }
+
+        try (Transaction tx = database.beginTx()) {
+            database.getNodeById(0).delete();
+            tx.success();
+        }
+
+        String cypher = "CREATE (n:RealLabel)";
+
+        assertSameGraph(database, cypher);
+    }
+
+    @Test
+    public void deletedNewPropsShouldNotInfluenceEquality() { //bug test
+        try (Transaction tx = database.beginTx()) {
+            database.createNode().setProperty("accident", "dummy");
+            database.createNode();
+            tx.success();
+        }
+
+        try (Transaction tx = database.beginTx()) {
+            database.getNodeById(0).delete();
+            tx.success();
+        }
+
+        String cypher = "CREATE (n)";
+
+        assertSameGraph(database, cypher);
     }
 }

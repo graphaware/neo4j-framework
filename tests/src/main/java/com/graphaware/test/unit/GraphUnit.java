@@ -113,10 +113,7 @@ public final class GraphUnit {
 
     private static void assertSameNumbersOfElements(GraphDatabaseService database, GraphDatabaseService otherDatabase) {
         assertEquals("There are different numbers of nodes in the two graphs", count(at(otherDatabase).getAllNodes()), count(at(database).getAllNodes()));
-        assertEquals("There are different numbers of labels in the two graphs", count(at(otherDatabase).getAllLabels()), count(at(database).getAllLabels()));
-        assertEquals("There are different numbers of property keys in the two graphs", count(at(otherDatabase).getAllPropertyKeys()), count(at(database).getAllPropertyKeys()));
         assertEquals("There are different numbers of relationships in the two graphs", count(at(otherDatabase).getAllRelationships()), count(at(database).getAllRelationships()));
-        assertEquals("There are different numbers of relationship types in the two graphs", count(at(otherDatabase).getAllRelationshipTypes()), count(at(database).getAllRelationshipTypes()));
     }
 
     private static void doAssertSubgraph(GraphDatabaseService database, GraphDatabaseService otherDatabase) {
