@@ -63,11 +63,17 @@ public final class TestUtils {
         }
     }
 
+    public static String post(String url, final int expectedStatusCode) {
+        return post(url, null, expectedStatusCode);
+    }
+
     public static String post(String url, String json, final int expectedStatusCode) {
         try {
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
                 HttpPost httpPost = new HttpPost(url);
-                httpPost.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
+                if (json != null) {
+                    httpPost.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
+                }
 
                 ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
                     public String handleResponse(final HttpResponse response) throws IOException {
