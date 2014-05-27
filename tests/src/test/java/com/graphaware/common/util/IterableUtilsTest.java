@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.test.util;
+package com.graphaware.common.util;
 
 import org.junit.After;
 import org.junit.Before;
