@@ -27,6 +27,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 import static com.graphaware.common.util.IterableUtils.*;
 import static java.util.Arrays.asList;
@@ -141,5 +142,13 @@ public class IterableUtilsTest {
     @Test(expected = IllegalStateException.class)
     public void exceptionShouldBeThrownWhenIterableHasMoreThanOneElement() {
         getSingle(Arrays.asList("test1", "test2"));
+    }
+
+    @Test
+    public void shouldSampleIterable() {
+        Iterable<Long> sampled = sample(asList(1L, 2L, 3L, 4L, 5L), 2);
+        assertEquals(2, count(sampled));
+        List<Long> longs = toList(sampled);
+        assertTrue(longs.contains(1L) || longs.contains(2L) || longs.contains(3L) || longs.contains(4L) || longs.contains(5L));
     }
 }

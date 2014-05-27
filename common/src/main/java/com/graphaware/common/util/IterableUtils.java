@@ -146,6 +146,22 @@ public final class IterableUtils {
         return getSingle(iterable.iterator());
     }
 
+    /**
+     * Sample an iterable using reservoir sampling.
+     *
+     * @param iterable        to sample.
+     * @param numberOfSamples to return.
+     * @param <T>             type of elements in the iterable.
+     * @return sampled iterable.
+     */
+    public static <T> Iterable<T> sample(Iterable<T> iterable, int numberOfSamples) {
+        ReservoirSampler<T> sampler = new ReservoirSampler<>(numberOfSamples);
+        for (T item : iterable) {
+            sampler.sample(item);
+        }
+        return sampler.getSamples();
+    }
+
     private IterableUtils() {
     }
 }
