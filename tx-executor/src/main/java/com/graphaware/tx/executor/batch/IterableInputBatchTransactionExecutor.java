@@ -62,6 +62,21 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
     }
 
     /**
+     * Create an instance of IterableInputBatchExecutor.
+     *
+     * @param database   against which to execute batched queries.
+     * @param batchSize  how many {@link UnitOfWork} are in a single batch.
+     * @param callback   that will produce the input to the execution but needs to run in a transaction. Items of the input are provided to each unit of work, one by one.
+     * @param unitOfWork to be executed for each input item. Must be thread-safe.
+     */
+    public IterableInputBatchTransactionExecutor(GraphDatabaseService database, int batchSize, TransactionCallback<Iterable<T>> callback, UnitOfWork<T> unitOfWork) {
+        this.batchSize = batchSize;
+        this.unitOfWork = unitOfWork;
+        this.executor = new SimpleTransactionExecutor(database);
+        this.iterator = executor.executeInTransaction(callback).iterator();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

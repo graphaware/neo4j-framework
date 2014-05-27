@@ -16,6 +16,7 @@
 
 package com.graphaware.tx.executor.batch;
 
+import com.graphaware.tx.executor.single.TransactionCallback;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +24,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Arrays;
 import java.util.List;
@@ -66,6 +68,42 @@ public class IterableInputBatchTransactionExecutorTest {
             assertEquals("Name111", database.getNodeById(0).getProperty("name"));
             assertEquals("Name212", database.getNodeById(1).getProperty("name"));
             assertEquals("Name321", database.getNodeById(2).getProperty("name"));
+        }
+    }
+
+    @Test
+    public void iterableAcquiredInTransactionShouldBeProcessed() {
+        try (Transaction tx = database.beginTx()) {
+            for (int i = 0; i < 100; i++) {
+                database.createNode();
+            }
+            tx.success();
+        }
+
+        BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, 10,
+                new TransactionCallback<Iterable<Node>>() {
+                    @Override
+                    public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
+                        return GlobalGraphOperations.at(database).getAllNodes();
+                    }
+                },
+                new UnitOfWork<Node>() {
+                    @Override
+                    public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
+                        node.setProperty("name", "Name" + batchNumber + stepNumber);
+                    }
+                }
+        );
+
+        executor.execute();
+
+        try (Transaction tx = database.beginTx()) {
+            assertEquals("Name11", database.getNodeById(0).getProperty("name"));
+            assertEquals("Name12", database.getNodeById(1).getProperty("name"));
+            assertEquals("Name13", database.getNodeById(2).getProperty("name"));
+            assertEquals("Name108", database.getNodeById(97).getProperty("name"));
+            assertEquals("Name109", database.getNodeById(98).getProperty("name"));
+            assertEquals("Name1010", database.getNodeById(99).getProperty("name"));
         }
     }
 }
