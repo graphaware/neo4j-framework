@@ -14,4 +14,9 @@ public class ServerIntegrationTest extends IntegrationTest {
     public void componentsShouldBeWired() {
         TestUtils.get("http://localhost:7474/graphaware/greeting", HttpStatus.SC_OK);
     }
+
+    @Test
+    public void jarFilesShouldBeWired() {
+        TestUtils.post("http://localhost:7474/graphaware/timetree/now", HttpStatus.SC_OK);
+    }
 }

@@ -24,7 +24,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  * Spring application config.
  */
 @Configuration
-@ComponentScan(basePackages = "**")
+@ComponentScan(basePackages = {"com.**.graphaware.**", "org.**.graphaware.**", "net.**.graphaware.**"})
 @EnableWebMvc
 public class AppConfig {
 

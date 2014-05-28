@@ -46,6 +46,11 @@
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>tests</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>timetree</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
