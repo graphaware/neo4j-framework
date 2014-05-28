@@ -4,7 +4,7 @@ GraphAware Neo4j Framework
 
 [![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework) | <a href="http://graphaware.com/downloads/" target="_blank">Downloads</a> | <a href="http://graphaware.com/site/framework/latest/apidocs/" target="_blank">Javadoc</a> | Latest Release: 2.0.3.4
 
-GraphAware Framework speeds up development with Neo4j by providing a platform for useful generic as
+GraphAware Framework speeds up development with <a href="http://neo4j.org" target="_blank">Neo4j</a> by providing a platform for useful generic as
 well as domain-specific functionality, analytical capabilities, graph algorithms, etc.
 
 Features Overview
@@ -103,9 +103,9 @@ down this page to find out which dependencies you will need. The available ones 
 
 ### Snapshots
 
-To use the latest development version, just clone this repository, run `mvn clean install` and change the version in the
-dependencies above to 2.0.3.5-SNAPSHOT. You will also need to clone [this repository](https://github.com/graphaware/neo4j-framework-build.git)
-and run `mvn clean install` on that if you want standalone .jar files with all dependencies for server mode.
+To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.0.3.5-SNAPSHOT
+ jar files. If you need standalone .jar files with all dependencies (for server mode), clone [this repository](https://github.com/graphaware/neo4j-framework-build.git)
+and run `mvn clean install` on that.
 
 ### Note on Versioning Scheme
 
@@ -118,7 +118,7 @@ GraphAware Server
 -----------------
 
 With GraphAware Framework in the `plugins` directory of your Neo4j server installation, it is possible to develop Spring
-MVC Controllers that have the `GraphDatabaseService` wired in.
+MVC Controllers that have the Neo4j database wired in as `GraphDatabaseService`.
 
 For example, to develop an API endpoint that counts all the nodes in the database using Spring MVC, create the following Controller:
 
@@ -147,11 +147,11 @@ For example, to develop an API endpoint that counts all the nodes in the databas
    }
 ```
 
-*WARNING:* There is currently a limitation in package naming. Your class must reside in a `com`, `net`, or `org` top-level
+*WARNING:* Your class must reside in a `com`, `net`, or `org` top-level
 package and one of the package levels must be called `graphaware`. For example, `com.mycompany.graphaware.NodeCountApi`
- will do.
+ will do. This is currently a limitation and will be addressed in a future release.
 
-Compile this code into a .jar file (with dependencies) and place it into the `plugins` directory of your Neo4j server
+Compile this code into a .jar file (with dependencies, see below) and place it into the `plugins` directory of your Neo4j server
 installation. You will then be able to issue a `GET` request to `http://your-neo4j-url:7474/graphaware/count` and
 receive the number of nodes in the database in the response body. Note that the `graphaware` part of the URL must be
 there and cannot (yet) be configured.
@@ -161,83 +161,83 @@ To get started quickly, use the <a href="https://github.com/graphaware/neo4j-spr
 To get started manually, you will need the following dependencies:
 
 ```xml
-    <dependencies>
+<dependencies>
 
-        <!-- GraphAware Framework -->
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>common</artifactId>
-            <version>2.0.3.4</version>
-            <scope>provided</scope>
-        </dependency>
+    <!-- GraphAware Framework -->
+    <dependency>
+        <groupId>com.graphaware.neo4j</groupId>
+        <artifactId>common</artifactId>
+        <version>2.0.3.4</version>
+        <scope>provided</scope>
+    </dependency>
 
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>api</artifactId>
-            <version>2.0.3.4</version>
-            <scope>provided</scope>
-        </dependency>
+    <dependency>
+        <groupId>com.graphaware.neo4j</groupId>
+        <artifactId>api</artifactId>
+        <version>2.0.3.4</version>
+        <scope>provided</scope>
+    </dependency>
 
-        <!-- Spring Framework -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>4.0.0.RELEASE</version>
-            <scope>provided</scope>
-        </dependency>
+    <!-- Spring Framework -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>4.0.0.RELEASE</version>
+        <scope>provided</scope>
+    </dependency>
 
-        <!-- Neo4j -->
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j</artifactId>
-            <version>2.0.3.4</version>
-            <scope>provided</scope>
-        </dependency>
+    <!-- Neo4j -->
+    <dependency>
+        <groupId>org.neo4j</groupId>
+        <artifactId>neo4j</artifactId>
+        <version>2.0.3.4</version>
+        <scope>provided</scope>
+    </dependency>
 
-        <!-- Testing -->
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>server-community</artifactId>
-            <version>2.0.3.4</version>
-            <scope>test</scope>
-        </dependency>
+    <!-- Testing -->
+    <dependency>
+        <groupId>com.graphaware.neo4j</groupId>
+        <artifactId>server-community</artifactId>
+        <version>2.0.3.4</version>
+        <scope>test</scope>
+    </dependency>
 
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <version>2.0.3.4</version>
-            <artifactId>tests</artifactId>
-            <scope>test</scope>
-        </dependency>
+    <dependency>
+        <groupId>com.graphaware.neo4j</groupId>
+        <version>2.0.3.4</version>
+        <artifactId>tests</artifactId>
+        <scope>test</scope>
+    </dependency>
 
-    </dependencies>
+</dependencies>
 ```
 
 It is also a good idea to use make sure the resulting .jar file includes all the dependencies, if you use any external
 ones that aren't listed above:
 
 ```xml
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attached</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <finalName>your-api-module-name-${project.version}</finalName>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+<build>
+    <plugins>
+        <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>attached</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <configuration>
+                <finalName>your-api-module-name-${project.version}</finalName>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+                <appendAssemblyId>false</appendAssemblyId>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
 ```
 
 
@@ -272,16 +272,19 @@ To start from scratch, you will need the following dependencies in your pom.xml
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>api</artifactId>
         <version>2.0.3.4</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>common</artifactId>
         <version>2.0.3.4</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>runtime</artifactId>
         <version>2.0.3.4</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
@@ -293,23 +296,25 @@ To start from scratch, you will need the following dependencies in your pom.xml
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tx-api</artifactId>
         <version>2.0.3.4</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tx-executor</artifactId>
         <version>2.0.3.4</version>
+        <scope>provided</scope>
     </dependency>
 
     ...
 </dependencies>
 ```
 
-Your module then needs to be build by implementing the `GraphAwareRuntimeModule` interface. Please refer to JavaDoc for details.
+Your module then needs to be built by implementing the `GraphAwareRuntimeModule` interface. Please refer to JavaDoc (todo link) for details.
 As an example, if we were to build a module that logs all changes performed in a transaction to system out in a human readable
 form, we would write the following code:
 
 ```java
-   todo
+   TBD //todo
 ```
 
 ### Using GraphAware Runtime (Embedded Mode)
@@ -319,7 +324,7 @@ to use the runtime with the `ChangeLoggingRuntimeModule` we've built in the prev
 need to do is instantiate the runtime and register the module with it:
 
 ```java
-   todo
+   TBD //todo
 ```
 
 The modules are presented with the about-to-be-committed transaction data in the order in which they've been registered.
@@ -388,9 +393,11 @@ verify that the graph created by `sameGraphCypher` statement is a subgraph of th
 
 <a name="perftest"/>
 #### Performance Testing
+TBD
 
 <a name="apitest"/>
 #### API Testing
+TBD
 
 <a name="tx-api"/>
 ### Improved Transaction Event API
