@@ -44,6 +44,12 @@ public final class GraphUnit {
     private static final Logger LOG = Logger.getLogger(GraphUnit.class);
 
     /**
+     * Private constructor - this class is a utility and should not be instantiated.
+     */
+    private GraphUnit() {
+    }
+
+    /**
      * Assert that the graph in the given database is exactly the same as the graph that would be created by the given
      * Cypher query. The only thing that can be different in those two graphs are IDs of nodes and relationships.
      * Properties values are converted to {@link String} before comparison, which means 123L (long) is equal to 123 (int),
