@@ -351,16 +351,7 @@ For populating a database quickly, people sometimes use Neo4j `BatchInserter`s. 
 well, in the following fashion:
 
 ```java
-    TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(/path/to/your/db);
-
-    GraphAwareFramework framework = new GraphAwareFramework(batchInserter);
-
-    framework.registerModule(new SomeModule());
-    framework.registerModule(new SomeOtherModule());
-
-    framework.start();
-
-    //use batchInserter as usual
+    tbd
 ```
 
 ### Existing GraphAware Runtime Modules
@@ -418,26 +409,26 @@ To use the API, simply instantiate one of the `ImprovedTransactionData` implemen
 `LazyTransactionData` is recommended as it is the easiest one to use.
 
 ```java
-     GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+ GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
-     database.registerTransactionEventHandler(new TransactionEventHandler<Object>() {
-         @Override
-         public Object beforeCommit(TransactionData data) throws Exception {
-             ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data);
+ database.registerTransactionEventHandler(new TransactionEventHandler<Object>() {
+     @Override
+     public Object beforeCommit(TransactionData data) throws Exception {
+         ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data);
 
-             //have fun here with improvedTransactionData!
+         //have fun here with improvedTransactionData!
 
-             return null;
-         }
+         return null;
+     }
 
-         @Override
-         public void afterCommit(TransactionData data, Object state) {
-         }
+     @Override
+     public void afterCommit(TransactionData data, Object state) {
+     }
 
-         @Override
-         public void afterRollback(TransactionData data, Object state) {
-         }
-     });
+     @Override
+     public void afterRollback(TransactionData data, Object state) {
+     }
+ });
 ```
 
 `FilteredTransactionData` can be used instead. They effectively hide portions of the graph, including any changes performed
@@ -446,40 +437,40 @@ what is interesting and what is not. For example, of only nodes with name equal 
 are of interest, the example above could be modified as follows:
 
 ```java
-    GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
-    database.registerTransactionEventHandler(new TransactionEventHandler<Object>() {
-        @Override
-        public Object beforeCommit(TransactionData data) throws Exception {
-            InclusionStrategies inclusionStrategies = InclusionStrategiesImpl.all()
-                    .with(new IncludeAllBusinessNodes() {
-                        @Override
-                        protected boolean doInclude(Node node) {
-                            return node.getProperty("name", "default").equals("Two");
-                        }
+database.registerTransactionEventHandler(new TransactionEventHandler<Object>() {
+    @Override
+    public Object beforeCommit(TransactionData data) throws Exception {
+        InclusionStrategies inclusionStrategies = InclusionStrategiesImpl.all()
+                .with(new IncludeAllBusinessNodes() {
+                    @Override
+                    protected boolean doInclude(Node node) {
+                        return node.getProperty("name", "default").equals("Two");
+                    }
 
-                        @Override
-                        public String asString() {
-                            return "includeOnlyNodeWithNameEqualToTwo";
-                        }
-                    })
-                    .with(IncludeNoRelationships.getInstance());
+                    @Override
+                    public String asString() {
+                        return "includeOnlyNodeWithNameEqualToTwo";
+                    }
+                })
+                .with(IncludeNoRelationships.getInstance());
 
-            ImprovedTransactionData improvedTransactionData = new FilteredTransactionData(new LazyTransactionData(data), inclusionStrategies);
+        ImprovedTransactionData improvedTransactionData = new FilteredTransactionData(new LazyTransactionData(data), inclusionStrategies);
 
-            //have fun here with improvedTransactionData!
+        //have fun here with improvedTransactionData!
 
-            return null;
-        }
+        return null;
+    }
 
-        @Override
-        public void afterCommit(TransactionData data, Object state) {
-        }
+    @Override
+    public void afterCommit(TransactionData data, Object state) {
+    }
 
-        @Override
-        public void afterRollback(TransactionData data, Object state) {
-        }
-    });
+    @Override
+    public void afterRollback(TransactionData data, Object state) {
+    }
+});
 ```
 
 #### Example Scenario
