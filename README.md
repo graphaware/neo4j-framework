@@ -103,7 +103,7 @@ down this page to find out which dependencies you will need. The available ones 
 
 ### Snapshots
 
-To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.0.3.5-SNAPSHOT
+To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.0.3.6-SNAPSHOT
  jar files. If you need standalone .jar files with all dependencies (for server mode), clone [this repository](https://github.com/graphaware/neo4j-framework-build.git)
 and run `mvn clean install` on that.
 
