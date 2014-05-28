@@ -147,6 +147,10 @@ For example, to develop an API endpoint that counts all the nodes in the databas
    }
 ```
 
+*WARNING:* There is currently a limitation in package naming. Your class must reside in a com, net, or org top-level
+package and one of the package levels must be called `graphaware`. For example, `com.mycompany.graphaware.NodeCountApi`
+ will do.
+
 Compile this code into a .jar file (with dependencies) and place it into the `plugins` directory of your Neo4j server
 installation. You will then be able to issue a `GET` request to `http://your-neo4j-url:7474/graphaware/count` and
 receive the number of nodes in the database in the response body. Note that the `graphaware` part of the URL must be
