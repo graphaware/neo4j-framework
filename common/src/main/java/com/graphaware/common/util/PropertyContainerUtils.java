@@ -21,10 +21,9 @@ import com.graphaware.common.strategy.InclusionStrategy;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.helpers.ArrayUtil;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.graphaware.common.util.ArrayUtils.isPrimitiveOrStringArray;
 import static com.graphaware.common.util.ArrayUtils.primitiveOrStringArrayToString;
@@ -68,6 +67,23 @@ public final class PropertyContainerUtils {
         }
 
         throw new IllegalStateException("Unknown Property Container: " + propertyContainer.getClass().getName());
+    }
+
+    /**
+     * Get IDs from an {@link Iterable} of {@link org.neo4j.graphdb.PropertyContainer}s.
+     *
+     * @param propertyContainers to get ID from. Must be an {@link Iterable} of {@link org.neo4j.graphdb.Node}s or {@link org.neo4j.graphdb.Relationship}s.
+     * @return IDs
+     * @throws IllegalStateException in case one of the propertyContainers is not a {@link org.neo4j.graphdb.Node} or a {@link org.neo4j.graphdb.Relationship}.
+     */
+    public static Long[] ids(Iterable<? extends PropertyContainer> propertyContainers) {
+        List<Long> result = new LinkedList<>();
+
+        for (PropertyContainer pc : propertyContainers) {
+            result.add(id(pc));
+        }
+
+        return result.toArray(new Long[result.size()]);
     }
 
     /**
