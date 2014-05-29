@@ -17,7 +17,7 @@
 package com.graphaware.test.performance;
 
 /**
- *
+ * Partial implementation of {@link Parameter} that wraps String as the parameter name.
  */
 public abstract class NamedParameter<T> implements Parameter<T> {
 
@@ -34,4 +34,5 @@ public abstract class NamedParameter<T> implements Parameter<T> {
     public String getName() {
         return name;
     }
+
 }

@@ -22,9 +22,9 @@ import java.util.List;
 /**
  * Enumerated {@link Parameter}.
  */
-public class EnumParameter extends NamedParameter<Enum> {
+public class EnumParameter extends NamedParameter<Enum<?>> {
 
-    private final Class<? extends Enum> enumClass;
+    private final Class<? extends Enum<?>> enumClass;
 
     /**
      * Construct a new parameter with values taken from the enum constants (order preserved).
@@ -32,7 +32,7 @@ public class EnumParameter extends NamedParameter<Enum> {
      * @param name      of the parameter.
      * @param enumClass enum.
      */
-    public EnumParameter(String name, Class<? extends Enum> enumClass) {
+    public EnumParameter(String name, Class<? extends Enum<?>> enumClass) {
         super(name);
         this.enumClass = enumClass;
     }
@@ -41,7 +41,8 @@ public class EnumParameter extends NamedParameter<Enum> {
      * {@inheritDoc}
      */
     @Override
-    public List<Enum> getValues() {
-        return Arrays.asList(enumClass.getEnumConstants());
+    public List<Enum<?>> getValues() {
+        return Arrays.<Enum<?>>asList(enumClass.getEnumConstants());
     }
+
 }
