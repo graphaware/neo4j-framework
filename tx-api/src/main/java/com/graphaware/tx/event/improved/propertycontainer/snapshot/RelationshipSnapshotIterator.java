@@ -21,6 +21,7 @@ import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.helpers.collection.PrefetchingIterator;
 
 import java.util.Iterator;
@@ -37,7 +38,14 @@ public class RelationshipSnapshotIterator extends PrefetchingIterator<Relationsh
     public RelationshipSnapshotIterator(Node node, Iterable<Relationship> wrappedIterable, TransactionDataContainer transactionDataContainer, Direction direction, RelationshipType... relationshipTypes) {
         this.wrappedIterator = wrappedIterable.iterator();
         this.transactionDataContainer = transactionDataContainer;
-        this.deletedRelationshipIterator = transactionDataContainer.getRelationshipTransactionData().getDeleted(node, direction, relationshipTypes).iterator();
+
+        if (transactionDataContainer.getNodeTransactionData().hasBeenDeleted(node)) {
+            //change in Neo4j 2.1! Deleted relationships of a deleted node are exposed via the node's API!
+            //Therefore, we don't want to add them again.
+            this.deletedRelationshipIterator = IteratorUtil.emptyIterator();
+        } else {
+            this.deletedRelationshipIterator = transactionDataContainer.getRelationshipTransactionData().getDeleted(node, direction, relationshipTypes).iterator();
+        }
     }
 
     /**

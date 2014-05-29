@@ -1101,12 +1101,8 @@ public class LazyTransactionDataIntegrationTest {
                             //OK
                         }
 
-                        try {
-                            r1.removeProperty("irrelevant");
-                            fail();
-                        } catch (IllegalStateException e) {
-                            //OK
-                        }
+                        r1.removeProperty("irrelevant");
+                        fail();
                     }
                 }
         );

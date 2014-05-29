@@ -125,7 +125,6 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
     }
 
     @Test
-    @Ignore("Issue 1595")
     public void changedModuleShouldBeReInitialized() {
         final BatchSupportingGraphAwareRuntimeModule mockModule = createBatchSupportingMockModule();
 
@@ -138,7 +137,7 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
         runtime.start();
 
         verify(mockModule).reinitialize(batchInserter);
-        verify(mockModule, times(2)).getConfiguration();
+        verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
@@ -146,7 +145,6 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
     }
 
     @Test
-    @Ignore("Issue 1595")
     public void forcedModuleShouldBeReInitialized() {
         final BatchSupportingGraphAwareRuntimeModule mockModule = createBatchSupportingMockModule();
 
@@ -160,7 +158,7 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
         runtime.start();
 
         verify(mockModule).reinitialize(batchInserter);
-        verify(mockModule).getConfiguration();
+        verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
@@ -168,7 +166,6 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
     }
 
     @Test
-    @Ignore("Issue 1595")
     public void moduleAlreadyRegisteredShouldBeInitializedWhenForced() {
         final BatchSupportingGraphAwareRuntimeModule mockModule = createBatchSupportingMockModule();
 
@@ -181,7 +178,7 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
         runtime.start();
 
         verify(mockModule).reinitialize(batchInserter);
-        verify(mockModule).getConfiguration();
+        verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
@@ -334,7 +331,6 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
     }
 
     @Test
-    @Ignore("Issue 1595")
     public void moduleThrowingInitExceptionShouldBeMarkedForReinitialization() {
         final GraphAwareRuntimeModule mockModule = createMockModule();
         when(mockModule.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
@@ -356,7 +352,6 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
     }
 
     @Test
-    @Ignore("Issue 1595")
     public void moduleThrowingInitExceptionShouldBeMarkedForReinitializationOnlyTheFirstTime() throws InterruptedException {
         final GraphAwareRuntimeModule mockModule = createMockModule();
         when(mockModule.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());

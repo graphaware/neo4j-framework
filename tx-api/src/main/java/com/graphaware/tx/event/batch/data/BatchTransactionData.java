@@ -20,6 +20,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.event.LabelEntry;
 import org.neo4j.graphdb.event.PropertyEntry;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
@@ -37,8 +38,8 @@ public class BatchTransactionData implements TransactionData {
     private final Set<Node> createdNodes = new HashSet<>();
     private final Map<IdAndKey, PropertyEntry<Node>> assignedNodeProperties = new HashMap<>();
     private final Map<IdAndKey, PropertyEntry<Node>> removedNodeProperties = new HashMap<>();
-    private final Map<Node, Set<String>> assignedNodeLabels = new HashMap<>();
-    private final Map<Node, Set<String>> removedNodeLabels = new HashMap<>();
+    private final Set<LabelEntry> assignedNodeLabels = new HashSet<>();
+    private final Set<LabelEntry> removedNodeLabels = new HashSet<>();
 
     private final Set<Relationship> createdRelationships = new HashSet<>();
     private final Map<IdAndKey, PropertyEntry<Relationship>> assignedRelationshipProperties = new HashMap<>();
@@ -178,21 +179,19 @@ public class BatchTransactionData implements TransactionData {
     }
 
     /**
-     * An API call that's missing in Neo4j (see https://github.com/neo4j/neo4j/issues/1065).
-     *
-     * @return all labels assigned to nodes in this transaction, keyed by {@link Node}.
+     * {@inheritDoc}
      */
-    public Map<Node, Set<String>> assignedNodeLabels() {
-        return Collections.unmodifiableMap(assignedNodeLabels);
+    @Override
+    public Iterable<LabelEntry> assignedLabels() {
+        return Collections.unmodifiableSet(assignedNodeLabels);
     }
 
     /**
-     * An API call that's missing in Neo4j (see https://github.com/neo4j/neo4j/issues/1065).
-     *
-     * @return all labels removed from nodes in this transaction, keyed by {@link Node}.
+     * {@inheritDoc}
      */
-    public Map<Node, Set<String>> removedNodeLabels() {
-        return Collections.unmodifiableMap(removedNodeLabels);
+    @Override
+    public Iterable<LabelEntry> removedLabels() {
+        return Collections.unmodifiableSet(removedNodeLabels);
     }
 
     /**
@@ -331,41 +330,29 @@ public class BatchTransactionData implements TransactionData {
             return;
         }
 
-        Set<String> newLabels = new HashSet<>();
+        Set<Label> newLabels = new HashSet<>();
         for (Label label : labels) {
-            newLabels.add(label.name());
+            newLabels.add(label);
         }
 
-        Set<String> existingLabels = new HashSet<>();
+        Set<Label> existingLabels = new HashSet<>();
         for (Label label : node.getLabels()) {
-            existingLabels.add(label.name());
+            existingLabels.add(label);
         }
 
-        Collection<String> removedLabels = CollectionUtils.subtract(existingLabels, newLabels);
-        Collection<String> assignedLabels = CollectionUtils.subtract(newLabels, existingLabels);
+        Collection<Label> removedLabels = CollectionUtils.subtract(existingLabels, newLabels);
+        Collection<Label> assignedLabels = CollectionUtils.subtract(newLabels, existingLabels);
 
-        for (String removedLabel : removedLabels) {
-            if (assignedNodeLabels.containsKey(node)) {
-                assignedNodeLabels.get(node).remove(removedLabel);
-            }
-
-            if (!removedNodeLabels.containsKey(node)) {
-                removedNodeLabels.put(node, new HashSet<String>());
-            }
-
-            removedNodeLabels.get(node).add(removedLabel);
+        for (Label removedLabel : removedLabels) {
+            LabelEntry entry = new LabelEntryImpl(removedLabel, node);
+            assignedNodeLabels.remove(entry);
+            removedNodeLabels.add(entry);
         }
 
-        for (String assignedLabel : assignedLabels) {
-            if (removedNodeLabels.containsKey(node)) {
-                removedNodeLabels.get(node).remove(assignedLabel);
-            }
-
-            if (!assignedNodeLabels.containsKey(node)) {
-                assignedNodeLabels.put(node, new HashSet<String>());
-            }
-
-            assignedNodeLabels.get(node).add(assignedLabel);
+        for (Label assignedLabel : assignedLabels) {
+            LabelEntry entry = new LabelEntryImpl(assignedLabel, node);
+            removedNodeLabels.remove(entry);
+            assignedNodeLabels.add(entry);
         }
     }
 
@@ -553,6 +540,61 @@ public class BatchTransactionData implements TransactionData {
         public int hashCode() {
             int result = (int) (id ^ (id >>> 32));
             result = 31 * result + key.hashCode();
+            return result;
+        }
+    }
+
+    /**
+     * Implementation of {@link LabelEntry} (the Neo4j one is private).
+     */
+    private class LabelEntryImpl implements LabelEntry {
+        private final Label label;
+        private final Node node;
+
+        private LabelEntryImpl(Label label, Node node) {
+            this.label = label;
+            this.node = node;
+        }
+
+        /**
+         * {@inheritDoc
+         */
+        @Override
+        public Label label() {
+            return label;
+        }
+
+        /**
+         * {@inheritDoc
+         */
+        @Override
+        public Node node() {
+            return node;
+        }
+
+        /**
+         * {@inheritDoc
+         */
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            LabelEntryImpl that = (LabelEntryImpl) o;
+
+            if (!label.equals(that.label)) return false;
+            if (!node.equals(that.node)) return false;
+
+            return true;
+        }
+
+        /**
+         * {@inheritDoc
+         */
+        @Override
+        public int hashCode() {
+            int result = label.hashCode();
+            result = 31 * result + node.hashCode();
             return result;
         }
     }
