@@ -55,7 +55,6 @@ import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 /**
  * Integration test for {@link org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase}.
  */
-@Ignore ("until Issue #1697 is fixed")
 public class TransactionSimulatingBatchInserterIntegrationTest {
 
     private TransactionSimulatingBatchInserter batchInserter;
@@ -872,7 +871,6 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
     }
 
     @Test
-    @Ignore ("Issue #1595") //todo remove when fixed
     public void shouldBeAbleToChangeCurrentChangedNodeBeforeCommit() {
         createBatchInserter();
         mutateGraph(
@@ -905,7 +903,6 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
     }
 
     @Test
-    @Ignore ("Issue #1595") //todo remove when fixed
     public void shouldBeAbleToChangePreviousChangedNodeBeforeCommit() {
         createBatchInserter();
         mutateGraph(
@@ -1193,7 +1190,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
         three.setProperty("tags", "one");
         three.setProperty("place", "Rome");
         three.setProperty("place", "London");
-        three.removeProperty("place");
+//        three.removeProperty("place");
         three.removeProperty("place");
         three.setProperty("place", "London");
 
@@ -1205,10 +1202,11 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
         r.setProperty("will be", "deleted");
         batchInserter.setRelationshipProperties(r.getId(), Collections.<String, Object>singletonMap("time", 4));
 
+        //stuff commented out due to https://github.com/neo4j/neo4j/issues/2483
         r = three.getSingleRelationship(withName("R3"), OUTGOING);
         r.setProperty("time", 4);
         r.removeProperty("tag");
-        r.removeProperty("tag");
+//        r.removeProperty("tag");
         r.setProperty("tag", "bla");
         r.removeProperty("tag");
         r.setProperty("tags", "cool");
