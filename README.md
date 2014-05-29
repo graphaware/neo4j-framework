@@ -40,6 +40,8 @@ deploying the GraphAware Framework (and any code using it) is a matter of [downl
 copying them into the `plugins` directory in your Neo4j installation, and restarting the server. The framework and modules
 are then used via calls to their REST APIs, if they provide any.
 
+Note that you need **at least version 2.0.3** of the Neo4j Server in order to use the GraphAware Framework as a plugin.  Older versions of Neo4j have an outdated implementation of `org.neo4j.server.Bootstrapper` that is not backwardly-compatible with the latest plugins.  If you see a `java.lang.IllegalAccessError` when starting up the server, then you're most likely using a version of Neo4j older than 2.0.3.
+
 ### Embedded Mode / Java Development
 
 Java developers that use Neo4j in <a href="http://docs.neo4j.org/chunked/stable/tutorials-java-embedded.html" target="_blank">embedded mode</a>
