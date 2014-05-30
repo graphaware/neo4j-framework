@@ -166,7 +166,9 @@ Neo4j server installation. You will then be able to issue a `GET` request to `ht
 and receive the number of nodes in the database in the response body. Note that the `graphaware` part of the URL must be
 there and cannot (yet) be configured.
 
-To get started quickly, use the <a href="https://github.com/graphaware/neo4j-springmvc-maven-archetype" target="_blank">Neo4j Spring MVC Maven Archetype</a>.
+To get started quickly, use the provided Maven archetype by typing:
+
+    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-springmvc-maven-archetype -DarchetypeVersion=2.0.3.5
 
 To get started manually, you will need the following dependencies:
 
@@ -269,7 +271,9 @@ happening at all. For example, you might want to:
 
 ### Building a GraphAware Runtime Module
 
-To get started quickly, use <a href="https://github.com/graphaware/neo4j-graphaware-runtime-module-maven-archetype" target="_blank">GraphAware Runtime Module Maven Archetype</a>.
+To get started quickly, use the provided Maven archetype by typing:
+
+    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-runtime-module-maven-archetype -DarchetypeVersion=2.0.3.5
 
 To start from scratch, you will need the following dependencies in your pom.xml
 

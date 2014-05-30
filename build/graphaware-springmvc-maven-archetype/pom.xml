@@ -24,6 +24,6 @@
         <version>2.0.3.6-SNAPSHOT</version>
     </parent>
 
-    <artifactId>neo4j-springmvc-maven-archetype</artifactId>
+    <artifactId>graphaware-springmvc-maven-archetype</artifactId>
 
 </project>
