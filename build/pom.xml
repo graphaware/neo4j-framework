@@ -36,4 +36,38 @@
         <module>graphaware-springmvc-maven-archetype</module>
     </modules>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>graphaware-framework-embedded</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>graphaware-framework-server-community</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>runtime</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>server-community</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>server-enterprise</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 </project>
