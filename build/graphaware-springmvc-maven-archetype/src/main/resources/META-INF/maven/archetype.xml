@@ -30,6 +30,7 @@
     </resources>
     <testSources>
         <source>src/test/java/NodeCountApiTest.java</source>
+        <source>src/test/java/NodeCountIntegrationTest.java</source>
     </testSources>
     <testResources>
         <resource>src/test/resources/log4j.properties</resource>
