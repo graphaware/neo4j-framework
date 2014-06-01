@@ -16,7 +16,8 @@
 
 package com.graphaware.example;
 
-import com.graphaware.test.integration.IntegrationTest;
+import com.graphaware.test.integration.ServerIntegrationTest;
+import com.graphaware.test.integration.ServerIntegrationTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -27,9 +28,9 @@ import static org.junit.Assert.assertEquals;
 /**
  * Test for {@link com.graphaware.example.module.FriendshipStrengthCounter}.
  */
-public class FriendshipStrengthModuleIntegrationTest extends IntegrationTest {
+public class FriendshipStrengthModuleServerIntegrationTest extends ServerIntegrationTest {
 
-    public FriendshipStrengthModuleIntegrationTest() {
+    public FriendshipStrengthModuleServerIntegrationTest() {
         super("neo4j-friendship.properties");
     }
 

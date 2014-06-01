@@ -1,6 +1,7 @@
 package com.graphaware.example;
 
-import com.graphaware.test.integration.IntegrationTest;
+import com.graphaware.test.integration.ServerIntegrationTest;
+import com.graphaware.test.integration.ServerIntegrationTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -8,9 +9,9 @@ import static com.graphaware.test.util.TestUtils.get;
 import static org.junit.Assert.assertEquals;
 
 /**
- * {@link IntegrationTest} for {@link NodeCountApi}.
+ * {@link com.graphaware.test.integration.ServerIntegrationTest} for {@link NodeCountApi}.
  */
-public class NodeCountIntegrationTest extends IntegrationTest {
+public class NodeCountServerIntegrationTest extends ServerIntegrationTest {
 
     @Test
     public void apiShouldBeMounted() {

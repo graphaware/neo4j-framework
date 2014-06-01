@@ -31,7 +31,7 @@ Additionally, for [Java developers only](#javadev)(1), the following functionali
 * [Transaction Executor](#tx-executor) and [Batch Transaction Executor](#batch-tx)
 * [Miscellaneous Utilities](#utils)
 
-(1) (i.e., for embedded mode users, managed/unmanaged extensions developers, [GraphAware Runtime Module](#graphaware-runtime)
+(1) i.e., for embedded mode users, managed/unmanaged extensions developers, [GraphAware Runtime Module](#graphaware-runtime)
  developers and framework-powered Spring MVC controller developers
 
 Framework Usage
@@ -113,8 +113,7 @@ down this page to find out which dependencies you will need. The available ones 
 ### Snapshots
 
 To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.0.3.6-SNAPSHOT
- jar files. If you need standalone .jar files with all dependencies (for server mode), clone [this repository](https://github.com/graphaware/neo4j-framework-build.git)
-and run `mvn clean install` on that.
+ jar files. If you need standalone .jar files with all dependencies, look into the `target` folders in the `build` directory.
 
 ### Note on Versioning Scheme
 
@@ -134,26 +133,26 @@ controller:
 
 ```java
 /**
-*  Sample REST API for counting all nodes in the database.
-*/
+ *  Sample REST API for counting all nodes in the database.
+ */
 @Controller
 @RequestMapping("count")
 public class NodeCountApi {
 
-   private final GraphDatabaseService database;
+    private final GraphDatabaseService database;
 
-   @Autowired
-   public NodeCountApi(GraphDatabaseService database) {
-       this.database = database;
-   }
+    @Autowired
+    public NodeCountApi(GraphDatabaseService database) {
+        this.database = database;
+    }
 
-   @RequestMapping(method = RequestMethod.GET)
-   @ResponseBody
-   public long count() {
-       try (Transaction tx = database.beginTx()) {
-           return Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
-       }
-   }
+    @RequestMapping(method = RequestMethod.GET)
+    @ResponseBody
+    public long count() {
+        try (Transaction tx = database.beginTx()) {
+            return Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
+        }
+    }
 }
 ```
 
@@ -226,7 +225,7 @@ To get started manually, you will need the following dependencies:
 
 It is also a good idea to use make sure the resulting .jar file includes all the dependencies, if you use any external
 ones that aren't listed above:
-
+<a name="alldependencies"/>
 ```xml
 <build>
     <plugins>
@@ -241,7 +240,7 @@ ones that aren't listed above:
                 </execution>
             </executions>
             <configuration>
-                <finalName>your-api-module-name-${project.version}</finalName>
+                <finalName>${project.name}-all-${project.version}</finalName>
                 <descriptorRefs>
                     <descriptorRef>jar-with-dependencies</descriptorRef>
                 </descriptorRefs>
@@ -322,81 +321,79 @@ To start from scratch, you will need the following dependencies in your pom.xml
 </dependencies>
 ```
 
-Again, if using other dependencies, you need to make sure the resulting .jar file includes all the dependencies:
-
-```xml
-<build>
-    <plugins>
-        <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>attached</goal>
-                    </goals>
-                </execution>
-            </executions>
-            <configuration>
-                <finalName>your-api-module-name-${project.version}</finalName>
-                <descriptorRefs>
-                    <descriptorRef>jar-with-dependencies</descriptorRef>
-                </descriptorRefs>
-                <appendAssemblyId>false</appendAssemblyId>
-            </configuration>
-        </plugin>
-    </plugins>
-</build>
-```
+Again, if using other dependencies, you need to make sure the resulting .jar file includes all the dependencies. [See above](#alldependencies).
 
 Your module then needs to be built by implementing the <a href="http://graphaware.com/site/framework/latest/apidocs/com/graphaware/runtime/GraphAwareRuntimeModule.html" target="_blank">GraphAwareRuntimeModule</a> interface.
-As an example, if we were to build a module that logs all changes performed in a transaction to system out in a human
-readable form, we would write the following code:
+An example is provided in `examples/friendship-strength-counter-module`. This computes the sum of all `strength` properties
+on `FRIEND_OF` relationships and keeps it up to data, written to a special node created for that purpose. It also has
+a REST API that can be queried for the total friendship strength value.
 
-```java
-   TBD //todo
-```
-
-### Using GraphAware Runtime (Embedded Mode)
-
-Using the GraphAware Runtime only makes sense when there is a GraphAware Runtime Module to go with it. Assuming we want
-to use the runtime with the `ChangeLoggingRuntimeModule` we've built in the previous section in embedded mode, all we
-need to do is instantiate the runtime and register the module with it:
-
-```java
-   TBD //todo
-```
-
-The modules are presented with the about-to-be-committed transaction data in the order in which they've been registered.
-
+<a name="server-usage"/>
 ### Using GraphAware Runtime (Server Mode)
 
-Provided that the GraphAware Framework .jar file is present in the Neo4j `plugins` directory, the following line needs to
+Using the GraphAware Runtime only makes sense when there is a GraphAware Runtime Module (or more) to go with it.
+Assuming we want to use the runtime with the `FriendshipStrengthModule` from examples in server mode, provided that
+the GraphAware Framework .jar file is present in the Neo4j `plugins` directory, the following line needs to
 be added to `neo4j.properties` in order for the GraphAware Runtime to be enabled:
 
 `com.graphaware.runtime.enabled=true`
 
-GraphAware Runtime Modules can be registered using the following mechanism. For instance, the `ChangeLoggingRuntimeModule`
-with its `ChangeLoggingRuntimeModuleBootstrapper` (assuming it lives in `com.graphaware.demo` package) can be registered
-with the runtime using the following line
-
-`com.graphaware.module.changelogger.1=com.graphaware.demo.ChangeLoggingRuntimeModuleBootstrapper`
-
-which means that the `ChangeLoggingRuntimeModule` will be the first runtime module registered with the runtime with ID
-equal to "changelogger".
-
-### Using GraphAware Runtime (Batch Inserters)
-
-For populating a database quickly, people sometimes use Neo4j `BatchInserter`s. The framework can be used with those as
-well, in the following fashion:
+GraphAware Runtime Modules can be registered using the following mechanism we will illustrate on the example of
+ `FriendshipStrengthModule`. First, a _bootstrapper_ needs to be created like this:
 
 ```java
-    tbd
+/**
+ * {@link GraphAwareRuntimeModuleBootstrapper} for {@link FriendshipStrengthModule}.
+ */
+public class FriendshipStrengthModuleBootstrapper implements GraphAwareRuntimeModuleBootstrapper {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GraphAwareRuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
+        return new FriendshipStrengthModule(moduleId, database);
+    }
+}
 ```
 
-### Existing GraphAware Runtime Modules
+Then, assuming it lives in `com.graphaware.example.module` package, the boostrapper must be registered
+with the runtime using the following line in neo4j.properties:
 
-So far, the only production-ready GraphAware module is the <a href="https://github.com/graphaware/neo4j-relcount" target="_blank">relationship count module</a>.
+`com.graphaware.module.FSM.1=com.graphaware.example.module.FriendshipStrengthModuleBootstrapper`
+
+which means that the `FriendshipStrengthModule` will be the first runtime module registered with the runtime with ID
+equal to "FSM".
+
+### Using GraphAware Runtime (Embedded Mode)
+
+To use the runtime and modules programmatically, all we need to do is instantiate the runtime and register the module with it:
+
+```java
+GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //replace with a real DB
+GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
+runtime.registerModule(new FriendshipStrengthModule("FSM", database));
+```
+
+It is, however, also possible to pass a _neo4j.properties_ file to the database. Same rules as in the [server mode](#server-usage)
+ apply. For example, if we have a neo4j-friendship.properties file with the following lines
+
+```
+# GraphAware Config
+com.graphaware.runtime.enabled=true
+com.graphaware.module.friendshipcounter.1=com.graphaware.example.module.FriendshipStrengthModuleBootstrapper
+```
+
+the runtime and modules will be configured correctly by just doing
+
+```java
+database = new TestGraphDatabaseFactory()
+              .newImpermanentDatabaseBuilder()
+              .loadPropertiesFromFile("neo4j-friendship.properties")
+              .newGraphDatabase();
+```
+
+**NOTE:** Modules are presented with the about-to-be-committed transaction data in the order in which they've been registered.
 
 <a name="javadev"/>
 Features for Java Developers
