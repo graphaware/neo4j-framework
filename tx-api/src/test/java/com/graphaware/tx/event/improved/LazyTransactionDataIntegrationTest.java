@@ -45,6 +45,7 @@ import static com.graphaware.tx.event.improved.api.Change.*;
 import static junit.framework.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
+import static org.neo4j.graphdb.DynamicLabel.*;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
@@ -75,11 +76,11 @@ public class LazyTransactionDataIntegrationTest {
                         long r1Id = database.getNodeById(5).getSingleRelationship(withName("R2"), OUTGOING).getId();
                         Relationship r1 = created.get(r1Id);
                         assertEquals(4, r1.getProperty("time"));
-                        Assert.assertEquals(1, count(r1.getPropertyKeys()));
+                        assertEquals(1, count(r1.getPropertyKeys()));
 
                         long r2Id = database.getNodeById(1).getSingleRelationship(withName("R1"), OUTGOING).getId();
                         Relationship r2 = created.get(r2Id);
-                        Assert.assertEquals(0, count(r2.getPropertyKeys()));
+                        assertEquals(0, count(r2.getPropertyKeys()));
 
                         assertTrue(transactionData.hasBeenCreated(r1));
                         assertTrue(transactionData.hasBeenCreated(r2));
@@ -131,12 +132,12 @@ public class LazyTransactionDataIntegrationTest {
                         assertEquals(1, changed.size());
 
                         Relationship previous = changed.entrySet().iterator().next().getValue().getPrevious();
-                        Assert.assertEquals(2, count(previous.getPropertyKeys()));
+                        assertEquals(2, count(previous.getPropertyKeys()));
                         assertEquals(3, previous.getProperty("time"));
                         assertEquals("cool", previous.getProperty("tag"));
 
                         Relationship current = changed.entrySet().iterator().next().getValue().getCurrent();
-                        Assert.assertEquals(2, count(current.getPropertyKeys()));
+                        assertEquals(2, count(current.getPropertyKeys()));
                         assertEquals(4, current.getProperty("time"));
                         assertEquals("cool", current.getProperty("tags"));
 
@@ -163,7 +164,7 @@ public class LazyTransactionDataIntegrationTest {
                         assertEquals("One", previous.getEndNode().getProperty("name"));
                         assertEquals(1, previous.getEndNode().getProperty("count", 2));
                         assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) previous.getEndNode().getProperty("tags")));
-                        Assert.assertEquals(3, count(previous.getEndNode().getPropertyKeys()));
+                        assertEquals(3, count(previous.getEndNode().getPropertyKeys()));
 
                         assertEquals("Three", previous.getStartNode().getProperty("name"));
                         assertEquals("London", previous.getStartNode().getProperty("place"));
@@ -197,7 +198,7 @@ public class LazyTransactionDataIntegrationTest {
                                 .uniqueness(Uniqueness.NODE_GLOBAL)
                                 .evaluator(Evaluators.toDepth(3));
 
-                        Assert.assertEquals(4, count(traversalDescription.traverse(previous.getEndNode()).nodes()));
+                        assertEquals(4, count(traversalDescription.traverse(previous.getEndNode()).nodes()));
                     }
                 }
         );
@@ -221,7 +222,7 @@ public class LazyTransactionDataIntegrationTest {
                         assertEquals(2, current.getEndNode().getProperty("count", 2));
                         assertFalse(current.getEndNode().hasProperty("count"));
                         assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) current.getEndNode().getProperty("tags")));
-                        Assert.assertEquals(2, count(current.getEndNode().getPropertyKeys()));
+                        assertEquals(2, count(current.getEndNode().getPropertyKeys()));
 
                         assertEquals("Three", current.getStartNode().getProperty("name"));
                         assertEquals("London", current.getStartNode().getProperty("place"));
@@ -251,7 +252,7 @@ public class LazyTransactionDataIntegrationTest {
                                 .depthFirst()
                                 .uniqueness(Uniqueness.NODE_GLOBAL);
 
-                        Assert.assertEquals(3, count(traversalDescription.traverse(current.getEndNode()).nodes()));
+                        assertEquals(3, count(traversalDescription.traverse(current.getEndNode()).nodes()));
                     }
                 }
         );
@@ -272,11 +273,11 @@ public class LazyTransactionDataIntegrationTest {
                         long r1Id = propertyContainersToMap(transactionData.getAllDeletedNodes()).get(2L).getSingleRelationship(withName("R1"), INCOMING).getId();
                         Relationship r1 = deleted.get(r1Id);
                         assertEquals(1, r1.getProperty("time"));
-                        Assert.assertEquals(1, count(r1.getPropertyKeys()));
+                        assertEquals(1, count(r1.getPropertyKeys()));
 
                         long r2Id = propertyContainersToMap(transactionData.getAllDeletedNodes()).get(2L).getSingleRelationship(withName("R2"), INCOMING).getId();
                         Relationship r2 = deleted.get(r2Id);
-                        Assert.assertEquals(0, count(r2.getPropertyKeys()));
+                        assertEquals(0, count(r2.getPropertyKeys()));
 
                         Iterator<Relationship> relationships = propertyContainersToMap(transactionData.getAllDeletedNodes()).get(2L).getRelationships(withName("R2"), OUTGOING).iterator();
                         long r3Id = relationships.next().getId();
@@ -285,11 +286,11 @@ public class LazyTransactionDataIntegrationTest {
                         }
                         Relationship r3 = deleted.get(r3Id);
                         assertEquals(2, r3.getProperty("time"));
-                        Assert.assertEquals(1, count(r3.getPropertyKeys()));
+                        assertEquals(1, count(r3.getPropertyKeys()));
 
                         long r4Id = changesToMap(transactionData.getAllChangedNodes()).get(3L).getPrevious().getSingleRelationship(withName("R3"), INCOMING).getId();
                         Relationship r4 = deleted.get(r4Id);
-                        Assert.assertEquals(0, count(r4.getPropertyKeys()));
+                        assertEquals(0, count(r4.getPropertyKeys()));
 
                         assertTrue(transactionData.hasBeenDeleted(r1));
                         assertTrue(transactionData.hasBeenDeleted(r2));
@@ -297,13 +298,13 @@ public class LazyTransactionDataIntegrationTest {
                         assertTrue(transactionData.hasBeenDeleted(r4));
                         assertFalse(transactionData.hasBeenDeleted(database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING)));
 
-                        Assert.assertEquals(3, count(transactionData.getDeletedRelationships(database.getNodeById(2))));
-                        Assert.assertEquals(3, count(transactionData.getDeletedRelationships(database.getNodeById(2), withName("R2"), withName("R1"))));
-                        Assert.assertEquals(2, count(transactionData.getDeletedRelationships(database.getNodeById(2), withName("R2"))));
-                        Assert.assertEquals(2, count(transactionData.getDeletedRelationships(database.getNodeById(2), OUTGOING)));
-                        Assert.assertEquals(2, count(transactionData.getDeletedRelationships(database.getNodeById(2), OUTGOING, withName("R2"))));
-                        Assert.assertEquals(1, count(transactionData.getDeletedRelationships(database.getNodeById(2), INCOMING, withName("R2"))));
-                        Assert.assertEquals(0, count(transactionData.getDeletedRelationships(database.getNodeById(2), withName("R3"))));
+                        assertEquals(3, count(transactionData.getDeletedRelationships(database.getNodeById(2))));
+                        assertEquals(3, count(transactionData.getDeletedRelationships(database.getNodeById(2), withName("R2"), withName("R1"))));
+                        assertEquals(2, count(transactionData.getDeletedRelationships(database.getNodeById(2), withName("R2"))));
+                        assertEquals(2, count(transactionData.getDeletedRelationships(database.getNodeById(2), OUTGOING)));
+                        assertEquals(2, count(transactionData.getDeletedRelationships(database.getNodeById(2), OUTGOING, withName("R2"))));
+                        assertEquals(1, count(transactionData.getDeletedRelationships(database.getNodeById(2), INCOMING, withName("R2"))));
+                        assertEquals(0, count(transactionData.getDeletedRelationships(database.getNodeById(2), withName("R3"))));
                     }
                 }
         );
@@ -327,7 +328,7 @@ public class LazyTransactionDataIntegrationTest {
                         assertEquals("One", deletedRel.getStartNode().getProperty("name"));
                         assertEquals(1, deletedRel.getStartNode().getProperty("count", 2));
                         assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) deletedRel.getStartNode().getProperty("tags")));
-                        Assert.assertEquals(3, count(deletedRel.getStartNode().getPropertyKeys()));
+                        assertEquals(3, count(deletedRel.getStartNode().getPropertyKeys()));
 
                         assertEquals("Three", deletedRel.getEndNode().getProperty("name"));
                         assertEquals("London", deletedRel.getEndNode().getProperty("place"));
@@ -337,11 +338,11 @@ public class LazyTransactionDataIntegrationTest {
                         Relationship r5 = startNode.getSingleRelationship(withName("R1"), OUTGOING);
                         assertEquals("Two", r5.getEndNode().getProperty("name"));
 
-                        Assert.assertEquals(4, count(startNode.getRelationships()));
-                        Assert.assertEquals(3, count(startNode.getRelationships(OUTGOING)));
-                        Assert.assertEquals(2, count(startNode.getRelationships(withName("R3"))));
-                        Assert.assertEquals(3, count(startNode.getRelationships(withName("R3"), withName("R1"))));
-                        Assert.assertEquals(1, count(startNode.getRelationships(INCOMING, withName("R3"), withName("R1"))));
+                        assertEquals(4, count(startNode.getRelationships()));
+                        assertEquals(3, count(startNode.getRelationships(OUTGOING)));
+                        assertEquals(2, count(startNode.getRelationships(withName("R3"))));
+                        assertEquals(3, count(startNode.getRelationships(withName("R3"), withName("R1"))));
+                        assertEquals(1, count(startNode.getRelationships(INCOMING, withName("R3"), withName("R1"))));
                     }
                 }
         );
@@ -367,7 +368,7 @@ public class LazyTransactionDataIntegrationTest {
                                 .uniqueness(Uniqueness.NODE_GLOBAL)
                                 .evaluator(Evaluators.toDepth(3));
 
-                        Assert.assertEquals(4, count(traversalDescription.traverse(deletedRel.getStartNode()).nodes()));
+                        assertEquals(4, count(traversalDescription.traverse(deletedRel.getStartNode()).nodes()));
                     }
                 }
         );
@@ -480,8 +481,9 @@ public class LazyTransactionDataIntegrationTest {
 
                         Node createdNode = createdNodes.get(5L);
                         assertEquals("Five", createdNode.getProperty("name"));
+                        assertEquals("SomeLabel", createdNode.getLabels().iterator().next().name());
                         assertEquals(4L, createdNode.getProperty("size"));
-                        Assert.assertEquals(2, count(createdNode.getPropertyKeys()));
+                        assertEquals(2, count(createdNode.getPropertyKeys()));
 
                         assertTrue(transactionData.hasBeenCreated(createdNode));
                         assertFalse(transactionData.hasBeenCreated(database.getNodeById(3)));
@@ -516,29 +518,32 @@ public class LazyTransactionDataIntegrationTest {
                 new BeforeCommitCallback() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
+                        if (!transactionData.mutationsOccurred()) {
+                            return;
+                        }
                         assertTrue(transactionData.mutationsOccurred());
 
                         Map<Long, Change<Node>> changed = changesToMap(transactionData.getAllChangedNodes());
-                        assertEquals(2, changed.size());
+                        assertEquals(4, changed.size());
 
                         Node previous1 = changed.get(1L).getPrevious();
-                        Assert.assertEquals(3, count(previous1.getPropertyKeys()));
+                        assertEquals(3, count(previous1.getPropertyKeys()));
                         assertEquals("One", previous1.getProperty("name"));
                         assertEquals(1, previous1.getProperty("count"));
                         assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) previous1.getProperty("tags")));
 
                         Node current1 = changed.get(1L).getCurrent();
-                        Assert.assertEquals(2, count(current1.getPropertyKeys()));
+                        assertEquals(2, count(current1.getPropertyKeys()));
                         assertEquals("NewOne", current1.getProperty("name"));
                         assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) current1.getProperty("tags")));
 
                         Node previous2 = changed.get(3L).getPrevious();
-                        Assert.assertEquals(2, count(previous2.getPropertyKeys()));
+                        assertEquals(2, count(previous2.getPropertyKeys()));
                         assertEquals("Three", previous2.getProperty("name"));
                         assertEquals("London", previous2.getProperty("place"));
 
                         Node current2 = changed.get(3L).getCurrent();
-                        Assert.assertEquals(3, count(current2.getPropertyKeys()));
+                        assertEquals(3, count(current2.getPropertyKeys()));
                         assertEquals("Three", current2.getProperty("name"));
                         assertEquals("London", current2.getProperty("place"));
                         assertEquals("one", current2.getProperty("tags"));
@@ -574,14 +579,14 @@ public class LazyTransactionDataIntegrationTest {
                         assertEquals(2L, previous.getRelationships(withName("R1")).iterator().next().getEndNode().getProperty("size"));
 
                         assertNull(previous.getSingleRelationship(withName("R1"), INCOMING));
-                        Assert.assertEquals(4, count(previous.getRelationships()));
-                        Assert.assertEquals(3, count(previous.getRelationships(withName("R1"), withName("R3"))));
-                        Assert.assertEquals(1, count(previous.getRelationships(withName("R1"))));
-                        Assert.assertEquals(3, count(previous.getRelationships(OUTGOING)));
-                        Assert.assertEquals(1, count(previous.getRelationships(INCOMING)));
-                        Assert.assertEquals(1, count(previous.getRelationships(OUTGOING, withName("R3"))));
-                        Assert.assertEquals(2, count(previous.getRelationships(OUTGOING, withName("R1"), withName("R3"))));
-                        Assert.assertEquals(1, count(previous.getRelationships(withName("R3"), OUTGOING)));
+                        assertEquals(4, count(previous.getRelationships()));
+                        assertEquals(3, count(previous.getRelationships(withName("R1"), withName("R3"))));
+                        assertEquals(1, count(previous.getRelationships(withName("R1"))));
+                        assertEquals(3, count(previous.getRelationships(OUTGOING)));
+                        assertEquals(1, count(previous.getRelationships(INCOMING)));
+                        assertEquals(1, count(previous.getRelationships(OUTGOING, withName("R3"))));
+                        assertEquals(2, count(previous.getRelationships(OUTGOING, withName("R1"), withName("R3"))));
+                        assertEquals(1, count(previous.getRelationships(withName("R3"), OUTGOING)));
 
                         assertTrue(previous.hasRelationship());
                         assertTrue(previous.hasRelationship(withName("R1"), withName("R3")));
@@ -627,7 +632,7 @@ public class LazyTransactionDataIntegrationTest {
                                 .uniqueness(Uniqueness.NODE_GLOBAL)
                                 .evaluator(Evaluators.toDepth(3));
 
-                        Assert.assertEquals(4, count(traversalDescription.traverse(previous).nodes()));
+                        assertEquals(4, count(traversalDescription.traverse(previous).nodes()));
                     }
                 }
         );
@@ -671,7 +676,7 @@ public class LazyTransactionDataIntegrationTest {
                                 .depthFirst()
                                 .uniqueness(Uniqueness.NODE_GLOBAL);
 
-                        Assert.assertEquals(3, count(traversalDescription.traverse(current).nodes()));
+                        assertEquals(3, count(traversalDescription.traverse(current).nodes()));
 
                     }
                 }
@@ -1101,8 +1106,12 @@ public class LazyTransactionDataIntegrationTest {
                             //OK
                         }
 
-                        r1.removeProperty("irrelevant");
-                        fail();
+                        try {
+                            r1.removeProperty("irrelevant");
+                            fail();
+                        } catch (IllegalStateException e) {
+                            //OK
+                        }
                     }
                 }
         );
@@ -1444,7 +1453,7 @@ public class LazyTransactionDataIntegrationTest {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
         new TestDataBuilder(database)
-                .node() //ID=0
+                .node(label("TestLabel")) //ID=0
                 .node().setProp("name", "One").setProp("count", 1).setProp("tags", new String[]{"one", "two"})
 
                 .node().setProp("name", "Two").setProp("size", 2L)
@@ -1458,7 +1467,10 @@ public class LazyTransactionDataIntegrationTest {
 
                 .node().setProp("name", "Four")
                 .relationshipFrom(3, "R1").setProp("time", 1)
-                .relationshipFrom(1, "WHATEVER");
+                .relationshipFrom(1, "WHATEVER")
+
+                .node(label("SomeLabel")).setProp("name", "Six")
+                .node(label("ToBeRemoved")).setProp("name", "Seven");
     }
 
     private class TestGraphMutation extends VoidReturningCallback {
@@ -1479,7 +1491,7 @@ public class LazyTransactionDataIntegrationTest {
             three.setProperty("place", "Rome");
             three.setProperty("place", "London");
 
-            Node five = database.createNode();
+            Node five = database.createNode(label("SomeLabel"));
             five.setProperty("name", "Five");
             five.setProperty("size", 3L);
             five.setProperty("size", 4L);
@@ -1499,6 +1511,12 @@ public class LazyTransactionDataIntegrationTest {
             Node four = database.getNodeById(4);
             four.setProperty("name", "Three");
             four.setProperty("name", "Four");
+
+            Node six = database.getNodeById(6);
+            six.addLabel(label("NewLabel"));
+
+            Node seven = database.getNodeById(7);
+            seven.removeLabel(label("ToBeRemoved"));
         }
     }
 }

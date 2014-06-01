@@ -194,7 +194,7 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
         return Collections.unmodifiableCollection(changed.values());
     }
 
-    private void initializeChanged() {
+    protected void initializeChanged() {
         initializeCreated();
         initializeDeleted();
 
