@@ -22,8 +22,8 @@ public class TestRuntimeModule extends BaseGraphAwareRuntimeModule {
     private final Map<String, String> config;
     private boolean initialized = false;
 
-    public TestRuntimeModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
-        super(moduleId, database);
+    public TestRuntimeModule(String moduleId, Map<String, String> config) {
+        super(moduleId);
         this.config = config;
         TEST_RUNTIME_MODULES.add(this);
     }

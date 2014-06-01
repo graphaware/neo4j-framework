@@ -35,12 +35,6 @@ public interface GraphAwareRuntimeModule {
     String getId();
 
     /**
-     * Get the database which this module runs in.
-     * @return database.
-     */
-    GraphDatabaseService getDatabase();
-
-    /**
      * Return the configuration of this module. Each module must encapsulate its entire configuration in an instance of
      * a {@link RuntimeModuleConfiguration} implementation. Use {@link com.graphaware.runtime.config.NullRuntimeModuleConfiguration}
      * if this module needs no configuration.

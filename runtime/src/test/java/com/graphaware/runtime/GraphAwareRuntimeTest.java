@@ -54,8 +54,8 @@ public abstract class GraphAwareRuntimeTest {
 
         private RuntimeConfiguration configuration;
 
-        public RealRuntimeConfiguredRuntimeModule(GraphDatabaseService database) {
-            super("TEST", database);
+        public RealRuntimeConfiguredRuntimeModule() {
+            super("TEST");
         }
 
         @Override
