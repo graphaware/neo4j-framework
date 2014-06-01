@@ -37,6 +37,9 @@
         <module>tx-api</module>
         <module>tx-executor</module>
         <module>build</module>
+
+        <!--examples-->
+        <module>examples/node-counter</module>
     </modules>
 
     <name>GraphAware Neo4j Framework</name>

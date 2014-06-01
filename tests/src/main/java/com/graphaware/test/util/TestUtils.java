@@ -27,6 +27,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -37,6 +38,8 @@ import static org.junit.Assert.*;
  * Utilities mainly intended for testing.
  */
 public final class TestUtils {
+
+    private static final Logger LOG = Logger.getLogger(TestUtils.class);
 
     public static void assertJsonEquals(String one, String two) {
         ObjectMapper mapper = new ObjectMapper();
@@ -86,9 +89,11 @@ public final class TestUtils {
                     }
                 };
 
-                String execute = httpClient.execute(httpPost, responseHandler);
-                System.out.println(execute);
-                return execute;
+                String result = httpClient.execute(httpPost, responseHandler);
+
+                LOG.debug(result);
+
+                return result;
 
             }
         } catch (IOException e) {
@@ -113,9 +118,11 @@ public final class TestUtils {
                     }
                 };
 
-                String execute = httpClient.execute(httpGet, responseHandler);
-                System.out.println(execute);
-                return execute;
+                String result = httpClient.execute(httpGet, responseHandler);
+
+                LOG.debug(result);
+
+                return result;
 
             }
         } catch (IOException e) {
