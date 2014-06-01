@@ -25,5 +25,6 @@
     </parent>
 
     <artifactId>graphaware-springmvc-maven-archetype</artifactId>
+    <name>GraphAware Spring MVC Maven Archetype</name>
 
 </project>

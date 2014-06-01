@@ -23,7 +23,7 @@
     <packaging>jar</packaging>
 
     <name>GraphAware Node Counter</name>
-    <description>Example of a spring MVC controller built and deployed using the GraphAware Framework</description>
+    <description>Example of a Spring MVC controller built and deployed using the GraphAware Framework</description>
     <url>http://graphaware.com</url>
 
     <dependencies>

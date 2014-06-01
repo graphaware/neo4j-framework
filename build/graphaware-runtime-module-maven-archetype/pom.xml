@@ -25,5 +25,6 @@
     </parent>
 
     <artifactId>graphaware-runtime-module-maven-archetype</artifactId>
+    <name>GraphAware Runtim Module Maven Archetype</name>
 
 </project>
