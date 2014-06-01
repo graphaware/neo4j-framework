@@ -16,9 +16,18 @@
 
 package com.graphaware.example;
 
+import com.graphaware.common.strategy.IncludeAllNodes;
+import com.graphaware.common.strategy.IncludeNoRelationships;
+import com.graphaware.common.strategy.InclusionStrategies;
+import com.graphaware.common.strategy.NodeInclusionStrategy;
+import com.graphaware.tx.event.improved.api.FilteredTransactionData;
+import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
+import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.event.TransactionData;
+import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.example.FriendshipStrengthCounter.*;
@@ -28,7 +37,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Test for {@link FriendshipStrengthCounter}.
  */
-public class ChangeLoggerTest {
+public class FriendshipStrengthCounterTest {
 
     private GraphDatabaseService database;
 

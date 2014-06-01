@@ -31,7 +31,7 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
  * to do its job, which is counting the total strength of all friendships in the database and writing that to a special
  * node created for that purpose.
  */
-public class FriendshipStrengthCounter implements TransactionEventHandler<Void> {
+public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<Void> {
 
     public static final RelationshipType FRIEND_OF = DynamicRelationshipType.withName("FRIEND_OF");
     public static final String STRENGTH = "strength";
@@ -114,15 +114,5 @@ public class FriendshipStrengthCounter implements TransactionEventHandler<Void> 
         }
 
         return result;
-    }
-
-    @Override
-    public void afterCommit(TransactionData data, Void state) {
-        //noop
-    }
-
-    @Override
-    public void afterRollback(TransactionData data, Void state) {
-        //noop
     }
 }

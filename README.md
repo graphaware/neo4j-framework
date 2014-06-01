@@ -125,6 +125,8 @@ The version number has two parts. The first three numbers indicate compatibility
 GraphAware Server
 -----------------
 
+**Example:** An example is provided in `examples/node-counter`.
+
 With GraphAware Framework in the _plugins_ directory of your Neo4j server installation, it is possible to develop Spring
 MVC controllers that have the Neo4j database wired in as `GraphDatabaseService`.
 
@@ -270,6 +272,8 @@ happening at all. For example, you might want to:
 
 ### Building a GraphAware Runtime Module
 
+**Example:** An example is provided in `examples/friendship-strength-counter-module`.
+
 To get started quickly, use the provided Maven archetype by typing:
 
     mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-runtime-module-maven-archetype -DarchetypeVersion=2.0.3.5
@@ -405,6 +409,17 @@ as a dependency and take advantage of its useful features.
 <a name="graphaware-test"/>
 ### GraphAware Test
 
+Add the following snippet to your pom.xml:
+
+```xml
+ <dependency>
+    <groupId>com.graphaware.neo4j</groupId>
+    <artifactId>tests</artifactId>
+    <version>2.0.3.5</version>
+    <scope>test</scope>
+</dependency>
+```
+
 <a name="graphunit"/>
 #### GraphUnit
 
@@ -429,6 +444,18 @@ TBD
 
 <a name="tx-api"/>
 ### Improved Transaction Event API
+
+Add the following snippet to your pom.xml:
+
+```xml
+<dependency>
+    <groupId>com.graphaware.neo4j</groupId>
+    <artifactId>tx-api</artifactId>
+    <version>2.0.3.5</version>
+</dependency>
+```
+
+**Example:** An example is provided in `examples/friendship-strength-counter`.
 
 In `com.graphaware.tx.event`, you will find a decorator of the Neo4j Transaction Event API (called `TransactionData`).
 Before a transaction commits, the improved API allows users to traverse the new version of the graph (as it will be
@@ -460,12 +487,14 @@ To use the API, simply instantiate one of the `ImprovedTransactionData` implemen
 
      @Override
      public void afterCommit(TransactionData data, Object state) {
+         //To change body of implemented methods use File | Settings | File Templates.
      }
 
      @Override
      public void afterRollback(TransactionData data, Object state) {
+         //To change body of implemented methods use File | Settings | File Templates.
      }
- });
+});
 ```
 
 `FilteredTransactionData` can be used instead. They effectively hide portions of the graph, including any changes performed
@@ -475,42 +504,31 @@ are of interest, the example above could be modified as follows:
 
 ```java
 GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-
-database.registerTransactionEventHandler(new TransactionEventHandler<Object>() {
+database.registerTransactionEventHandler(new TransactionEventHandler.Adapter<Object>() {
     @Override
     public Object beforeCommit(TransactionData data) throws Exception {
-        InclusionStrategies inclusionStrategies = InclusionStrategiesImpl.all()
-                .with(new IncludeAllBusinessNodes() {
+        InclusionStrategies inclusionStrategies = InclusionStrategies.all()
+                .with(new NodeInclusionStrategy() {
                     @Override
-                    protected boolean doInclude(Node node) {
+                    public boolean include(Node node) {
                         return node.getProperty("name", "default").equals("Two");
-                    }
-
-                    @Override
-                    public String asString() {
-                        return "includeOnlyNodeWithNameEqualToTwo";
                     }
                 })
                 .with(IncludeNoRelationships.getInstance());
 
-        ImprovedTransactionData improvedTransactionData = new FilteredTransactionData(new LazyTransactionData(data), inclusionStrategies);
+        ImprovedTransactionData improvedTransactionData
+                = new FilteredTransactionData(new LazyTransactionData(data), inclusionStrategies);
 
         //have fun here with improvedTransactionData!
 
         return null;
     }
-
-    @Override
-    public void afterCommit(TransactionData data, Object state) {
-    }
-
-    @Override
-    public void afterRollback(TransactionData data, Object state) {
-    }
 });
 ```
 
 #### Example Scenario
+
+**Example:** The following example is provided in `examples/friendship-strength-counter`.
 
 Let's illustrate why this might be useful on a very simple example. Let's say we have a `FRIEND_OF` relationship in the
 system and it has a `strength` property indicating the strength of the friendship from 1 to 3. Let's further assume that
@@ -518,20 +536,30 @@ we are interested in the total strength of all `FRIEND_OF` relationships in the 
 
 We'll achieve this by creating a custom transaction event handler that keeps track of the total strength. While not an
 ideal choice from a system throughput perspective, let's say for the sake of simplicity that we are going to store the
-total strength on the root node (with ID=0) as a `totalFriendshipStrength` property.
+total strength on a special node (with label `FriendshipCounter`) as a `totalFriendshipStrength` property.
 
 ```java
-public class TotalFriendshipStrengthCounter implements TransactionEventHandler<Void> {
-    private static final RelationshipType FRIEND_OF = DynamicRelationshipType.withName("FRIEND_OF");
-    private static final String STRENGTH = "strength";
+/**
+ * Example of a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler} that uses GraphAware {@link ImprovedTransactionData}
+ * to do its job, which is counting the total strength of all friendships in the database and writing that to a special
+ * node created for that purpose.
+ */
+public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<Void> {
+
+    public static final RelationshipType FRIEND_OF = DynamicRelationshipType.withName("FRIEND_OF");
+    public static final String STRENGTH = "strength";
     public static final String TOTAL_FRIENDSHIP_STRENGTH = "totalFriendshipStrength";
+    public static final Label COUNTER_NODE_LABEL = DynamicLabel.label("FriendshipCounter");
 
     private final GraphDatabaseService database;
 
-    public TotalFriendshipStrengthCounter(GraphDatabaseService database) {
+    public FriendshipStrengthCounter(GraphDatabaseService database) {
         this.database = database;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Void beforeCommit(TransactionData data) throws Exception {
         ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data);
@@ -560,18 +588,45 @@ public class TotalFriendshipStrengthCounter implements TransactionEventHandler<V
             }
         }
 
-        Node root = database.getNodeById(0);
-        root.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (int) root.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0) + delta);
+        if (delta != 0) {
+            Node root = getCounterNode(database);
+            root.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (int) root.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0) + delta);
+        }
 
         return null;
     }
 
-    @Override
-    public void afterCommit(TransactionData data, Void state) {
+    /**
+     * Get the counter node, where the friendship strength is stored. Create it if it does not exist.
+     *
+     * @param database to find the node in.
+     * @return counter node.
+     */
+    private static Node getCounterNode(GraphDatabaseService database) {
+        Node result = getSingle(at(database).getAllNodesWithLabel(COUNTER_NODE_LABEL));
+
+        if (result != null) {
+            return result;
+        }
+
+        return database.createNode(COUNTER_NODE_LABEL);
     }
 
-    @Override
-    public void afterRollback(TransactionData data, Void state) {
+    /**
+     * Get the counter value of the total friendship strength counter.
+     *
+     * @param database to find the counter in.
+     * @return total friendship strength.
+     */
+    public static int getTotalFriendshipStrength(GraphDatabaseService database) {
+        int result = 0;
+
+        try (Transaction tx = database.beginTx()) {
+            result = (int) getCounterNode(database).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0);
+            tx.success();
+        }
+
+        return result;
     }
 }
 ```
@@ -580,10 +635,8 @@ All that remains is registering this event handler on the database:
 
 ```java
 GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-database.registerTransactionEventHandler(new TotalFriendshipStrengthCounter(database));
+database.registerTransactionEventHandler(new FriendshipStrengthCounter(database));
 ```
-
-`TotalFriendshipStrengthCountingDemo` demonstrates the entire example.
 
 #### Usage in Detail
 
@@ -681,15 +734,15 @@ GraphAware provides an alternative, callback-based API called `TransactionExecut
 To create an empty node in a database, you would write something like this.
 
 ```java
-    GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //only for demo, use your own persistent one!
-    TransactionExecutor executor = new SimpleTransactionExecutor(database);
+GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //only for demo, use your own persistent one!
+TransactionExecutor executor = new SimpleTransactionExecutor(database);
 
-    executor.executeInTransaction(new VoidReturningCallback() {
-        @Override
-        public void doInTx(GraphDatabaseService database) {
-            database.createNode();
-        }
-    });
+executor.executeInTransaction(new VoidReturningCallback() {
+    @Override
+    public void doInTx(GraphDatabaseService database) {
+        database.createNode();
+    }
+});
 ```
 
 You have the option of selecting an `ExceptionHandlingStrategy`. By default, if an exception occurs, the transaction will be
@@ -728,20 +781,20 @@ new one started, until we run out of input items to process.
 For example, if you were to create a number of nodes from a list of node names, you would do something like this:
 
 ```java
-    GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //only for demo, use your own persistent one!
+GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //only for demo, use your own persistent one!
 
-    List<String> nodeNames = Arrays.asList("Name1", "Name2", "Name3");  //there will be many more
+List<String> nodeNames = Arrays.asList("Name1", "Name2", "Name3");  //there will be many more
 
-    int batchSize = 10;
-    BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, batchSize, nodeNames, new UnitOfWork<String>() {
-        @Override
-        public void execute(GraphDatabaseService database, String nodeName, int batchNumber, int stepNumber) {
-            Node node = database.createNode();
-            node.setProperty("name", nodeName);
-        }
-    });
+int batchSize = 10;
+BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, batchSize, nodeNames, new UnitOfWork<String>() {
+    @Override
+    public void execute(GraphDatabaseService database, String nodeName, int batchNumber, int stepNumber) {
+        Node node = database.createNode();
+        node.setProperty("name", nodeName);
+    }
+});
 
-    executor.execute();
+executor.execute();
 ```
 
 #### Batch Operations with Generated Input or No Input
@@ -752,35 +805,35 @@ can use the `NoInputBatchTransactionExecutor`.
 First, you would create an implementation of `UnitOfWork<NullItem>`, which is a unit of work expecting no input:
 
 ```java
-    /**
-     * Unit of work that creates an empty node with random name. Singleton.
-     */
-    public class CreateRandomNode implements UnitOfWork<NullItem> {
-        private static final CreateRandomNode INSTANCE = new CreateRandomNode();
+/**
+ * Unit of work that creates an empty node with random name. Singleton.
+ */
+public class CreateRandomNode implements UnitOfWork<NullItem> {
+    private static final CreateRandomNode INSTANCE = new CreateRandomNode();
 
-        public static CreateRandomNode getInstance() {
-            return INSTANCE;
-        }
-
-        private CreateRandomNode() {
-        }
-
-        @Override
-        public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
-            Node node = database.createNode();
-            node.setProperty("name", UUID.randomUUID());
-        }
+    public static CreateRandomNode getInstance() {
+        return INSTANCE;
     }
+
+    private CreateRandomNode() {
+    }
+
+    @Override
+    public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
+        Node node = database.createNode();
+        node.setProperty("name", UUID.randomUUID());
+    }
+}
 ```
 
 Then, you would use it in `NoInputBatchTransactionExecutor`:
 
 ```java
-    //create 100,000 nodes in batches of 1,000:
-    int batchSize = 1000;
-    int noNodes = 100000;
-    BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, batchSize, noNodes, CreateRandomNode.getInstance());
-    batchExecutor.execute();
+//create 100,000 nodes in batches of 1,000:
+int batchSize = 1000;
+int noNodes = 100000;
+BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, batchSize, noNodes, CreateRandomNode.getInstance());
+batchExecutor.execute();
 ```
 
 #### Multi-Threaded Batch Operations
@@ -789,11 +842,11 @@ If you wish to execute any batch operation using more than one thread, you can u
  as a decorator of any `BatchTransactionExecutor`. For example, to execute the above example using 4 threads:
 
 ```java
-    int batchSize = 1000;
-    int noNodes = 100000;
-    BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, batchSize, noNodes, CreateRandomNode.getInstance());
-    BatchTransactionExecutor multiThreadedExecutor = new MultiThreadedBatchTransactionExecutor(batchExecutor, 4);
-    multiThreadedExecutor.execute();
+int batchSize = 1000;
+int noNodes = 100000;
+BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, batchSize, noNodes, CreateRandomNode.getInstance());
+BatchTransactionExecutor multiThreadedExecutor = new MultiThreadedBatchTransactionExecutor(batchExecutor, 4);
+multiThreadedExecutor.execute();
 ```
 
 <a name="utils"/>
