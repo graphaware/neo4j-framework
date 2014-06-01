@@ -41,7 +41,7 @@ public class FriendshipStrengthModuleEmbeddedDeclarativeIntegrationTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .loadPropertiesFromFile("examples/friendship-strength-counter-module/src/test/resources/neo4j-friendship.properties")
+                .loadPropertiesFromFile(this.getClass().getClassLoader().getResource("neo4j-friendship.properties").getPath())
                 .newGraphDatabase();
     }
 
