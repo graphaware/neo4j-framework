@@ -18,6 +18,7 @@ package com.graphaware.tx.event.improved;
 
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
@@ -52,6 +53,7 @@ public class LazyTransactionDataTest {
         database.registerTransactionEventHandler(eventHandler);
     }
 
+    @After
     public void tearDown() {
         database.shutdown();
     }

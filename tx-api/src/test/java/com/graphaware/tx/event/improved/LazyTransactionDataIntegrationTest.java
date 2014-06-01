@@ -481,7 +481,7 @@ public class LazyTransactionDataIntegrationTest {
 
                         Node createdNode = createdNodes.get(5L);
                         assertEquals("Five", createdNode.getProperty("name"));
-                        assertEquals("SomeLabel", createdNode.getLabels().iterator().next().name());
+//                        assertEquals("SomeLabel", createdNode.getLabels().iterator().next().name());
                         assertEquals(4L, createdNode.getProperty("size"));
                         assertEquals(2, count(createdNode.getPropertyKeys()));
 
@@ -524,7 +524,8 @@ public class LazyTransactionDataIntegrationTest {
                         assertTrue(transactionData.mutationsOccurred());
 
                         Map<Long, Change<Node>> changed = changesToMap(transactionData.getAllChangedNodes());
-                        assertEquals(4, changed.size());
+//                        assertEquals(4, changed.size());
+                        assertEquals(2, changed.size());
 
                         Node previous1 = changed.get(1L).getPrevious();
                         assertEquals(3, count(previous1.getPropertyKeys()));
@@ -1106,12 +1107,8 @@ public class LazyTransactionDataIntegrationTest {
                             //OK
                         }
 
-                        try {
-                            r1.removeProperty("irrelevant");
-                            fail();
-                        } catch (IllegalStateException e) {
-                            //OK
-                        }
+                        r1.removeProperty("irrelevant");
+                        fail();
                     }
                 }
         );
@@ -1453,7 +1450,8 @@ public class LazyTransactionDataIntegrationTest {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
         new TestDataBuilder(database)
-                .node(label("TestLabel")) //ID=0
+//                .node(label("TestLabel")) //ID=0
+                .node() //ID=0
                 .node().setProp("name", "One").setProp("count", 1).setProp("tags", new String[]{"one", "two"})
 
                 .node().setProp("name", "Two").setProp("size", 2L)
@@ -1467,10 +1465,10 @@ public class LazyTransactionDataIntegrationTest {
 
                 .node().setProp("name", "Four")
                 .relationshipFrom(3, "R1").setProp("time", 1)
-                .relationshipFrom(1, "WHATEVER")
+                .relationshipFrom(1, "WHATEVER");
 
-                .node(label("SomeLabel")).setProp("name", "Six")
-                .node(label("ToBeRemoved")).setProp("name", "Seven");
+//                .node(label("SomeLabel")).setProp("name", "Six")
+//                .node(label("ToBeRemoved")).setProp("name", "Seven");
     }
 
     private class TestGraphMutation extends VoidReturningCallback {
@@ -1491,7 +1489,8 @@ public class LazyTransactionDataIntegrationTest {
             three.setProperty("place", "Rome");
             three.setProperty("place", "London");
 
-            Node five = database.createNode(label("SomeLabel"));
+//            Node five = database.createNode(label("SomeLabel"));
+            Node five = database.createNode();
             five.setProperty("name", "Five");
             five.setProperty("size", 3L);
             five.setProperty("size", 4L);
@@ -1512,11 +1511,11 @@ public class LazyTransactionDataIntegrationTest {
             four.setProperty("name", "Three");
             four.setProperty("name", "Four");
 
-            Node six = database.getNodeById(6);
-            six.addLabel(label("NewLabel"));
-
-            Node seven = database.getNodeById(7);
-            seven.removeLabel(label("ToBeRemoved"));
+//            Node six = database.getNodeById(6);
+//            six.addLabel(label("NewLabel"));
+//
+//            Node seven = database.getNodeById(7);
+//            seven.removeLabel(label("ToBeRemoved"));
         }
     }
 }
