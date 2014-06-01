@@ -41,6 +41,7 @@
         <!--examples-->
         <module>examples/node-counter</module>
         <module>examples/friendship-strength-counter</module>
+        <module>examples/friendship-strength-counter-module</module>
     </modules>
 
     <name>GraphAware Neo4j Framework</name>

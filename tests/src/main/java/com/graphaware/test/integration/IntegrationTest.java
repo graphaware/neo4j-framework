@@ -18,6 +18,7 @@ package com.graphaware.test.integration;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpStatus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,6 +29,8 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
 import java.io.IOException;
+
+import static com.graphaware.test.util.TestUtils.*;
 
 /**
  * Base class for server mode integration tests that are as close to real Neo4j server deployment as possible.
@@ -74,5 +77,15 @@ public abstract class IntegrationTest {
     @After
     public void tearDown() throws IOException, InterruptedException {
         bootstrapper.stop();
+    }
+
+    protected String executeCypher(String... cypherStatements) {
+        StringBuilder stringBuilder = new StringBuilder("{\"statements\" : [ {");
+        for (String statement : cypherStatements) {
+            stringBuilder.append("\"statement\" : \"").append(statement).append("\"");
+        }
+        stringBuilder.append("}]}");
+
+        return post("http://localhost:7474/db/data/transaction/commit", stringBuilder.toString(), HttpStatus.SC_OK);
     }
 }

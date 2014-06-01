@@ -115,7 +115,7 @@ public class RuntimeKernelExtension implements Lifecycle {
 
             try {
                 GraphAwareRuntimeModuleBootstrapper bootstrapper = (GraphAwareRuntimeModuleBootstrapper) Class.forName(bootstrapperPair.other()).newInstance();
-                bootstrapper.bootstrap(runtime, bootstrapperPair.first(), findModuleConfig(bootstrapperPair.first()));
+                runtime.registerModule(bootstrapper.bootstrapModule(bootstrapperPair.first(), findModuleConfig(bootstrapperPair.first()), database));
             } catch (Exception e) {
                 LOG.error("Unable to bootstrap module " + bootstrapperPair.first(), e);
             }

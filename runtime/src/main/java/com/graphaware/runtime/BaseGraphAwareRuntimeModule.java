@@ -11,9 +11,11 @@ import org.neo4j.graphdb.GraphDatabaseService;
 public abstract class BaseGraphAwareRuntimeModule implements GraphAwareRuntimeModule {
 
     private final String moduleId;
+    private final GraphDatabaseService database;
 
-    public BaseGraphAwareRuntimeModule(String moduleId) {
+    protected BaseGraphAwareRuntimeModule(String moduleId, GraphDatabaseService database) {
         this.moduleId = moduleId;
+        this.database = database;
     }
 
     /**
@@ -22,6 +24,14 @@ public abstract class BaseGraphAwareRuntimeModule implements GraphAwareRuntimeMo
     @Override
     public String getId() {
         return moduleId;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GraphDatabaseService getDatabase() {
+        return database;
     }
 
     /**
@@ -45,23 +55,8 @@ public abstract class BaseGraphAwareRuntimeModule implements GraphAwareRuntimeMo
      */
     @Override
     public void reinitialize(GraphDatabaseService database) {
-        //to be overridden
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void initialize(TransactionSimulatingBatchInserter batchInserter) {
-        //to be overridden
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void reinitialize(TransactionSimulatingBatchInserter batchInserter) {
-        //to be overridden
+        //to be overridden if re-initialisation differs from initialisation
+        initialize(database);
     }
 
     /**

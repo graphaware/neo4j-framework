@@ -35,6 +35,12 @@ public interface GraphAwareRuntimeModule {
     String getId();
 
     /**
+     * Get the database which this module runs in.
+     * @return database.
+     */
+    GraphDatabaseService getDatabase();
+
+    /**
      * Return the configuration of this module. Each module must encapsulate its entire configuration in an instance of
      * a {@link RuntimeModuleConfiguration} implementation. Use {@link com.graphaware.runtime.config.NullRuntimeModuleConfiguration}
      * if this module needs no configuration.
@@ -60,24 +66,6 @@ public interface GraphAwareRuntimeModule {
      * @param database to initialize this module for.
      */
     void reinitialize(GraphDatabaseService database);
-
-    /**
-     * Initialize this module. This method must bring the module to a state equivalent to a state of the same module that
-     * has been registered at all times since the database was empty. It can perform global-graph operations to achieve
-     * this.
-     *
-     * @param batchInserter to initialize this module for.
-     */
-    void initialize(TransactionSimulatingBatchInserter batchInserter);
-
-    /**
-     * Re-initialize this module. This method must remove all metadata written to the graph by this module and bring the
-     * module to a state equivalent to a state of the same module that has been registered at all times since the
-     * database was empty. It can perform global-graph operations to achieve this.
-     *
-     * @param batchInserter to initialize this module for.
-     */
-    void reinitialize(TransactionSimulatingBatchInserter batchInserter);
 
     /**
      * Perform cleanup if needed before database shutdown.

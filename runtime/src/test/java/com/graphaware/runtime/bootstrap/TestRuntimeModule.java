@@ -1,5 +1,6 @@
 package com.graphaware.runtime.bootstrap;
 
+import com.graphaware.runtime.BaseGraphAwareRuntimeModule;
 import com.graphaware.runtime.GraphAwareRuntimeModule;
 import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
 import com.graphaware.runtime.config.RuntimeModuleConfiguration;
@@ -14,22 +15,17 @@ import java.util.Map;
 /**
  * {@link com.graphaware.runtime.GraphAwareRuntimeModule} that can tell whether it has been initialized for testing.
  */
-public class TestRuntimeModule implements GraphAwareRuntimeModule {
+public class TestRuntimeModule extends BaseGraphAwareRuntimeModule {
 
     public static final List<TestRuntimeModule> TEST_RUNTIME_MODULES = new ArrayList<>();
 
-    private final String id;
     private final Map<String, String> config;
     private boolean initialized = false;
 
-    public TestRuntimeModule(String id, Map<String, String> config) {
-        this.id = id;
+    public TestRuntimeModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
+        super(moduleId, database);
         this.config = config;
         TEST_RUNTIME_MODULES.add(this);
-    }
-
-    public String getId() {
-        return id;
     }
 
     @Override
@@ -58,16 +54,6 @@ public class TestRuntimeModule implements GraphAwareRuntimeModule {
 
     @Override
     public void reinitialize(GraphDatabaseService database) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void initialize(TransactionSimulatingBatchInserter batchInserter) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void reinitialize(TransactionSimulatingBatchInserter batchInserter) {
         throw new UnsupportedOperationException();
     }
 

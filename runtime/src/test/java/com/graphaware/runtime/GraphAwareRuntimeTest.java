@@ -17,6 +17,7 @@
 package com.graphaware.runtime;
 
 import com.graphaware.runtime.config.*;
+import com.graphaware.runtime.strategy.BatchSupportingGraphAwareRuntimeModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -38,51 +39,37 @@ public abstract class GraphAwareRuntimeTest {
         return mockModule;
     }
 
+    protected BatchSupportingGraphAwareRuntimeModule createBatchSupportingMockModule() {
+        BatchSupportingGraphAwareRuntimeModule mockModule = mock(BatchSupportingGraphAwareRuntimeModule.class);
+        when(mockModule.getId()).thenReturn(MOCK);
+        when(mockModule.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
+        return mockModule;
+    }
+
     protected interface RuntimeConfiguredRuntimeModule extends GraphAwareRuntimeModule, RuntimeConfigured {
 
     }
 
-    protected class RealRuntimeConfiguredRuntimeModule extends BaseRuntimeConfigured implements RuntimeConfiguredRuntimeModule {
+    protected class RealRuntimeConfiguredRuntimeModule extends BaseGraphAwareRuntimeModule implements RuntimeConfiguredRuntimeModule {
 
-        //make public
-        @Override
-        protected RuntimeConfiguration getConfig() {
-            return super.getConfig();
+        private RuntimeConfiguration configuration;
+
+        public RealRuntimeConfiguredRuntimeModule(GraphDatabaseService database) {
+            super("TEST", database);
         }
 
         @Override
-        public String getId() {
-            return "TEST";
+        public void configurationChanged(RuntimeConfiguration configuration) {
+            this.configuration = configuration;
         }
 
-        @Override
-        public RuntimeModuleConfiguration getConfiguration() {
-            return NullRuntimeModuleConfiguration.getInstance();
-        }
+        public RuntimeConfiguration getConfig() {
+            if (configuration == null) {
+                throw new IllegalStateException("Component hasn't been configured. Has it been registered with the " +
+                        "GraphAware runtime?");
+            }
 
-        @Override
-        public void initialize(GraphDatabaseService database) {
-            //do nothing
-        }
-
-        @Override
-        public void reinitialize(GraphDatabaseService database) {
-            //do nothing
-        }
-
-        @Override
-        public void initialize(TransactionSimulatingBatchInserter batchInserter) {
-            //do nothing
-        }
-
-        @Override
-        public void reinitialize(TransactionSimulatingBatchInserter batchInserter) {
-            //do nothing
-        }
-
-        @Override
-        public void shutdown() {
-            //do nothing
+            return configuration;
         }
 
         @Override

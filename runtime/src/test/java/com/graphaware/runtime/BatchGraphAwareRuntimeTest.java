@@ -21,6 +21,7 @@ import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.MinimalRuntimeModuleConfiguration;
 import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
+import com.graphaware.runtime.strategy.BatchSupportingGraphAwareRuntimeModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserterImpl;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -88,7 +89,7 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
 
     @Test
     public void moduleRegisteredForTheFirstTimeShouldBeInitialized() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final BatchSupportingGraphAwareRuntimeModule mockModule = createBatchSupportingMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
@@ -126,7 +127,7 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
     @Test
     @Ignore("Issue 1595")
     public void changedModuleShouldBeReInitialized() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final BatchSupportingGraphAwareRuntimeModule mockModule = createBatchSupportingMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         long root = batchInserter.createNode(Collections.<String, Object>singletonMap(GA_PREFIX + RUNTIME + "_" + MOCK, CONFIG + "123"), GA_ROOT);
@@ -147,7 +148,7 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
     @Test
     @Ignore("Issue 1595")
     public void forcedModuleShouldBeReInitialized() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final BatchSupportingGraphAwareRuntimeModule mockModule = createBatchSupportingMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         long root = batchInserter.createNode(new HashMap<String, Object>(), GA_ROOT);
@@ -169,7 +170,7 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
     @Test
     @Ignore("Issue 1595")
     public void moduleAlreadyRegisteredShouldBeInitializedWhenForced() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final BatchSupportingGraphAwareRuntimeModule mockModule = createBatchSupportingMockModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         long root = batchInserter.createNode(Collections.<String, Object>singletonMap(GA_PREFIX + RUNTIME + "_" + MOCK, Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG)), GA_ROOT);
@@ -285,15 +286,15 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
 
     @Test
     public void allRegisteredInterestedModulesShouldBeDelegatedTo() {
-        GraphAwareRuntimeModule mockModule1 = mock(GraphAwareRuntimeModule.class);
+        final BatchSupportingGraphAwareRuntimeModule mockModule1 = createBatchSupportingMockModule();
         when(mockModule1.getId()).thenReturn("MOCK1");
         when(mockModule1.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
 
-        GraphAwareRuntimeModule mockModule2 = mock(GraphAwareRuntimeModule.class);
+        final BatchSupportingGraphAwareRuntimeModule mockModule2 = createBatchSupportingMockModule();
         when(mockModule2.getId()).thenReturn("MOCK2");
         when(mockModule2.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
 
-        GraphAwareRuntimeModule mockModule3 = mock(GraphAwareRuntimeModule.class);
+        final BatchSupportingGraphAwareRuntimeModule mockModule3 = createBatchSupportingMockModule();
         when(mockModule3.getId()).thenReturn("MOCK3");
         when(mockModule3.getConfiguration()).thenReturn(new MinimalRuntimeModuleConfiguration(InclusionStrategies.none()));
 
@@ -434,7 +435,7 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
 
     @Test
     public void realRuntimeConfiguredModulesShouldBeConfigured() {
-        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule();
+        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule(null);
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
@@ -445,7 +446,7 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
 
     @Test(expected = IllegalStateException.class)
     public void unConfiguredModuleShouldThrowException() {
-        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule();
+        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule(null);
         module.getConfig();
     }
 
@@ -467,12 +468,12 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
 
     @Test
     public void whenOneModuleThrowsAnExceptionThenOtherModulesShouldStillBeDelegatedTo() {
-        GraphAwareRuntimeModule mockModule1 = mock(GraphAwareRuntimeModule.class);
+        final BatchSupportingGraphAwareRuntimeModule mockModule1 = createBatchSupportingMockModule();
         when(mockModule1.getId()).thenReturn(MOCK + "1");
         when(mockModule1.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
         doThrow(new RuntimeException()).when(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
 
-        GraphAwareRuntimeModule mockModule2 = mock(GraphAwareRuntimeModule.class);
+        final BatchSupportingGraphAwareRuntimeModule mockModule2 = createBatchSupportingMockModule();
         when(mockModule2.getId()).thenReturn(MOCK + "2");
         when(mockModule2.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
 
