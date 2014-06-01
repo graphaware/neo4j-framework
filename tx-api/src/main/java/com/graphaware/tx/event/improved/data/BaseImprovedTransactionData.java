@@ -23,7 +23,12 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
+import static com.graphaware.common.util.PropertyContainerUtils.nodeToString;
+import static com.graphaware.common.util.PropertyContainerUtils.relationshipToString;
 
 /**
  * Base-class for {@link com.graphaware.tx.event.improved.api.ImprovedTransactionData} implementations that delegates all work to
@@ -266,5 +271,38 @@ public abstract class BaseImprovedTransactionData {
                 || !getAllDeletedRelationships().isEmpty()
                 || !getAllChangedNodes().isEmpty()
                 || !getAllChangedRelationships().isEmpty();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<String> mutationsToStrings() {
+        Set<String> result = new HashSet<>();
+
+        for (Node createdNode : getAllCreatedNodes()) {
+            result.add("Created node " + nodeToString(createdNode));
+        }
+
+        for (Node deletedNode : getAllDeletedNodes()) {
+            result.add("Deleted node " + nodeToString(deletedNode));
+        }
+
+        for (Change<Node> changedNode : getAllChangedNodes()) {
+            result.add("Changed node " + nodeToString(changedNode.getPrevious()) + " to " + nodeToString(changedNode.getCurrent()));
+        }
+
+        for (Relationship createdRelationship : getAllCreatedRelationships()) {
+            result.add("Created relationship " + relationshipToString(createdRelationship));
+        }
+
+        for (Relationship deletedRelationship : getAllDeletedRelationships()) {
+            result.add("Deleted relationship " + relationshipToString(deletedRelationship));
+        }
+
+        for (Change<Relationship> changedRelationship : getAllChangedRelationships()) {
+            result.add("Changed relationship " + relationshipToString(changedRelationship.getPrevious()) + " to " + relationshipToString(changedRelationship.getCurrent()));
+        }
+
+        return result;
     }
 }

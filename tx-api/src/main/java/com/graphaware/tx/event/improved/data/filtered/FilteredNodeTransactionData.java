@@ -22,7 +22,10 @@ import com.graphaware.common.strategy.PropertyInclusionStrategy;
 import com.graphaware.tx.event.improved.data.NodeTransactionData;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+
+import java.util.Set;
 
 /**
  * {@link FilteredPropertyContainerTransactionData} for {@link org.neo4j.graphdb.Node}s.
@@ -46,7 +49,7 @@ public class FilteredNodeTransactionData extends FilteredPropertyContainerTransa
      * {@inheritDoc}
      */
     @Override
-    protected PropertyContainerTransactionData<Node> getWrapped() {
+    protected NodeTransactionData getWrapped() {
         return wrapped;
     }
 
@@ -72,5 +75,45 @@ public class FilteredNodeTransactionData extends FilteredPropertyContainerTransa
     @Override
     protected PropertyInclusionStrategy<Node> getPropertyInclusionStrategy() {
         return strategies.getNodePropertyInclusionStrategy();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasLabelBeenAssigned(Node node, Label label) {
+        return getWrapped().hasLabelBeenAssigned(node, label);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Label> assignedLabels(Node node) {
+        return getWrapped().assignedLabels(node);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasLabelBeenRemoved(Node node, Label label) {
+        return getWrapped().hasLabelBeenRemoved(node, label);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Label> removedLabels(Node node) {
+        return getWrapped().removedLabels(node);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Label> labelsOfDeletedNode(Node node) {
+        return getWrapped().labelsOfDeletedNode(node);
     }
 }

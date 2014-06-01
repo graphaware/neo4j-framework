@@ -20,11 +20,14 @@ import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.data.NodeTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import com.graphaware.tx.event.improved.propertycontainer.snapshot.NodeSnapshot;
+import org.apache.log4j.Logger;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.event.LabelEntry;
 import org.neo4j.graphdb.event.PropertyEntry;
 import org.neo4j.graphdb.event.TransactionData;
 
-import java.util.HashMap;
+import java.util.*;
 
 import static com.graphaware.common.util.PropertyContainerUtils.id;
 
@@ -32,9 +35,14 @@ import static com.graphaware.common.util.PropertyContainerUtils.id;
  * {@link LazyPropertyContainerTransactionData} for {@link org.neo4j.graphdb.Node}s.
  */
 public class LazyNodeTransactionData extends LazyPropertyContainerTransactionData<Node> implements NodeTransactionData {
+    private static final Logger LOG = Logger.getLogger(LazyPropertyContainerTransactionData.class);
 
     private final TransactionData transactionData;
     private final TransactionDataContainer transactionDataContainer;
+
+    private Map<Long, Set<Label>> assignedLabels = null;
+    private Map<Long, Set<Label>> removedLabels = null;
+    private Map<Long, Set<Label>> deletedNodeLabels = null;
 
     /**
      * Construct node transaction data from Neo4j {@link org.neo4j.graphdb.event.TransactionData}.
@@ -95,22 +103,141 @@ public class LazyNodeTransactionData extends LazyPropertyContainerTransactionDat
         return transactionData.removedNodeProperties();
     }
 
-    protected void initializeChanged() {
-        super.initializeChanged();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasLabelBeenAssigned(Node node, Label label) {
+        initializeChanged();
 
-        for (transactionData.)
+        if (!hasBeenChanged(node)) {
+            LOG.warn(node + " has not been changed but the caller thinks it should have assigned labels.");
+            return false;
+        }
 
-        for (PropertyEntry<T> propertyEntry : assignedProperties()) {
-            if (hasNotActuallyChanged(propertyEntry)) {
+        if (!assignedLabels.containsKey(id(node))) {
+            return false;
+        }
+
+        return assignedLabels.get(id(node)).contains(label);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Label> assignedLabels(Node node) {
+        initializeChanged();
+
+        if (!hasBeenChanged(node)) {
+            LOG.warn(node + " has not been changed but the caller thinks it should have assigned labels.");
+            return Collections.emptySet();
+        }
+
+        if (!assignedLabels.containsKey(id(node))) {
+            return Collections.emptySet();
+        }
+
+        return Collections.unmodifiableSet(assignedLabels.get(id(node)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasLabelBeenRemoved(Node node, Label label) {
+        initializeChanged();
+
+        if (!hasBeenChanged(node)) {
+            LOG.warn(node + " has not been changed but the caller thinks it should have removed labels.");
+            return false;
+        }
+
+        if (!removedLabels.containsKey(id(node))) {
+            return false;
+        }
+
+        return removedLabels.get(id(node)).contains(label);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Label> removedLabels(Node node) {
+        initializeChanged();
+
+        if (!hasBeenChanged(node)) {
+            LOG.warn(node + " has not been changed but the caller thinks it should have removed labels.");
+            return Collections.emptySet();
+        }
+
+        if (!removedLabels.containsKey(id(node))) {
+            return Collections.emptySet();
+        }
+
+        return Collections.unmodifiableSet(removedLabels.get(id(node)));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Label> labelsOfDeletedNode(Node node) {
+        initializeChanged();
+
+        if (!hasBeenDeleted(node)) {
+            LOG.warn(node + " has not been deleted but the caller thinks it has!");
+            return Collections.emptySet();
+        }
+
+        if (!deletedNodeLabels.containsKey(id(node))) {
+            return Collections.emptySet();
+        }
+
+        return Collections.unmodifiableSet(deletedNodeLabels.get(id(node)));
+    }
+
+    @Override
+    protected void doInitializeChanged() {
+        assignedLabels = new HashMap<>();
+        removedLabels = new HashMap<>();
+        deletedNodeLabels = new HashMap<>();
+
+        for (LabelEntry labelEntry : transactionData.assignedLabels()) {
+            Node node = labelEntry.node();
+
+            if (hasBeenCreated(node)) {
                 continue;
             }
 
-            T candidate = propertyEntry.entity();
-            if (!hasBeenCreated(candidate) && !changed.containsKey(id(candidate))) {
-                Change<T> change = new Change<>(oldSnapshot(candidate), newSnapshot(candidate));
-                changed.put(id(candidate), change);
+            if (!assignedLabels.containsKey(id(node))) {
+                assignedLabels.put(id(node), new HashSet<Label>());
             }
+
+            assignedLabels.get(id(node)).add(labelEntry.label());
+
+            registerChange(node);
         }
 
+        for (LabelEntry labelEntry : transactionData.removedLabels()) {
+            Node node = labelEntry.node();
+
+            if (hasBeenDeleted(node)) {
+                if (!deletedNodeLabels.containsKey(id(node))) {
+                    deletedNodeLabels.put(id(node), new HashSet<Label>());
+                }
+                deletedNodeLabels.get(id(node)).add(labelEntry.label());
+                continue;
+            }
+
+            if (!removedLabels.containsKey(id(node))) {
+                removedLabels.put(id(node), new HashSet<Label>());
+            }
+
+            removedLabels.get(id(node)).add(labelEntry.label());
+
+            registerChange(node);
+        }
     }
 }

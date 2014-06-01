@@ -155,15 +155,19 @@ public final class PropertyContainerUtils {
     public static String nodeToString(Node node) {
         StringBuilder string = new StringBuilder("(");
 
-        boolean hasLabels = false;
+        List<String> labelNames = new LinkedList<>();
         for (Label label : node.getLabels()) {
-            hasLabels = true;
-            string.append(":").append(label.name());
+            labelNames.add(label.name());
+        }
+        Collections.sort(labelNames);
+
+        for (String labelName : labelNames) {
+            string.append(":").append(labelName);
         }
 
         String props = propertiesToString(node);
 
-        if (StringUtils.isNotEmpty(props) && hasLabels) {
+        if (StringUtils.isNotEmpty(props) && !labelNames.isEmpty()) {
             string.append(" ");
         }
 
@@ -197,8 +201,14 @@ public final class PropertyContainerUtils {
 
         StringBuilder string = new StringBuilder("{");
 
-        boolean first = true;
+        List<String> propertyKeys = new LinkedList<>();
         for (String key : propertyContainer.getPropertyKeys()) {
+            propertyKeys.add(key);
+        }
+        Collections.sort(propertyKeys);
+
+        boolean first = true;
+        for (String key : propertyKeys) {
             if (!first) {
                 string.append(", ");
             }

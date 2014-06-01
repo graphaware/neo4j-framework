@@ -22,7 +22,9 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Within the context of a running transaction, this API gives users the ability to find out exactly what mutations
@@ -346,4 +348,10 @@ public interface ImprovedTransactionData {
      *         {@link #getAllDeletedRelationships()}, {@link #getAllChangedNodes()}, {@link #getAllChangedRelationships()}.
      */
     boolean mutationsOccurred();
+
+    /**
+     * Convert all mutations in the transaction to human-readable Strings.
+     * @return human-readable Strings.
+     */
+    Set<String> mutationsToStrings();
 }
