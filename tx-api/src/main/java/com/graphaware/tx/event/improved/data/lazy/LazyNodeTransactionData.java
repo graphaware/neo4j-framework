@@ -16,12 +16,17 @@
 
 package com.graphaware.tx.event.improved.data.lazy;
 
+import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.data.NodeTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import com.graphaware.tx.event.improved.propertycontainer.snapshot.NodeSnapshot;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.event.PropertyEntry;
 import org.neo4j.graphdb.event.TransactionData;
+
+import java.util.HashMap;
+
+import static com.graphaware.common.util.PropertyContainerUtils.id;
 
 /**
  * {@link LazyPropertyContainerTransactionData} for {@link org.neo4j.graphdb.Node}s.
@@ -88,5 +93,24 @@ public class LazyNodeTransactionData extends LazyPropertyContainerTransactionDat
     @Override
     protected Iterable<PropertyEntry<Node>> removedProperties() {
         return transactionData.removedNodeProperties();
+    }
+
+    protected void initializeChanged() {
+        super.initializeChanged();
+
+        for (transactionData.)
+
+        for (PropertyEntry<T> propertyEntry : assignedProperties()) {
+            if (hasNotActuallyChanged(propertyEntry)) {
+                continue;
+            }
+
+            T candidate = propertyEntry.entity();
+            if (!hasBeenCreated(candidate) && !changed.containsKey(id(candidate))) {
+                Change<T> change = new Change<>(oldSnapshot(candidate), newSnapshot(candidate));
+                changed.put(id(candidate), change);
+            }
+        }
+
     }
 }
