@@ -37,15 +37,12 @@ public class TestDataBuilder {
      *
      * @return this.
      */
-    public TestDataBuilder node() {
+    public TestDataBuilder node(Label... labels) {
         lastRelationship = null;
 
-        Transaction tx = database.beginTx();
-        try {
-            lastNode = database.createNode();
+        try (Transaction tx = database.beginTx()) {
+            lastNode = database.createNode(labels);
             tx.success();
-        } finally {
-            tx.finish();
         }
 
         return this;
@@ -65,12 +62,9 @@ public class TestDataBuilder {
 
         final Node node = lastNode;
 
-        Transaction tx = database.beginTx();
-        try {
+        try (Transaction tx = database.beginTx()) {
             lastRelationship = node.createRelationshipTo(database.getNodeById(nodeId), type);
             tx.success();
-        } finally {
-            tx.finish();
         }
 
         return this;
@@ -90,12 +84,9 @@ public class TestDataBuilder {
 
         final Node node = lastNode;
 
-        Transaction tx = database.beginTx();
-        try {
+        try (Transaction tx = database.beginTx()) {
             lastRelationship = node.createRelationshipTo(database.getNodeById(nodeId), DynamicRelationshipType.withName(type));
             tx.success();
-        } finally {
-            tx.finish();
         }
 
         return this;
@@ -115,12 +106,9 @@ public class TestDataBuilder {
 
         final Node node = lastNode;
 
-        Transaction tx = database.beginTx();
-        try {
+        try (Transaction tx = database.beginTx()) {
             lastRelationship = database.getNodeById(nodeId).createRelationshipTo(node, type);
             tx.success();
-        } finally {
-            tx.finish();
         }
 
         return this;
@@ -140,12 +128,9 @@ public class TestDataBuilder {
 
         final Node node = lastNode;
 
-        Transaction tx = database.beginTx();
-        try {
+        try (Transaction tx = database.beginTx()) {
             lastRelationship = database.getNodeById(nodeId).createRelationshipTo(node, DynamicRelationshipType.withName(type));
             tx.success();
-        } finally {
-            tx.finish();
         }
 
         return this;

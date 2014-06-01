@@ -24,6 +24,8 @@ import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.*;
 
+import static com.graphaware.common.util.PropertyContainerUtils.nodeToString;
+import static com.graphaware.common.util.PropertyContainerUtils.relationshipToString;
 import static com.graphaware.common.util.PropertyContainerUtils.valueToString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -327,47 +329,5 @@ public final class GraphUnit {
         }
 
         return true;
-    }
-
-    private static String nodeToString(Node node) {
-        StringBuilder string = new StringBuilder("(");
-
-        for (Label label : node.getLabels()) {
-            string.append(":").append(label.name());
-        }
-
-        string.append(propertiesToString(node));
-
-        string.append(")");
-
-        return string.toString();
-    }
-
-    private static String relationshipToString(Relationship relationship) {
-        StringBuilder string = new StringBuilder();
-
-        string.append(nodeToString(relationship.getStartNode()));
-        string.append("-[:").append(relationship.getType().name());
-        string.append(propertiesToString(relationship));
-        string.append("]->");
-        string.append(nodeToString(relationship.getEndNode()));
-
-        return string.toString();
-    }
-
-    private static String propertiesToString(PropertyContainer propertyContainer) {
-        if (!propertyContainer.getPropertyKeys().iterator().hasNext()) {
-            return "";
-        }
-
-        StringBuilder string = new StringBuilder(" {");
-
-        for (String key : propertyContainer.getPropertyKeys()) {
-            string.append(key).append(":").append(valueToString(propertyContainer.getProperty(key))).append(" ");
-        }
-
-        string.append("}");
-
-        return string.toString();
     }
 }

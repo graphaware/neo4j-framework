@@ -18,9 +18,11 @@ package com.graphaware.common.util;
 
 import com.graphaware.common.strategy.IncludeAll;
 import com.graphaware.common.strategy.InclusionStrategy;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
+import org.parboiled.common.StringUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -133,6 +135,65 @@ public final class PropertyContainerUtils {
         }
         toDelete.delete();
         return result;
+    }
+
+    public static String nodeToString(Node node) {
+        StringBuilder string = new StringBuilder("(");
+
+        boolean hasLabels = false;
+        for (Label label : node.getLabels()) {
+            hasLabels = true;
+            string.append(":").append(label.name());
+        }
+
+        String props = propertiesToString(node);
+
+        if (StringUtils.isNotEmpty(props) && hasLabels) {
+            string.append(" ");
+        }
+
+        string.append(props);
+
+        string.append(")");
+
+        return string.toString();
+    }
+
+    public static String relationshipToString(Relationship relationship) {
+        StringBuilder string = new StringBuilder();
+
+        string.append(nodeToString(relationship.getStartNode()));
+        string.append("-[:").append(relationship.getType().name());
+        String props = propertiesToString(relationship);
+        if (StringUtils.isNotEmpty(props)) {
+            string.append(" ");
+        }
+        string.append(props);
+        string.append("]->");
+        string.append(nodeToString(relationship.getEndNode()));
+
+        return string.toString();
+    }
+
+    public static String propertiesToString(PropertyContainer propertyContainer) {
+        if (!propertyContainer.getPropertyKeys().iterator().hasNext()) {
+            return "";
+        }
+
+        StringBuilder string = new StringBuilder("{");
+
+        boolean first = true;
+        for (String key : propertyContainer.getPropertyKeys()) {
+            if (!first) {
+                string.append(", ");
+            }
+            first = false;
+            string.append(key).append(": ").append(valueToString(propertyContainer.getProperty(key)));
+        }
+
+        string.append("}");
+
+        return string.toString();
     }
 
     private PropertyContainerUtils() {

@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Test for {@link FriendshipStrengthCounter}.
  */
-public class FriendshipStrengthCounterTest {
+public class ChangeLoggerTest {
 
     private GraphDatabaseService database;
 
