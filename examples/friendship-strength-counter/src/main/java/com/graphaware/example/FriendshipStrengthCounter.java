@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.demo;
+package com.graphaware.example;
 
 import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -23,20 +23,30 @@ import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 
+import static com.graphaware.common.util.IterableUtils.getSingle;
+import static org.neo4j.tooling.GlobalGraphOperations.at;
+
 /**
- * Total friendship strength counter for documentation.
+ * Example of a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler} that uses GraphAware {@link ImprovedTransactionData}
+ * to do its job, which is counting the total strength of all friendships in the database and writing that to a special
+ * node created for that purpose.
  */
-public class TotalFriendshipStrengthCounter implements TransactionEventHandler<Void> {
+public class FriendshipStrengthCounter implements TransactionEventHandler<Void> {
+
     public static final RelationshipType FRIEND_OF = DynamicRelationshipType.withName("FRIEND_OF");
     public static final String STRENGTH = "strength";
     public static final String TOTAL_FRIENDSHIP_STRENGTH = "totalFriendshipStrength";
+    public static final Label COUNTER_NODE_LABEL = DynamicLabel.label("FriendshipCounter");
 
     private final GraphDatabaseService database;
 
-    public TotalFriendshipStrengthCounter(GraphDatabaseService database) {
+    public FriendshipStrengthCounter(GraphDatabaseService database) {
         this.database = database;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Void beforeCommit(TransactionData data) throws Exception {
         ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data);
@@ -65,19 +75,54 @@ public class TotalFriendshipStrengthCounter implements TransactionEventHandler<V
             }
         }
 
-        if (delta != 0) {  //todo investigate why this is needed!
-            Node root = database.getNodeById(0);
+        if (delta != 0) {
+            Node root = getCounterNode(database);
             root.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (int) root.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0) + delta);
         }
 
         return null;
     }
 
+    /**
+     * Get the counter node, where the friendship strength is stored. Create it if it does not exist.
+     *
+     * @param database to find the node in.
+     * @return counter node.
+     */
+    private static Node getCounterNode(GraphDatabaseService database) {
+        Node result = getSingle(at(database).getAllNodesWithLabel(COUNTER_NODE_LABEL));
+
+        if (result != null) {
+            return result;
+        }
+
+        return database.createNode(COUNTER_NODE_LABEL);
+    }
+
+    /**
+     * Get the counter value of the total friendship strength counter.
+     *
+     * @param database to find the counter in.
+     * @return total friendship strength.
+     */
+    public static int getTotalFriendshipStrength(GraphDatabaseService database) {
+        int result = 0;
+
+        try (Transaction tx = database.beginTx()) {
+            result = (int) getCounterNode(database).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0);
+            tx.success();
+        }
+
+        return result;
+    }
+
     @Override
     public void afterCommit(TransactionData data, Void state) {
+        //noop
     }
 
     @Override
     public void afterRollback(TransactionData data, Void state) {
+        //noop
     }
 }
