@@ -26,33 +26,41 @@
     <description>Example of a GraphAware Runtime Module</description>
     <url>http://graphaware.com</url>
 
+    <properties>
+        <java.version>1.7</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <neo4j.version>2.0.3</neo4j.version>
+        <graphware.version>2.0.3.6-SNAPSHOT</graphware.version>
+        <spring.version>4.0.0.RELEASE</spring.version>
+    </properties>
+
     <dependencies>
         <!-- GraphAware Framework -->
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>common</artifactId>
-            <version>2.0.3.6-SNAPSHOT</version>
+            <version>${graphware.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>api</artifactId>
-            <version>2.0.3.6-SNAPSHOT</version>
+            <version>${graphware.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>runtime</artifactId>
-            <version>2.0.3.6-SNAPSHOT</version>
+            <version>${graphware.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>tx-api</artifactId>
-            <version>2.0.3.6-SNAPSHOT</version>
+            <version>${graphware.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -60,7 +68,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>4.0.0.RELEASE</version>
+            <version>${spring.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -68,7 +76,7 @@
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j</artifactId>
-            <version>2.0.3</version>
+            <version>${neo4j.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -76,17 +84,63 @@
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>server-community</artifactId>
-            <version>2.0.3.6-SNAPSHOT</version>
+            <version>${graphware.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
-            <version>2.0.3.6-SNAPSHOT</version>
+            <version>${graphware.version}</version>
             <artifactId>tests</artifactId>
             <scope>test</scope>
         </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <links>
+                        <link>http://api.neo4j.org/2.0.3/</link>
+                    </links>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
