@@ -66,7 +66,11 @@ public final class GraphUnit {
 
         new ExecutionEngine(otherDatabase).execute(sameGraphCypher);
 
-        assertSameGraph(database, otherDatabase);
+        try {
+            assertSameGraph(database, otherDatabase);
+        } finally {
+            otherDatabase.shutdown();
+        }
     }
 
     /**
@@ -93,7 +97,11 @@ public final class GraphUnit {
 
         new ExecutionEngine(otherDatabase).execute(subgraphCypher);
 
-        assertSubgraph(database, otherDatabase);
+        try {
+            assertSubgraph(database, otherDatabase);
+        } finally {
+            otherDatabase.shutdown();
+        }
     }
 
     private static void assertSameGraph(GraphDatabaseService database, GraphDatabaseService otherDatabase) {
