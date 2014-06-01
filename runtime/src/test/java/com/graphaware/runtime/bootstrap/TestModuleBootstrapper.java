@@ -21,6 +21,6 @@ public class TestModuleBootstrapper implements GraphAwareRuntimeModuleBootstrapp
 
     @Override
     public GraphAwareRuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
-        return new TestRuntimeModule(moduleId, config, database);
+        return new TestRuntimeModule(moduleId, config);
     }
 }

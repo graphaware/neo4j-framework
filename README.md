@@ -31,7 +31,7 @@ Additionally, for [Java developers only](#javadev)(1), the following functionali
 * [Transaction Executor](#tx-executor) and [Batch Transaction Executor](#batch-tx)
 * [Miscellaneous Utilities](#utils)
 
-(1) (i.e., for embedded mode users, managed/unmanaged extensions developers, [GraphAware Runtime Module](#graphaware-runtime)
+(1) i.e., for embedded mode users, managed/unmanaged extensions developers, [GraphAware Runtime Module](#graphaware-runtime)
  developers and framework-powered Spring MVC controller developers
 
 Framework Usage
@@ -113,8 +113,7 @@ down this page to find out which dependencies you will need. The available ones 
 ### Snapshots
 
 To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.0.3.6-SNAPSHOT
- jar files. If you need standalone .jar files with all dependencies (for server mode), clone [this repository](https://github.com/graphaware/neo4j-framework-build.git)
-and run `mvn clean install` on that.
+ jar files. If you need standalone .jar files with all dependencies, look into the `target` folders in the `build` directory.
 
 ### Note on Versioning Scheme
 
@@ -126,6 +125,8 @@ The version number has two parts. The first three numbers indicate compatibility
 GraphAware Server
 -----------------
 
+**Example:** An example is provided in `examples/node-counter`.
+
 With GraphAware Framework in the _plugins_ directory of your Neo4j server installation, it is possible to develop Spring
 MVC controllers that have the Neo4j database wired in as `GraphDatabaseService`.
 
@@ -134,26 +135,26 @@ controller:
 
 ```java
 /**
-*  Sample REST API for counting all nodes in the database.
-*/
+ *  Sample REST API for counting all nodes in the database.
+ */
 @Controller
 @RequestMapping("count")
 public class NodeCountApi {
 
-   private final GraphDatabaseService database;
+    private final GraphDatabaseService database;
 
-   @Autowired
-   public NodeCountApi(GraphDatabaseService database) {
-       this.database = database;
-   }
+    @Autowired
+    public NodeCountApi(GraphDatabaseService database) {
+        this.database = database;
+    }
 
-   @RequestMapping(method = RequestMethod.GET)
-   @ResponseBody
-   public long count() {
-       try (Transaction tx = database.beginTx()) {
-           return Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
-       }
-   }
+    @RequestMapping(method = RequestMethod.GET)
+    @ResponseBody
+    public long count() {
+        try (Transaction tx = database.beginTx()) {
+            return Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
+        }
+    }
 }
 ```
 
@@ -226,7 +227,7 @@ To get started manually, you will need the following dependencies:
 
 It is also a good idea to use make sure the resulting .jar file includes all the dependencies, if you use any external
 ones that aren't listed above:
-
+<a name="alldependencies"/>
 ```xml
 <build>
     <plugins>
@@ -241,7 +242,7 @@ ones that aren't listed above:
                 </execution>
             </executions>
             <configuration>
-                <finalName>your-api-module-name-${project.version}</finalName>
+                <finalName>${project.name}-all-${project.version}</finalName>
                 <descriptorRefs>
                     <descriptorRef>jar-with-dependencies</descriptorRef>
                 </descriptorRefs>
@@ -270,6 +271,8 @@ happening at all. For example, you might want to:
 * ... and much more
 
 ### Building a GraphAware Runtime Module
+
+**Example:** An example is provided in `examples/friendship-strength-counter-module`.
 
 To get started quickly, use the provided Maven archetype by typing:
 
@@ -322,81 +325,79 @@ To start from scratch, you will need the following dependencies in your pom.xml
 </dependencies>
 ```
 
-Again, if using other dependencies, you need to make sure the resulting .jar file includes all the dependencies:
-
-```xml
-<build>
-    <plugins>
-        <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>attached</goal>
-                    </goals>
-                </execution>
-            </executions>
-            <configuration>
-                <finalName>your-api-module-name-${project.version}</finalName>
-                <descriptorRefs>
-                    <descriptorRef>jar-with-dependencies</descriptorRef>
-                </descriptorRefs>
-                <appendAssemblyId>false</appendAssemblyId>
-            </configuration>
-        </plugin>
-    </plugins>
-</build>
-```
+Again, if using other dependencies, you need to make sure the resulting .jar file includes all the dependencies. [See above](#alldependencies).
 
 Your module then needs to be built by implementing the <a href="http://graphaware.com/site/framework/latest/apidocs/com/graphaware/runtime/GraphAwareRuntimeModule.html" target="_blank">GraphAwareRuntimeModule</a> interface.
-As an example, if we were to build a module that logs all changes performed in a transaction to system out in a human
-readable form, we would write the following code:
+An example is provided in `examples/friendship-strength-counter-module`. This computes the sum of all `strength` properties
+on `FRIEND_OF` relationships and keeps it up to data, written to a special node created for that purpose. It also has
+a REST API that can be queried for the total friendship strength value.
 
-```java
-   TBD //todo
-```
-
-### Using GraphAware Runtime (Embedded Mode)
-
-Using the GraphAware Runtime only makes sense when there is a GraphAware Runtime Module to go with it. Assuming we want
-to use the runtime with the `ChangeLoggingRuntimeModule` we've built in the previous section in embedded mode, all we
-need to do is instantiate the runtime and register the module with it:
-
-```java
-   TBD //todo
-```
-
-The modules are presented with the about-to-be-committed transaction data in the order in which they've been registered.
-
+<a name="server-usage"/>
 ### Using GraphAware Runtime (Server Mode)
 
-Provided that the GraphAware Framework .jar file is present in the Neo4j `plugins` directory, the following line needs to
+Using the GraphAware Runtime only makes sense when there is a GraphAware Runtime Module (or more) to go with it.
+Assuming we want to use the runtime with the `FriendshipStrengthModule` from examples in server mode, provided that
+the GraphAware Framework .jar file is present in the Neo4j `plugins` directory, the following line needs to
 be added to `neo4j.properties` in order for the GraphAware Runtime to be enabled:
 
 `com.graphaware.runtime.enabled=true`
 
-GraphAware Runtime Modules can be registered using the following mechanism. For instance, the `ChangeLoggingRuntimeModule`
-with its `ChangeLoggingRuntimeModuleBootstrapper` (assuming it lives in `com.graphaware.demo` package) can be registered
-with the runtime using the following line
-
-`com.graphaware.module.changelogger.1=com.graphaware.demo.ChangeLoggingRuntimeModuleBootstrapper`
-
-which means that the `ChangeLoggingRuntimeModule` will be the first runtime module registered with the runtime with ID
-equal to "changelogger".
-
-### Using GraphAware Runtime (Batch Inserters)
-
-For populating a database quickly, people sometimes use Neo4j `BatchInserter`s. The framework can be used with those as
-well, in the following fashion:
+GraphAware Runtime Modules can be registered using the following mechanism we will illustrate on the example of
+ `FriendshipStrengthModule`. First, a _bootstrapper_ needs to be created like this:
 
 ```java
-    tbd
+/**
+ * {@link GraphAwareRuntimeModuleBootstrapper} for {@link FriendshipStrengthModule}.
+ */
+public class FriendshipStrengthModuleBootstrapper implements GraphAwareRuntimeModuleBootstrapper {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public GraphAwareRuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
+        return new FriendshipStrengthModule(moduleId, database);
+    }
+}
 ```
 
-### Existing GraphAware Runtime Modules
+Then, assuming it lives in `com.graphaware.example.module` package, the boostrapper must be registered
+with the runtime using the following line in neo4j.properties:
 
-So far, the only production-ready GraphAware module is the <a href="https://github.com/graphaware/neo4j-relcount" target="_blank">relationship count module</a>.
+`com.graphaware.module.FSM.1=com.graphaware.example.module.FriendshipStrengthModuleBootstrapper`
+
+which means that the `FriendshipStrengthModule` will be the first runtime module registered with the runtime with ID
+equal to "FSM".
+
+### Using GraphAware Runtime (Embedded Mode)
+
+To use the runtime and modules programmatically, all we need to do is instantiate the runtime and register the module with it:
+
+```java
+GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //replace with a real DB
+GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
+runtime.registerModule(new FriendshipStrengthModule("FSM", database));
+```
+
+It is, however, also possible to pass a _neo4j.properties_ file to the database. Same rules as in the [server mode](#server-usage)
+ apply. For example, if we have a neo4j-friendship.properties file with the following lines
+
+```
+# GraphAware Config
+com.graphaware.runtime.enabled=true
+com.graphaware.module.friendshipcounter.1=com.graphaware.example.module.FriendshipStrengthModuleBootstrapper
+```
+
+the runtime and modules will be configured correctly by just doing
+
+```java
+database = new TestGraphDatabaseFactory()
+              .newImpermanentDatabaseBuilder()
+              .loadPropertiesFromFile("neo4j-friendship.properties")
+              .newGraphDatabase();
+```
+
+**NOTE:** Modules are presented with the about-to-be-committed transaction data in the order in which they've been registered.
 
 <a name="javadev"/>
 Features for Java Developers
@@ -407,6 +408,17 @@ as a dependency and take advantage of its useful features.
 
 <a name="graphaware-test"/>
 ### GraphAware Test
+
+Add the following snippet to your pom.xml:
+
+```xml
+ <dependency>
+    <groupId>com.graphaware.neo4j</groupId>
+    <artifactId>tests</artifactId>
+    <version>2.0.3.5</version>
+    <scope>test</scope>
+</dependency>
+```
 
 <a name="graphunit"/>
 #### GraphUnit
@@ -432,6 +444,18 @@ TBD
 
 <a name="tx-api"/>
 ### Improved Transaction Event API
+
+Add the following snippet to your pom.xml:
+
+```xml
+<dependency>
+    <groupId>com.graphaware.neo4j</groupId>
+    <artifactId>tx-api</artifactId>
+    <version>2.0.3.5</version>
+</dependency>
+```
+
+**Example:** An example is provided in `examples/friendship-strength-counter`.
 
 In `com.graphaware.tx.event`, you will find a decorator of the Neo4j Transaction Event API (called `TransactionData`).
 Before a transaction commits, the improved API allows users to traverse the new version of the graph (as it will be
@@ -463,12 +487,14 @@ To use the API, simply instantiate one of the `ImprovedTransactionData` implemen
 
      @Override
      public void afterCommit(TransactionData data, Object state) {
+         //To change body of implemented methods use File | Settings | File Templates.
      }
 
      @Override
      public void afterRollback(TransactionData data, Object state) {
+         //To change body of implemented methods use File | Settings | File Templates.
      }
- });
+});
 ```
 
 `FilteredTransactionData` can be used instead. They effectively hide portions of the graph, including any changes performed
@@ -478,42 +504,31 @@ are of interest, the example above could be modified as follows:
 
 ```java
 GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-
-database.registerTransactionEventHandler(new TransactionEventHandler<Object>() {
+database.registerTransactionEventHandler(new TransactionEventHandler.Adapter<Object>() {
     @Override
     public Object beforeCommit(TransactionData data) throws Exception {
-        InclusionStrategies inclusionStrategies = InclusionStrategiesImpl.all()
-                .with(new IncludeAllBusinessNodes() {
+        InclusionStrategies inclusionStrategies = InclusionStrategies.all()
+                .with(new NodeInclusionStrategy() {
                     @Override
-                    protected boolean doInclude(Node node) {
+                    public boolean include(Node node) {
                         return node.getProperty("name", "default").equals("Two");
-                    }
-
-                    @Override
-                    public String asString() {
-                        return "includeOnlyNodeWithNameEqualToTwo";
                     }
                 })
                 .with(IncludeNoRelationships.getInstance());
 
-        ImprovedTransactionData improvedTransactionData = new FilteredTransactionData(new LazyTransactionData(data), inclusionStrategies);
+        ImprovedTransactionData improvedTransactionData
+                = new FilteredTransactionData(new LazyTransactionData(data), inclusionStrategies);
 
         //have fun here with improvedTransactionData!
 
         return null;
     }
-
-    @Override
-    public void afterCommit(TransactionData data, Object state) {
-    }
-
-    @Override
-    public void afterRollback(TransactionData data, Object state) {
-    }
 });
 ```
 
 #### Example Scenario
+
+**Example:** The following example is provided in `examples/friendship-strength-counter`.
 
 Let's illustrate why this might be useful on a very simple example. Let's say we have a `FRIEND_OF` relationship in the
 system and it has a `strength` property indicating the strength of the friendship from 1 to 3. Let's further assume that
@@ -521,20 +536,30 @@ we are interested in the total strength of all `FRIEND_OF` relationships in the 
 
 We'll achieve this by creating a custom transaction event handler that keeps track of the total strength. While not an
 ideal choice from a system throughput perspective, let's say for the sake of simplicity that we are going to store the
-total strength on the root node (with ID=0) as a `totalFriendshipStrength` property.
+total strength on a special node (with label `FriendshipCounter`) as a `totalFriendshipStrength` property.
 
 ```java
-public class TotalFriendshipStrengthCounter implements TransactionEventHandler<Void> {
-    private static final RelationshipType FRIEND_OF = DynamicRelationshipType.withName("FRIEND_OF");
-    private static final String STRENGTH = "strength";
+/**
+ * Example of a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler} that uses GraphAware {@link ImprovedTransactionData}
+ * to do its job, which is counting the total strength of all friendships in the database and writing that to a special
+ * node created for that purpose.
+ */
+public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<Void> {
+
+    public static final RelationshipType FRIEND_OF = DynamicRelationshipType.withName("FRIEND_OF");
+    public static final String STRENGTH = "strength";
     public static final String TOTAL_FRIENDSHIP_STRENGTH = "totalFriendshipStrength";
+    public static final Label COUNTER_NODE_LABEL = DynamicLabel.label("FriendshipCounter");
 
     private final GraphDatabaseService database;
 
-    public TotalFriendshipStrengthCounter(GraphDatabaseService database) {
+    public FriendshipStrengthCounter(GraphDatabaseService database) {
         this.database = database;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Void beforeCommit(TransactionData data) throws Exception {
         ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data);
@@ -563,18 +588,45 @@ public class TotalFriendshipStrengthCounter implements TransactionEventHandler<V
             }
         }
 
-        Node root = database.getNodeById(0);
-        root.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (int) root.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0) + delta);
+        if (delta != 0) {
+            Node root = getCounterNode(database);
+            root.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (int) root.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0) + delta);
+        }
 
         return null;
     }
 
-    @Override
-    public void afterCommit(TransactionData data, Void state) {
+    /**
+     * Get the counter node, where the friendship strength is stored. Create it if it does not exist.
+     *
+     * @param database to find the node in.
+     * @return counter node.
+     */
+    private static Node getCounterNode(GraphDatabaseService database) {
+        Node result = getSingle(at(database).getAllNodesWithLabel(COUNTER_NODE_LABEL));
+
+        if (result != null) {
+            return result;
+        }
+
+        return database.createNode(COUNTER_NODE_LABEL);
     }
 
-    @Override
-    public void afterRollback(TransactionData data, Void state) {
+    /**
+     * Get the counter value of the total friendship strength counter.
+     *
+     * @param database to find the counter in.
+     * @return total friendship strength.
+     */
+    public static int getTotalFriendshipStrength(GraphDatabaseService database) {
+        int result = 0;
+
+        try (Transaction tx = database.beginTx()) {
+            result = (int) getCounterNode(database).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0);
+            tx.success();
+        }
+
+        return result;
     }
 }
 ```
@@ -583,10 +635,8 @@ All that remains is registering this event handler on the database:
 
 ```java
 GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-database.registerTransactionEventHandler(new TotalFriendshipStrengthCounter(database));
+database.registerTransactionEventHandler(new FriendshipStrengthCounter(database));
 ```
-
-`TotalFriendshipStrengthCountingDemo` demonstrates the entire example.
 
 #### Usage in Detail
 
@@ -684,15 +734,15 @@ GraphAware provides an alternative, callback-based API called `TransactionExecut
 To create an empty node in a database, you would write something like this.
 
 ```java
-    GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //only for demo, use your own persistent one!
-    TransactionExecutor executor = new SimpleTransactionExecutor(database);
+GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //only for demo, use your own persistent one!
+TransactionExecutor executor = new SimpleTransactionExecutor(database);
 
-    executor.executeInTransaction(new VoidReturningCallback() {
-        @Override
-        public void doInTx(GraphDatabaseService database) {
-            database.createNode();
-        }
-    });
+executor.executeInTransaction(new VoidReturningCallback() {
+    @Override
+    public void doInTx(GraphDatabaseService database) {
+        database.createNode();
+    }
+});
 ```
 
 You have the option of selecting an `ExceptionHandlingStrategy`. By default, if an exception occurs, the transaction will be
@@ -731,20 +781,20 @@ new one started, until we run out of input items to process.
 For example, if you were to create a number of nodes from a list of node names, you would do something like this:
 
 ```java
-    GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //only for demo, use your own persistent one!
+GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //only for demo, use your own persistent one!
 
-    List<String> nodeNames = Arrays.asList("Name1", "Name2", "Name3");  //there will be many more
+List<String> nodeNames = Arrays.asList("Name1", "Name2", "Name3");  //there will be many more
 
-    int batchSize = 10;
-    BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, batchSize, nodeNames, new UnitOfWork<String>() {
-        @Override
-        public void execute(GraphDatabaseService database, String nodeName, int batchNumber, int stepNumber) {
-            Node node = database.createNode();
-            node.setProperty("name", nodeName);
-        }
-    });
+int batchSize = 10;
+BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, batchSize, nodeNames, new UnitOfWork<String>() {
+    @Override
+    public void execute(GraphDatabaseService database, String nodeName, int batchNumber, int stepNumber) {
+        Node node = database.createNode();
+        node.setProperty("name", nodeName);
+    }
+});
 
-    executor.execute();
+executor.execute();
 ```
 
 #### Batch Operations with Generated Input or No Input
@@ -755,35 +805,35 @@ can use the `NoInputBatchTransactionExecutor`.
 First, you would create an implementation of `UnitOfWork<NullItem>`, which is a unit of work expecting no input:
 
 ```java
-    /**
-     * Unit of work that creates an empty node with random name. Singleton.
-     */
-    public class CreateRandomNode implements UnitOfWork<NullItem> {
-        private static final CreateRandomNode INSTANCE = new CreateRandomNode();
+/**
+ * Unit of work that creates an empty node with random name. Singleton.
+ */
+public class CreateRandomNode implements UnitOfWork<NullItem> {
+    private static final CreateRandomNode INSTANCE = new CreateRandomNode();
 
-        public static CreateRandomNode getInstance() {
-            return INSTANCE;
-        }
-
-        private CreateRandomNode() {
-        }
-
-        @Override
-        public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
-            Node node = database.createNode();
-            node.setProperty("name", UUID.randomUUID());
-        }
+    public static CreateRandomNode getInstance() {
+        return INSTANCE;
     }
+
+    private CreateRandomNode() {
+    }
+
+    @Override
+    public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
+        Node node = database.createNode();
+        node.setProperty("name", UUID.randomUUID());
+    }
+}
 ```
 
 Then, you would use it in `NoInputBatchTransactionExecutor`:
 
 ```java
-    //create 100,000 nodes in batches of 1,000:
-    int batchSize = 1000;
-    int noNodes = 100000;
-    BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, batchSize, noNodes, CreateRandomNode.getInstance());
-    batchExecutor.execute();
+//create 100,000 nodes in batches of 1,000:
+int batchSize = 1000;
+int noNodes = 100000;
+BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, batchSize, noNodes, CreateRandomNode.getInstance());
+batchExecutor.execute();
 ```
 
 #### Multi-Threaded Batch Operations
@@ -792,11 +842,11 @@ If you wish to execute any batch operation using more than one thread, you can u
  as a decorator of any `BatchTransactionExecutor`. For example, to execute the above example using 4 threads:
 
 ```java
-    int batchSize = 1000;
-    int noNodes = 100000;
-    BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, batchSize, noNodes, CreateRandomNode.getInstance());
-    BatchTransactionExecutor multiThreadedExecutor = new MultiThreadedBatchTransactionExecutor(batchExecutor, 4);
-    multiThreadedExecutor.execute();
+int batchSize = 1000;
+int noNodes = 100000;
+BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, batchSize, noNodes, CreateRandomNode.getInstance());
+BatchTransactionExecutor multiThreadedExecutor = new MultiThreadedBatchTransactionExecutor(batchExecutor, 4);
+multiThreadedExecutor.execute();
 ```
 
 <a name="utils"/>

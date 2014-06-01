@@ -29,7 +29,7 @@ public class FriendshipStrengthModule extends BaseGraphAwareRuntimeModule {
     private final FriendshipStrengthCounter counter;
 
     public FriendshipStrengthModule(String moduleId, GraphDatabaseService database) {
-        super(moduleId, database);
+        super(moduleId);
         this.counter = new FriendshipStrengthCounter(database);
 
         //only take into account relationships with FRIEND_OF type:

@@ -41,7 +41,7 @@ import static com.graphaware.test.util.TestUtils.*;
  * The configuration is provided using a constructor. It defaults to "neo4j.properties" and if no such file is present
  * on the classpath of the implementing class, one that ships with Neo4j is used.
  */
-public abstract class IntegrationTest {
+public abstract class ServerIntegrationTest {
 
     private final String neo4jProperties;
     private Bootstrapper bootstrapper;
@@ -49,11 +49,11 @@ public abstract class IntegrationTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    protected IntegrationTest() {
+    protected ServerIntegrationTest() {
         this("neo4j.properties");
     }
 
-    protected IntegrationTest(String neo4jProperties) {
+    protected ServerIntegrationTest(String neo4jProperties) {
         this.neo4jProperties = neo4jProperties;
     }
 

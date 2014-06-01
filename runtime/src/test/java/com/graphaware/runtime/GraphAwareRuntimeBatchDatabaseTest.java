@@ -438,7 +438,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test
     public void realRuntimeConfiguredModulesShouldBeConfigured() {
-        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule(database);
+        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule();
 
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         runtime.registerModule(module, true);
@@ -448,7 +448,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test(expected = IllegalStateException.class)
     public void unConfiguredModuleShouldThrowException() {
-        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule(database);
+        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule();
         module.getConfig();
     }
 

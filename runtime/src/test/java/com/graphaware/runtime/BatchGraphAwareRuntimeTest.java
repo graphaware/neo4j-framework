@@ -430,7 +430,7 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
 
     @Test
     public void realRuntimeConfiguredModulesShouldBeConfigured() {
-        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule(null);
+        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule();
 
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
@@ -441,7 +441,7 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
 
     @Test(expected = IllegalStateException.class)
     public void unConfiguredModuleShouldThrowException() {
-        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule(null);
+        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule();
         module.getConfig();
     }
 

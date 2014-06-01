@@ -1,4 +1,4 @@
-package com.graphaware.example;
+package ${package};
 
 import com.graphaware.test.integration.IntegrationTest;
 import org.apache.http.HttpStatus;

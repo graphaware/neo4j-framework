@@ -11,11 +11,9 @@ import org.neo4j.graphdb.GraphDatabaseService;
 public abstract class BaseGraphAwareRuntimeModule implements GraphAwareRuntimeModule {
 
     private final String moduleId;
-    private final GraphDatabaseService database;
 
-    protected BaseGraphAwareRuntimeModule(String moduleId, GraphDatabaseService database) {
+    protected BaseGraphAwareRuntimeModule(String moduleId) {
         this.moduleId = moduleId;
-        this.database = database;
     }
 
     /**
@@ -24,14 +22,6 @@ public abstract class BaseGraphAwareRuntimeModule implements GraphAwareRuntimeMo
     @Override
     public String getId() {
         return moduleId;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GraphDatabaseService getDatabase() {
-        return database;
     }
 
     /**

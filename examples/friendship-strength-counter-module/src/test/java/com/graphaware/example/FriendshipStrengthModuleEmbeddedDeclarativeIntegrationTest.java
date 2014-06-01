@@ -16,34 +16,46 @@
 
 package com.graphaware.example;
 
-import com.graphaware.test.integration.IntegrationTest;
-import org.apache.http.HttpStatus;
+import com.graphaware.example.module.FriendshipStrengthCounter;
+import com.graphaware.example.module.FriendshipStrengthModule;
+import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.ProductionGraphAwareRuntime;
+import org.junit.Before;
 import org.junit.Test;
+import org.neo4j.cypher.javacompat.ExecutionEngine;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.test.TestGraphDatabaseFactory;
+import org.springframework.core.io.ClassPathResource;
 
-import static com.graphaware.test.util.TestUtils.get;
 import static org.junit.Assert.assertEquals;
 
 
 /**
  * Test for {@link com.graphaware.example.module.FriendshipStrengthCounter}.
  */
-public class FriendshipStrengthModuleIntegrationTest extends IntegrationTest {
+public class FriendshipStrengthModuleEmbeddedDeclarativeIntegrationTest {
 
-    public FriendshipStrengthModuleIntegrationTest() {
-        super("neo4j-friendship.properties");
+    private GraphDatabaseService database;
+
+    @Before
+    public void setUp() {
+        database = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .loadPropertiesFromFile(this.getClass().getClassLoader().getResource("neo4j-friendship.properties").getPath())
+                .newGraphDatabase();
     }
 
     @Test
     public void totalFriendshipStrengthOnEmptyDatabaseShouldBeZero() {
-         assertEquals("0", get("http://localhost:7474/graphaware/friendship/strength", HttpStatus.SC_OK));
+        assertEquals(0, new FriendshipStrengthCounter(database).getTotalFriendshipStrength());
     }
 
     @Test
     public void totalFriendshipStrengthShouldBeCorrectlyCalculated() {
-        executeCypher("CREATE " +
+        new ExecutionEngine(database).execute("CREATE " +
                 "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
                 "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
 
-        assertEquals("3", get("http://localhost:7474/graphaware/friendship/strength", HttpStatus.SC_OK));
+        assertEquals(3, new FriendshipStrengthCounter(database).getTotalFriendshipStrength());
     }
 }
