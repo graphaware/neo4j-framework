@@ -146,9 +146,34 @@ public class IterableUtilsTest {
 
     @Test
     public void shouldSampleIterable() {
-        Iterable<Long> sampled = sample(asList(1L, 2L, 3L, 4L, 5L), 2);
+        Iterable<Long> sampled = random(asList(1L, 2L, 3L, 4L, 5L), 2);
         assertEquals(2, count(sampled));
         List<Long> longs = toList(sampled);
         assertTrue(longs.contains(1L) || longs.contains(2L) || longs.contains(3L) || longs.contains(4L) || longs.contains(5L));
+    }
+
+    @Test
+    public void randomSelectionShouldBeUniform() {
+        int noSamples = 100;
+        int noTrials = 1000000;
+        double tolerance = 0.05;
+
+        List<Integer> input = new LinkedList<>();
+        for (int i = 0; i < noSamples; i++) {
+            input.add(i);
+        }
+
+        Counter<Integer> counter = new Counter<>();
+        for (int i = 0; i < noTrials; i++) {
+            counter.increment(IterableUtils.random(input));
+        }
+
+        for (int i = 0; i < noSamples; i++) {
+            long count = counter.getCount(i);
+            double lowerBound = (noTrials / noSamples) * (1 - tolerance);
+            double upperBound = (noTrials / noSamples) * (1 + tolerance);
+            assertTrue(count > lowerBound);
+            assertTrue(count < upperBound);
+        }
     }
 }

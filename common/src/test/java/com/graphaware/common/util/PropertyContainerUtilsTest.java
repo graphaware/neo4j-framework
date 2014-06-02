@@ -30,9 +30,11 @@ import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
+import static com.graphaware.common.util.ArrayUtils.*;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.neo4j.graphdb.Direction.OUTGOING;
@@ -82,6 +84,20 @@ public class PropertyContainerUtilsTest {
     public void shouldFindRelationshipId() {
         try (Transaction tx = database.beginTx()) {
             assertEquals(0L, id(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
+        }
+    }
+
+    @Test
+    public void shouldFindNodeIds() {
+        try (Transaction tx = database.beginTx()) {
+            assertEquals("[0, 1, 2]", Arrays.toString(ids(GlobalGraphOperations.at(database).getAllNodes())));
+        }
+    }
+
+    @Test
+    public void shouldFindRelationshipIds() {
+        try (Transaction tx = database.beginTx()) {
+            assertEquals("[0]", Arrays.toString((ids(GlobalGraphOperations.at(database).getAllRelationships()))));
         }
     }
 

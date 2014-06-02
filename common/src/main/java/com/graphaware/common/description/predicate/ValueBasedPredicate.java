@@ -17,7 +17,7 @@
 package com.graphaware.common.description.predicate;
 
 import static com.graphaware.common.util.ArrayUtils.arrayFriendlyEquals;
-import static com.graphaware.common.util.ArrayUtils.arrayFriendlyHasCode;
+import static com.graphaware.common.util.ArrayUtils.arrayFriendlyHashCode;
 
 /**
  * A {@link Predicate} that contains a value and performs some comparison to is when {@link #evaluate(Object)} is invoked.
@@ -65,6 +65,6 @@ abstract class ValueBasedPredicate<V> extends BasePredicate {
      */
     @Override
     public int hashCode() {
-        return arrayFriendlyHasCode(value);
+        return arrayFriendlyHashCode(value);
     }
 }

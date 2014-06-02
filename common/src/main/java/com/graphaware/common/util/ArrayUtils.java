@@ -117,7 +117,7 @@ public final class ArrayUtils {
      * @param o to get a hash code for.
      * @return hash code.
      */
-    public static int arrayFriendlyHasCode(Object o) {
+    public static int arrayFriendlyHashCode(Object o) {
         if (o instanceof byte[]) {
             return Arrays.hashCode((byte[]) o);
         } else if (o instanceof char[]) {

@@ -34,7 +34,7 @@ public class ReservoirSampler<T> {
      */
     public void sample(T item) {
         if (item == null) {
-            throw new IllegalArgumentException("Item to sample must not be null");
+            throw new IllegalArgumentException("Item to random must not be null");
         }
 
         if (reservoir.size() < numberOfSamples) {

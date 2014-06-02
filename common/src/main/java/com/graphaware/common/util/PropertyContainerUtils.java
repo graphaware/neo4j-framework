@@ -152,6 +152,12 @@ public final class PropertyContainerUtils {
         return result;
     }
 
+    /**
+     * Convert a {@link Node} to a human-readable String.
+     *
+     * @param node to convert.
+     * @return node as String.
+     */
     public static String nodeToString(Node node) {
         StringBuilder string = new StringBuilder("(");
 
@@ -178,6 +184,12 @@ public final class PropertyContainerUtils {
         return string.toString();
     }
 
+    /**
+     * Convert a {@link Relationship} to a human-readable String.
+     *
+     * @param relationship to convert.
+     * @return relationship as String.
+     */
     public static String relationshipToString(Relationship relationship) {
         StringBuilder string = new StringBuilder();
 
@@ -194,6 +206,12 @@ public final class PropertyContainerUtils {
         return string.toString();
     }
 
+    /**
+     * Convert a {@link PropertyContainer} to a human-readable String.
+     *
+     * @param propertyContainer to convert.
+     * @return propertyContainer as String.
+     */
     public static String propertiesToString(PropertyContainer propertyContainer) {
         if (!propertyContainer.getPropertyKeys().iterator().hasNext()) {
             return "";
