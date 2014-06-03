@@ -42,6 +42,7 @@ import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.common.util.IterableUtils.countNodes;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static com.graphaware.tx.event.improved.api.Change.*;
+import static java.util.Arrays.*;
 import static junit.framework.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
@@ -866,6 +867,40 @@ public class LazyTransactionDataIntegrationTest {
                         assertEquals("Four", unchanged.getProperty("name", "nothing"));
                         assertEquals("nothing", unchanged.getProperty("non-existing", "nothing"));
 
+                        //labels changed
+                        changed = changesToMap(transactionData.getAllChangedNodes()).get(5L);
+                        assertEquals(0, transactionData.changedProperties(changed.getCurrent()).size());
+                        assertEquals(0, transactionData.changedProperties(changed.getPrevious()).size());
+                        assertFalse(transactionData.hasPropertyBeenChanged(changed.getCurrent(), "name"));
+                        assertEquals(1, transactionData.assignedLabels(changed.getPrevious()).size());
+                        assertEquals(1, transactionData.assignedLabels(changed.getCurrent()).size());
+                        assertEquals("NewLabel", transactionData.assignedLabels(changed.getPrevious()).iterator().next().name());
+                        assertEquals("NewLabel", transactionData.assignedLabels(changed.getCurrent()).iterator().next().name());
+                        assertTrue(transactionData.hasLabelBeenAssigned(changed.getPrevious(), label("NewLabel")));
+                        assertTrue(transactionData.hasLabelBeenAssigned(changed.getCurrent(), label("NewLabel")));
+                        assertFalse(transactionData.hasLabelBeenAssigned(changed.getPrevious(), label("SomeOther")));
+                        assertFalse(transactionData.hasLabelBeenAssigned(changed.getCurrent(), label("SomeOther")));
+                        assertFalse(transactionData.hasLabelBeenRemoved(changed.getPrevious(), label("NewLabel")));
+                        assertFalse(transactionData.hasLabelBeenRemoved(changed.getCurrent(), label("NewLabel")));
+                        assertEquals(0, transactionData.removedLabels(changed.getPrevious()).size());
+                        assertEquals(0, transactionData.removedLabels(changed.getCurrent()).size());
+
+                        changed = changesToMap(transactionData.getAllChangedNodes()).get(6L);
+                        assertEquals(0, transactionData.changedProperties(changed.getCurrent()).size());
+                        assertEquals(0, transactionData.changedProperties(changed.getPrevious()).size());
+                        assertFalse(transactionData.hasPropertyBeenChanged(changed.getCurrent(), "name"));
+                        assertEquals(1, transactionData.removedLabels(changed.getPrevious()).size());
+                        assertEquals(1, transactionData.removedLabels(changed.getCurrent()).size());
+                        assertEquals("ToBeRemoved", transactionData.removedLabels(changed.getPrevious()).iterator().next().name());
+                        assertEquals("ToBeRemoved", transactionData.removedLabels(changed.getCurrent()).iterator().next().name());
+                        assertTrue(transactionData.hasLabelBeenRemoved(changed.getPrevious(), label("ToBeRemoved")));
+                        assertTrue(transactionData.hasLabelBeenRemoved(changed.getCurrent(), label("ToBeRemoved")));
+                        assertFalse(transactionData.hasLabelBeenRemoved(changed.getPrevious(), label("SomeOther")));
+                        assertFalse(transactionData.hasLabelBeenRemoved(changed.getCurrent(), label("SomeOther")));
+                        assertFalse(transactionData.hasLabelBeenAssigned(changed.getPrevious(), label("NewLabel")));
+                        assertFalse(transactionData.hasLabelBeenAssigned(changed.getCurrent(), label("NewLabel")));
+                        assertEquals(0, transactionData.assignedLabels(changed.getPrevious()).size());
+                        assertEquals(0, transactionData.assignedLabels(changed.getCurrent()).size());
                     }
                 }
         );

@@ -17,10 +17,7 @@
 package com.graphaware.tx.event.improved.data;
 
 import com.graphaware.tx.event.improved.api.Change;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.*;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -146,6 +143,34 @@ public abstract class BaseImprovedTransactionData {
      */
     public Map<String, Change<Object>> changedProperties(Node node) {
         return getNodeTransactionData().changedProperties(node);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasLabelBeenAssigned(Node node, Label label) {
+        return getNodeTransactionData().hasLabelBeenAssigned(node, label);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<Label> assignedLabels(Node node) {
+        return getNodeTransactionData().assignedLabels(node);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasLabelBeenRemoved(Node node, Label label) {
+        return getNodeTransactionData().hasLabelBeenRemoved(node, label);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<Label> removedLabels(Node node) {
+        return getNodeTransactionData().removedLabels(node);
     }
 
     /**

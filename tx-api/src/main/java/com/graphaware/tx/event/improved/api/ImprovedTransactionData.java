@@ -16,10 +16,7 @@
 
 package com.graphaware.tx.event.improved.api;
 
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -201,6 +198,40 @@ public interface ImprovedTransactionData {
      *         after the transaction started, respectively.
      */
     Map<String, Change<Object>> changedProperties(Node node);
+
+    /**
+     * Check whether a label has been assigned in the transaction.
+     *
+     * @param node  to check.
+     * @param label to check.
+     * @return true iff the node has been assigned.
+     */
+    boolean hasLabelBeenAssigned(Node node, Label label);
+
+    /**
+     * Get labels assigned in the transaction.
+     *
+     * @param node for which to get assigned labels.
+     * @return read-only labels created for the given node.
+     */
+    Set<Label> assignedLabels(Node node);
+
+    /**
+     * Check whether a label has been removed in the transaction.
+     *
+     * @param node  to check.
+     * @param label to check.
+     * @return true iff the label has been removed.
+     */
+    boolean hasLabelBeenRemoved(Node node, Label label);
+
+    /**
+     * Get labels removed in the transaction.
+     *
+     * @param node for which to get removed labels.
+     * @return read-only labels removed for the given node.
+     */
+    Set<Label> removedLabels(Node node);
 
     /**
      * Check whether the given relationship has been created in the transaction.
