@@ -21,7 +21,6 @@ import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import com.graphaware.tx.executor.single.*;
-import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Test;
 import org.neo4j.graphdb.*;
@@ -45,7 +44,6 @@ import static com.graphaware.tx.event.improved.api.Change.*;
 import static junit.framework.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.graphdb.DynamicLabel.*;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
@@ -65,7 +63,7 @@ public class LazyTransactionDataIntegrationTest {
     public void createdRelationshipsShouldBeCorrectlyIdentified() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -98,7 +96,7 @@ public class LazyTransactionDataIntegrationTest {
     public void startingWithCreatedRelationshipCurrentGraphVersionShouldBeTraversed() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -123,7 +121,7 @@ public class LazyTransactionDataIntegrationTest {
     public void changedRelationshipsShouldBeCorrectlyIdentified() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -153,7 +151,7 @@ public class LazyTransactionDataIntegrationTest {
     public void startingWithPreviousChangedRelationshipPreviousGraphVersionShouldBeTraversedUsingNativeApi() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -183,7 +181,7 @@ public class LazyTransactionDataIntegrationTest {
     public void startingWithPreviousChangedRelationshipPreviousGraphVersionShouldBeTraversedUsingTraversalApi() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -208,7 +206,7 @@ public class LazyTransactionDataIntegrationTest {
     public void startingWithCurrentChangedRelationshipCurrentGraphVersionShouldBeTraversedUsingNativeApi() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -238,7 +236,7 @@ public class LazyTransactionDataIntegrationTest {
     public void startingWithCurrentChangedRelationshipCurrentGraphVersionShouldBeTraversedUsingTraversalApi() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -262,7 +260,7 @@ public class LazyTransactionDataIntegrationTest {
     public void deletedRelationshipsShouldBeCorrectlyIdentified() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -314,7 +312,7 @@ public class LazyTransactionDataIntegrationTest {
     public void startingWithDeletedRelationshipPreviousGraphVersionShouldBeTraversedUsingNativeApi() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -352,7 +350,7 @@ public class LazyTransactionDataIntegrationTest {
     public void startingWithDeletedRelationshipPreviousGraphVersionShouldBeTraversedUsingTraversalApi() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -378,7 +376,7 @@ public class LazyTransactionDataIntegrationTest {
     public void createdRelationshipPropertiesShouldBeCorrectlyIdentified() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -408,7 +406,7 @@ public class LazyTransactionDataIntegrationTest {
     public void changedRelationshipPropertiesShouldBeCorrectlyIdentified() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -437,7 +435,7 @@ public class LazyTransactionDataIntegrationTest {
     public void deletedRelationshipPropertiesShouldBeCorrectlyIdentified() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -471,7 +469,7 @@ public class LazyTransactionDataIntegrationTest {
     public void createdNodesShouldBeCorrectlyIdentified() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -496,7 +494,7 @@ public class LazyTransactionDataIntegrationTest {
     public void startingWithCreatedNodeCurrentGraphVersionShouldBeTraversed() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -515,7 +513,7 @@ public class LazyTransactionDataIntegrationTest {
     public void changedNodesShouldBeCorrectlyIdentified() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         if (!transactionData.mutationsOccurred()) {
@@ -564,7 +562,7 @@ public class LazyTransactionDataIntegrationTest {
     public void startingWithPreviousChangedNodePreviousGraphVersionShouldBeTraversedUsingNativeApi() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -617,7 +615,7 @@ public class LazyTransactionDataIntegrationTest {
     public void startingWithPreviousChangedNodePreviousGraphVersionShouldBeTraversedUsingTraversalApi() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -643,7 +641,7 @@ public class LazyTransactionDataIntegrationTest {
     public void startingWithCurrentChangedNodeCurrentGraphVersionShouldBeTraversedUsingNativeApi() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -663,7 +661,7 @@ public class LazyTransactionDataIntegrationTest {
     public void startingWithCurrentChangedNodeCurrentGraphVersionShouldBeTraversed() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -688,7 +686,7 @@ public class LazyTransactionDataIntegrationTest {
     public void deletedNodesShouldBeCorrectlyIdentified() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -715,7 +713,7 @@ public class LazyTransactionDataIntegrationTest {
     public void startingWithDeletedNodePreviousGraphVersionShouldBeTraversedUsingNativeApi() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -738,7 +736,7 @@ public class LazyTransactionDataIntegrationTest {
     public void startingWithDeletedNodePreviousGraphVersionShouldBeTraversedUsingTraversalApi() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -765,7 +763,7 @@ public class LazyTransactionDataIntegrationTest {
     public void createdNodePropertiesShouldBeCorrectlyIdentified() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -792,7 +790,7 @@ public class LazyTransactionDataIntegrationTest {
     public void changedNodePropertiesShouldBeCorrectlyIdentified() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -853,7 +851,7 @@ public class LazyTransactionDataIntegrationTest {
     public void deletedNodePropertiesShouldBeCorrectlyIdentified() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
@@ -895,7 +893,7 @@ public class LazyTransactionDataIntegrationTest {
     public void shouldBeAbleToChangeCreatedRelationshipBeforeCommit() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         if (!transactionData.mutationsOccurred()) {
@@ -925,7 +923,7 @@ public class LazyTransactionDataIntegrationTest {
     public void shouldBeAbleToChangeCreatedNodeBeforeCommit() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         if (!transactionData.mutationsOccurred()) {
@@ -957,7 +955,7 @@ public class LazyTransactionDataIntegrationTest {
     public void shouldBeAbleToChangeCurrentChangedRelationshipBeforeCommit() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         if (!transactionData.mutationsOccurred()) {
@@ -989,7 +987,7 @@ public class LazyTransactionDataIntegrationTest {
     public void shouldBeAbleToChangePreviousChangedRelationshipBeforeCommit() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         if (!transactionData.mutationsOccurred()) {
@@ -1022,7 +1020,7 @@ public class LazyTransactionDataIntegrationTest {
     public void shouldBeAbleToChangeCurrentChangedNodeBeforeCommit() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         if (!transactionData.mutationsOccurred()) {
@@ -1055,7 +1053,7 @@ public class LazyTransactionDataIntegrationTest {
     public void shouldBeAbleToChangePreviousChangedNodeBeforeCommit() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         if (!transactionData.mutationsOccurred()) {
@@ -1088,7 +1086,7 @@ public class LazyTransactionDataIntegrationTest {
     public void shouldNotBeAbleToChangeDeletedRelationshipBeforeCommit() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         if (!transactionData.mutationsOccurred()) {
@@ -1102,13 +1100,12 @@ public class LazyTransactionDataIntegrationTest {
 
                         try {
                             r1.setProperty("irrelevant", "irrelevant");
-                            fail();
+                            return;
                         } catch (IllegalStateException e) {
                             //OK
                         }
 
                         r1.removeProperty("irrelevant");
-                        fail();
                     }
                 }
         );
@@ -1118,7 +1115,7 @@ public class LazyTransactionDataIntegrationTest {
     public void shouldNotBeAbleToChangeDeletedNodeBeforeCommit() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         Map<Long, Node> deletedNodes = propertyContainersToMap(transactionData.getAllDeletedNodes());
@@ -1127,17 +1124,12 @@ public class LazyTransactionDataIntegrationTest {
 
                         try {
                             deleted.setProperty("irrelevant", "irrelevant");
-                            fail();
+                            return;
                         } catch (IllegalStateException e) {
                             //OK
                         }
 
-                        try {
-                            deleted.removeProperty("irrelevant");
-                            fail();
-                        } catch (IllegalStateException e) {
-                            //OK
-                        }
+                        deleted.removeProperty("irrelevant");
                     }
                 }
         );
@@ -1147,19 +1139,14 @@ public class LazyTransactionDataIntegrationTest {
     public void shouldNotBeAbleToCreateARelationshipFromDeletedNodeBeforeCommit() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         Map<Long, Node> deletedNodes = propertyContainersToMap(transactionData.getAllDeletedNodes());
 
                         Node deleted = deletedNodes.get(2L);
 
-                        try {
-                            deleted.createRelationshipTo(database.getNodeById(3), withName("illegal"));
-                            fail();
-                        } catch (IllegalStateException e) {
-                            //OK
-                        }
+                        deleted.createRelationshipTo(database.getNodeById(3), withName("illegal"));
                     }
                 }
         );
@@ -1169,19 +1156,14 @@ public class LazyTransactionDataIntegrationTest {
     public void shouldNotBeAbleToCreateARelationshipToDeletedNodeBeforeCommit() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         Map<Long, Node> deletedNodes = propertyContainersToMap(transactionData.getAllDeletedNodes());
 
                         Node deleted = deletedNodes.get(2L);
 
-                        try {
-                            database.getNodeById(3).createRelationshipTo(deleted, withName("illegal"));
-                            fail();
-                        } catch (IllegalStateException e) {
-                            //OK
-                        }
+                        database.getNodeById(3).createRelationshipTo(deleted, withName("illegal"));
                     }
                 }
         );
@@ -1192,7 +1174,7 @@ public class LazyTransactionDataIntegrationTest {
         createTestDatabase();
         mutateGraph(
                 new TestGraphMutation(),
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         throw new RuntimeException("Deliberate testing exception");
@@ -1231,7 +1213,7 @@ public class LazyTransactionDataIntegrationTest {
     public void shouldBeAbleToDeleteChangedNodeCommittingTransaction() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         Change<Node> change = transactionData.getChanged(database.getNodeById(1));
@@ -1251,7 +1233,7 @@ public class LazyTransactionDataIntegrationTest {
     public void shouldBeAbleToWipeTheGraphBeforeCommittingTransaction() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
@@ -1270,7 +1252,7 @@ public class LazyTransactionDataIntegrationTest {
     public void shouldNotChangeAnythingWhenDeletingAlreadyDeletedNodeAndRelationships() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         Map<Long, Node> deletedNodes = propertyContainersToMap(transactionData.getAllDeletedNodes());
@@ -1289,7 +1271,7 @@ public class LazyTransactionDataIntegrationTest {
     public void shouldBeAbleToCreateAdditionalNodesAndRelationshipsFromCurrentGraphVersion() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         if (!transactionData.mutationsOccurred()) {
@@ -1319,7 +1301,7 @@ public class LazyTransactionDataIntegrationTest {
     public void shouldBeAbleToCreateAdditionalNodesAndRelationshipsFromPreviousGraphVersion() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         if (!transactionData.mutationsOccurred()) {
@@ -1349,7 +1331,7 @@ public class LazyTransactionDataIntegrationTest {
     public void propertyExtractionStrategySmokeTest() {
         createTestDatabase();
         mutateGraph(
-                new BeforeCommitCallback() {
+                new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         Relationship previous = transactionData.getAllChangedRelationships().iterator().next().getPrevious();
@@ -1384,8 +1366,13 @@ public class LazyTransactionDataIntegrationTest {
                         }
                     }, new BeforeCommitCallback() {
                         @Override
-                        public void doBeforeCommit(ImprovedTransactionData transactionData) {
+                        public void beforeCommit(ImprovedTransactionData transactionData) {
                             assertFalse(transactionData.mutationsOccurred());
+                        }
+
+                        @Override
+                        public boolean mutationsOccurred() {
+                            return true;
                         }
                     }
         );
@@ -1405,6 +1392,7 @@ public class LazyTransactionDataIntegrationTest {
         TestingTxEventHandler handler = new TestingTxEventHandler(beforeCommitCallback);
         database.registerTransactionEventHandler(handler);
         new SimpleTransactionExecutor(database).executeInTransaction(transactionCallback, exceptionHandlingStrategy);
+        assertTrue(beforeCommitCallback.mutationsOccurred());
     }
 
     private class TestingTxEventHandler implements TransactionEventHandler {
@@ -1417,7 +1405,7 @@ public class LazyTransactionDataIntegrationTest {
 
         @Override
         public Object beforeCommit(TransactionData data) throws Exception {
-            beforeCommitCallback.doBeforeCommit(new LazyTransactionData(data));
+            beforeCommitCallback.beforeCommit(new LazyTransactionData(data));
             return null;
         }
 
@@ -1433,7 +1421,32 @@ public class LazyTransactionDataIntegrationTest {
     }
 
     private interface BeforeCommitCallback {
-        void doBeforeCommit(ImprovedTransactionData transactionData);
+        void beforeCommit(ImprovedTransactionData transactionData);
+
+        boolean mutationsOccurred();
+
+        public abstract class RememberingAdapter implements BeforeCommitCallback {
+
+            private boolean mutationsOccurred = false;
+
+            @Override
+            public void beforeCommit(ImprovedTransactionData transactionData) {
+                if (!transactionData.mutationsOccurred()) {
+                    return;
+                }
+
+                mutationsOccurred = true;
+
+                doBeforeCommit(transactionData);
+
+            }
+
+            protected abstract void doBeforeCommit(ImprovedTransactionData transactionData);
+
+            public boolean mutationsOccurred() {
+                return mutationsOccurred;
+            }
+        }
     }
 
     private class OtherNodeNameIncludingRelationshipPropertiesExtractor {
