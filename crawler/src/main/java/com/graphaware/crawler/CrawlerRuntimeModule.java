@@ -24,7 +24,9 @@ public class CrawlerRuntimeModule extends BaseGraphAwareRuntimeModule {
 	public void initialize(GraphDatabaseService database) {
 		/*
 		 * Here, I reckon we will have to set up the thread to crawl the database and allow the consumer of the framework to
-		 * choose a NodeSelectionStrategy. In fact, should I use InclusionStrategy?
+		 * choose a NodeSelectionStrategy.  In fact, should it be InclusionStrategy?
+		 *
+		 * We also need to decide on the throttling here and set that up.
 		 */
 	}
 
