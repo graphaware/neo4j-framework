@@ -17,7 +17,7 @@ import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 public class CrawlerRuntimeModule extends BaseGraphAwareRuntimeModule {
 
 	private final InclusionStrategy<Node> nodeInclusionStrategy;
-    private final ThingThatGetsCalledWhenWeFindSomething inclusionHandler;
+	private final ThingThatGetsCalledWhenWeFindSomething inclusionHandler;
 
 	/**
 	 * Constructs a new {@link CrawlerRuntimeModule} identified by the given argument.

@@ -63,10 +63,10 @@ public class SimpleRecursiveGraphCrawler implements PerpetualGraphCrawler {
 
 		// TODO: properly decide what relationship to follow.  Another inclusion strategy, perhaps?
 		for (Iterator<Relationship> it = startNode.getRelationships(Direction.BOTH).iterator(); it.hasNext();) {
-			Relationship outgoingRelationship = it.next();
-			if (!outgoingRelationship.equals(howDidIGetHere)) {
-				debug("Following relationship: " + outgoingRelationship.getType(), currentDepth);
-				crawl(outgoingRelationship.getOtherNode(startNode), maxDepth, currentDepth + 1, outgoingRelationship);
+			Relationship relationship = it.next();
+			if (!relationship.equals(howDidIGetHere)) {
+				debug("Following relationship: " + relationship.getType(), currentDepth);
+				crawl(relationship.getOtherNode(startNode), maxDepth, currentDepth + 1, relationship);
 			}
 		}
 
