@@ -1,9 +1,9 @@
 package com.graphaware.runtime;
 
+import org.neo4j.graphdb.GraphDatabaseService;
+
 import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
 import com.graphaware.runtime.config.RuntimeModuleConfiguration;
-import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  *  Base class for {@link GraphAwareRuntimeModule} implementations.
@@ -34,6 +34,9 @@ public abstract class BaseGraphAwareRuntimeModule implements GraphAwareRuntimeMo
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that the implementation in this base class doesn't do anything and can be safely overridden without calling super.
+     * </p>
      */
     @Override
     public void initialize(GraphDatabaseService database) {
@@ -51,9 +54,13 @@ public abstract class BaseGraphAwareRuntimeModule implements GraphAwareRuntimeMo
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that the implementation in this base class doesn't do anything and can be safely overridden without calling super.
+     * </p>
      */
     @Override
     public void shutdown() {
         //to be overridden
     }
+
 }
