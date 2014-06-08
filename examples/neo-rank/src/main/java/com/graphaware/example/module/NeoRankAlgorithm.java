@@ -14,8 +14,7 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
  * First shot on the PageRank-like algorithm, assuming a 
  * single relationship type and static structure
  * of the network (the model is not dynamic and doesn't 
- * react on network changes). Also assumes a single 
- * strongly connected component only (no hyperjumps)!
+ * react on network changes). 
  * 
  * Also note that as implemented, we have a local (complex)
  * process rather than a global p.
@@ -33,7 +32,13 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
  */
 public class NeoRankAlgorithm {
     
+    // Defines probabilities of diffusion/hyperjumps
+    private static final double DIFFUSE = 0.9;
+    private static final double HYPERJUMP = 0.1;
+    
+    // Private properties
     private final GraphDatabaseService database;
+    
     private Node current;          // currently visited node
     private int normalization = 0; // number of ranks assigned to normalize
     
@@ -77,18 +82,38 @@ public class NeoRankAlgorithm {
      * (I will focus on some theory to get a bound on number
      * of steps needed for convergence of this process, so we 
      * can see how fast we can obtain some meaningful data)
+     * 
+     * In an ideal case, we should have random walkers at
+     * every node at any instant. The original Page Rank
+     * is modeled in terms of a diffusion process to which
+     * the RV model converges in large number of iterations.
+     * 
+     * To get a meaningful data, we should focus either on
+     * 
+     * 1) what does "large" mean in this context.
+     * 
+     * OR 
+     * 
+     * 2) how to formulate this as a calculation on a sparse
+     *    matrix system.
+     * 
      */
     public void step() 
     {
        /**
         * Proceed to a randomly choosen nearest neighbour
         */
-       current = chooseNeighbourAtRandom(current);
+       if(random() < DIFFUSE) {
+            current = chooseNeighbourAtRandom(current);
+       }else {
+            current = makeHyperJump();
+       }
+       
        int rank = (int) current.getProperty(PropertyKeys.NEORANK, 0);
        current.setProperty(PropertyKeys.NEORANK, rank+1);
-       
-       // increment normalization constant to allow to present results consistently 
-       normalization ++;  
+
+        // increment normalization constant to allow to present results consistently 
+        normalization++;  
     } 
     
     /**
@@ -108,25 +133,62 @@ public class NeoRankAlgorithm {
      */
     private Node chooseNeighbourAtRandom(Node n)
     {
-        double max =  .0f;
         Relationship edgeChoice = null; // Not entirely kosher, correct later
         Iterable<Relationship> relationships = n.getRelationships();
 
-        for(Iterator<Relationship> it = relationships.iterator(); it.hasNext();)
-        {
-           Relationship temp = it.next();
-           
-           double rnd = Math.random();
-           if (rnd > max){
-               max = rnd;
-               edgeChoice = temp;
-           }  
+        double max =  .0;
+        for (Relationship temp : relationships) {
+            double rnd = random();
+            if (rnd > max){
+                max = rnd;
+                edgeChoice = temp;
+            }  
         }
         
         return edgeChoice.getEndNode();
     }
     
+    /** 
+     * It is necessary to make a hyperjump sometimes to 
+     * reach weakly connected (or entirely unconnected)
+     * components of the network.
+     * 
+     * The method selects a node at random.
+     * 
+     * Wouldn't it be better to choose an ID rather then
+     * iterate over?
+     * 
+     * @param n
+     * @return 
+     */
+    private Node makeHyperJump()
+    {
+        Node target = null; // again, could be formulated in a better way.
+        Iterable<Node> nodes = at(database).getAllNodes();
+        
+        double max = .0;  
+        for (Node temp : nodes) {
+            double rnd = random();
+            if (rnd > max)
+            {
+                max = rnd;
+                target = temp;
+            }
+        }
+        
+        return target;
+    }
     
+    /**
+     * Substitute method to allow for change of random() implementation
+     * later on. 
+     * 
+     * @return 
+     */
+    private double random()
+    {
+        return Math.random();
+    }
     
     
     
