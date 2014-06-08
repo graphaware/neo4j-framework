@@ -40,7 +40,7 @@ public class NeoRankAlgorithm {
     private final GraphDatabaseService database;
     
     private Node current;          // currently visited node
-    private int normalization = 0; // number of ranks assigned to normalize
+    private static int normalization = 0; // number of ranks assigned to normalize. Static to allow more RW at once
     
     /** 
      * Algorithm for NeoRank on static network
@@ -75,8 +75,7 @@ public class NeoRankAlgorithm {
     }
     
     /** 
-     * Perform a random-walker step on the graph. No 
-     * hyperjumps yet.
+     * Perform a random-walker step on the graph. 
      * 
      * Call this whenever you want, it will update the system.
      * (I will focus on some theory to get a bound on number
@@ -158,7 +157,6 @@ public class NeoRankAlgorithm {
      * Wouldn't it be better to choose an ID rather then
      * iterate over?
      * 
-     * @param n
      * @return 
      */
     private Node makeHyperJump()
