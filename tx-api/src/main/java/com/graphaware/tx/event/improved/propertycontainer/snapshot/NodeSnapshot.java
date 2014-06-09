@@ -132,7 +132,11 @@ public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Nod
      */
     @Override
     public int getDegree() {
-        return super.getDegree();    //To change body of overridden methods use File | Settings | File Templates.
+        int degree = super.getDegree();
+        long removed = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getDeleted(this));
+        long added = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getCreated(this));
+
+        return degree + (int) removed - (int) added;
     }
 
     /**
@@ -140,7 +144,11 @@ public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Nod
      */
     @Override
     public int getDegree(RelationshipType type) {
-        return super.getDegree(type);    //To change body of overridden methods use File | Settings | File Templates.
+        int degree = super.getDegree(type);
+        long removed = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getDeleted(this, type));
+        long added = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getCreated(this, type));
+
+        return degree + (int) removed - (int) added;
     }
 
     /**
@@ -148,7 +156,11 @@ public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Nod
      */
     @Override
     public int getDegree(Direction direction) {
-        return super.getDegree(direction);    //To change body of overridden methods use File | Settings | File Templates.
+        int degree = super.getDegree(direction);
+        long removed = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getDeleted(this, direction));
+        long added = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getCreated(this, direction));
+
+        return degree + (int) removed - (int) added;
     }
 
     /**
@@ -156,6 +168,10 @@ public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Nod
      */
     @Override
     public int getDegree(RelationshipType type, Direction direction) {
-        return super.getDegree(type, direction);    //To change body of overridden methods use File | Settings | File Templates.
+        int degree = super.getDegree(type, direction);
+        long removed = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getDeleted(this, direction, type));
+        long added = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getCreated(this, direction, type));
+
+        return degree + (int) removed - (int) added;
     }
 }

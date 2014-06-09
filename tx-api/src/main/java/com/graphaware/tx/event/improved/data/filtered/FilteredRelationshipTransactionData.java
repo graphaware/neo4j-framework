@@ -67,6 +67,22 @@ public class FilteredRelationshipTransactionData extends FilteredPropertyContain
      * {@inheritDoc}
      */
     @Override
+    public Collection<Relationship> getCreated(Node node, RelationshipType... types) {
+        return filterPropertyContainers(wrapped.getCreated(node, types));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<Relationship> getCreated(Node node, Direction direction, RelationshipType... types) {
+        return filterPropertyContainers(wrapped.getCreated(node, direction, types));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Collection<Relationship> getDeleted(Node node, RelationshipType... types) {
         return filterPropertyContainers(wrapped.getDeleted(node, types));
     }

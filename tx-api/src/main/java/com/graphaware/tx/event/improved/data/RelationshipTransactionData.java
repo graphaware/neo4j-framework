@@ -29,6 +29,26 @@ import java.util.Collection;
 public interface RelationshipTransactionData extends PropertyContainerTransactionData<Relationship> {
 
     /**
+     * Get all relationships for the given node and of the given types, which have been created in the transaction.
+     *
+     * @param node  for which to get created relationships.
+     * @param types of the created relationships. If no types are provided, all types are returned.
+     * @return all created relationships for the given node of the given types.
+     */
+    Collection<Relationship> getCreated(Node node, RelationshipType... types);
+
+    /**
+     * Get all relationships for the given node and of the given directions and types, which have been created in the
+     * transaction.
+     *
+     * @param node      for which to get created relationships.
+     * @param direction of the created relationships
+     * @param types     of the created relationships. If no types are provided, all types are returned.
+     * @return all created relationships for the given node of the given direction and types.
+     */
+    Collection<Relationship> getCreated(Node node, Direction direction, RelationshipType... types);
+
+    /**
      * Get all relationships for the given node and of the given types, which have been deleted in the transaction.
      *
      * @param node  for which to get deleted relationships.

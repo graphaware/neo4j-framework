@@ -20,7 +20,6 @@ import com.graphaware.test.util.TestDataBuilder;
 import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
-import com.graphaware.tx.event.improved.data.lazy.LazyNodeTransactionData;
 import com.graphaware.tx.executor.single.*;
 import org.junit.After;
 import org.junit.Test;
@@ -1552,6 +1551,47 @@ public class LazyTransactionDataComprehensiveTest {
                             return true;
                         }
                     }
+        );
+    }
+
+    @Test
+    public void verifyDegrees() {
+        createTestDatabase();
+        mutateGraph(
+                new BeforeCommitCallback.RememberingAdapter() {
+                    @Override
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Change<Node> changed = changesToMap(td.getAllChangedNodes()).get(1L);
+
+                        Node oneCurrent = changed.getCurrent();
+                        assertEquals(3, oneCurrent.getDegree());
+                        assertEquals(2, oneCurrent.getDegree(OUTGOING));
+                        assertEquals(1, oneCurrent.getDegree(INCOMING));
+                        assertEquals(1, oneCurrent.getDegree(R3));
+                        assertEquals(1, oneCurrent.getDegree(R3, INCOMING));
+                        assertEquals(1, oneCurrent.getDegree(R1));
+                        assertEquals(0, oneCurrent.getDegree(R3, OUTGOING));
+                        assertEquals(0, oneCurrent.getDegree(R4));
+
+                        Node onePrevious = changed.getPrevious();
+                        assertEquals(4, onePrevious.getDegree());
+                        assertEquals(3, onePrevious.getDegree(OUTGOING));
+                        assertEquals(1, onePrevious.getDegree(INCOMING));
+                        assertEquals(2, onePrevious.getDegree(R3));
+                        assertEquals(1, onePrevious.getDegree(R3, INCOMING));
+                        assertEquals(1, onePrevious.getDegree(R3, OUTGOING));
+                        assertEquals(1, onePrevious.getDegree(R1, OUTGOING));
+                        assertEquals(0, onePrevious.getDegree(R1, INCOMING));
+
+                        Node two = td.getDeleted(db.getNodeById(2L));
+                        assertEquals(3, two.getDegree()); //todo loops only count as 1 - emailed Neo if this is a deliberate choice
+                        assertEquals(2, two.getDegree(R2));
+                        assertEquals(1, two.getDegree(R2, INCOMING));
+                        assertEquals(2, two.getDegree(R2, OUTGOING));
+                        assertEquals(2, two.getDegree(INCOMING));
+                        assertEquals(2, two.getDegree(OUTGOING));
+                    }
+                }
         );
     }
 
