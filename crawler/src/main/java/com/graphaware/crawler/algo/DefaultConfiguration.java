@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.graphaware.algo;
+package com.graphaware.crawler.algo;
 
 import com.graphaware.common.strategy.IncludeAllNodes;
 import com.graphaware.common.strategy.IncludeAllRelationships;

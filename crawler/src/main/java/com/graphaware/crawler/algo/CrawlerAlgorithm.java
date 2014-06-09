@@ -1,6 +1,6 @@
 
 
-package com.graphaware.algo;
+package com.graphaware.crawler.algo;
 
 import java.util.concurrent.Callable;
 import org.neo4j.graphdb.Node;

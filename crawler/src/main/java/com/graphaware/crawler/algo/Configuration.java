@@ -4,7 +4,7 @@
  *
  */
 
-package com.graphaware.algo;
+package com.graphaware.crawler.algo;
 
 import com.graphaware.common.strategy.NodeInclusionStrategy;
 import com.graphaware.common.strategy.RelationshipInclusionStrategy;
