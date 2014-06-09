@@ -1129,17 +1129,12 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
                         try {
                             r1.setProperty("irrelevant", "irrelevant");
-                            fail();
+                            return;
                         } catch (IllegalStateException e) {
                             //OK
                         }
 
-                        try {
-                            r1.removeProperty("irrelevant");
-                            fail();
-                        } catch (IllegalStateException e) {
-                            //OK
-                        }
+                        r1.removeProperty("irrelevant");
                     }
                 }
         );
@@ -1158,17 +1153,12 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
                         try {
                             deleted.setProperty("irrelevant", "irrelevant");
-                            fail();
+                            return;
                         } catch (IllegalStateException e) {
                             //OK
                         }
 
-                        try {
-                            deleted.removeProperty("irrelevant");
-                            fail();
-                        } catch (IllegalStateException e) {
-                            //OK
-                        }
+                        deleted.removeProperty("irrelevant");
                     }
                 }
         );
@@ -1185,12 +1175,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
                         Node deleted = deletedNodes.get(2L);
 
-                        try {
-                            deleted.createRelationshipTo(database.getNodeById(3), withName("illegal"));
-                            fail();
-                        } catch (IllegalStateException e) {
-                            //OK
-                        }
+                        deleted.createRelationshipTo(database.getNodeById(3), withName("illegal"));
                     }
                 }
         );

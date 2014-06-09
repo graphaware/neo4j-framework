@@ -140,12 +140,12 @@ public abstract class PropertyContainerSnapshot<T extends PropertyContainer> ext
 
     /**
      * Check whether this property container has not been deleted and can thus be mutated.
-     * In case the container can be mutated, nothing happens. In the opposite case, a message is logged.
-     * There is no need to throw an exception, Neo4j will do that.
+     * In case the container can be mutated, nothing happens. In the opposite case, an {@link IllegalStateException} exception is thrown.
      */
     protected void checkCanBeMutated() {
         if (transactionData().hasBeenDeleted(wrapped)) {
             LOG.error("Deleted property container " + wrapped + " should not be mutated.");
+            throw new IllegalStateException("Deleted property container " + wrapped + " should not be mutated.");
         }
     }
 

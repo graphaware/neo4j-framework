@@ -103,13 +103,27 @@ public final class IterableUtils {
      * @return random element.
      */
     public static <T> T random(Iterable<T> iterable) {
+        return random(iterable, 1).iterator().next();
+    }
+
+    /**
+     * Sample an iterable using reservoir sampling.
+     *
+     * @param iterable        to sample.
+     * @param numberOfSamples to return.
+     * @param <T>             type of elements in the iterable.
+     * @return sampled iterable.
+     */
+    public static <T> Iterable<T> random(Iterable<T> iterable, int numberOfSamples) {
         if (!iterable.iterator().hasNext()) {
             throw new IllegalArgumentException("Empty iterable can't be randomized!");
         }
 
-        List<T> list = toList(iterable);
-        Collections.shuffle(list);
-        return list.get(0);
+        ReservoirSampler<T> sampler = new ReservoirSampler<>(numberOfSamples);
+        for (T item : iterable) {
+            sampler.sample(item);
+        }
+        return sampler.getSamples();
     }
 
     /**
@@ -147,21 +161,8 @@ public final class IterableUtils {
     }
 
     /**
-     * Sample an iterable using reservoir sampling.
-     *
-     * @param iterable        to sample.
-     * @param numberOfSamples to return.
-     * @param <T>             type of elements in the iterable.
-     * @return sampled iterable.
+     * private constructor to prevent instantiation.
      */
-    public static <T> Iterable<T> sample(Iterable<T> iterable, int numberOfSamples) {
-        ReservoirSampler<T> sampler = new ReservoirSampler<>(numberOfSamples);
-        for (T item : iterable) {
-            sampler.sample(item);
-        }
-        return sampler.getSamples();
-    }
-
     private IterableUtils() {
     }
 }

@@ -118,30 +118,30 @@ public class ArrayUtilsTest {
 
     @Test
     public void equalArraysShouldHaveEqualHasCodes() {
-        assertEquals(arrayFriendlyHasCode(new byte[]{1, 2}), arrayFriendlyHasCode(new byte[]{1, 2}));
-        assertEquals(arrayFriendlyHasCode(new char[]{1, 2}), arrayFriendlyHasCode(new char[]{1, 2}));
-        assertEquals(arrayFriendlyHasCode(new boolean[]{true, false}), arrayFriendlyHasCode(new boolean[]{true, false}));
-        assertEquals(arrayFriendlyHasCode(new long[]{1, 2}), arrayFriendlyHasCode(new long[]{1, 2}));
-        assertEquals(arrayFriendlyHasCode(new double[]{1, 2}), arrayFriendlyHasCode(new double[]{1, 2}));
-        assertEquals(arrayFriendlyHasCode(new int[]{1, 2}), arrayFriendlyHasCode(new int[]{1, 2}));
-        assertEquals(arrayFriendlyHasCode(new short[]{1, 2}), arrayFriendlyHasCode(new short[]{1, 2}));
-        assertEquals(arrayFriendlyHasCode(new float[]{1, 2}), arrayFriendlyHasCode(new float[]{1, 2}));
-        assertEquals(arrayFriendlyHasCode(new String[]{"1", "2"}), arrayFriendlyHasCode(new String[]{"1", "2"}));
-        assertEquals(arrayFriendlyHasCode(new Object[]{"1", 2}), arrayFriendlyHasCode(new Object[]{"1", 2}));
-        assertEquals(arrayFriendlyHasCode("2"), arrayFriendlyHasCode("2"));
-        assertEquals(arrayFriendlyHasCode(2), arrayFriendlyHasCode(2));
+        assertEquals(arrayFriendlyHashCode(new byte[]{1, 2}), arrayFriendlyHashCode(new byte[]{1, 2}));
+        assertEquals(arrayFriendlyHashCode(new char[]{1, 2}), arrayFriendlyHashCode(new char[]{1, 2}));
+        assertEquals(arrayFriendlyHashCode(new boolean[]{true, false}), arrayFriendlyHashCode(new boolean[]{true, false}));
+        assertEquals(arrayFriendlyHashCode(new long[]{1, 2}), arrayFriendlyHashCode(new long[]{1, 2}));
+        assertEquals(arrayFriendlyHashCode(new double[]{1, 2}), arrayFriendlyHashCode(new double[]{1, 2}));
+        assertEquals(arrayFriendlyHashCode(new int[]{1, 2}), arrayFriendlyHashCode(new int[]{1, 2}));
+        assertEquals(arrayFriendlyHashCode(new short[]{1, 2}), arrayFriendlyHashCode(new short[]{1, 2}));
+        assertEquals(arrayFriendlyHashCode(new float[]{1, 2}), arrayFriendlyHashCode(new float[]{1, 2}));
+        assertEquals(arrayFriendlyHashCode(new String[]{"1", "2"}), arrayFriendlyHashCode(new String[]{"1", "2"}));
+        assertEquals(arrayFriendlyHashCode(new Object[]{"1", 2}), arrayFriendlyHashCode(new Object[]{"1", 2}));
+        assertEquals(arrayFriendlyHashCode("2"), arrayFriendlyHashCode("2"));
+        assertEquals(arrayFriendlyHashCode(2), arrayFriendlyHashCode(2));
 
-        assertNotSame(arrayFriendlyHasCode(new byte[]{1, 3}), arrayFriendlyHasCode(new byte[]{1, 2}));
-        assertNotSame(arrayFriendlyHasCode(new char[]{1, 3}), arrayFriendlyHasCode(new char[]{1, 2}));
-        assertNotSame(arrayFriendlyHasCode(new boolean[]{false, false}), arrayFriendlyHasCode(new boolean[]{true, false}));
-        assertNotSame(arrayFriendlyHasCode(new long[]{1, 2}), arrayFriendlyHasCode(new int[]{1, 2}));
-        assertNotSame(arrayFriendlyHasCode(new double[]{1, 2}), arrayFriendlyHasCode(new float[]{1, 2}));
-        assertNotSame(arrayFriendlyHasCode(new int[]{1, 2}), arrayFriendlyHasCode(new byte[]{1, 2}));
-        assertNotSame(arrayFriendlyHasCode(new int[]{1, 2}), arrayFriendlyHasCode(new short[]{1, 2}));
-        assertNotSame(arrayFriendlyHasCode(new float[]{1, 2}), arrayFriendlyHasCode(new Float[]{new Float(1.0), new Float(2.0)}));
-        assertNotSame(arrayFriendlyHasCode(new Object[]{"1", "2"}), arrayFriendlyHasCode(new Object[]{"1", 2}));
-        assertNotSame(arrayFriendlyHasCode("2"), arrayFriendlyHasCode("3"));
-        assertNotSame(arrayFriendlyHasCode(2), arrayFriendlyHasCode(3));
+        assertNotSame(arrayFriendlyHashCode(new byte[]{1, 3}), arrayFriendlyHashCode(new byte[]{1, 2}));
+        assertNotSame(arrayFriendlyHashCode(new char[]{1, 3}), arrayFriendlyHashCode(new char[]{1, 2}));
+        assertNotSame(arrayFriendlyHashCode(new boolean[]{false, false}), arrayFriendlyHashCode(new boolean[]{true, false}));
+        assertNotSame(arrayFriendlyHashCode(new long[]{1, 2}), arrayFriendlyHashCode(new int[]{1, 2}));
+        assertNotSame(arrayFriendlyHashCode(new double[]{1, 2}), arrayFriendlyHashCode(new float[]{1, 2}));
+        assertNotSame(arrayFriendlyHashCode(new int[]{1, 2}), arrayFriendlyHashCode(new byte[]{1, 2}));
+        assertNotSame(arrayFriendlyHashCode(new int[]{1, 2}), arrayFriendlyHashCode(new short[]{1, 2}));
+        assertNotSame(arrayFriendlyHashCode(new float[]{1, 2}), arrayFriendlyHashCode(new Float[]{new Float(1.0), new Float(2.0)}));
+        assertNotSame(arrayFriendlyHashCode(new Object[]{"1", "2"}), arrayFriendlyHashCode(new Object[]{"1", 2}));
+        assertNotSame(arrayFriendlyHashCode("2"), arrayFriendlyHashCode("3"));
+        assertNotSame(arrayFriendlyHashCode(2), arrayFriendlyHashCode(3));
     }
 
     @Test

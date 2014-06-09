@@ -16,11 +16,56 @@
 
 package com.graphaware.tx.event.improved.data;
 
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * {@link PropertyContainerTransactionData} for {@link org.neo4j.graphdb.Node}s.
  */
 public interface NodeTransactionData extends PropertyContainerTransactionData<Node> {
 
+    /**
+     * Check whether a label has been assigned in the transaction.
+     *
+     * @param node  to check.
+     * @param label to check.
+     * @return true iff the node has been assigned.
+     */
+    boolean hasLabelBeenAssigned(Node node, Label label);
+
+    /**
+     * Get labels assigned in the transaction.
+     *
+     * @param node for which to get assigned labels.
+     * @return read-only labels created for the given node.
+     */
+    Set<Label> assignedLabels(Node node);
+
+    /**
+     * Check whether a label has been removed in the transaction.
+     *
+     * @param node  to check.
+     * @param label to check.
+     * @return true iff the label has been removed.
+     */
+    boolean hasLabelBeenRemoved(Node node, Label label);
+
+    /**
+     * Get labels removed in the transaction.
+     *
+     * @param node for which to get removed labels.
+     * @return read-only labels removed for the given node.
+     */
+    Set<Label> removedLabels(Node node);
+
+    /**
+     * Get labels of a deleted node.
+     *
+     * @param node deleted node.
+     * @return read-only labels of the deleted node.
+     */
+    Set<Label> labelsOfDeletedNode(Node node);
 }

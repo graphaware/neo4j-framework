@@ -16,14 +16,13 @@
 
 package com.graphaware.tx.event.improved.propertycontainer.snapshot;
 
+import com.graphaware.common.util.IterableUtils;
 import com.graphaware.common.wrapper.NodeWrapper;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.apache.log4j.Logger;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.*;
+import org.neo4j.helpers.collection.IterableWrapper;
 
 /**
  * A {@link PropertyContainerSnapshot} representing a {@link org.neo4j.graphdb.Node}.
@@ -92,5 +91,87 @@ public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Nod
     @Override
     protected Iterable<Relationship> wrapRelationships(Iterable<Relationship> relationships, Direction direction, RelationshipType... relationshipTypes) {
         return new RelationshipSnapshotIterator(this, relationships, transactionDataContainer, direction, relationshipTypes);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasLabel(Label label) {
+        return IterableUtils.contains(getLabels(), label);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterable<Label> getLabels() {
+        return new LabelSnapshotIterator(this, super.getLabels(), transactionDataContainer);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addLabel(Label label) {
+        checkCanBeMutated();
+        super.addLabel(label);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeLabel(Label label) {
+        checkCanBeMutated();
+        super.removeLabel(label);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getDegree() {
+        int degree = super.getDegree();
+        long removed = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getDeleted(this));
+        long added = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getCreated(this));
+
+        return degree + (int) removed - (int) added;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getDegree(RelationshipType type) {
+        int degree = super.getDegree(type);
+        long removed = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getDeleted(this, type));
+        long added = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getCreated(this, type));
+
+        return degree + (int) removed - (int) added;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getDegree(Direction direction) {
+        int degree = super.getDegree(direction);
+        long removed = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getDeleted(this, direction));
+        long added = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getCreated(this, direction));
+
+        return degree + (int) removed - (int) added;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getDegree(RelationshipType type, Direction direction) {
+        int degree = super.getDegree(type, direction);
+        long removed = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getDeleted(this, direction, type));
+        long added = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getCreated(this, direction, type));
+
+        return degree + (int) removed - (int) added;
     }
 }

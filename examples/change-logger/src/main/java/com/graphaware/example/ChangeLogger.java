@@ -47,28 +47,8 @@ public class ChangeLogger extends TransactionEventHandler.Adapter<Void> {
     }
 
     private void logChanges(ImprovedTransactionData improvedData) {
-        for (Node createdNode : improvedData.getAllCreatedNodes()) {
-            System.out.println("Created node " + nodeToString(createdNode));
-        }
-
-        for (Node deletedNode : improvedData.getAllDeletedNodes()) {
-            System.out.println("Deleted node " + nodeToString(deletedNode));
-        }
-
-        for (Change<Node> changedNode : improvedData.getAllChangedNodes()) {
-            System.out.println("Changed node "+nodeToString(changedNode.getPrevious())+" to "+nodeToString(changedNode.getCurrent()));
-        }
-
-        for (Relationship createdRelationship : improvedData.getAllCreatedRelationships()) {
-            System.out.println("Created relationship " + relationshipToString(createdRelationship));
-        }
-
-        for (Relationship deletedRelationship : improvedData.getAllDeletedRelationships()) {
-            System.out.println("Deleted relationship " + relationshipToString(deletedRelationship));
-        }
-
-        for (Change<Relationship> changedRelationship : improvedData.getAllChangedRelationships()) {
-            System.out.println("Changed relationship " + relationshipToString(changedRelationship.getPrevious()) + " to " + relationshipToString(changedRelationship.getCurrent()));
+        for (String change : improvedData.mutationsToStrings()) {
+            System.out.println(change);
         }
     }
 }

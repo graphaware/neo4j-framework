@@ -168,7 +168,7 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
     @Override
     public boolean hasBeenChanged(T container) {
         initializeChanged();
-        return changed.containsKey(id(container));
+        return changedContainsKey(container);
     }
 
     /**
@@ -194,7 +194,7 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
         return Collections.unmodifiableCollection(changed.values());
     }
 
-    private void initializeChanged() {
+    protected void initializeChanged() {
         initializeCreated();
         initializeDeleted();
 
@@ -207,12 +207,35 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
                 }
 
                 T candidate = propertyEntry.entity();
-                if (!hasBeenCreated(candidate) && !changed.containsKey(id(candidate))) {
-                    Change<T> change = new Change<>(oldSnapshot(candidate), newSnapshot(candidate));
-                    changed.put(id(candidate), change);
+                if (!hasBeenCreated(candidate)) {
+                    registerChange(candidate);
                 }
             }
+
+            for (PropertyEntry<T> propertyEntry : removedProperties()) {
+                T candidate = propertyEntry.entity();
+                if (!hasBeenDeleted(candidate)) {
+                    registerChange(candidate);
+                }
+            }
+
+            doInitializeChanged();
         }
+    }
+
+    protected void doInitializeChanged() {
+        //for subclasses
+    }
+
+    protected void registerChange(T candidate) {
+        if (!changedContainsKey(candidate)) {
+            Change<T> change = new Change<>(oldSnapshot(candidate), newSnapshot(candidate));
+            changed.put(id(candidate), change);
+        }
+    }
+
+    protected boolean changedContainsKey(T candidate) {
+        return changed.containsKey(id(candidate));
     }
 
     /**
@@ -313,8 +336,8 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
         initializeProperties();
 
         if (!hasBeenDeleted(container)) {
-            LOG.warn(container + " has not been deleted but the caller thinks it has!");
-            return Collections.emptyMap();
+            LOG.error(container + " has not been deleted but the caller thinks it has! This is a bug.");
+            throw new IllegalStateException(container + " has not been deleted but the caller thinks it has! This is a bug.");
         }
 
         if (!deletedContainersProperties.containsKey(id(container))) {
@@ -415,11 +438,11 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
                 continue;
             }
 
-            if (!changed.containsKey(id(container))) {
-                System.out.println("trouble");
+            if (!changedContainsKey(container)) {
+                throw new IllegalStateException(container + " seems to have not been deleted or changed, this is a bug");
             }
 
-            assert changed.containsKey(id(container));
+            assert changedContainsKey(container);
 
             if (!deletedProperties.containsKey(id(container))) {
                 deletedProperties.put(id(container), new HashMap<String, Object>());

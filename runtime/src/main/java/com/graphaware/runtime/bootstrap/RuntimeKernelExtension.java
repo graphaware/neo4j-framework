@@ -57,13 +57,15 @@ import static org.neo4j.helpers.Settings.*;
  * "com.graphaware.module.X.A = B", where X is the module ID, A is the configuration key, and B is the configuration value.
  * <p/>
  * For instance, if you develop a {@link com.graphaware.runtime.GraphAwareRuntimeModule} that is bootstrapped by
- * com.mycompany.mymodule.MyBootstrapper and want to register it as the first module of the runtime with MyModuleID as
+ * <code>com.mycompany.mymodule.MyBootstrapper</code> and want to register it as the first module of the runtime with MyModuleID as
  * the module ID, with an extra configuration called "threshold" equal to 20, then there should be the two following
  * configuration entries passed to the database:
  * <p/>
+ * <pre>
  * com.graphaware.runtime.enabled=true
  * com.graphaware.module.MyModuleID.1=com.mycompany.mymodule.MyBootstrapper
  * com.graphaware.module.MyModuleID.threshold=20
+ * </pre>
  *
  * @see GraphAwareRuntimeModuleBootstrapper
  */

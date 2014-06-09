@@ -24,9 +24,7 @@ import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
 import org.parboiled.common.StringUtils;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.graphaware.common.util.ArrayUtils.isPrimitiveOrStringArray;
 import static com.graphaware.common.util.ArrayUtils.primitiveOrStringArrayToString;
@@ -70,6 +68,23 @@ public final class PropertyContainerUtils {
         }
 
         throw new IllegalStateException("Unknown Property Container: " + propertyContainer.getClass().getName());
+    }
+
+    /**
+     * Get IDs from an {@link Iterable} of {@link org.neo4j.graphdb.PropertyContainer}s.
+     *
+     * @param propertyContainers to get ID from. Must be an {@link Iterable} of {@link org.neo4j.graphdb.Node}s or {@link org.neo4j.graphdb.Relationship}s.
+     * @return IDs
+     * @throws IllegalStateException in case one of the propertyContainers is not a {@link org.neo4j.graphdb.Node} or a {@link org.neo4j.graphdb.Relationship}.
+     */
+    public static Long[] ids(Iterable<? extends PropertyContainer> propertyContainers) {
+        List<Long> result = new LinkedList<>();
+
+        for (PropertyContainer pc : propertyContainers) {
+            result.add(id(pc));
+        }
+
+        return result.toArray(new Long[result.size()]);
     }
 
     /**
@@ -137,18 +152,28 @@ public final class PropertyContainerUtils {
         return result;
     }
 
+    /**
+     * Convert a {@link Node} to a human-readable String.
+     *
+     * @param node to convert.
+     * @return node as String.
+     */
     public static String nodeToString(Node node) {
         StringBuilder string = new StringBuilder("(");
 
-        boolean hasLabels = false;
+        List<String> labelNames = new LinkedList<>();
         for (Label label : node.getLabels()) {
-            hasLabels = true;
-            string.append(":").append(label.name());
+            labelNames.add(label.name());
+        }
+        Collections.sort(labelNames);
+
+        for (String labelName : labelNames) {
+            string.append(":").append(labelName);
         }
 
         String props = propertiesToString(node);
 
-        if (StringUtils.isNotEmpty(props) && hasLabels) {
+        if (StringUtils.isNotEmpty(props) && !labelNames.isEmpty()) {
             string.append(" ");
         }
 
@@ -159,6 +184,12 @@ public final class PropertyContainerUtils {
         return string.toString();
     }
 
+    /**
+     * Convert a {@link Relationship} to a human-readable String.
+     *
+     * @param relationship to convert.
+     * @return relationship as String.
+     */
     public static String relationshipToString(Relationship relationship) {
         StringBuilder string = new StringBuilder();
 
@@ -175,6 +206,12 @@ public final class PropertyContainerUtils {
         return string.toString();
     }
 
+    /**
+     * Convert a {@link PropertyContainer} to a human-readable String.
+     *
+     * @param propertyContainer to convert.
+     * @return propertyContainer as String.
+     */
     public static String propertiesToString(PropertyContainer propertyContainer) {
         if (!propertyContainer.getPropertyKeys().iterator().hasNext()) {
             return "";
@@ -182,8 +219,14 @@ public final class PropertyContainerUtils {
 
         StringBuilder string = new StringBuilder("{");
 
-        boolean first = true;
+        List<String> propertyKeys = new LinkedList<>();
         for (String key : propertyContainer.getPropertyKeys()) {
+            propertyKeys.add(key);
+        }
+        Collections.sort(propertyKeys);
+
+        boolean first = true;
+        for (String key : propertyKeys) {
             if (!first) {
                 string.append(", ");
             }

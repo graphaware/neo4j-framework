@@ -104,6 +104,22 @@ public class LazyRelationshipTransactionData extends LazyPropertyContainerTransa
      * {@inheritDoc}
      */
     @Override
+    public Collection<Relationship> getCreated(Node node, RelationshipType... types) {
+        return getCreated(node, BOTH, types);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<Relationship> getCreated(Node node, Direction direction, RelationshipType... types) {
+        return filterRelationships(getAllCreated(), node, direction, types);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Collection<Relationship> getDeleted(Node node, RelationshipType... types) {
         return getDeleted(node, BOTH, types);
     }
@@ -113,17 +129,29 @@ public class LazyRelationshipTransactionData extends LazyPropertyContainerTransa
      */
     @Override
     public Collection<Relationship> getDeleted(Node node, Direction direction, RelationshipType... types) {
+        return filterRelationships(getAllDeleted(), node, direction, types);
+    }
+
+    /**
+     * Filter relationships based on type and direction.
+     *
+     * @param node      whose point of view we're looking.
+     * @param direction of the relationships to be incuded.
+     * @param types     of the relationships to be included.
+     * @return filtered relationships.
+     */
+    private Collection<Relationship> filterRelationships(Iterable<Relationship> relationships, Node node, Direction direction, RelationshipType[] types) {
         Set<String> typeNames = new HashSet<>();
         for (RelationshipType type : types) {
             typeNames.add(type.name());
         }
 
         Set<Relationship> result = new HashSet<>();
-        for (Relationship deleted : getAllDeleted()) {
-            if ((typeNames.isEmpty() || typeNames.contains(deleted.getType().name())) &&
-                    ((deleted.getStartNode().getId() == node.getId() && matches(deleted, deleted.getStartNode(), direction))
-                            || (deleted.getEndNode().getId() == node.getId() && matches(deleted, deleted.getEndNode(), direction)))) {
-                result.add(deleted);
+        for (Relationship r : relationships) {
+            if ((typeNames.isEmpty() || typeNames.contains(r.getType().name())) &&
+                    ((r.getStartNode().getId() == node.getId() && matches(r, r.getStartNode(), direction))
+                            || (r.getEndNode().getId() == node.getId() && matches(r, r.getEndNode(), direction)))) {
+                result.add(r);
             }
         }
 

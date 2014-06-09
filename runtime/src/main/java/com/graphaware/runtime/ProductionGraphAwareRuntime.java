@@ -17,6 +17,7 @@
 package com.graphaware.runtime;
 
 import com.graphaware.common.serialize.Serializer;
+
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -170,6 +171,8 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
         private final Iterator<Node> nodes;
 
         private RootNodeIterator(GraphDatabaseService database) {
+            //this is deliberately using the deprecated API
+            //noinspection deprecation
             nodes = database.getAllNodes().iterator();
         }
 

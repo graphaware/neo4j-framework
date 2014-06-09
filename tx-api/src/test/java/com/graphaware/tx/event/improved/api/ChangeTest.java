@@ -9,11 +9,12 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import java.util.Collections;
 import java.util.Map;
 
 import static com.graphaware.tx.event.improved.api.Change.changesToMap;
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  *  Unit test for {@link Change}.
@@ -45,6 +46,28 @@ public class ChangeTest {
             assertEquals(0, changeMap.get(0L).getCurrent().getId());
             assertEquals(0, changeMap.get(0L).getPrevious().getId());
             assertEquals(1, changeMap.size());
+        }
+    }
+
+    @Test
+    public void equalChangesShouldBeEqual() {
+        try (Transaction tx = database.beginTx()) {
+            Change<Node> nodeChange1 = new Change<>(database.getNodeById(0), database.getNodeById(0));
+            Change<Node> nodeChange2 = new Change<>(database.getNodeById(0), database.getNodeById(0));
+            Change<Node> nodeChange3 = new Change<>(database.getNodeById(1), database.getNodeById(1));
+
+            assertTrue(nodeChange1.equals(nodeChange2));
+            assertTrue(nodeChange2.equals(nodeChange1));
+            assertFalse(nodeChange3.equals(nodeChange1));
+            assertFalse(nodeChange1.equals(nodeChange3));
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void invalidChangeShouldThrowException() {
+        try (Transaction tx = database.beginTx()) {
+            Change<Node> nodeChange1 = new Change<>(database.getNodeById(0), database.getNodeById(1));
+            changesToMap(Collections.singleton(nodeChange1));
         }
     }
 }

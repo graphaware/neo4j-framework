@@ -27,10 +27,6 @@ import org.neo4j.server.web.WebServer;
  */
 public class GraphAwareCommunityNeoServer extends CommunityNeoServer {
 
-    public GraphAwareCommunityNeoServer(Logging logging) {
-        super(logging);
-    }
-
     public GraphAwareCommunityNeoServer(Configurator configurator, Logging logging) {
         super(configurator, logging);
     }

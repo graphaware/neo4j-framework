@@ -153,6 +153,41 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
     }
 
     /**
+     * @see {@link org.neo4j.graphdb.Node#getRelationshipTypes()}.
+     */
+    public Iterable<RelationshipType> getRelationshipTypes() {
+        return getWrappedNode().getRelationshipTypes();
+    }
+
+    /**
+     * @see {@link org.neo4j.graphdb.Node#getDegree()}.
+     */
+    public int getDegree() {
+        return getWrappedNode().getDegree();
+    }
+
+    /**
+     * @see {@link org.neo4j.graphdb.Node#getDegree(org.neo4j.graphdb.RelationshipType)}.
+     */
+    public int getDegree(RelationshipType type) {
+        return getWrappedNode().getDegree(type);
+    }
+
+    /**
+     * @see {@link org.neo4j.graphdb.Node#getDegree(org.neo4j.graphdb.Direction)}.
+     */
+    public int getDegree(Direction direction) {
+        return getWrappedNode().getDegree(direction);
+    }
+
+    /**
+     * @see {@link org.neo4j.graphdb.Node#getDegree(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction)}.
+     */
+    public int getDegree(RelationshipType type, Direction direction) {
+        return getWrappedNode().getDegree(type, direction);
+    }
+
+    /**
      * @see {@link org.neo4j.graphdb.Relationship#getType()}.
      */
     public RelationshipType getType() {
