@@ -1,10 +1,10 @@
 package com.graphaware.crawler.internal;
 
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-
 import com.graphaware.common.strategy.InclusionStrategy;
 import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 /**
  * Perpetually crawls the entire graph, picking out certain parts of it for special attention as discerned by its
@@ -24,7 +24,7 @@ public interface PerpetualGraphCrawler {
 	 *        node filtering is not required
 	 */
 	void setNodeInclusionStrategy(InclusionStrategy<? super Node> nodeInclusionStrategy);
-
+        void setRelationshipInclusionStrategy(InclusionStrategy<Relationship> relInclusionStrategy);
 	// TODO: Javadoc when you think of a remotely decent name for this method and its parameter type!
 	void addInclusionHandler(ThingThatGetsCalledWhenWeFindSomething inclusionHandler);
 

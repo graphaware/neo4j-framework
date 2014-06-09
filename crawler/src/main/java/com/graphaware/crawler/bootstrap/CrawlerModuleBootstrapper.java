@@ -5,6 +5,7 @@ import java.util.Map;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import com.graphaware.common.strategy.IncludeAllNodes;
+import com.graphaware.common.strategy.IncludeAllRelationships;
 import com.graphaware.crawler.CrawlerRuntimeModule;
 import com.graphaware.crawler.api.Context;
 import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
@@ -19,7 +20,10 @@ public class CrawlerModuleBootstrapper implements GraphAwareRuntimeModuleBootstr
 
 	@Override
 	public GraphAwareRuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
-		return new CrawlerRuntimeModule(moduleId, IncludeAllNodes.getInstance(), new ThingThatGetsCalledWhenWeFindSomething() {
+		return new CrawlerRuntimeModule(moduleId, 
+                                                IncludeAllNodes.getInstance(),  
+                                                IncludeAllRelationships.getInstance(), 
+                                                new ThingThatGetsCalledWhenWeFindSomething() {
 			@Override
 			public void doSomeStuff(Context context) {
 				throw new UnsupportedOperationException("atg hasn't written this method yet");

@@ -82,4 +82,9 @@ public class SimpleRecursiveGraphCrawler implements PerpetualGraphCrawler {
 		LOG.debug(sb.toString());
 	}
 
+    @Override
+    public void setRelationshipInclusionStrategy(InclusionStrategy<Relationship> relInclusionStrategy) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

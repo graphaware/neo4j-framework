@@ -2,8 +2,6 @@ package com.graphaware.example.module;
 
 import static com.graphaware.common.util.IterableUtils.getSingle;
 
-import java.lang.Exception;
-import java.util.Iterator;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
