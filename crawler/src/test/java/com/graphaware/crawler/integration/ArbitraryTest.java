@@ -1,6 +1,7 @@
 package com.graphaware.crawler.integration;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,13 +22,15 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.Pair;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import com.graphaware.common.strategy.IncludeAllRelationships;
 import com.graphaware.common.strategy.NodeInclusionStrategy;
+import com.graphaware.crawler.CrawlerModuleConfiguration;
 import com.graphaware.crawler.CrawlerRuntimeModule;
+import com.graphaware.crawler.CustomCrawlerModuleConfiguration;
 import com.graphaware.crawler.api.Context;
 import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
+import com.graphaware.crawler.internal.SimpleRecursiveGraphCrawler;
 import com.graphaware.runtime.ProductionGraphAwareRuntime;
-import com.graphaware.runtime.config.MinimalRuntimeModuleConfiguration;
-import com.graphaware.runtime.config.RuntimeModuleConfiguration;
 
 /**
  * This is a just playground, in truth. It won't be here for very long.
@@ -47,8 +50,7 @@ public class ArbitraryTest {
 	@Test
 	public void shouldBeAbleToCrawlAnArbitraryGraph() {
 		@SuppressWarnings("serial")
-		List<Pair<String, String>> folks;
-                folks = new LinkedList<Pair<String, String>>() {
+		List<Pair<String, String>> folks = new LinkedList<Pair<String, String>>() {
                 {
                     add(Pair.of("Jeff", "Chris"));
                     add(Pair.of("Jeff", "Paul"));
@@ -117,15 +119,14 @@ public class ArbitraryTest {
 
 		ProductionGraphAwareRuntime graphAwareRuntime = new ProductionGraphAwareRuntime(this.database);
 		this.database.registerKernelEventHandler(graphAwareRuntime);
-		RuntimeModuleConfiguration runtimeModuleConfiguration = new MinimalRuntimeModuleConfiguration()
-				.with(nodeInclusionStrategy);
+		CrawlerModuleConfiguration runtimeModuleConfiguration = new CustomCrawlerModuleConfiguration(nodeInclusionStrategy,
+				IncludeAllRelationships.getInstance(), new SimpleRecursiveGraphCrawler());
 		graphAwareRuntime.registerModule(new CrawlerRuntimeModule("TestingCrawler", runtimeModuleConfiguration, findBigBossesHandler));
 		graphAwareRuntime.start();
 
-		// FIXME: this is failing with proper implementation
-//		assertFalse("The collection of names shouldn't be empty", namesOfBigBosses.isEmpty());
-//		Collections.sort(namesOfBigBosses);
-//		assertEquals("The resultant collection wasn't returned", Arrays.asList("Gary", "Jeff", "John"), namesOfBigBosses);
+		assertFalse("The collection of names shouldn't be empty", namesOfBigBosses.isEmpty());
+		Collections.sort(namesOfBigBosses);
+		assertEquals("The resultant collection wasn't returned", Arrays.asList("Gary", "Jeff", "John"), namesOfBigBosses);
 	}
 
 	// TODO: this sort of thing should be part of GraphUnit, I reckon

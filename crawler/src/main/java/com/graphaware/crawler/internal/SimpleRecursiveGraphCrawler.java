@@ -25,8 +25,8 @@ public class SimpleRecursiveGraphCrawler implements PerpetualGraphCrawler {
 	private static final Logger LOG = Logger.getLogger(SimpleRecursiveGraphCrawler.class);
 
 	private InclusionStrategy<? super Node> nodeInclusionStrategy;
-	private ThingThatGetsCalledWhenWeFindSomething handler;
 	private InclusionStrategy<? super Relationship> relationshipInclusionStrategy;
+	private ThingThatGetsCalledWhenWeFindSomething handler;
 
 	@Override
 	public void setNodeInclusionStrategy(InclusionStrategy<? super Node> nodeInclusionStrategy) {
@@ -52,6 +52,11 @@ public class SimpleRecursiveGraphCrawler implements PerpetualGraphCrawler {
 			this.relationshipInclusionStrategy = IncludeAllRelationships.getInstance();
 		}
 
+		/* I reckon we will have to start a new transaction for each iteration of the algorithm, otherwise we won't
+		 * be able to pick up changes to the graph, assuming transactions worth the way I think they work, that is.
+		 *
+		 * Probably need to do a bit of research on Neo4j transaction properties...
+		 */
 		try (Transaction transaction = databaseService.beginTx()) {
 			Node arbitraryStartNode = GlobalGraphOperations.at(databaseService).getAllNodes().iterator().next();
 			// TODO: actually make this crawl perpetually

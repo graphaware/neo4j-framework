@@ -1,11 +1,8 @@
 package com.graphaware.crawler.integration;
 
-import com.graphaware.common.strategy.NodeInclusionStrategy;
-import com.graphaware.common.strategy.RelationshipInclusionStrategy;
-import com.graphaware.crawler.CrawlerRuntimeModule;
-import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicLabel;
@@ -19,6 +16,14 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.Pair;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import com.graphaware.common.strategy.NodeInclusionStrategy;
+import com.graphaware.common.strategy.RelationshipInclusionStrategy;
+import com.graphaware.crawler.CrawlerModuleConfiguration;
+import com.graphaware.crawler.CrawlerRuntimeModule;
+import com.graphaware.crawler.CustomCrawlerModuleConfiguration;
+import com.graphaware.crawler.internal.NeoRankCrawler;
+import com.graphaware.runtime.ProductionGraphAwareRuntime;
+
 /**
  * This is a just playground, in truth. It won't be here for very long.
  */
@@ -26,16 +31,13 @@ public class NeoRankTest {
 
 	private GraphDatabaseService database;
 
-	/**
-	 * Sets the up ;)
-	 */
 	@Before
 	public void setUp() {
 		this.database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 	}
 
 	@Test
-	public void shouldBeAbleToCrawlAnArbitraryGraph() {
+	public void shouldRenameThisTestToDescribeWhatItDoes() {
 		@SuppressWarnings("serial")
 		List<Pair<String, String>> folks = new LinkedList<Pair<String, String>>() {
 			{
@@ -65,9 +67,6 @@ public class NeoRankTest {
 			transaction.success();
 		}
 
-		// so, now we have a graph, we can set up a crawler to find big bosses (i.e., who's got no incoming BOSS_OF relationship)
-		
-
 		// this is serving the same purpose as the MATCH part of a cypher query, but is applied at each step of the graph walk
 		NodeInclusionStrategy nodeInclusionStrategy = new NodeInclusionStrategy() {
 			@Override
@@ -76,24 +75,20 @@ public class NeoRankTest {
 				return object.hasLabel(DynamicLabel.label("Person"));
 			}
 		};
-                
-                /* Adam: Any suggestions on how to extend the framework, so it
-                         also includes the relationship types? 
-                */
-                RelationshipInclusionStrategy relInclusionStrategy = new RelationshipInclusionStrategy() {
-                    @Override
-                    public boolean include(Relationship object) {
-                        return true;
-                    }
-                };
+
+		RelationshipInclusionStrategy relInclusionStrategy = new RelationshipInclusionStrategy() {
+			@Override
+			public boolean include(Relationship object) {
+				return true;
+			}
+		};
+
+		CrawlerModuleConfiguration runtimeModuleConfiguration = new CustomCrawlerModuleConfiguration(
+				nodeInclusionStrategy, relInclusionStrategy, new NeoRankCrawler());
 
 		ProductionGraphAwareRuntime graphAwareRuntime = new ProductionGraphAwareRuntime(this.database);
 		this.database.registerKernelEventHandler(graphAwareRuntime);
-		graphAwareRuntime.registerModule(new CrawlerRuntimeModule("TestingCrawler", nodeInclusionStrategy, relInclusionStrategy));
-                
-		//assertFalse("The collection of names shouldn't be empty", namesOfBigBosses.isEmpty());
-		//Collections.sort(namesOfBigBosses);
-		//assertEquals("The resultant collection wasn't returned", Arrays.asList("Gary", "Jeff", "John"), namesOfBigBosses);
+		graphAwareRuntime.registerModule(new CrawlerRuntimeModule("TestingCrawler", runtimeModuleConfiguration, null));
 	}
 
 	// TODO: this sort of thing should be part of GraphUnit, I reckon
