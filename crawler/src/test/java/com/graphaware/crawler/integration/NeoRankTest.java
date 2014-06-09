@@ -9,7 +9,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
