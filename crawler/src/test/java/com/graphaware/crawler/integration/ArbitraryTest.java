@@ -27,6 +27,8 @@ import com.graphaware.crawler.CrawlerRuntimeModule;
 import com.graphaware.crawler.api.Context;
 import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
 import com.graphaware.runtime.ProductionGraphAwareRuntime;
+import com.graphaware.runtime.config.MinimalRuntimeModuleConfiguration;
+import com.graphaware.runtime.config.RuntimeModuleConfiguration;
 
 /**
  * This is a just playground, in truth. It won't be here for very long.
@@ -115,7 +117,9 @@ public class ArbitraryTest {
 
 		ProductionGraphAwareRuntime graphAwareRuntime = new ProductionGraphAwareRuntime(this.database);
 		this.database.registerKernelEventHandler(graphAwareRuntime);
-		graphAwareRuntime.registerModule(new CrawlerRuntimeModule("TestingCrawler", nodeInclusionStrategy, findBigBossesHandler));
+		RuntimeModuleConfiguration runtimeModuleConfiguration = new MinimalRuntimeModuleConfiguration()
+				.with(nodeInclusionStrategy);
+		graphAwareRuntime.registerModule(new CrawlerRuntimeModule("TestingCrawler", runtimeModuleConfiguration, findBigBossesHandler));
 		graphAwareRuntime.start();
 
 		assertFalse("The collection of names shouldn't be empty", namesOfBigBosses.isEmpty());

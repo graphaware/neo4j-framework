@@ -2,12 +2,14 @@ package com.graphaware.crawler;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 import com.graphaware.common.strategy.InclusionStrategy;
 import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
 import com.graphaware.crawler.internal.PerpetualGraphCrawler;
 import com.graphaware.crawler.internal.SimpleRecursiveGraphCrawler;
 import com.graphaware.runtime.BaseGraphAwareRuntimeModule;
+import com.graphaware.runtime.config.RuntimeModuleConfiguration;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 
 /**
@@ -17,19 +19,39 @@ import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 public class CrawlerRuntimeModule extends BaseGraphAwareRuntimeModule {
 
 	private final InclusionStrategy<Node> nodeInclusionStrategy;
+	private final InclusionStrategy<Relationship> relationshipInclusionStrategy;
 	private final ThingThatGetsCalledWhenWeFindSomething inclusionHandler;
 
 	/**
 	 * Constructs a new {@link CrawlerRuntimeModule} identified by the given argument.
 	 *
+	 * @deprecated The configuration object is better-suited for this so use
 	 * @param moduleId The ID by which to uniquely identify this module
 	 * @param nodeInclusionStrategy The {@link InclusionStrategy} to use for discerning whether we care about a particular node
+	 * @param relationshipInclusionStrategy The {@link InclusionStrategy} to use for discerning whether or not to follow a
+	 *        particular relationship when crawling the graph
 	 * @param inclusionHandler The {@link ThingThatGetsCalledWhenWeFindSomething}
 	 */
+	@Deprecated
 	public CrawlerRuntimeModule(String moduleId, InclusionStrategy<Node> nodeInclusionStrategy,
-			ThingThatGetsCalledWhenWeFindSomething inclusionHandler) {
+			InclusionStrategy<Relationship> relationshipInclusionStrategy, ThingThatGetsCalledWhenWeFindSomething inclusionHandler) {
 		super(moduleId);
 		this.nodeInclusionStrategy = nodeInclusionStrategy;
+		this.relationshipInclusionStrategy = relationshipInclusionStrategy;
+		this.inclusionHandler = inclusionHandler;
+	}
+
+	/**
+	 * Constructs a new {@link CrawlerRuntimeModule} based on the given arguments.
+	 *
+	 * @param moduleId The ID by which to uniquely identify this module
+	 * @param configuration The {@link RuntimeModuleConfiguration} containing the inclusion strategies for configuring the crawler algorithm
+	 * @param inclusionHandler The {@link ThingThatGetsCalledWhenWeFindSomething}
+	 */
+	public CrawlerRuntimeModule(String moduleId, RuntimeModuleConfiguration configuration, ThingThatGetsCalledWhenWeFindSomething inclusionHandler) {
+		super(moduleId);
+		this.nodeInclusionStrategy = configuration.getInclusionStrategies().getNodeInclusionStrategy();
+		this.relationshipInclusionStrategy = configuration.getInclusionStrategies().getRelationshipInclusionStrategy();
 		this.inclusionHandler = inclusionHandler;
 	}
 
@@ -48,6 +70,7 @@ public class CrawlerRuntimeModule extends BaseGraphAwareRuntimeModule {
 		 */
 		PerpetualGraphCrawler crawler = new SimpleRecursiveGraphCrawler();
 		crawler.setNodeInclusionStrategy(this.nodeInclusionStrategy);
+		crawler.setRelationshipInclusionStrategy(this.relationshipInclusionStrategy);
 		crawler.addInclusionHandler(this.inclusionHandler);
 		crawler.startCrawling(database);
 	}
