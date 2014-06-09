@@ -11,6 +11,7 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import com.graphaware.common.strategy.IncludeAllNodes;
+import com.graphaware.common.strategy.IncludeAllRelationships;
 import com.graphaware.common.strategy.InclusionStrategy;
 import com.graphaware.crawler.api.Context;
 import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
@@ -25,10 +26,16 @@ public class SimpleRecursiveGraphCrawler implements PerpetualGraphCrawler {
 
 	private InclusionStrategy<? super Node> nodeInclusionStrategy;
 	private ThingThatGetsCalledWhenWeFindSomething handler;
+	private InclusionStrategy<? super Relationship> relationshipInclusionStrategy;
 
 	@Override
 	public void setNodeInclusionStrategy(InclusionStrategy<? super Node> nodeInclusionStrategy) {
 		this.nodeInclusionStrategy = nodeInclusionStrategy;
+	}
+
+	@Override
+	public void setRelationshipInclusionStrategy(InclusionStrategy<? super Relationship> relationshipInclusionStrategy) {
+		this.relationshipInclusionStrategy = relationshipInclusionStrategy;
 	}
 
 	@Override
@@ -40,6 +47,9 @@ public class SimpleRecursiveGraphCrawler implements PerpetualGraphCrawler {
 	public void startCrawling(GraphDatabaseService databaseService) {
 		if (this.nodeInclusionStrategy == null) {
 			this.nodeInclusionStrategy = IncludeAllNodes.getInstance();
+		}
+		if (this.relationshipInclusionStrategy == null) {
+			this.relationshipInclusionStrategy = IncludeAllRelationships.getInstance();
 		}
 
 		try (Transaction transaction = databaseService.beginTx()) {
@@ -61,10 +71,9 @@ public class SimpleRecursiveGraphCrawler implements PerpetualGraphCrawler {
 			this.handler.doSomeStuff(new Context(startNode, howDidIGetHere));
 		}
 
-		// TODO: properly decide what relationship to follow.  Another inclusion strategy, perhaps?
 		for (Iterator<Relationship> it = startNode.getRelationships(Direction.BOTH).iterator(); it.hasNext();) {
 			Relationship relationship = it.next();
-			if (!relationship.equals(howDidIGetHere)) {
+			if (!relationship.equals(howDidIGetHere) && this.relationshipInclusionStrategy.include(relationship)) {
 				debug("Following relationship: " + relationship.getType(), currentDepth);
 				crawl(relationship.getOtherNode(startNode), maxDepth, currentDepth + 1, relationship);
 			}
