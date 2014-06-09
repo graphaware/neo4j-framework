@@ -1,12 +1,9 @@
 package com.graphaware.crawler;
 
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
 
-import com.graphaware.common.strategy.InclusionStrategy;
 import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
 import com.graphaware.crawler.internal.PerpetualGraphCrawler;
-import com.graphaware.crawler.internal.SimpleRecursiveGraphCrawler;
 import com.graphaware.runtime.BaseGraphAwareRuntimeModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 
@@ -16,21 +13,27 @@ import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
  */
 public class CrawlerRuntimeModule extends BaseGraphAwareRuntimeModule {
 
-	private final InclusionStrategy<Node> nodeInclusionStrategy;
+	private final CrawlerModuleConfiguration moduleConfiguration;
 	private final ThingThatGetsCalledWhenWeFindSomething inclusionHandler;
 
 	/**
-	 * Constructs a new {@link CrawlerRuntimeModule} identified by the given argument.
+	 * Constructs a new {@link CrawlerRuntimeModule} based on the given arguments.
 	 *
 	 * @param moduleId The ID by which to uniquely identify this module
-	 * @param nodeInclusionStrategy The {@link InclusionStrategy} to use for discerning whether we care about a particular node
+	 * @param configuration The {@link CrawlerModuleConfiguration} containing the information about how the graph should be
+	 *        crawled
 	 * @param inclusionHandler The {@link ThingThatGetsCalledWhenWeFindSomething}
 	 */
-	public CrawlerRuntimeModule(String moduleId, InclusionStrategy<Node> nodeInclusionStrategy,
+	public CrawlerRuntimeModule(String moduleId, CrawlerModuleConfiguration configuration,
 			ThingThatGetsCalledWhenWeFindSomething inclusionHandler) {
 		super(moduleId);
-		this.nodeInclusionStrategy = nodeInclusionStrategy;
+		this.moduleConfiguration = configuration;
 		this.inclusionHandler = inclusionHandler;
+	}
+
+	@Override
+	public CrawlerModuleConfiguration getConfiguration() {
+		return this.moduleConfiguration;
 	}
 
 	@Override
@@ -46,10 +49,11 @@ public class CrawlerRuntimeModule extends BaseGraphAwareRuntimeModule {
 		 * Actually, are these inclusion strategies even necessary?  Couldn't we just have the handler decide if it's interested
 		 * or not?  I know there's a separation of concerns here but is it over-engineering?
 		 */
-		PerpetualGraphCrawler crawler = new SimpleRecursiveGraphCrawler();
-		crawler.setNodeInclusionStrategy(this.nodeInclusionStrategy);
-		crawler.addInclusionHandler(this.inclusionHandler);
-		crawler.startCrawling(database);
+		PerpetualGraphCrawler graphCrawler = this.moduleConfiguration.getPerpetualGraphCrawler();
+		graphCrawler.setNodeInclusionStrategy(this.moduleConfiguration.getInclusionStrategies().getNodeInclusionStrategy());
+		graphCrawler.setRelationshipInclusionStrategy(this.moduleConfiguration.getInclusionStrategies().getRelationshipInclusionStrategy());
+		graphCrawler.addInclusionHandler(this.inclusionHandler);
+		graphCrawler.startCrawling(database);
 	}
 
 	@Override

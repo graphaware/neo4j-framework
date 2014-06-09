@@ -2,6 +2,7 @@ package com.graphaware.crawler.internal;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 import com.graphaware.common.strategy.InclusionStrategy;
 import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
@@ -24,6 +25,15 @@ public interface PerpetualGraphCrawler {
 	 *        node filtering is not required
 	 */
 	void setNodeInclusionStrategy(InclusionStrategy<? super Node> nodeInclusionStrategy);
+
+	/**
+	 * Sets the {@link InclusionStrategy} to use for choosing which of the relationships from nodes visited during the crawl
+	 * should be followed in order traverse the graph.
+	 *
+	 * @param relationshipInclusionStrategy The {@link InclusionStrategy} to use for selecting relationships, which may be
+	 *        <code>null</code> if filtering relationships is not required
+	 */
+	void setRelationshipInclusionStrategy(InclusionStrategy<? super Relationship> relationshipInclusionStrategy);
 
 	// TODO: Javadoc when you think of a remotely decent name for this method and its parameter type!
 	void addInclusionHandler(ThingThatGetsCalledWhenWeFindSomething inclusionHandler);

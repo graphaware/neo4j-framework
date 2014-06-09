@@ -44,6 +44,7 @@
         <module>examples/friendship-strength-counter</module>
         <module>examples/change-logger</module>
         <module>examples/friendship-strength-counter-module</module>
+        <module>examples/neo-rank</module>
     </modules>
 
     <name>GraphAware Neo4j Framework</name>

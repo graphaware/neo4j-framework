@@ -11,6 +11,7 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import com.graphaware.common.strategy.IncludeAllNodes;
+import com.graphaware.common.strategy.IncludeAllRelationships;
 import com.graphaware.common.strategy.InclusionStrategy;
 import com.graphaware.crawler.api.Context;
 import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
@@ -24,11 +25,17 @@ public class SimpleRecursiveGraphCrawler implements PerpetualGraphCrawler {
 	private static final Logger LOG = Logger.getLogger(SimpleRecursiveGraphCrawler.class);
 
 	private InclusionStrategy<? super Node> nodeInclusionStrategy;
+	private InclusionStrategy<? super Relationship> relationshipInclusionStrategy;
 	private ThingThatGetsCalledWhenWeFindSomething handler;
 
 	@Override
 	public void setNodeInclusionStrategy(InclusionStrategy<? super Node> nodeInclusionStrategy) {
 		this.nodeInclusionStrategy = nodeInclusionStrategy;
+	}
+
+	@Override
+	public void setRelationshipInclusionStrategy(InclusionStrategy<? super Relationship> relationshipInclusionStrategy) {
+		this.relationshipInclusionStrategy = relationshipInclusionStrategy;
 	}
 
 	@Override
@@ -41,7 +48,15 @@ public class SimpleRecursiveGraphCrawler implements PerpetualGraphCrawler {
 		if (this.nodeInclusionStrategy == null) {
 			this.nodeInclusionStrategy = IncludeAllNodes.getInstance();
 		}
+		if (this.relationshipInclusionStrategy == null) {
+			this.relationshipInclusionStrategy = IncludeAllRelationships.getInstance();
+		}
 
+		/* I reckon we will have to start a new transaction for each iteration of the algorithm, otherwise we won't
+		 * be able to pick up changes to the graph, assuming transactions worth the way I think they work, that is.
+		 *
+		 * Probably need to do a bit of research on Neo4j transaction properties...
+		 */
 		try (Transaction transaction = databaseService.beginTx()) {
 			Node arbitraryStartNode = GlobalGraphOperations.at(databaseService).getAllNodes().iterator().next();
 			// TODO: actually make this crawl perpetually
@@ -61,10 +76,9 @@ public class SimpleRecursiveGraphCrawler implements PerpetualGraphCrawler {
 			this.handler.doSomeStuff(new Context(startNode, howDidIGetHere));
 		}
 
-		// TODO: properly decide what relationship to follow.  Another inclusion strategy, perhaps?
 		for (Iterator<Relationship> it = startNode.getRelationships(Direction.BOTH).iterator(); it.hasNext();) {
 			Relationship relationship = it.next();
-			if (!relationship.equals(howDidIGetHere)) {
+			if (!relationship.equals(howDidIGetHere) && this.relationshipInclusionStrategy.include(relationship)) {
 				debug("Following relationship: " + relationship.getType(), currentDepth);
 				crawl(relationship.getOtherNode(startNode), maxDepth, currentDepth + 1, relationship);
 			}
