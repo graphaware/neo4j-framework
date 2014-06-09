@@ -115,11 +115,11 @@ public class LazyNodeTransactionData extends LazyPropertyContainerTransactionDat
             return false;
         }
 
-        if (!assignedLabels.containsKey(id(node))) {
+        if (!assignedLabels.containsKey(node.getId())) {
             return false;
         }
 
-        return assignedLabels.get(id(node)).contains(label);
+        return assignedLabels.get(node.getId()).contains(label);
     }
 
     /**
@@ -134,11 +134,11 @@ public class LazyNodeTransactionData extends LazyPropertyContainerTransactionDat
             return Collections.emptySet();
         }
 
-        if (!assignedLabels.containsKey(id(node))) {
+        if (!assignedLabels.containsKey(node.getId())) {
             return Collections.emptySet();
         }
 
-        return Collections.unmodifiableSet(assignedLabels.get(id(node)));
+        return Collections.unmodifiableSet(assignedLabels.get(node.getId()));
     }
 
     /**
@@ -153,11 +153,11 @@ public class LazyNodeTransactionData extends LazyPropertyContainerTransactionDat
             return false;
         }
 
-        if (!removedLabels.containsKey(id(node))) {
+        if (!removedLabels.containsKey(node.getId())) {
             return false;
         }
 
-        return removedLabels.get(id(node)).contains(label);
+        return removedLabels.get(node.getId()).contains(label);
     }
 
     /**
@@ -172,11 +172,11 @@ public class LazyNodeTransactionData extends LazyPropertyContainerTransactionDat
             return Collections.emptySet();
         }
 
-        if (!removedLabels.containsKey(id(node))) {
+        if (!removedLabels.containsKey(node.getId())) {
             return Collections.emptySet();
         }
 
-        return Collections.unmodifiableSet(removedLabels.get(id(node)));
+        return Collections.unmodifiableSet(removedLabels.get(node.getId()));
     }
 
     /**
@@ -187,15 +187,15 @@ public class LazyNodeTransactionData extends LazyPropertyContainerTransactionDat
         initializeChanged();
 
         if (!hasBeenDeleted(node)) {
-            LOG.warn(node + " has not been deleted but the caller thinks it has!");
+            LOG.error(node + " has not been deleted but the caller thinks it has! This is a bug.");
+            throw new IllegalStateException(node + " has not been deleted but the caller thinks it has! This is a bug.");
+        }
+
+        if (!deletedNodeLabels.containsKey(node.getId())) {
             return Collections.emptySet();
         }
 
-        if (!deletedNodeLabels.containsKey(id(node))) {
-            return Collections.emptySet();
-        }
-
-        return Collections.unmodifiableSet(deletedNodeLabels.get(id(node)));
+        return Collections.unmodifiableSet(deletedNodeLabels.get(node.getId()));
     }
 
     @Override
@@ -204,6 +204,8 @@ public class LazyNodeTransactionData extends LazyPropertyContainerTransactionDat
         removedLabels = new HashMap<>();
         deletedNodeLabels = new HashMap<>();
 
+        Map<Long, Node> potentiallyChangedNodes = new HashMap<>();
+
         for (LabelEntry labelEntry : transactionData.assignedLabels()) {
             Node node = labelEntry.node();
 
@@ -211,33 +213,40 @@ public class LazyNodeTransactionData extends LazyPropertyContainerTransactionDat
                 continue;
             }
 
-            if (!assignedLabels.containsKey(id(node))) {
-                assignedLabels.put(id(node), new HashSet<Label>());
+            if (!assignedLabels.containsKey(node.getId())) {
+                assignedLabels.put(node.getId(), new HashSet<Label>());
             }
 
-            assignedLabels.get(id(node)).add(labelEntry.label());
+            assignedLabels.get(node.getId()).add(labelEntry.label());
 
-            registerChange(node);
+            potentiallyChangedNodes.put(node.getId(), node);
         }
 
         for (LabelEntry labelEntry : transactionData.removedLabels()) {
             Node node = labelEntry.node();
 
             if (hasBeenDeleted(node)) {
-                if (!deletedNodeLabels.containsKey(id(node))) {
-                    deletedNodeLabels.put(id(node), new HashSet<Label>());
+                if (!deletedNodeLabels.containsKey(node.getId())) {
+                    deletedNodeLabels.put(node.getId(), new HashSet<Label>());
                 }
-                deletedNodeLabels.get(id(node)).add(labelEntry.label());
+                deletedNodeLabels.get(node.getId()).add(labelEntry.label());
                 continue;
             }
 
-            if (!removedLabels.containsKey(id(node))) {
-                removedLabels.put(id(node), new HashSet<Label>());
+            if (!removedLabels.containsKey(node.getId())) {
+                removedLabels.put(node.getId(), new HashSet<Label>());
             }
+            removedLabels.get(node.getId()).add(labelEntry.label());
 
-            removedLabels.get(id(node)).add(labelEntry.label());
+            potentiallyChangedNodes.put(node.getId(), node);
+        }
 
-            registerChange(node);
+        for (Long nodeId : assignedLabels.keySet()) {
+            registerChange(potentiallyChangedNodes.get(nodeId));
+        }
+
+        for (Long nodeId : removedLabels.keySet()) {
+            registerChange(potentiallyChangedNodes.get(nodeId));
         }
     }
 }

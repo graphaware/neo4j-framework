@@ -39,7 +39,7 @@ import static org.neo4j.graphdb.DynamicLabel.label;
 /**
  * Unit test for {@link com.graphaware.tx.event.improved.api.LazyTransactionData}.
  */
-public class LazyTransactionDataTest {
+public class LazyTransactionDataSmokeTest {
 
     private GraphDatabaseService database;
     private ExecutionEngine executionEngine;

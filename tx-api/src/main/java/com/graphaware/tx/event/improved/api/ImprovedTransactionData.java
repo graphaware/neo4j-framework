@@ -382,6 +382,7 @@ public interface ImprovedTransactionData {
 
     /**
      * Convert all mutations in the transaction to human-readable Strings.
+     *
      * @return human-readable Strings.
      */
     Set<String> mutationsToStrings();

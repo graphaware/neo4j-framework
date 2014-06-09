@@ -336,8 +336,8 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
         initializeProperties();
 
         if (!hasBeenDeleted(container)) {
-            LOG.warn(container + " has not been deleted but the caller thinks it has!");
-            return Collections.emptyMap();
+            LOG.error(container + " has not been deleted but the caller thinks it has! This is a bug.");
+            throw new IllegalStateException(container + " has not been deleted but the caller thinks it has! This is a bug.");
         }
 
         if (!deletedContainersProperties.containsKey(id(container))) {

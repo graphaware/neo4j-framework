@@ -16,11 +16,11 @@
 
 package com.graphaware.tx.event.improved;
 
-import com.graphaware.common.util.PropertyContainerUtils;
 import com.graphaware.test.util.TestDataBuilder;
 import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
+import com.graphaware.tx.event.improved.data.lazy.LazyNodeTransactionData;
 import com.graphaware.tx.executor.single.*;
 import org.junit.After;
 import org.junit.Test;
@@ -37,20 +37,57 @@ import java.util.*;
 
 import static com.graphaware.common.util.IterableUtils.*;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
-import static com.graphaware.tx.event.improved.LazyTransactionDataIntegrationTest.RelationshipTypes.*;
-import static com.graphaware.tx.event.improved.api.Change.*;
+import static com.graphaware.tx.event.improved.LazyTransactionDataComprehensiveTest.RelationshipTypes.*;
 import static com.graphaware.tx.event.improved.api.Change.changesToMap;
 import static junit.framework.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.graphdb.DynamicLabel.*;
+import static org.neo4j.graphdb.DynamicLabel.label;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
- * Integration test for {@link com.graphaware.tx.event.improved.api.LazyTransactionData}.
+ * Comprehensive unit test for {@link com.graphaware.tx.event.improved.api.LazyTransactionData}.
+ * <p/>
+ * Start graph:
+ * <p/>
+ * CREATE
+ * (nodeWithIdZero:TestLabel),
+ * (one:One {name:"One", count:1, tags:["one","two"]}),
+ * (two {name:"Two", size:2}),
+ * (three {name:"Three", place:"London"}),
+ * (four {name:"Four"}),
+ * (five:SomeLabel {name:"Five"}),
+ * (six:ToBeRemoved {name:"Six"}),
+ * (one)-[:R1 {time:1}]->(two),
+ * (two)-[:R2]->(two),
+ * (two)-[:R2 {time:2}]->(three),
+ * (three)-[:R3 {time:3, tag:"cool"}]->(one),
+ * (one)-[:R3]->(three),
+ * (three)-[:R1 {time:1}]->(four),
+ * (one)-[:WHATEVER]->(four),
+ * (four)-[:R4]->(five),
+ * (five)-[:R4]->(six);
+ * <p/>
+ * Graph after mutation:
+ * <p/>
+ * CREATE
+ * (nodeWithIdZero:TestLabel),
+ * (one:NewOne {name:"NewOne", tags:["one","three"]}),
+ * (three {name:"Three", place:"London", tags:"one"}),
+ * (four {name:"Four"}),
+ * (five:SomeLabel:NewLabel {name:"Five"}),
+ * (six {name:"Six"}),
+ * (seven:SomeLabel {size:4})
+ * (three)-[:R3 {time:4, tags:"cool"}]->(one),
+ * (three)-[:R1 {time:1}]->(four),
+ * (one)-[:R1]->(three)
+ * (one)-[:WHATEVER]->(four),
+ * (seven)-[:R2 {time:4}]->(three)
+ * (four)-[:R4]->(five),
+ * (five)-[:R4]->(six);
  */
 @SuppressWarnings("deprecation")
-public class LazyTransactionDataIntegrationTest {
+public class LazyTransactionDataComprehensiveTest {
 
     public static final String TIME = "time";
     public static final String PLACE = "place";
@@ -60,7 +97,7 @@ public class LazyTransactionDataIntegrationTest {
     public static final String TAG = "tag";
 
     public static enum RelationshipTypes implements RelationshipType {
-        R1, R2, R3
+        R1, R2, R3, R4
     }
 
     private GraphDatabaseService db;
@@ -113,12 +150,18 @@ public class LazyTransactionDataIntegrationTest {
                         long r2Id = db.getNodeById(1).getSingleRelationship(R1, OUTGOING).getId();
                         Relationship r2 = created.get(r2Id);
 
-                        assertEquals("NewOne", r2.getStartNode().getProperty(NAME));
-                        assertFalse(r2.getStartNode().hasProperty(COUNT));
-                        assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) r2.getStartNode().getProperty(TAGS)));
+                        Node one = r2.getStartNode();
+                        assertEquals("NewOne", one.getProperty(NAME));
+                        assertFalse(one.hasProperty(COUNT));
+                        assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) one.getProperty(TAGS)));
+                        assertEquals(1, count(one.getLabels()));
+                        assertTrue(contains(one.getLabels(), label("NewOne")));
+                        assertTrue(one.hasLabel(label("NewOne")));
+                        assertFalse(one.hasLabel(label("One")));
 
-                        assertNull(r2.getEndNode().getSingleRelationship(R3, INCOMING));
-                        assertEquals(7, r2.getEndNode().getSingleRelationship(R2, INCOMING).getStartNode().getId());
+                        Node three = r2.getEndNode();
+                        assertNull(three.getSingleRelationship(R3, INCOMING));
+                        assertEquals(7, three.getSingleRelationship(R2, INCOMING).getStartNode().getId());
                     }
                 }
         );
@@ -162,19 +205,23 @@ public class LazyTransactionDataIntegrationTest {
                         Map<Long, Change<Relationship>> changed = changesToMap(td.getAllChangedRelationships());
                         Relationship previous = getSingleValue(changed).getPrevious();
 
-                        assertEquals("One", previous.getEndNode().getProperty(NAME));
-                        assertEquals(1, previous.getEndNode().getProperty(COUNT, 2));
-                        assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) previous.getEndNode().getProperty(TAGS)));
-                        assertEquals(3, count(previous.getEndNode().getPropertyKeys()));
+                        Node one = previous.getEndNode();
+                        assertEquals("One", one.getProperty(NAME));
+                        assertEquals(1, one.getProperty(COUNT, 2));
+                        assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) one.getProperty(TAGS)));
+                        assertEquals(3, count(one.getPropertyKeys()));
+                        assertEquals(1, count(one.getLabels()));
+                        assertTrue(contains(one.getLabels(), label("One")));
+                        assertTrue(one.hasLabel(label("One")));
+                        assertFalse(one.hasLabel(label("NewOne")));
 
-                        assertEquals("Three", previous.getStartNode().getProperty(NAME));
-                        assertEquals("London", previous.getStartNode().getProperty(PLACE));
-                        assertEquals("nothing", previous.getStartNode().getProperty(TAGS, "nothing"));
+                        Node three = previous.getStartNode();
+                        assertEquals("Three", three.getProperty(NAME));
+                        assertEquals("London", three.getProperty(PLACE));
+                        assertEquals("nothing", three.getProperty(TAGS, "nothing"));
 
-                        Node endNode = previous.getEndNode();
-                        Relationship r1 = endNode.getSingleRelationship(R1, OUTGOING);
-                        Node endNode1 = r1.getEndNode();
-                        assertEquals("Two", endNode1.getProperty(NAME));
+                        Relationship r1 = one.getSingleRelationship(R1, OUTGOING);
+                        assertEquals("Two", r1.getEndNode().getProperty(NAME));
                     }
                 }
         );
@@ -215,17 +262,21 @@ public class LazyTransactionDataIntegrationTest {
 
                         current = td.getChanged(current).getCurrent();
 
-                        assertEquals("NewOne", current.getEndNode().getProperty(NAME));
-                        assertEquals(2, current.getEndNode().getProperty(COUNT, 2));
-                        assertFalse(current.getEndNode().hasProperty(COUNT));
-                        assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) current.getEndNode().getProperty(TAGS)));
-                        assertEquals(2, count(current.getEndNode().getPropertyKeys()));
+                        Node one = current.getEndNode();
+                        assertEquals("NewOne", one.getProperty(NAME));
+                        assertEquals(2, one.getProperty(COUNT, 2));
+                        assertFalse(one.hasProperty(COUNT));
+                        assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) one.getProperty(TAGS)));
+                        assertEquals(2, count(one.getPropertyKeys()));
+                        assertEquals(1, count(one.getLabels()));
+                        assertTrue(contains(one.getLabels(), label("NewOne")));
 
-                        assertEquals("Three", current.getStartNode().getProperty(NAME));
-                        assertEquals("London", current.getStartNode().getProperty(PLACE));
-                        assertEquals("one", current.getStartNode().getProperty(TAGS));
+                        Node three = current.getStartNode();
+                        assertEquals("Three", three.getProperty(NAME));
+                        assertEquals("London", three.getProperty(PLACE));
+                        assertEquals("one", three.getProperty(TAGS));
 
-                        assertEquals("Three", current.getEndNode().getSingleRelationship(R1, OUTGOING).getEndNode().getProperty(NAME));
+                        assertEquals("Three", one.getSingleRelationship(R1, OUTGOING).getEndNode().getProperty(NAME));
                     }
                 }
         );
@@ -259,22 +310,20 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
-
-                        Map<Long, Relationship> deleted = toMap(transactionData.getAllDeletedRelationships());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Relationship> deleted = toMap(td.getAllDeletedRelationships());
                         assertEquals(4, deleted.size());
 
-                        long r1Id = toMap(transactionData.getAllDeletedNodes()).get(2L).getSingleRelationship(R1, INCOMING).getId();
+                        long r1Id = toMap(td.getAllDeletedNodes()).get(2L).getSingleRelationship(R1, INCOMING).getId();
                         Relationship r1 = deleted.get(r1Id);
                         assertEquals(1, r1.getProperty(TIME));
                         assertEquals(1, count(r1.getPropertyKeys()));
 
-                        long r2Id = toMap(transactionData.getAllDeletedNodes()).get(2L).getSingleRelationship(R2, INCOMING).getId();
+                        long r2Id = toMap(td.getAllDeletedNodes()).get(2L).getSingleRelationship(R2, INCOMING).getId();
                         Relationship r2 = deleted.get(r2Id);
                         assertEquals(0, count(r2.getPropertyKeys()));
 
-                        Iterator<Relationship> relationships = toMap(transactionData.getAllDeletedNodes()).get(2L).getRelationships(R2, OUTGOING).iterator();
+                        Iterator<Relationship> relationships = toMap(td.getAllDeletedNodes()).get(2L).getRelationships(R2, OUTGOING).iterator();
                         long r3Id = relationships.next().getId();
                         if (r3Id == r2Id) {
                             r3Id = relationships.next().getId();
@@ -283,23 +332,23 @@ public class LazyTransactionDataIntegrationTest {
                         assertEquals(2, r3.getProperty(TIME));
                         assertEquals(1, count(r3.getPropertyKeys()));
 
-                        long r4Id = changesToMap(transactionData.getAllChangedNodes()).get(3L).getPrevious().getSingleRelationship(R3, INCOMING).getId();
+                        long r4Id = changesToMap(td.getAllChangedNodes()).get(3L).getPrevious().getSingleRelationship(R3, INCOMING).getId();
                         Relationship r4 = deleted.get(r4Id);
                         assertEquals(0, count(r4.getPropertyKeys()));
 
-                        assertTrue(transactionData.hasBeenDeleted(r1));
-                        assertTrue(transactionData.hasBeenDeleted(r2));
-                        assertTrue(transactionData.hasBeenDeleted(r3));
-                        assertTrue(transactionData.hasBeenDeleted(r4));
-                        assertFalse(transactionData.hasBeenDeleted(db.getNodeById(3).getSingleRelationship(R3, OUTGOING)));
+                        assertTrue(td.hasBeenDeleted(r1));
+                        assertTrue(td.hasBeenDeleted(r2));
+                        assertTrue(td.hasBeenDeleted(r3));
+                        assertTrue(td.hasBeenDeleted(r4));
+                        assertFalse(td.hasBeenDeleted(db.getNodeById(3).getSingleRelationship(R3, OUTGOING)));
 
-                        assertEquals(3, count(transactionData.getDeletedRelationships(db.getNodeById(2))));
-                        assertEquals(3, count(transactionData.getDeletedRelationships(db.getNodeById(2), R2, R1)));
-                        assertEquals(2, count(transactionData.getDeletedRelationships(db.getNodeById(2), R2)));
-                        assertEquals(2, count(transactionData.getDeletedRelationships(db.getNodeById(2), OUTGOING)));
-                        assertEquals(2, count(transactionData.getDeletedRelationships(db.getNodeById(2), OUTGOING, R2)));
-                        assertEquals(1, count(transactionData.getDeletedRelationships(db.getNodeById(2), INCOMING, R2)));
-                        assertEquals(0, count(transactionData.getDeletedRelationships(db.getNodeById(2), R3)));
+                        assertEquals(3, count(td.getDeletedRelationships(db.getNodeById(2))));
+                        assertEquals(3, count(td.getDeletedRelationships(db.getNodeById(2), R2, R1)));
+                        assertEquals(2, count(td.getDeletedRelationships(db.getNodeById(2), R2)));
+                        assertEquals(2, count(td.getDeletedRelationships(db.getNodeById(2), OUTGOING)));
+                        assertEquals(2, count(td.getDeletedRelationships(db.getNodeById(2), OUTGOING, R2)));
+                        assertEquals(1, count(td.getDeletedRelationships(db.getNodeById(2), INCOMING, R2)));
+                        assertEquals(0, count(td.getDeletedRelationships(db.getNodeById(2), R3)));
                     }
                 }
         );
@@ -311,33 +360,34 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
-
-                        Map<Long, Relationship> deleted = toMap(transactionData.getAllDeletedRelationships());
-                        long r4Id = changesToMap(transactionData.getAllChangedNodes()).get(3L).getPrevious().getSingleRelationship(R3, INCOMING).getId();
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Relationship> deleted = toMap(td.getAllDeletedRelationships());
+                        long r4Id = changesToMap(td.getAllChangedNodes()).get(3L).getPrevious().getSingleRelationship(R3, INCOMING).getId();
                         Relationship r4 = deleted.get(r4Id);
 
-                        Relationship deletedRel = transactionData.getDeleted(r4);
+                        Relationship deletedRel = td.getDeleted(r4);
 
-                        assertEquals("One", deletedRel.getStartNode().getProperty(NAME));
-                        assertEquals(1, deletedRel.getStartNode().getProperty(COUNT, 2));
-                        assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) deletedRel.getStartNode().getProperty(TAGS)));
-                        assertEquals(3, count(deletedRel.getStartNode().getPropertyKeys()));
+                        Node one = deletedRel.getStartNode();
+                        assertEquals("One", one.getProperty(NAME));
+                        assertEquals(1, one.getProperty(COUNT, 2));
+                        assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) one.getProperty(TAGS)));
+                        assertEquals(3, count(one.getPropertyKeys()));
+                        assertEquals(1, count(one.getLabels()));
+                        assertTrue(contains(one.getLabels(), label("One")));
 
-                        assertEquals("Three", deletedRel.getEndNode().getProperty(NAME));
-                        assertEquals("London", deletedRel.getEndNode().getProperty(PLACE));
-                        assertEquals("nothing", deletedRel.getEndNode().getProperty(TAGS, "nothing"));
+                        Node three = deletedRel.getEndNode();
+                        assertEquals("Three", three.getProperty(NAME));
+                        assertEquals("London", three.getProperty(PLACE));
+                        assertEquals("nothing", three.getProperty(TAGS, "nothing"));
 
-                        Node startNode = deletedRel.getStartNode();
-                        Relationship r5 = startNode.getSingleRelationship(R1, OUTGOING);
+                        Relationship r5 = one.getSingleRelationship(R1, OUTGOING);
                         assertEquals("Two", r5.getEndNode().getProperty(NAME));
 
-                        assertEquals(4, count(startNode.getRelationships()));
-                        assertEquals(3, count(startNode.getRelationships(OUTGOING)));
-                        assertEquals(2, count(startNode.getRelationships(R3)));
-                        assertEquals(3, count(startNode.getRelationships(R3, R1)));
-                        assertEquals(1, count(startNode.getRelationships(INCOMING, R3, R1)));
+                        assertEquals(4, count(one.getRelationships()));
+                        assertEquals(3, count(one.getRelationships(OUTGOING)));
+                        assertEquals(2, count(one.getRelationships(R3)));
+                        assertEquals(3, count(one.getRelationships(R3, R1)));
+                        assertEquals(1, count(one.getRelationships(INCOMING, R3, R1)));
                     }
                 }
         );
@@ -349,12 +399,10 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
-
-                        Map<Long, Relationship> deleted = toMap(transactionData.getAllDeletedRelationships());
-                        long r4Id = changesToMap(transactionData.getAllChangedNodes()).get(3L).getPrevious().getSingleRelationship(R3, INCOMING).getId();
-                        Relationship deletedRel = transactionData.getDeleted(deleted.get(r4Id));
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Relationship> deleted = toMap(td.getAllDeletedRelationships());
+                        long r4Id = changesToMap(td.getAllChangedNodes()).get(3L).getPrevious().getSingleRelationship(R3, INCOMING).getId();
+                        Relationship deletedRel = td.getDeleted(deleted.get(r4Id));
 
                         TraversalDescription traversalDescription = db.traversalDescription()
                                 .relationships(R1, OUTGOING)
@@ -375,25 +423,23 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Change<Relationship> change = td.getAllChangedRelationships().iterator().next();
 
-                        Change<Relationship> change = transactionData.getAllChangedRelationships().iterator().next();
+                        assertTrue(td.hasPropertyBeenCreated(change.getCurrent(), TAGS));
+                        assertFalse(td.hasPropertyBeenCreated(change.getCurrent(), TIME));
+                        assertTrue(td.hasPropertyBeenCreated(change.getPrevious(), TAGS));
+                        assertFalse(td.hasPropertyBeenCreated(change.getPrevious(), TAG));
 
-                        assertTrue(transactionData.hasPropertyBeenCreated(change.getCurrent(), TAGS));
-                        assertFalse(transactionData.hasPropertyBeenCreated(change.getCurrent(), TIME));
-                        assertTrue(transactionData.hasPropertyBeenCreated(change.getPrevious(), TAGS));
-                        assertFalse(transactionData.hasPropertyBeenCreated(change.getPrevious(), TAG));
+                        assertEquals(1, td.createdProperties(change.getCurrent()).size());
+                        assertEquals(1, td.createdProperties(change.getPrevious()).size());
+                        assertEquals("cool", td.createdProperties(change.getCurrent()).get(TAGS));
+                        assertEquals("cool", td.createdProperties(change.getPrevious()).get(TAGS));
 
-                        assertEquals(1, transactionData.createdProperties(change.getCurrent()).size());
-                        assertEquals(1, transactionData.createdProperties(change.getPrevious()).size());
-                        assertEquals("cool", transactionData.createdProperties(change.getCurrent()).get(TAGS));
-                        assertEquals("cool", transactionData.createdProperties(change.getPrevious()).get(TAGS));
-
-                        assertFalse(transactionData.hasPropertyBeenCreated(transactionData.getAllDeletedRelationships().iterator().next(), TAGS));
+                        assertFalse(td.hasPropertyBeenCreated(td.getAllDeletedRelationships().iterator().next(), TAGS));
 
                         //created relationship should not fall into this category
-                        assertFalse(transactionData.hasPropertyBeenCreated(db.getNodeById(7).getSingleRelationship(R2, OUTGOING), TIME));
+                        assertFalse(td.hasPropertyBeenCreated(db.getNodeById(7).getSingleRelationship(R2, OUTGOING), TIME));
                     }
                 }
         );
@@ -405,24 +451,22 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Change<Relationship> change = td.getAllChangedRelationships().iterator().next();
 
-                        Change<Relationship> change = transactionData.getAllChangedRelationships().iterator().next();
+                        assertTrue(td.hasPropertyBeenChanged(change.getCurrent(), TIME));
+                        assertFalse(td.hasPropertyBeenChanged(change.getCurrent(), TAGS));
+                        assertTrue(td.hasPropertyBeenChanged(change.getPrevious(), TIME));
+                        assertFalse(td.hasPropertyBeenChanged(change.getPrevious(), TAG));
 
-                        assertTrue(transactionData.hasPropertyBeenChanged(change.getCurrent(), TIME));
-                        assertFalse(transactionData.hasPropertyBeenChanged(change.getCurrent(), TAGS));
-                        assertTrue(transactionData.hasPropertyBeenChanged(change.getPrevious(), TIME));
-                        assertFalse(transactionData.hasPropertyBeenChanged(change.getPrevious(), TAG));
+                        assertEquals(1, td.changedProperties(change.getCurrent()).size());
+                        assertEquals(1, td.changedProperties(change.getPrevious()).size());
+                        assertEquals(3, td.changedProperties(change.getCurrent()).get(TIME).getPrevious());
+                        assertEquals(3, td.changedProperties(change.getPrevious()).get(TIME).getPrevious());
+                        assertEquals(4, td.changedProperties(change.getCurrent()).get(TIME).getCurrent());
+                        assertEquals(4, td.changedProperties(change.getPrevious()).get(TIME).getCurrent());
 
-                        assertEquals(1, transactionData.changedProperties(change.getCurrent()).size());
-                        assertEquals(1, transactionData.changedProperties(change.getPrevious()).size());
-                        assertEquals(3, transactionData.changedProperties(change.getCurrent()).get(TIME).getPrevious());
-                        assertEquals(3, transactionData.changedProperties(change.getPrevious()).get(TIME).getPrevious());
-                        assertEquals(4, transactionData.changedProperties(change.getCurrent()).get(TIME).getCurrent());
-                        assertEquals(4, transactionData.changedProperties(change.getPrevious()).get(TIME).getCurrent());
-
-                        assertFalse(transactionData.hasPropertyBeenChanged(transactionData.getAllDeletedRelationships().iterator().next(), TAGS));
+                        assertFalse(td.hasPropertyBeenChanged(td.getAllDeletedRelationships().iterator().next(), TAGS));
                     }
                 }
         );
@@ -434,33 +478,32 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Change<Relationship> change = td.getAllChangedRelationships().iterator().next();
 
-                        Change<Relationship> change = transactionData.getAllChangedRelationships().iterator().next();
+                        assertTrue(td.hasPropertyBeenDeleted(change.getCurrent(), TAG));
+                        assertFalse(td.hasPropertyBeenDeleted(change.getCurrent(), TIME));
+                        assertTrue(td.hasPropertyBeenDeleted(change.getPrevious(), TAG));
+                        assertFalse(td.hasPropertyBeenDeleted(change.getPrevious(), TAGS));
 
-                        assertTrue(transactionData.hasPropertyBeenDeleted(change.getCurrent(), TAG));
-                        assertFalse(transactionData.hasPropertyBeenDeleted(change.getCurrent(), TIME));
-                        assertTrue(transactionData.hasPropertyBeenDeleted(change.getPrevious(), TAG));
-                        assertFalse(transactionData.hasPropertyBeenDeleted(change.getPrevious(), TAGS));
+                        assertEquals(1, td.deletedProperties(change.getCurrent()).size());
+                        assertEquals(1, td.deletedProperties(change.getPrevious()).size());
+                        assertEquals("cool", td.deletedProperties(change.getCurrent()).get(TAG));
+                        assertEquals("cool", td.deletedProperties(change.getPrevious()).get(TAG));
 
-                        assertEquals(1, transactionData.deletedProperties(change.getCurrent()).size());
-                        assertEquals(1, transactionData.deletedProperties(change.getPrevious()).size());
-                        assertEquals("cool", transactionData.deletedProperties(change.getCurrent()).get(TAG));
-                        assertEquals("cool", transactionData.deletedProperties(change.getPrevious()).get(TAG));
-
-                        assertFalse(transactionData.hasPropertyBeenDeleted(transactionData.getAllCreatedRelationships().iterator().next(), TAGS));
+                        assertFalse(td.hasPropertyBeenDeleted(td.getAllCreatedRelationships().iterator().next(), TAGS));
 
                         //deleted relationships' props don't qualify
-                        Iterator<Relationship> iterator = transactionData.getAllDeletedRelationships().iterator();
-                        assertFalse(transactionData.hasPropertyBeenDeleted(iterator.next(), TIME));
-                        assertFalse(transactionData.hasPropertyBeenDeleted(iterator.next(), TIME));
-                        assertFalse(transactionData.hasPropertyBeenDeleted(iterator.next(), TIME));
-                        assertFalse(transactionData.hasPropertyBeenDeleted(iterator.next(), TIME));
+                        Iterator<Relationship> iterator = td.getAllDeletedRelationships().iterator();
+                        assertFalse(td.hasPropertyBeenDeleted(iterator.next(), TIME));
+                        assertFalse(td.hasPropertyBeenDeleted(iterator.next(), TIME));
+                        assertFalse(td.hasPropertyBeenDeleted(iterator.next(), TIME));
+                        assertFalse(td.hasPropertyBeenDeleted(iterator.next(), TIME));
                     }
                 }
         );
     }
+
 
     @Test
     public void createdNodesShouldBeCorrectlyIdentified() {
@@ -468,20 +511,19 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
-
-                        Map<Long, Node> createdNodes = toMap(transactionData.getAllCreatedNodes());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Node> createdNodes = toMap(td.getAllCreatedNodes());
                         assertEquals(1, createdNodes.size());
 
                         Node createdNode = createdNodes.get(7L);
                         assertEquals("Seven", createdNode.getProperty(NAME));
-//                        assertEquals("SomeLabel", createdNode.getLabels().iterator().next().name());
+                        assertEquals(1, count(createdNode.getLabels()));
+                        assertTrue(contains(createdNode.getLabels(), label("SomeLabel")));
                         assertEquals(4L, createdNode.getProperty("size"));
                         assertEquals(2, count(createdNode.getPropertyKeys()));
 
-                        assertTrue(transactionData.hasBeenCreated(createdNode));
-                        assertFalse(transactionData.hasBeenCreated(db.getNodeById(3)));
+                        assertTrue(td.hasBeenCreated(createdNode));
+                        assertFalse(td.hasBeenCreated(db.getNodeById(3)));
                     }
                 }
         );
@@ -493,14 +535,17 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
-
-                        Map<Long, Node> createdNodes = toMap(transactionData.getAllCreatedNodes());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Node> createdNodes = toMap(td.getAllCreatedNodes());
                         Node createdNode = createdNodes.get(7L);
 
-                        assertEquals("one", createdNode.getSingleRelationship(R2, OUTGOING).getEndNode().getProperty(TAGS));
-                        assertFalse(createdNode.getSingleRelationship(R2, OUTGOING).getEndNode().getRelationships(R3, INCOMING).iterator().hasNext());
+                        Node three = createdNode.getSingleRelationship(R2, OUTGOING).getEndNode();
+                        assertEquals("one", three.getProperty(TAGS));
+                        assertFalse(three.getRelationships(R3, INCOMING).iterator().hasNext());
+
+                        Node one = three.getSingleRelationship(R1, INCOMING).getStartNode();
+                        assertEquals(1, count(one.getLabels()));
+                        assertTrue(contains(one.getLabels(), label("NewOne")));
                     }
                 }
         );
@@ -509,17 +554,18 @@ public class LazyTransactionDataIntegrationTest {
     @Test
     public void changedNodesShouldBeCorrectlyIdentified() {
         createTestDatabase();
+        try (Transaction tx = db.beginTx()) {
+            Node node = db.createNode(label("TestLabel"));
+            node.delete();
+            tx.success();
+        }
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        if (!transactionData.mutationsOccurred()) {
-                            return;
-                        }
-                        assertTrue(transactionData.mutationsOccurred());
-
-                        Map<Long, Change<Node>> changed = changesToMap(transactionData.getAllChangedNodes());
-                        assertEquals(4, changed.size());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Change<Node>> changed = changesToMap(td.getAllChangedNodes());
+                        assertEquals(5, changed.size()); //todo wait for https://github.com/neo4j/neo4j/issues/2534 to be resolved, then change to 4
+//                        assertEquals(4, changed.size());
 
                         Node previous1 = changed.get(1L).getPrevious();
                         assertEquals(3, count(previous1.getPropertyKeys()));
@@ -563,15 +609,23 @@ public class LazyTransactionDataIntegrationTest {
                         assertEquals("Six", current4.getProperty(NAME));
                         assertEquals(0, count(current4.getLabels()));
 
-                        assertTrue(transactionData.hasBeenChanged(previous1));
-                        assertTrue(transactionData.hasBeenChanged(previous2));
-                        assertTrue(transactionData.hasBeenChanged(previous3));
-                        assertTrue(transactionData.hasBeenChanged(previous4));
-                        assertTrue(transactionData.hasBeenChanged(current1));
-                        assertTrue(transactionData.hasBeenChanged(current2));
-                        assertTrue(transactionData.hasBeenChanged(current3));
-                        assertTrue(transactionData.hasBeenChanged(current4));
-                        assertFalse(transactionData.hasBeenChanged(db.getNodeById(4)));
+                        assertTrue(td.hasBeenChanged(previous1));
+                        assertTrue(td.hasBeenChanged(previous2));
+                        assertTrue(td.hasBeenChanged(previous3));
+                        assertTrue(td.hasBeenChanged(previous4));
+                        assertTrue(td.hasBeenChanged(current1));
+                        assertTrue(td.hasBeenChanged(current2));
+                        assertTrue(td.hasBeenChanged(current3));
+                        assertTrue(td.hasBeenChanged(current4));
+                        assertFalse(td.hasBeenChanged(db.getNodeById(4)));
+                        //assertFalse(td.hasBeenChanged(db.getNodeById(0)));  //todo wait for https://github.com/neo4j/neo4j/issues/2534 to be resolved, then uncomment
+
+                        try {
+                            td.getChanged(db.getNodeById(4));
+                            fail();
+                        } catch (IllegalArgumentException e) {
+                            //ok
+                        }
                     }
                 }
         );
@@ -583,13 +637,13 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
-
-                        Map<Long, Change<Node>> changed = changesToMap(transactionData.getAllChangedNodes());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Change<Node>> changed = changesToMap(td.getAllChangedNodes());
 
                         Node current = changed.get(1L).getCurrent();
-                        Node previous = transactionData.getChanged(current).getPrevious();
+                        Node previous = td.getChanged(current).getPrevious();
+                        assertEquals(1, count(previous.getLabels()));
+                        assertTrue(contains(previous.getLabels(), label("One")));
 
                         assertEquals(1, previous.getSingleRelationship(R1, OUTGOING).getProperty(TIME));
                         assertEquals("Two", previous.getRelationships(R1, OUTGOING).iterator().next().getEndNode().getProperty(NAME));
@@ -636,10 +690,8 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
-
-                        Map<Long, Change<Node>> changed = changesToMap(transactionData.getAllChangedNodes());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Change<Node>> changed = changesToMap(td.getAllChangedNodes());
 
                         Node previous = changed.get(1L).getPrevious();
 
@@ -662,11 +714,11 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
-
-                        Map<Long, Change<Node>> changed = changesToMap(transactionData.getAllChangedNodes());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Change<Node>> changed = changesToMap(td.getAllChangedNodes());
                         Node current = changed.get(1L).getCurrent();
+                        assertEquals(1, count(current.getLabels()));
+                        assertTrue(contains(current.getLabels(), label("NewOne")));
 
                         assertEquals("Three", current.getSingleRelationship(R1, OUTGOING).getEndNode().getProperty(NAME));
                         assertEquals("London", current.getRelationships(R1, OUTGOING).iterator().next().getEndNode().getProperty(PLACE));
@@ -682,10 +734,8 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
-
-                        Map<Long, Change<Node>> changed = changesToMap(transactionData.getAllChangedNodes());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Change<Node>> changed = changesToMap(td.getAllChangedNodes());
                         Node current = changed.get(1L).getCurrent();
 
                         TraversalDescription traversalDescription = db.traversalDescription()
@@ -707,21 +757,26 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
-
-                        Map<Long, Node> deletedNodes = toMap(transactionData.getAllDeletedNodes());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
                         assertEquals(1, deletedNodes.size());
 
                         Node deleted = deletedNodes.get(2L);
-                        Node one = transactionData.getDeleted(deleted).getSingleRelationship(R1, INCOMING).getStartNode();
+                        Node one = td.getDeleted(deleted).getSingleRelationship(R1, INCOMING).getStartNode();
 
                         assertEquals("Two", deleted.getProperty(NAME));
                         assertEquals(2L, deleted.getProperty("size"));
                         assertEquals(2, count(deleted.getPropertyKeys()));
 
-                        assertTrue(transactionData.hasBeenDeleted(deleted));
-                        assertFalse(transactionData.hasBeenDeleted(one));
+                        assertTrue(td.hasBeenDeleted(deleted));
+                        assertFalse(td.hasBeenDeleted(one));
+
+                        try {
+                            td.getDeleted(db.getNodeById(4L));
+                            fail();
+                        } catch (IllegalArgumentException e) {
+                            //ok
+                        }
                     }
                 }
         );
@@ -734,13 +789,13 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
-
-                        Map<Long, Node> deletedNodes = toMap(transactionData.getAllDeletedNodes());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
                         Node deleted = deletedNodes.get(2L);
 
-                        Node one = transactionData.getDeleted(deleted).getSingleRelationship(R1, INCOMING).getStartNode();
+                        Node one = td.getDeleted(deleted).getSingleRelationship(R1, INCOMING).getStartNode();
+                        assertEquals(1, count(one.getLabels()));
+                        assertTrue(contains(one.getLabels(), label("One")));
 
                         assertEquals(1, one.getSingleRelationship(R1, OUTGOING).getProperty(TIME));
                         assertEquals("Two", one.getRelationships(R1, OUTGOING).iterator().next().getEndNode().getProperty(NAME));
@@ -749,7 +804,7 @@ public class LazyTransactionDataIntegrationTest {
                     }
                 }
         );
-    }
+    }                                       //todo multiple labels not tested
 
     @Test
     public void startingWithDeletedNodePreviousGraphVersionShouldBeTraversedUsingTraversalApi() {
@@ -757,13 +812,11 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
-
-                        Map<Long, Node> deletedNodes = toMap(transactionData.getAllDeletedNodes());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
                         Node deleted = deletedNodes.get(2L);
 
-                        Node one = transactionData.getDeleted(deleted).getSingleRelationship(R1, INCOMING).getStartNode();
+                        Node one = td.getDeleted(deleted).getSingleRelationship(R1, INCOMING).getStartNode();
 
                         TraversalDescription traversalDescription = db.traversalDescription()
                                 .relationships(R1, OUTGOING)
@@ -779,82 +832,103 @@ public class LazyTransactionDataIntegrationTest {
     }
 
     @Test
-    public void createdNodePropertiesShouldBeCorrectlyIdentified() {
+    public void createdNodePropertiesAndLabelsShouldBeCorrectlyIdentified() {
         createTestDatabase();
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Change<Node> changed = changesToMap(td.getAllChangedNodes()).get(3L);
 
-                        Change<Node> changed = changesToMap(transactionData.getAllChangedNodes()).get(3L);
+                        assertTrue(td.hasPropertyBeenCreated(changed.getCurrent(), TAGS));
+                        assertFalse(td.hasPropertyBeenCreated(changed.getCurrent(), NAME));
+                        assertTrue(td.hasPropertyBeenCreated(changed.getPrevious(), TAGS));
+                        assertFalse(td.hasPropertyBeenCreated(changed.getPrevious(), NAME));
 
-                        assertTrue(transactionData.hasPropertyBeenCreated(changed.getCurrent(), TAGS));
-                        assertFalse(transactionData.hasPropertyBeenCreated(changed.getCurrent(), NAME));
-                        assertTrue(transactionData.hasPropertyBeenCreated(changed.getPrevious(), TAGS));
-                        assertFalse(transactionData.hasPropertyBeenCreated(changed.getPrevious(), NAME));
+                        assertEquals(1, td.createdProperties(changed.getCurrent()).size());
+                        assertEquals(1, td.createdProperties(changed.getPrevious()).size());
+                        assertEquals("one", td.createdProperties(changed.getCurrent()).get(TAGS));
+                        assertEquals("one", td.createdProperties(changed.getPrevious()).get(TAGS));
 
-                        assertEquals(1, transactionData.createdProperties(changed.getCurrent()).size());
-                        assertEquals(1, transactionData.createdProperties(changed.getPrevious()).size());
-                        assertEquals("one", transactionData.createdProperties(changed.getCurrent()).get(TAGS));
-                        assertEquals("one", transactionData.createdProperties(changed.getPrevious()).get(TAGS));
+                        assertFalse(td.hasPropertyBeenCreated(changesToMap(td.getAllChangedNodes()).get(1L).getCurrent(), TAGS));
 
-                        assertFalse(transactionData.hasPropertyBeenCreated(changesToMap(transactionData.getAllChangedNodes()).get(1L).getCurrent(), TAGS));
+                        Change<Node> changed1 = changesToMap(td.getAllChangedNodes()).get(1L);
+                        assertTrue(td.hasLabelBeenAssigned(changed1.getCurrent(), label("NewOne")));
+                        assertTrue(td.hasLabelBeenAssigned(changed1.getPrevious(), label("NewOne")));
+                        assertFalse(td.hasLabelBeenAssigned(changed1.getCurrent(), label("One")));
+                        assertFalse(td.hasLabelBeenAssigned(changed1.getPrevious(), label("One")));
+                        assertEquals(1, td.assignedLabels(changed1.getCurrent()).size());
+                        assertEquals(1, td.assignedLabels(changed1.getPrevious()).size());
+                        assertEquals("NewOne", getSingle(td.assignedLabels(changed1.getCurrent())).name());
+                        assertEquals("NewOne", getSingle(td.assignedLabels(changed1.getPrevious())).name());
+
+                        Change<Node> changed5 = changesToMap(td.getAllChangedNodes()).get(5L);
+                        assertTrue(td.hasLabelBeenAssigned(changed5.getCurrent(), label("NewLabel")));
+                        assertTrue(td.hasLabelBeenAssigned(changed5.getPrevious(), label("NewLabel")));
+                        assertFalse(td.hasLabelBeenAssigned(changed5.getCurrent(), label("SomeLabel")));
+                        assertFalse(td.hasLabelBeenAssigned(changed5.getPrevious(), label("SomeLabel")));
+                        assertEquals(1, td.assignedLabels(changed5.getCurrent()).size());
+                        assertEquals(1, td.assignedLabels(changed5.getPrevious()).size());
+                        assertEquals("NewLabel", getSingle(td.assignedLabels(changed5.getCurrent())).name());
+                        assertEquals("NewLabel", getSingle(td.assignedLabels(changed5.getPrevious())).name());
+
+                        //not changed at all
+                        assertTrue(td.createdProperties(db.getNodeById(4)).isEmpty());
+                        assertTrue(td.deletedProperties(db.getNodeById(4)).isEmpty());
+                        assertTrue(td.changedProperties(db.getNodeById(4)).isEmpty());
                     }
                 }
         );
     }
 
     @Test
-    public void changedNodePropertiesShouldBeCorrectlyIdentified() {
+    public void changedNodePropertiesAndLabelsShouldBeCorrectlyIdentified() {
         createTestDatabase();
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Change<Node> changed = changesToMap(td.getAllChangedNodes()).get(1L);
 
-                        Change<Node> changed = changesToMap(transactionData.getAllChangedNodes()).get(1L);
+                        assertTrue(td.hasPropertyBeenChanged(changed.getCurrent(), NAME));
+                        assertTrue(td.hasPropertyBeenChanged(changed.getCurrent(), TAGS));
+                        assertFalse(td.hasPropertyBeenChanged(changed.getCurrent(), COUNT));
+                        assertTrue(td.hasPropertyBeenChanged(changed.getPrevious(), NAME));
+                        assertTrue(td.hasPropertyBeenChanged(changed.getPrevious(), TAGS));
+                        assertFalse(td.hasPropertyBeenChanged(changed.getPrevious(), COUNT));
 
-                        assertTrue(transactionData.hasPropertyBeenChanged(changed.getCurrent(), NAME));
-                        assertTrue(transactionData.hasPropertyBeenChanged(changed.getCurrent(), TAGS));
-                        assertFalse(transactionData.hasPropertyBeenChanged(changed.getCurrent(), COUNT));
-                        assertTrue(transactionData.hasPropertyBeenChanged(changed.getPrevious(), NAME));
-                        assertTrue(transactionData.hasPropertyBeenChanged(changed.getPrevious(), TAGS));
-                        assertFalse(transactionData.hasPropertyBeenChanged(changed.getPrevious(), COUNT));
-
-                        assertEquals(2, transactionData.changedProperties(changed.getCurrent()).size());
-                        assertEquals(2, transactionData.changedProperties(changed.getPrevious()).size());
-                        assertEquals("One", transactionData.changedProperties(changed.getCurrent()).get(NAME).getPrevious());
-                        assertEquals("One", transactionData.changedProperties(changed.getPrevious()).get(NAME).getPrevious());
-                        assertEquals("NewOne", transactionData.changedProperties(changed.getCurrent()).get(NAME).getCurrent());
-                        assertEquals("NewOne", transactionData.changedProperties(changed.getPrevious()).get(NAME).getCurrent());
-                        assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) transactionData.changedProperties(changed.getCurrent()).get(TAGS).getCurrent()));
-                        assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) transactionData.changedProperties(changed.getPrevious()).get(TAGS).getPrevious()));
-                        assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) transactionData.changedProperties(changed.getCurrent()).get(TAGS).getCurrent()));
-                        assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) transactionData.changedProperties(changed.getPrevious()).get(TAGS).getPrevious()));
+                        assertEquals(2, td.changedProperties(changed.getCurrent()).size());
+                        assertEquals(2, td.changedProperties(changed.getPrevious()).size());
+                        assertEquals("One", td.changedProperties(changed.getCurrent()).get(NAME).getPrevious());
+                        assertEquals("One", td.changedProperties(changed.getPrevious()).get(NAME).getPrevious());
+                        assertEquals("NewOne", td.changedProperties(changed.getCurrent()).get(NAME).getCurrent());
+                        assertEquals("NewOne", td.changedProperties(changed.getPrevious()).get(NAME).getCurrent());
+                        assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) td.changedProperties(changed.getCurrent()).get(TAGS).getCurrent()));
+                        assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) td.changedProperties(changed.getPrevious()).get(TAGS).getPrevious()));
+                        assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) td.changedProperties(changed.getCurrent()).get(TAGS).getCurrent()));
+                        assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) td.changedProperties(changed.getPrevious()).get(TAGS).getPrevious()));
 
                         assertEquals(3, count(changed.getPrevious().getPropertyKeys()));
                         assertEquals(2, count(changed.getCurrent().getPropertyKeys()));
 
-                        changed = changesToMap(transactionData.getAllChangedNodes()).get(3L);
-                        assertEquals(0, transactionData.changedProperties(changed.getCurrent()).size());
-                        assertEquals(0, transactionData.changedProperties(changed.getPrevious()).size());
-                        assertFalse(transactionData.hasPropertyBeenChanged(changed.getCurrent(), NAME));
-                        assertFalse(transactionData.hasPropertyBeenChanged(changed.getCurrent(), TAGS));
-                        assertFalse(transactionData.hasPropertyBeenChanged(changed.getCurrent(), PLACE));
-                        assertFalse(transactionData.hasPropertyBeenChanged(changed.getPrevious(), NAME));
-                        assertFalse(transactionData.hasPropertyBeenChanged(changed.getPrevious(), TAGS));
-                        assertFalse(transactionData.hasPropertyBeenChanged(changed.getPrevious(), PLACE));
+                        changed = changesToMap(td.getAllChangedNodes()).get(3L);
+                        assertEquals(0, td.changedProperties(changed.getCurrent()).size());
+                        assertEquals(0, td.changedProperties(changed.getPrevious()).size());
+                        assertFalse(td.hasPropertyBeenChanged(changed.getCurrent(), NAME));
+                        assertFalse(td.hasPropertyBeenChanged(changed.getCurrent(), TAGS));
+                        assertFalse(td.hasPropertyBeenChanged(changed.getCurrent(), PLACE));
+                        assertFalse(td.hasPropertyBeenChanged(changed.getPrevious(), NAME));
+                        assertFalse(td.hasPropertyBeenChanged(changed.getPrevious(), TAGS));
+                        assertFalse(td.hasPropertyBeenChanged(changed.getPrevious(), PLACE));
 
-                        assertFalse(transactionData.hasPropertyBeenChanged(transactionData.getAllDeletedNodes().iterator().next(), NAME));
-                        assertFalse(transactionData.hasPropertyBeenChanged(transactionData.getAllCreatedNodes().iterator().next(), NAME));
+                        assertFalse(td.hasPropertyBeenChanged(getSingle(td.getAllDeletedNodes()), NAME));
+                        assertFalse(td.hasPropertyBeenChanged(getSingle(td.getAllCreatedNodes()), NAME));
 
                         assertEquals(2, count(changed.getPrevious().getPropertyKeys()));
                         assertEquals(3, count(changed.getCurrent().getPropertyKeys()));
 
                         //one that isn't changed
-                        Node unchanged = changesToMap(transactionData.getAllChangedNodes()).get(1L).getPrevious().getSingleRelationship(R3, OUTGOING).getEndNode().getSingleRelationship(R1, OUTGOING).getEndNode();
+                        Node unchanged = changesToMap(td.getAllChangedNodes()).get(1L).getPrevious().getSingleRelationship(R3, OUTGOING).getEndNode().getSingleRelationship(R1, OUTGOING).getEndNode();
                         assertEquals(1, count(unchanged.getPropertyKeys()));
                         assertEquals(NAME, unchanged.getPropertyKeys().iterator().next());
                         assertEquals("Four", unchanged.getProperty(NAME));
@@ -862,79 +936,102 @@ public class LazyTransactionDataIntegrationTest {
                         assertEquals("nothing", unchanged.getProperty("non-existing", "nothing"));
 
                         //labels changed
-                        changed = changesToMap(transactionData.getAllChangedNodes()).get(5L);
-                        assertEquals(0, transactionData.changedProperties(changed.getCurrent()).size());
-                        assertEquals(0, transactionData.changedProperties(changed.getPrevious()).size());
-                        assertFalse(transactionData.hasPropertyBeenChanged(changed.getCurrent(), NAME));
-                        assertEquals(1, transactionData.assignedLabels(changed.getPrevious()).size());
-                        assertEquals(1, transactionData.assignedLabels(changed.getCurrent()).size());
-                        assertEquals("NewLabel", transactionData.assignedLabels(changed.getPrevious()).iterator().next().name());
-                        assertEquals("NewLabel", transactionData.assignedLabels(changed.getCurrent()).iterator().next().name());
-                        assertTrue(transactionData.hasLabelBeenAssigned(changed.getPrevious(), label("NewLabel")));
-                        assertTrue(transactionData.hasLabelBeenAssigned(changed.getCurrent(), label("NewLabel")));
-                        assertFalse(transactionData.hasLabelBeenAssigned(changed.getPrevious(), label("SomeOther")));
-                        assertFalse(transactionData.hasLabelBeenAssigned(changed.getCurrent(), label("SomeOther")));
-                        assertFalse(transactionData.hasLabelBeenRemoved(changed.getPrevious(), label("NewLabel")));
-                        assertFalse(transactionData.hasLabelBeenRemoved(changed.getCurrent(), label("NewLabel")));
-                        assertEquals(0, transactionData.removedLabels(changed.getPrevious()).size());
-                        assertEquals(0, transactionData.removedLabels(changed.getCurrent()).size());
+                        changed = changesToMap(td.getAllChangedNodes()).get(5L);
+                        assertEquals(0, td.changedProperties(changed.getCurrent()).size());
+                        assertEquals(0, td.changedProperties(changed.getPrevious()).size());
+                        assertFalse(td.hasPropertyBeenChanged(changed.getCurrent(), NAME));
+                        assertEquals(1, td.assignedLabels(changed.getPrevious()).size());
+                        assertEquals(1, td.assignedLabels(changed.getCurrent()).size());
+                        assertEquals("NewLabel", getSingle(td.assignedLabels(changed.getPrevious())).name());
+                        assertEquals("NewLabel", getSingle(td.assignedLabels(changed.getCurrent())).name());
+                        assertTrue(td.hasLabelBeenAssigned(changed.getPrevious(), label("NewLabel")));
+                        assertTrue(td.hasLabelBeenAssigned(changed.getCurrent(), label("NewLabel")));
+                        assertFalse(td.hasLabelBeenAssigned(changed.getPrevious(), label("SomeOther")));
+                        assertFalse(td.hasLabelBeenAssigned(changed.getCurrent(), label("SomeOther")));
+                        assertFalse(td.hasLabelBeenRemoved(changed.getPrevious(), label("NewLabel")));
+                        assertFalse(td.hasLabelBeenRemoved(changed.getCurrent(), label("NewLabel")));
+                        assertEquals(0, td.removedLabels(changed.getPrevious()).size());
+                        assertEquals(0, td.removedLabels(changed.getCurrent()).size());
 
-                        changed = changesToMap(transactionData.getAllChangedNodes()).get(6L);
-                        assertEquals(0, transactionData.changedProperties(changed.getCurrent()).size());
-                        assertEquals(0, transactionData.changedProperties(changed.getPrevious()).size());
-                        assertFalse(transactionData.hasPropertyBeenChanged(changed.getCurrent(), NAME));
-                        assertEquals(1, transactionData.removedLabels(changed.getPrevious()).size());
-                        assertEquals(1, transactionData.removedLabels(changed.getCurrent()).size());
-                        assertEquals("ToBeRemoved", transactionData.removedLabels(changed.getPrevious()).iterator().next().name());
-                        assertEquals("ToBeRemoved", transactionData.removedLabels(changed.getCurrent()).iterator().next().name());
-                        assertTrue(transactionData.hasLabelBeenRemoved(changed.getPrevious(), label("ToBeRemoved")));
-                        assertTrue(transactionData.hasLabelBeenRemoved(changed.getCurrent(), label("ToBeRemoved")));
-                        assertFalse(transactionData.hasLabelBeenRemoved(changed.getPrevious(), label("SomeOther")));
-                        assertFalse(transactionData.hasLabelBeenRemoved(changed.getCurrent(), label("SomeOther")));
-                        assertFalse(transactionData.hasLabelBeenAssigned(changed.getPrevious(), label("NewLabel")));
-                        assertFalse(transactionData.hasLabelBeenAssigned(changed.getCurrent(), label("NewLabel")));
-                        assertEquals(0, transactionData.assignedLabels(changed.getPrevious()).size());
-                        assertEquals(0, transactionData.assignedLabels(changed.getCurrent()).size());
+                        changed = changesToMap(td.getAllChangedNodes()).get(6L);
+                        assertEquals(0, td.changedProperties(changed.getCurrent()).size());
+                        assertEquals(0, td.changedProperties(changed.getPrevious()).size());
+                        assertFalse(td.hasPropertyBeenChanged(changed.getCurrent(), NAME));
+                        assertEquals(1, td.removedLabels(changed.getPrevious()).size());
+                        assertEquals(1, td.removedLabels(changed.getCurrent()).size());
+                        assertEquals("ToBeRemoved", getSingle(td.removedLabels(changed.getPrevious())).name());
+                        assertEquals("ToBeRemoved", getSingle(td.removedLabels(changed.getCurrent())).name());
+                        assertTrue(td.hasLabelBeenRemoved(changed.getPrevious(), label("ToBeRemoved")));
+                        assertTrue(td.hasLabelBeenRemoved(changed.getCurrent(), label("ToBeRemoved")));
+                        assertFalse(td.hasLabelBeenRemoved(changed.getPrevious(), label("SomeOther")));
+                        assertFalse(td.hasLabelBeenRemoved(changed.getCurrent(), label("SomeOther")));
+                        assertFalse(td.hasLabelBeenAssigned(changed.getPrevious(), label("NewLabel")));
+                        assertFalse(td.hasLabelBeenAssigned(changed.getCurrent(), label("NewLabel")));
+                        assertEquals(0, td.assignedLabels(changed.getPrevious()).size());
+                        assertEquals(0, td.assignedLabels(changed.getCurrent()).size());
+
+                        assertTrue(td.assignedLabels(db.getNodeById(4)).isEmpty());
+                        assertTrue(td.removedLabels(db.getNodeById(4)).isEmpty());
+                        assertFalse(td.hasLabelBeenAssigned(db.getNodeById(4), label("any")));
+                        assertFalse(td.hasLabelBeenRemoved(db.getNodeById(4), label("any")));
                     }
                 }
         );
     }
 
     @Test
-    public void deletedNodePropertiesShouldBeCorrectlyIdentified() {
+    public void deletedNodePropertiesAndLabelsShouldBeCorrectlyIdentified() {
         createTestDatabase();
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        assertTrue(transactionData.mutationsOccurred());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Change<Node> changed = changesToMap(td.getAllChangedNodes()).get(1L);
 
-                        Change<Node> changed = changesToMap(transactionData.getAllChangedNodes()).get(1L);
+                        assertFalse(td.hasPropertyBeenDeleted(changed.getCurrent(), NAME));
+                        assertFalse(td.hasPropertyBeenDeleted(changed.getCurrent(), TAGS));
+                        assertTrue(td.hasPropertyBeenDeleted(changed.getCurrent(), COUNT));
+                        assertFalse(td.hasPropertyBeenDeleted(changed.getPrevious(), NAME));
+                        assertFalse(td.hasPropertyBeenDeleted(changed.getPrevious(), TAGS));
+                        assertTrue(td.hasPropertyBeenDeleted(changed.getPrevious(), COUNT));
 
-                        assertFalse(transactionData.hasPropertyBeenDeleted(changed.getCurrent(), NAME));
-                        assertFalse(transactionData.hasPropertyBeenDeleted(changed.getCurrent(), TAGS));
-                        assertTrue(transactionData.hasPropertyBeenDeleted(changed.getCurrent(), COUNT));
-                        assertFalse(transactionData.hasPropertyBeenDeleted(changed.getPrevious(), NAME));
-                        assertFalse(transactionData.hasPropertyBeenDeleted(changed.getPrevious(), TAGS));
-                        assertTrue(transactionData.hasPropertyBeenDeleted(changed.getPrevious(), COUNT));
+                        assertEquals(1, td.deletedProperties(changed.getCurrent()).size());
+                        assertEquals(1, td.deletedProperties(changed.getPrevious()).size());
+                        assertEquals(1, td.deletedProperties(changed.getCurrent()).get(COUNT));
+                        assertEquals(1, td.deletedProperties(changed.getPrevious()).get(COUNT));
 
-                        assertEquals(1, transactionData.deletedProperties(changed.getCurrent()).size());
-                        assertEquals(1, transactionData.deletedProperties(changed.getPrevious()).size());
-                        assertEquals(1, transactionData.deletedProperties(changed.getCurrent()).get(COUNT));
-                        assertEquals(1, transactionData.deletedProperties(changed.getPrevious()).get(COUNT));
+                        assertTrue(td.hasLabelBeenRemoved(changed.getCurrent(), label("One")));
+                        assertTrue(td.hasLabelBeenRemoved(changed.getPrevious(), label("One")));
+                        assertEquals(1, td.removedLabels(changed.getCurrent()).size());
+                        assertEquals(1, td.removedLabels(changed.getPrevious()).size());
+                        assertEquals("One", getSingle(td.removedLabels(changed.getCurrent())).name());
+                        assertEquals("One", getSingle(td.removedLabels(changed.getPrevious())).name());
 
-                        changed = changesToMap(transactionData.getAllChangedNodes()).get(3L);
-                        assertEquals(0, transactionData.deletedProperties(changed.getCurrent()).size());
-                        assertEquals(0, transactionData.deletedProperties(changed.getPrevious()).size());
-                        assertFalse(transactionData.hasPropertyBeenDeleted(changed.getCurrent(), NAME));
-                        assertFalse(transactionData.hasPropertyBeenDeleted(changed.getCurrent(), TAGS));
-                        assertFalse(transactionData.hasPropertyBeenDeleted(changed.getCurrent(), PLACE));
-                        assertFalse(transactionData.hasPropertyBeenDeleted(changed.getPrevious(), NAME));
-                        assertFalse(transactionData.hasPropertyBeenDeleted(changed.getPrevious(), TAGS));
-                        assertFalse(transactionData.hasPropertyBeenDeleted(changed.getPrevious(), PLACE));
+                        changed = changesToMap(td.getAllChangedNodes()).get(3L);
+                        assertEquals(0, td.deletedProperties(changed.getCurrent()).size());
+                        assertEquals(0, td.deletedProperties(changed.getPrevious()).size());
+                        assertFalse(td.hasPropertyBeenDeleted(changed.getCurrent(), NAME));
+                        assertFalse(td.hasPropertyBeenDeleted(changed.getCurrent(), TAGS));
+                        assertFalse(td.hasPropertyBeenDeleted(changed.getCurrent(), PLACE));
+                        assertFalse(td.hasPropertyBeenDeleted(changed.getPrevious(), NAME));
+                        assertFalse(td.hasPropertyBeenDeleted(changed.getPrevious(), TAGS));
+                        assertFalse(td.hasPropertyBeenDeleted(changed.getPrevious(), PLACE));
 
-                        assertFalse(transactionData.hasPropertyBeenDeleted(transactionData.getAllDeletedNodes().iterator().next(), NAME));
-                        assertFalse(transactionData.hasPropertyBeenDeleted(transactionData.getAllCreatedNodes().iterator().next(), NAME));
+                        assertFalse(td.hasPropertyBeenDeleted(getSingle(td.getAllDeletedNodes()), NAME));
+                        assertFalse(td.hasPropertyBeenDeleted(getSingle(td.getAllCreatedNodes()), NAME));
+
+                        changed = changesToMap(td.getAllChangedNodes()).get(6L);
+                        assertTrue(td.hasLabelBeenRemoved(changed.getCurrent(), label("ToBeRemoved")));
+                        assertTrue(td.hasLabelBeenRemoved(changed.getPrevious(), label("ToBeRemoved")));
+                        assertEquals(1, td.removedLabels(changed.getCurrent()).size());
+                        assertEquals(1, td.removedLabels(changed.getPrevious()).size());
+                        assertEquals("ToBeRemoved", getSingle(td.removedLabels(changed.getCurrent())).name());
+                        assertEquals("ToBeRemoved", getSingle(td.removedLabels(changed.getPrevious())).name());
+
+                        assertTrue(td.assignedLabels(db.getNodeById(4)).isEmpty());
+                        assertTrue(td.removedLabels(db.getNodeById(4)).isEmpty());
+                        assertFalse(td.hasLabelBeenAssigned(db.getNodeById(4), label("any")));
+                        assertFalse(td.hasLabelBeenRemoved(db.getNodeById(4), label("any")));
                     }
                 }
         );
@@ -948,12 +1045,12 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        if (!transactionData.mutationsOccurred()) {
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        if (!td.mutationsOccurred()) {
                             return;
                         }
 
-                        Map<Long, Relationship> created = toMap(transactionData.getAllCreatedRelationships());
+                        Map<Long, Relationship> created = toMap(td.getAllCreatedRelationships());
 
                         long r1Id = db.getNodeById(7).getSingleRelationship(R2, OUTGOING).getId();
                         Relationship r1 = created.get(r1Id);
@@ -978,17 +1075,18 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        if (!transactionData.mutationsOccurred()) {
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        if (!td.mutationsOccurred()) {
                             return;
                         }
 
-                        Map<Long, Node> createdNodes = toMap(transactionData.getAllCreatedNodes());
+                        Map<Long, Node> createdNodes = toMap(td.getAllCreatedNodes());
                         Node createdNode = createdNodes.get(7L);
 
                         createdNode.setProperty(NAME, "NewSeven");
                         createdNode.setProperty("additional", "something");
                         createdNode.removeProperty("size");
+                        createdNode.addLabel(label("SomeNewLabel"));
                     }
                 }
         );
@@ -1001,6 +1099,7 @@ public class LazyTransactionDataIntegrationTest {
             assertEquals("something", createdNode.getProperty("additional"));
             assertEquals(2, count(createdNode.getPropertyKeys()));
             assertFalse(createdNode.hasProperty("size"));
+            assertTrue(createdNode.hasLabel(label("SomeNewLabel")));
         }
     }
 
@@ -1010,14 +1109,14 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        if (!transactionData.mutationsOccurred()) {
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        if (!td.mutationsOccurred()) {
                             return;
                         }
 
-                        Map<Long, Change<Relationship>> changed = changesToMap(transactionData.getAllChangedRelationships());
+                        Map<Long, Change<Relationship>> changed = changesToMap(td.getAllChangedRelationships());
 
-                        Relationship r = changed.entrySet().iterator().next().getValue().getCurrent();
+                        Relationship r = getSingle(changed.entrySet()).getValue().getCurrent();
 
                         r.setProperty(TIME, 5);
                         r.setProperty("additional", "something");
@@ -1042,12 +1141,12 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        if (!transactionData.mutationsOccurred()) {
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        if (!td.mutationsOccurred()) {
                             return;
                         }
 
-                        Map<Long, Change<Relationship>> changed = changesToMap(transactionData.getAllChangedRelationships());
+                        Map<Long, Change<Relationship>> changed = changesToMap(td.getAllChangedRelationships());
 
                         Relationship r = changed.entrySet().iterator().next().getValue().getPrevious();
 
@@ -1075,18 +1174,19 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        if (!transactionData.mutationsOccurred()) {
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        if (!td.mutationsOccurred()) {
                             return;
                         }
 
-                        Map<Long, Change<Node>> changed = changesToMap(transactionData.getAllChangedNodes());
+                        Map<Long, Change<Node>> changed = changesToMap(td.getAllChangedNodes());
 
                         Node node = changed.get(1L).getCurrent();
 
                         node.setProperty(NAME, "YetAnotherOne");
                         node.setProperty("additional", "something");
                         node.removeProperty(TAGS);
+                        node.removeLabel(label("NewOne"));
                     }
                 }
         );
@@ -1099,6 +1199,7 @@ public class LazyTransactionDataIntegrationTest {
             assertEquals("YetAnotherOne", node.getProperty(NAME));
             assertEquals("something", node.getProperty("additional"));
             assertFalse(node.hasProperty(TAGS));
+            assertEquals(0, count(node.getLabels()));
         }
     }
 
@@ -1108,18 +1209,20 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        if (!transactionData.mutationsOccurred()) {
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        if (!td.mutationsOccurred()) {
                             return;
                         }
 
-                        Map<Long, Change<Node>> changed = changesToMap(transactionData.getAllChangedNodes());
+                        Map<Long, Change<Node>> changed = changesToMap(td.getAllChangedNodes());
 
                         Node node = changed.get(1L).getPrevious();
 
                         node.setProperty(NAME, "YetAnotherOne");
                         node.setProperty("additional", "something");
                         node.removeProperty(TAGS);
+                        node.addLabel(label("YetAnotherLabel"));
+                        node.removeLabel(label("NewOne"));
                     }
                 }
         );
@@ -1132,6 +1235,8 @@ public class LazyTransactionDataIntegrationTest {
             assertEquals("YetAnotherOne", node.getProperty(NAME));
             assertEquals("something", node.getProperty("additional"));
             assertFalse(node.hasProperty(TAGS));
+            assertEquals(1, count(node.getLabels()));
+            assertTrue(node.hasLabel(label("YetAnotherLabel")));
         }
     }
 
@@ -1141,14 +1246,14 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        if (!transactionData.mutationsOccurred()) {
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        if (!td.mutationsOccurred()) {
                             return;
                         }
 
-                        Map<Long, Relationship> deleted = toMap(transactionData.getAllDeletedRelationships());
+                        Map<Long, Relationship> deleted = toMap(td.getAllDeletedRelationships());
 
-                        long r1Id = toMap(transactionData.getAllDeletedNodes()).get(2L).getSingleRelationship(R1, INCOMING).getId();
+                        long r1Id = toMap(td.getAllDeletedNodes()).get(2L).getSingleRelationship(R1, INCOMING).getId();
                         Relationship r1 = deleted.get(r1Id);
 
                         try {
@@ -1170,8 +1275,8 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        Map<Long, Node> deletedNodes = toMap(transactionData.getAllDeletedNodes());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
 
                         Node deleted = deletedNodes.get(2L);
 
@@ -1181,6 +1286,21 @@ public class LazyTransactionDataIntegrationTest {
                         } catch (IllegalStateException e) {
                             //OK
                         }
+
+                        try {
+                            deleted.addLabel(label("irrelevant"));
+                            return;
+                        } catch (IllegalStateException e) {
+                            //OK
+                        }
+
+                        try {
+                            deleted.removeLabel(label("irrelevant"));
+                            return;
+                        } catch (IllegalStateException e) {
+                            //OK
+                        }
+
 
                         deleted.removeProperty("irrelevant");
                     }
@@ -1194,8 +1314,8 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        Map<Long, Node> deletedNodes = toMap(transactionData.getAllDeletedNodes());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
 
                         Node deleted = deletedNodes.get(2L);
 
@@ -1211,8 +1331,8 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        Map<Long, Node> deletedNodes = toMap(transactionData.getAllDeletedNodes());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
 
                         Node deleted = deletedNodes.get(2L);
 
@@ -1229,7 +1349,7 @@ public class LazyTransactionDataIntegrationTest {
                 new TestGraphMutation(),
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
+                    public void doBeforeCommit(ImprovedTransactionData td) {
                         throw new RuntimeException("Deliberate testing exception");
                     }
                 },
@@ -1241,24 +1361,26 @@ public class LazyTransactionDataIntegrationTest {
             long r4Id = db.getNodeById(3L).getSingleRelationship(R3, INCOMING).getId();
             Relationship r4 = db.getRelationshipById(r4Id);
 
-            assertEquals("One", r4.getStartNode().getProperty(NAME));
-            assertEquals(1, r4.getStartNode().getProperty(COUNT, 2));
-            assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) r4.getStartNode().getProperty(TAGS)));
-            assertEquals(3, count(r4.getStartNode().getPropertyKeys()));
+            Node one = r4.getStartNode();
+            assertEquals("One", one.getProperty(NAME));
+            assertEquals(1, one.getProperty(COUNT, 2));
+            assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) one.getProperty(TAGS)));
+            assertEquals(3, count(one.getPropertyKeys()));
+            assertEquals(1, count(one.getLabels()));
+            assertTrue(contains(one.getLabels(), label("One")));
 
             assertEquals("Three", r4.getEndNode().getProperty(NAME));
             assertEquals("London", r4.getEndNode().getProperty(PLACE));
             assertEquals("nothing", r4.getEndNode().getProperty(TAGS, "nothing"));
 
-            Node startNode = r4.getStartNode();
-            Relationship r5 = startNode.getSingleRelationship(R1, OUTGOING);
+            Relationship r5 = one.getSingleRelationship(R1, OUTGOING);
             assertEquals("Two", r5.getEndNode().getProperty(NAME));
 
-            assertEquals(4, count(startNode.getRelationships()));
-            assertEquals(3, count(startNode.getRelationships(OUTGOING)));
-            assertEquals(2, count(startNode.getRelationships(R3)));
-            assertEquals(3, count(startNode.getRelationships(R3, R1)));
-            assertEquals(1, count(startNode.getRelationships(INCOMING, R3, R1)));
+            assertEquals(4, count(one.getRelationships()));
+            assertEquals(3, count(one.getRelationships(OUTGOING)));
+            assertEquals(2, count(one.getRelationships(R3)));
+            assertEquals(3, count(one.getRelationships(R3, R1)));
+            assertEquals(1, count(one.getRelationships(INCOMING, R3, R1)));
         }
     }
 
@@ -1268,8 +1390,8 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        Change<Node> change = transactionData.getChanged(db.getNodeById(1));
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Change<Node> change = td.getChanged(db.getNodeById(1));
                         //must first delete the new relationship
                         change.getCurrent().getSingleRelationship(R1, OUTGOING).delete();
                         deleteNodeAndRelationships(change.getPrevious());
@@ -1288,7 +1410,7 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
+                    public void doBeforeCommit(ImprovedTransactionData td) {
                         for (Node node : GlobalGraphOperations.at(db).getAllNodes()) {
                             deleteNodeAndRelationships(node);
                         }
@@ -1307,8 +1429,8 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        Map<Long, Node> deletedNodes = toMap(transactionData.getAllDeletedNodes());
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
                         Node deleted = deletedNodes.get(2L);
                         deleteNodeAndRelationships(deleted);
                     }
@@ -1326,16 +1448,16 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        if (!transactionData.mutationsOccurred()) {
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        if (!td.mutationsOccurred()) {
                             return;
                         }
 
-                        Map<Long, Change<Node>> changed = changesToMap(transactionData.getAllChangedNodes());
+                        Map<Long, Change<Node>> changed = changesToMap(td.getAllChangedNodes());
 
                         Node node = changed.get(1L).getCurrent();
 
-                        Node newNode = db.createNode();
+                        Node newNode = db.createNode(label("NewNode"));
                         newNode.setProperty(NAME, "Eight");
                         node.createRelationshipTo(newNode, withName("R4")).setProperty("new", true);
                     }
@@ -1347,6 +1469,7 @@ public class LazyTransactionDataIntegrationTest {
             assertNotNull(newRelationship);
             assertEquals("Eight", newRelationship.getEndNode().getProperty(NAME));
             assertEquals(true, newRelationship.getProperty("new"));
+            assertTrue(contains(newRelationship.getEndNode().getLabels(), label("NewNode")));
         }
     }
 
@@ -1356,16 +1479,16 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        if (!transactionData.mutationsOccurred()) {
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        if (!td.mutationsOccurred()) {
                             return;
                         }
 
-                        Map<Long, Change<Node>> changed = changesToMap(transactionData.getAllChangedNodes());
+                        Map<Long, Change<Node>> changed = changesToMap(td.getAllChangedNodes());
 
                         Node node = changed.get(1L).getPrevious();
 
-                        Node newNode = db.createNode();
+                        Node newNode = db.createNode(label("NewNode"));
                         newNode.setProperty(NAME, "Eight");
                         node.createRelationshipTo(newNode, withName("R4")).setProperty("new", true);
                     }
@@ -1377,6 +1500,7 @@ public class LazyTransactionDataIntegrationTest {
             assertNotNull(newRelationship);
             assertEquals("Eight", newRelationship.getEndNode().getProperty(NAME));
             assertEquals(true, newRelationship.getProperty("new"));
+            assertTrue(contains(newRelationship.getEndNode().getLabels(), label("NewNode")));
         }
     }
 
@@ -1386,9 +1510,9 @@ public class LazyTransactionDataIntegrationTest {
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
-                    public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        Relationship previous = transactionData.getAllChangedRelationships().iterator().next().getPrevious();
-                        Relationship current = transactionData.getAllChangedRelationships().iterator().next().getCurrent();
+                    public void doBeforeCommit(ImprovedTransactionData td) {
+                        Relationship previous = getSingle(td.getAllChangedRelationships()).getPrevious();
+                        Relationship current = getSingle(td.getAllChangedRelationships()).getCurrent();
 
                         Map<String, Object> previousProps = new OtherNodeNameIncludingRelationshipPropertiesExtractor().extractProperties(previous, previous.getStartNode());
                         assertEquals(3, previousProps.size());
@@ -1419,8 +1543,8 @@ public class LazyTransactionDataIntegrationTest {
                         }
                     }, new BeforeCommitCallback() {
                         @Override
-                        public void beforeCommit(ImprovedTransactionData transactionData) {
-                            assertFalse(transactionData.mutationsOccurred());
+                        public void beforeCommit(ImprovedTransactionData td) {
+                            assertFalse(td.mutationsOccurred());
                         }
 
                         @Override
@@ -1518,7 +1642,7 @@ public class LazyTransactionDataIntegrationTest {
 
         new TestDataBuilder(db)
                 .node(label("TestLabel"))
-                .node().setProp(NAME, "One").setProp(COUNT, 1).setProp(TAGS, new String[]{"one", "two"})
+                .node(label("One")).setProp(NAME, "One").setProp(COUNT, 1).setProp(TAGS, new String[]{"one", "two"})
 
                 .node().setProp(NAME, "Two").setProp("size", 2L)
                 .relationshipFrom(1, "R1").setProp(TIME, 1)
@@ -1534,7 +1658,9 @@ public class LazyTransactionDataIntegrationTest {
                 .relationshipFrom(1, "WHATEVER")
 
                 .node(label("SomeLabel")).setProp(NAME, "Five")
-                .node(label("ToBeRemoved")).setProp(NAME, "Six");
+                .relationshipFrom(4, R4)
+                .node(label("ToBeRemoved")).setProp(NAME, "Six")
+                .relationshipFrom(5, R4);
     }
 
     private class TestGraphMutation extends VoidReturningCallback {
@@ -1546,6 +1672,8 @@ public class LazyTransactionDataIntegrationTest {
             one.removeProperty(COUNT);
             one.setProperty(TAGS, new String[]{"one"});
             one.setProperty(TAGS, new String[]{"one", "three"});
+            one.removeLabel(label("One"));
+            one.addLabel(label("NewOne"));
 
             Node two = database.getNodeById(2);
             deleteNodeAndRelationships(two);
@@ -1578,9 +1706,16 @@ public class LazyTransactionDataIntegrationTest {
 
             Node five = database.getNodeById(5);
             five.addLabel(label("NewLabel"));
-//
+
             Node six = database.getNodeById(6);
             six.removeLabel(label("ToBeRemoved"));
+
+            //this should not be picked up as a change
+            Node zero = database.getNodeById(0);
+            zero.removeLabel(label("TestLabel"));
+            zero.addLabel(label("Temp"));
+            zero.removeLabel(label("Temp"));
+            zero.addLabel(label("TestLabel"));
         }
     }
 

@@ -127,21 +127,33 @@ public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Nod
         super.removeLabel(label);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getDegree() {
         return super.getDegree();    //To change body of overridden methods use File | Settings | File Templates.
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getDegree(RelationshipType type) {
         return super.getDegree(type);    //To change body of overridden methods use File | Settings | File Templates.
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getDegree(Direction direction) {
         return super.getDegree(direction);    //To change body of overridden methods use File | Settings | File Templates.
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getDegree(RelationshipType type, Direction direction) {
         return super.getDegree(type, direction);    //To change body of overridden methods use File | Settings | File Templates.
