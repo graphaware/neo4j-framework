@@ -171,7 +171,9 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
         private final Iterator<Node> nodes;
 
         private RootNodeIterator(GraphDatabaseService database) {
-            nodes = at(database).getAllNodes().iterator();
+            //this is deliberately using the deprecated API
+            //noinspection deprecation
+            nodes = database.getAllNodes().iterator();
         }
 
         @Override
