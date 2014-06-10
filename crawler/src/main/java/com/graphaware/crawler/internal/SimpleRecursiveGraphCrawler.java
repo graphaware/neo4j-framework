@@ -56,6 +56,11 @@ public class SimpleRecursiveGraphCrawler implements PerpetualGraphCrawler {
 		 * be able to pick up changes to the graph, assuming transactions worth the way I think they work, that is.
 		 *
 		 * Probably need to do a bit of research on Neo4j transaction properties...
+		 * Points to note:
+		 * - transactions are flattened when nested (i.e., all within the scope of the top-level transaction)
+		 * - transactions are thread-bound, which could be interesting if we run this offline
+		 * 		I think this implies that we have to start/end run each tx within the converging thread
+		 * 		In other words, I'm advocating starting a new transaction for each iteration of the algorithm
 		 */
 		try (Transaction transaction = databaseService.beginTx()) {
 			Node arbitraryStartNode = GlobalGraphOperations.at(databaseService).getAllNodes().iterator().next();
