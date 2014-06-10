@@ -16,7 +16,6 @@
 
 package com.graphaware.server.web;
 
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -24,7 +23,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  * Spring application config.
  */
 @Configuration
-@ComponentScan(basePackages = {"com.**.graphaware.**", "org.**.graphaware.**", "net.**.graphaware.**"})
 @EnableWebMvc
 public class AppConfig {
 

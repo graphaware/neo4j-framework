@@ -16,11 +16,11 @@
 
 package com.graphaware.example;
 
-import com.graphaware.test.integration.ServerIntegrationTest;
-import com.graphaware.test.integration.ServerIntegrationTest;
+import com.graphaware.test.integration.NeoServerIntegrationTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
+import static com.graphaware.test.util.TestUtils.executeCypher;
 import static com.graphaware.test.util.TestUtils.get;
 import static org.junit.Assert.assertEquals;
 
@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Test for {@link com.graphaware.example.module.FriendshipStrengthCounter}.
  */
-public class FriendshipStrengthModuleServerIntegrationTest extends ServerIntegrationTest {
+public class FriendshipStrengthModuleServerIntegrationTest extends NeoServerIntegrationTest {
 
     public FriendshipStrengthModuleServerIntegrationTest() {
         super("neo4j-friendship.properties");
@@ -41,7 +41,8 @@ public class FriendshipStrengthModuleServerIntegrationTest extends ServerIntegra
 
     @Test
     public void totalFriendshipStrengthShouldBeCorrectlyCalculated() {
-        executeCypher("CREATE " +
+        executeCypher("http://localhost:7474/" ,
+                "CREATE " +
                 "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
                 "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
 

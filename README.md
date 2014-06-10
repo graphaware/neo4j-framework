@@ -158,9 +158,20 @@ public class NodeCountApi {
 }
 ```
 
-**WARNING:** Your class must reside in a `com`, `net`, or `org` top-level
+**WARNING** Your class must reside in a `com`, `net`, or `org` top-level
 package and one of the package levels must be called `graphaware`. For example, `com.mycompany.graphaware.NodeCountApi`
- will do. This is currently a limitation and will be addressed in a future release.
+ will do. Alternatively, if you do not want the class to reside in the specified package, you need to put the following
+ class in a package that follows the specification:
+
+```java
+@Configuration
+@ComponentScan(basePackages = {"com.yourdomain.**"})
+public class GraphAwareIntegration {
+}
+```
+
+Then your controllers can reside in any subpackage of `com.yourdomain`.
+**WARNING END**
 
 Compile this code into a .jar file (with dependencies, see below) and place it into the _plugins_ directory of your
 Neo4j server installation. You will then be able to issue a `GET` request to `http://your-neo4j-url:7474/graphaware/count`

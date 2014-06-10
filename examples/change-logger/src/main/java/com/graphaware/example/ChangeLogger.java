@@ -16,18 +16,12 @@
 
 package com.graphaware.example;
 
-import com.graphaware.common.description.property.LiteralPropertiesDescription;
-import com.graphaware.common.util.PropertyContainerUtils;
-import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
-import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 
-import static com.graphaware.common.util.IterableUtils.getSingle;
-import static com.graphaware.common.util.PropertyContainerUtils.*;
-import static org.neo4j.tooling.GlobalGraphOperations.at;
+import static com.graphaware.common.util.IterableUtils.getSingleOrNull;
 
 /**
  * Example of a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler} that uses GraphAware {@link ImprovedTransactionData}
