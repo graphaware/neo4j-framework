@@ -20,6 +20,26 @@ public final class RelationshipUtils {
      * @return a single relationship, null if there is no such relationship between the nodes. If there is
      *         more than one relationship, one (unspecified which one) will be returned.
      */
+    public static Relationship getSingleRelationship(Node node1, Node node2, RelationshipType type, Direction direction) {
+        Relationship result = getSingleRelationshipOrNull(node1, node2, type, direction);
+
+        if (result == null) {
+            throw new NotFoundException("Relationship between " + node1 + " and " + node2 + " of type " + type + " and direction " + direction + " does not exist.");
+        }
+
+        return result;
+    }
+
+    /**
+     * Get a single relationship between two nodes.
+     *
+     * @param node1     first node.
+     * @param node2     second node.
+     * @param type      relationship type.
+     * @param direction relationship direction from first node's point of view (can be BOTH).
+     * @return a single relationship, null if there is no such relationship between the nodes. If there is
+     *         more than one relationship, one (unspecified which one) will be returned.
+     */
     public static Relationship getSingleRelationshipOrNull(Node node1, Node node2, RelationshipType type, Direction direction) {
         Path singlePath = shortestPath(forTypeAndDirection(type, direction), 1, 1).findSinglePath(node1, node2);
 

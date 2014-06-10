@@ -52,6 +52,18 @@ public class RelationshipUtilsTest {
         }
     }
 
+    @Test(expected = NotFoundException.class)
+    public void nonExistingRelationshipShouldBeCorrectlyIdentified2() {
+        try (Transaction tx = database.beginTx()) {
+            Node node1 = database.getNodeById(0);
+            Node node2 = database.getNodeById(1);
+
+            getSingleRelationship(node2, node1, withName("IDONTEXIST"), INCOMING);
+
+            tx.success();
+        }
+    }
+
     @Test
     public void existingRelationshipShouldNotBeRecreated() {
         try (Transaction tx = database.beginTx()) {
@@ -67,7 +79,7 @@ public class RelationshipUtilsTest {
     }
 
     @Test
-    public void nonExistingRelationshipSouldBeCreated() {
+    public void nonExistingRelationshipShouldBeCreated() {
         try (Transaction tx = database.beginTx()) {
             Node node1 = database.getNodeById(0);
             Node node2 = database.getNodeById(1);
