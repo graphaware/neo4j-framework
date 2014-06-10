@@ -479,10 +479,18 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
     }
 
     private Node getRuntimeRoot() {
-        Node root;
+        Node root = null;
 
         try (Transaction tx = database.beginTx()) {
-            root = getSingle(GlobalGraphOperations.at(database).getAllNodesWithLabel(GA_ROOT));
+            //deliberately using deprecated API, do not attempt to fix, or at least run the test afterwards
+            //noinspection deprecation
+            for (Node node : database.getAllNodes()) {
+                if (node.hasLabel(GA_ROOT)) {
+                    root = node;
+                    break;
+                }
+            }
+
             tx.success();
         }
 
