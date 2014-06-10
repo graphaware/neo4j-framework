@@ -24,9 +24,9 @@ transactions in real-time.
 Additionally, for [Java developers only](#javadev)(1), the following functionality is provided:
 
 * [GraphAware Test](#graphaware-test)
-    * [GraphUnit](#graphunit) - a library for simple graph unit-testing
-    * [Performance Testing Library](#perftest)
-    * [API Testing Library](#apitest)
+    * [GraphUnit](#graphunit) - simple graph unit-testing
+    * [Integration Testing](#inttest) - support for integration testing
+    * [Performance Testing](#perftest) - support for performance testing
 * [Improved Neo4j Transaction API](#tx-api)
 * [Transaction Executor](#tx-executor) and [Batch Transaction Executor](#batch-tx)
 * [Miscellaneous Utilities](#utils)
@@ -445,12 +445,12 @@ Neo4j internal node/relationship IDs are ignored. In case the graphs aren't iden
 The second method `public static void assertSubgraph(GraphDatabaseService database, String subgraphCypher)` is used to
 verify that the graph created by `sameGraphCypher` statement is a subgraph of the graph in the `database`.
 
-<a name="perftest"/>
-#### Performance Testing
+<a name="inttest"/>
+#### Integration Testing
 TBD
 
-<a name="apitest"/>
-#### API Testing
+<a name="perftest"/>
+#### Performance Testing
 TBD
 
 <a name="tx-api"/>
