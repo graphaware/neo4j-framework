@@ -30,12 +30,14 @@ import org.mockito.Mockito;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.tooling.GlobalGraphOperations;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
 
 import java.io.IOException;
 
 import static com.graphaware.common.util.IterableUtils.count;
+import static com.graphaware.common.util.IterableUtils.getSingle;
 import static com.graphaware.runtime.ProductionGraphAwareRuntime.*;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_ROOT;
@@ -480,6 +482,8 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
         Node root = null;
 
         try (Transaction tx = database.beginTx()) {
+            //deliberately using deprecated API, do not attempt to fix, or at least run the test afterwards
+            //noinspection deprecation
             for (Node node : database.getAllNodes()) {
                 if (node.hasLabel(GA_ROOT)) {
                     root = node;

@@ -18,12 +18,9 @@ package com.graphaware.example.module;
 
 import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.neo4j.graphdb.*;
-import org.neo4j.graphdb.event.TransactionData;
-import org.neo4j.graphdb.event.TransactionEventHandler;
 
-import static com.graphaware.common.util.IterableUtils.getSingle;
+import static com.graphaware.common.util.IterableUtils.getSingleOrNull;
 import static com.graphaware.example.module.Labels.*;
 import static com.graphaware.example.module.PropertyKeys.*;
 import static com.graphaware.example.module.Relationships.*;
@@ -93,7 +90,7 @@ public class FriendshipStrengthCounter {
      * @return counter node.
      */
     private static Node getCounterNode(GraphDatabaseService database) {
-        Node result = getSingle(at(database).getAllNodesWithLabel(FriendshipCounter));
+        Node result = getSingleOrNull(at(database).getAllNodesWithLabel(FriendshipCounter));
 
         if (result != null) {
             return result;

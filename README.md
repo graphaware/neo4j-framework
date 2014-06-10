@@ -24,9 +24,9 @@ transactions in real-time.
 Additionally, for [Java developers only](#javadev)(1), the following functionality is provided:
 
 * [GraphAware Test](#graphaware-test)
-    * [GraphUnit](#graphunit) - a library for simple graph unit-testing
-    * [Performance Testing Library](#perftest)
-    * [API Testing Library](#apitest)
+    * [GraphUnit](#graphunit) - simple graph unit-testing
+    * [Integration Testing](#inttest) - support for integration testing
+    * [Performance Testing](#perftest) - support for performance testing
 * [Improved Neo4j Transaction API](#tx-api)
 * [Transaction Executor](#tx-executor) and [Batch Transaction Executor](#batch-tx)
 * [Miscellaneous Utilities](#utils)
@@ -158,9 +158,20 @@ public class NodeCountApi {
 }
 ```
 
-**WARNING:** Your class must reside in a `com`, `net`, or `org` top-level
+**WARNING** Your class must reside in a `com`, `net`, or `org` top-level
 package and one of the package levels must be called `graphaware`. For example, `com.mycompany.graphaware.NodeCountApi`
- will do. This is currently a limitation and will be addressed in a future release.
+ will do. Alternatively, if you do not want the class to reside in the specified package, you need to put the following
+ class in a package that follows the specification:
+
+```java
+@Configuration
+@ComponentScan(basePackages = {"com.yourdomain.**"})
+public class GraphAwareIntegration {
+}
+```
+
+Then your controllers can reside in any subpackage of `com.yourdomain`.
+**WARNING END**
 
 Compile this code into a .jar file (with dependencies, see below) and place it into the _plugins_ directory of your
 Neo4j server installation. You will then be able to issue a `GET` request to `http://your-neo4j-url:7474/graphaware/count`
@@ -434,12 +445,12 @@ Neo4j internal node/relationship IDs are ignored. In case the graphs aren't iden
 The second method `public static void assertSubgraph(GraphDatabaseService database, String subgraphCypher)` is used to
 verify that the graph created by `sameGraphCypher` statement is a subgraph of the graph in the `database`.
 
-<a name="perftest"/>
-#### Performance Testing
+<a name="inttest"/>
+#### Integration Testing
 TBD
 
-<a name="apitest"/>
-#### API Testing
+<a name="perftest"/>
+#### Performance Testing
 TBD
 
 <a name="tx-api"/>
