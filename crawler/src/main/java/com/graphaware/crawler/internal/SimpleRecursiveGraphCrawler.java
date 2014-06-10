@@ -65,13 +65,19 @@ public class SimpleRecursiveGraphCrawler implements PerpetualGraphCrawler {
 		try (Transaction transaction = databaseService.beginTx()) {
 			Node arbitraryStartNode = GlobalGraphOperations.at(databaseService).getAllNodes().iterator().next();
 			// TODO: actually make this crawl perpetually
-			crawl(arbitraryStartNode, 9, 0, null);
+			try {
+				crawl(arbitraryStartNode, 9, 0, null);
+			} catch (Exception e) {
+				transaction.failure();
+				LOG.error("Unhandled exception caught when crawling graph", e);
+			}
 
 			transaction.success(); // I reckon we want this trans'n to be read-only, but I don't know whether that's possible
 		}
+
 	}
 
-	private void crawl(Node startNode, int maxDepth, int currentDepth, Relationship howDidIGetHere) {
+	private void crawl(Node startNode, int maxDepth, int currentDepth, Relationship howDidIGetHere) throws Exception {
 		if (currentDepth > maxDepth || startNode.getDegree() == 0) {
 			return;
 		}
