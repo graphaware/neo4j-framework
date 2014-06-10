@@ -17,8 +17,9 @@ public final class RelationshipUtils {
      * @param node2     second node.
      * @param type      relationship type.
      * @param direction relationship direction from first node's point of view (can be BOTH).
-     * @return a single relationship, null if there is no such relationship between the nodes. If there is
+     * @return a single relationship. If there is
      *         more than one relationship, one (unspecified which one) will be returned.
+     * @throws NotFoundException if there is no such relationship.
      */
     public static Relationship getSingleRelationship(Node node1, Node node2, RelationshipType type, Direction direction) {
         Relationship result = getSingleRelationshipOrNull(node1, node2, type, direction);
