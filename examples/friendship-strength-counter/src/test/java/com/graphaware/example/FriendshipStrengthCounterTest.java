@@ -49,7 +49,7 @@ public class FriendshipStrengthCounterTest {
 
     @Test
     public void totalFriendshipStrengthShouldBeZeroInEmptyDatabase() {
-        assertEquals(0, getTotalFriendshipStrength(database));
+        assertEquals(0L, getTotalFriendshipStrength(database));
     }
 
     @Test
@@ -63,16 +63,16 @@ public class FriendshipStrengthCounterTest {
             person2.setProperty("name", "Person Two");
             person3.setProperty("name", "Person Three");
 
-            person1.createRelationshipTo(person2, FRIEND_OF).setProperty(STRENGTH, 2);
-            person1.createRelationshipTo(person3, FRIEND_OF).setProperty(STRENGTH, 1);
-            person2.createRelationshipTo(person1, FRIEND_OF).setProperty(STRENGTH, 3);
-            person2.createRelationshipTo(person3, FRIEND_OF).setProperty(STRENGTH, 1);
-            person3.createRelationshipTo(person1, FRIEND_OF).setProperty(STRENGTH, 2);
+            person1.createRelationshipTo(person2, FRIEND_OF).setProperty(STRENGTH, 2L);
+            person1.createRelationshipTo(person3, FRIEND_OF).setProperty(STRENGTH, 1L);
+            person2.createRelationshipTo(person1, FRIEND_OF).setProperty(STRENGTH, 3L);
+            person2.createRelationshipTo(person3, FRIEND_OF).setProperty(STRENGTH, 1L);
+            person3.createRelationshipTo(person1, FRIEND_OF).setProperty(STRENGTH, 2L);
 
             tx.success();
         }
 
-        assertEquals(9, getTotalFriendshipStrength(database));
+        assertEquals(9L, getTotalFriendshipStrength(database));
 
         //delete and change some friendships
         try (Transaction tx = database.beginTx()) {
@@ -80,14 +80,14 @@ public class FriendshipStrengthCounterTest {
                 if (relationship.getEndNode().getId() == 1) {
                     relationship.delete(); //remove 2 from total strength
                 } else {
-                    relationship.setProperty(STRENGTH, 2); //add 1 to total strength
+                    relationship.setProperty(STRENGTH, 2L); //add 1 to total strength
                 }
             }
 
             tx.success();
         }
 
-        assertEquals(8, getTotalFriendshipStrength(database));
+        assertEquals(8L, getTotalFriendshipStrength(database));
     }
 
     @Test

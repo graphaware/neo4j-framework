@@ -105,7 +105,6 @@ public class FriendshipStrengthCounter {
      *
      * @return total friendship strength.
      */
-    @Transactional
     public long getTotalFriendshipStrength() {
         return (long) getCounterNode(database).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L);
     }
