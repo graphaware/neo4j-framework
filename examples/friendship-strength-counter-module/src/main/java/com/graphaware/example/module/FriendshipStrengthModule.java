@@ -21,7 +21,8 @@ import static com.graphaware.example.module.Relationships.FRIEND_OF;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
- *
+ * {@link com.graphaware.runtime.GraphAwareRuntimeModule} that counts the total friendship strength in the database
+ * and keeps it up to date.
  */
 public class FriendshipStrengthModule extends BaseGraphAwareRuntimeModule {
 

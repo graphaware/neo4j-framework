@@ -19,6 +19,7 @@ package com.graphaware.example.module;
 import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.graphaware.common.util.IterableUtils.getSingleOrNull;
 import static com.graphaware.example.module.Labels.*;
@@ -104,14 +105,8 @@ public class FriendshipStrengthCounter {
      *
      * @return total friendship strength.
      */
+    @Transactional
     public long getTotalFriendshipStrength() {
-        long result = 0L;
-
-        try (Transaction tx = database.beginTx()) {
-            result = (long) getCounterNode(database).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L);
-            tx.success();
-        }
-
-        return result;
+        return (long) getCounterNode(database).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L);
     }
 }
