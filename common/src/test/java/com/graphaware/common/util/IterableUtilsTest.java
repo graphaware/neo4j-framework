@@ -147,7 +147,16 @@ public class IterableUtilsTest {
 
     @Test(expected = NotFoundException.class)
     public void exceptionShouldBeThrownWhenIterableHasNoElements() {
-        assertNull(getSingle(Collections.emptyList()));
+        getSingle(Collections.emptyList());
+    }
+
+    @Test
+    public void exceptionShouldBeThrownWhenIterableHasNoElements2() {
+        try {
+            getSingle(Collections.emptyList(), "test");
+        } catch (NotFoundException e) {
+            assertEquals("test", e.getMessage());
+        }
     }
 
     @Test(expected = IllegalStateException.class)
