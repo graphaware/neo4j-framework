@@ -36,7 +36,7 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
-import org.neo4j.kernel.Uniqueness;
+import org.neo4j.graphdb.traversal.Uniqueness;
 import org.neo4j.kernel.impl.traversal.MonoDirectionalTraversalDescription;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
 
@@ -1062,7 +1062,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertEquals(5, count(getNodeById(1).getRelationships()));
-                        assertEquals(5, count(getNodeById(1).getRelationships(BOTH, null)));
+                        assertEquals(5, count(getNodeById(1).getRelationships(BOTH)));
                         assertEquals(5, count(getNodeById(1).getRelationships(BOTH, new RelationshipType[0])));
                         assertEquals(2, count(getNodeById(1).getRelationships(withName("R3"))));
                         assertEquals(3, count(getNodeById(1).getRelationships(withName("R3"), withName("R1"))));

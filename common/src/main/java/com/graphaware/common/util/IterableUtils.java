@@ -17,6 +17,7 @@
 package com.graphaware.common.util;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.tooling.GlobalGraphOperations;
 
@@ -131,10 +132,42 @@ public final class IterableUtils {
      *
      * @param iterator to find a single element.
      * @param <T>      type of the element.
-     * @return the element iff there is exactly one, null iff there is 0.
+     * @return the element iff there is exactly one.
+     * @throws NotFoundException     in case there are no elements.
      * @throws IllegalStateException in case the iterable contains more than 1 element.
      */
     public static <T> T getSingle(Iterator<T> iterator) {
+        T result = getSingleOrNull(iterator);
+
+        if (result == null) {
+            throw new NotFoundException("Iterator is empty");
+        }
+
+        return result;
+    }
+
+    /**
+     * Get a single element from iterable.
+     *
+     * @param iterable to find a single element.
+     * @param <T>      type of the element.
+     * @return the element iff there is exactly one.
+     * @throws NotFoundException     in case there are no elements.
+     * @throws IllegalStateException in case the iterable contains more than 1 element.
+     */
+    public static <T> T getSingle(Iterable<T> iterable) {
+        return getSingle(iterable.iterator());
+    }
+
+    /**
+     * Get a single element from iterator.
+     *
+     * @param iterator to find a single element.
+     * @param <T>      type of the element.
+     * @return the element iff there is exactly one, null iff there is 0.
+     * @throws IllegalStateException in case the iterable contains more than 1 element.
+     */
+    public static <T> T getSingleOrNull(Iterator<T> iterator) {
         T result = null;
 
         if (iterator.hasNext()) {
@@ -156,8 +189,8 @@ public final class IterableUtils {
      * @return the element iff there is exactly one, null iff there is 0.
      * @throws IllegalStateException in case the iterable contains more than 1 element.
      */
-    public static <T> T getSingle(Iterable<T> iterable) {
-        return getSingle(iterable.iterator());
+    public static <T> T getSingleOrNull(Iterable<T> iterable) {
+        return getSingleOrNull(iterable.iterator());
     }
 
     /**

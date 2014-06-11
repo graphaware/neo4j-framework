@@ -1,6 +1,6 @@
 package com.graphaware.example;
 
-import com.graphaware.test.api.ApiTest;
+import com.graphaware.test.integration.GraphAwareApiTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
@@ -9,13 +9,13 @@ import static com.graphaware.test.util.TestUtils.get;
 import static org.junit.Assert.assertEquals;
 
 /**
- *  {@link ApiTest} for {@link NodeCountApi}.
+ * {@link GraphAwareApiTest} for {@link NodeCountApi}.
  */
-public class NodeCountApiTest extends ApiTest {
+public class NodeCountApiTest extends GraphAwareApiTest {
 
     @Test
     public void emptyDatabaseShouldHaveZeroNodes() {
-          assertEquals("0", get("http://localhost:"+getPort()+"/graphaware/count", HttpStatus.SC_OK));
+        assertEquals("0", get(baseUrl() + "/count", HttpStatus.SC_OK));
     }
 
     @Test
@@ -27,6 +27,6 @@ public class NodeCountApiTest extends ApiTest {
             tx.success();
         }
 
-        assertEquals("2", get("http://localhost:"+getPort()+"/graphaware/count", HttpStatus.SC_OK));
+        assertEquals("2", get(baseUrl() + "/count", HttpStatus.SC_OK));
     }
 }

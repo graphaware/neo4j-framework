@@ -18,7 +18,6 @@ package com.graphaware.test.integration;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpStatus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -30,18 +29,19 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.File;
 import java.io.IOException;
 
-import static com.graphaware.test.util.TestUtils.*;
-
 /**
- * Base class for server mode integration tests that are as close to real Neo4j server deployment as possible.
+ * Base class for server mode integration tests that are as close to real Neo4j server deployment as possible. As a consequence,
+ * low-level access to {@link org.neo4j.graphdb.GraphDatabaseService} is not provided. Instead, use {@link com.graphaware.test.util.TestUtils#executeCypher(String, String...)}
+ * to populate/query the database.
  * <p/>
+ * The target audience of this class are developers of GraphAware Framework (Runtime) Modules.
  * The primary purpose of tests that extend this class should be to verify that given a certain Neo4j configuration,
  * a (possibly runtime) module is bootstrapped and started correctly when the Neo4j server starts.
  * <p/>
  * The configuration is provided using a constructor. It defaults to "neo4j.properties" and if no such file is present
  * on the classpath of the implementing class, one that ships with Neo4j is used.
  */
-public abstract class ServerIntegrationTest {
+public abstract class NeoServerIntegrationTest {
 
     private final String neo4jProperties;
     private Bootstrapper bootstrapper;
@@ -49,11 +49,11 @@ public abstract class ServerIntegrationTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    protected ServerIntegrationTest() {
+    protected NeoServerIntegrationTest() {
         this("neo4j.properties");
     }
 
-    protected ServerIntegrationTest(String neo4jProperties) {
+    protected NeoServerIntegrationTest(String neo4jProperties) {
         this.neo4jProperties = neo4jProperties;
     }
 
@@ -77,15 +77,5 @@ public abstract class ServerIntegrationTest {
     @After
     public void tearDown() throws IOException, InterruptedException {
         bootstrapper.stop();
-    }
-
-    protected String executeCypher(String... cypherStatements) {
-        StringBuilder stringBuilder = new StringBuilder("{\"statements\" : [ {");
-        for (String statement : cypherStatements) {
-            stringBuilder.append("\"statement\" : \"").append(statement).append("\"");
-        }
-        stringBuilder.append("}]}");
-
-        return post("http://localhost:7474/db/data/transaction/commit", stringBuilder.toString(), HttpStatus.SC_OK);
     }
 }
