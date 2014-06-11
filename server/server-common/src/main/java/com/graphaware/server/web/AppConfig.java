@@ -16,7 +16,15 @@
 
 package com.graphaware.server.web;
 
+import org.neo4j.kernel.GraphDatabaseAPI;
+import org.neo4j.kernel.impl.transaction.SpringTransactionManager;
+import org.neo4j.kernel.impl.transaction.UserTransactionImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.jta.JtaTransactionManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
@@ -24,6 +32,14 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  */
 @Configuration
 @EnableWebMvc
+@EnableTransactionManagement
 public class AppConfig {
 
+    @Autowired
+    private GraphDatabaseAPI databaseAPI;
+
+    @Bean
+    public PlatformTransactionManager transactionManager() {
+        return new JtaTransactionManager(new UserTransactionImpl(databaseAPI), new SpringTransactionManager(databaseAPI));
+    }
 }
