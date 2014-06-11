@@ -217,6 +217,14 @@
 
             <dependency>
                 <groupId>org.neo4j.app</groupId>
+                <artifactId>neo4j-server</artifactId>
+                <version>${neo4j.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.neo4j.app</groupId>
                 <artifactId>neo4j-server-enterprise</artifactId>
                 <version>${neo4j.version}</version>
                 <scope>provided</scope>

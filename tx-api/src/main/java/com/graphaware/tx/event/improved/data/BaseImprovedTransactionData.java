@@ -48,246 +48,245 @@ public abstract class BaseImprovedTransactionData {
     protected abstract RelationshipTransactionData getRelationshipTransactionData();
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#hasBeenCreated(org.neo4j.graphdb.Node)
      */
     public boolean hasBeenCreated(Node node) {
         return getNodeTransactionData().hasBeenCreated(node);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#getAllCreatedNodes()
      */
     public Collection<Node> getAllCreatedNodes() {
         return getNodeTransactionData().getAllCreated();
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#hasBeenDeleted(org.neo4j.graphdb.Node)
      */
     public boolean hasBeenDeleted(Node node) {
         return getNodeTransactionData().hasBeenDeleted(node);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#getDeleted(org.neo4j.graphdb.Node)
      */
     public Node getDeleted(Node node) {
         return getNodeTransactionData().getDeleted(node);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#getAllDeletedNodes()
      */
     public Collection<Node> getAllDeletedNodes() {
         return getNodeTransactionData().getAllDeleted();
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#hasBeenChanged(org.neo4j.graphdb.Node)
      */
     public boolean hasBeenChanged(Node node) {
         return getNodeTransactionData().hasBeenChanged(node);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#getChanged(org.neo4j.graphdb.Node)
      */
     public Change<Node> getChanged(Node node) {
         return getNodeTransactionData().getChanged(node);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#getAllChangedNodes()
      */
     public Collection<Change<Node>> getAllChangedNodes() {
         return getNodeTransactionData().getAllChanged();
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#hasPropertyBeenCreated(org.neo4j.graphdb.Node, String)
      */
     public boolean hasPropertyBeenCreated(Node node, String key) {
         return getNodeTransactionData().hasPropertyBeenCreated(node, key);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#createdProperties(org.neo4j.graphdb.Node)
      */
     public Map<String, Object> createdProperties(Node node) {
         return getNodeTransactionData().createdProperties(node);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#hasPropertyBeenDeleted(org.neo4j.graphdb.Node, String)
      */
     public boolean hasPropertyBeenDeleted(Node node, String key) {
         return getNodeTransactionData().hasPropertyBeenDeleted(node, key);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#deletedProperties(org.neo4j.graphdb.Node)
      */
     public Map<String, Object> deletedProperties(Node node) {
         return getNodeTransactionData().deletedProperties(node);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#hasPropertyBeenChanged(org.neo4j.graphdb.Node, String)
      */
     public boolean hasPropertyBeenChanged(Node node, String key) {
         return getNodeTransactionData().hasPropertyBeenChanged(node, key);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#changedProperties(org.neo4j.graphdb.Node)
      */
     public Map<String, Change<Object>> changedProperties(Node node) {
         return getNodeTransactionData().changedProperties(node);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#hasLabelBeenAssigned(org.neo4j.graphdb.Node, org.neo4j.graphdb.Label)
      */
     public boolean hasLabelBeenAssigned(Node node, Label label) {
         return getNodeTransactionData().hasLabelBeenAssigned(node, label);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#assignedLabels(org.neo4j.graphdb.Node)
      */
     public Set<Label> assignedLabels(Node node) {
         return getNodeTransactionData().assignedLabels(node);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#hasLabelBeenRemoved(org.neo4j.graphdb.Node, org.neo4j.graphdb.Label)
      */
     public boolean hasLabelBeenRemoved(Node node, Label label) {
         return getNodeTransactionData().hasLabelBeenRemoved(node, label);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#removedLabels(org.neo4j.graphdb.Node)
      */
     public Set<Label> removedLabels(Node node) {
         return getNodeTransactionData().removedLabels(node);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#hasBeenCreated(org.neo4j.graphdb.Relationship)
      */
     public boolean hasBeenCreated(Relationship relationship) {
         return getRelationshipTransactionData().hasBeenCreated(relationship);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#getAllCreatedRelationships()
      */
     public Collection<Relationship> getAllCreatedRelationships() {
         return getRelationshipTransactionData().getAllCreated();
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#hasBeenDeleted(org.neo4j.graphdb.Relationship)
      */
     public boolean hasBeenDeleted(Relationship relationship) {
         return getRelationshipTransactionData().hasBeenDeleted(relationship);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#getDeleted(org.neo4j.graphdb.Relationship)
      */
     public Relationship getDeleted(Relationship relationship) {
         return getRelationshipTransactionData().getDeleted(relationship);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#getAllDeletedRelationships()
      */
     public Collection<Relationship> getAllDeletedRelationships() {
         return getRelationshipTransactionData().getAllDeleted();
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#getDeletedRelationships(org.neo4j.graphdb.Node, org.neo4j.graphdb.RelationshipType...)
      */
     public Collection<Relationship> getDeletedRelationships(Node node, RelationshipType... types) {
         return getRelationshipTransactionData().getDeleted(node, types);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#getDeletedRelationships(org.neo4j.graphdb.Node, org.neo4j.graphdb.Direction, org.neo4j.graphdb.RelationshipType...)
      */
-
     public Collection<Relationship> getDeletedRelationships(Node node, Direction direction, RelationshipType... types) {
         return getRelationshipTransactionData().getDeleted(node, direction, types);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#hasBeenChanged(org.neo4j.graphdb.Relationship)
      */
     public boolean hasBeenChanged(Relationship relationship) {
         return getRelationshipTransactionData().hasBeenChanged(relationship);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#getChanged(org.neo4j.graphdb.Relationship)
      */
     public Change<Relationship> getChanged(Relationship relationship) {
         return getRelationshipTransactionData().getChanged(relationship);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#getAllChangedRelationships()
      */
     public Collection<Change<Relationship>> getAllChangedRelationships() {
         return getRelationshipTransactionData().getAllChanged();
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#hasPropertyBeenCreated(org.neo4j.graphdb.Relationship, String)
      */
     public boolean hasPropertyBeenCreated(Relationship relationship, String key) {
         return getRelationshipTransactionData().hasPropertyBeenCreated(relationship, key);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#createdProperties(org.neo4j.graphdb.Relationship)
      */
     public Map<String, Object> createdProperties(Relationship relationship) {
         return getRelationshipTransactionData().createdProperties(relationship);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#hasPropertyBeenDeleted(org.neo4j.graphdb.Relationship, String)
      */
     public boolean hasPropertyBeenDeleted(Relationship relationship, String key) {
         return getRelationshipTransactionData().hasPropertyBeenDeleted(relationship, key);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#deletedProperties(org.neo4j.graphdb.Relationship)
      */
     public Map<String, Object> deletedProperties(Relationship relationship) {
         return getRelationshipTransactionData().deletedProperties(relationship);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#hasPropertyBeenChanged(org.neo4j.graphdb.Relationship, String)
      */
     public boolean hasPropertyBeenChanged(Relationship relationship, String key) {
         return getRelationshipTransactionData().hasPropertyBeenChanged(relationship, key);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#changedProperties(org.neo4j.graphdb.Relationship)
      */
     public Map<String, Change<Object>> changedProperties(Relationship relationship) {
         return getRelationshipTransactionData().changedProperties(relationship);
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#mutationsOccurred()
      */
     public boolean mutationsOccurred() {
         return !getAllCreatedNodes().isEmpty()
@@ -299,7 +298,7 @@ public abstract class BaseImprovedTransactionData {
     }
 
     /**
-     * {@inheritDoc}
+     * @see com.graphaware.tx.event.improved.api.ImprovedTransactionData#mutationsToStrings()
      */
     public Set<String> mutationsToStrings() {
         Set<String> result = new HashSet<>();

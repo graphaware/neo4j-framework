@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
@@ -131,16 +132,31 @@ public class IterableUtilsTest {
 
     @Test
     public void singleElementShouldBeReturnedWhenIterableHasOneElement() {
+        assertEquals("test", getSingleOrNull(Collections.singletonList("test")));
+    }
+
+    @Test
+    public void singleElementShouldBeReturnedWhenIterableHasOneElement2() {
         assertEquals("test", getSingle(Collections.singletonList("test")));
     }
 
     @Test
     public void nullShouldBeReturnedWhenIterableHasNoElements() {
+        assertNull(getSingleOrNull(Collections.emptyList()));
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void exceptionShouldBeThrownWhenIterableHasNoElements() {
         assertNull(getSingle(Collections.emptyList()));
     }
 
     @Test(expected = IllegalStateException.class)
     public void exceptionShouldBeThrownWhenIterableHasMoreThanOneElement() {
+        getSingleOrNull(Arrays.asList("test1", "test2"));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void exceptionShouldBeThrownWhenIterableHasMoreThanOneElement2() {
         getSingle(Arrays.asList("test1", "test2"));
     }
 

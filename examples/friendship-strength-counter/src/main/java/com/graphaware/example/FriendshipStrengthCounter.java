@@ -23,7 +23,7 @@ import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 
-import static com.graphaware.common.util.IterableUtils.getSingle;
+import static com.graphaware.common.util.IterableUtils.getSingleOrNull;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
@@ -90,7 +90,7 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
      * @return counter node.
      */
     private static Node getCounterNode(GraphDatabaseService database) {
-        Node result = getSingle(at(database).getAllNodesWithLabel(COUNTER_NODE_LABEL));
+        Node result = getSingleOrNull(at(database).getAllNodesWithLabel(COUNTER_NODE_LABEL));
 
         if (result != null) {
             return result;

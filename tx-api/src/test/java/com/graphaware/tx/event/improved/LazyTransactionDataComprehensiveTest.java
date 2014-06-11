@@ -28,7 +28,7 @@ import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
-import org.neo4j.kernel.Uniqueness;
+import org.neo4j.graphdb.traversal.Uniqueness;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
@@ -858,8 +858,8 @@ public class LazyTransactionDataComprehensiveTest {
                         assertFalse(td.hasLabelBeenAssigned(changed1.getPrevious(), label("One")));
                         assertEquals(1, td.assignedLabels(changed1.getCurrent()).size());
                         assertEquals(1, td.assignedLabels(changed1.getPrevious()).size());
-                        assertEquals("NewOne", getSingle(td.assignedLabels(changed1.getCurrent())).name());
-                        assertEquals("NewOne", getSingle(td.assignedLabels(changed1.getPrevious())).name());
+                        assertEquals("NewOne", getSingleOrNull(td.assignedLabels(changed1.getCurrent())).name());
+                        assertEquals("NewOne", getSingleOrNull(td.assignedLabels(changed1.getPrevious())).name());
 
                         Change<Node> changed5 = changesToMap(td.getAllChangedNodes()).get(5L);
                         assertTrue(td.hasLabelBeenAssigned(changed5.getCurrent(), label("NewLabel")));
@@ -868,8 +868,8 @@ public class LazyTransactionDataComprehensiveTest {
                         assertFalse(td.hasLabelBeenAssigned(changed5.getPrevious(), label("SomeLabel")));
                         assertEquals(1, td.assignedLabels(changed5.getCurrent()).size());
                         assertEquals(1, td.assignedLabels(changed5.getPrevious()).size());
-                        assertEquals("NewLabel", getSingle(td.assignedLabels(changed5.getCurrent())).name());
-                        assertEquals("NewLabel", getSingle(td.assignedLabels(changed5.getPrevious())).name());
+                        assertEquals("NewLabel", getSingleOrNull(td.assignedLabels(changed5.getCurrent())).name());
+                        assertEquals("NewLabel", getSingleOrNull(td.assignedLabels(changed5.getPrevious())).name());
 
                         //not changed at all
                         assertTrue(td.createdProperties(db.getNodeById(4)).isEmpty());
@@ -920,8 +920,8 @@ public class LazyTransactionDataComprehensiveTest {
                         assertFalse(td.hasPropertyBeenChanged(changed.getPrevious(), TAGS));
                         assertFalse(td.hasPropertyBeenChanged(changed.getPrevious(), PLACE));
 
-                        assertFalse(td.hasPropertyBeenChanged(getSingle(td.getAllDeletedNodes()), NAME));
-                        assertFalse(td.hasPropertyBeenChanged(getSingle(td.getAllCreatedNodes()), NAME));
+                        assertFalse(td.hasPropertyBeenChanged(getSingleOrNull(td.getAllDeletedNodes()), NAME));
+                        assertFalse(td.hasPropertyBeenChanged(getSingleOrNull(td.getAllCreatedNodes()), NAME));
 
                         assertEquals(2, count(changed.getPrevious().getPropertyKeys()));
                         assertEquals(3, count(changed.getCurrent().getPropertyKeys()));
@@ -941,8 +941,8 @@ public class LazyTransactionDataComprehensiveTest {
                         assertFalse(td.hasPropertyBeenChanged(changed.getCurrent(), NAME));
                         assertEquals(1, td.assignedLabels(changed.getPrevious()).size());
                         assertEquals(1, td.assignedLabels(changed.getCurrent()).size());
-                        assertEquals("NewLabel", getSingle(td.assignedLabels(changed.getPrevious())).name());
-                        assertEquals("NewLabel", getSingle(td.assignedLabels(changed.getCurrent())).name());
+                        assertEquals("NewLabel", getSingleOrNull(td.assignedLabels(changed.getPrevious())).name());
+                        assertEquals("NewLabel", getSingleOrNull(td.assignedLabels(changed.getCurrent())).name());
                         assertTrue(td.hasLabelBeenAssigned(changed.getPrevious(), label("NewLabel")));
                         assertTrue(td.hasLabelBeenAssigned(changed.getCurrent(), label("NewLabel")));
                         assertFalse(td.hasLabelBeenAssigned(changed.getPrevious(), label("SomeOther")));
@@ -958,8 +958,8 @@ public class LazyTransactionDataComprehensiveTest {
                         assertFalse(td.hasPropertyBeenChanged(changed.getCurrent(), NAME));
                         assertEquals(1, td.removedLabels(changed.getPrevious()).size());
                         assertEquals(1, td.removedLabels(changed.getCurrent()).size());
-                        assertEquals("ToBeRemoved", getSingle(td.removedLabels(changed.getPrevious())).name());
-                        assertEquals("ToBeRemoved", getSingle(td.removedLabels(changed.getCurrent())).name());
+                        assertEquals("ToBeRemoved", getSingleOrNull(td.removedLabels(changed.getPrevious())).name());
+                        assertEquals("ToBeRemoved", getSingleOrNull(td.removedLabels(changed.getCurrent())).name());
                         assertTrue(td.hasLabelBeenRemoved(changed.getPrevious(), label("ToBeRemoved")));
                         assertTrue(td.hasLabelBeenRemoved(changed.getCurrent(), label("ToBeRemoved")));
                         assertFalse(td.hasLabelBeenRemoved(changed.getPrevious(), label("SomeOther")));
@@ -1003,8 +1003,8 @@ public class LazyTransactionDataComprehensiveTest {
                         assertTrue(td.hasLabelBeenRemoved(changed.getPrevious(), label("One")));
                         assertEquals(1, td.removedLabels(changed.getCurrent()).size());
                         assertEquals(1, td.removedLabels(changed.getPrevious()).size());
-                        assertEquals("One", getSingle(td.removedLabels(changed.getCurrent())).name());
-                        assertEquals("One", getSingle(td.removedLabels(changed.getPrevious())).name());
+                        assertEquals("One", getSingleOrNull(td.removedLabels(changed.getCurrent())).name());
+                        assertEquals("One", getSingleOrNull(td.removedLabels(changed.getPrevious())).name());
 
                         changed = changesToMap(td.getAllChangedNodes()).get(3L);
                         assertEquals(0, td.deletedProperties(changed.getCurrent()).size());
@@ -1016,16 +1016,16 @@ public class LazyTransactionDataComprehensiveTest {
                         assertFalse(td.hasPropertyBeenDeleted(changed.getPrevious(), TAGS));
                         assertFalse(td.hasPropertyBeenDeleted(changed.getPrevious(), PLACE));
 
-                        assertFalse(td.hasPropertyBeenDeleted(getSingle(td.getAllDeletedNodes()), NAME));
-                        assertFalse(td.hasPropertyBeenDeleted(getSingle(td.getAllCreatedNodes()), NAME));
+                        assertFalse(td.hasPropertyBeenDeleted(getSingleOrNull(td.getAllDeletedNodes()), NAME));
+                        assertFalse(td.hasPropertyBeenDeleted(getSingleOrNull(td.getAllCreatedNodes()), NAME));
 
                         changed = changesToMap(td.getAllChangedNodes()).get(6L);
                         assertTrue(td.hasLabelBeenRemoved(changed.getCurrent(), label("ToBeRemoved")));
                         assertTrue(td.hasLabelBeenRemoved(changed.getPrevious(), label("ToBeRemoved")));
                         assertEquals(1, td.removedLabels(changed.getCurrent()).size());
                         assertEquals(1, td.removedLabels(changed.getPrevious()).size());
-                        assertEquals("ToBeRemoved", getSingle(td.removedLabels(changed.getCurrent())).name());
-                        assertEquals("ToBeRemoved", getSingle(td.removedLabels(changed.getPrevious())).name());
+                        assertEquals("ToBeRemoved", getSingleOrNull(td.removedLabels(changed.getCurrent())).name());
+                        assertEquals("ToBeRemoved", getSingleOrNull(td.removedLabels(changed.getPrevious())).name());
 
                         assertTrue(td.assignedLabels(db.getNodeById(4)).isEmpty());
                         assertTrue(td.removedLabels(db.getNodeById(4)).isEmpty());
@@ -1115,7 +1115,7 @@ public class LazyTransactionDataComprehensiveTest {
 
                         Map<Long, Change<Relationship>> changed = changesToMap(td.getAllChangedRelationships());
 
-                        Relationship r = getSingle(changed.entrySet()).getValue().getCurrent();
+                        Relationship r = getSingleOrNull(changed.entrySet()).getValue().getCurrent();
 
                         r.setProperty(TIME, 5);
                         r.setProperty("additional", "something");
@@ -1510,8 +1510,8 @@ public class LazyTransactionDataComprehensiveTest {
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData td) {
-                        Relationship previous = getSingle(td.getAllChangedRelationships()).getPrevious();
-                        Relationship current = getSingle(td.getAllChangedRelationships()).getCurrent();
+                        Relationship previous = getSingleOrNull(td.getAllChangedRelationships()).getPrevious();
+                        Relationship current = getSingleOrNull(td.getAllChangedRelationships()).getCurrent();
 
                         Map<String, Object> previousProps = new OtherNodeNameIncludingRelationshipPropertiesExtractor().extractProperties(previous, previous.getStartNode());
                         assertEquals(3, previousProps.size());
@@ -1771,6 +1771,6 @@ public class LazyTransactionDataComprehensiveTest {
     }
 
     private static <K, V> V getSingleValue(Map<K, V> map) {
-        return getSingle(map.entrySet()).getValue();
+        return getSingleOrNull(map.entrySet()).getValue();
     }
 }

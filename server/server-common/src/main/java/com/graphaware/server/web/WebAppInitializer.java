@@ -41,7 +41,7 @@ public class WebAppInitializer extends AbstractDispatcherServletInitializer {
 
         AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
         appContext.setParent(parent);
-        appContext.register(AppConfig.class);
+        appContext.scan("com.**.graphaware.**", "org.**.graphaware.**", "net.**.graphaware.**");
 
         return appContext;
     }
