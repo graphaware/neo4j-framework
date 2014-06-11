@@ -16,6 +16,7 @@
 
 package com.graphaware.server.web;
 
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.impl.transaction.SpringTransactionManager;
 import org.neo4j.kernel.impl.transaction.UserTransactionImpl;
@@ -28,18 +29,28 @@ import org.springframework.transaction.jta.JtaTransactionManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
- * Spring application config.
+ * Spring transactions-related application config.
  */
 @Configuration
-@EnableWebMvc
 @EnableTransactionManagement
-public class AppConfig {
+public class TxConfig {
 
-    @Autowired
+    @Autowired(required = false)
     private GraphDatabaseAPI databaseAPI;
+
+    @Autowired (required = false)
+    private GraphDatabaseService database;
 
     @Bean
     public PlatformTransactionManager transactionManager() {
-        return new JtaTransactionManager(new UserTransactionImpl(databaseAPI), new SpringTransactionManager(databaseAPI));
+        if (databaseAPI != null) {
+            return new JtaTransactionManager(new UserTransactionImpl(databaseAPI), new SpringTransactionManager(databaseAPI));
+        }
+
+        if (database != null) {
+            return new JtaTransactionManager(new UserTransactionImpl((GraphDatabaseAPI) database), new SpringTransactionManager((GraphDatabaseAPI) database));
+        }
+
+        throw new IllegalStateException("Neither GraphDatabaseAPI nor GraphDatabaseService are present");
     }
 }
