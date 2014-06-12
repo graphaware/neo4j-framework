@@ -21,7 +21,7 @@ import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 
-import static com.graphaware.common.util.IterableUtils.getSingleOrNull;
+//import static com.graphaware.common.util.IterableUtils.getSingleOrNull;
 
 /**
  * Example of a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler} that uses GraphAware {@link ImprovedTransactionData}
