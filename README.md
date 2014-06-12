@@ -2,7 +2,7 @@
 GraphAware Neo4j Framework
 ==========================
 
-[![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework) | <a href="http://graphaware.com/downloads/" target="_blank">Downloads</a> | <a href="http://graphaware.com/site/framework/latest/apidocs/" target="_blank">Javadoc</a> | Latest Releases: 2.1.1.6
+[![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework) | <a href="http://graphaware.com/downloads/" target="_blank">Downloads</a> | <a href="http://graphaware.com/site/framework/latest/apidocs/" target="_blank">Javadoc</a> | Latest Releases: 2.1.2.7
 
 GraphAware Framework speeds up development with <a href="http://neo4j.org" target="_blank">Neo4j</a> by providing a
 platform for building useful generic as well as domain-specific functionality, analytical capabilities, graph algorithms,
@@ -67,9 +67,9 @@ To use the latest release, download the appropriate version and put it
 the _plugins_ directory in your Neo4j server installation and restart the server (server mode), or on the classpath (embedded mode).
 
 The following downloads are available:
-* [GraphAware Framework for Embedded Mode, version 2.1.1.6](http://graphaware.com/downloads/graphaware-embedded-all-2.1.1.6.jar)
-* [GraphAware Framework for Server Mode (Community), version 2.1.1.6](http://graphaware.com/downloads/graphaware-server-community-all-2.1.1.6.jar)
-* [GraphAware Framework for Server Mode (Enterprise), version 2.1.1.6](http://graphaware.com/downloads/graphaware-server-enterprise-all-2.1.1.6.jar)
+* [GraphAware Framework for Embedded Mode, version 2.1.2.7](http://graphaware.com/downloads/graphaware-embedded-all-2.1.2.7.jar)
+* [GraphAware Framework for Server Mode (Community), version 2.1.2.7](http://graphaware.com/downloads/graphaware-server-community-all-2.1.2.7.jar)
+* [GraphAware Framework for Server Mode (Enterprise), version 2.1.2.7](http://graphaware.com/downloads/graphaware-server-enterprise-all-2.1.2.7.jar)
 
 Releases are synced to <a href="http://search.maven.org/#search%7Cga%7C1%7Ccom.graphaware.neo4j" target="_blank">Maven Central repository</a>. When using Maven for dependency management, include one of more of the following dependencies in your pom.xml. Read further
 down this page to find out which dependencies you will need. The available ones are:
@@ -79,32 +79,32 @@ down this page to find out which dependencies you will need. The available ones 
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>api</artifactId>
-            <version>2.1.1.6</version>
+            <version>2.1.2.7</version>
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>common</artifactId>
-            <version>2.1.1.6</version>
+            <version>2.1.2.7</version>
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>runtime</artifactId>
-            <version>2.1.1.6</version>
+            <version>2.1.2.7</version>
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>tests</artifactId>
-            <version>2.1.1.6</version>
+            <version>2.1.2.7</version>
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>tx-api</artifactId>
-            <version>2.1.1.6</version>
+            <version>2.1.2.7</version>
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>tx-executor</artifactId>
-            <version>2.1.1.6</version>
+            <version>2.1.2.7</version>
         </dependency>
 
         ...
@@ -112,14 +112,14 @@ down this page to find out which dependencies you will need. The available ones 
 
 ### Snapshots
 
-To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.1.1.6-SNAPSHOT
+To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.1.2.8-SNAPSHOT
  jar files. If you need standalone .jar files with all dependencies, look into the `target` folders in the `build` directory.
 
 ### Note on Versioning Scheme
 
 The version number has two parts. The first three numbers indicate compatibility with a Neo4j version.
- The last number is the version of the framework. For example, version 2.1.1.3 is version 3 of the framework
- compatible with Neo4j 2.1.1
+ The last number is the version of the framework. For example, version 2.1.2.3 is version 3 of the framework
+ compatible with Neo4j 2.1.2
 
 <a name="server"/>
 GraphAware Server
@@ -180,7 +180,7 @@ there and cannot (yet) be configured.
 
 To get started quickly, use the provided Maven archetype by typing:
 
-    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-springmvc-maven-archetype -DarchetypeVersion=2.1.1.6
+    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-springmvc-maven-archetype -DarchetypeVersion=2.1.2.7
 
 To get started manually, you will need the following dependencies:
 
@@ -191,14 +191,14 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>common</artifactId>
-        <version>2.1.1.6</version>
+        <version>2.1.2.7</version>
         <scope>provided</scope>
     </dependency>
 
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>api</artifactId>
-        <version>2.1.1.6</version>
+        <version>2.1.2.7</version>
         <scope>provided</scope>
     </dependency>
 
@@ -214,7 +214,7 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>org.neo4j</groupId>
         <artifactId>neo4j</artifactId>
-        <version>2.1.1.6</version>
+        <version>2.1.2.7</version>
         <scope>provided</scope>
     </dependency>
 
@@ -222,13 +222,13 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>server-community</artifactId>
-        <version>2.1.1.6</version>
+        <version>2.1.2.7</version>
         <scope>test</scope>
     </dependency>
 
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
-        <version>2.1.1.6</version>
+        <version>2.1.2.7</version>
         <artifactId>tests</artifactId>
         <scope>test</scope>
     </dependency>
@@ -287,7 +287,7 @@ happening at all. For example, you might want to:
 
 To get started quickly, use the provided Maven archetype by typing:
 
-    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-runtime-module-maven-archetype -DarchetypeVersion=2.1.1.6
+    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-runtime-module-maven-archetype -DarchetypeVersion=2.1.2.7
 
 To start from scratch, you will need the following dependencies in your pom.xml
 
@@ -298,37 +298,37 @@ To start from scratch, you will need the following dependencies in your pom.xml
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>api</artifactId>
-        <version>2.1.1.6</version>
+        <version>2.1.2.7</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>common</artifactId>
-        <version>2.1.1.6</version>
+        <version>2.1.2.7</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>runtime</artifactId>
-        <version>2.1.1.6</version>
+        <version>2.1.2.7</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tests</artifactId>
-        <version>2.1.1.6</version>
+        <version>2.1.2.7</version>
         <scope>test</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tx-api</artifactId>
-        <version>2.1.1.6</version>
+        <version>2.1.2.7</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tx-executor</artifactId>
-        <version>2.1.1.6</version>
+        <version>2.1.2.7</version>
         <scope>provided</scope>
     </dependency>
 
@@ -426,7 +426,7 @@ Add the following snippet to your pom.xml:
  <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>tests</artifactId>
-    <version>2.1.1.6</version>
+    <version>2.1.2.7</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -462,7 +462,7 @@ Add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>tx-api</artifactId>
-    <version>2.1.1.6</version>
+    <version>2.1.2.7</version>
 </dependency>
 ```
 
