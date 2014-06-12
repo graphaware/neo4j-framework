@@ -62,8 +62,7 @@ public class SelfLoopsTest {
         
         SelfLoops instance = new SelfLoops(database);
         boolean expResult = false;
-        boolean result = instance.generateGraph(distribution);
-        assertEquals(expResult, result);
+        instance.generateGraph(distribution);
         // TODO review the generated test code and remove the default call to fail.
         // fail("The test case is a prototype.");
     }
