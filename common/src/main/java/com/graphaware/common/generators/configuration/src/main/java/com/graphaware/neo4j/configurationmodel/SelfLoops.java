@@ -48,13 +48,13 @@ public class SelfLoops  implements ConfigurationModelGenerator {
      * abundant.
      * 
      * @param distribution
-     * @return
      * @throws com.graphaware.neo4j.configurationmodel.InvalidDistributionException
      */
     @Override
     public void generateGraph(ArrayList<Integer> distribution) throws InvalidDistributionException
     {
-        // Begin algo:
+        // Spread the distribution, 
+        // shuffle and form pairs
         if (!isValidDistribution(distribution))
             throw new InvalidDistributionException("Invalid distribution supplied. Check that the sum of degrees is even");
         
@@ -68,10 +68,10 @@ public class SelfLoops  implements ConfigurationModelGenerator {
             pairs.add(Pair.of(spread.get(i), spread.get(i+1)));
         }
         
-        
-        // Now feed the pairs to Neo4j -  I am using a 
-        // graph generating code from the test written by
-        // Adam
+        /* Now feed the pairs to Neo4j -  I am using a 
+           graph generating code from the test written by
+           Adam George (Graphaware) to do this. Please let me know
+           if that is ok */
         try (Transaction transaction = this.database.beginTx()) {
             Label personLabel = DynamicLabel.label("Node");
 	    RelationshipType relationshipType = DynamicRelationshipType.withName("relto");
@@ -95,11 +95,9 @@ public class SelfLoops  implements ConfigurationModelGenerator {
     public boolean isValidDistribution(ArrayList<Integer> distribution)
     {
         int degreeSum = 0;           // Has to be even by the handshaking lemma
-        
         for(int degree : distribution) {
             degreeSum += degree;
         }
-        
         return (degreeSum%2) == 0;  
     }
     
@@ -134,17 +132,4 @@ public class SelfLoops  implements ConfigurationModelGenerator {
 	newNode.setProperty("name", name);
 	return newNode;
     }
-    
-    
-    /**
-     * Ready for another generators
-     * @return 
-     */
-    private double random()
-    {
-        return Math.random();
-    }
-    
-    
-    
 }
