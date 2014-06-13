@@ -27,6 +27,7 @@ import org.neo4j.helpers.Pair;
  * self-loops are allowed. For a simple graph
  * generator, see ConfigurationModelGenerator
  * 
+ * 
  * @author Vojtech Havlicek (Graphaware)
  */
 
