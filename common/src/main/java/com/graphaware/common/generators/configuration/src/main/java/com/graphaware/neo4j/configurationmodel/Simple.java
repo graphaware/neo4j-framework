@@ -5,45 +5,15 @@ package com.graphaware.neo4j.configurationmodel;
 
 import static java.lang.Math.min;
 import java.util.ArrayList;
-import java.util.Collections;  
+import java.util.Collections;
 import static java.util.Collections.shuffle;
 import static java.util.Collections.sort;
+import static java.util.Collections.sort;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.helpers.Pair;
-
-/**
- * To keep track of indices while shuffling
- * @author Vojtech Havlicek (Graphaware)
- */
-class SimpleNode 
-{
-    public int degree;
-    public int index;
-    public SimpleNode(int degree, int index) {
-        this.degree = degree;
-        this.index = index;
-    }
-};
-
-/**
- * Sorts the simpleNodes according to the degree in
- * descending order.
- * @author Vojtech Havlicek (Graphaware)
- */
-class SimpleNodeComparator implements Comparator<SimpleNode> {
-
-    @Override
-    public int compare(SimpleNode o1, SimpleNode o2) {
-        if(o1.degree < o2.degree)
-            return 1;
-        else if (o1.degree == o2.degree)
-            return 0;
-        else
-            return -1;
-    }
-    
-};
 
 /**
  * A simple minded generator of graphs based on a degree distribution. So far,
@@ -58,6 +28,8 @@ class SimpleNodeComparator implements Comparator<SimpleNode> {
  *
  * @author Vojtech Havlicek (Graphaware)
  */
+
+
 public class Simple {
 
     private final GraphDatabaseService database;
@@ -87,67 +59,67 @@ public class Simple {
      * @throws com.graphaware.neo4j.configurationmodel.InvalidDistributionException
      */
     public boolean generateGraph(ArrayList<Integer> distribution) throws InvalidDistributionException {
+        ArrayList<UnorderedPair<Integer>> edges = new ArrayList<>();
         
-        System.out.println("distribution after validity check: " + distribution);
-        ArrayList<Pair<Integer,Integer>> pairs = new ArrayList<>();
-        
-        /**
-         * Copy distribution into ArrayList of nodes
-         */
-        int k = 0;
-        ArrayList<SimpleNode> nodes = new ArrayList<>();
-        for (int degree: distribution) {
-            nodes.add(new SimpleNode(degree, k));
-            k++;
-        }
-        
-        Comparator comparator = new SimpleNodeComparator();
-        
-        if (!isValidDistribution(nodes)) 
-            throw new InvalidDistributionException("The degree distribution supplied doesn't satisfy Erdos-Galai condition and can be used to generate a simple graph");
-        
-        
-        /**
-         * 
-         */
-        
-        while (!nodes.isEmpty()) {
-            SimpleNode first = nodes.remove(0);
+        //while(!distribution.isEmpty()) { 
+            int length = distribution.size();
+            int index  = distribution.indexOf(Collections.min(distribution));
+            int degree = distribution.get(index); // choose a (nonzero) minimum
             
-            ArrayList<SimpleNode> temp = new ArrayList<>();
-            ArrayList<Pair<Integer,Integer>> tempPairs = new ArrayList<>();
+            System.out.println(distribution);
+            // Obtain a candidate list:
+            //while(true){
+                ArrayList<Integer> temp = new ArrayList<>(distribution);
                 
-            do {
-                temp = nodes;
-                shuffle(temp);
-                
-                // choose randomly "first nodes" and connect
-                for (int q = 0; q < first.degree; ++q) {
-                    // iterate over the reservoir and sample, 
-                    // the graph is realizable (tested initially)
-                    temp.get(q).degree --;
-                    
-                    System.out.println(tempPairs.toString() + " " + temp.toString());
-                    System.out.println("temp.get(q).index: " + temp.get(q).index + " " + first.index);
-               
-                    tempPairs.add(Pair.of(temp.get(q).index, first.index));
-                     
-                    if (temp.get(q).degree == 0) // quite a hack
-                        temp.set(q, null);
-                    
-                    temp.removeAll(Collections.singleton(null));
-                } 
-            }while(!isValidDistribution(temp));
-            
-            pairs.addAll(tempPairs);
-            nodes = temp;
-            sort(nodes, comparator);
-        }
+                // TODO : this should be proportional to degree.
+                int rnd =  (int) Math.floor(Math.random()*(length - 1)); // choose an index from one elem. less range. OK
+                int candidateIndex = rnd >= index ? rnd + 1 : rnd;       // skip index. OK
 
+                UnorderedPair<Integer> edgeCandidate = new UnorderedPair(candidateIndex, index);
+
+                /**
+                 * Improve this one, check if edge has already been added.
+                 */
+                for(UnorderedPair<Integer> edge : edges)
+                    if(edge.equals(edgeCandidate))
+                        continue;
+                
+                /**
+                 * Prepare the candidate set and test if it is graphical
+                 */
+                decrease(temp, index);
+                decrease(temp, candidateIndex);
+                
+                if(isValidDistribution(temp)){
+                    distribution = temp; // assign temp to distribution
+                    //break;
+                }
+                System.out.println(temp);
+                System.out.println(distribution);
+            //}
+            
+            // candidate list is obtained at this stage.
+            
+            
+            
+        //}
+        
+        // Edge set is know at this place
         return true;
-
+        
+        
     }
 
+    /**
+     * 
+     */
+    private boolean isNullArrayList(ArrayList<Integer> distribution) {
+        for (int degree : distribution)
+            if (degree > 0)
+                return false;
+        return true;      
+    }
+    
     /**
      * Fisher-Yates shuffle on part of the array list
      *
@@ -156,7 +128,7 @@ public class Simple {
      * @param to
      */
     private ArrayList<Integer> shufflePartially(ArrayList<Integer> distribution, int from, int to) {
-        
+
         // Use the Fisher-Yates shuffle
         for (int j = from; j < to; j++) {
 
@@ -228,29 +200,30 @@ public class Simple {
      * @param distribution
      * @return
      */
-    private boolean isValidDistribution(ArrayList<SimpleNode> distribution) {
+    private boolean isValidDistribution(ArrayList<Integer> distribution) {
+        System.out.println(distribution.toString());
         int L = distribution.size();
         int degreeSum = 0;           // Has to be even by the handshaking lemma
 
-        for (SimpleNode node : distribution) {
-            degreeSum += node.degree;
+        for (int degree : distribution) {
+            degreeSum += degree;
         }
 
         if (degreeSum % 2 != 0) {
             return false;
         }
 
-        sort(distribution, new SimpleNodeComparator());
+        sort(distribution);
 
         for (int k = 1; k < L; ++k) {
             int sum = 0;
             for (int i = 0; i < k; ++i) {
-                sum += distribution.get(i).degree;
+                sum += distribution.get(i);
             }
 
             int comp = 0;
             for (int j = k; j < L; ++j) {
-                comp += min(k, distribution.get(j).degree);
+                comp += min(k, distribution.get(j));
             }
 
             if (sum > k * (k - 1) + comp) {
