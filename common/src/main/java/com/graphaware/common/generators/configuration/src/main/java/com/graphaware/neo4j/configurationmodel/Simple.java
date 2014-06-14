@@ -61,17 +61,28 @@ public class Simple {
     public boolean generateGraph(ArrayList<Integer> distribution) throws InvalidDistributionException {
         ArrayList<UnorderedPair<Integer>> edges = new ArrayList<>();
         
-        //while(!distribution.isEmpty()) { 
+        while(!isNullArrayList(distribution)) { 
             int length = distribution.size();
-            int index  = distribution.indexOf(Collections.min(distribution));
-            int degree = distribution.get(index); // choose a (nonzero) minimum
+            int index  = 0; 
+            int min    = Integer.MAX_VALUE;
             
-            System.out.println(distribution);
+            // find minimal nonzero element
+            for (int i = 0; i < distribution.size(); ++i) {
+                int elem = distribution.get(i);
+                if (elem != 0 && elem < min) {
+                    min   = elem;        
+                    index = i;
+                }
+            }
+            
+            distribution.indexOf(Collections.min(distribution)); // avoid zeroes? 
+            int degree = distribution.get(index); // choose a (nonzero) minimum
+          
             // Obtain a candidate list:
-            //while(true){
+            while(true) {
                 ArrayList<Integer> temp = new ArrayList<>(distribution);
                 
-                // TODO : this should be proportional to degree.
+                // TODO : this should be proportional to degree (!!! Check the proof)
                 int rnd =  (int) Math.floor(Math.random()*(length - 1)); // choose an index from one elem. less range. OK
                 int candidateIndex = rnd >= index ? rnd + 1 : rnd;       // skip index. OK
 
@@ -90,21 +101,24 @@ public class Simple {
                 decrease(temp, index);
                 decrease(temp, candidateIndex);
                 
-                if(isValidDistribution(temp)){
-                    distribution = temp; // assign temp to distribution
-                    //break;
-                }
                 System.out.println(temp);
-                System.out.println(distribution);
-            //}
+                if(isValidDistribution(temp)) { // use Erdos-Galai test, since it doesn't sort the entries
+                    distribution = temp;              // assign temp to distribution
+                    edges.add(edgeCandidate);         // edge is allowed, add it.
+                    break;
+                }
+            }
             
-            // candidate list is obtained at this stage.
+            // candidate list is obtained at this stage
+            System.out.println(distribution.toString());
             
-            
-            
-        //}
+        }
         
         // Edge set is know at this place
+        System.out.println("Edges: ");
+        for (UnorderedPair<Integer> edge : edges)
+            System.out.println(edge.toString());
+        
         return true;
         
         
@@ -197,15 +211,20 @@ public class Simple {
      * Erdos-Gallai condition on degree distribution graphicality. (see
      * Blitzstein-Diaconis paper)
      *
+     * Warning! Sorts the distrib.
      * @param distribution
      * @return
      */
     private boolean isValidDistribution(ArrayList<Integer> distribution) {
-        System.out.println(distribution.toString());
-        int L = distribution.size();
+        ArrayList<Integer> copy = new ArrayList<>(distribution);
+        
+        System.out.println(copy.toString());
+        int L = copy.size();
         int degreeSum = 0;           // Has to be even by the handshaking lemma
 
-        for (int degree : distribution) {
+        for (int degree : copy) {
+            if(degree < 0)
+                return false;
             degreeSum += degree;
         }
 
@@ -213,17 +232,17 @@ public class Simple {
             return false;
         }
 
-        sort(distribution);
+        sort(copy);
 
         for (int k = 1; k < L; ++k) {
             int sum = 0;
             for (int i = 0; i < k; ++i) {
-                sum += distribution.get(i);
+                sum += copy.get(i);
             }
 
             int comp = 0;
             for (int j = k; j < L; ++j) {
-                comp += min(k, distribution.get(j));
+                comp += min(k, copy.get(j));
             }
 
             if (sum > k * (k - 1) + comp) {
@@ -257,12 +276,14 @@ public class Simple {
             int j = 1;
             for (int k = 0; k < first; ++k) {
                 while (distribution.get(j) == 0) {
+                    
                     j++;
                     if (j > L) {
                         return false;
                     }
                 }
-
+                    
+                
                 distribution.set(j, distribution.get(j) - 1);
             }
 

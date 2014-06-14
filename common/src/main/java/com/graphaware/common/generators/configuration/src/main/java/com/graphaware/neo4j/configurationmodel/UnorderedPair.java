@@ -57,6 +57,12 @@ public class UnorderedPair<T> {
         return hash;
     }
     
+    @Override
+    public String toString() {
+       String s = "(" + first.toString() + ", " + second.toString() + ")";
+       return s;
+    }
+    
     static boolean equals( Object obj1, Object obj2 )
     {
         return ( obj1 == obj2 ) || ( obj1 != null && obj1.equals( obj2 ) );
