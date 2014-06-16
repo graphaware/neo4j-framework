@@ -1,19 +1,26 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package com.graphaware.generator;
 
 /**
- *
- * @author Vojtech Havlicek (Graphaware)
+ * Exception signifying an invalid distribution used for graph generation.
  */
-public class InvalidDistributionException extends Exception{
-    
-    public InvalidDistributionException(String message)
-    {
+public class InvalidDistributionException extends RuntimeException {
+
+    public InvalidDistributionException() {
+    }
+
+    public InvalidDistributionException(String message) {
         super(message);
+    }
+
+    public InvalidDistributionException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public InvalidDistributionException(Throwable cause) {
+        super(cause);
+    }
+
+    public InvalidDistributionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }
