@@ -7,6 +7,8 @@ import static java.lang.Math.min;
 import java.util.ArrayList;
 import java.util.Collections;
 import static java.util.Collections.sort;
+
+import com.graphaware.common.util.UnorderedPair;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
