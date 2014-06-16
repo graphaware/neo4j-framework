@@ -2,7 +2,7 @@
  * EXPERIMENTAL
  */
 
-package com.graphaware.neo4j.configurationmodel;
+package com.graphaware.generator;
 
 import java.util.ArrayList;
 import static java.util.Collections.shuffle;
@@ -49,7 +49,7 @@ public class SelfLoops  implements ConfigurationModelGenerator {
      * abundant.
      * 
      * @param distribution
-     * @throws com.graphaware.neo4j.configurationmodel.InvalidDistributionException
+     * @throws InvalidDistributionException
      */
     @Override
     public void generateGraph(ArrayList<Integer> distribution) throws InvalidDistributionException

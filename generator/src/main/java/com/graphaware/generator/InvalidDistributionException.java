@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.graphaware.neo4j.configurationmodel;
+package com.graphaware.generator;
 
 /**
  *

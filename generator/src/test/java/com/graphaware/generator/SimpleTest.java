@@ -4,12 +4,12 @@
  * and open the template in the editor.
  */
 
-package com.graphaware.neo4j.configurationmodel;
+package com.graphaware.generator;
 
 import java.util.ArrayList;
+
 import org.junit.After;
 import org.junit.AfterClass;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

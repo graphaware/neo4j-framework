@@ -3,7 +3,7 @@
  * Note that this package is experimental and being developed
  */
 
-package com.graphaware.neo4j.configurationmodel;
+package com.graphaware.generator;
 
 import java.util.ArrayList;
 

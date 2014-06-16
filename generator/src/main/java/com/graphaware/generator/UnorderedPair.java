@@ -4,7 +4,7 @@
  * Maybe reimplement, to behave as neo Pair.of ?
  */
 
-package com.graphaware.neo4j.configurationmodel;
+package com.graphaware.generator;
 
 import java.util.Objects;
 

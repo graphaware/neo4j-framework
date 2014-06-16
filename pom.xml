@@ -31,6 +31,7 @@
     <modules>
         <module>api</module>
         <module>common</module>
+        <module>generator</module>
         <module>runtime</module>
         <module>server</module>
         <module>tests</module>

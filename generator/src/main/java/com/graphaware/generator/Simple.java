@@ -1,7 +1,7 @@
 /**
  * EXPERIMENTAL
  */
-package com.graphaware.neo4j.configurationmodel;
+package com.graphaware.generator;
 
 import static java.lang.Math.min;
 import java.util.ArrayList;
