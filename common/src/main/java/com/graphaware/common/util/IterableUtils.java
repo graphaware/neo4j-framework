@@ -130,6 +130,40 @@ public final class IterableUtils {
     /**
      * Get a single element from iterator.
      *
+     * @param iterator        to find a single element.
+     * @param notFoundMessage exception message if there are no elements.
+     * @param <T>             type of the element.
+     * @return the element iff there is exactly one.
+     * @throws NotFoundException     in case there are no elements.
+     * @throws IllegalStateException in case the iterable contains more than 1 element.
+     */
+    public static <T> T getSingle(Iterator<T> iterator, String notFoundMessage) {
+        T result = getSingleOrNull(iterator);
+
+        if (result == null) {
+            throw new NotFoundException(notFoundMessage);
+        }
+
+        return result;
+    }
+
+    /**
+     * Get a single element from iterable.
+     *
+     * @param iterable        to find a single element.
+     * @param notFoundMessage exception message if there are no elements.
+     * @param <T>             type of the element.
+     * @return the element iff there is exactly one.
+     * @throws NotFoundException     in case there are no elements.
+     * @throws IllegalStateException in case the iterable contains more than 1 element.
+     */
+    public static <T> T getSingle(Iterable<T> iterable, String notFoundMessage) {
+        return getSingle(iterable.iterator(), notFoundMessage);
+    }
+
+    /**
+     * Get a single element from iterator.
+     *
      * @param iterator to find a single element.
      * @param <T>      type of the element.
      * @return the element iff there is exactly one.
@@ -137,13 +171,7 @@ public final class IterableUtils {
      * @throws IllegalStateException in case the iterable contains more than 1 element.
      */
     public static <T> T getSingle(Iterator<T> iterator) {
-        T result = getSingleOrNull(iterator);
-
-        if (result == null) {
-            throw new NotFoundException("Iterator is empty");
-        }
-
-        return result;
+        return getSingle(iterator, "Iterator is empty");
     }
 
     /**
@@ -156,7 +184,7 @@ public final class IterableUtils {
      * @throws IllegalStateException in case the iterable contains more than 1 element.
      */
     public static <T> T getSingle(Iterable<T> iterable) {
-        return getSingle(iterable.iterator());
+        return getSingle(iterable.iterator(), "Iterable is empty");
     }
 
     /**
