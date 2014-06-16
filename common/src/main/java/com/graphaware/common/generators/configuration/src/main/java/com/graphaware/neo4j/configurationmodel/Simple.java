@@ -80,7 +80,7 @@ public class Simple {
         // If the dstribution is graphical => exist a sub-distribution which is graphical
         ArrayList<UnorderedPair<Integer>> edges = new ArrayList<>();
 
-        while (!isNullArrayList(distribution)) {
+        while (!isZeroArrayList(distribution)) {
             int length = distribution.size();
             int index = 0;
             int min = Integer.MAX_VALUE;
@@ -93,8 +93,6 @@ public class Simple {
                     index = i;
                 }
             }
-
-            distribution.indexOf(Collections.min(distribution)); // avoid zeroes? 
 
             // Obtain a candidate list:
             while (true) {
@@ -139,51 +137,12 @@ public class Simple {
     }
 
     /**
-     * Sends a mutating "query" to the db, constructing the requested simple
-     * graph.
-     *
-     * TODO: make sure undirected nodes are created
-     *
-     * @param edges
+     * Returns true if the supplied distribution is a zero-list.
+     * 
+     * @param distribution
+     * @return boolean is th supplied distribution a zero-list?
      */
-    private void queryDB(ArrayList<UnorderedPair<Integer>> edges) {
-
-        /* Now feed the pairs to Neo4j -  I am using a 
-         graph generating code from the test written by
-         Adam George (Graphaware) to do this. Please let me know
-         if that is ok */
-        try (Transaction transaction = this.database.beginTx()) {
-            Label personLabel = DynamicLabel.label("Node");
-            RelationshipType relationshipType = DynamicRelationshipType.withName("relto");
-
-            for (UnorderedPair<Integer> edge : edges) {
-                Node node = findOrCreateNode(personLabel, "" + edge.first());
-                Node friend = findOrCreateNode(personLabel, "" + edge.second());
-                node.createRelationshipTo(friend, relationshipType);
-            }
-
-            transaction.success();
-        }
-    }
-
-    // The following was 
-    // Written by Adam George (Graphaware) as a test for 
-    // the crawler class. Please let me know if this is OK
-    // in the final implementation as well.
-    private Node findOrCreateNode(Label label, String name) {
-        ResourceIterable<Node> existingNodes = this.database.findNodesByLabelAndProperty(label, "name", name);
-        if (existingNodes.iterator().hasNext()) {
-            return existingNodes.iterator().next();
-        }
-        Node newNode = this.database.createNode(label);
-        newNode.setProperty("name", name);
-        return newNode;
-    }
-
-    /**
-     *
-     */
-    private boolean isNullArrayList(ArrayList<Integer> distribution) {
+    private boolean isZeroArrayList(ArrayList<Integer> distribution) {
         for (int degree : distribution) {
             if (degree > 0) {
                 return false;
@@ -291,5 +250,47 @@ public class Simple {
             sort(copy, Collections.reverseOrder());
         }
         return true;
+    }
+
+    /**
+     * Sends a mutating "query" to the db, constructing the requested simple
+     * graph.
+     *
+     * TODO: make sure undirected nodes are created
+     *
+     * @param edges
+     */
+    private void queryDB(ArrayList<UnorderedPair<Integer>> edges) {
+
+        /* Now feed the pairs to Neo4j -  I am using a 
+         graph generating code from the test written by
+         Adam George (Graphaware) to do this. Please let me know
+         if that is ok */
+        try (Transaction transaction = this.database.beginTx()) {
+            Label personLabel = DynamicLabel.label("Node");
+            RelationshipType relationshipType = DynamicRelationshipType.withName("relto");
+
+            for (UnorderedPair<Integer> edge : edges) {
+                Node node = findOrCreateNode(personLabel, "" + edge.first());
+                Node friend = findOrCreateNode(personLabel, "" + edge.second());
+                node.createRelationshipTo(friend, relationshipType);
+            }
+
+            transaction.success();
+        }
+    }
+
+    // The following was 
+    // Written by Adam George (Graphaware) as a test for 
+    // the crawler class. Please let me know if this is OK
+    // in the final implementation as well.
+    private Node findOrCreateNode(Label label, String name) {
+        ResourceIterable<Node> existingNodes = this.database.findNodesByLabelAndProperty(label, "name", name);
+        if (existingNodes.iterator().hasNext()) {
+            return existingNodes.iterator().next();
+        }
+        Node newNode = this.database.createNode(label);
+        newNode.setProperty("name", name);
+        return newNode;
     }
 }
