@@ -37,7 +37,7 @@
         <module>tests</module>
         <module>tx-api</module>
         <module>tx-executor</module>
-        <!--<module>crawler</module>-->
+        <module>crawler</module>
         <module>build</module>
 
         <!--examples-->
