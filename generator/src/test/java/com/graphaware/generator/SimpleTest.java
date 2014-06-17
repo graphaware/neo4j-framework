@@ -6,21 +6,19 @@
 
 package com.graphaware.generator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import com.graphaware.common.util.IterableUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
-import org.junit.*;
+import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.tooling.GlobalGraphOperations;
 
-import static com.graphaware.common.util.IterableUtils.*;
-import static org.junit.Assert.*;
-import static org.neo4j.tooling.GlobalGraphOperations.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static com.graphaware.common.util.IterableUtils.count;
+import static org.junit.Assert.assertEquals;
+import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
  * @author Vojtech Havlicek (Graphaware)
