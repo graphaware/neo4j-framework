@@ -37,6 +37,11 @@
 
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>tx-executor</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
             <artifactId>tests</artifactId>
         </dependency>
 

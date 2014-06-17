@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.generator;
+package com.graphaware.generator.distribution;
 
 /**
  * Exception signifying an invalid distribution used for graph generation.
