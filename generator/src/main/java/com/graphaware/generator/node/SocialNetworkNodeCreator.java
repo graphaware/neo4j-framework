@@ -52,7 +52,7 @@ public class SocialNetworkNodeCreator implements NodeCreator {
     private void populateGendersAndNames() {
         for (String line : FileScanner.produceLines(SocialNetworkNodeCreator.class.getClassLoader().getResourceAsStream("fake_names.csv"), 0)) {
             String[] fields = line.split(",");
-            gendersAndNames.add(new Pair<>("female".equals(fields[0]) ? FEMALE_LABEL : MALE_LABEL, fields[1] + fields[2]));
+            gendersAndNames.add(new Pair<>("female".equals(fields[0]) ? FEMALE_LABEL : MALE_LABEL, fields[1] +" "+ fields[2]));
         }
     }
 }
