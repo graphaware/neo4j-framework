@@ -7,16 +7,22 @@
 package com.graphaware.generator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
+import com.graphaware.common.util.IterableUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
 import org.junit.*;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.tooling.GlobalGraphOperations;
 
+import static com.graphaware.common.util.IterableUtils.*;
 import static org.junit.Assert.*;
+import static org.neo4j.tooling.GlobalGraphOperations.*;
 
 /**
- *
  * @author Vojtech Havlicek (Graphaware)
  */
 public class SimpleTest extends DatabaseIntegrationTest {
@@ -36,16 +42,20 @@ public class SimpleTest extends DatabaseIntegrationTest {
     public void testGenerateGraph() {
         System.out.println("generateGraph");
 
-        ArrayList<Integer> distribution = new ArrayList<>();
-        distribution.add(2);
-        distribution.add(2);
-        distribution.add(2);
-        distribution.add(2);
-        
-        Simple instance = new Simple(getDatabase());
-        boolean result = instance.generateGraph(distribution);
+        ArrayList<Integer> distribution = new ArrayList<>(Arrays.asList(2, 2, 2, 2));
 
-        assertTrue(result);
+        new Simple(getDatabase()).generateGraph(distribution);
+
+        try (Transaction tx = getDatabase().beginTx()) {
+            assertEquals(4, count(at(getDatabase()).getAllNodes()));
+            assertEquals(4, count(at(getDatabase()).getAllRelationships()));
+
+            for (Node node : at(getDatabase()).getAllNodes()) {
+                assertEquals(2, node.getDegree());
+            }
+
+            tx.success();
+        }
     }
-    
+
 }

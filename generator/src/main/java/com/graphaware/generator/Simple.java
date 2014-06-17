@@ -3,24 +3,15 @@
  */
 package com.graphaware.generator;
 
-import static com.graphaware.common.util.IterableUtils.*;
-import static java.lang.Math.min;
+import com.graphaware.common.util.UnorderedPair;
+import org.neo4j.graphdb.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
+import static com.graphaware.common.util.IterableUtils.getSingleOrNull;
+import static java.lang.Math.min;
 import static java.util.Collections.sort;
-
-import com.graphaware.common.util.IterableUtils;
-import com.graphaware.common.util.UnorderedPair;
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.ResourceIterable;
-import org.neo4j.graphdb.Transaction;
 
 /**
  * A simple minded generator of graphs based on a degree distribution. So far,
@@ -38,7 +29,7 @@ import org.neo4j.graphdb.Transaction;
  *
  * @author Vojtech Havlicek (Graphaware)
  */
-public class Simple {
+public class Simple implements ConfigurationModelGenerator {
 
     private final GraphDatabaseService database;
 
@@ -56,15 +47,10 @@ public class Simple {
      * @param distribution
      * @return
      */
-    public boolean generateGraph(ArrayList<Integer> distribution) {
-
-        // Get edges of the new graph 
-        ArrayList<UnorderedPair<Integer>> edges;
-
-        edges = getEdges(distribution);
+    public void generateGraph(ArrayList<Integer> distribution) {
+        ArrayList<UnorderedPair<Integer>> edges = getEdges(distribution);
 
         queryDB(edges);
-        return true;
     }
 
     /**
@@ -104,7 +90,7 @@ public class Simple {
                 int rnd = (int) Math.floor(Math.random() * (length - 1)); // choose an index from one elem. less range. OK
                 int candidateIndex = rnd >= index ? rnd + 1 : rnd;       // skip index. OK
 
-                UnorderedPair<Integer> edgeCandidate = new UnorderedPair(candidateIndex, index);
+                UnorderedPair<Integer> edgeCandidate = new UnorderedPair<>(candidateIndex, index);
 
                 /**
                  * Improve this one, check if edge has already been added.
@@ -117,7 +103,7 @@ public class Simple {
                     }
                 }
 
-                if (skip == true) {
+                if (skip) {
                     continue;
                 }
 
@@ -172,7 +158,7 @@ public class Simple {
      * @param distribution
      * @return
      */
-    private boolean isValidDistribution(ArrayList<Integer> distribution) {
+    public boolean isValidDistribution(ArrayList<Integer> distribution) {
         // Do this in-place instead?
         ArrayList<Integer> copy = new ArrayList<>(distribution);
 
@@ -230,7 +216,7 @@ public class Simple {
 
         int i = 0, L = 0, first = 0;
 
-        while (L > 0) {
+        while (L > 0) {   //todo this can't work
             first = copy.get(i);
             L--;
 
