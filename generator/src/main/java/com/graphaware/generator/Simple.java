@@ -3,6 +3,7 @@
  */
 package com.graphaware.generator;
 
+import static com.graphaware.common.util.IterableUtils.*;
 import static java.lang.Math.min;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.Collections;
 
 import static java.util.Collections.sort;
 
+import com.graphaware.common.util.IterableUtils;
 import com.graphaware.common.util.UnorderedPair;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -279,16 +281,13 @@ public class Simple {
         }
     }
 
-    // The following was 
-    // Written by Adam George (Graphaware) as a test for 
-    // the crawler class. Please let me know if this is OK
-    // in the final implementation as well.
     private Node findOrCreateNode(Label label, String name) {
-        ResourceIterable<Node> existingNodes = this.database.findNodesByLabelAndProperty(label, "name", name);
-        if (existingNodes.iterator().hasNext()) {
-            return existingNodes.iterator().next();
+        Node existing = getSingleOrNull(database.findNodesByLabelAndProperty(label, "name", name));
+        if (existing != null) {
+            return existing;
         }
-        Node newNode = this.database.createNode(label);
+
+        Node newNode = database.createNode(label);
         newNode.setProperty("name", name);
         return newNode;
     }
