@@ -4,8 +4,10 @@
 package com.graphaware.generator;
 
 import static java.lang.Math.min;
+
 import java.util.ArrayList;
 import java.util.Collections;
+
 import static java.util.Collections.sort;
 
 import com.graphaware.common.util.UnorderedPair;
@@ -22,12 +24,12 @@ import org.neo4j.graphdb.Transaction;
  * A simple minded generator of graphs based on a degree distribution. So far,
  * the model accepts a list of node degrees as an input and creates a graph
  * according to that.
- *
+ * <p/>
  * Also, the distribution of randomly generated graphs isn't exactly uniform
  * (see the paper below)
- *
+ * <p/>
  * Uses Blitzstein-Diaconis algorithm Ref:
- *
+ * <p/>
  * A SEQUENTIAL IMPORTANCE SAMPLING ALGORITHM FOR GENERATING RANDOM GRAPHS WITH
  * PRESCRIBED DEGREES By Joseph Blitzstein and Persi Diaconis (Stanford
  * University). (Harvard, June 2006)
@@ -39,7 +41,6 @@ public class Simple {
     private final GraphDatabaseService database;
 
     /**
-     *
      * @param database
      */
     public Simple(GraphDatabaseService database) {
@@ -58,11 +59,7 @@ public class Simple {
         // Get edges of the new graph 
         ArrayList<UnorderedPair<Integer>> edges;
 
-        try {
-            edges = getEdges(distribution);
-        } catch (InvalidDistributionException ex) {
-            return false;
-        }
+        edges = getEdges(distribution);
 
         queryDB(edges);
         return true;
@@ -140,7 +137,7 @@ public class Simple {
 
     /**
      * Returns true if the supplied distribution is a zero-list.
-     * 
+     *
      * @param distribution
      * @return boolean is th supplied distribution a zero-list?
      */
@@ -167,7 +164,7 @@ public class Simple {
      * All valid distributions must be graphical. This is tested using
      * Erdos-Gallai condition on degree distribution graphicality. (see
      * Blitzstein-Diaconis paper)
-     *
+     * <p/>
      * Warning! Sorts the distrib.
      *
      * @param distribution
@@ -257,7 +254,7 @@ public class Simple {
     /**
      * Sends a mutating "query" to the db, constructing the requested simple
      * graph.
-     *
+     * <p/>
      * TODO: make sure undirected nodes are created
      *
      * @param edges

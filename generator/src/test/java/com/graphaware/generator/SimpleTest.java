@@ -8,59 +8,44 @@ package com.graphaware.generator;
 
 import java.util.ArrayList;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import com.graphaware.test.integration.DatabaseIntegrationTest;
+import org.junit.*;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.test.TestGraphDatabaseFactory;
+
+import static org.junit.Assert.*;
 
 /**
  *
  * @author Vojtech Havlicek (Graphaware)
  */
-public class SimpleTest {
-    
-    private GraphDatabaseService database;
-    public SimpleTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
-    public void setUp() {
-        this.database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-    }
-    
-    @After
-    public void tearDown() {
+public class SimpleTest extends DatabaseIntegrationTest {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected GraphDatabaseService createDatabase() {
+        return new TestGraphDatabaseFactory().newImpermanentDatabase();
     }
 
     /**
      * Test of generateGraph method, of class Simple.
      */
     @Test
-    public void testGenerateGraph() throws Exception {
+    public void testGenerateGraph() {
         System.out.println("generateGraph");
-        
-        // Prepare the test distribution
+
         ArrayList<Integer> distribution = new ArrayList<>();
         distribution.add(2);
         distribution.add(2);
         distribution.add(2);
         distribution.add(2);
         
-        // Test the method
-        Simple instance = new Simple(database);
+        Simple instance = new Simple(getDatabase());
         boolean result = instance.generateGraph(distribution);
-       
+
+        assertTrue(result);
     }
     
 }

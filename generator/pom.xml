@@ -35,5 +35,10 @@
             <artifactId>common</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>tests</artifactId>
+        </dependency>
+
     </dependencies>
 </project>
