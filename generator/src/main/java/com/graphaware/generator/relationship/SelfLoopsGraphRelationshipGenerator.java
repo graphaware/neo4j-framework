@@ -22,7 +22,6 @@ package com.graphaware.generator.relationship;
 
 import com.graphaware.common.util.SameTypePair;
 import com.graphaware.generator.distribution.DegreeDistribution;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 import java.util.ArrayList;
 import java.util.List;

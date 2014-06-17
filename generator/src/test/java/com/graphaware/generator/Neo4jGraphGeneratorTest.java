@@ -33,7 +33,7 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
 /**
  * Smoke test for {@link Neo4jGraphGenerator}.
  */
-public class SimpleGraphGeneratorTest extends DatabaseIntegrationTest {
+public class Neo4jGraphGeneratorTest extends DatabaseIntegrationTest {
 
     /**
      * {@inheritDoc}
