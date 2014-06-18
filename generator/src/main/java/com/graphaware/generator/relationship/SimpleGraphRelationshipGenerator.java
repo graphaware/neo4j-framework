@@ -42,7 +42,7 @@ public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator 
      */
     @Override
     protected boolean isValidDistribution(DegreeDistribution distribution) {
-        return passesHavelHakimiTest(distribution);
+        return passesErdosGallaiTest(distribution);
         //return passesErdosGallaiTest(distribution); //can be swapped for Havel-Hakimi
     }
 
@@ -80,9 +80,8 @@ public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator 
 
                 SameTypePair<Integer> edgeCandidate = new UnorderedPair<>(candidateIndex, index);
 
-                /**
-                 * Improve this one, check if edge has already been added.
-                 */
+
+                //  Checks if edge has already been added.
                 boolean skip = false;
                 for (SameTypePair<Integer> edge : edges) {
                     if (edge.equals(edgeCandidate)) {
@@ -95,9 +94,8 @@ public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator 
                     continue;
                 }
 
-                /**
-                 * Prepare the candidate set and test if it is graphical
-                 */
+
+                // Prepare the candidate set and test if it is graphical
                 temp.decrease(index);
                 temp.decrease(candidateIndex);
 
@@ -158,8 +156,7 @@ public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator 
     }
 
     /**
-     * Use Havel-Hakimi test instead of the Erdos-Gallai condition TODO: Do
-     * these in-place?
+     * Havel-Hakimi is a recursive alternative to the Erdos-Gallai condition
      *
      * @param distribution to test.
      * @return true iff passes.
