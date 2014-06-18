@@ -19,6 +19,6 @@ public class EnterpriseNeoServerIntegrationTest extends NeoServerIntegrationTest
 
     @Test
     public void jarFilesShouldBeWired() {
-        post("http://localhost:7474/graphaware/timetree/now", HttpStatus.SC_OK);
+        get("http://localhost:7474/graphaware/timetree/now", HttpStatus.SC_OK);
     }
 }

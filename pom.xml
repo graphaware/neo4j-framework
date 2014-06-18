@@ -139,6 +139,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <neo4j.version>2.1.2</neo4j.version>
         <spring.version>4.0.0.RELEASE</spring.version>
+        <graphaware.version>${project.version}</graphaware.version>
     </properties>
 
     <dependencyManagement>
@@ -149,25 +150,25 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>api</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>common</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>server-common</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tests</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
                 <scope>test</scope>
             </dependency>
 
@@ -175,20 +176,20 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>timetree</artifactId>
-                <version>2.0.3.4.4</version>
+                <version>2.1.2.7.9</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-api</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-executor</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <!-- Neo4j -->
