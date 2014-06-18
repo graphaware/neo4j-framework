@@ -42,7 +42,8 @@ public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator 
      */
     @Override
     protected boolean isValidDistribution(DegreeDistribution distribution) {
-        return passesErdosGallaiTest(distribution); //can be swapped for Havel-Hakimi
+        return passesHavelHakimiTest(distribution);
+        //return passesErdosGallaiTest(distribution); //can be swapped for Havel-Hakimi
     }
 
     /**
@@ -100,9 +101,9 @@ public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator 
                 temp.decrease(index);
                 temp.decrease(candidateIndex);
 
-                if (isValidDistribution(temp)) { // use Erdos-Galai test, since it doesn't sort the entries
-                    distribution = temp;              // assign temp to distribution
-                    edges.add(edgeCandidate);         // edge is allowed, add it.
+                if (isValidDistribution(temp)) {
+                    distribution = temp;
+                    edges.add(edgeCandidate); // edge is allowed, add it.
                     break;
                 }
             }
@@ -172,9 +173,11 @@ public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator 
 
         DegreeDistribution copy = distribution.duplicate();
 
-        int i = 0, L = 0, first = 0;
+        int i = 0;
+        int first;
+        int L = distribution.size();
 
-        while (L > 0) {   //todo this can't work
+        while (L > 0) {
             first = copy.get(i);
             L--;
 
@@ -188,7 +191,7 @@ public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator 
                     }
                 }
 
-                copy.set(j, copy.get(j) - 1); //todo switch to decrease?
+                copy.set(j, copy.get(j) - 1);
             }
 
             copy.set(i, 0);
