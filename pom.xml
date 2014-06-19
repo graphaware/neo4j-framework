@@ -19,7 +19,7 @@
 
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>framework-parent</artifactId>
-    <version>2.1.1.7-SNAPSHOT</version>
+    <version>2.1.2.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
@@ -31,6 +31,7 @@
     <modules>
         <module>api</module>
         <module>common</module>
+        <module>generator</module>
         <module>runtime</module>
         <module>server</module>
         <module>tests</module>
@@ -137,7 +138,7 @@
     <properties>
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>2.1.1</neo4j.version>
+        <neo4j.version>2.1.2</neo4j.version>
         <spring.version>4.0.0.RELEASE</spring.version>
     </properties>
 
@@ -340,6 +341,18 @@
                 <version>${spring.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-tx</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.transaction</groupId>
+                <artifactId>javax.transaction-api</artifactId>
+                <version>1.2</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -410,7 +423,7 @@
                 <version>2.9</version>
                 <configuration>
                     <links>
-                        <link>http://api.neo4j.org/2.1.1/</link>
+                        <link>http://api.neo4j.org/2.1.2/</link>
                     </links>
                 </configuration>
                 <executions>

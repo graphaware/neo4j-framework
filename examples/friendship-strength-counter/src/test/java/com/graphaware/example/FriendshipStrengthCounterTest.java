@@ -16,19 +16,14 @@
 
 package com.graphaware.example;
 
-import com.graphaware.common.strategy.IncludeAllNodes;
-import com.graphaware.common.strategy.IncludeNoRelationships;
-import com.graphaware.common.strategy.InclusionStrategies;
-import com.graphaware.common.strategy.NodeInclusionStrategy;
-import com.graphaware.tx.event.improved.api.FilteredTransactionData;
-import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import com.graphaware.tx.event.improved.api.LazyTransactionData;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.*;
-import org.neo4j.graphdb.event.TransactionData;
-import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.test.TestGraphDatabaseFactory;
+
+import java.util.Map;
 
 import static com.graphaware.example.FriendshipStrengthCounter.*;
 import static org.junit.Assert.assertEquals;
@@ -47,9 +42,14 @@ public class FriendshipStrengthCounterTest {
         database.registerTransactionEventHandler(new FriendshipStrengthCounter(database));
     }
 
+    @After
+    public void tearDown() {
+        database.shutdown();
+    }
+
     @Test
     public void totalFriendshipStrengthShouldBeZeroInEmptyDatabase() {
-        assertEquals(0, getTotalFriendshipStrength(database));
+        assertEquals(0L, getTotalFriendshipStrength(database));
     }
 
     @Test
@@ -63,16 +63,16 @@ public class FriendshipStrengthCounterTest {
             person2.setProperty("name", "Person Two");
             person3.setProperty("name", "Person Three");
 
-            person1.createRelationshipTo(person2, FRIEND_OF).setProperty(STRENGTH, 2);
-            person1.createRelationshipTo(person3, FRIEND_OF).setProperty(STRENGTH, 1);
-            person2.createRelationshipTo(person1, FRIEND_OF).setProperty(STRENGTH, 3);
-            person2.createRelationshipTo(person3, FRIEND_OF).setProperty(STRENGTH, 1);
-            person3.createRelationshipTo(person1, FRIEND_OF).setProperty(STRENGTH, 2);
+            person1.createRelationshipTo(person2, FRIEND_OF).setProperty(STRENGTH, 2L);
+            person1.createRelationshipTo(person3, FRIEND_OF).setProperty(STRENGTH, 1L);
+            person2.createRelationshipTo(person1, FRIEND_OF).setProperty(STRENGTH, 3L);
+            person2.createRelationshipTo(person3, FRIEND_OF).setProperty(STRENGTH, 1L);
+            person3.createRelationshipTo(person1, FRIEND_OF).setProperty(STRENGTH, 2L);
 
             tx.success();
         }
 
-        assertEquals(9, getTotalFriendshipStrength(database));
+        assertEquals(9L, getTotalFriendshipStrength(database));
 
         //delete and change some friendships
         try (Transaction tx = database.beginTx()) {
@@ -80,13 +80,36 @@ public class FriendshipStrengthCounterTest {
                 if (relationship.getEndNode().getId() == 1) {
                     relationship.delete(); //remove 2 from total strength
                 } else {
-                    relationship.setProperty(STRENGTH, 2); //add 1 to total strength
+                    relationship.setProperty(STRENGTH, 2L); //add 1 to total strength
                 }
             }
 
             tx.success();
         }
 
-        assertEquals(8, getTotalFriendshipStrength(database));
+        assertEquals(8L, getTotalFriendshipStrength(database));
+    }
+
+    @Test
+    public void totalFriendshipStrengthShouldBeCountedUsingCypher() {
+        ExecutionEngine executionEngine = new ExecutionEngine(database);
+
+        executionEngine.execute("CREATE " +
+                "(p1:Person), (p2:Person), (p3:Person)," +
+                "(p1)-[:FRIEND_OF {strength:3}]->(p2)," +
+                "(p2)-[:FRIEND_OF {strength:1}]->(p1)," +
+                "(p1)-[:FRIEND_OF {strength:2}]->(p3)");
+
+        String query = "MATCH (c:FriendshipCounter) RETURN c.totalFriendshipStrength as result";
+
+        for (Map<String, Object> result : executionEngine.execute(query)) {
+            assertEquals(6L, result.get("result"));
+        }
+
+        executionEngine.execute("MATCH (p1:Person)-[f:FRIEND_OF {strength:3}]->(p2) DELETE f");
+
+        for (Map<String, Object> result : executionEngine.execute(query)) {
+            assertEquals(3L, result.get("result"));
+        }
     }
 }

@@ -16,12 +16,19 @@
 
 package com.graphaware.example;
 
+import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 
-import static com.graphaware.common.util.IterableUtils.getSingleOrNull;
+import java.util.HashSet;
+import java.util.Set;
+
+import static com.graphaware.common.util.PropertyContainerUtils.nodeToString;
+import static com.graphaware.common.util.PropertyContainerUtils.relationshipToString;
 
 /**
  * Example of a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler} that uses GraphAware {@link ImprovedTransactionData}
@@ -41,7 +48,33 @@ public class ChangeLogger extends TransactionEventHandler.Adapter<Void> {
     }
 
     private void logChanges(ImprovedTransactionData improvedData) {
-        for (String change : improvedData.mutationsToStrings()) {
+        Set<String> changes = new HashSet<>();
+
+        for (Node createdNode : improvedData.getAllCreatedNodes()) {
+            changes.add("Created node " + nodeToString(createdNode));
+        }
+
+        for (Node deletedNode : improvedData.getAllDeletedNodes()) {
+            changes.add("Deleted node " + nodeToString(deletedNode));
+        }
+
+        for (Change<Node> changedNode : improvedData.getAllChangedNodes()) {
+            changes.add("Changed node " + nodeToString(changedNode.getPrevious()) + " to " + nodeToString(changedNode.getCurrent()));
+        }
+
+        for (Relationship createdRelationship : improvedData.getAllCreatedRelationships()) {
+            changes.add("Created relationship " + relationshipToString(createdRelationship));
+        }
+
+        for (Relationship deletedRelationship : improvedData.getAllDeletedRelationships()) {
+            changes.add("Deleted relationship " + relationshipToString(deletedRelationship));
+        }
+
+        for (Change<Relationship> changedRelationship : improvedData.getAllChangedRelationships()) {
+            changes.add("Changed relationship " + relationshipToString(changedRelationship.getPrevious()) + " to " + relationshipToString(changedRelationship.getCurrent()));
+        }
+
+        for (String change : changes) {
             System.out.println(change);
         }
     }

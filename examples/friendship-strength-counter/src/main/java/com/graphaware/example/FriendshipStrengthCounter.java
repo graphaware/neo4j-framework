@@ -51,33 +51,33 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
     public Void beforeCommit(TransactionData data) throws Exception {
         ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data);
 
-        int delta = 0;
+        long delta = 0;
 
         //handle new friendships
         for (Relationship newFriendship : improvedTransactionData.getAllCreatedRelationships()) {
             if (newFriendship.isType(FRIEND_OF)) {
-                delta += (int) newFriendship.getProperty(STRENGTH, 0);
+                delta += (long) newFriendship.getProperty(STRENGTH, 0L);
             }
         }
 
         //handle changed friendships
         for (Change<Relationship> changedFriendship : improvedTransactionData.getAllChangedRelationships()) {
             if (changedFriendship.getPrevious().isType(FRIEND_OF)) {
-                delta -= (int) changedFriendship.getPrevious().getProperty(STRENGTH, 0);
-                delta += (int) changedFriendship.getCurrent().getProperty(STRENGTH, 0);
+                delta -= (long) changedFriendship.getPrevious().getProperty(STRENGTH, 0L);
+                delta += (long) changedFriendship.getCurrent().getProperty(STRENGTH, 0L);
             }
         }
 
         //handle deleted friendships
         for (Relationship deletedFriendship : improvedTransactionData.getAllDeletedRelationships()) {
             if (deletedFriendship.isType(FRIEND_OF)) {
-                delta -= (int) deletedFriendship.getProperty(STRENGTH, 0);
+                delta -= (long) deletedFriendship.getProperty(STRENGTH, 0L);
             }
         }
 
         if (delta != 0) {
             Node root = getCounterNode(database);
-            root.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (int) root.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0) + delta);
+            root.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (long) root.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L) + delta);
         }
 
         return null;
@@ -105,11 +105,11 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
      * @param database to find the counter in.
      * @return total friendship strength.
      */
-    public static int getTotalFriendshipStrength(GraphDatabaseService database) {
-        int result = 0;
+    public static long getTotalFriendshipStrength(GraphDatabaseService database) {
+        long result = 0;
 
         try (Transaction tx = database.beginTx()) {
-            result = (int) getCounterNode(database).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0);
+            result = (long) getCounterNode(database).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L);
             tx.success();
         }
 

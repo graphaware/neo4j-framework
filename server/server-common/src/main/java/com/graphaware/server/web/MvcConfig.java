@@ -20,10 +20,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
- * Spring application config.
+ * Spring MVC application config.
  */
 @Configuration
 @EnableWebMvc
-public class AppConfig {
-
+public class MvcConfig {
 }

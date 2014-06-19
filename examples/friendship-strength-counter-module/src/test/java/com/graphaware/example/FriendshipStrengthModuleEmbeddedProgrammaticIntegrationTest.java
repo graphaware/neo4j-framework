@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static org.junit.Assert.assertEquals;
@@ -45,7 +46,10 @@ public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
 
     @Test
     public void totalFriendshipStrengthOnEmptyDatabaseShouldBeZero() {
-        assertEquals(0, new FriendshipStrengthCounter(database).getTotalFriendshipStrength());
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(0, new FriendshipStrengthCounter(database).getTotalFriendshipStrength());
+            tx.success();
+        }
     }
 
     @Test
@@ -54,6 +58,9 @@ public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
                 "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
                 "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
 
-        assertEquals(3, new FriendshipStrengthCounter(database).getTotalFriendshipStrength());
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(3, new FriendshipStrengthCounter(database).getTotalFriendshipStrength());
+            tx.success();
+        }
     }
 }
