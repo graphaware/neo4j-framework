@@ -20,7 +20,7 @@ public class FixedDelayTimingStrategy implements TimingStrategy {
      * {@inheritDoc}
      */
     @Override
-    public long nextDelay() {
+    public long nextDelay(long lastTaskDuration) {
         return delay;
     }
 }

@@ -27,12 +27,12 @@ public class FileScannerTest {
 
     @Test
     public void verifyCorrectNumberOfScannedLines() throws IOException {
-        assertEquals(4, FileScanner.produceLines(FileScannerTest.class.getResourceAsStream("scanner-test.csv"), 0).size());
+        assertEquals(4, FileScanner.produceLines(FileScannerTest.class.getClassLoader().getResourceAsStream("scanner-test.csv"), 0).size());
     }
 
     @Test
     public void verifyCorrectlyScannedLines() throws IOException {
-        List<String> lines = FileScanner.produceLines(FileScannerTest.class.getResourceAsStream("scanner-test.csv"),1);
+        List<String> lines = FileScanner.produceLines(FileScannerTest.class.getClassLoader().getResourceAsStream("scanner-test.csv"),1);
 
         assertEquals(3, lines.size());
         assertEquals("line1;bla", lines.get(0));

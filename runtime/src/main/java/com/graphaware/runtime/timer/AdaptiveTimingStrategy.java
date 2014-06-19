@@ -18,7 +18,7 @@ public class AdaptiveTimingStrategy implements TimingStrategy {
      * {@inheritDoc}
      */
     @Override
-    public long nextDelay() {
+    public long nextDelay(long lastTaskDuration) {
         //todo implement this
         throw new UnsupportedOperationException("not yet implemented");
     }
