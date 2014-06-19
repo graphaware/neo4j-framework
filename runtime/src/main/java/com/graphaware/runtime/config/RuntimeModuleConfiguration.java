@@ -3,7 +3,7 @@ package com.graphaware.runtime.config;
 import com.graphaware.common.strategy.InclusionStrategies;
 
 /**
- * Encapsulates all configuration of a single {@link com.graphaware.runtime.GraphAwareRuntimeModule}. Modules that need
+ * Encapsulates all configuration of a single {@link com.graphaware.runtime.module.TransactionDrivenRuntimeModule}. Modules that need
  * no configuration should use {@link NullRuntimeModuleConfiguration}.
  */
 public interface RuntimeModuleConfiguration {

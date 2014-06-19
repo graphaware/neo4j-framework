@@ -1,4 +1,4 @@
-package com.graphaware.runtime;
+package com.graphaware.runtime.module;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -6,13 +6,13 @@ import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
 import com.graphaware.runtime.config.RuntimeModuleConfiguration;
 
 /**
- *  Base class for {@link GraphAwareRuntimeModule} implementations.
+ *  Base class for {@link TransactionDrivenRuntimeModule} implementations.
  */
-public abstract class BaseGraphAwareRuntimeModule implements GraphAwareRuntimeModule {
+public abstract class BaseTransactionDrivenRuntimeModule implements TransactionDrivenRuntimeModule {
 
     private final String moduleId;
 
-    protected BaseGraphAwareRuntimeModule(String moduleId) {
+    protected BaseTransactionDrivenRuntimeModule(String moduleId) {
         this.moduleId = moduleId;
     }
 

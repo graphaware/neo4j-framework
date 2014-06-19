@@ -17,10 +17,10 @@
 package com.graphaware.runtime;
 
 import com.graphaware.runtime.config.*;
-import com.graphaware.runtime.strategy.BatchSupportingGraphAwareRuntimeModule;
-import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
+import com.graphaware.runtime.strategy.BatchSupportingTransactionDrivenRuntimeModule;
+import com.graphaware.runtime.module.BaseTransactionDrivenRuntimeModule;
+import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -32,25 +32,25 @@ public abstract class GraphAwareRuntimeTest {
 
     protected static final String MOCK = "MOCK";
 
-    protected GraphAwareRuntimeModule createMockModule() {
-        GraphAwareRuntimeModule mockModule = mock(GraphAwareRuntimeModule.class);
+    protected TransactionDrivenRuntimeModule createMockModule() {
+        TransactionDrivenRuntimeModule mockModule = mock(TransactionDrivenRuntimeModule.class);
         when(mockModule.getId()).thenReturn(MOCK);
         when(mockModule.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
         return mockModule;
     }
 
-    protected BatchSupportingGraphAwareRuntimeModule createBatchSupportingMockModule() {
-        BatchSupportingGraphAwareRuntimeModule mockModule = mock(BatchSupportingGraphAwareRuntimeModule.class);
+    protected BatchSupportingTransactionDrivenRuntimeModule createBatchSupportingMockModule() {
+        BatchSupportingTransactionDrivenRuntimeModule mockModule = mock(BatchSupportingTransactionDrivenRuntimeModule.class);
         when(mockModule.getId()).thenReturn(MOCK);
         when(mockModule.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
         return mockModule;
     }
 
-    protected interface RuntimeConfiguredRuntimeModule extends GraphAwareRuntimeModule, RuntimeConfigured {
+    protected interface RuntimeConfiguredRuntimeModule extends TransactionDrivenRuntimeModule, RuntimeConfigured {
 
     }
 
-    protected class RealRuntimeConfiguredRuntimeModule extends BaseGraphAwareRuntimeModule implements RuntimeConfiguredRuntimeModule {
+    protected class RealRuntimeConfiguredRuntimeModule extends BaseTransactionDrivenRuntimeModule implements RuntimeConfiguredRuntimeModule {
 
         private RuntimeConfiguration configuration;
 

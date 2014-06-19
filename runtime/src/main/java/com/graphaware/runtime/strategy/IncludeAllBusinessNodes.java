@@ -24,7 +24,7 @@ import org.neo4j.graphdb.Node;
 /**
  * Base-class for all {@link NodeInclusionStrategy} implementations
  * that include arbitrary business / application level nodes (up to subclasses to decide which ones), but exclude any
- * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link com.graphaware.runtime.GraphAwareRuntimeModule} internal nodes.
+ * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link com.graphaware.runtime.module.TransactionDrivenRuntimeModule} internal nodes.
  */
 public class IncludeAllBusinessNodes extends IncludeAllNodes {
 

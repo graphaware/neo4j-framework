@@ -22,7 +22,6 @@
         <version>2.1.2.8-SNAPSHOT</version>
     </parent>
     <artifactId>runtime</artifactId>
-    <packaging>jar</packaging>
 
     <name>GraphAware Runtime</name>
     <description>Runtime for GraphAware Runtime Modules</description>

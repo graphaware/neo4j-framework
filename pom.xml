@@ -37,7 +37,7 @@
         <module>tests</module>
         <module>tx-api</module>
         <module>tx-executor</module>
-        <!--<module>crawler</module>-->
+        <module>crawler</module>
         <module>build</module>
 
         <!--examples-->
@@ -150,6 +150,12 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>runtime</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
