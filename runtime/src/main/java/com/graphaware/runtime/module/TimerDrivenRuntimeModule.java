@@ -2,15 +2,12 @@ package com.graphaware.runtime.module;
 
 import com.graphaware.common.util.Pair;
 import com.graphaware.runtime.state.GraphPosition;
+import com.graphaware.runtime.state.ModuleContext;
 
 /**
  *
  */
-public interface TimerDrivenRuntimeModule<T, P extends GraphPosition<T>, C> extends RuntimeModule {
+public interface TimerDrivenRuntimeModule<C extends ModuleContext<?>> extends RuntimeModule {
 
-    Pair<P, C> pickFirstPosition();
-
-    Pair<P, C> pickNextPosition(P lastPosition, C lastContext);
-
-    void doSomeWork(P position, C context);
+    C doSomeWork(C lastContext);
 }
