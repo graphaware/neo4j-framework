@@ -123,6 +123,31 @@ public class ArbitraryTest {
 			}
 		});
 
+		/*
+		 * What I want to do here is separate the perpetualisation from the thing that manages the context
+		 *
+		 * So, we've got the way in which we decide what node to visit next and how to get there, which is currently
+		 * handled by SimpleRecursiveGraphCrawler.crawl().  This also needs some kind or exit condition, which will
+		 * be satisfactory convergence after a number of iterations.
+		 *
+		 * How about this then:
+		 *
+		 * PerpetualGraphCrawler <>------> GraphCrawlingAlgorithm
+		 *
+		 * ... where GCA has an entry point (start method) and a way of managing what happens next.  This could be
+		 * like a life cycle where the return value dictates what happens and PerpetualGraphCrawler takes the
+		 * appropriate action based on this.  Bit like a JSP tag life cycle.
+		 *
+		 * So then we'd have PerpetualGC responsible for starting the thread and managing the overall crawl.  So what
+		 * goes into the algorithm???  The code to govern the method by which we converge on centrality, I suppose.
+		 *
+		 * Let's not forget that PageRank is only one implementation of this.  PageRank should be implemented as a
+		 * ThingThatGetsCalledWhenWeFindSomething, not part of the framework!
+		 *
+		 * So, should we actually have PerpetualGraphCrawler implementation called something like:
+		 * SeparateThreadIterativeConvergentPerpetualGraphCrawler?
+		 *
+		 */
 		// might end up with this sort of code in the PerpetualGraphCrawler to manage the "perpetualness"
 		final GraphDatabaseService db = this.database;
 		final Thread crawlerThread = new Thread(new Runnable() {

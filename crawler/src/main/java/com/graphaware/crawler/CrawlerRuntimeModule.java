@@ -10,7 +10,10 @@ import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 /**
  * Module that beavers away in the background while a graph database is running, performing arbitrary offline processing with
  * arbitrary nodes.
+ *
+ * @deprecated Consequence of a misunderstanding - this functionality shouldn't be a module but should be part of the runtime
  */
+@Deprecated
 public class CrawlerRuntimeModule extends BaseTransactionDrivenRuntimeModule {
 
 	private final CrawlerModuleConfiguration moduleConfiguration;
