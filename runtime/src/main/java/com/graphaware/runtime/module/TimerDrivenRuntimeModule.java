@@ -6,7 +6,7 @@ import com.graphaware.runtime.state.GraphPosition;
 /**
  *
  */
-public interface TimerDrivenRuntimeModule<T, P extends GraphPosition<T>, C> {
+public interface TimerDrivenRuntimeModule<T, P extends GraphPosition<T>, C> extends RuntimeModule {
 
     Pair<P, C> pickFirstPosition();
 
