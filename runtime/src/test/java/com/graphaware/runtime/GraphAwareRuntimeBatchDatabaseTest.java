@@ -21,6 +21,7 @@ import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.MinimalRuntimeModuleConfiguration;
 import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
+import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.junit.After;
 import org.junit.Before;
@@ -30,7 +31,6 @@ import org.mockito.Mockito;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.tooling.GlobalGraphOperations;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
 
@@ -83,7 +83,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test
     public void moduleRegisteredForTheFirstTimeShouldBeInitialized() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final TransactionDrivenRuntimeModule mockModule = createMockModule();
 
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         runtime.registerModule(mockModule);
@@ -100,7 +100,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test
     public void moduleAlreadyRegisteredShouldNotBeInitialized() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final TransactionDrivenRuntimeModule mockModule = createMockModule();
 
         createRuntimeRoot().setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG));
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
@@ -117,7 +117,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test
     public void changedModuleShouldBeReInitialized() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final TransactionDrivenRuntimeModule mockModule = createMockModule();
         createRuntimeRoot().setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, CONFIG + "123");
 
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
@@ -135,7 +135,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test
     public void forcedModuleShouldBeReInitialized() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final TransactionDrivenRuntimeModule mockModule = createMockModule();
 
         createRuntimeRoot().setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, FORCE_INITIALIZATION + "123");
 
@@ -154,7 +154,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test
     public void moduleAlreadyRegisteredShouldBeInitializedWhenForced() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final TransactionDrivenRuntimeModule mockModule = createMockModule();
 
         createRuntimeRoot().setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG));
 
@@ -173,7 +173,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test
     public void changedModuleShouldNotBeReInitializedWhenInitializationSkipped() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final TransactionDrivenRuntimeModule mockModule = createMockModule();
 
         createRuntimeRoot().setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, CONFIG + "123");
 
@@ -190,7 +190,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotBeAbleToRegisterTheSameModuleTwice() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final TransactionDrivenRuntimeModule mockModule = createMockModule();
 
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         runtime.registerModule(mockModule);
@@ -199,8 +199,8 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotBeAbleToRegisterModuleWithTheSameIdTwice() {
-        final GraphAwareRuntimeModule mockModule1 = createMockModule();
-        final GraphAwareRuntimeModule mockModule2 = createMockModule();
+        final TransactionDrivenRuntimeModule mockModule1 = createMockModule();
+        final TransactionDrivenRuntimeModule mockModule2 = createMockModule();
         when(mockModule1.getId()).thenReturn("ID");
         when(mockModule2.getId()).thenReturn("ID");
 
@@ -211,7 +211,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test
     public void unusedModulesShouldBeRemoved() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final TransactionDrivenRuntimeModule mockModule = createMockModule();
 
         Node root = createRuntimeRoot();
         root.setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG));
@@ -231,7 +231,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test(expected = IllegalStateException.class)
     public void usedCorruptModulesShouldThrowException() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final TransactionDrivenRuntimeModule mockModule = createMockModule();
 
         Node root = createRuntimeRoot();
         root.setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, "CORRUPT");
@@ -244,7 +244,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test
     public void unusedCorruptModulesShouldBeRemoved() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final TransactionDrivenRuntimeModule mockModule = createMockModule();
 
         Node root = createRuntimeRoot();
         root.setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG));
@@ -267,15 +267,15 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
         database.shutdown();
         database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()), 0);
 
-        GraphAwareRuntimeModule mockModule1 = mock(GraphAwareRuntimeModule.class);
+        TransactionDrivenRuntimeModule mockModule1 = mock(TransactionDrivenRuntimeModule.class);
         when(mockModule1.getId()).thenReturn("MOCK1");
         when(mockModule1.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
 
-        GraphAwareRuntimeModule mockModule2 = mock(GraphAwareRuntimeModule.class);
+        TransactionDrivenRuntimeModule mockModule2 = mock(TransactionDrivenRuntimeModule.class);
         when(mockModule2.getId()).thenReturn("MOCK2");
         when(mockModule2.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
 
-        GraphAwareRuntimeModule mockModule3 = mock(GraphAwareRuntimeModule.class);
+        TransactionDrivenRuntimeModule mockModule3 = mock(TransactionDrivenRuntimeModule.class);
         when(mockModule3.getId()).thenReturn("MOCK3");
         when(mockModule3.getConfiguration()).thenReturn(new MinimalRuntimeModuleConfiguration(InclusionStrategies.none()));
 
@@ -311,15 +311,15 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test
     public void noRegisteredInterestedModulesShouldBeDelegatedToBeforeRuntimeStarts() {
-        GraphAwareRuntimeModule mockModule1 = mock(GraphAwareRuntimeModule.class);
+        TransactionDrivenRuntimeModule mockModule1 = mock(TransactionDrivenRuntimeModule.class);
         when(mockModule1.getId()).thenReturn("MOCK1");
         when(mockModule1.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
 
-        GraphAwareRuntimeModule mockModule2 = mock(GraphAwareRuntimeModule.class);
+        TransactionDrivenRuntimeModule mockModule2 = mock(TransactionDrivenRuntimeModule.class);
         when(mockModule2.getId()).thenReturn("MOCK2");
         when(mockModule2.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
 
-        GraphAwareRuntimeModule mockModule3 = mock(GraphAwareRuntimeModule.class);
+        TransactionDrivenRuntimeModule mockModule3 = mock(TransactionDrivenRuntimeModule.class);
         when(mockModule3.getId()).thenReturn("MOCK3");
         when(mockModule3.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
 
@@ -340,7 +340,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test
     public void moduleThrowingInitExceptionShouldBeMarkedForReinitialization() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final TransactionDrivenRuntimeModule mockModule = createMockModule();
         Mockito.doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
         database.shutdown();
@@ -360,7 +360,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test
     public void moduleThrowingInitExceptionShouldBeMarkedForReinitializationOnlyTheFirstTime() throws InterruptedException {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final TransactionDrivenRuntimeModule mockModule = createMockModule();
         doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
@@ -395,7 +395,7 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
 
     @Test(expected = IllegalStateException.class)
     public void modulesCannotBeRegisteredAfterStart() {
-        final GraphAwareRuntimeModule mockModule = createMockModule();
+        final TransactionDrivenRuntimeModule mockModule = createMockModule();
 
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
         runtime.start(true);

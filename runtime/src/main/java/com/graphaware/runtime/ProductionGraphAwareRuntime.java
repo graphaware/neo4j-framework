@@ -18,6 +18,7 @@ package com.graphaware.runtime;
 
 import com.graphaware.common.serialize.Serializer;
 
+import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -81,7 +82,7 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
      * {@inheritDoc}
      */
     @Override
-    protected void doInitialize(GraphAwareRuntimeModule module) {
+    protected void doInitialize(TransactionDrivenRuntimeModule module) {
         module.initialize(database);
     }
 
@@ -89,7 +90,7 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
      * {@inheritDoc}
      */
     @Override
-    protected void doReinitialize(GraphAwareRuntimeModule module) {
+    protected void doReinitialize(TransactionDrivenRuntimeModule module) {
         module.reinitialize(database);
     }
 
@@ -97,7 +98,7 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
      * {@inheritDoc}
      */
     @Override
-    protected void doRecordInitialization(final GraphAwareRuntimeModule module, final String key) {
+    protected void doRecordInitialization(final TransactionDrivenRuntimeModule module, final String key) {
         try (Transaction tx = database.beginTx()) {
             getOrCreateRoot().setProperty(key, Serializer.toString(module.getConfiguration(), CONFIG));
             tx.success();
@@ -122,7 +123,7 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
      * {@inheritDoc}
      */
     @Override
-    protected void forceInitialization(final GraphAwareRuntimeModule module) {
+    protected void forceInitialization(final TransactionDrivenRuntimeModule module) {
         try (Transaction tx = database.beginTx()) {
             getOrCreateRoot().setProperty(moduleKey(module), FORCE_INITIALIZATION + System.currentTimeMillis());
             tx.success();

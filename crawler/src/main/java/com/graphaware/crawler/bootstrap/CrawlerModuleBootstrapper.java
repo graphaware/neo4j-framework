@@ -2,6 +2,8 @@ package com.graphaware.crawler.bootstrap;
 
 import java.util.Map;
 
+import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
+import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import com.graphaware.crawler.CrawlerModuleConfiguration;
@@ -9,17 +11,15 @@ import com.graphaware.crawler.CrawlerRuntimeModule;
 import com.graphaware.crawler.DefaultCrawlerModuleConfiguration;
 import com.graphaware.crawler.api.Context;
 import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
-import com.graphaware.runtime.GraphAwareRuntimeModule;
-import com.graphaware.runtime.GraphAwareRuntimeModuleBootstrapper;
 
 /**
- * {@link GraphAwareRuntimeModuleBootstrapper} for the module that beavers away in the background, crawling the graph and
+ * {@link com.graphaware.runtime.module.RuntimeModuleBootstrapper} for the module that beavers away in the background, crawling the graph and
  * performing arbitrary offline tasks.
  */
-public class CrawlerModuleBootstrapper implements GraphAwareRuntimeModuleBootstrapper {
+public class CrawlerModuleBootstrapper implements RuntimeModuleBootstrapper {
 
 	@Override
-	public GraphAwareRuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
+	public TransactionDrivenRuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
 		CrawlerModuleConfiguration moduleConfiguration = new DefaultCrawlerModuleConfiguration();
 
 		// I thought about putting the ThingThatGetsCalled... into the configuration, but keeping it as a separate part of the

@@ -3,7 +3,7 @@ package com.graphaware.runtime.config;
 import com.graphaware.common.strategy.InclusionStrategies;
 
 /**
- * {@link RuntimeModuleConfiguration} for {@link com.graphaware.runtime.GraphAwareRuntimeModule}s with no configuration.
+ * {@link RuntimeModuleConfiguration} for {@link com.graphaware.runtime.module.TransactionDrivenRuntimeModule}s with no configuration.
  * Singleton.
  */
 public final class NullRuntimeModuleConfiguration implements RuntimeModuleConfiguration {

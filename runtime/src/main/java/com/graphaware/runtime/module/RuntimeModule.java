@@ -14,21 +14,19 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime;
+package com.graphaware.runtime.module;
 
 import com.graphaware.runtime.config.RuntimeModuleConfiguration;
-import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
-import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
- * A {@link ProductionGraphAwareRuntime} module performing some useful work based on about-to-be-committed transaction data.
+ * A {@link com.graphaware.runtime.ProductionGraphAwareRuntime} module performing some useful work based on about-to-be-committed transaction data.
  */
-public interface GraphAwareRuntimeModule {
+public interface RuntimeModule {
 
     /**
-     * Get a human-readable (ideally short) ID of this module. This ID must be unique across all {@link GraphAwareRuntimeModule}s
-     * used in a single {@link GraphAwareRuntime} instance.
+     * Get a human-readable (ideally short) ID of this module. This ID must be unique across all {@link RuntimeModule}s
+     * used in a single {@link com.graphaware.runtime.GraphAwareRuntime} instance.
      *
      * @return short ID of this module.
      */
@@ -36,7 +34,7 @@ public interface GraphAwareRuntimeModule {
 
     /**
      * Return the configuration of this module. Each module must encapsulate its entire configuration in an instance of
-     * a {@link RuntimeModuleConfiguration} implementation. Use {@link com.graphaware.runtime.config.NullRuntimeModuleConfiguration}
+     * a {@link com.graphaware.runtime.config.RuntimeModuleConfiguration} implementation. Use {@link com.graphaware.runtime.config.NullRuntimeModuleConfiguration}
      * if this module needs no configuration.
      *
      * @return module configuration.
@@ -65,14 +63,4 @@ public interface GraphAwareRuntimeModule {
      * Perform cleanup if needed before database shutdown.
      */
     void shutdown();
-
-    /**
-     * Perform the core business logic of this module before a transaction commits.
-     *
-     * @param transactionData data about the soon-to-be-committed transaction. It is already filtered based on {@link #getInclusionStrategies()}.
-     * @throws NeedsInitializationException if it detects data is out of sync. {@link #initialize(org.neo4j.graphdb.GraphDatabaseService)}  will be called next
-     *                                      time the {@link GraphAwareRuntime} is started. Until then, the module
-     *                                      should perform on best-effort basis.
-     */
-    void beforeCommit(ImprovedTransactionData transactionData);
 }

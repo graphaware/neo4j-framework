@@ -1,15 +1,16 @@
 package com.graphaware.runtime;
 
+import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 
 /**
- * Runtime that delegates to registered {@link GraphAwareRuntimeModule}s to perform useful work.
+ * Runtime that delegates to registered {@link com.graphaware.runtime.module.TransactionDrivenRuntimeModule}s to perform useful work.
  * There must be exactly one instance of this runtime for a single {@link org.neo4j.graphdb.GraphDatabaseService}.
  * <p/>
  * The runtime registers itself as a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler},
  * translates {@link org.neo4j.graphdb.event.TransactionData} into {@link com.graphaware.tx.event.improved.api.ImprovedTransactionData}
- * and lets registered {@link GraphAwareRuntimeModule}s deal with the data before each transaction
+ * and lets registered {@link com.graphaware.runtime.module.TransactionDrivenRuntimeModule}s deal with the data before each transaction
  * commits, in the order the modules were registered.
  * <p/>
  * After all desired modules have been registered, {@link #start()} can be called in order to initialize the runtime and
@@ -19,7 +20,7 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
  * transaction received from callers. In such case, all other transaction will be blocked until the runtime and all its
  * modules have been initialized.
  * <p/>
- * Every new {@link GraphAwareRuntimeModule} and every {@link GraphAwareRuntimeModule}
+ * Every new {@link com.graphaware.runtime.module.TransactionDrivenRuntimeModule} and every {@link com.graphaware.runtime.module.TransactionDrivenRuntimeModule}
  * whose configuration has changed since the last run will be forced to (re-)initialize, which can lead to very long
  * startup times, as (re-)initialization could be a global graph operation. Re-initialization will also be automatically
  * performed for all modules, for which it has been detected that something is out-of-sync
@@ -33,15 +34,15 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
 public interface GraphAwareRuntime extends TransactionEventHandler<Void>, KernelEventHandler {
 
     /**
-     * Register a {@link GraphAwareRuntimeModule}. Note that modules are delegated to in the order they are registered.
+     * Register a {@link com.graphaware.runtime.module.TransactionDrivenRuntimeModule}. Note that modules are delegated to in the order they are registered.
      * Must be called before the Runtime is started.
      *
      * @param module to register.
      */
-    void registerModule(GraphAwareRuntimeModule module);
+    void registerModule(TransactionDrivenRuntimeModule module);
 
     /**
-     * Register a {@link GraphAwareRuntimeModule} and optionally force its (re-)initialization.
+     * Register a {@link TransactionDrivenRuntimeModule} and optionally force its (re-)initialization.
      * <p/>
      * Forcing re-initialization should only be necessary in exceptional circumstances, such as that the database has
      * been written to without the module being registered / runtime running. Re-initialization can be a very
@@ -56,7 +57,7 @@ public interface GraphAwareRuntime extends TransactionEventHandler<Void>, Kernel
      * @param module              to register.
      * @param forceInitialization true to force (re-)initialization.
      */
-    void registerModule(GraphAwareRuntimeModule module, boolean forceInitialization);
+    void registerModule(TransactionDrivenRuntimeModule module, boolean forceInitialization);
 
     /**
      * Start the Runtime. Must be called before anything gets written into the database, but will be called automatically

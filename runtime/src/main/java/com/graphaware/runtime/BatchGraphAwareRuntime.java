@@ -17,7 +17,8 @@
 package com.graphaware.runtime;
 
 import com.graphaware.common.serialize.Serializer;
-import com.graphaware.runtime.strategy.BatchSupportingGraphAwareRuntimeModule;
+import com.graphaware.runtime.strategy.BatchSupportingTransactionDrivenRuntimeModule;
+import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
 import org.apache.log4j.Logger;
@@ -114,9 +115,9 @@ public class BatchGraphAwareRuntime extends BaseGraphAwareRuntime {
      * {@inheritDoc}
      */
     @Override
-    protected void doInitialize(GraphAwareRuntimeModule module) {
-        if (module instanceof BatchSupportingGraphAwareRuntimeModule) {
-            ((BatchSupportingGraphAwareRuntimeModule) module).initialize(batchInserter);
+    protected void doInitialize(TransactionDrivenRuntimeModule module) {
+        if (module instanceof BatchSupportingTransactionDrivenRuntimeModule) {
+            ((BatchSupportingTransactionDrivenRuntimeModule) module).initialize(batchInserter);
         }
     }
 
@@ -124,9 +125,9 @@ public class BatchGraphAwareRuntime extends BaseGraphAwareRuntime {
      * {@inheritDoc}
      */
     @Override
-    protected void doReinitialize(GraphAwareRuntimeModule module) {
-        if (module instanceof BatchSupportingGraphAwareRuntimeModule) {
-            ((BatchSupportingGraphAwareRuntimeModule) module).reinitialize(batchInserter);
+    protected void doReinitialize(TransactionDrivenRuntimeModule module) {
+        if (module instanceof BatchSupportingTransactionDrivenRuntimeModule) {
+            ((BatchSupportingTransactionDrivenRuntimeModule) module).reinitialize(batchInserter);
         }
     }
 
@@ -134,7 +135,7 @@ public class BatchGraphAwareRuntime extends BaseGraphAwareRuntime {
      * {@inheritDoc}
      */
     @Override
-    protected void doRecordInitialization(final GraphAwareRuntimeModule module, final String key) {
+    protected void doRecordInitialization(final TransactionDrivenRuntimeModule module, final String key) {
         getOrCreateRoot().setProperty(key, Serializer.toString(module.getConfiguration(), CONFIG));
     }
 
@@ -153,7 +154,7 @@ public class BatchGraphAwareRuntime extends BaseGraphAwareRuntime {
      * {@inheritDoc}
      */
     @Override
-    protected void forceInitialization(final GraphAwareRuntimeModule module) {
+    protected void forceInitialization(final TransactionDrivenRuntimeModule module) {
         getOrCreateRoot().setProperty(moduleKey(module), FORCE_INITIALIZATION + System.currentTimeMillis());
     }
 

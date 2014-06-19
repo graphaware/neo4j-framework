@@ -1,17 +1,17 @@
 package com.graphaware.crawler;
 
+import com.graphaware.runtime.module.BaseTransactionDrivenRuntimeModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
 import com.graphaware.crawler.internal.PerpetualGraphCrawler;
-import com.graphaware.runtime.BaseGraphAwareRuntimeModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 
 /**
  * Module that beavers away in the background while a graph database is running, performing arbitrary offline processing with
  * arbitrary nodes.
  */
-public class CrawlerRuntimeModule extends BaseGraphAwareRuntimeModule {
+public class CrawlerRuntimeModule extends BaseTransactionDrivenRuntimeModule {
 
 	private final CrawlerModuleConfiguration moduleConfiguration;
 	private final ThingThatGetsCalledWhenWeFindSomething inclusionHandler;

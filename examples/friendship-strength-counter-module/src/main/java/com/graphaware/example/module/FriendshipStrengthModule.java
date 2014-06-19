@@ -2,7 +2,7 @@ package com.graphaware.example.module;
 
 import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.common.strategy.RelationshipInclusionStrategy;
-import com.graphaware.runtime.BaseGraphAwareRuntimeModule;
+import com.graphaware.runtime.module.BaseTransactionDrivenRuntimeModule;
 import com.graphaware.runtime.config.MinimalRuntimeModuleConfiguration;
 import com.graphaware.runtime.config.RuntimeModuleConfiguration;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -21,10 +21,10 @@ import static com.graphaware.example.module.Relationships.FRIEND_OF;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
- * {@link com.graphaware.runtime.GraphAwareRuntimeModule} that counts the total friendship strength in the database
+ * {@link com.graphaware.runtime.module.TransactionDrivenRuntimeModule} that counts the total friendship strength in the database
  * and keeps it up to date.
  */
-public class FriendshipStrengthModule extends BaseGraphAwareRuntimeModule {
+public class FriendshipStrengthModule extends BaseTransactionDrivenRuntimeModule {
 
     private final RuntimeModuleConfiguration configuration;
     private final FriendshipStrengthCounter counter;
