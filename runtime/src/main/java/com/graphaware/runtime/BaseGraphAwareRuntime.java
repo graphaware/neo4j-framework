@@ -203,22 +203,8 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
      */
     @Override
     public final Void beforeCommit(TransactionData data) throws Exception {
-        if (!databaseAvailable()) {
-            return null;
-        }
-
-        synchronized (this) {
-            switch (state) {
-                case NONE:
-                    start();
-                    break;
-                case STARTING:
-                    return null;
-                case STARTED:
-                    break;
-                default:
-                    throw new IllegalStateException("Unknown GraphAware Runtime state. This is a bug.");
-            }
+        if (runtimeHasNotYetInitialised()) {
+        	return null;
         }
 
         if (data.isDeleted(getOrCreateRoot())) {
@@ -248,6 +234,35 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
 
         return null;
     }
+
+	/**
+	 * Checks to see if initialisation of this {@link GraphAwareRuntime} has <b>NOT</b> been completed, starting the initialisation
+	 * process if necessary.
+	 *
+	 * @return <code>true</code> if any of the prerequisites haven't been satisfied, <code>false</code> if it's alright to
+	 *         delegate onto modules
+	 */
+	protected boolean runtimeHasNotYetInitialised() {
+		if (!databaseAvailable()) {
+            return true;
+        }
+
+        synchronized (this) {
+            switch (state) {
+                case NONE:
+                    start();
+                    break;
+                case STARTING:
+                    return true;
+                case STARTED:
+                    break;
+                default:
+                    throw new IllegalStateException("Unknown GraphAware Runtime state. This is a bug.");
+            }
+        }
+
+        return false;
+	}
 
     /**
      * {@inheritDoc}
