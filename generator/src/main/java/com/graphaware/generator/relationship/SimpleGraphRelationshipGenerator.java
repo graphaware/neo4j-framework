@@ -18,6 +18,7 @@ package com.graphaware.generator.relationship;
 import com.graphaware.common.util.SameTypePair;
 import com.graphaware.common.util.UnorderedPair;
 import com.graphaware.generator.distribution.DegreeDistribution;
+import com.graphaware.generator.utils.WeightedReservoirSampler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -69,17 +70,17 @@ public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator 
                 }
             }
 
+            WeightedReservoirSampler sampler = new WeightedReservoirSampler();
+
             // Obtain a candidate list:
             while (true) {
                 DegreeDistribution temp = distribution.duplicate();
+                int candidateIndex = sampler.randomIndexChoice(temp.getDegrees(), index);
 
-                // TODO : this should be proportional to degree to
-                // make the random graph distribution as uniform as possible
-                int rnd = (int) Math.floor(Math.random() * (length - 1)); // choose an index from one elem. less range. OK
-                int candidateIndex = rnd >= index ? rnd + 1 : rnd;       // skip index. OK
+                // int rnd =  (int) Math.floor(Math.random() * (length - 1)); // choose an index from one elem. less range. OK
+                // int candidateIndex = rnd >= index ? rnd + 1 : rnd;         // skip index.
 
                 SameTypePair<Integer> edgeCandidate = new UnorderedPair<>(candidateIndex, index);
-
 
                 //  Checks if edge has already been added.
                 boolean skip = false;
