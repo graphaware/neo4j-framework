@@ -459,7 +459,15 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
         for (RuntimeModule module : getAllModules()) {
             module.shutdown();
         }
+        shutdownRuntime();
         LOG.info("GraphAware Runtime shut down.");
+    }
+
+    /**
+     * Perform any last-minute operations required in order to cleanly shut down this {@link GraphAwareRuntime}.
+     */
+    protected void shutdownRuntime() {
+    	// don't do anything by default
     }
 
     /**

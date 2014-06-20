@@ -1,5 +1,8 @@
 package com.graphaware.runtime.crawler;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import com.graphaware.crawler.algo.CrawlerAlgorithm;
@@ -16,6 +19,7 @@ public class TimedProductionGraphAwareRuntime extends ProductionGraphAwareRuntim
 
 	private CrawlerAlgorithm crawlerAlgorithm;
 	private TimingStrategy timingStrategy;
+	private ExecutorService executor;
 
 	/**
 	 * Constructs a new {@link TimedProductionGraphAwareRuntime} that acts upon the given database.
@@ -45,7 +49,21 @@ public class TimedProductionGraphAwareRuntime extends ProductionGraphAwareRuntim
 		 * just like the ProductionGraphAwareRuntime, this does a "check prerequisites" and then does "notify modules"
 		 */
 
-		new Thread(new Worker()).start();
+		this.executor = Executors.newCachedThreadPool();
+		this.executor.execute(new Worker());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation ensures that any background threads are killed and resources freed.
+	 * </p>
+	 */
+	@Override
+	protected void shutdownRuntime() {
+		if (this.executor != null) {
+			this.executor.shutdown();
+		}
 	}
 
 	/**
@@ -56,6 +74,7 @@ public class TimedProductionGraphAwareRuntime extends ProductionGraphAwareRuntim
 		@Override
 		public void run() {
 			try {
+				System.out.println("working...");
 				Thread.sleep(timingStrategy.nextDelay(-1));
 			} catch (InterruptedException e) {
 				e.printStackTrace(System.err);

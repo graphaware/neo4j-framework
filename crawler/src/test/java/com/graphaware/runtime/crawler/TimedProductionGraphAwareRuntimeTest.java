@@ -41,4 +41,10 @@ public class TimedProductionGraphAwareRuntimeTest {
         verifyNoMoreInteractions(mockDatabase);
 	}
 
+	@Test
+	public void shouldStartAndShutDownWithoutIssue() {
+		this.runtime.runtimeStarted();
+		this.runtime.shutdownRuntime();
+	}
+
 }
