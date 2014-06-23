@@ -1,5 +1,7 @@
 package com.graphaware.runtime.module;
 
+import org.neo4j.graphdb.GraphDatabaseService;
+
 import com.graphaware.runtime.state.ModuleContext;
 
 /**
@@ -8,5 +10,6 @@ import com.graphaware.runtime.state.ModuleContext;
  */
 public interface TimerDrivenRuntimeModule<C extends ModuleContext<?>> extends RuntimeModule {
 
-	C doSomeWork(C lastContext);
+	C doSomeWork(C lastContext, GraphDatabaseService graphDatabaseService);
+
 }
