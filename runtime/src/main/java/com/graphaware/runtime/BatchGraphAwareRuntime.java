@@ -16,21 +16,15 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.common.serialize.Serializer;
-import com.graphaware.runtime.module.RuntimeModule;
-import com.graphaware.runtime.strategy.BatchSupportingTransactionDrivenRuntimeModule;
+import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
+import com.graphaware.runtime.manager.BatchModuleManager;
+import com.graphaware.runtime.manager.ProductionTransactionDrivenModuleManager;
+import com.graphaware.runtime.metadata.BatchSingleNodeModuleMetadataRepository;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
-import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Lock;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Transaction;
-
-import java.util.Collection;
-import java.util.HashMap;
-
-import static com.graphaware.runtime.config.RuntimeConfiguration.GA_ROOT;
 
 
 /**
@@ -51,7 +45,7 @@ public class BatchGraphAwareRuntime extends BaseGraphAwareRuntime {
      * @param batchInserter that the runtime should use.
      */
     public BatchGraphAwareRuntime(TransactionSimulatingBatchInserter batchInserter) {
-        super();
+        super(new BatchModuleManager(new BatchSingleNodeModuleMetadataRepository(batchInserter, DefaultRuntimeConfiguration.getInstance()), batchInserter));
         this.batchInserter = batchInserter;
         registerSelfAsHandler();
     }
@@ -109,66 +103,5 @@ public class BatchGraphAwareRuntime extends BaseGraphAwareRuntime {
                 throw new UnsupportedOperationException("Fake tx!");
             }
         };
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doInitialize(RuntimeModule module) {
-        if (module instanceof BatchSupportingTransactionDrivenRuntimeModule) {
-            ((BatchSupportingTransactionDrivenRuntimeModule) module).initialize(batchInserter);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doReinitialize(RuntimeModule module) {
-        if (module instanceof BatchSupportingTransactionDrivenRuntimeModule) {
-            ((BatchSupportingTransactionDrivenRuntimeModule) module).reinitialize(batchInserter);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doRecordInitialization(final RuntimeModule module, final String key) {
-        getOrCreateRoot().setProperty(key, Serializer.toString(module.getConfiguration(), CONFIG));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void removeUnusedModules(final Collection<String> unusedModules) {
-        for (String toRemove : unusedModules) {
-            LOG.info("Removing unused module " + toRemove + ".");
-            getOrCreateRoot().removeProperty(toRemove);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void forceInitialization(final RuntimeModule module) {
-        getOrCreateRoot().setProperty(moduleKey(module), FORCE_INITIALIZATION + System.currentTimeMillis());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Node getOrCreateRoot() {
-        for (long candidate : batchInserter.getAllNodes()) {
-            if (batchInserter.nodeHasLabel(candidate, GA_ROOT)) {
-                return new BatchInserterNode(candidate, batchInserter);
-            }
-        }
-
-        return new BatchInserterNode(batchInserter.createNode(new HashMap<String, Object>(), GA_ROOT), batchInserter);
     }
 }

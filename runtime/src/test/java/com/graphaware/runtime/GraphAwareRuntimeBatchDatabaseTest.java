@@ -21,6 +21,7 @@ import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.MinimalRuntimeModuleConfiguration;
 import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
+import com.graphaware.runtime.manager.BaseModuleManager;
 import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.junit.After;
@@ -40,6 +41,7 @@ import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.runtime.ProductionGraphAwareRuntime.*;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_ROOT;
+import static com.graphaware.runtime.manager.BaseModuleManager.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 

@@ -16,43 +16,28 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.common.serialize.Serializer;
-import com.graphaware.common.strategy.InclusionStrategy;
-import com.graphaware.common.util.PropertyContainerUtils;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfigured;
-import com.graphaware.runtime.manager.ModuleManager;
+import com.graphaware.runtime.manager.TransactionDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
-import com.graphaware.runtime.module.TimerDrivenRuntimeModule;
 import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
-import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.apache.log4j.Logger;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.ErrorState;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.graphdb.event.TransactionData;
 
-import java.util.*;
-
 /**
  * Abstract base-class for {@link GraphAwareRuntime} implementations.
  */
 public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
-    static final String FORCE_INITIALIZATION = "FORCE_INIT:";
-    public static final String CONFIG = "CONFIG:";
-
-    public static final String RUNTIME = "RUNTIME";
-
     private static final Logger LOG = Logger.getLogger(BaseGraphAwareRuntime.class);
 
     private final RuntimeConfiguration configuration;
-    private final List<TransactionDrivenRuntimeModule> txModules = new LinkedList<>();
-    private final List<TimerDrivenRuntimeModule> timerModules = new LinkedList<>();
 
-    //private final ModuleManager transactionDrivenModuleManager;
+    private final TransactionDrivenModuleManager transactionDrivenModuleManager;
 
     private State state = State.NONE;
 
@@ -65,17 +50,13 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
     /**
      * Create a new instance of the runtime with {@link com.graphaware.runtime.config.DefaultRuntimeConfiguration}.
      */
-    public BaseGraphAwareRuntime() {
-        this(DefaultRuntimeConfiguration.getInstance());
+    public BaseGraphAwareRuntime(TransactionDrivenModuleManager transactionDrivenModuleManager) {
+        this(DefaultRuntimeConfiguration.getInstance(), transactionDrivenModuleManager);
     }
 
-    /**
-     * Create a new instance of the runtime.
-     *
-     * @param configuration of the runtime.
-     */
-    public BaseGraphAwareRuntime(RuntimeConfiguration configuration) {
+    protected BaseGraphAwareRuntime(RuntimeConfiguration configuration, TransactionDrivenModuleManager transactionDrivenModuleManager) {
         this.configuration = configuration;
+        this.transactionDrivenModuleManager = transactionDrivenModuleManager;
     }
 
     /**
@@ -89,53 +70,20 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
         }
 
         LOG.info("Registering module " + module.getId() + " with GraphAware Runtime.");
-        checkNotAlreadyRegistered(module);
 
-        if (module instanceof TransactionDrivenRuntimeModule) {
-            //manager.registerModule(module);
-            txModules.add((TransactionDrivenRuntimeModule) module);
-        }
-
-        if (module instanceof TimerDrivenRuntimeModule) {
-            timerModules.add((TimerDrivenRuntimeModule) module);
-        }
+        doRegisterModule(module);
 
         if (module instanceof RuntimeConfigured) {
             ((RuntimeConfigured) module).configurationChanged(configuration);
         }
     }
 
-    /**
-     * Check that the given module isn't already registered with the runtime.
-     *
-     * @param module to check.
-     * @throws IllegalStateException in case the module is already registered.
-     */
-    private void checkNotAlreadyRegistered(RuntimeModule module) {
-        Set<RuntimeModule> allModules = getAllModules();
-
-        if (allModules.contains(module)) {
-            throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
-        }
-
-        for (RuntimeModule existing : allModules) {
-            if (existing.getId().equals(module.getId())) {
-                throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
-            }
+    protected void doRegisterModule(RuntimeModule module) {
+        if (module instanceof TransactionDrivenRuntimeModule) {
+            transactionDrivenModuleManager.registerModule((TransactionDrivenRuntimeModule) module);
         }
     }
 
-    /**
-     * Get all modules registered with the runtime.
-     *
-     * @return all modules.
-     */
-    private Set<RuntimeModule> getAllModules() {
-        Set<RuntimeModule> allModules = new HashSet<>();
-        allModules.addAll(txModules);
-        allModules.addAll(timerModules);
-        return allModules;
-    }
 
     /**
      * {@inheritDoc}
@@ -168,7 +116,10 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
             LOG.info("Initialization skipped.");
         } else {
             LOG.info("Initializing modules...");
-            initializeModules();
+            try (Transaction tx = startTransaction()) {
+                initializeModules();
+                tx.success();
+            }
             LOG.info("Modules initialized.");
         }
 
@@ -194,49 +145,31 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
     @Override
     public final Void beforeCommit(TransactionData data) throws Exception {
         if (runtimeHasNotYetInitialised()) {
-        	return null;
+            return null;
         }
 
-        if (data.isDeleted(getOrCreateRoot())) {
-            throw new IllegalStateException("Attempted to delete GraphAware Runtime root node!");
-        }
+        transactionDrivenModuleManager.check(data);
 
         LazyTransactionData lazyTransactionData = new LazyTransactionData(data);
 
-        for (TransactionDrivenRuntimeModule module : txModules) {
-            FilteredTransactionData filteredTransactionData = new FilteredTransactionData(lazyTransactionData, module.getConfiguration().getInclusionStrategies());
-
-            if (!filteredTransactionData.mutationsOccurred()) {
-                continue;
-            }
-
-            try {
-                module.beforeCommit(filteredTransactionData);
-            } catch (NeedsInitializationException e) {
-                LOG.warn("Module " + module.getId() + " seems to have a problem and will be re-initialized next time the database is started. ");
-                if (!getOrCreateRoot().getProperty(moduleKey(module)).toString().startsWith(FORCE_INITIALIZATION)) {
-                    forceInitialization(module);
-                }
-            } catch (RuntimeException e) {
-                LOG.warn("Module " + module.getId() + " threw an exception!", e);
-            }
-        }
+        transactionDrivenModuleManager.beforeCommit(lazyTransactionData);
 
         return null;
     }
 
-	/**
-	 * Checks to see if initialisation of this {@link GraphAwareRuntime} has <b>NOT</b> been completed, starting the initialisation
-	 * process if necessary.
-	 *
-	 * @return <code>true</code> if any of the prerequisites haven't been satisfied, <code>false</code> if it's alright to
-	 *         delegate onto modules
-	 */
-	protected boolean runtimeHasNotYetInitialised() {
-		if (!databaseAvailable()) {
+    /**
+     * Checks to see if initialisation of this {@link GraphAwareRuntime} has <b>NOT</b> been completed, starting the initialisation
+     * process if necessary.
+     *
+     * @return <code>true</code> if any of the prerequisites haven't been satisfied, <code>false</code> if it's alright to
+     *         delegate onto modules
+     */
+    protected boolean runtimeHasNotYetInitialised() {
+        if (!databaseAvailable()) {
             return true;
         }
 
+        //todo: is this a bottleneck? all transactions arrive here!
         synchronized (this) {
             switch (state) {
                 case NONE:
@@ -252,7 +185,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
         }
 
         return false;
-	}
+    }
 
     /**
      * {@inheritDoc}
@@ -287,154 +220,9 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
      * the module has been run with
      * - {@link #FORCE_INITIALIZATION} + timestamp indicating the module should be re-initialized.
      */
-    private void initializeModules() {
-        try (Transaction tx = startTransaction()) {
-            final Node root = getOrCreateRoot();
-            final Map<String, Object> moduleMetadata = getInternalProperties(root);
-            final Collection<String> unusedModules = new HashSet<>(moduleMetadata.keySet());
-
-            for (final RuntimeModule module : getAllModules()) {
-                final String key = moduleKey(module);
-                unusedModules.remove(key);
-
-                Serializer.register(module.getConfiguration().getClass());
-
-                if (!moduleMetadata.containsKey(key)) {
-                    LOG.info("Module " + module.getId() + " seems to have been registered for the first time, will initialize...");
-                    initializeModule(module);
-                    continue;
-
-                }
-
-                String value = (String) moduleMetadata.get(key);
-
-                if (value.startsWith(CONFIG)) {
-                    if (!value.equals(Serializer.toString(module.getConfiguration(), CONFIG))) {
-                        LOG.info("Module " + module.getId() + " seems to have changed configuration since last run, will re-initialize...");
-                        reinitializeModule(module);
-                    } else {
-                        LOG.info("Module " + module.getId() + " has not changed configuration since last run, already initialized.");
-                    }
-                    continue;
-                }
-
-                if (value.startsWith(FORCE_INITIALIZATION)) {
-                    LOG.info("Module " + module.getId() + " has been marked for re-initialization on "
-                            + new Date(Long.valueOf(value.replace(FORCE_INITIALIZATION, ""))).toString() + ". Will re-initialize...");
-                    reinitializeModule(module);
-                    continue;
-
-                }
-
-                LOG.fatal("Corrupted module info: " + value + " is not a valid value!");
-                throw new IllegalStateException("Corrupted module info: " + value + " is not a valid value");
-            }
-
-            removeUnusedModules(unusedModules);
-
-            tx.success();
-        }
+    protected void initializeModules() {
+        transactionDrivenModuleManager.initializeModules();
     }
-
-    /**
-     * Initialize a module and capture that fact on the as a root node's property.
-     *
-     * @param module to initialize.
-     */
-    private void initializeModule(final RuntimeModule module) {
-        doInitialize(module);
-        recordInitialization(module);
-    }
-
-    /**
-     * Initialize module.
-     *
-     * @param module to initialize.
-     */
-    protected abstract void doInitialize(RuntimeModule module);
-
-    /**
-     * Re-initialize a module and capture that fact on the as a root node's property.
-     *
-     * @param module to initialize.
-     */
-    private void reinitializeModule(final RuntimeModule module) {
-        doReinitialize(module);
-        recordInitialization(module);
-    }
-
-    /**
-     * Re-initialize a module.
-     *
-     * @param module to initialize.
-     */
-    protected abstract void doReinitialize(RuntimeModule module);
-
-    /**
-     * Capture the fact the a module has been (re-)initialized as a root node's property.
-     *
-     * @param module that has been initialized.
-     */
-    private void recordInitialization(final RuntimeModule module) {
-        final String key = moduleKey(module);
-        doRecordInitialization(module, key);
-    }
-
-    /**
-     * Capture the fact the a module has been (re-)initialized as a root node's property.
-     *
-     * @param module that has been initialized.
-     * @param key    of the property to set.
-     */
-    protected abstract void doRecordInitialization(final RuntimeModule module, final String key);
-
-    /**
-     * Remove unused modules.
-     *
-     * @param unusedModules to remove from the root node's properties.
-     */
-    protected abstract void removeUnusedModules(final Collection<String> unusedModules);
-
-    /**
-     * Get properties starting with {@link com.graphaware.runtime.config.RuntimeConfiguration#GA_PREFIX} + {@link #RUNTIME} from a node.
-     *
-     * @param node to get properties from.
-     * @return map of properties (key-value).
-     */
-    private Map<String, Object> getInternalProperties(Node node) {
-        return PropertyContainerUtils.propertiesToMap(node, new InclusionStrategy<String>() {
-            @Override
-            public boolean include(String s) {
-                return s.startsWith(configuration.createPrefix(RUNTIME));
-            }
-        });
-    }
-
-    /**
-     * Build a module key to use as a property on the root node for storing metadata.
-     *
-     * @param module to build a key for.
-     * @return module key.
-     */
-    protected final String moduleKey(RuntimeModule module) {
-        return configuration.createPrefix(RUNTIME) + module.getId();
-    }
-
-    /**
-     * Force a module to be (re-)initialized next time the database (and runtime) are started.
-     *
-     * @param module to be (re-)initialized next time.
-     */
-    protected abstract void forceInitialization(final RuntimeModule module);
-
-    /**
-     * Get the root node.
-     *
-     * @return root node.
-     * @throws org.neo4j.graphdb.NotFoundException
-     *          if root not found.
-     */
-    protected abstract Node getOrCreateRoot();
 
     /**
      * {@inheritDoc}
@@ -442,18 +230,20 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
     @Override
     public final void beforeShutdown() {
         LOG.info("Shutting down GraphAware Runtime... ");
-        for (RuntimeModule module : getAllModules()) {
-            module.shutdown();
-        }
+        doShutdown();
         shutdownRuntime();
         LOG.info("GraphAware Runtime shut down.");
+    }
+
+    protected void doShutdown() {
+        transactionDrivenModuleManager.shutdownModules();
     }
 
     /**
      * Perform any last-minute operations required in order to cleanly shut down this {@link GraphAwareRuntime}.
      */
     protected void shutdownRuntime() {
-    	// don't do anything by default
+        // don't do anything by default
     }
 
     /**

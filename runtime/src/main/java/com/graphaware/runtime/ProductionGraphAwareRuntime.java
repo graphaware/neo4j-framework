@@ -16,22 +16,14 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.common.serialize.Serializer;
-
-import com.graphaware.runtime.manager.ModuleManager;
+import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
+import com.graphaware.runtime.manager.*;
+import com.graphaware.runtime.metadata.ProductionSingleNodeModuleMetadataRepository;
 import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.runtime.module.TimerDrivenRuntimeModule;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.helpers.collection.PrefetchingIterator;
-import org.neo4j.kernel.GraphDatabaseAPI;
-
-import java.util.Collection;
-import java.util.Iterator;
-
-import static com.graphaware.runtime.config.RuntimeConfiguration.GA_ROOT;
-import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 
 /**
@@ -41,9 +33,8 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
     private static final Logger LOG = Logger.getLogger(ProductionGraphAwareRuntime.class);
 
     private final GraphDatabaseService database;
-    private Node root; //only here until https://github.com/neo4j/neo4j/issues/1065 is resolved
 
-    //private final ModuleManager timerDrivenModuleManager;
+    private final TimerDrivenModuleManager timerDrivenModuleManager;
 
     /**
      * Create a new instance of the runtime.
@@ -51,10 +42,12 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
      * @param database on which the runtime should operate.
      */
     public ProductionGraphAwareRuntime(GraphDatabaseService database) {
-        super();
+        super(new ProductionTransactionDrivenModuleManager(new ProductionSingleNodeModuleMetadataRepository(database, DefaultRuntimeConfiguration.getInstance()), database));
         this.database = database;
+        this.timerDrivenModuleManager = new TimerDrivenModuleManagerImpl(new ProductionSingleNodeModuleMetadataRepository(database, DefaultRuntimeConfiguration.getInstance()), database);
         registerSelfAsHandler();
     }
+
 
     /**
      * {@inheritDoc}
@@ -81,115 +74,27 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
         return database.beginTx();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
+
     @Override
-    protected void doInitialize(RuntimeModule module) {
-        module.initialize(database);
+    protected void initializeModules() {
+        super.initializeModules();
+        timerDrivenModuleManager.initializeModules();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void doReinitialize(RuntimeModule module) {
-        module.reinitialize(database);
+    protected void doRegisterModule(RuntimeModule module) {
+        super.doRegisterModule(module);
+
+        if (module instanceof TimerDrivenRuntimeModule) {
+            timerDrivenModuleManager.registerModule((TimerDrivenRuntimeModule) module);
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void doRecordInitialization(final RuntimeModule module, final String key) {
-        try (Transaction tx = database.beginTx()) {
-            getOrCreateRoot().setProperty(key, Serializer.toString(module.getConfiguration(), CONFIG));
-            tx.success();
-        }
-    }
+    protected void doShutdown() {
+        super.doShutdown();
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void removeUnusedModules(final Collection<String> unusedModules) {
-        try (Transaction tx = database.beginTx()) {
-            for (String toRemove : unusedModules) {
-                LOG.info("Removing unused module " + toRemove + ".");
-                getOrCreateRoot().removeProperty(toRemove);
-            }
-            tx.success();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void forceInitialization(final RuntimeModule module) {
-        try (Transaction tx = database.beginTx()) {
-            getOrCreateRoot().setProperty(moduleKey(module), FORCE_INITIALIZATION + System.currentTimeMillis());
-            tx.success();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Node getOrCreateRoot() {
-        if (root == null) {
-            root = getOrCreateRoot(database);
-        }
-
-        return root;
-    }
-
-    public static Node getOrCreateRoot(GraphDatabaseService database) {
-        Iterator<Node> roots;
-
-        if (database instanceof GraphDatabaseAPI) {
-            roots = at(database).getAllNodesWithLabel(GA_ROOT).iterator();
-        } else {
-            //this is for Batch Graph Database
-            roots = new RootNodeIterator(database);
-        }
-
-        if (!roots.hasNext()) {
-            LOG.info("GraphAware Runtime has never been run before on this database. Creating runtime root node...");
-            return database.createNode(GA_ROOT);
-        }
-
-        Node result = roots.next();
-
-        if (roots.hasNext()) {
-            LOG.fatal("There is more than 1 runtime root node! Cannot start GraphAware Runtime.");
-            throw new IllegalStateException("There is more than 1 runtime root node! Cannot start GraphAware Runtime.");
-        }
-
-        return result;
-    }
-
-    private static class RootNodeIterator extends PrefetchingIterator<Node> {
-
-        private final Iterator<Node> nodes;
-
-        private RootNodeIterator(GraphDatabaseService database) {
-            //this is deliberately using the deprecated API
-            //noinspection deprecation
-            nodes = database.getAllNodes().iterator();
-        }
-
-        @Override
-        protected Node fetchNextOrNull() {
-            while (nodes.hasNext()) {
-                Node next = nodes.next();
-                if (next.hasLabel(GA_ROOT)) {
-                    return next;
-                }
-            }
-
-            return null;
-        }
+        timerDrivenModuleManager.shutdownModules();
     }
 }
