@@ -104,7 +104,7 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         LOG.info("GraphAware Runtime enabled, bootstrapping...");
 
-        registerModules(new ProductionGraphAwareRuntime(database));
+        registerModules(ProductionGraphAwareRuntime.forDatabase(database));
 
         LOG.info("GraphAware Runtime bootstrapped.");
     }

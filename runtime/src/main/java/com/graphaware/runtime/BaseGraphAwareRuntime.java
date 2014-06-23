@@ -230,12 +230,12 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
     @Override
     public final void beforeShutdown() {
         LOG.info("Shutting down GraphAware Runtime... ");
-        doShutdown();
+        shutdownModules();
         shutdownRuntime();
         LOG.info("GraphAware Runtime shut down.");
     }
 
-    protected void doShutdown() {
+    protected void shutdownModules() {
         transactionDrivenModuleManager.shutdownModules();
     }
 

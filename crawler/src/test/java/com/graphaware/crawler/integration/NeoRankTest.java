@@ -86,7 +86,7 @@ public class NeoRankTest {
 		CrawlerModuleConfiguration runtimeModuleConfiguration = new CustomCrawlerModuleConfiguration(
 				nodeInclusionStrategy, relInclusionStrategy, new NeoRankCrawler());
 
-		ProductionGraphAwareRuntime graphAwareRuntime = new ProductionGraphAwareRuntime(this.database);
+		ProductionGraphAwareRuntime graphAwareRuntime = ProductionGraphAwareRuntime.forDatabase(database);
 		this.database.registerKernelEventHandler(graphAwareRuntime);
 		graphAwareRuntime.registerModule(new CrawlerRuntimeModule("TestingCrawler", runtimeModuleConfiguration, null));
 	}

@@ -386,7 +386,7 @@ To use the runtime and modules programmatically, all we need to do is instantiat
 
 ```java
 GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //replace with a real DB
-GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
+GraphAwareRuntime runtime = ProductionGraphAwareRuntime.forDatabase(database);
 runtime.registerModule(new FriendshipStrengthModule("FSM", database));
 ```
 

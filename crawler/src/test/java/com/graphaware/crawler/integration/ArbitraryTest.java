@@ -94,7 +94,7 @@ public class ArbitraryTest {
 			}
 		};
 
-		ProductionGraphAwareRuntime graphAwareRuntime = new ProductionGraphAwareRuntime(this.database);
+		ProductionGraphAwareRuntime graphAwareRuntime = ProductionGraphAwareRuntime.forDatabase(database);
 		this.database.registerKernelEventHandler(graphAwareRuntime);
 		CrawlerModuleConfiguration runtimeModuleConfiguration = new CustomCrawlerModuleConfiguration(nodeInclusionStrategy,
 				IncludeAllRelationships.getInstance(), new SimpleRecursiveGraphCrawler());

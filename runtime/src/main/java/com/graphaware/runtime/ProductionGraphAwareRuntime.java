@@ -17,10 +17,13 @@
 package com.graphaware.runtime;
 
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.*;
+import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.ProductionSingleNodeModuleMetadataRepository;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TimerDrivenRuntimeModule;
+import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
@@ -30,24 +33,28 @@ import org.neo4j.graphdb.Transaction;
  * {@link GraphAwareRuntime} that operates on a real {@link GraphDatabaseService}.
  */
 public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implements GraphAwareRuntime {
-    private static final Logger LOG = Logger.getLogger(ProductionGraphAwareRuntime.class);
 
     private final GraphDatabaseService database;
-
     private final TimerDrivenModuleManager timerDrivenModuleManager;
 
-    /**
-     * Create a new instance of the runtime.
-     *
-     * @param database on which the runtime should operate.
-     */
-    public ProductionGraphAwareRuntime(GraphDatabaseService database) {
-        super(new ProductionTransactionDrivenModuleManager(new ProductionSingleNodeModuleMetadataRepository(database, DefaultRuntimeConfiguration.getInstance()), database));
-        this.database = database;
-        this.timerDrivenModuleManager = new TimerDrivenModuleManagerImpl(new ProductionSingleNodeModuleMetadataRepository(database, DefaultRuntimeConfiguration.getInstance()), database);
-        registerSelfAsHandler();
+    public static ProductionGraphAwareRuntime forDatabase(GraphDatabaseService database) {
+        return forDatabase(database, DefaultRuntimeConfiguration.getInstance());
     }
 
+    public static ProductionGraphAwareRuntime forDatabase(GraphDatabaseService database, RuntimeConfiguration configuration) {
+        ModuleMetadataRepository metadataRepository = new ProductionSingleNodeModuleMetadataRepository(database, configuration);
+        TimerDrivenModuleManager timerDrivenModuleManager = new TimerDrivenModuleManagerImpl(metadataRepository, database);
+        TransactionDrivenModuleManager<TransactionDrivenRuntimeModule> transactionDrivenModuleManager = new ProductionTransactionDrivenModuleManager(metadataRepository, database);
+
+        return new ProductionGraphAwareRuntime(database, transactionDrivenModuleManager, timerDrivenModuleManager);
+    }
+
+    private ProductionGraphAwareRuntime(GraphDatabaseService database, TransactionDrivenModuleManager transactionDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager) {
+        super(transactionDrivenModuleManager);
+        this.database = database;
+        this.timerDrivenModuleManager = timerDrivenModuleManager;
+        registerSelfAsHandler();
+    }
 
     /**
      * {@inheritDoc}
@@ -74,14 +81,18 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
         return database.beginTx();
     }
 
-
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void initializeModules() {
         super.initializeModules();
         timerDrivenModuleManager.initializeModules();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void doRegisterModule(RuntimeModule module) {
         super.doRegisterModule(module);
@@ -91,9 +102,12 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void doShutdown() {
-        super.doShutdown();
+    protected void shutdownModules() {
+        super.shutdownModules();
 
         timerDrivenModuleManager.shutdownModules();
     }
