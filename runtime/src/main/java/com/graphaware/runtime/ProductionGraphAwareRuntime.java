@@ -18,6 +18,7 @@ package com.graphaware.runtime;
 
 import com.graphaware.common.serialize.Serializer;
 
+import com.graphaware.runtime.manager.ModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -41,6 +42,8 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
 
     private final GraphDatabaseService database;
     private Node root; //only here until https://github.com/neo4j/neo4j/issues/1065 is resolved
+
+    //private final ModuleManager timerDrivenModuleManager;
 
     /**
      * Create a new instance of the runtime.

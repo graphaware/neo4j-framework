@@ -168,30 +168,6 @@ public class ProductionGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
     }
 
     @Test
-    public void moduleAlreadyRegisteredShouldBeInitializedWhenForced() {
-        final TransactionDrivenRuntimeModule mockModule = createMockModule();
-
-        try (Transaction tx = database.beginTx()) {
-            createRuntimeRoot().setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG));
-            tx.success();
-        }
-
-        GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
-        runtime.registerModule(mockModule, true);
-
-        runtime.start();
-
-        verify(mockModule).reinitialize(database);
-        verify(mockModule, atLeastOnce()).getId();
-        verify(mockModule, atLeastOnce()).getConfiguration();
-        verifyNoMoreInteractions(mockModule);
-
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG), getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
-        }
-    }
-
-    @Test
     public void changedModuleShouldNotBeReInitializedWhenInitializationSkipped() {
         final TransactionDrivenRuntimeModule mockModule = createMockModule();
 
@@ -443,25 +419,11 @@ public class ProductionGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
     }
 
     @Test
-    public void runtimeConfiguredModulesShouldBeConfigured2() {
-        RuntimeConfiguredRuntimeModule mockModule = mock(RuntimeConfiguredRuntimeModule.class);
-        when(mockModule.getId()).thenReturn(MOCK);
-        when(mockModule.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
-
-        GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
-        runtime.registerModule(mockModule, true);
-
-        verify(mockModule).configurationChanged(DefaultRuntimeConfiguration.getInstance());
-        verify(mockModule, atLeastOnce()).getId();
-        verifyNoMoreInteractions(mockModule);
-    }
-
-    @Test
     public void realRuntimeConfiguredModulesShouldBeConfigured() {
         RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule();
 
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
-        runtime.registerModule(module, true);
+        runtime.registerModule(module);
 
         assertEquals(DefaultRuntimeConfiguration.getInstance(), module.getConfig());
     }

@@ -22,6 +22,7 @@ import com.graphaware.common.util.PropertyContainerUtils;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfigured;
+import com.graphaware.runtime.manager.ModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TimerDrivenRuntimeModule;
 import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
@@ -50,7 +51,8 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
     private final RuntimeConfiguration configuration;
     private final List<TransactionDrivenRuntimeModule> txModules = new LinkedList<>();
     private final List<TimerDrivenRuntimeModule> timerModules = new LinkedList<>();
-    private final List<RuntimeModule> modulesToForce = new LinkedList<>();
+
+    //private final ModuleManager transactionDrivenModuleManager;
 
     private State state = State.NONE;
 
@@ -81,14 +83,6 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
      */
     @Override
     public final synchronized void registerModule(RuntimeModule module) {
-        registerModule(module, false);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final synchronized void registerModule(RuntimeModule module, boolean forceInitialization) {
         if (!State.NONE.equals(state)) {
             LOG.error("Modules must be registered before GraphAware Runtime is started!");
             throw new IllegalStateException("Modules must be registered before GraphAware Runtime is started!");
@@ -98,6 +92,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
         checkNotAlreadyRegistered(module);
 
         if (module instanceof TransactionDrivenRuntimeModule) {
+            //manager.registerModule(module);
             txModules.add((TransactionDrivenRuntimeModule) module);
         }
 
@@ -107,11 +102,6 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
 
         if (module instanceof RuntimeConfigured) {
             ((RuntimeConfigured) module).configurationChanged(configuration);
-        }
-
-        if (forceInitialization) {
-            LOG.info("Forcing module " + module.getId() + " to be initialized.");
-            modulesToForce.add(module);
         }
     }
 
@@ -299,10 +289,6 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
      */
     private void initializeModules() {
         try (Transaction tx = startTransaction()) {
-            for (final RuntimeModule module : modulesToForce) {
-                forceInitialization(module);
-            }
-
             final Node root = getOrCreateRoot();
             final Map<String, Object> moduleMetadata = getInternalProperties(root);
             final Collection<String> unusedModules = new HashSet<>(moduleMetadata.keySet());

@@ -153,25 +153,6 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
     }
 
     @Test
-    public void moduleAlreadyRegisteredShouldBeInitializedWhenForced() {
-        final TransactionDrivenRuntimeModule mockModule = createMockModule();
-
-        createRuntimeRoot().setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG));
-
-        GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
-        runtime.registerModule(mockModule, true);
-
-        runtime.start();
-
-        verify(mockModule).reinitialize(database);
-        verify(mockModule, atLeastOnce()).getConfiguration();
-        verify(mockModule, atLeastOnce()).getId();
-        verifyNoMoreInteractions(mockModule);
-
-        assertEquals(Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG), getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
-    }
-
-    @Test
     public void changedModuleShouldNotBeReInitializedWhenInitializationSkipped() {
         final TransactionDrivenRuntimeModule mockModule = createMockModule();
 
@@ -425,24 +406,11 @@ public class GraphAwareRuntimeBatchDatabaseTest extends GraphAwareRuntimeTest {
     }
 
     @Test
-    public void runtimeConfiguredModulesShouldBeConfigured2() {
-        RuntimeConfiguredRuntimeModule mockModule = mock(RuntimeConfiguredRuntimeModule.class);
-        when(mockModule.getId()).thenReturn("MOCK");
-
-        GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
-        runtime.registerModule(mockModule, true);
-
-        verify(mockModule).configurationChanged(DefaultRuntimeConfiguration.getInstance());
-        verify(mockModule, atLeastOnce()).getId();
-        verifyNoMoreInteractions(mockModule);
-    }
-
-    @Test
     public void realRuntimeConfiguredModulesShouldBeConfigured() {
         RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule();
 
         GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
-        runtime.registerModule(module, true);
+        runtime.registerModule(module);
 
         assertEquals(DefaultRuntimeConfiguration.getInstance(), module.getConfig());
     }
