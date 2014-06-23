@@ -17,9 +17,7 @@ import java.util.ListIterator;
  *
  * TODO: merge this more closely to the network (ideally into common.util)
  */
-
 public class WeightedReservoirSampler /*extends ReservoirSampler<T> ? */{
-
     private final Random random;
 
     /**
@@ -57,9 +55,8 @@ public class WeightedReservoirSampler /*extends ReservoirSampler<T> ? */{
     }
 
     /**
-     * Returns a randomly chosen index, omitting a given index.
-     * This is very specific override used in the Simple graph
-     * algorithm.
+     * Returns a randomly chosen index, omitting a given indices.
+     * This is very specific override.
      * @param weights
      * @param omitIndices
      * @return
@@ -74,12 +71,12 @@ public class WeightedReservoirSampler /*extends ReservoirSampler<T> ? */{
             index = it.nextIndex();
             weight = it.next();
 
-            if (omitIndices.contains(index)) {
+            if (omitIndices.contains(index))
                 continue;
-            }
+
 
             u = random.nextDouble();
-            key = Math.pow(u, (1.0 / weight)); // Protect from zero division?
+            key = Math.pow(u, (1.0 / weight));
 
             if (key > maxKey) {
                 maxKey = key;
@@ -96,7 +93,7 @@ public class WeightedReservoirSampler /*extends ReservoirSampler<T> ? */{
      * This is very specific override used in the Simple graph
      * algorithm.
      * @param weights
-     * @param omitIndices
+     * @param omit
      * @return
      */
     public int randomIndexChoice(List<Integer> weights, int omit) {
@@ -112,9 +109,8 @@ public class WeightedReservoirSampler /*extends ReservoirSampler<T> ? */{
             if (index == omit)
                 continue;
 
-
             u = random.nextDouble();
-            key = Math.pow(u, (1.0/weight)); // Protect from zero division?
+            key = Math.pow(u, (1.0/weight));
 
             if (key > maxKey) {
                 maxKey = key;

@@ -36,7 +36,7 @@ import static java.util.Collections.shuffle;
  *
  * @see {@link SimpleGraphRelationshipGenerator}.
  */
-public class SelfLoopsGraphRelationshipGenerator extends BaseRelationshipGenerator {
+public class ConfigurationModelRelationshipGenerator extends BaseRelationshipGenerator {
 
     /**
      * {@inheritDoc}

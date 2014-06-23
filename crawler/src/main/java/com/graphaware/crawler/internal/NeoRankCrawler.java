@@ -81,10 +81,8 @@ public class NeoRankCrawler implements PerpetualGraphCrawler {
      *       but if you know of something better, I would be quite happy if
      *       you implemented it. Thanks!
      *
-     * @param startNode
      * @param maxDepth
      * @param currentDepth
-     * @param howDidIGetHere
      */
     private void crawl(Node current,
                       int maxDepth,
