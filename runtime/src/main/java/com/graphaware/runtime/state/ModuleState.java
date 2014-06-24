@@ -1,6 +1,6 @@
 package com.graphaware.runtime.state;
 
-import com.graphaware.runtime.config.RuntimeModuleConfiguration;
+import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 
 /**
  * An interface for objects representing a {@link com.graphaware.runtime.module.RuntimeModule}'s state.
@@ -12,5 +12,5 @@ public interface ModuleState {
      *
      * @return last configuration.
      */
-    RuntimeModuleConfiguration getConfiguration();
+    TxDrivenModuleConfiguration getConfiguration();
 }

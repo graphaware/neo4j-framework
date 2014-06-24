@@ -32,9 +32,16 @@ public interface ModuleManager<T extends RuntimeModule> {
     /**
      * Initialize modules if needed. A module should only be "initialised" if it has been established that it has been
      * registered for the first time, or that its configuration has changed since the last time the database was started.
+     *
+     * @return IDs of all registered modules, no matter if they have or have not been initialized.
      */
     Set<String> initializeModules();
 
+    /**
+     * Perform cleanup of unused modules that might have written their metadata into the graph but are no longer present.
+     *
+     * @param usedModules IDs of modules that are known to be used.
+     */
     void performCleanup(Set<String> usedModules);
 
     /**

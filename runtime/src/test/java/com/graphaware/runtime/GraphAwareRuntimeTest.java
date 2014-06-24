@@ -17,9 +17,9 @@
 package com.graphaware.runtime;
 
 import com.graphaware.runtime.config.*;
+import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.runtime.strategy.BatchSupportingTransactionDrivenRuntimeModule;
 import com.graphaware.runtime.module.BaseTransactionDrivenRuntimeModule;
-import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 
 import static org.mockito.Mockito.mock;
@@ -32,21 +32,21 @@ public abstract class GraphAwareRuntimeTest {
 
     protected static final String MOCK = "MOCK";
 
-    protected TransactionDrivenRuntimeModule createMockModule() {
-        TransactionDrivenRuntimeModule mockModule = mock(TransactionDrivenRuntimeModule.class);
+    protected TxDrivenModule createMockModule() {
+        TxDrivenModule mockModule = mock(TxDrivenModule.class);
         when(mockModule.getId()).thenReturn(MOCK);
-        when(mockModule.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
+        when(mockModule.getConfiguration()).thenReturn(NullTxDrivenModuleConfiguration.getInstance());
         return mockModule;
     }
 
     protected BatchSupportingTransactionDrivenRuntimeModule createBatchSupportingMockModule() {
         BatchSupportingTransactionDrivenRuntimeModule mockModule = mock(BatchSupportingTransactionDrivenRuntimeModule.class);
         when(mockModule.getId()).thenReturn(MOCK);
-        when(mockModule.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
+        when(mockModule.getConfiguration()).thenReturn(NullTxDrivenModuleConfiguration.getInstance());
         return mockModule;
     }
 
-    protected interface RuntimeConfiguredRuntimeModule extends TransactionDrivenRuntimeModule, RuntimeConfigured {
+    protected interface RuntimeConfiguredRuntimeModule extends TxDrivenModule, RuntimeConfigured {
 
     }
 

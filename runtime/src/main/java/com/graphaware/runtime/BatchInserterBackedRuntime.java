@@ -16,15 +16,10 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.manager.BatchModuleManager;
-import com.graphaware.runtime.manager.ProductionTransactionDrivenModuleManager;
 import com.graphaware.runtime.manager.TransactionDrivenModuleManager;
-import com.graphaware.runtime.metadata.BatchSingleNodeModuleMetadataRepository;
 import com.graphaware.runtime.strategy.BatchSupportingTransactionDrivenRuntimeModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
-import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Lock;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Transaction;
@@ -37,7 +32,7 @@ import org.neo4j.graphdb.Transaction;
  * @see BaseGraphAwareRuntime
  * @see org.neo4j.unsafe.batchinsert.BatchInserter - same limitations apply.
  */
-public class BatchInserterBackedRuntime extends TransactionDrivenRuntime<BatchSupportingTransactionDrivenRuntimeModule> {
+public class BatchInserterBackedRuntime extends TxDrivenRuntime<BatchSupportingTransactionDrivenRuntimeModule> {
 
 
     protected BatchInserterBackedRuntime(TransactionSimulatingBatchInserter batchInserter, RuntimeConfiguration configuration, TransactionDrivenModuleManager<BatchSupportingTransactionDrivenRuntimeModule> transactionDrivenModuleManager) {

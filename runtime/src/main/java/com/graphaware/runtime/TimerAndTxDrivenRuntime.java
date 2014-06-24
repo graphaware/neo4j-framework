@@ -16,14 +16,10 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
-import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.*;
-import com.graphaware.runtime.metadata.ModuleMetadataRepository;
-import com.graphaware.runtime.metadata.ProductionSingleNodeModuleMetadataRepository;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TimerDrivenRuntimeModule;
-import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
+import com.graphaware.runtime.module.TxDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import java.util.HashSet;
@@ -33,11 +29,11 @@ import java.util.Set;
 /**
  * {@link GraphAwareRuntime} that operates on a real {@link GraphDatabaseService}.
  */
-public class TimerDrivenModuleSupportingRuntime extends DatabaseBackedRuntime {
+public class TimerAndTxDrivenRuntime extends DatabaseBackedRuntime {
 
     private final TimerDrivenModuleManager timerDrivenModuleManager;
 
-    protected TimerDrivenModuleSupportingRuntime(GraphDatabaseService database, TransactionDrivenModuleManager<TransactionDrivenRuntimeModule> transactionDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager) {
+    protected TimerAndTxDrivenRuntime(GraphDatabaseService database, TransactionDrivenModuleManager<TxDrivenModule> transactionDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager) {
         super(database, transactionDrivenModuleManager);
         this.timerDrivenModuleManager = timerDrivenModuleManager;
         database.registerTransactionEventHandler(this);

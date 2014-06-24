@@ -22,7 +22,7 @@ import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
  * A {@link com.graphaware.runtime.GraphAwareRuntime} module performing some useful work based on
  * about-to-be-committed transaction data.
  */
-public interface TransactionDrivenRuntimeModule extends RuntimeModule {
+public interface TxDrivenModule extends RuntimeModule {
 
     /**
      * Perform the core business logic of this module before a transaction commits.

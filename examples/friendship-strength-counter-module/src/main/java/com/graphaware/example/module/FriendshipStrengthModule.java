@@ -2,9 +2,9 @@ package com.graphaware.example.module;
 
 import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.common.strategy.RelationshipInclusionStrategy;
+import com.graphaware.runtime.config.MinimalTxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.module.BaseTransactionDrivenRuntimeModule;
-import com.graphaware.runtime.config.MinimalRuntimeModuleConfiguration;
-import com.graphaware.runtime.config.RuntimeModuleConfiguration;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.UnitOfWork;
@@ -21,12 +21,12 @@ import static com.graphaware.example.module.Relationships.FRIEND_OF;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
- * {@link com.graphaware.runtime.module.TransactionDrivenRuntimeModule} that counts the total friendship strength in the database
+ * {@link com.graphaware.runtime.module.TxDrivenModule} that counts the total friendship strength in the database
  * and keeps it up to date.
  */
 public class FriendshipStrengthModule extends BaseTransactionDrivenRuntimeModule {
 
-    private final RuntimeModuleConfiguration configuration;
+    private final TxDrivenModuleConfiguration configuration;
     private final FriendshipStrengthCounter counter;
 
     public FriendshipStrengthModule(String moduleId, GraphDatabaseService database) {
@@ -34,7 +34,7 @@ public class FriendshipStrengthModule extends BaseTransactionDrivenRuntimeModule
         this.counter = new FriendshipStrengthCounter(database);
 
         //only take into account relationships with FRIEND_OF type:
-        configuration = new MinimalRuntimeModuleConfiguration(
+        configuration = new MinimalTxDrivenModuleConfiguration(
                 InclusionStrategies.all().with(
                         new RelationshipInclusionStrategy() {
                             @Override
@@ -49,7 +49,7 @@ public class FriendshipStrengthModule extends BaseTransactionDrivenRuntimeModule
      * {@inheritDoc}
      */
     @Override
-    public RuntimeModuleConfiguration getConfiguration() {
+    public TxDrivenModuleConfiguration getConfiguration() {
         return configuration;
     }
 

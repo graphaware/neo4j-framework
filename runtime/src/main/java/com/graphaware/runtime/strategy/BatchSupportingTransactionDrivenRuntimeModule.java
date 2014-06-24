@@ -1,12 +1,12 @@
 package com.graphaware.runtime.strategy;
 
-import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
+import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 
 /**
  *
  */
-public interface BatchSupportingTransactionDrivenRuntimeModule extends TransactionDrivenRuntimeModule {
+public interface BatchSupportingTransactionDrivenRuntimeModule extends TxDrivenModule {
 
     /**
      * Initialize this module. This method must bring the module to a state equivalent to a state of the same module that

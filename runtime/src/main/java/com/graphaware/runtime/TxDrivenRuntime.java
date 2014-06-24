@@ -20,12 +20,8 @@ import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.TransactionDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
-import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
+import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
-import org.apache.log4j.Logger;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.event.ErrorState;
-import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 
@@ -34,23 +30,23 @@ import java.util.Set;
 /**
  * {@link BaseGraphAwareRuntime} that registers itself as a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler},
  * translates {@link org.neo4j.graphdb.event.TransactionData} into {@link com.graphaware.tx.event.improved.api.ImprovedTransactionData}
- * and lets registered {@link com.graphaware.runtime.module.TransactionDrivenRuntimeModule}s deal with the data before each transaction
+ * and lets registered {@link com.graphaware.runtime.module.TxDrivenModule}s deal with the data before each transaction
  * commits, in the order the modules were registered.
  *
- * @param <T> implementation of {@link TransactionDrivenRuntimeModule} that this runtime supports.
+ * @param <T> implementation of {@link com.graphaware.runtime.module.TxDrivenModule} that this runtime supports.
  */
-public abstract class TransactionDrivenRuntime<T extends TransactionDrivenRuntimeModule> extends BaseGraphAwareRuntime implements TransactionEventHandler<Void> {
+public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGraphAwareRuntime implements TransactionEventHandler<Void> {
 
     private final TransactionDrivenModuleManager<T> transactionDrivenModuleManager;
 
     /**
      * Create a new instance of the runtime with {@link com.graphaware.runtime.config.DefaultRuntimeConfiguration}.
      */
-    protected TransactionDrivenRuntime(TransactionDrivenModuleManager<T> transactionDrivenModuleManager) {
+    protected TxDrivenRuntime(TransactionDrivenModuleManager<T> transactionDrivenModuleManager) {
         this(DefaultRuntimeConfiguration.getInstance(), transactionDrivenModuleManager);
     }
 
-    protected TransactionDrivenRuntime(RuntimeConfiguration configuration, TransactionDrivenModuleManager<T> transactionDrivenModuleManager) {
+    protected TxDrivenRuntime(RuntimeConfiguration configuration, TransactionDrivenModuleManager<T> transactionDrivenModuleManager) {
         super(configuration);
         this.transactionDrivenModuleManager = transactionDrivenModuleManager;
     }

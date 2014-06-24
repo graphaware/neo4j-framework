@@ -1,7 +1,7 @@
 package com.graphaware.runtime.state;
 
 /**
- * A {@link ModuleState} for {@link com.graphaware.runtime.module.TransactionDrivenRuntimeModule}s.
+ * A {@link ModuleState} for {@link com.graphaware.runtime.module.TxDrivenModule}s.
  */
 public interface TransactionDrivenModuleState extends ModuleState {
 

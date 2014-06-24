@@ -10,12 +10,11 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.event.LabelEntry;
 import org.neo4j.graphdb.event.TransactionData;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static com.graphaware.runtime.config.RuntimeConfiguration.GA_ROOT;
+import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
 import static com.graphaware.runtime.manager.BaseModuleManager.RUNTIME;
 
 /**
@@ -36,7 +35,7 @@ public abstract class SingleNodeModuleMetadataRepository implements ModuleMetada
     @Override
     public void check(TransactionData transactionData) {
         for (LabelEntry entry : transactionData.removedLabels()) {
-            if (entry.label().equals(GA_ROOT)) {
+            if (entry.label().equals(GA_METADATA)) {
                 throw new IllegalStateException("Attempted to delete GraphAware Runtime root node!");
             }
         }

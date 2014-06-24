@@ -1,14 +1,14 @@
 package com.graphaware.runtime.module;
 
+import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import org.neo4j.graphdb.GraphDatabaseService;
 
-import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
-import com.graphaware.runtime.config.RuntimeModuleConfiguration;
+import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 
 /**
- *  Base class for {@link TransactionDrivenRuntimeModule} implementations.
+ *  Base class for {@link TxDrivenModule} implementations.
  */
-public abstract class BaseTransactionDrivenRuntimeModule implements TransactionDrivenRuntimeModule {
+public abstract class BaseTransactionDrivenRuntimeModule implements TxDrivenModule {
 
     private final String moduleId;
 
@@ -28,8 +28,8 @@ public abstract class BaseTransactionDrivenRuntimeModule implements TransactionD
      * {@inheritDoc}
      */
     @Override
-    public RuntimeModuleConfiguration getConfiguration() {
-        return NullRuntimeModuleConfiguration.getInstance();
+    public TxDrivenModuleConfiguration getConfiguration() {
+        return NullTxDrivenModuleConfiguration.getInstance();
     }
 
     /**

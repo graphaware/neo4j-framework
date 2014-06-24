@@ -12,8 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.graphaware.runtime.GraphAwareRuntime;
-import com.graphaware.runtime.GraphAwareRuntimeFactory;
-import com.graphaware.runtime.TimerDrivenModuleSupportingRuntime;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.Direction;
@@ -98,7 +96,7 @@ public class ArbitraryTest {
 			}
 		};
 
-		GraphAwareRuntime graphAwareRuntime = productionRuntime(database);
+		GraphAwareRuntime graphAwareRuntime = createRuntime(database);
 		this.database.registerKernelEventHandler((KernelEventHandler) graphAwareRuntime);
 		CrawlerModuleConfiguration runtimeModuleConfiguration = new CustomCrawlerModuleConfiguration(nodeInclusionStrategy,
 				IncludeAllRelationships.getInstance(), new SimpleRecursiveGraphCrawler());

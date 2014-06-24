@@ -31,15 +31,9 @@ public interface RuntimeConfiguration {
     public static final String GA_PREFIX = "_GA_";
 
     /**
-     * Label of the runtime root node.
+     * Label of the runtime metadata node.
      */
-    public static final Label GA_ROOT = DynamicLabel.label(GA_PREFIX + "ROOT");
-
-    /**
-     * Key of a property present on GraphAware internal nodes. This is fixed as there is little chance
-     * that users would have a reason to change it.
-     */
-    public static final String GA_NODE_PROPERTY_KEY = GA_PREFIX + "LABEL";
+    public static final Label GA_METADATA = DynamicLabel.label(GA_PREFIX + "METADATA");
 
     /**
      * Create prefix a component should use for internal data it reads/writes (nodes, relationships, properties).

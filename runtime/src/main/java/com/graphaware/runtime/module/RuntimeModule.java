@@ -16,11 +16,11 @@
 
 package com.graphaware.runtime.module;
 
-import com.graphaware.runtime.config.RuntimeModuleConfiguration;
+import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
- * A {@link com.graphaware.runtime.TimerDrivenModuleSupportingRuntime} module performing some useful work based on about-to-be-committed transaction data.
+ * A {@link com.graphaware.runtime.TimerAndTxDrivenRuntime} module performing some useful work based on about-to-be-committed transaction data.
  */
 public interface RuntimeModule {
 
@@ -34,12 +34,12 @@ public interface RuntimeModule {
 
     /**
      * Return the configuration of this module. Each module must encapsulate its entire configuration in an instance of
-     * a {@link com.graphaware.runtime.config.RuntimeModuleConfiguration} implementation. Use {@link com.graphaware.runtime.config.NullRuntimeModuleConfiguration}
+     * a {@link com.graphaware.runtime.config.TxDrivenModuleConfiguration} implementation. Use {@link com.graphaware.runtime.config.NullTxDrivenModuleConfiguration}
      * if this module needs no configuration.
      *
      * @return module configuration.
      */
-    RuntimeModuleConfiguration getConfiguration();
+    TxDrivenModuleConfiguration getConfiguration();
 
     /**
      * Initialize this module. This method must bring the module to a state equivalent to a state of the same module that

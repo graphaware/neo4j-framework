@@ -20,7 +20,6 @@ import com.graphaware.example.module.FriendshipStrengthCounter;
 import com.graphaware.example.module.FriendshipStrengthModule;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
-import com.graphaware.runtime.TimerDrivenModuleSupportingRuntime;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
@@ -41,7 +40,7 @@ public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.productionRuntime(database);
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
         runtime.registerModule(new FriendshipStrengthModule("FSM", database));
     }
 

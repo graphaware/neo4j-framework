@@ -5,7 +5,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import java.util.Map;
 
 /**
- * Component that automatically bootstraps a {@link com.graphaware.runtime.module.TransactionDrivenRuntimeModule} based on config parameters passed to Neo4j.
+ * Component that automatically bootstraps a {@link TxDrivenModule} based on config parameters passed to Neo4j.
  * <p/>
  * Implementations can expect that if there is the following entry in neo4j.properties
  * <p/>
@@ -32,5 +32,5 @@ public interface RuntimeModuleBootstrapper {
      * @param config   for this module as key-value pairs.
      * @param database which the module will run on.
      */
-    TransactionDrivenRuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database);
+    TxDrivenModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database);
 }

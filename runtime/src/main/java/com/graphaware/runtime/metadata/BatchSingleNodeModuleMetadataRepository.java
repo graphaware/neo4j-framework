@@ -8,7 +8,7 @@ import org.neo4j.graphdb.Node;
 
 import java.util.HashMap;
 
-import static com.graphaware.runtime.config.RuntimeConfiguration.GA_ROOT;
+import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
 
 /**
  *
@@ -30,11 +30,11 @@ public class BatchSingleNodeModuleMetadataRepository extends SingleNodeModuleMet
     @Override
     protected Node getOrCreateRoot() {
         for (long candidate : batchInserter.getAllNodes()) {
-            if (batchInserter.nodeHasLabel(candidate, GA_ROOT)) {
+            if (batchInserter.nodeHasLabel(candidate, GA_METADATA)) {
                 return new BatchInserterNode(candidate, batchInserter);
             }
         }
 
-        return new BatchInserterNode(batchInserter.createNode(new HashMap<String, Object>(), GA_ROOT), batchInserter);
+        return new BatchInserterNode(batchInserter.createNode(new HashMap<String, Object>(), GA_METADATA), batchInserter);
     }
 }

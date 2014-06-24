@@ -19,16 +19,11 @@ package com.graphaware.runtime;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfigured;
-import com.graphaware.runtime.manager.TransactionDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
-import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
-import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.ErrorState;
 import org.neo4j.graphdb.event.KernelEventHandler;
-import org.neo4j.graphdb.event.TransactionData;
-import org.neo4j.graphdb.event.TransactionEventHandler;
 
 import java.util.Set;
 

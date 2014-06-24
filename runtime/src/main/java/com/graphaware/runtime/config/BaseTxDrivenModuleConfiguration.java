@@ -3,13 +3,13 @@ package com.graphaware.runtime.config;
 import com.graphaware.common.strategy.*;
 
 /**
- * Base-class for {@link RuntimeModuleConfiguration} implementations.
+ * Base-class for {@link TxDrivenModuleConfiguration} implementations.
  */
-public abstract class BaseRuntimeModuleConfiguration<T extends BaseRuntimeModuleConfiguration<T>> {
+public abstract class BaseTxDrivenModuleConfiguration<T extends BaseTxDrivenModuleConfiguration<T>> {
 
     private final InclusionStrategies inclusionStrategies;
 
-    protected BaseRuntimeModuleConfiguration(InclusionStrategies inclusionStrategies) {
+    protected BaseTxDrivenModuleConfiguration(InclusionStrategies inclusionStrategies) {
         this.inclusionStrategies = inclusionStrategies;
     }
 
@@ -48,7 +48,7 @@ public abstract class BaseRuntimeModuleConfiguration<T extends BaseRuntimeModule
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        BaseRuntimeModuleConfiguration that = (BaseRuntimeModuleConfiguration) o;
+        BaseTxDrivenModuleConfiguration that = (BaseTxDrivenModuleConfiguration) o;
 
         if (!inclusionStrategies.equals(that.inclusionStrategies)) return false;
 

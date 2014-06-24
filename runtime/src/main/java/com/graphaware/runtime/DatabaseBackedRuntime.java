@@ -16,17 +16,8 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
-import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.manager.ProductionTransactionDrivenModuleManager;
-import com.graphaware.runtime.manager.TimerDrivenModuleManager;
-import com.graphaware.runtime.manager.TimerDrivenModuleManagerImpl;
 import com.graphaware.runtime.manager.TransactionDrivenModuleManager;
-import com.graphaware.runtime.metadata.ModuleMetadataRepository;
-import com.graphaware.runtime.metadata.ProductionSingleNodeModuleMetadataRepository;
-import com.graphaware.runtime.module.RuntimeModule;
-import com.graphaware.runtime.module.TimerDrivenRuntimeModule;
-import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
+import com.graphaware.runtime.module.TxDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
@@ -34,11 +25,11 @@ import org.neo4j.graphdb.Transaction;
 /**
  * {@link com.graphaware.runtime.GraphAwareRuntime} that operates on a real {@link org.neo4j.graphdb.GraphDatabaseService}.
  */
-public class DatabaseBackedRuntime extends TransactionDrivenRuntime<TransactionDrivenRuntimeModule> {
+public class DatabaseBackedRuntime extends TxDrivenRuntime<TxDrivenModule> {
 
     private final GraphDatabaseService database;
 
-    protected DatabaseBackedRuntime(GraphDatabaseService database, TransactionDrivenModuleManager<TransactionDrivenRuntimeModule> transactionDrivenModuleManager) {
+    protected DatabaseBackedRuntime(GraphDatabaseService database, TransactionDrivenModuleManager<TxDrivenModule> transactionDrivenModuleManager) {
         super(transactionDrivenModuleManager);
         this.database = database;
         database.registerTransactionEventHandler(this);
@@ -49,8 +40,8 @@ public class DatabaseBackedRuntime extends TransactionDrivenRuntime<TransactionD
      * {@inheritDoc}
      */
     @Override
-    protected Class<TransactionDrivenRuntimeModule> supportedModule() {
-        return TransactionDrivenRuntimeModule.class;
+    protected Class<TxDrivenModule> supportedModule() {
+        return TxDrivenModule.class;
     }
 
     /**

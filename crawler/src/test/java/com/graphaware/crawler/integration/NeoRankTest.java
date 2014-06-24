@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
-import com.graphaware.runtime.TimerDrivenModuleSupportingRuntime;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicLabel;
@@ -89,7 +88,7 @@ public class NeoRankTest {
 		CrawlerModuleConfiguration runtimeModuleConfiguration = new CustomCrawlerModuleConfiguration(
 				nodeInclusionStrategy, relInclusionStrategy, new NeoRankCrawler());
 
-		GraphAwareRuntime graphAwareRuntime = GraphAwareRuntimeFactory.productionRuntime(database);
+		GraphAwareRuntime graphAwareRuntime = GraphAwareRuntimeFactory.createRuntime(database);
 		this.database.registerKernelEventHandler((KernelEventHandler) graphAwareRuntime);
 		graphAwareRuntime.registerModule(new CrawlerRuntimeModule("TestingCrawler", runtimeModuleConfiguration, null));
 	}

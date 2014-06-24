@@ -2,16 +2,15 @@ package com.graphaware.runtime.manager;
 
 import com.graphaware.runtime.NeedsInitializationException;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
-import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
+import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.apache.log4j.Logger;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  *
  */
-public abstract class BaseTransactionDrivenModuleManager<T extends TransactionDrivenRuntimeModule> extends BaseModuleManager<T> implements TransactionDrivenModuleManager<T> {
+public abstract class BaseTransactionDrivenModuleManager<T extends TxDrivenModule> extends BaseModuleManager<T> implements TransactionDrivenModuleManager<T> {
 
     private static final Logger LOG = Logger.getLogger(BaseTransactionDrivenModuleManager.class);
 
