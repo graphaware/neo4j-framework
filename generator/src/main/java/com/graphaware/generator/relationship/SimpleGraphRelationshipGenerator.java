@@ -57,7 +57,7 @@ public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator 
         List<SameTypePair<Integer>> edges = new ArrayList<>();
 
         while (!distribution.isZeroList()) {
-            int length = distribution.size();
+            // int length = distribution.size();
             int index = 0;
             int min = Integer.MAX_VALUE;
 
