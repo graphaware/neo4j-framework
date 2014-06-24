@@ -28,16 +28,19 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.ErrorState;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.graphdb.event.TransactionData;
+import org.neo4j.graphdb.event.TransactionEventHandler;
+
+import java.util.Set;
 
 /**
- * Abstract base-class for {@link GraphAwareRuntime} implementations.
+ * Abstract base-class for {@link GraphAwareRuntime} implementations. Handles lifecycle of the runtime and basic
+ * module-related sanity checks.
  */
-public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
+public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, KernelEventHandler {
+
     private static final Logger LOG = Logger.getLogger(BaseGraphAwareRuntime.class);
 
     private final RuntimeConfiguration configuration;
-
-    private final TransactionDrivenModuleManager transactionDrivenModuleManager;
 
     private State state = State.NONE;
 
@@ -50,13 +53,17 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
     /**
      * Create a new instance of the runtime with {@link com.graphaware.runtime.config.DefaultRuntimeConfiguration}.
      */
-    public BaseGraphAwareRuntime(TransactionDrivenModuleManager transactionDrivenModuleManager) {
-        this(DefaultRuntimeConfiguration.getInstance(), transactionDrivenModuleManager);
+    protected BaseGraphAwareRuntime() {
+        this(DefaultRuntimeConfiguration.getInstance());
     }
 
-    protected BaseGraphAwareRuntime(RuntimeConfiguration configuration, TransactionDrivenModuleManager transactionDrivenModuleManager) {
+    /**
+     * Create a new instance.
+     *
+     * @param configuration config.
+     */
+    protected BaseGraphAwareRuntime(RuntimeConfiguration configuration) {
         this.configuration = configuration;
-        this.transactionDrivenModuleManager = transactionDrivenModuleManager;
     }
 
     /**
@@ -78,12 +85,12 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
         }
     }
 
-    protected void doRegisterModule(RuntimeModule module) {
-        if (module instanceof TransactionDrivenRuntimeModule) {
-            transactionDrivenModuleManager.registerModule((TransactionDrivenRuntimeModule) module);
-        }
-    }
-
+    /**
+     * Perform the actual module registration after sanity checks have passed.
+     *
+     * @param module to register.
+     */
+    protected abstract void doRegisterModule(RuntimeModule module);
 
     /**
      * {@inheritDoc}
@@ -117,7 +124,8 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
         } else {
             LOG.info("Initializing modules...");
             try (Transaction tx = startTransaction()) {
-                initializeModules();
+                Set<String> moduleIds = initializeModules();
+                removeUnusedModules(moduleIds);
                 tx.success();
             }
             LOG.info("Modules initialized.");
@@ -128,9 +136,48 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
     }
 
     /**
-     * Register itself as transaction (and kernel) event handler. Should be called in the constructor of implementations.
+     * Start a database transaction.
+     *
+     * @return tx.
      */
-    protected abstract void registerSelfAsHandler();
+    protected abstract Transaction startTransaction();
+
+    /**
+     * Initialize modules if needed.
+     */
+    protected abstract Set<String> initializeModules();
+
+    protected abstract void removeUnusedModules(Set<String> usedModules);
+
+
+    /**
+     * Checks to see if this {@link GraphAwareRuntime} has <b>NOT</b> yet been started, starting it if necessary and possible.
+     *
+     * @return <code>false</code> if the database isn't yet available or the runtime is currently starting,
+     *         <code>true</code> if it's alright to delegate onto modules.
+     */
+    protected final boolean makeSureIsStarted() {
+        if (!databaseAvailable()) {
+            return false;
+        }
+
+        //todo: is this a bottleneck? all transactions arrive here!
+        synchronized (this) {
+            switch (state) {
+                case NONE:
+                    start();
+                    break;
+                case STARTING:
+                    return false;
+                case STARTED:
+                    break;
+                default:
+                    throw new IllegalStateException("Unknown GraphAware Runtime state. This is a bug.");
+            }
+        }
+
+        return true;
+    }
 
     /**
      * Find out whether the database is available and ready for use.
@@ -143,108 +190,16 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
      * {@inheritDoc}
      */
     @Override
-    public final Void beforeCommit(TransactionData data) throws Exception {
-        if (runtimeHasNotYetInitialised()) {
-            return null;
-        }
-
-        transactionDrivenModuleManager.check(data);
-
-        LazyTransactionData lazyTransactionData = new LazyTransactionData(data);
-
-        transactionDrivenModuleManager.beforeCommit(lazyTransactionData);
-
-        return null;
-    }
-
-    /**
-     * Checks to see if initialisation of this {@link GraphAwareRuntime} has <b>NOT</b> been completed, starting the initialisation
-     * process if necessary.
-     *
-     * @return <code>true</code> if any of the prerequisites haven't been satisfied, <code>false</code> if it's alright to
-     *         delegate onto modules
-     */
-    protected boolean runtimeHasNotYetInitialised() {
-        if (!databaseAvailable()) {
-            return true;
-        }
-
-        //todo: is this a bottleneck? all transactions arrive here!
-        synchronized (this) {
-            switch (state) {
-                case NONE:
-                    start();
-                    break;
-                case STARTING:
-                    return true;
-                case STARTED:
-                    break;
-                default:
-                    throw new IllegalStateException("Unknown GraphAware Runtime state. This is a bug.");
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final void afterCommit(TransactionData data, Void state) {
-        //do nothing for now
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final void afterRollback(TransactionData data, Void state) {
-        //do nothing for now
-    }
-
-    /**
-     * Start a database transaction.
-     *
-     * @return tx.
-     */
-    protected abstract Transaction startTransaction();
-
-    /**
-     * Initialize modules if needed.
-     * <p/>
-     * Metadata about modules is stored as properties on the GraphAware Runtime Root Node in the form of
-     * {@link com.graphaware.runtime.config.RuntimeConfiguration#GA_PREFIX}{@link #RUNTIME}_{@link TransactionDrivenRuntimeModule#getId()}
-     * as key and one of the following as value:
-     * - {@link #CONFIG} + {@link TransactionDrivenRuntimeModule#getConfiguration()} (serialized) capturing the last configuration
-     * the module has been run with
-     * - {@link #FORCE_INITIALIZATION} + timestamp indicating the module should be re-initialized.
-     */
-    protected void initializeModules() {
-        transactionDrivenModuleManager.initializeModules();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public final void beforeShutdown() {
         LOG.info("Shutting down GraphAware Runtime... ");
         shutdownModules();
-        shutdownRuntime();
         LOG.info("GraphAware Runtime shut down.");
     }
 
-    protected void shutdownModules() {
-        transactionDrivenModuleManager.shutdownModules();
-    }
-
     /**
-     * Perform any last-minute operations required in order to cleanly shut down this {@link GraphAwareRuntime}.
+     * Shutdown all modules.
      */
-    protected void shutdownRuntime() {
-        // don't do anything by default
-    }
+    protected abstract void shutdownModules();
 
     /**
      * {@inheritDoc}

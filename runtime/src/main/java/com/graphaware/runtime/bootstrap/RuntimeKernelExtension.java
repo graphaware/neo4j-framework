@@ -17,8 +17,9 @@
 package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.GraphAwareRuntimeFactory;
+import com.graphaware.runtime.TimerDrivenModuleSupportingRuntime;
 import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
-import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
@@ -32,10 +33,11 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.graphaware.runtime.GraphAwareRuntimeFactory.*;
 import static org.neo4j.helpers.Settings.*;
 
 /**
- * Neo4j kernel extension that automatically creates the {@link com.graphaware.runtime.ProductionGraphAwareRuntime} and
+ * Neo4j kernel extension that automatically creates the {@link com.graphaware.runtime.TimerDrivenModuleSupportingRuntime} and
  * registers {@link com.graphaware.runtime.module.TransactionDrivenRuntimeModule}s with it.
  * <p/>
  * The mechanism of this extension is as follows. Of course, the GraphAware Framework .jar file must be present on
@@ -104,7 +106,7 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         LOG.info("GraphAware Runtime enabled, bootstrapping...");
 
-        registerModules(ProductionGraphAwareRuntime.forDatabase(database));
+        registerModules(productionRuntime(database));
 
         LOG.info("GraphAware Runtime bootstrapped.");
     }

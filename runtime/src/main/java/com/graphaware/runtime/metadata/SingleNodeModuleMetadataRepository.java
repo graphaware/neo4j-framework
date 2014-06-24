@@ -7,11 +7,15 @@ import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModule;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.event.LabelEntry;
 import org.neo4j.graphdb.event.TransactionData;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import static com.graphaware.runtime.config.RuntimeConfiguration.GA_ROOT;
 import static com.graphaware.runtime.manager.BaseModuleManager.RUNTIME;
 
 /**
@@ -31,19 +35,26 @@ public abstract class SingleNodeModuleMetadataRepository implements ModuleMetada
 
     @Override
     public void check(TransactionData transactionData) {
-        if (transactionData.isDeleted(getOrCreateRoot())) {
-            throw new IllegalStateException("Attempted to delete GraphAware Runtime root node!");
+        for (LabelEntry entry : transactionData.removedLabels()) {
+            if (entry.label().equals(GA_ROOT)) {
+                throw new IllegalStateException("Attempted to delete GraphAware Runtime root node!");
+            }
         }
     }
 
     @Override
-    public Collection<String> getAllModuleIds() {
-        return getInternalProperties(getOrCreateRoot()).keySet();
+    public Set<String> getAllModuleIds() {
+        String prefix = configuration.createPrefix(RUNTIME);
+        Set<String> result = new HashSet<>();
+        for (String key : getInternalProperties(getOrCreateRoot()).keySet()) {
+            result.add(key.replace(prefix, ""));
+        }
+        return result;
     }
 
     @Override
     public void removeModuleMetadata(String moduleId) {
-        getOrCreateRoot().removeProperty(moduleKey(moduleId));//To change body of implemented methods use File | Settings | File Templates.
+        getOrCreateRoot().removeProperty(moduleKey(moduleId));
     }
 
     @Override

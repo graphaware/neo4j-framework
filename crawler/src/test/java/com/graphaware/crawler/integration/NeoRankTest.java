@@ -3,6 +3,9 @@ package com.graphaware.crawler.integration;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.GraphAwareRuntimeFactory;
+import com.graphaware.runtime.TimerDrivenModuleSupportingRuntime;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicLabel;
@@ -13,6 +16,7 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.helpers.Pair;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
@@ -22,7 +26,6 @@ import com.graphaware.crawler.CrawlerModuleConfiguration;
 import com.graphaware.crawler.CrawlerRuntimeModule;
 import com.graphaware.crawler.CustomCrawlerModuleConfiguration;
 import com.graphaware.crawler.internal.NeoRankCrawler;
-import com.graphaware.runtime.ProductionGraphAwareRuntime;
 
 /**
  * This is a just playground, in truth. It won't be here for very long.
@@ -86,8 +89,8 @@ public class NeoRankTest {
 		CrawlerModuleConfiguration runtimeModuleConfiguration = new CustomCrawlerModuleConfiguration(
 				nodeInclusionStrategy, relInclusionStrategy, new NeoRankCrawler());
 
-		ProductionGraphAwareRuntime graphAwareRuntime = ProductionGraphAwareRuntime.forDatabase(database);
-		this.database.registerKernelEventHandler(graphAwareRuntime);
+		GraphAwareRuntime graphAwareRuntime = GraphAwareRuntimeFactory.productionRuntime(database);
+		this.database.registerKernelEventHandler((KernelEventHandler) graphAwareRuntime);
 		graphAwareRuntime.registerModule(new CrawlerRuntimeModule("TestingCrawler", runtimeModuleConfiguration, null));
 	}
 

@@ -20,7 +20,7 @@ import com.graphaware.runtime.config.RuntimeModuleConfiguration;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
- * A {@link com.graphaware.runtime.ProductionGraphAwareRuntime} module performing some useful work based on about-to-be-committed transaction data.
+ * A {@link com.graphaware.runtime.TimerDrivenModuleSupportingRuntime} module performing some useful work based on about-to-be-committed transaction data.
  */
 public interface RuntimeModule {
 

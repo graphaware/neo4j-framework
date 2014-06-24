@@ -28,7 +28,7 @@ public abstract class BaseModuleManager<T extends RuntimeModule> implements Modu
     }
 
     @Override
-    public void check(TransactionData transactionData) {
+    public void throwExceptionIfIllegal(TransactionData transactionData) {
         metadataRepository.check(transactionData);
     }
 
@@ -58,11 +58,11 @@ public abstract class BaseModuleManager<T extends RuntimeModule> implements Modu
     }
 
     @Override
-    public void initializeModules() {
-        final Collection<String> unusedModules = metadataRepository.getAllModuleIds();
+    public Set<String> initializeModules() {
+        final Set<String> moduleIds = new HashSet<>();
 
         for (final T module : modules) {
-            unusedModules.remove(module.getId());
+            moduleIds.add(module.getId());
 
 
             String moduleMetadata = metadataRepository.getModuleMetadata(module);
@@ -95,13 +95,18 @@ public abstract class BaseModuleManager<T extends RuntimeModule> implements Modu
             throw new IllegalStateException("Corrupted module info: " + moduleMetadata + " is not a valid value");
         }
 
-        for (String moduleId : unusedModules) {
-            metadataRepository.removeModuleMetadata(moduleId);
-        }
+        return moduleIds;
     }
 
     @Override
-    public void shutdownModules() {
+    public void performCleanup(Set<String> usedModules) {
+        Set<String> unusedModules = metadataRepository.getAllModuleIds();
+        unusedModules.removeAll(usedModules);
+        removeUnusedModules(unusedModules);
+    }
+
+    @Override
+    public void stopModules() {
         for (T module : modules) {
             module.shutdown();
         }
@@ -149,7 +154,6 @@ public abstract class BaseModuleManager<T extends RuntimeModule> implements Modu
     private void recordInitialization(final T module) {
         metadataRepository.persistModuleMetadata(module, Serializer.toString(module.getConfiguration(), CONFIG));
     }
-
 
     /**
      * Remove unused modules.

@@ -6,6 +6,7 @@ import org.neo4j.graphdb.event.TransactionData;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -14,7 +15,7 @@ public interface ModuleMetadataRepository {
 
     void check(TransactionData transactionData);
 
-    Collection<String> getAllModuleIds();
+    Set<String> getAllModuleIds();
 
     String getModuleMetadata(RuntimeModule module);
 

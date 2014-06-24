@@ -1,5 +1,6 @@
 package com.graphaware.crawler.integration;
 
+import static com.graphaware.runtime.GraphAwareRuntimeFactory.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
@@ -10,6 +11,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.GraphAwareRuntimeFactory;
+import com.graphaware.runtime.TimerDrivenModuleSupportingRuntime;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.Direction;
@@ -22,6 +26,7 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.helpers.Pair;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
@@ -34,7 +39,6 @@ import com.graphaware.crawler.api.Context;
 import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
 import com.graphaware.crawler.internal.PerpetualGraphCrawler;
 import com.graphaware.crawler.internal.SimpleRecursiveGraphCrawler;
-import com.graphaware.runtime.ProductionGraphAwareRuntime;
 
 /**
  * This is a just playground, in truth. It won't be here for very long.
@@ -94,8 +98,8 @@ public class ArbitraryTest {
 			}
 		};
 
-		ProductionGraphAwareRuntime graphAwareRuntime = ProductionGraphAwareRuntime.forDatabase(database);
-		this.database.registerKernelEventHandler(graphAwareRuntime);
+		GraphAwareRuntime graphAwareRuntime = productionRuntime(database);
+		this.database.registerKernelEventHandler((KernelEventHandler) graphAwareRuntime);
 		CrawlerModuleConfiguration runtimeModuleConfiguration = new CustomCrawlerModuleConfiguration(nodeInclusionStrategy,
 				IncludeAllRelationships.getInstance(), new SimpleRecursiveGraphCrawler());
 		graphAwareRuntime.registerModule(new CrawlerRuntimeModule("TestingCrawler", runtimeModuleConfiguration, findBigBossesHandler));

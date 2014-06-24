@@ -25,4 +25,9 @@ public class TimerDrivenModuleManagerImpl extends BaseModuleManager<TimerDrivenR
     protected void doReinitialize(TimerDrivenRuntimeModule module) {
         module.reinitialize(database);
     }
+
+    @Override
+    public void startModules() {
+        throw new UnsupportedOperationException("not yet implemented");
+    }
 }
