@@ -43,24 +43,6 @@ public interface GraphAwareRuntime extends TransactionEventHandler<Void>, Kernel
     void registerModule(RuntimeModule module);
 
     /**
-     * Register a {@link RuntimeModule} and optionally force its (re-)initialization.
-     * <p/>
-     * Forcing re-initialization should only be necessary in exceptional circumstances, such as that the database has
-     * been written to without the module being registered / runtime running. Re-initialization can be a very
-     * expensive, graph-global operation, should only be run once, database stopped and started again without forcing
-     * re-initialization.
-     * <p/>
-     * New modules and modules with changed configuration will be (re-)initialized automatically; there is no need to use
-     * this method for that purpose.
-     * <p/>
-     * Note that modules are delegated to in the order they are registered. Must be called before the Runtime is started.
-     *
-     * @param module              to register.
-     * @param forceInitialization true to force (re-)initialization.
-     */
-    void registerModule(RuntimeModule module, boolean forceInitialization);
-
-    /**
      * Start the Runtime. Must be called before anything gets written into the database, but will be called automatically
      * if not called explicitly. Automatic invocation means that first transactions run against the database will have
      * to wait for the Runtime to be started and modules initialized.

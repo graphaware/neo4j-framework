@@ -166,26 +166,6 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
     }
 
     @Test
-    public void moduleAlreadyRegisteredShouldBeInitializedWhenForced() {
-        final BatchSupportingTransactionDrivenRuntimeModule mockModule = createBatchSupportingMockModule();
-
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        long root = batchInserter.createNode(Collections.<String, Object>singletonMap(GA_PREFIX + RUNTIME + "_" + MOCK, Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG)), GA_ROOT);
-
-        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
-        runtime.registerModule(mockModule, true);
-
-        runtime.start();
-
-        verify(mockModule).reinitialize(batchInserter);
-        verify(mockModule, atLeastOnce()).getConfiguration();
-        verify(mockModule, atLeastOnce()).getId();
-        verifyNoMoreInteractions(mockModule);
-
-        assertEquals(Serializer.toString(NullRuntimeModuleConfiguration.getInstance(), CONFIG), batchInserter.getNodeProperties(root).get(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
-    }
-
-    @Test
     public void changedModuleShouldNotBeReInitializedWhenInitializationSkipped() {
         final TransactionDrivenRuntimeModule mockModule = createMockModule();
 
@@ -407,21 +387,6 @@ public class BatchGraphAwareRuntimeTest extends GraphAwareRuntimeTest {
         TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
         BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
         runtime.registerModule(mockModule);
-
-        verify(mockModule).configurationChanged(DefaultRuntimeConfiguration.getInstance());
-        verify(mockModule, atLeastOnce()).getId();
-        verifyNoMoreInteractions(mockModule);
-    }
-
-    @Test
-    public void runtimeConfiguredModulesShouldBeConfigured2() {
-        RuntimeConfiguredRuntimeModule mockModule = mock(RuntimeConfiguredRuntimeModule.class);
-        when(mockModule.getId()).thenReturn(MOCK);
-        when(mockModule.getConfiguration()).thenReturn(NullRuntimeModuleConfiguration.getInstance());
-
-        TransactionSimulatingBatchInserter batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()));
-        BatchGraphAwareRuntime runtime = new BatchGraphAwareRuntime(batchInserter);
-        runtime.registerModule(mockModule, true);
 
         verify(mockModule).configurationChanged(DefaultRuntimeConfiguration.getInstance());
         verify(mockModule, atLeastOnce()).getId();
