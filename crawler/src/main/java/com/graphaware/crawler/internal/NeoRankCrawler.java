@@ -5,17 +5,18 @@
  */
 package com.graphaware.crawler.internal;
 
-import com.graphaware.common.strategy.IncludeAllNodes;
-import com.graphaware.common.strategy.InclusionStrategy;
-import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
-
-import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.tooling.GlobalGraphOperations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.graphaware.common.strategy.IncludeAllNodes;
+import com.graphaware.common.strategy.InclusionStrategy;
+import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
 
 /**
  *
@@ -23,7 +24,7 @@ import org.neo4j.tooling.GlobalGraphOperations;
  */
 public class NeoRankCrawler implements PerpetualGraphCrawler {
 
-    private static final Logger LOG = Logger.getLogger(SimpleRecursiveGraphCrawler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SimpleRecursiveGraphCrawler.class);
 
     private InclusionStrategy<? super Node> nodeInclusionStrategy;
     private InclusionStrategy<? super Relationship> relInclusionStrategy;
