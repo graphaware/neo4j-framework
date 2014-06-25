@@ -20,7 +20,8 @@ import com.graphaware.common.util.IterableUtils;
 import com.graphaware.common.wrapper.NodeWrapper;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.IterableWrapper;
 
@@ -28,7 +29,7 @@ import org.neo4j.helpers.collection.IterableWrapper;
  * A {@link PropertyContainerSnapshot} representing a {@link org.neo4j.graphdb.Node}.
  */
 public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Node, NodeWrapper {
-    private static final Logger LOG = Logger.getLogger(NodeSnapshot.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NodeSnapshot.class);
 
     /**
      * Construct a snapshot.

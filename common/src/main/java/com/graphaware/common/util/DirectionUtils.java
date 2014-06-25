@@ -16,7 +16,8 @@
 
 package com.graphaware.common.util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -27,7 +28,7 @@ import static org.neo4j.graphdb.Direction.*;
  * Utility class for static methods related to {@link org.neo4j.graphdb.Relationship} {@link org.neo4j.graphdb.Direction}.
  */
 public final class DirectionUtils {
-    private static final Logger LOG = Logger.getLogger(DirectionUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DirectionUtils.class);
 
     /**
      * Resolve the direction of a relationship from a node's point of view. If the start and end nodes of the relationship

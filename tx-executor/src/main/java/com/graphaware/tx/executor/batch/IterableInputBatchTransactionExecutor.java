@@ -21,7 +21,8 @@ import com.graphaware.tx.executor.single.KeepCalmAndCarryOn;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.TransactionCallback;
 import com.graphaware.tx.executor.single.TransactionExecutor;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import java.util.Iterator;
@@ -35,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @param <T> type of the input item, on which steps are executed.
  */
 public class IterableInputBatchTransactionExecutor<T> implements BatchTransactionExecutor {
-    private static final Logger LOG = Logger.getLogger(IterableInputBatchTransactionExecutor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IterableInputBatchTransactionExecutor.class);
 
     private final int batchSize;
     private final UnitOfWork<T> unitOfWork;

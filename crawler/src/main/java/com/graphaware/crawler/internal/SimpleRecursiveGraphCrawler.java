@@ -2,7 +2,8 @@ package com.graphaware.crawler.internal;
 
 import java.util.Iterator;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -22,7 +23,7 @@ import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
  */
 public class SimpleRecursiveGraphCrawler implements PerpetualGraphCrawler {
 
-	private static final Logger LOG = Logger.getLogger(SimpleRecursiveGraphCrawler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SimpleRecursiveGraphCrawler.class);
 
 	private InclusionStrategy<? super Node> nodeInclusionStrategy;
 	private InclusionStrategy<? super Relationship> relationshipInclusionStrategy;

@@ -16,7 +16,8 @@
 
 package com.graphaware.test.performance;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -30,7 +31,7 @@ import java.util.*;
  * Base class for suites of {@link PerformanceTest}s.
  */
 public abstract class PerformanceTestSuite {
-    private static final Logger LOG = Logger.getLogger(PerformanceTestSuite.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PerformanceTestSuite.class);
 
     private TemporaryFolder temporaryFolder;
     private GraphDatabaseService database;

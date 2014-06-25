@@ -28,7 +28,8 @@ import com.graphaware.runtime.module.TimerDrivenRuntimeModule;
 import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.ErrorState;
@@ -46,7 +47,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
 
     public static final String RUNTIME = "RUNTIME";
 
-    private static final Logger LOG = Logger.getLogger(BaseGraphAwareRuntime.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BaseGraphAwareRuntime.class);
 
     private final RuntimeConfiguration configuration;
     private final List<TransactionDrivenRuntimeModule> txModules = new LinkedList<>();
@@ -326,7 +327,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime {
 
                 }
 
-                LOG.fatal("Corrupted module info: " + value + " is not a valid value!");
+                LOG.error("Corrupted module info: " + value + " is not a valid value!");
                 throw new IllegalStateException("Corrupted module info: " + value + " is not a valid value");
             }
 
