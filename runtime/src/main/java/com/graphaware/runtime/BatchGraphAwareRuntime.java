@@ -20,7 +20,8 @@ import com.graphaware.common.serialize.Serializer;
 import com.graphaware.runtime.strategy.BatchSupportingGraphAwareRuntimeModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.neo4j.graphdb.Lock;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
@@ -40,7 +41,7 @@ import static com.graphaware.runtime.config.RuntimeConfiguration.GA_ROOT;
  * @see org.neo4j.unsafe.batchinsert.BatchInserter - same limitations apply.
  */
 public class BatchGraphAwareRuntime extends BaseGraphAwareRuntime {
-    private static final Logger LOG = Logger.getLogger(BatchGraphAwareRuntime.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BatchGraphAwareRuntime.class);
 
     private final TransactionSimulatingBatchInserter batchInserter;
 

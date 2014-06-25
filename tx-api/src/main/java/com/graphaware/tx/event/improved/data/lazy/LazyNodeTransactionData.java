@@ -20,7 +20,8 @@ import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.data.NodeTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import com.graphaware.tx.event.improved.propertycontainer.snapshot.NodeSnapshot;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.event.LabelEntry;
@@ -35,7 +36,7 @@ import static com.graphaware.common.util.PropertyContainerUtils.id;
  * {@link LazyPropertyContainerTransactionData} for {@link org.neo4j.graphdb.Node}s.
  */
 public class LazyNodeTransactionData extends LazyPropertyContainerTransactionData<Node> implements NodeTransactionData {
-    private static final Logger LOG = Logger.getLogger(LazyPropertyContainerTransactionData.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LazyPropertyContainerTransactionData.class);
 
     private final TransactionData transactionData;
     private final TransactionDataContainer transactionDataContainer;

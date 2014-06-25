@@ -18,7 +18,8 @@ package com.graphaware.runtime;
 
 import com.graphaware.common.serialize.Serializer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -36,7 +37,7 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
  * {@link GraphAwareRuntime} that operates on a real {@link GraphDatabaseService}.
  */
 public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implements GraphAwareRuntime {
-    private static final Logger LOG = Logger.getLogger(ProductionGraphAwareRuntime.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProductionGraphAwareRuntime.class);
 
     private final GraphDatabaseService database;
     private Node root; //only here until https://github.com/neo4j/neo4j/issues/1065 is resolved
@@ -159,7 +160,7 @@ public class ProductionGraphAwareRuntime extends BaseGraphAwareRuntime implement
         Node result = roots.next();
 
         if (roots.hasNext()) {
-            LOG.fatal("There is more than 1 runtime root node! Cannot start GraphAware Runtime.");
+            LOG.error("There is more than 1 runtime root node! Cannot start GraphAware Runtime.");
             throw new IllegalStateException("There is more than 1 runtime root node! Cannot start GraphAware Runtime.");
         }
 

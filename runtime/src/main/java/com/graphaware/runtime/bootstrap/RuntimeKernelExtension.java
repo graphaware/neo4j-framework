@@ -19,7 +19,8 @@ package com.graphaware.runtime.bootstrap;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeModuleBootstrapper;
 import com.graphaware.runtime.ProductionGraphAwareRuntime;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.helpers.Pair;
@@ -70,7 +71,7 @@ import static org.neo4j.helpers.Settings.*;
  * @see GraphAwareRuntimeModuleBootstrapper
  */
 public class RuntimeKernelExtension implements Lifecycle {
-    private static final Logger LOG = Logger.getLogger(RuntimeKernelExtension.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RuntimeKernelExtension.class);
 
     public static final Setting<Boolean> RUNTIME_ENABLED = setting("com.graphaware.runtime.enabled", BOOLEAN, "false");
     public static final String MODULE_CONFIG_KEY = "com.graphaware.module"; //.ID.Order = fully qualified class name of bootstrapper
