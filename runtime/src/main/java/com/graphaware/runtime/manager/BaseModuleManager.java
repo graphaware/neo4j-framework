@@ -1,13 +1,15 @@
 package com.graphaware.runtime.manager;
 
-import com.graphaware.common.serialize.Serializer;
-import com.graphaware.runtime.metadata.ModuleMetadata;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.module.RuntimeModule;
-import org.apache.log4j.Logger;
-import org.neo4j.graphdb.event.TransactionData;
-
-import java.util.*;
 
 /**
  *
@@ -27,12 +29,6 @@ public abstract class BaseModuleManager<T extends RuntimeModule> implements Modu
     protected BaseModuleManager(ModuleMetadataRepository metadataRepository) {
         this.metadataRepository = metadataRepository;
     }
-
-    @Override
-    public void throwExceptionIfIllegal(TransactionData transactionData) {
-        metadataRepository.check(transactionData);
-    }
-
 
     /**
      * Check that the given module isn't already registered with the runtime.

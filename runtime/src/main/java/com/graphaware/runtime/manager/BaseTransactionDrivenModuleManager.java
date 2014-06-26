@@ -7,7 +7,9 @@ import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
+
 import org.apache.log4j.Logger;
+import org.neo4j.graphdb.event.TransactionData;
 
 import java.util.Date;
 
@@ -22,7 +24,13 @@ public abstract class BaseTransactionDrivenModuleManager<T extends TxDrivenModul
         super(metadataRepository);
     }
 
-    protected void initializeModule2(T module) {
+    @Override
+    public void throwExceptionIfIllegal(TransactionData transactionData) {
+        metadataRepository.check(transactionData);
+    }
+
+    @Override
+	protected void initializeModule2(T module) {
         TxDrivenModuleMetadata moduleMetadata = metadataRepository.getModuleMetadata(module);
 
         if (moduleMetadata == null) {

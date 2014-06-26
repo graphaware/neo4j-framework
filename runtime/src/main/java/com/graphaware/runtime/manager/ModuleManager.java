@@ -1,9 +1,8 @@
 package com.graphaware.runtime.manager;
 
-import com.graphaware.runtime.module.RuntimeModule;
-import org.neo4j.graphdb.event.TransactionData;
-
 import java.util.Set;
+
+import com.graphaware.runtime.module.RuntimeModule;
 
 /**
  * A manager of {@link RuntimeModule}s, which takes care of their lifecycle.
@@ -11,15 +10,6 @@ import java.util.Set;
  * @param <T> type of module this manager can manage.
  */
 public interface ModuleManager<T extends RuntimeModule> {
-
-    /**
-     * Throw an exception if the transaction that's about to be committed does something illegal from the manager's
-     * point of view. This is a performance optimization.
-     *
-     * @param transactionData about-to-be-committed transaction data.
-     * @throws IllegalStateException if the transaction is illegal.
-     */
-    void throwExceptionIfIllegal(TransactionData transactionData);
 
     /**
      * Register a module with this manager.
