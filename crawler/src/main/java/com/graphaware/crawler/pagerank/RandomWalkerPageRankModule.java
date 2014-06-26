@@ -11,6 +11,9 @@ import com.graphaware.runtime.state.ModuleContext;
 
 public class RandomWalkerPageRankModule implements TimerDrivenRuntimeModule<ModuleContext<GraphPosition<Node>>> {
 
+	/** The name of the property key that is modified on visited nodes by this module. */
+	public static final String PAGE_RANK_PROPERTY_KEY = "pageRankValue";
+
 	private RandomNodeSelector randomNodeSelector;
 	private RelationshipChooser relationshipChooser;
 
@@ -55,8 +58,8 @@ public class RandomWalkerPageRankModule implements TimerDrivenRuntimeModule<Modu
 		}
 		Node nextNode = determineNextNode(currentNode, graphDatabaseService);
 
-		int pageRankValue = (int) nextNode.getProperty("pageRankValue", 0);
-		nextNode.setProperty("pageRankValue", pageRankValue + 1);
+		int pageRankValue = (int) nextNode.getProperty(PAGE_RANK_PROPERTY_KEY, 0);
+		nextNode.setProperty(PAGE_RANK_PROPERTY_KEY, pageRankValue + 1);
 
 		return new PageRankModuleContext(nextNode);
 	}
