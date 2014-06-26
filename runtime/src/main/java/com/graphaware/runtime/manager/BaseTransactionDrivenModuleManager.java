@@ -1,6 +1,7 @@
 package com.graphaware.runtime.manager;
 
 import com.graphaware.runtime.NeedsInitializationException;
+import com.graphaware.runtime.metadata.CorruptMetadataException;
 import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
@@ -31,7 +32,14 @@ public abstract class BaseTransactionDrivenModuleManager<T extends TxDrivenModul
 
     @Override
 	protected void initializeModule2(T module) {
-        TxDrivenModuleMetadata moduleMetadata = metadataRepository.getModuleMetadata(module);
+        TxDrivenModuleMetadata moduleMetadata;
+
+        try {
+            moduleMetadata = metadataRepository.getModuleMetadata(module);
+        } catch (CorruptMetadataException e) {
+            reinitializeModule(module);
+            return;
+        }
 
         if (moduleMetadata == null) {
             LOG.info("Module " + module.getId() + " seems to have been registered for the first time, will initialize...");

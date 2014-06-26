@@ -60,18 +60,19 @@ public abstract class SingleNodeModuleMetadataRepository implements ModuleMetada
     public <M extends ModuleMetadata> M getModuleMetadata(RuntimeModule<M> module) {
         Map<String, Object> internalProperties = getInternalProperties(getOrCreateRoot());
         final String key = moduleKey(module);
-        byte[] serializedMetadata = (byte[]) internalProperties.get(key);
-
-        if (serializedMetadata == null) {
-            return null;
-        }
 
         try {
+            byte[] serializedMetadata = (byte[]) internalProperties.get(key);
+
+            if (serializedMetadata == null) {
+                return null;
+            }
+
             return Serializer.fromByteArray(serializedMetadata, module.getMetadataClass());
         } catch (Exception e) {
             removeModuleMetadata(module.getId());
             LOG.error("Could not deserialize metadata for module ID " + module.getId());
-            return null;
+            throw new CorruptMetadataException(e);
         }
     }
 

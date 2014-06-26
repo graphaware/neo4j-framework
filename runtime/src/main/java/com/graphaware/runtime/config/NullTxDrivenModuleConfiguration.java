@@ -1,6 +1,9 @@
 package com.graphaware.runtime.config;
 
+import com.esotericsoftware.kryo.serializers.DefaultSerializers;
+import com.graphaware.common.serialize.SerializableSingleton;
 import com.graphaware.common.serialize.Serializer;
+import com.graphaware.common.serialize.SingletonSerializer;
 import com.graphaware.common.strategy.InclusionStrategies;
 
 /**
@@ -9,6 +12,10 @@ import com.graphaware.common.strategy.InclusionStrategies;
  */
 public final class NullTxDrivenModuleConfiguration implements TxDrivenModuleConfiguration {
 
+    static {
+        Serializer.register(NullTxDrivenModuleConfiguration.class, new SingletonSerializer());
+    }
+
     private static final TxDrivenModuleConfiguration INSTANCE = new NullTxDrivenModuleConfiguration();
 
     public static TxDrivenModuleConfiguration getInstance() {
@@ -16,7 +23,6 @@ public final class NullTxDrivenModuleConfiguration implements TxDrivenModuleConf
     }
 
     private NullTxDrivenModuleConfiguration() {
-        Serializer.register(NullTxDrivenModuleConfiguration.class);
     }
 
     @Override
