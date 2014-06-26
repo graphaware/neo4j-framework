@@ -1,13 +1,13 @@
 package com.graphaware.runtime.manager;
 
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
-import com.graphaware.runtime.module.TimerDrivenRuntimeModule;
+import com.graphaware.runtime.module.TimerDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  *
  */
-public class TimerDrivenModuleManagerImpl extends BaseModuleManager<TimerDrivenRuntimeModule> implements TimerDrivenModuleManager {
+public class TimerDrivenModuleManagerImpl extends BaseModuleManager<TimerDrivenModule> implements TimerDrivenModuleManager {
 
     private final GraphDatabaseService database;
 
@@ -17,13 +17,8 @@ public class TimerDrivenModuleManagerImpl extends BaseModuleManager<TimerDrivenR
     }
 
     @Override
-    protected void doInitialize(TimerDrivenRuntimeModule module) {
-        module.initialize(database);
-    }
-
-    @Override
-    protected void doReinitialize(TimerDrivenRuntimeModule module) {
-        module.reinitialize(database);
+    protected void initializeModule2(TimerDrivenModule module) {
+        throw new UnsupportedOperationException("not yet implemented");
     }
 
     @Override

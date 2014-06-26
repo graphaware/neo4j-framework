@@ -16,13 +16,17 @@
 
 package com.graphaware.runtime.module;
 
+import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
+import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
+import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
+import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  * A {@link com.graphaware.runtime.GraphAwareRuntime} module performing some useful work based on
  * about-to-be-committed transaction data.
  */
-public interface TxDrivenModule extends RuntimeModule {
+public interface TxDrivenModule extends RuntimeModule<DefaultTxDrivenModuleMetadata> {
 
     /**
      * Perform the core business logic of this module before a transaction commits.
@@ -34,4 +38,32 @@ public interface TxDrivenModule extends RuntimeModule {
      *          should perform on best-effort basis.
      */
     void beforeCommit(ImprovedTransactionData transactionData);
+
+    /**
+     * Return the configuration of this module. Each module must encapsulate its entire configuration in an instance of
+     * a {@link com.graphaware.runtime.config.TxDrivenModuleConfiguration} implementation. Use {@link com.graphaware.runtime.config.NullTxDrivenModuleConfiguration}
+     * if this module needs no configuration.
+     *
+     * @return module configuration.
+     */
+    TxDrivenModuleConfiguration getConfiguration();
+
+    /**
+     * Initialize this module. This method must bring the module to a state equivalent to a state of the same module that
+     * has been registered at all times since the database was empty. It can perform global-graph operations to achieve
+     * this.
+     *
+     * @param database to initialize this module for.
+     */
+    void initialize(GraphDatabaseService database);
+
+    /**
+     * Re-initialize this module. This method must remove all metadata written to the graph by this module and bring the
+     * module to a state equivalent to a state of the same module that has been registered at all times since the
+     * database was empty. It can perform global-graph operations to achieve this.
+     *
+     * @param database to initialize this module for.
+     */
+    void reinitialize(GraphDatabaseService database);
+
 }

@@ -1,5 +1,6 @@
 package com.graphaware.runtime.config;
 
+import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.strategy.InclusionStrategies;
 
 /**
@@ -15,6 +16,7 @@ public final class NullTxDrivenModuleConfiguration implements TxDrivenModuleConf
     }
 
     private NullTxDrivenModuleConfiguration() {
+        Serializer.register(NullTxDrivenModuleConfiguration.class);
     }
 
     @Override

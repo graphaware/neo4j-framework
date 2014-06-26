@@ -21,6 +21,10 @@ import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.MinimalTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
+import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
+import com.graphaware.runtime.metadata.ModuleMetadataRepository;
+import com.graphaware.runtime.metadata.ProductionSingleNodeModuleMetadataRepository;
+import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
@@ -42,6 +46,7 @@ import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
 import static com.graphaware.runtime.manager.BaseModuleManager.*;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
@@ -51,10 +56,12 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
 public class TimerAndTxDrivenRuntimeTest extends GraphAwareRuntimeTest {
 
     private GraphDatabaseService database;
+    private ModuleMetadataRepository repository;
 
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        repository = new ProductionSingleNodeModuleMetadataRepository(database, DefaultRuntimeConfiguration.getInstance());
     }
 
     @After
@@ -90,7 +97,10 @@ public class TimerAndTxDrivenRuntimeTest extends GraphAwareRuntimeTest {
         verifyNoMoreInteractions(mockModule);
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(Serializer.toString(NullTxDrivenModuleConfiguration.getInstance(), CONFIG), getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
+            TxDrivenModuleMetadata moduleMetadata = repository.getModuleMetadata(mockModule);
+            assertEquals(NullTxDrivenModuleConfiguration.getInstance(), moduleMetadata.getConfig());
+            assertFalse(moduleMetadata.needsInitialization());
+            assertEquals(-1, moduleMetadata.timestamp());
         }
     }
 
@@ -98,12 +108,10 @@ public class TimerAndTxDrivenRuntimeTest extends GraphAwareRuntimeTest {
     public void moduleAlreadyRegisteredShouldNotBeInitialized() {
         final TxDrivenModule mockModule = createMockModule();
 
-        new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
-            @Override
-            protected void doInTx(GraphDatabaseService database) {
-                createRuntimeRoot().setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, Serializer.toString(NullTxDrivenModuleConfiguration.getInstance(), CONFIG));
-            }
-        });
+        try (Transaction tx = database.beginTx()) {
+            repository.persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()));
+            tx.success();
+        }
 
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
         runtime.registerModule(mockModule);
@@ -115,7 +123,10 @@ public class TimerAndTxDrivenRuntimeTest extends GraphAwareRuntimeTest {
         verifyNoMoreInteractions(mockModule);
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(Serializer.toString(NullTxDrivenModuleConfiguration.getInstance(), CONFIG), getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
+            TxDrivenModuleMetadata moduleMetadata = repository.getModuleMetadata(mockModule);
+            assertEquals(NullTxDrivenModuleConfiguration.getInstance(), moduleMetadata.getConfig());
+            assertFalse(moduleMetadata.needsInitialization());
+            assertEquals(-1, moduleMetadata.timestamp());
         }
     }
 
@@ -124,7 +135,7 @@ public class TimerAndTxDrivenRuntimeTest extends GraphAwareRuntimeTest {
         final TxDrivenModule mockModule = createMockModule();
 
         try (Transaction tx = database.beginTx()) {
-            createRuntimeRoot().setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, CONFIG + "123");
+            repository.persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none())));
             tx.success();
         }
 
@@ -139,7 +150,10 @@ public class TimerAndTxDrivenRuntimeTest extends GraphAwareRuntimeTest {
         verifyNoMoreInteractions(mockModule);
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(Serializer.toString(NullTxDrivenModuleConfiguration.getInstance(), CONFIG), getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
+            TxDrivenModuleMetadata moduleMetadata = repository.getModuleMetadata(mockModule);
+            assertEquals(NullTxDrivenModuleConfiguration.getInstance(), moduleMetadata.getConfig());
+            assertFalse(moduleMetadata.needsInitialization());
+            assertEquals(-1, moduleMetadata.timestamp());
         }
     }
 
@@ -148,7 +162,7 @@ public class TimerAndTxDrivenRuntimeTest extends GraphAwareRuntimeTest {
         final TxDrivenModule mockModule = createMockModule();
 
         try (Transaction tx = database.beginTx()) {
-            createRuntimeRoot().setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, FORCE_INITIALIZATION + "123");
+            repository.persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()).markedNeedingInitialization());
             tx.success();
         }
 
@@ -163,7 +177,10 @@ public class TimerAndTxDrivenRuntimeTest extends GraphAwareRuntimeTest {
         verifyNoMoreInteractions(mockModule);
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(Serializer.toString(NullTxDrivenModuleConfiguration.getInstance(), CONFIG), getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
+            TxDrivenModuleMetadata moduleMetadata = repository.getModuleMetadata(mockModule);
+            assertEquals(NullTxDrivenModuleConfiguration.getInstance(), moduleMetadata.getConfig());
+            assertFalse(moduleMetadata.needsInitialization());
+            assertEquals(-1, moduleMetadata.timestamp());
         }
     }
 
@@ -172,7 +189,7 @@ public class TimerAndTxDrivenRuntimeTest extends GraphAwareRuntimeTest {
         final TxDrivenModule mockModule = createMockModule();
 
         try (Transaction tx = database.beginTx()) {
-            createRuntimeRoot().setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, CONFIG + "123");
+            repository.persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none())));
             tx.success();
         }
 
@@ -185,7 +202,10 @@ public class TimerAndTxDrivenRuntimeTest extends GraphAwareRuntimeTest {
         verifyNoMoreInteractions(mockModule);
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(CONFIG + "123", getRuntimeRoot().getProperty(GA_PREFIX + RUNTIME + "_" + MOCK).toString());
+            TxDrivenModuleMetadata moduleMetadata = repository.getModuleMetadata(mockModule);
+            assertEquals(new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none()), moduleMetadata.getConfig());
+            assertFalse(moduleMetadata.needsInitialization());
+            assertEquals(-1, moduleMetadata.timestamp());
         }
     }
 
@@ -213,11 +233,11 @@ public class TimerAndTxDrivenRuntimeTest extends GraphAwareRuntimeTest {
     @Test
     public void unusedModulesShouldBeRemoved() {
         final TxDrivenModule mockModule = createMockModule();
+        final TxDrivenModule unusedModule = createMockModule("UNUSED");
 
         try (Transaction tx = database.beginTx()) {
-            Node root = createRuntimeRoot();
-            root.setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, Serializer.toString(NullTxDrivenModuleConfiguration.getInstance(), CONFIG));
-            root.setProperty(GA_PREFIX + RUNTIME + "_UNUSED", CONFIG + "123");
+            repository.persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none())));
+            repository.persistModuleMetadata(unusedModule, new DefaultTxDrivenModuleMetadata(new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none())));
             tx.success();
         }
 

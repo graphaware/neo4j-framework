@@ -1,4 +1,4 @@
-package com.graphaware.runtime.state;
+package com.graphaware.runtime.metadata;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;

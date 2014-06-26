@@ -17,12 +17,13 @@
 package com.graphaware.runtime.module;
 
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
+import com.graphaware.runtime.metadata.ModuleMetadata;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  * A {@link com.graphaware.runtime.TimerAndTxDrivenRuntime} module performing some useful work based on about-to-be-committed transaction data.
  */
-public interface RuntimeModule {
+public interface RuntimeModule<M extends ModuleMetadata> {
 
     /**
      * Get a human-readable (ideally short) ID of this module. This ID must be unique across all {@link RuntimeModule}s
@@ -33,34 +34,9 @@ public interface RuntimeModule {
     String getId();
 
     /**
-     * Return the configuration of this module. Each module must encapsulate its entire configuration in an instance of
-     * a {@link com.graphaware.runtime.config.TxDrivenModuleConfiguration} implementation. Use {@link com.graphaware.runtime.config.NullTxDrivenModuleConfiguration}
-     * if this module needs no configuration.
-     *
-     * @return module configuration.
-     */
-    TxDrivenModuleConfiguration getConfiguration();
-
-    /**
-     * Initialize this module. This method must bring the module to a state equivalent to a state of the same module that
-     * has been registered at all times since the database was empty. It can perform global-graph operations to achieve
-     * this.
-     *
-     * @param database to initialize this module for.
-     */
-    void initialize(GraphDatabaseService database);
-
-    /**
-     * Re-initialize this module. This method must remove all metadata written to the graph by this module and bring the
-     * module to a state equivalent to a state of the same module that has been registered at all times since the
-     * database was empty. It can perform global-graph operations to achieve this.
-     *
-     * @param database to initialize this module for.
-     */
-    void reinitialize(GraphDatabaseService database);
-
-    /**
      * Perform cleanup if needed before database shutdown.
      */
     void shutdown();
+
+    Class<M> getMetadataClass();
 }

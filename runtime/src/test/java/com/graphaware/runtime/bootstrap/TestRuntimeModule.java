@@ -1,7 +1,7 @@
 package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
-import com.graphaware.runtime.module.BaseTransactionDrivenRuntimeModule;
+import com.graphaware.runtime.module.BaseTxDrivenModule;
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * {@link com.graphaware.runtime.module.TxDrivenModule} that can tell whether it has been initialized for testing.
  */
-public class TestRuntimeModule extends BaseTransactionDrivenRuntimeModule {
+public class TestRuntimeModule extends BaseTxDrivenModule {
 
     public static final List<TestRuntimeModule> TEST_RUNTIME_MODULES = new ArrayList<>();
 

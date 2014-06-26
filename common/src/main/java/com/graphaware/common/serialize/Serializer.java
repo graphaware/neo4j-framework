@@ -77,6 +77,10 @@ public final class Serializer {
         kryo.register(type);
     }
 
+    public static void register(Class type, com.esotericsoftware.kryo.Serializer serializer) {
+        kryo.register(type, serializer);
+    }
+
     /**
      * Serialize an object to byte array.
      *

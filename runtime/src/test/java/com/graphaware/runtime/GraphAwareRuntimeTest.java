@@ -17,9 +17,11 @@
 package com.graphaware.runtime;
 
 import com.graphaware.runtime.config.*;
+import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
+import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
+import com.graphaware.runtime.module.BaseTxDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.runtime.strategy.BatchSupportingTransactionDrivenRuntimeModule;
-import com.graphaware.runtime.module.BaseTransactionDrivenRuntimeModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 
 import static org.mockito.Mockito.mock;
@@ -33,9 +35,14 @@ public abstract class GraphAwareRuntimeTest {
     protected static final String MOCK = "MOCK";
 
     protected TxDrivenModule createMockModule() {
+        return createMockModule(MOCK);
+    }
+
+    protected TxDrivenModule createMockModule(String id) {
         TxDrivenModule mockModule = mock(TxDrivenModule.class);
-        when(mockModule.getId()).thenReturn(MOCK);
+        when(mockModule.getId()).thenReturn(id);
         when(mockModule.getConfiguration()).thenReturn(NullTxDrivenModuleConfiguration.getInstance());
+        when(mockModule.getMetadataClass()).thenReturn(DefaultTxDrivenModuleMetadata.class);
         return mockModule;
     }
 
@@ -50,7 +57,7 @@ public abstract class GraphAwareRuntimeTest {
 
     }
 
-    protected class RealRuntimeConfiguredRuntimeModule extends BaseTransactionDrivenRuntimeModule implements RuntimeConfiguredRuntimeModule {
+    protected class RealRuntimeConfiguredRuntimeModule extends BaseTxDrivenModule implements RuntimeConfiguredRuntimeModule {
 
         private RuntimeConfiguration configuration;
 

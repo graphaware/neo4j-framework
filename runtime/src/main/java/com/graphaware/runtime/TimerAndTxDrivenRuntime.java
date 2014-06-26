@@ -18,7 +18,7 @@ package com.graphaware.runtime;
 
 import com.graphaware.runtime.manager.*;
 import com.graphaware.runtime.module.RuntimeModule;
-import com.graphaware.runtime.module.TimerDrivenRuntimeModule;
+import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -64,8 +64,8 @@ public class TimerAndTxDrivenRuntime extends DatabaseBackedRuntime {
     protected void doRegisterModule(RuntimeModule module) {
         super.doRegisterModule(module);
 
-        if (module instanceof TimerDrivenRuntimeModule) {
-            timerDrivenModuleManager.registerModule((TimerDrivenRuntimeModule) module);
+        if (module instanceof TimerDrivenModule) {
+            timerDrivenModuleManager.registerModule((TimerDrivenModule) module);
         }
     }
 

@@ -4,7 +4,7 @@ import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.common.strategy.RelationshipInclusionStrategy;
 import com.graphaware.runtime.config.MinimalTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
-import com.graphaware.runtime.module.BaseTransactionDrivenRuntimeModule;
+import com.graphaware.runtime.module.BaseTxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.UnitOfWork;
@@ -24,7 +24,7 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
  * {@link com.graphaware.runtime.module.TxDrivenModule} that counts the total friendship strength in the database
  * and keeps it up to date.
  */
-public class FriendshipStrengthModule extends BaseTransactionDrivenRuntimeModule {
+public class FriendshipStrengthModule extends BaseTxDrivenModule {
 
     private final TxDrivenModuleConfiguration configuration;
     private final FriendshipStrengthCounter counter;

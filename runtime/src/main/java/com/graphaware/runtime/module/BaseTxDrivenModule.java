@@ -1,6 +1,8 @@
 package com.graphaware.runtime.module;
 
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
+import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
+import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
@@ -8,11 +10,11 @@ import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 /**
  *  Base class for {@link TxDrivenModule} implementations.
  */
-public abstract class BaseTransactionDrivenRuntimeModule implements TxDrivenModule {
+public abstract class BaseTxDrivenModule implements TxDrivenModule {
 
     private final String moduleId;
 
-    protected BaseTransactionDrivenRuntimeModule(String moduleId) {
+    protected BaseTxDrivenModule(String moduleId) {
         this.moduleId = moduleId;
     }
 
@@ -63,4 +65,8 @@ public abstract class BaseTransactionDrivenRuntimeModule implements TxDrivenModu
         //to be overridden
     }
 
+    @Override
+    public Class<DefaultTxDrivenModuleMetadata> getMetadataClass() {
+        return DefaultTxDrivenModuleMetadata.class;
+    }
 }
