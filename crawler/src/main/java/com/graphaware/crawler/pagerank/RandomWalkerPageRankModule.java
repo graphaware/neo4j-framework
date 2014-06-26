@@ -53,11 +53,11 @@ public class RandomWalkerPageRankModule implements TimerDrivenRuntimeModule<Modu
 		if (currentNode == null) {
 			currentNode = this.randomNodeSelector.selectRandomNode(graphDatabaseService);
 		}
-
-		int pageRankValue = (int) currentNode.getProperty("pageRankValue", 0);
-		currentNode.setProperty("pageRankValue", pageRankValue + 1);
-
 		Node nextNode = determineNextNode(currentNode, graphDatabaseService);
+
+		int pageRankValue = (int) nextNode.getProperty("pageRankValue", 0);
+		nextNode.setProperty("pageRankValue", pageRankValue + 1);
+
 		return new PageRankModuleContext(nextNode);
 	}
 
