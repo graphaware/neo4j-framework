@@ -16,9 +16,10 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.common.util.FakeTransaction;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.TransactionDrivenModuleManager;
-import com.graphaware.runtime.strategy.BatchSupportingTransactionDrivenRuntimeModule;
+import com.graphaware.runtime.strategy.BatchSupportingTxDrivenModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import org.neo4j.graphdb.Lock;
 import org.neo4j.graphdb.PropertyContainer;
@@ -32,23 +33,20 @@ import org.neo4j.graphdb.Transaction;
  * @see BaseGraphAwareRuntime
  * @see org.neo4j.unsafe.batchinsert.BatchInserter - same limitations apply.
  */
-public class BatchInserterBackedRuntime extends TxDrivenRuntime<BatchSupportingTransactionDrivenRuntimeModule> {
+public class BatchInserterBackedRuntime extends TxDrivenRuntime<BatchSupportingTxDrivenModule> {
 
-
-    protected BatchInserterBackedRuntime(TransactionSimulatingBatchInserter batchInserter, RuntimeConfiguration configuration, TransactionDrivenModuleManager<BatchSupportingTransactionDrivenRuntimeModule> transactionDrivenModuleManager) {
+    protected BatchInserterBackedRuntime(TransactionSimulatingBatchInserter batchInserter, RuntimeConfiguration configuration, TransactionDrivenModuleManager<BatchSupportingTxDrivenModule> transactionDrivenModuleManager) {
         super(configuration, transactionDrivenModuleManager);
         batchInserter.registerTransactionEventHandler(this);
         batchInserter.registerKernelEventHandler(this);
     }
 
-
-
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Class<BatchSupportingTransactionDrivenRuntimeModule> supportedModule() {
-        return BatchSupportingTransactionDrivenRuntimeModule.class;
+    protected Class<BatchSupportingTxDrivenModule> supportedModule() {
+        return BatchSupportingTxDrivenModule.class;
     }
 
     /**
@@ -64,36 +62,6 @@ public class BatchInserterBackedRuntime extends TxDrivenRuntime<BatchSupportingT
      */
     @Override
     protected Transaction startTransaction() {
-        return new Transaction() {
-            @Override
-            public void failure() {
-                //intentionally do nothing, this is a fake tx
-            }
-
-            @Override
-            public void success() {
-                //intentionally do nothing, this is a fake tx
-            }
-
-            @Override
-            public void finish() {
-                //intentionally do nothing, this is a fake tx
-            }
-
-            @Override
-            public void close() {
-                //intentionally do nothing, this is a fake tx
-            }
-
-            @Override
-            public Lock acquireWriteLock(PropertyContainer entity) {
-                throw new UnsupportedOperationException("Fake tx!");
-            }
-
-            @Override
-            public Lock acquireReadLock(PropertyContainer entity) {
-                throw new UnsupportedOperationException("Fake tx!");
-            }
-        };
+        return new FakeTransaction();
     }
 }

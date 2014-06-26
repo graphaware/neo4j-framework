@@ -1,13 +1,13 @@
 package com.graphaware.runtime.manager;
 
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
-import com.graphaware.runtime.strategy.BatchSupportingTransactionDrivenRuntimeModule;
+import com.graphaware.runtime.strategy.BatchSupportingTxDrivenModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 
 /**
  *
  */
-public class BatchModuleManager extends BaseTransactionDrivenModuleManager<BatchSupportingTransactionDrivenRuntimeModule> {
+public class BatchModuleManager extends BaseTransactionDrivenModuleManager<BatchSupportingTxDrivenModule> {
 
     private final TransactionSimulatingBatchInserter batchInserter;
 
@@ -17,12 +17,12 @@ public class BatchModuleManager extends BaseTransactionDrivenModuleManager<Batch
     }
 
     @Override
-    protected void doInitialize(BatchSupportingTransactionDrivenRuntimeModule module) {
+    protected void doInitialize(BatchSupportingTxDrivenModule module) {
         module.initialize(batchInserter);
     }
 
     @Override
-    protected void doReinitialize(BatchSupportingTransactionDrivenRuntimeModule module) {
+    protected void doReinitialize(BatchSupportingTxDrivenModule module) {
         module.reinitialize(batchInserter);
     }
 }

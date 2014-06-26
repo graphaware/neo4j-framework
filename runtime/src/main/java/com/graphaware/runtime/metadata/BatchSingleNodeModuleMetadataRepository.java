@@ -29,10 +29,22 @@ public class BatchSingleNodeModuleMetadataRepository extends SingleNodeModuleMet
      */
     @Override
     protected Node getOrCreateRoot() {
+        Node root = null;
+
         for (long candidate : batchInserter.getAllNodes()) {
             if (batchInserter.nodeHasLabel(candidate, GA_METADATA)) {
-                return new BatchInserterNode(candidate, batchInserter);
+                if (root == null) {
+                    root = new BatchInserterNode(candidate, batchInserter);
+                }
+                else {
+                    LOG.fatal("There is more than 1 runtime root node! Cannot start GraphAware Runtime.");
+                    throw new IllegalStateException("There is more than 1 runtime root node! Cannot start GraphAware Runtime.");
+                }
             }
+        }
+
+        if (root != null) {
+            return root;
         }
 
         return new BatchInserterNode(batchInserter.createNode(new HashMap<String, Object>(), GA_METADATA), batchInserter);

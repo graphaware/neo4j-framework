@@ -118,7 +118,7 @@ public class BatchTransactionData implements TransactionData {
      * Increment the number of mutations performed since the last "commit" and simulate a commit if needed.
      */
     private void incrementMutationsAndCommitIfNeeded() {
-        if (++numberOfMutations > commitTxAfterMutations) {
+        if (++numberOfMutations >= commitTxAfterMutations) {
             simulateCommit();
         }
     }
