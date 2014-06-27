@@ -23,9 +23,9 @@ public final class GraphAwareRuntimeFactory {
     public static GraphAwareRuntime createRuntime(GraphDatabaseService database, RuntimeConfiguration configuration) {
         ModuleMetadataRepository repository = new ProductionSingleNodeModuleMetadataRepository(database, configuration);
         TimerDrivenModuleManager timerDrivenModuleManager = new TimerDrivenModuleManagerImpl(repository, database);
-        TransactionDrivenModuleManager<TxDrivenModule> transactionDrivenModuleManager = new ProductionTransactionDrivenModuleManager(repository, database);
+        TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTransactionDrivenModuleManager(repository, database);
 
-        return new TimerAndTxDrivenRuntime(database, transactionDrivenModuleManager, timerDrivenModuleManager);
+        return new ProductionRuntime(database, txDrivenModuleManager, timerDrivenModuleManager);
     }
 
     public static GraphAwareRuntime createRuntime(TransactionSimulatingBatchInserter batchInserter) {
@@ -34,7 +34,7 @@ public final class GraphAwareRuntimeFactory {
 
     public static GraphAwareRuntime createRuntime(TransactionSimulatingBatchInserter batchInserter, RuntimeConfiguration configuration) {
         ModuleMetadataRepository metadataRepository = new BatchSingleNodeModuleMetadataRepository(batchInserter, configuration);
-        TransactionDrivenModuleManager<BatchSupportingTxDrivenModule> manager = new BatchModuleManager(metadataRepository, batchInserter);
+        TxDrivenModuleManager<BatchSupportingTxDrivenModule> manager = new BatchModuleManager(metadataRepository, batchInserter);
 
         return new BatchInserterBackedRuntime(batchInserter, configuration, manager);
     }

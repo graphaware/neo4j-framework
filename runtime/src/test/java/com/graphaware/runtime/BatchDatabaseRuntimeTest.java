@@ -32,7 +32,7 @@ import java.io.IOException;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
 
 /**
- * Unit test for {@link TimerAndTxDrivenRuntime} used with batch graph database.
+ * Unit test for {@link ProductionRuntime} used with batch graph database.
  */
 public class BatchDatabaseRuntimeTest extends DatabaseBackedRuntimeTest {
 

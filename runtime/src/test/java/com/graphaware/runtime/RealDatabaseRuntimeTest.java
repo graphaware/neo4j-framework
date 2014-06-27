@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
- * Unit test for {@link TimerAndTxDrivenRuntime}.
+ * Unit test for {@link ProductionRuntime}.
  */
 public class RealDatabaseRuntimeTest extends DatabaseBackedRuntimeTest {
 

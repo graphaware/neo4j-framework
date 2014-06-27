@@ -120,7 +120,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
             LOG.info("Initializing modules...");
             try (Transaction tx = startTransaction()) {
                 Set<String> moduleIds = initializeModules();
-                removeUnusedModules(moduleIds);
+                performCleanup(moduleIds);
                 tx.success();
             }
             LOG.info("Modules initialized.");
@@ -142,7 +142,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
      */
     protected abstract Set<String> initializeModules();
 
-    protected abstract void removeUnusedModules(Set<String> usedModules);
+    protected abstract void performCleanup(Set<String> usedModules);
 
 
     /**

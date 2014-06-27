@@ -27,17 +27,26 @@ import java.util.Set;
 
 
 /**
- * {@link GraphAwareRuntime} that operates on a real {@link GraphDatabaseService}.
+ * {@link DatabaseBackedRuntime} intended for production use.
+ * <p/>
+ * Supports both {@link TimerDrivenModule} and {@link TxDrivenModule} {@link RuntimeModule}s.
+ * <p/>
+ * To use this {@link GraphAwareRuntime}, please construct it using {@link GraphAwareRuntimeFactory}.
  */
-public class TimerAndTxDrivenRuntime extends DatabaseBackedRuntime {
+public class ProductionRuntime extends DatabaseBackedRuntime {
 
     private final TimerDrivenModuleManager timerDrivenModuleManager;
 
-    protected TimerAndTxDrivenRuntime(GraphDatabaseService database, TransactionDrivenModuleManager<TxDrivenModule> transactionDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager) {
-        super(database, transactionDrivenModuleManager);
+    /**
+     * Construct a new runtime.
+     *
+     * @param database                 on which the runtime operates.
+     * @param txDrivenModuleManager    manager for transaction-driven modules.
+     * @param timerDrivenModuleManager manager for timer-driven modules.
+     */
+    protected ProductionRuntime(GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager) {
+        super(database, txDrivenModuleManager);
         this.timerDrivenModuleManager = timerDrivenModuleManager;
-        database.registerTransactionEventHandler(this);
-        database.registerKernelEventHandler(this);
     }
 
     /**
@@ -51,10 +60,13 @@ public class TimerAndTxDrivenRuntime extends DatabaseBackedRuntime {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void removeUnusedModules(Set<String> usedModules) {
-        super.removeUnusedModules(usedModules);
-        timerDrivenModuleManager.performCleanup(usedModules);
+    protected void performCleanup(Set<String> usedModules) {
+        super.performCleanup(usedModules);
+        timerDrivenModuleManager.removeUnusedModules(usedModules);
     }
 
     /**
@@ -76,6 +88,6 @@ public class TimerAndTxDrivenRuntime extends DatabaseBackedRuntime {
     protected void shutdownModules() {
         super.shutdownModules();
 
-        timerDrivenModuleManager.stopModules();
+        timerDrivenModuleManager.shutdownModules();
     }
 }

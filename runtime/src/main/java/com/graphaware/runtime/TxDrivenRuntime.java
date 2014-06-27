@@ -18,7 +18,7 @@ package com.graphaware.runtime;
 
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.manager.TransactionDrivenModuleManager;
+import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
@@ -37,18 +37,18 @@ import java.util.Set;
  */
 public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGraphAwareRuntime implements TransactionEventHandler<Void> {
 
-    private final TransactionDrivenModuleManager<T> transactionDrivenModuleManager;
+    private final TxDrivenModuleManager<T> txDrivenModuleManager;
 
     /**
      * Create a new instance of the runtime with {@link com.graphaware.runtime.config.DefaultRuntimeConfiguration}.
      */
-    protected TxDrivenRuntime(TransactionDrivenModuleManager<T> transactionDrivenModuleManager) {
-        this(DefaultRuntimeConfiguration.getInstance(), transactionDrivenModuleManager);
+    protected TxDrivenRuntime(TxDrivenModuleManager<T> txDrivenModuleManager) {
+        this(DefaultRuntimeConfiguration.getInstance(), txDrivenModuleManager);
     }
 
-    protected TxDrivenRuntime(RuntimeConfiguration configuration, TransactionDrivenModuleManager<T> transactionDrivenModuleManager) {
+    protected TxDrivenRuntime(RuntimeConfiguration configuration, TxDrivenModuleManager<T> txDrivenModuleManager) {
         super(configuration);
-        this.transactionDrivenModuleManager = transactionDrivenModuleManager;
+        this.txDrivenModuleManager = txDrivenModuleManager;
     }
 
 
@@ -56,7 +56,7 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
 
     protected void doRegisterModule(RuntimeModule module) {
         if (supportedModule().isAssignableFrom(module.getClass())) {
-            transactionDrivenModuleManager.registerModule((T) module);
+            txDrivenModuleManager.registerModule((T) module);
         }
     }
 
@@ -69,9 +69,9 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
             return null;
         }
 
-        transactionDrivenModuleManager.throwExceptionIfIllegal(data);
+        txDrivenModuleManager.throwExceptionIfIllegal(data);
 
-        transactionDrivenModuleManager.beforeCommit(new LazyTransactionData(data));
+        txDrivenModuleManager.beforeCommit(new LazyTransactionData(data));
 
         return null;
     }
@@ -97,15 +97,15 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      */
     @Override
     protected Set<String> initializeModules() {
-        return transactionDrivenModuleManager.initializeModules();
+        return txDrivenModuleManager.initializeModules();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void removeUnusedModules(Set<String> usedModules) {
-        transactionDrivenModuleManager.performCleanup(usedModules);
+    protected void performCleanup(Set<String> usedModules) {
+        txDrivenModuleManager.removeUnusedModules(usedModules);
     }
 
     /**
@@ -113,6 +113,6 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      */
     @Override
     protected void shutdownModules() {
-        transactionDrivenModuleManager.stopModules();
+        txDrivenModuleManager.shutdownModules();
     }
 }

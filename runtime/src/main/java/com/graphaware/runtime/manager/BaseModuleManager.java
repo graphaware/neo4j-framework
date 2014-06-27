@@ -69,14 +69,14 @@ public abstract class BaseModuleManager<T extends RuntimeModule> implements Modu
     protected abstract void initializeModule2(T module);
 
     @Override
-    public void performCleanup(Set<String> usedModules) {
+    public void removeUnusedModules(Set<String> usedModules) {
         Set<String> unusedModules = metadataRepository.getAllModuleIds();
         unusedModules.removeAll(usedModules);
         removeUnusedModules(unusedModules);
     }
 
     @Override
-    public void stopModules() {
+    public void shutdownModules() {
         for (T module : modules) {
             module.shutdown();
         }

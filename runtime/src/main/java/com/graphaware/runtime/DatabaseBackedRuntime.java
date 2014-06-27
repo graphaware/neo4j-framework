@@ -16,21 +16,27 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.manager.TransactionDrivenModuleManager;
+import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.TxDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
 
 /**
- * {@link com.graphaware.runtime.GraphAwareRuntime} that operates on a real {@link org.neo4j.graphdb.GraphDatabaseService}.
+ * {@link TxDrivenRuntime} that operates on a real {@link org.neo4j.graphdb.GraphDatabaseService}.
  */
 public class DatabaseBackedRuntime extends TxDrivenRuntime<TxDrivenModule> {
 
     private final GraphDatabaseService database;
 
-    protected DatabaseBackedRuntime(GraphDatabaseService database, TransactionDrivenModuleManager<TxDrivenModule> transactionDrivenModuleManager) {
-        super(transactionDrivenModuleManager);
+    /**
+     * Construct a new runtime.
+     *
+     * @param database              on which the runtime operates.
+     * @param txDrivenModuleManager manager for transaction-driven modules.
+     */
+    protected DatabaseBackedRuntime(GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager) {
+        super(txDrivenModuleManager);
         this.database = database;
         database.registerTransactionEventHandler(this);
         database.registerKernelEventHandler(this);

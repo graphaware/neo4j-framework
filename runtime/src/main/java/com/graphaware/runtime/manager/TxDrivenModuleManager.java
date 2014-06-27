@@ -8,7 +8,7 @@ import org.neo4j.graphdb.event.TransactionData;
 /**
  *
  */
-public interface TransactionDrivenModuleManager<T extends TxDrivenModule> extends ModuleManager<T> {
+public interface TxDrivenModuleManager<T extends TxDrivenModule> extends ModuleManager<T> {
 
     /**
      * Throw an exception if the transaction that's about to be committed does something illegal from the manager's

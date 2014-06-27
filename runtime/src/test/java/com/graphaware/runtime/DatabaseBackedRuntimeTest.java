@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit test for {@link com.graphaware.runtime.TimerAndTxDrivenRuntime}.
+ * Unit test for {@link ProductionRuntime}.
  */
 public abstract class DatabaseBackedRuntimeTest extends GraphAwareRuntimeTest {
 

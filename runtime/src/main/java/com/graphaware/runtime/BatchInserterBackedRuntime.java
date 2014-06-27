@@ -18,11 +18,9 @@ package com.graphaware.runtime;
 
 import com.graphaware.common.util.FakeTransaction;
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.manager.TransactionDrivenModuleManager;
+import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.strategy.BatchSupportingTxDrivenModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
-import org.neo4j.graphdb.Lock;
-import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Transaction;
 
 
@@ -35,8 +33,8 @@ import org.neo4j.graphdb.Transaction;
  */
 public class BatchInserterBackedRuntime extends TxDrivenRuntime<BatchSupportingTxDrivenModule> {
 
-    protected BatchInserterBackedRuntime(TransactionSimulatingBatchInserter batchInserter, RuntimeConfiguration configuration, TransactionDrivenModuleManager<BatchSupportingTxDrivenModule> transactionDrivenModuleManager) {
-        super(configuration, transactionDrivenModuleManager);
+    protected BatchInserterBackedRuntime(TransactionSimulatingBatchInserter batchInserter, RuntimeConfiguration configuration, TxDrivenModuleManager<BatchSupportingTxDrivenModule> txDrivenModuleManager) {
+        super(configuration, txDrivenModuleManager);
         batchInserter.registerTransactionEventHandler(this);
         batchInserter.registerKernelEventHandler(this);
     }

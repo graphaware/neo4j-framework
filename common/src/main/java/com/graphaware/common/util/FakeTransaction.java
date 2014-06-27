@@ -5,9 +5,9 @@ import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Transaction;
 
 /**
- *
+ * A fake {@link Transaction}, for framework use only.
  */
-public class FakeTransaction implements Transaction {
+public final class FakeTransaction implements Transaction {
 
     @Override
     public void failure() {

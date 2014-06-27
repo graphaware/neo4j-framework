@@ -16,12 +16,10 @@
 
 package com.graphaware.runtime.module;
 
-import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.metadata.ModuleMetadata;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
- * A {@link com.graphaware.runtime.TimerAndTxDrivenRuntime} module performing some useful work based on about-to-be-committed transaction data.
+ * A {@link com.graphaware.runtime.ProductionRuntime} module performing some useful work based on about-to-be-committed transaction data.
  */
 public interface RuntimeModule<M extends ModuleMetadata> {
 

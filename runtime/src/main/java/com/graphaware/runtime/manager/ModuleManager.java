@@ -32,10 +32,10 @@ public interface ModuleManager<T extends RuntimeModule> {
      *
      * @param usedModules IDs of modules that are known to be used.
      */
-    void performCleanup(Set<String> usedModules);
+    void removeUnusedModules(Set<String> usedModules);
 
     /**
      * Bring all modules to an orderly shutdown, when the database is stopped.
      */
-    void stopModules();
+    void shutdownModules();
 }

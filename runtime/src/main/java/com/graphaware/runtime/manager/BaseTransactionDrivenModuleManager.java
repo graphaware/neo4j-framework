@@ -17,7 +17,7 @@ import java.util.Date;
 /**
  *
  */
-public abstract class BaseTransactionDrivenModuleManager<T extends TxDrivenModule> extends BaseModuleManager<T> implements TransactionDrivenModuleManager<T> {
+public abstract class BaseTransactionDrivenModuleManager<T extends TxDrivenModule> extends BaseModuleManager<T> implements TxDrivenModuleManager<T> {
 
     private static final Logger LOG = Logger.getLogger(BaseTransactionDrivenModuleManager.class);
 
