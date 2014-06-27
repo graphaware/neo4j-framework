@@ -8,12 +8,12 @@ import org.neo4j.graphdb.GraphDatabaseService;
 /**
  *
  */
-public class ProductionTransactionDrivenModuleManager extends BaseTransactionDrivenModuleManager<TxDrivenModule>  {
-    private static final Logger LOG = Logger.getLogger(ProductionTransactionDrivenModuleManager.class);
+public class ProductionTxDrivenModuleManager extends BaseTxDrivenModuleManager<TxDrivenModule> {
+    private static final Logger LOG = Logger.getLogger(ProductionTxDrivenModuleManager.class);
 
     private final GraphDatabaseService database;
 
-    public ProductionTransactionDrivenModuleManager(ModuleMetadataRepository metadataRepository, GraphDatabaseService database) {
+    public ProductionTxDrivenModuleManager(ModuleMetadataRepository metadataRepository, GraphDatabaseService database) {
         super(metadataRepository);
         this.database = database;
     }

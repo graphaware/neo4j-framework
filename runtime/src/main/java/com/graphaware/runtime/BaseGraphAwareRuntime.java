@@ -57,7 +57,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
      *
      * @param configuration config.
      */
-    protected BaseGraphAwareRuntime(RuntimeConfiguration configuration) {
+    private BaseGraphAwareRuntime(RuntimeConfiguration configuration) {
         this.configuration = configuration;
     }
 
@@ -114,6 +114,13 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
         LOG.info("Starting GraphAware...");
         state = State.STARTING;
 
+        doStart(skipInitialization);
+
+        state = State.STARTED;
+        LOG.info("GraphAware started.");
+    }
+
+    protected void doStart(boolean skipInitialization) {
         if (skipInitialization) {
             LOG.info("Initialization skipped.");
         } else {
@@ -125,9 +132,6 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
             }
             LOG.info("Modules initialized.");
         }
-
-        state = State.STARTED;
-        LOG.info("GraphAware started.");
     }
 
     /**
@@ -138,12 +142,19 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
     protected abstract Transaction startTransaction();
 
     /**
-     * Initialize modules if needed.
+     * Initialize modules if needed. Modules typically need to be initialized only the very first time they are used
+     * with a database instance.
+     *
+     * @return IDs of all modules registered with the runtime, no matter whether they needed to be initialized or not.
      */
     protected abstract Set<String> initializeModules();
 
+    /**
+     * Perform cleanup of metadata potentially written to the graph by modules that aren't used any more.
+     *
+     * @param usedModules IDs of all the used modules (should be the same as returned by {@link #initializeModules()}.
+     */
     protected abstract void performCleanup(Set<String> usedModules);
-
 
     /**
      * Checks to see if this {@link GraphAwareRuntime} has <b>NOT</b> yet been started, starting it if necessary and possible.
@@ -151,7 +162,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
      * @return <code>false</code> if the database isn't yet available or the runtime is currently starting,
      *         <code>true</code> if it's alright to delegate onto modules.
      */
-    protected final boolean makeSureIsStarted() {
+    protected final boolean tryToStartIfNotStarted() {
         if (!databaseAvailable()) {
             return false;
         }
@@ -161,17 +172,15 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
             switch (state) {
                 case NONE:
                     start();
-                    break;
+                    return true;
                 case STARTING:
                     return false;
                 case STARTED:
-                    break;
+                    return true;
                 default:
                     throw new IllegalStateException("Unknown GraphAware Runtime state. This is a bug.");
             }
         }
-
-        return true;
     }
 
     /**

@@ -17,11 +17,11 @@ import java.util.Date;
 /**
  *
  */
-public abstract class BaseTransactionDrivenModuleManager<T extends TxDrivenModule> extends BaseModuleManager<T> implements TxDrivenModuleManager<T> {
+public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extends BaseModuleManager<T> implements TxDrivenModuleManager<T> {
 
-    private static final Logger LOG = Logger.getLogger(BaseTransactionDrivenModuleManager.class);
+    private static final Logger LOG = Logger.getLogger(BaseTxDrivenModuleManager.class);
 
-    protected BaseTransactionDrivenModuleManager(ModuleMetadataRepository metadataRepository) {
+    protected BaseTxDrivenModuleManager(ModuleMetadataRepository metadataRepository) {
         super(metadataRepository);
     }
 
@@ -31,45 +31,39 @@ public abstract class BaseTransactionDrivenModuleManager<T extends TxDrivenModul
     }
 
     @Override
-	protected void initializeModule2(T module) {
+	protected void initializeModule(T module) {
         TxDrivenModuleMetadata moduleMetadata;
 
         try {
             moduleMetadata = metadataRepository.getModuleMetadata(module);
         } catch (CorruptMetadataException e) {
-            reinitializeModule(module);
+            doReinitialize(module);
+            recordInitialization(module);
             return;
         }
 
         if (moduleMetadata == null) {
             LOG.info("Module " + module.getId() + " seems to have been registered for the first time, will initialize...");
-            initializeModule(module);
+            doInitialize(module);
+            recordInitialization(module);
             return;
         }
 
         if (moduleMetadata.needsInitialization()) {
             LOG.info("Module " + module.getId() + " has been marked for re-initialization on "
                     + new Date(moduleMetadata.timestamp()).toString() + ". Will re-initialize...");
-            reinitializeModule(module);
+            doReinitialize(module);
+            recordInitialization(module);
             return;
         }
 
         if (!moduleMetadata.getConfig().equals(module.getConfiguration())) {
             LOG.info("Module " + module.getId() + " seems to have changed configuration since last run, will re-initialize...");
-            reinitializeModule(module);
+            doReinitialize(module);
+            recordInitialization(module);
         } else {
             LOG.info("Module " + module.getId() + " has not changed configuration since last run, already initialized.");
         }
-    }
-
-    /**
-     * Initialize a module and capture that fact on the as a root node's property.
-     *
-     * @param module to initialize.
-     */
-    private void initializeModule(final T module) {
-        doInitialize(module);
-        recordInitialization(module);
     }
 
     /**
@@ -80,22 +74,11 @@ public abstract class BaseTransactionDrivenModuleManager<T extends TxDrivenModul
     protected abstract void doInitialize(T module);
 
     /**
-     * Re-initialize a module and capture that fact on the as a root node's property.
-     *
-     * @param module to initialize.
-     */
-    private void reinitializeModule(final T module) {
-        doReinitialize(module);
-        recordInitialization(module);
-    }
-
-    /**
      * Re-initialize a module.
      *
      * @param module to initialize.
      */
     protected abstract void doReinitialize(T module);
-
 
     /**
      * Capture the fact the a module has been (re-)initialized as a root node's property.

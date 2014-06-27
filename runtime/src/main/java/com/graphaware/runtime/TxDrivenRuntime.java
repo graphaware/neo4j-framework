@@ -16,8 +16,6 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
-import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TxDrivenModule;
@@ -41,21 +39,27 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
 
     /**
      * Create a new instance of the runtime with {@link com.graphaware.runtime.config.DefaultRuntimeConfiguration}.
+     *
+     * @param txDrivenModuleManager manager for transaction-driven modules.
      */
     protected TxDrivenRuntime(TxDrivenModuleManager<T> txDrivenModuleManager) {
-        this(DefaultRuntimeConfiguration.getInstance(), txDrivenModuleManager);
-    }
-
-    protected TxDrivenRuntime(RuntimeConfiguration configuration, TxDrivenModuleManager<T> txDrivenModuleManager) {
-        super(configuration);
         this.txDrivenModuleManager = txDrivenModuleManager;
     }
 
-
+    /**
+     * Get the type of modules that this runtime supports, i.e. the modules that it lets register with itself.
+     *
+     * @return supported modules type.
+     */
     protected abstract Class<T> supportedModule();
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void doRegisterModule(RuntimeModule module) {
         if (supportedModule().isAssignableFrom(module.getClass())) {
+            //noinspection unchecked
             txDrivenModuleManager.registerModule((T) module);
         }
     }
@@ -65,7 +69,7 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      */
     @Override
     public final Void beforeCommit(TransactionData data) throws Exception {
-        if (!makeSureIsStarted()) {
+        if (!tryToStartIfNotStarted()) {
             return null;
         }
 

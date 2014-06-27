@@ -33,8 +33,8 @@ import org.neo4j.graphdb.Transaction;
  */
 public class BatchInserterBackedRuntime extends TxDrivenRuntime<BatchSupportingTxDrivenModule> {
 
-    protected BatchInserterBackedRuntime(TransactionSimulatingBatchInserter batchInserter, RuntimeConfiguration configuration, TxDrivenModuleManager<BatchSupportingTxDrivenModule> txDrivenModuleManager) {
-        super(configuration, txDrivenModuleManager);
+    protected BatchInserterBackedRuntime(TransactionSimulatingBatchInserter batchInserter, TxDrivenModuleManager<BatchSupportingTxDrivenModule> txDrivenModuleManager) {
+        super(txDrivenModuleManager);
         batchInserter.registerTransactionEventHandler(this);
         batchInserter.registerKernelEventHandler(this);
     }

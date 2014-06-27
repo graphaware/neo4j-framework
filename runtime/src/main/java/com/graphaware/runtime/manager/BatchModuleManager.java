@@ -7,7 +7,7 @@ import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 /**
  *
  */
-public class BatchModuleManager extends BaseTransactionDrivenModuleManager<BatchSupportingTxDrivenModule> {
+public class BatchModuleManager extends BaseTxDrivenModuleManager<BatchSupportingTxDrivenModule> {
 
     private final TransactionSimulatingBatchInserter batchInserter;
 

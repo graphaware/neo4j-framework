@@ -60,6 +60,12 @@ public class ProductionRuntime extends DatabaseBackedRuntime {
         return result;
     }
 
+    @Override
+    protected void doStart(boolean skipInitialization) {
+        super.doStart(skipInitialization);
+        timerDrivenModuleManager.startModules();
+    }
+
     /**
      * {@inheritDoc}
      */

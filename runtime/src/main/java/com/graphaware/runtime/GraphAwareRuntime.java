@@ -12,7 +12,7 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
  * After all desired modules have been registered, {@link #start()} can be called in order to initialize the runtime and
  * all its modules before the database is exposed to callers. No more modules can be registered thereafter.
  * <p/>
- * If not called explicitly, the {@link #start()} method will be called automatically by the runtime upon first
+ * If not called explicitly, the {@link #start()} method shall be called automatically by the runtime upon first
  * transaction received from callers. In such case, all other transaction will be blocked until the runtime and all its
  * modules have been initialized.
  * <p/>

@@ -17,16 +17,14 @@ public class TimerDrivenModuleManagerImpl extends BaseModuleManager<TimerDrivenM
     }
 
     @Override
-    protected void initializeModule2(TimerDrivenModule module) {
-    	// modules of this type don't even have an initialise method so I've no idea what to do here
-        throw new UnsupportedOperationException("not yet implemented");
+    protected void initializeModule(TimerDrivenModule module) {
+    	//for now, timer-driven modules do not need to be initialised when registered for the first time or when their
+        //configuration changed.
     }
 
     @Override
     public void startModules() {
-    	// Given that there's no apparent initialisation, we can probably start the scheduling here.
-    	// Also note that this isn't getting called at present
-        throw new UnsupportedOperationException("not yet implemented");
+    	// We will start the scheduling here.
         /*
          * I reckon we want to have something here that says "start the scheduler" and then it's off and running.
          *

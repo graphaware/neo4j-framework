@@ -1,6 +1,5 @@
 package com.graphaware.runtime.manager;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,37 +59,28 @@ public abstract class BaseModuleManager<T extends RuntimeModule> implements Modu
 
         for (final T module : modules) {
             moduleIds.add(module.getId());
-            initializeModule2(module);
+            initializeModule(module);
         }
 
         return moduleIds;
     }
 
-    protected abstract void initializeModule2(T module);
+    protected abstract void initializeModule(T module);
 
     @Override
     public void removeUnusedModules(Set<String> usedModules) {
         Set<String> unusedModules = metadataRepository.getAllModuleIds();
         unusedModules.removeAll(usedModules);
-        removeUnusedModules(unusedModules);
+        for (String moduleId : unusedModules) {
+            LOG.info("Removing unused module " + moduleId + ".");
+            metadataRepository.removeModuleMetadata(moduleId);
+        }
     }
 
     @Override
     public void shutdownModules() {
         for (T module : modules) {
             module.shutdown();
-        }
-    }
-
-    /**
-     * Remove unused modules.
-     *
-     * @param unusedModules to remove from the root node's properties.
-     */
-    protected void removeUnusedModules(final Collection<String> unusedModules) {
-        for (String moduleId : unusedModules) {
-            LOG.info("Removing unused module " + moduleId + ".");
-            metadataRepository.removeModuleMetadata(moduleId);
         }
     }
 }
