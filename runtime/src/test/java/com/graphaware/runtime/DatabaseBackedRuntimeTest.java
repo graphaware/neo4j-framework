@@ -20,9 +20,7 @@ import com.graphaware.common.util.IterableUtils;
 import com.graphaware.common.util.PropertyContainerUtils;
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
-import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
-import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.runtime.module.TxDrivenModule;
 import org.junit.Test;
 import org.neo4j.graphdb.*;
@@ -38,7 +36,7 @@ public abstract class DatabaseBackedRuntimeTest extends GraphAwareRuntimeTest {
     protected GraphDatabaseService database;
     protected ModuleMetadataRepository repository;
 
-    protected abstract Node getRuntimeRoot();
+    protected abstract Node getMetadataNode();
 
     protected GraphAwareRuntime createRuntime() {
         return GraphAwareRuntimeFactory.createRuntime(database);
@@ -107,15 +105,15 @@ public abstract class DatabaseBackedRuntimeTest extends GraphAwareRuntimeTest {
     }
 
     @Test
-    public void shouldCreateRuntimeRootNodeAfterFirstStartup() {
-        assertNull(getRuntimeRoot());
+    public void shouldCreateRuntimeMetadataNodeAfterFirstStartup() {
+        assertNull(getMetadataNode());
 
         GraphAwareRuntime runtime = createRuntime();
 
-        assertNull(getRuntimeRoot());
+        assertNull(getMetadataNode());
 
         runtime.start();
 
-        assertNotNull(getRuntimeRoot());
+        assertNotNull(getMetadataNode());
     }
 }

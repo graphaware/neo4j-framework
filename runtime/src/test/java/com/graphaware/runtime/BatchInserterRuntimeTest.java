@@ -82,7 +82,7 @@ public class BatchInserterRuntimeTest extends GraphAwareRuntimeTest<BatchSupport
     }
 
     @Override
-    protected Node createRuntimeRoot() {
+    protected Node createMetadataNode() {
         for (long candidate : batchInserter.getAllNodes()) {
             if (batchInserter.nodeHasLabel(candidate, GA_METADATA)) {
                 throw new IllegalArgumentException("Runtime root already exists!");
@@ -146,7 +146,7 @@ public class BatchInserterRuntimeTest extends GraphAwareRuntimeTest<BatchSupport
     }
 
     @Test
-    public void shouldCreateRuntimeRootNodeAfterFirstStartup() {
+    public void shouldCreateRuntimeMetadataNodeAfterFirstStartup() {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(batchInserter);
         runtime.start();
         batchInserter.shutdown();

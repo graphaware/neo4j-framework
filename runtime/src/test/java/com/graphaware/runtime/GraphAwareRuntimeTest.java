@@ -17,13 +17,11 @@
 package com.graphaware.runtime;
 
 import com.graphaware.common.strategy.InclusionStrategies;
-import com.graphaware.common.util.PropertyContainerUtils;
 import com.graphaware.runtime.config.*;
 import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.runtime.module.BaseTxDrivenModule;
-import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.NeedsInitializationException;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -49,7 +47,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     protected abstract GraphAwareRuntime createRuntime();
 
-    protected abstract Node createRuntimeRoot();
+    protected abstract Node createMetadataNode();
 
     protected abstract T mockTxModule();
 
@@ -249,7 +247,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         final T mockModule = mockTxModule();
 
         try (Transaction tx = getTransaction()) {
-            Node root = createRuntimeRoot();
+            Node root = createMetadataNode();
             root.setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, "CORRUPT");
             tx.success();
         }
@@ -277,7 +275,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         final T mockModule = mockTxModule();
 
         try (Transaction tx = getTransaction()) {
-            Node root = createRuntimeRoot();
+            Node root = createMetadataNode();
             root.setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, new byte[]{2, 3, 4});
             tx.success();
         }
@@ -305,7 +303,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         final TxDrivenModule mockModule = mockTxModule();
 
         try (Transaction tx = getTransaction()) {
-            Node root = createRuntimeRoot();
+            Node root = createMetadataNode();
             getRepository().persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()));
             root.setProperty(GA_PREFIX + RUNTIME + "_UNUSED", "CORRUPT");
             root.setProperty(GA_PREFIX + RUNTIME + "_UNUSED2", new byte[]{1, 2, 3});
@@ -533,7 +531,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void shouldFailWhenThereAreTwoRootNodes() {
+    public void shouldFailWhenThereAreTwoMetadataNodes() {
         try (Transaction tx = getTransaction()) {
             createNode(GA_METADATA);
             createNode(GA_METADATA);

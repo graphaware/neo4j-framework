@@ -18,7 +18,6 @@ package com.graphaware.runtime;
 
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
-import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -55,12 +54,12 @@ public class RealDatabaseRuntimeTest extends DatabaseBackedRuntimeTest {
     }
 
     @Test(expected = TransactionFailureException.class)
-    public void shouldNotBeAllowedToDeleteRuntimeRootNode() {
+    public void shouldNotBeAllowedToDeleteRuntimeMetadataNode() {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
         runtime.start();
 
         try (Transaction tx = database.beginTx()) {
-            getRuntimeRoot().delete();
+            getMetadataNode().delete();
             tx.success();
         }
     }
@@ -85,7 +84,7 @@ public class RealDatabaseRuntimeTest extends DatabaseBackedRuntimeTest {
         assertEquals(1, countNodes()); //just the node for storing metadata
     }
 
-    protected Node getRuntimeRoot() {
+    protected Node getMetadataNode() {
         Node root = null;
 
         try (Transaction tx = database.beginTx()) {
@@ -104,11 +103,11 @@ public class RealDatabaseRuntimeTest extends DatabaseBackedRuntimeTest {
         return root;
     }
 
-    protected Node createRuntimeRoot() {
+    protected Node createMetadataNode() {
         Node root;
 
         try (Transaction tx = database.beginTx()) {
-            if (getRuntimeRoot() != null) {
+            if (getMetadataNode() != null) {
                 throw new IllegalArgumentException("Runtime root already exists!");
             }
             root = database.createNode(GA_METADATA);
