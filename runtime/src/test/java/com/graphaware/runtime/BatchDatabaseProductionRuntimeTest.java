@@ -41,7 +41,7 @@ import static org.mockito.Mockito.doThrow;
 /**
  * Unit test for {@link ProductionRuntime} used with batch graph database.
  */
-public class BatchDatabaseRuntimeTest extends DatabaseBackedRuntimeTest {
+public class BatchDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
 
     private final TemporaryFolder temporaryFolder = new TemporaryFolder();
 

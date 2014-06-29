@@ -28,17 +28,15 @@ import java.util.Set;
 
 
 /**
- * {@link TxDrivenRuntime} intended for production use.
+ * {@link DatabaseRuntime} intended for production use.
  * <p/>
  * Supports both {@link TimerDrivenModule} and {@link TxDrivenModule} {@link RuntimeModule}s.
  * <p/>
  * To use this {@link GraphAwareRuntime}, please construct it using {@link GraphAwareRuntimeFactory}.
  */
-public class ProductionRuntime extends TxDrivenRuntime<TxDrivenModule> {
+public class ProductionRuntime extends DatabaseRuntime {
 
-    private final GraphDatabaseService database;
     private final TimerDrivenModuleManager timerDrivenModuleManager;
-    private final TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager;
 
     /**
      * Construct a new runtime. Protected, please use {@link GraphAwareRuntimeFactory}.
@@ -48,19 +46,8 @@ public class ProductionRuntime extends TxDrivenRuntime<TxDrivenModule> {
      * @param timerDrivenModuleManager manager for timer-driven modules.
      */
     protected ProductionRuntime(GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager) {
-        this.database = database;
-        this.txDrivenModuleManager = txDrivenModuleManager;
+        super(database, txDrivenModuleManager);
         this.timerDrivenModuleManager = timerDrivenModuleManager;
-        database.registerTransactionEventHandler(this);
-        database.registerKernelEventHandler(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected TxDrivenModuleManager<TxDrivenModule> getTxDrivenModuleManager() {
-        return txDrivenModuleManager;
     }
 
     /**
@@ -97,9 +84,7 @@ public class ProductionRuntime extends TxDrivenRuntime<TxDrivenModule> {
      */
     @Override
     protected void doRegisterModule(RuntimeModule module) {
-        if (module instanceof TxDrivenModule) {
-            txDrivenModuleManager.registerModule((TxDrivenModule) module);
-        }
+        super.doRegisterModule(module);
 
         if (module instanceof TimerDrivenModule) {
             timerDrivenModuleManager.registerModule((TimerDrivenModule) module);
@@ -114,21 +99,5 @@ public class ProductionRuntime extends TxDrivenRuntime<TxDrivenModule> {
         super.shutdownModules();
 
         timerDrivenModuleManager.shutdownModules();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean databaseAvailable() {
-        return database.isAvailable(0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Transaction startTransaction() {
-        return database.beginTx();
     }
 }

@@ -12,7 +12,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
  * Production implementation of {@link TimerDrivenModuleManager}. Must be backed by a {@link GraphDatabaseService},
  * as there is no support for using {@link TimerDrivenModule}s in batch mode (i.e. with {@link org.neo4j.unsafe.batchinsert.BatchInserter}s).
  */
-public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerDrivenModuleMetadata, TimerDrivenModule<TimerDrivenModuleMetadata>> implements TimerDrivenModuleManager {
+public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerDrivenModuleMetadata, TimerDrivenModule> implements TimerDrivenModuleManager {
 
     private final GraphDatabaseService database;
     private final TaskScheduler taskScheduler;

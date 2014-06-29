@@ -33,14 +33,15 @@ import java.util.Iterator;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
  * Unit test for {@link ProductionRuntime}.
  */
-public class RealDatabaseRuntimeTest extends DatabaseBackedRuntimeTest {
+public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
 
     @Before
     public void setUp() {
@@ -82,6 +83,15 @@ public class RealDatabaseRuntimeTest extends DatabaseBackedRuntimeTest {
         }
 
         assertEquals(1, countNodes()); //just the node for storing metadata
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotBeAbleToRegisterDifferentModulesWithSameId() {
+        final TxDrivenModule mockModule = mockTxModule();
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule);
+        runtime.registerModule(mockModule);
     }
 
     protected Node getMetadataNode() {

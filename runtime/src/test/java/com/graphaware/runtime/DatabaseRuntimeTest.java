@@ -31,7 +31,7 @@ import static org.mockito.Mockito.*;
 /**
  * Unit test for {@link ProductionRuntime}.
  */
-public abstract class DatabaseBackedRuntimeTest extends GraphAwareRuntimeTest {
+public abstract class DatabaseRuntimeTest extends GraphAwareRuntimeTest {
 
     protected GraphDatabaseService database;
     protected ModuleMetadataRepository repository;
@@ -42,6 +42,7 @@ public abstract class DatabaseBackedRuntimeTest extends GraphAwareRuntimeTest {
         return GraphAwareRuntimeFactory.createRuntime(database);
     }
 
+    @Override
     protected TxDrivenModule mockTxModule() {
         return mockTxModule(MOCK);
     }
