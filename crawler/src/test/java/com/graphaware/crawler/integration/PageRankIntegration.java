@@ -3,6 +3,7 @@ package com.graphaware.crawler.integration;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.graphaware.runtime.metadata.NodeBasedContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +17,6 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.graphaware.crawler.pagerank.PageRankModuleContext;
 import com.graphaware.crawler.pagerank.RandomWalkerPageRankModule;
 import com.graphaware.generator.GraphGenerator;
 import com.graphaware.generator.Neo4jGraphGenerator;
@@ -25,8 +25,6 @@ import com.graphaware.generator.distribution.SimpleDegreeDistribution;
 import com.graphaware.generator.node.SocialNetworkNodeCreator;
 import com.graphaware.generator.relationship.SimpleGraphRelationshipGenerator;
 import com.graphaware.generator.relationship.SocialNetworkRelationshipCreator;
-import com.graphaware.runtime.state.GraphPosition;
-import com.graphaware.runtime.state.ModuleContext;
 
 /**
  * Integration tests for page rank module.  Note that it's not called "Test" in order to prevent Maven running it.
@@ -37,26 +35,25 @@ public class PageRankIntegration {
 	private static final Logger LOG = LoggerFactory.getLogger(PageRankIntegration.class);
 
 	private RandomWalkerPageRankModule pageRankModule;
-	private GraphDatabaseService graphDatabaseService;
+	private GraphDatabaseService database;
 	private ExecutionEngine executionEngine;
 
 	/** */
 	@Before
 	public void setUp() {
-		this.graphDatabaseService = new TestGraphDatabaseFactory().newImpermanentDatabase();
-		this.executionEngine = new ExecutionEngine(this.graphDatabaseService);
-
-		this.pageRankModule = new RandomWalkerPageRankModule();
+		this.database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+		this.executionEngine = new ExecutionEngine(this.database);
+		this.pageRankModule = new RandomWalkerPageRankModule("TEST");
 	}
 
 	/** */
 	@Test
 	public void generateSocialNetworkAndWorkOutSomePageRankStatistics() {
-		try (Transaction transaction = this.graphDatabaseService.beginTx()) {
+		try (Transaction transaction = this.database.beginTx()) {
 			LOG.info("Creating arbitrary social network database...");
 
 			long time = System.currentTimeMillis();
-			GraphGenerator graphGenerator = new Neo4jGraphGenerator(this.graphDatabaseService);
+			GraphGenerator graphGenerator = new Neo4jGraphGenerator(this.database);
 			graphGenerator.generateGraph(new BasicGeneratorConfiguration(
 					SocialNetworkNodeCreator.getInstance(),
 					SocialNetworkRelationshipCreator.getInstance(),
@@ -69,10 +66,10 @@ public class PageRankIntegration {
 			final int totalSteps = 100;
 			LOG.info("Performing " + totalSteps + " steps to convergence on page rank");
 
-			ModuleContext<GraphPosition<Node>> context = new PageRankModuleContext(null);
-			time = System.currentTimeMillis();
+            NodeBasedContext context = this.pageRankModule.createInitialContext(database);
+            time = System.currentTimeMillis();
 			for (int i=0 ; i<totalSteps ; i++) {
-				context = this.pageRankModule.doSomeWork(context, this.graphDatabaseService);
+				context = this.pageRankModule.doSomeWork(context, this.database);
 			}
 			time = System.currentTimeMillis() - time;
 			LOG.info("All steps completed in " + time + "ms");
@@ -81,7 +78,7 @@ public class PageRankIntegration {
 			for (Map<String, Object> map : result) {
 				Node n = (Node) map.get("node");
 				LOG.info(n.getProperty("name") + " has " + n.getDegree() + " relationships and a page rank value of: "
-						+ n.getProperty(RandomWalkerPageRankModule.PAGE_RANK_PROPERTY_KEY));
+						+ n.getProperty(RandomWalkerPageRankModule.PAGE_RANK_PROPERTY_KEY, 0));
 			}
 		}
 	}

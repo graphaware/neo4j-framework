@@ -6,9 +6,10 @@ import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TimerDrivenModuleContext;
 import com.graphaware.runtime.metadata.TimerDrivenModuleMetadata;
 import com.graphaware.runtime.module.TimerDrivenModule;
-import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  * in which the modules were registered. All work performed by this implementation is done by a single thread.
  */
 public class RotatingTaskScheduler implements TaskScheduler {
-    private static final Logger LOG = Logger.getLogger(RotatingTaskScheduler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RotatingTaskScheduler.class);
 
     private final GraphDatabaseService database;
     private final ModuleMetadataRepository repository;

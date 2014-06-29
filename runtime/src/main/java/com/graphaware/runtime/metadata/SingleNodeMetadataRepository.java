@@ -5,10 +5,11 @@ import com.graphaware.common.strategy.InclusionStrategy;
 import com.graphaware.common.util.PropertyContainerUtils;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModule;
-import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.event.LabelEntry;
 import org.neo4j.graphdb.event.TransactionData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -24,7 +25,7 @@ import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
  */
 public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepository {
 
-    private static final Logger LOG = Logger.getLogger(SingleNodeMetadataRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SingleNodeMetadataRepository.class);
 
     private final String propertyPrefix;
 

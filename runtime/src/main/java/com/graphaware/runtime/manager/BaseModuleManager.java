@@ -6,16 +6,17 @@ import java.util.List;
 import java.util.Set;
 
 import com.graphaware.runtime.metadata.*;
-import org.apache.log4j.Logger;
 
 import com.graphaware.runtime.module.RuntimeModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base-class for {@link ModuleManager} implementations.
  */
 public abstract class BaseModuleManager<M extends ModuleMetadata, T extends RuntimeModule> implements ModuleManager<T> {
 
-    private static final Logger LOG = Logger.getLogger(BaseModuleManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BaseModuleManager.class);
 
     protected final List<T> modules = new LinkedList<>();
     protected final ModuleMetadataRepository metadataRepository;

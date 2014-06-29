@@ -1093,7 +1093,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
         populateDatabase();
 
         batchInserter.shutdown();
-        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()), 27);
+        batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()), 28);
 
         final AtomicInteger numberOfCommits = new AtomicInteger(0);
 

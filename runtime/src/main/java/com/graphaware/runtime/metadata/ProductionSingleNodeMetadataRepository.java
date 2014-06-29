@@ -1,11 +1,12 @@
 package com.graphaware.runtime.metadata;
 
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.helpers.collection.PrefetchingIterator;
 import org.neo4j.kernel.GraphDatabaseAPI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 
@@ -17,7 +18,7 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
  */
 public class ProductionSingleNodeMetadataRepository extends SingleNodeMetadataRepository {
 
-    private static final Logger LOG = Logger.getLogger(ProductionSingleNodeMetadataRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProductionSingleNodeMetadataRepository.class);
 
     private final GraphDatabaseService database;
 
@@ -55,7 +56,7 @@ public class ProductionSingleNodeMetadataRepository extends SingleNodeMetadataRe
         Node result = nodes.next();
 
         if (nodes.hasNext()) {
-            LOG.fatal("There is more than 1 runtime metadata node! Cannot start GraphAware Runtime.");
+            LOG.error("There is more than 1 runtime metadata node! Cannot start GraphAware Runtime.");
             throw new IllegalStateException("There is more than 1 runtime metadata node! Cannot start GraphAware Runtime.");
         }
 

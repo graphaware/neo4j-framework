@@ -3,8 +3,9 @@ package com.graphaware.runtime.metadata;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
-import org.apache.log4j.Logger;
 import org.neo4j.graphdb.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
@@ -15,7 +16,7 @@ import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
  */
 public class BatchSingleNodeMetadataRepository extends SingleNodeMetadataRepository {
 
-    private static final Logger LOG = Logger.getLogger(BatchSingleNodeMetadataRepository.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BatchSingleNodeMetadataRepository.class);
 
     private final TransactionSimulatingBatchInserter batchInserter;
 
@@ -43,7 +44,7 @@ public class BatchSingleNodeMetadataRepository extends SingleNodeMetadataReposit
                 if (root == null) {
                     root = new BatchInserterNode(candidate, batchInserter);
                 } else {
-                    LOG.fatal("There is more than 1 runtime metadata node! Cannot start GraphAware Runtime.");
+                    LOG.error("There is more than 1 runtime metadata node! Cannot start GraphAware Runtime.");
                     throw new IllegalStateException("There is more than 1 runtime metadata node! Cannot start GraphAware Runtime.");
                 }
             }

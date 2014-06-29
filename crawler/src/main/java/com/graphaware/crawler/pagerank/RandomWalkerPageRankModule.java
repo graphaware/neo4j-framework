@@ -1,15 +1,14 @@
 package com.graphaware.crawler.pagerank;
 
+import com.graphaware.runtime.metadata.NodeBasedContext;
+import com.graphaware.runtime.module.BaseRuntimeModule;
+import com.graphaware.runtime.module.TimerDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Relationship;
 
-import com.graphaware.runtime.config.RuntimeModuleConfiguration;
-import com.graphaware.runtime.module.TimerDrivenRuntimeModule;
-import com.graphaware.runtime.state.GraphPosition;
-import com.graphaware.runtime.state.ModuleContext;
-
-public class RandomWalkerPageRankModule implements TimerDrivenRuntimeModule<ModuleContext<GraphPosition<Node>>> {
+public class RandomWalkerPageRankModule extends BaseRuntimeModule implements TimerDrivenModule<NodeBasedContext> {
 
 	/** The name of the property key that is modified on visited nodes by this module. */
 	public static final String PAGE_RANK_PROPERTY_KEY = "pageRankValue";
@@ -17,52 +16,48 @@ public class RandomWalkerPageRankModule implements TimerDrivenRuntimeModule<Modu
 	private RandomNodeSelector randomNodeSelector;
 	private RelationshipChooser relationshipChooser;
 
-	public RandomWalkerPageRankModule() {
-		this.randomNodeSelector = new HyperJumpRandomNodeSelector();
-		// TODO: add relationship type and direction filtering based on module configuration
-		this.relationshipChooser = new RandomRelationshipChooser();
-	}
+    public RandomWalkerPageRankModule(String moduleId) {
+        super(moduleId);
+        this.randomNodeSelector = new HyperJumpRandomNodeSelector();
+        // TODO: add relationship type and direction filtering based on module configuration
+        this.relationshipChooser = new RandomRelationshipChooser();
+    }
 
-	@Override
-	public void initialize(GraphDatabaseService database) {
-		// nothing to do here
-	}
-
-	@Override
-	public String getId() {
-		throw new UnsupportedOperationException("atg hasn't written this method yet");
-	}
-
-	@Override
-	public RuntimeModuleConfiguration getConfiguration() {
-		throw new UnsupportedOperationException("atg hasn't written this method yet");
-	}
-
-	@Override
-	public void reinitialize(GraphDatabaseService database) {
-		throw new UnsupportedOperationException("atg hasn't written this method yet");
-	}
-
+    /**
+     * {@inheritDoc}
+     */
 	@Override
 	public void shutdown() {
-		throw new UnsupportedOperationException("atg hasn't written this method yet");
+		//nothing needed for now
 	}
 
-	@Override
-	public ModuleContext<GraphPosition<Node>> doSomeWork(ModuleContext<GraphPosition<Node>> lastContext, GraphDatabaseService graphDatabaseService) {
-		// the first context is provided by the framework, which may not have any positional information on very first run
-		GraphPosition<Node> graphPosition = lastContext.getPosition(); // XXX: will this be null for the first step?
-		Node currentNode = graphPosition.find(graphDatabaseService);
-		if (currentNode == null) {
-			currentNode = this.randomNodeSelector.selectRandomNode(graphDatabaseService);
-		}
-		Node nextNode = determineNextNode(currentNode, graphDatabaseService);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeBasedContext createInitialContext(GraphDatabaseService database) {
+        return new NodeBasedContext(randomNodeSelector.selectRandomNode(database).getId());
+    }
 
-		int pageRankValue = (int) nextNode.getProperty(PAGE_RANK_PROPERTY_KEY, 0);
-		nextNode.setProperty(PAGE_RANK_PROPERTY_KEY, pageRankValue + 1);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+	public NodeBasedContext doSomeWork(NodeBasedContext lastContext, GraphDatabaseService database) {
+        Node currentNode;
+        try {
+            currentNode = lastContext.find(database);
+        } catch (NotFoundException e) {
+            currentNode = randomNodeSelector.selectRandomNode(database);
+        }
 
-		return new PageRankModuleContext(nextNode);
-	}
+        Node nextNode = determineNextNode(currentNode, database);
+
+        int pageRankValue = (int) nextNode.getProperty(PAGE_RANK_PROPERTY_KEY, 0);
+        nextNode.setProperty(PAGE_RANK_PROPERTY_KEY, pageRankValue + 1);
+
+        return new NodeBasedContext(nextNode);
+    }
 
 	private Node determineNextNode(Node currentNode, GraphDatabaseService graphDatabaseService) {
 		Relationship chosenRelationship = this.relationshipChooser.chooseRelationship(currentNode);

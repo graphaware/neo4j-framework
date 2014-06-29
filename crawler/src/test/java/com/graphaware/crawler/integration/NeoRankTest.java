@@ -7,14 +7,7 @@ import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.ResourceIterable;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.helpers.Pair;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -58,7 +51,7 @@ public class NeoRankTest {
 		// first, we need a graph to crawl
 		try (Transaction transaction = this.database.beginTx()) {
 			Label personLabel = DynamicLabel.label("Person");
-			RelationshipType relationshipType = Relationships.CASUAL;
+            RelationshipType relationshipType = DynamicRelationshipType.withName("CAUSAL");
 
 			for (Pair<String, String> pairOfPeople : folks) {
 				Node person = findOrCreateNode(personLabel, pairOfPeople.first());

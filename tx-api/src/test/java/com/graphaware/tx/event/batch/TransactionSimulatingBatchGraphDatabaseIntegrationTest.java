@@ -1075,7 +1075,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
         populateDatabase();
 
         database.shutdown();
-        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(dir), 27);
+        database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(dir), 28);
 
         final AtomicInteger numberOfCommits = new AtomicInteger(0);
 

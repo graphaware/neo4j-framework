@@ -2,14 +2,15 @@ package com.graphaware.runtime.manager;
 
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.module.TxDrivenModule;
-import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link BaseTxDrivenModuleManager} backed by a {@link GraphDatabaseService}.
  */
 public class ProductionTxDrivenModuleManager extends BaseTxDrivenModuleManager<TxDrivenModule> {
-    private static final Logger LOG = Logger.getLogger(ProductionTxDrivenModuleManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ProductionTxDrivenModuleManager.class);
 
     private final GraphDatabaseService database;
 

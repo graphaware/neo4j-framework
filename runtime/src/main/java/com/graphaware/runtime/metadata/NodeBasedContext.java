@@ -20,6 +20,15 @@ public class NodeBasedContext implements TimerDrivenModuleContext<Node> {
     }
 
     /**
+     * Construct a new position.
+     *
+     * @param node the node. Must not be null.
+     */
+    public NodeBasedContext(Node node) {
+        this(node.getId());
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
