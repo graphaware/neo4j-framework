@@ -69,7 +69,7 @@ public class RotatingTaskScheduler implements TaskScheduler {
         }
 
         LOG.info("There are " + moduleContexts.size() + " timer-driven runtime modules. Scheduling the first task...");
-        scheduleNextTask(-2);
+        scheduleNextTask(-2); //-2 here is to indicate initial task, a bit of a hack for now to allow longer delay for the very first timer firing
     }
 
     /**
