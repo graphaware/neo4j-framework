@@ -14,7 +14,7 @@ public interface TimerDrivenModule<C extends TimerDrivenModuleContext> extends R
      * Create the initial context for this module, when no previously produced context is available.
      *
      * @param database against which the module is running.
-     * @return intial context.
+     * @return initial context.
      */
     C createInitialContext(GraphDatabaseService database);
 
