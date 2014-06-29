@@ -36,6 +36,28 @@ public interface RuntimeConfiguration {
     public static final Label GA_METADATA = DynamicLabel.label(GA_PREFIX + "METADATA");
 
     /**
+     * Prefix for property keys of properties storing {@link com.graphaware.runtime.metadata.TxDrivenModuleMetadata}.
+     */
+    public static final String TX_MODULES_PROPERTY_PREFIX = "TX_MODULE";
+
+    /**
+     * Prefix for property keys of properties storing {@link com.graphaware.runtime.metadata.TimerDrivenModuleMetadata}.
+     */
+    public static final String TIMER_MODULES_PROPERTY_PREFIX = "TIMER_MODULE";
+
+    /**
+     * Initial timer delay for timer driven module work after the runtime starts. This is temporary and will go away
+     * when adaptive timing is properly implemented.
+     */
+    public static final long INITIAL_TIMER_DELAY = 1000;
+
+    /**
+     * Timer delay for timer driven module work intervals. This is temporary and will go away
+     * when adaptive timing is properly implemented.
+     */
+    public static final long TIMER_DELAY = 200;
+
+    /**
      * Create prefix a component should use for internal data it reads/writes (nodes, relationships, properties).
      *
      * @param id of the component/module.

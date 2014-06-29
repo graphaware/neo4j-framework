@@ -22,7 +22,6 @@ import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.metadata.BatchSingleNodeMetadataRepository;
-import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.TxDrivenModule;
@@ -51,6 +50,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
+import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROPERTY_PREFIX;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.doThrow;
@@ -62,13 +62,13 @@ public class BatchInserterRuntimeTest extends GraphAwareRuntimeTest<BatchSupport
 
     private final TemporaryFolder temporaryFolder = new TemporaryFolder();
     private TransactionSimulatingBatchInserter batchInserter;
-    private ModuleMetadataRepository repository;
+    private ModuleMetadataRepository txRepo;
 
     @Before
     public void setUp() throws IOException {
         temporaryFolder.create();
         batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()), 1);
-        repository = new BatchSingleNodeMetadataRepository(batchInserter, DefaultRuntimeConfiguration.getInstance());
+        txRepo = new BatchSingleNodeMetadataRepository(batchInserter, DefaultRuntimeConfiguration.getInstance(), TX_MODULES_PROPERTY_PREFIX);
     }
 
     @After
@@ -136,8 +136,8 @@ public class BatchInserterRuntimeTest extends GraphAwareRuntimeTest<BatchSupport
     }
 
     @Override
-    protected ModuleMetadataRepository getRepository() {
-        return repository;
+    protected ModuleMetadataRepository getTxRepo() {
+        return txRepo;
     }
 
     @Override

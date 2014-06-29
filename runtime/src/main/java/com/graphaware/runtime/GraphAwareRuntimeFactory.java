@@ -12,6 +12,8 @@ import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.GraphDatabaseAPI;
 
+import static com.graphaware.runtime.config.RuntimeConfiguration.*;
+
 /**
  * Factory producing {@link GraphAwareRuntime}. This should be the only way a runtime is created.
  */
@@ -66,22 +68,23 @@ public final class GraphAwareRuntimeFactory {
      * @return runtime.
      */
     public static GraphAwareRuntime createRuntime(TransactionSimulatingBatchInserter batchInserter, RuntimeConfiguration configuration) {
-        ModuleMetadataRepository metadataRepository = new BatchSingleNodeMetadataRepository(batchInserter, configuration);
+        ModuleMetadataRepository metadataRepository = new BatchSingleNodeMetadataRepository(batchInserter, configuration, TX_MODULES_PROPERTY_PREFIX);
         TxDrivenModuleManager<BatchSupportingTxDrivenModule> manager = new BatchModuleManager(batchInserter, metadataRepository);
 
         return new BatchInserterRuntime(batchInserter, manager);
     }
 
     private static GraphAwareRuntime createProductionRuntime(GraphDatabaseService database, RuntimeConfiguration configuration) {
-        ModuleMetadataRepository repository = new ProductionSingleNodeMetadataRepository(database, configuration);
-        TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, repository);
-        TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, repository);
+        ModuleMetadataRepository timerRepo = new ProductionSingleNodeMetadataRepository(database, configuration, TIMER_MODULES_PROPERTY_PREFIX);
+        ModuleMetadataRepository txRepo = new ProductionSingleNodeMetadataRepository(database, configuration, TX_MODULES_PROPERTY_PREFIX);
+        TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo);
+        TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, txRepo);
 
         return new ProductionRuntime(database, txDrivenModuleManager, timerDrivenModuleManager);
     }
 
     private static GraphAwareRuntime createBatchRuntime(GraphDatabaseService database, RuntimeConfiguration configuration) {
-        ModuleMetadataRepository repository = new ProductionSingleNodeMetadataRepository(database, configuration);
+        ModuleMetadataRepository repository = new ProductionSingleNodeMetadataRepository(database, configuration, TX_MODULES_PROPERTY_PREFIX);
         TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, repository);
 
         return new DatabaseRuntime(database, txDrivenModuleManager);

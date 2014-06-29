@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
 public abstract class DatabaseRuntimeTest extends GraphAwareRuntimeTest {
 
     protected GraphDatabaseService database;
-    protected ModuleMetadataRepository repository;
+    protected ModuleMetadataRepository txRepo;
 
     protected abstract Node getMetadataNode();
 
@@ -84,8 +84,8 @@ public abstract class DatabaseRuntimeTest extends GraphAwareRuntimeTest {
     }
 
     @Override
-    protected ModuleMetadataRepository getRepository() {
-        return repository;
+    protected ModuleMetadataRepository getTxRepo() {
+        return txRepo;
     }
 
     @Override

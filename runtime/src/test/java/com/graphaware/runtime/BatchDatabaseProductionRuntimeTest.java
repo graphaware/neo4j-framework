@@ -33,6 +33,7 @@ import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
 import java.io.IOException;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
+import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROPERTY_PREFIX;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -49,7 +50,7 @@ public class BatchDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
     public void setUp() throws IOException {
         temporaryFolder.create();
         database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()), 1);
-        repository = new ProductionSingleNodeMetadataRepository(database, DefaultRuntimeConfiguration.getInstance());
+        txRepo = new ProductionSingleNodeMetadataRepository(database, DefaultRuntimeConfiguration.getInstance(), TX_MODULES_PROPERTY_PREFIX);
     }
 
     @After

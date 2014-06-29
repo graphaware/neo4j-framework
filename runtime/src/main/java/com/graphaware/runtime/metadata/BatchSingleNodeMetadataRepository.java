@@ -22,11 +22,12 @@ public class BatchSingleNodeMetadataRepository extends SingleNodeMetadataReposit
     /**
      * Create a new repository.
      *
-     * @param batchInserter to back the repository.
-     * @param configuration of the runtime.
+     * @param batchInserter  to back the repository.
+     * @param configuration  of the runtime.
+     * @param propertyPrefix String with which the property keys of properties written by this repository will be prefixed.
      */
-    public BatchSingleNodeMetadataRepository(TransactionSimulatingBatchInserter batchInserter, RuntimeConfiguration configuration) {
-        super(configuration);
+    public BatchSingleNodeMetadataRepository(TransactionSimulatingBatchInserter batchInserter, RuntimeConfiguration configuration, String propertyPrefix) {
+        super(configuration, propertyPrefix);
         this.batchInserter = batchInserter;
     }
 

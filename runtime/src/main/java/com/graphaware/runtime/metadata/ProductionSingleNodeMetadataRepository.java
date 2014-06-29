@@ -24,11 +24,12 @@ public class ProductionSingleNodeMetadataRepository extends SingleNodeMetadataRe
     /**
      * Create a new repository.
      *
-     * @param database      to back the repository.
-     * @param configuration of the runtime.
+     * @param database       to back the repository.
+     * @param configuration  of the runtime.
+     * @param propertyPrefix String with which the property keys of properties written by this repository will be prefixed.
      */
-    public ProductionSingleNodeMetadataRepository(GraphDatabaseService database, RuntimeConfiguration configuration) {
-        super(configuration);
+    public ProductionSingleNodeMetadataRepository(GraphDatabaseService database, RuntimeConfiguration configuration, String propertyPrefix) {
+        super(configuration, propertyPrefix);
         this.database = database;
     }
 

@@ -20,23 +20,23 @@ import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
  * {@link ModuleMetadataRepository} that stores all {@link ModuleMetadata} on a single Neo4j {@link Node}. Each module's
  * metadata is stored serialized into a byte array as the value of a property, keyed by a key built by
  * {@link RuntimeConfiguration#createPrefix(String)} + {@link com.graphaware.runtime.module.RuntimeModule#getId()}, where
- * the argument passed to {@link RuntimeConfiguration#createPrefix(String)} is {@link #RUNTIME}.
+ * the argument passed to {@link RuntimeConfiguration#createPrefix(String)} is provided by the constructor of this class.
  */
 public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepository {
 
     private static final Logger LOG = Logger.getLogger(SingleNodeMetadataRepository.class);
 
-    public static final String RUNTIME = "RUNTIME";
+    private final String propertyPrefix;
 
-    private final RuntimeConfiguration configuration;
 
     /**
      * Create a new repository.
      *
-     * @param configuration runtime configuration.
+     * @param configuration  runtime configuration.
+     * @param propertyPrefix String with which the property keys of properties written by this repository will be prefixed.
      */
-    protected SingleNodeMetadataRepository(RuntimeConfiguration configuration) {
-        this.configuration = configuration;
+    protected SingleNodeMetadataRepository(RuntimeConfiguration configuration, String propertyPrefix) {
+        this.propertyPrefix = configuration.createPrefix(propertyPrefix);
     }
 
     /**
@@ -55,7 +55,7 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
      * {@inheritDoc}
      */
     @Override
-    public <M extends ModuleMetadata, T extends RuntimeModule> M getModuleMetadata(T module) {
+    public <M extends ModuleMetadata> M getModuleMetadata(RuntimeModule module) {
         Map<String, Object> internalProperties = getInternalProperties(getOrMetadataNode());
         final String key = moduleKey(module);
 
@@ -78,7 +78,7 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
      * {@inheritDoc}
      */
     @Override
-    public <M extends ModuleMetadata, T extends RuntimeModule> void persistModuleMetadata(T module, M metadata) {
+    public <M extends ModuleMetadata> void persistModuleMetadata(RuntimeModule module, M metadata) {
         getOrMetadataNode().setProperty(moduleKey(module), Serializer.toByteArray(metadata));
     }
 
@@ -87,10 +87,9 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
      */
     @Override
     public Set<String> getAllModuleIds() {
-        String prefix = configuration.createPrefix(RUNTIME);
         Set<String> result = new HashSet<>();
         for (String key : getInternalProperties(getOrMetadataNode()).keySet()) {
-            result.add(key.replace(prefix, ""));
+            result.add(key.replace(propertyPrefix, ""));
         }
         return result;
     }
@@ -111,7 +110,7 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
     protected abstract Node getOrMetadataNode();
 
     /**
-     * Get properties starting with {@link com.graphaware.runtime.config.RuntimeConfiguration#GA_PREFIX} + {@link #RUNTIME} from a node.
+     * Get properties starting with {@link #propertyPrefix} from a node.
      *
      * @param node to get properties from.
      * @return map of properties (key-value).
@@ -120,7 +119,7 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
         return PropertyContainerUtils.propertiesToMap(node, new InclusionStrategy<String>() {
             @Override
             public boolean include(String s) {
-                return s.startsWith(configuration.createPrefix(RUNTIME));
+                return s.startsWith(propertyPrefix);
             }
         });
     }
@@ -142,6 +141,6 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
      * @return module key.
      */
     protected final String moduleKey(String moduleId) {
-        return configuration.createPrefix(RUNTIME) + moduleId;
+        return propertyPrefix + moduleId;
     }
 }
