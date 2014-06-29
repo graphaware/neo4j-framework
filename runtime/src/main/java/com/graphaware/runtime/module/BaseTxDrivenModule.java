@@ -8,22 +8,17 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 
 /**
- *  Base class for {@link TxDrivenModule} implementations.
+ * Base class for {@link TxDrivenModule} implementations.
  */
-public abstract class BaseTxDrivenModule implements TxDrivenModule<DefaultTxDrivenModuleMetadata> {
-
-    private final String moduleId;
-
-    protected BaseTxDrivenModule(String moduleId) {
-        this.moduleId = moduleId;
-    }
+public abstract class BaseTxDrivenModule extends BaseRuntimeModule<DefaultTxDrivenModuleMetadata> implements TxDrivenModule<DefaultTxDrivenModuleMetadata> {
 
     /**
-     * {@inheritDoc}
+     * Construct a new module.
+     *
+     * @param moduleId ID of this module.
      */
-    @Override
-    public String getId() {
-        return moduleId;
+    protected BaseTxDrivenModule(String moduleId) {
+        super(moduleId);
     }
 
     /**
