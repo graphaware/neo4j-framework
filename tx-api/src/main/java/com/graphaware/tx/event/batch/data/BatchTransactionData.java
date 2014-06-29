@@ -89,18 +89,19 @@ public class BatchTransactionData implements TransactionData {
 
         commitInProgress = true;
 
-        for (TransactionEventHandler handler : transactionEventHandlers) {
-            try {
-                Object result = handler.beforeCommit(this);
-                handler.afterCommit(this, result);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+        try {
+            for (TransactionEventHandler handler : transactionEventHandlers) {
+                try {
+                    Object result = handler.beforeCommit(this);
+                    handler.afterCommit(this, result);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
+        } finally {
+            clear();
+            commitInProgress = false;
         }
-
-        clear();
-
-        commitInProgress = false;
     }
 
     private boolean noChangesOccurred() {

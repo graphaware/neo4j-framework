@@ -13,7 +13,7 @@ import com.graphaware.runtime.module.RuntimeModule;
 /**
  * Base-class for {@link ModuleManager} implementations.
  */
-public abstract class BaseModuleManager<M extends ModuleMetadata, T extends RuntimeModule<? extends M>> implements ModuleManager<T> {
+public abstract class BaseModuleManager<M extends ModuleMetadata, T extends RuntimeModule> implements ModuleManager<T> {
 
     private static final Logger LOG = Logger.getLogger(BaseModuleManager.class);
 

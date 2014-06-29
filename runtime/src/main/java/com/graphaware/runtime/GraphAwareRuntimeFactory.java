@@ -6,7 +6,6 @@ import com.graphaware.runtime.manager.*;
 import com.graphaware.runtime.metadata.BatchSingleNodeMetadataRepository;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
-import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -36,7 +35,7 @@ public final class GraphAwareRuntimeFactory {
         ModuleMetadataRepository metadataRepository = new BatchSingleNodeMetadataRepository(batchInserter, configuration);
         TxDrivenModuleManager manager = new BatchModuleManager(batchInserter, metadataRepository);
 
-        return new BatchInserterBackedRuntime(batchInserter, manager);
+        return new BatchInserterRuntime(batchInserter, manager);
     }
 
     private GraphAwareRuntimeFactory() {

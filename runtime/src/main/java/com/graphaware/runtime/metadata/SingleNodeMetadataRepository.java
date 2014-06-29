@@ -55,7 +55,7 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
      * {@inheritDoc}
      */
     @Override
-    public <M extends ModuleMetadata, T extends RuntimeModule<? extends M>> M getModuleMetadata(T module) {
+    public <M extends ModuleMetadata, T extends RuntimeModule> M getModuleMetadata(T module) {
         Map<String, Object> internalProperties = getInternalProperties(getOrMetadataNode());
         final String key = moduleKey(module);
 
@@ -66,7 +66,7 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
                 return null;
             }
 
-            return Serializer.fromByteArray(serializedMetadata, module.getMetadataClass());
+            return Serializer.fromByteArray(serializedMetadata);
         } catch (Exception e) {
             removeModuleMetadata(module.getId());
             LOG.error("Could not deserialize metadata for module ID " + module.getId());
@@ -78,7 +78,7 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
      * {@inheritDoc}
      */
     @Override
-    public <M extends ModuleMetadata, T extends RuntimeModule<? extends M>> void persistModuleMetadata(T module, M metadata) {
+    public <M extends ModuleMetadata, T extends RuntimeModule> void persistModuleMetadata(T module, M metadata) {
         getOrMetadataNode().setProperty(moduleKey(module), Serializer.toByteArray(metadata));
     }
 

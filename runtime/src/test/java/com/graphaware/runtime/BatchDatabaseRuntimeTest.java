@@ -19,6 +19,9 @@ package com.graphaware.runtime;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
 import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
+import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
+import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +34,10 @@ import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
 import java.io.IOException;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 
 /**
  * Unit test for {@link ProductionRuntime} used with batch graph database.
@@ -63,6 +70,24 @@ public class BatchDatabaseRuntimeTest extends DatabaseBackedRuntimeTest {
         runtime.start();
 
         getRuntimeRoot().delete();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void moduleThrowingExceptionShouldFailTheImport() {
+        TxDrivenModule mockModule = mockTxModule(MOCK);
+        doThrow(new DeliberateTransactionRollbackException("Deliberate testing exception")).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule);
+        runtime.start();
+
+        try (Transaction tx = getTransaction()) {
+            Node node = createNode();
+            node.setProperty("test", "test");
+            tx.success();
+        }
+
+        fail();
     }
 
     protected Node getRuntimeRoot() {

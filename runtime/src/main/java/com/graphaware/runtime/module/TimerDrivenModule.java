@@ -7,7 +7,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
  * Specialisation of {@link RuntimeModule} that can be driven by a timing strategy as opposed to a response to transaction
  * events.
  */
-public interface TimerDrivenModule<M extends TimerDrivenModuleMetadata<?>> extends RuntimeModule<M> {
+public interface TimerDrivenModule<M extends TimerDrivenModuleMetadata> extends RuntimeModule {
 
     /**
      * Create the first metadata for this module, when no previously produced metadata is available.

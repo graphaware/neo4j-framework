@@ -19,6 +19,9 @@ package com.graphaware.runtime;
 import com.graphaware.common.util.FakeTransaction;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.BatchSupportingTxDrivenModule;
+import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.runtime.module.TimerDrivenModule;
+import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import org.neo4j.graphdb.Transaction;
 
@@ -26,14 +29,24 @@ import org.neo4j.graphdb.Transaction;
 /**
  * {@link GraphAwareRuntime} that operates on a {@link org.neo4j.unsafe.batchinsert.BatchInserter}
  * (or more precisely {@link TransactionSimulatingBatchInserter}) rather than {@link org.neo4j.graphdb.GraphDatabaseService}.
+ * <p/>
+ * Only supports {@link com.graphaware.runtime.module.TxDrivenModule}, <b>does not support</b> {@link com.graphaware.runtime.module.TimerDrivenModule}s.
  *
  * @see BaseGraphAwareRuntime
  * @see org.neo4j.unsafe.batchinsert.BatchInserter - same limitations apply.
  */
-public class BatchInserterBackedRuntime extends TxDrivenRuntime<BatchSupportingTxDrivenModule> {
+public class BatchInserterRuntime extends TxDrivenRuntime<BatchSupportingTxDrivenModule> {
 
-    protected BatchInserterBackedRuntime(TransactionSimulatingBatchInserter batchInserter, TxDrivenModuleManager<BatchSupportingTxDrivenModule> txDrivenModuleManager) {
-        super(txDrivenModuleManager);
+    private final TxDrivenModuleManager<BatchSupportingTxDrivenModule> txDrivenModuleManager;
+
+    /**
+     * Construct a new runtime. This method is protected, please use {@link GraphAwareRuntimeFactory}.
+     *
+     * @param batchInserter         against which this runtime runs.
+     * @param txDrivenModuleManager module manager.
+     */
+    protected BatchInserterRuntime(TransactionSimulatingBatchInserter batchInserter, TxDrivenModuleManager<BatchSupportingTxDrivenModule> txDrivenModuleManager) {
+        this.txDrivenModuleManager = txDrivenModuleManager;
         batchInserter.registerTransactionEventHandler(this);
         batchInserter.registerKernelEventHandler(this);
     }
@@ -42,8 +55,18 @@ public class BatchInserterBackedRuntime extends TxDrivenRuntime<BatchSupportingT
      * {@inheritDoc}
      */
     @Override
-    protected Class<BatchSupportingTxDrivenModule> supportedModule() {
-        return BatchSupportingTxDrivenModule.class;
+    protected TxDrivenModuleManager<BatchSupportingTxDrivenModule> getTxDrivenModuleManager() {
+        return txDrivenModuleManager;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void doRegisterModule(RuntimeModule module) {
+        if (module instanceof BatchSupportingTxDrivenModule) {
+            txDrivenModuleManager.registerModule((BatchSupportingTxDrivenModule) module);
+        }
     }
 
     /**

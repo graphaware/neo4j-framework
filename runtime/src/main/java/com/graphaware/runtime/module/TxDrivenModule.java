@@ -25,13 +25,13 @@ import org.neo4j.graphdb.GraphDatabaseService;
 /**
  * A {@link RuntimeModule} module performing some useful work based on about-to-be-committed transaction data.
  */
-public interface TxDrivenModule<M extends TxDrivenModuleMetadata> extends RuntimeModule<M> {
+public interface TxDrivenModule extends RuntimeModule {
 
     /**
      * Perform the core business logic of this module before a transaction commits.
      *
      * @param transactionData data about the soon-to-be-committed transaction. It is already filtered based on {@link #getConfiguration()}.
-     * @throws com.graphaware.runtime.NeedsInitializationException
+     * @throws NeedsInitializationException
      *          if it detects data is out of sync. {@link #initialize(org.neo4j.graphdb.GraphDatabaseService)}  will be called next
      *          time the {@link com.graphaware.runtime.GraphAwareRuntime} is started. Until then, the module
      *          should perform on best-effort basis.

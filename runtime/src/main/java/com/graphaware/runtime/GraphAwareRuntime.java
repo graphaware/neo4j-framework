@@ -20,7 +20,7 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
  * be forced to (re-)initialize, which can lead to very long
  * startup times, as (re-)initialization could be a global graph operation. Re-initialization will also be automatically
  * performed for all modules, for which it has been detected that something is out-of-sync
- * (module threw a {@link NeedsInitializationException}).
+ * (module threw a {@link com.graphaware.runtime.module.NeedsInitializationException}).
  * <p/>
  * The runtime might use special nodes for internal data storage and prevent the deletion of those nodes.
  */

@@ -8,7 +8,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 /**
  * {@link BaseTxDrivenModuleManager} backed by a {@link GraphDatabaseService}.
  */
-public class ProductionTxDrivenModuleManager extends BaseTxDrivenModuleManager<TxDrivenModule<?>> {
+public class ProductionTxDrivenModuleManager extends BaseTxDrivenModuleManager<TxDrivenModule> {
     private static final Logger LOG = Logger.getLogger(ProductionTxDrivenModuleManager.class);
 
     private final GraphDatabaseService database;

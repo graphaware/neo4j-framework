@@ -1,6 +1,7 @@
 package com.graphaware.runtime.manager;
 
-import com.graphaware.runtime.NeedsInitializationException;
+import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
+import com.graphaware.runtime.module.NeedsInitializationException;
 import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
@@ -15,7 +16,7 @@ import java.util.Date;
 /**
  * {@link BaseModuleManager} for {@link TxDrivenModule}s.
  */
-public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule<?>> extends BaseModuleManager<TxDrivenModuleMetadata, T> implements TxDrivenModuleManager<T> {
+public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extends BaseModuleManager<TxDrivenModuleMetadata, T> implements TxDrivenModuleManager<T> {
 
     private static final Logger LOG = Logger.getLogger(BaseTxDrivenModuleManager.class);
 
@@ -130,9 +131,11 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule<?>> ext
                 LOG.warn("Module " + module.getId() + " seems to have a problem and will be re-initialized next time the database is started. ");
                 TxDrivenModuleMetadata moduleMetadata = metadataRepository.getModuleMetadata(module);
                 metadataRepository.persistModuleMetadata(module, moduleMetadata.markedNeedingInitialization());
-            } catch (RuntimeException e) {
-                LOG.info("Module " + module.getId() + " threw an exception", e);
+            } catch (DeliberateTransactionRollbackException e) {
+                LOG.debug("Module " + module.getId() + " threw an exception indicating that the transaction should be rolled back.", e);
                 throw e;
+            } catch (RuntimeException e) {
+                LOG.warn("Module " + module.getId() + " threw an exception", e);
             }
         }
     }

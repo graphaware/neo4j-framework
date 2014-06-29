@@ -1,5 +1,6 @@
 package com.graphaware.runtime.schedule;
 
+import com.graphaware.common.util.Pair;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TimerDrivenModuleMetadata;
 import com.graphaware.runtime.module.TimerDrivenModule;
@@ -129,9 +130,9 @@ public class RotatingTaskScheduler implements TaskScheduler {
      * @param <T> module type of the module that will be delegated to.
      */
     private <M extends TimerDrivenModuleMetadata, T extends TimerDrivenModule<M>> void runNextTask() {
-        Map.Entry<T, M> moduleAndMetadata = nextModuleAndMetadata();
-        T module = moduleAndMetadata.getKey();
-        M metadata = moduleAndMetadata.getValue();
+        Pair<T, M> moduleAndMetadata = nextModuleAndMetadata();
+        T module = moduleAndMetadata.first();
+        M metadata = moduleAndMetadata.second();
 
         try (Transaction tx = database.beginTx()) {
             M newMetadata = module.doSomeWork(metadata, database);
@@ -148,13 +149,14 @@ public class RotatingTaskScheduler implements TaskScheduler {
      * @param <T> module type.
      * @return module & metadata as a {@link Map.Entry}
      */
-    private <M extends TimerDrivenModuleMetadata, T extends TimerDrivenModule<M>> Map.Entry<T, M> nextModuleAndMetadata() {
+    private <M extends TimerDrivenModuleMetadata, T extends TimerDrivenModule<M>> Pair<T, M> nextModuleAndMetadata() {
         if (moduleMetadataIterator == null || !moduleMetadataIterator.hasNext()) {
             moduleMetadataIterator = moduleMetadata.entrySet().iterator();
         }
 
-        //this class controls the insertion to the map and it is type-safe.
+        Map.Entry<TimerDrivenModule, TimerDrivenModuleMetadata> entry = moduleMetadataIterator.next();
+
         //noinspection unchecked
-        return (Map.Entry<T, M>) moduleMetadataIterator.next();
+        return new Pair<>((T) entry.getKey(), (M) entry.getValue());
     }
 }

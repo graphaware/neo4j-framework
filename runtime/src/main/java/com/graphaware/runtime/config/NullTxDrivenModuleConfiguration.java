@@ -10,7 +10,7 @@ import com.graphaware.common.strategy.InclusionStrategies;
 public final class NullTxDrivenModuleConfiguration implements TxDrivenModuleConfiguration {
 
     static {
-        Serializer.register(NullTxDrivenModuleConfiguration.class, new SingletonSerializer());
+       Serializer.register(NullTxDrivenModuleConfiguration.class, new SingletonSerializer(), 1000);
     }
 
     private static final TxDrivenModuleConfiguration INSTANCE = new NullTxDrivenModuleConfiguration();

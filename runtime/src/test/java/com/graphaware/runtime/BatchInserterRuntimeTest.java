@@ -24,11 +24,13 @@ import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.metadata.BatchSingleNodeMetadataRepository;
 import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
+import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.runtime.module.BatchSupportingTxDrivenModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserterImpl;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
+import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
 import org.junit.After;
@@ -49,13 +51,12 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
 
 /**
- * Unit test for {@link BatchInserterBackedRuntime}.
+ * Unit test for {@link BatchInserterRuntime}.
  */
 public class BatchInserterRuntimeTest extends GraphAwareRuntimeTest<BatchSupportingTxDrivenModule> {
 
@@ -106,7 +107,6 @@ public class BatchInserterRuntimeTest extends GraphAwareRuntimeTest<BatchSupport
         BatchSupportingTxDrivenModule mockModule = mock(BatchSupportingTxDrivenModule.class);
         when(mockModule.getId()).thenReturn(id);
         when(mockModule.getConfiguration()).thenReturn(configuration);
-        when(mockModule.getMetadataClass()).thenReturn(DefaultTxDrivenModuleMetadata.class);
         return mockModule;
     }
 
@@ -174,5 +174,23 @@ public class BatchInserterRuntimeTest extends GraphAwareRuntimeTest<BatchSupport
 
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void moduleThrowingExceptionShouldFailTheImport() {
+        TxDrivenModule mockModule = mockTxModule(MOCK);
+        doThrow(new DeliberateTransactionRollbackException("Deliberate testing exception")).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule);
+        runtime.start();
+
+        try (Transaction tx = getTransaction()) {
+            Node node = createNode();
+            node.setProperty("test", "test");
+            tx.success();
+        }
+
+        fail();
     }
 }

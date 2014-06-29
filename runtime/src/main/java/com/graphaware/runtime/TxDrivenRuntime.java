@@ -35,34 +35,12 @@ import java.util.Set;
  */
 public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGraphAwareRuntime implements TransactionEventHandler<Void> {
 
-    private final TxDrivenModuleManager<T> txDrivenModuleManager;
-
     /**
-     * Create a new instance of the runtime with {@link com.graphaware.runtime.config.DefaultRuntimeConfiguration}.
+     * Get the manager for {@link TxDrivenModule}s.
      *
-     * @param txDrivenModuleManager manager for transaction-driven modules.
+     * @return module manager.
      */
-    protected TxDrivenRuntime(TxDrivenModuleManager<T> txDrivenModuleManager) {
-        this.txDrivenModuleManager = txDrivenModuleManager;
-    }
-
-    /**
-     * Get the type of modules that this runtime supports, i.e. the modules that it lets register with itself.
-     *
-     * @return supported modules type.
-     */
-    protected abstract Class<T> supportedModule();
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void doRegisterModule(RuntimeModule module) {
-        if (supportedModule().isAssignableFrom(module.getClass())) {
-            //noinspection unchecked
-            txDrivenModuleManager.registerModule((T) module);
-        }
-    }
+    protected abstract TxDrivenModuleManager<T> getTxDrivenModuleManager();
 
     /**
      * {@inheritDoc}
@@ -73,9 +51,9 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
             return null;
         }
 
-        txDrivenModuleManager.throwExceptionIfIllegal(data);
+        getTxDrivenModuleManager().throwExceptionIfIllegal(data);
 
-        txDrivenModuleManager.beforeCommit(new LazyTransactionData(data));
+        getTxDrivenModuleManager().beforeCommit(new LazyTransactionData(data));
 
         return null;
     }
@@ -101,7 +79,7 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      */
     @Override
     protected Set<String> loadMetadata() {
-        return txDrivenModuleManager.loadMetadata();
+        return getTxDrivenModuleManager().loadMetadata();
     }
 
     /**
@@ -109,7 +87,7 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      */
     @Override
     protected void cleanupMetadata(Set<String> usedModules) {
-        txDrivenModuleManager.cleanupMetadata(usedModules);
+        getTxDrivenModuleManager().cleanupMetadata(usedModules);
     }
 
     /**
@@ -117,6 +95,6 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      */
     @Override
     protected void shutdownModules() {
-        txDrivenModuleManager.shutdownModules();
+        getTxDrivenModuleManager().shutdownModules();
     }
 }

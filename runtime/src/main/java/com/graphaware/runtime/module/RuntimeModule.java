@@ -16,14 +16,10 @@
 
 package com.graphaware.runtime.module;
 
-import com.graphaware.runtime.metadata.ModuleMetadata;
-
 /**
  * A module performing some useful work on the graph in the background, being delegated to by {@link com.graphaware.runtime.GraphAwareRuntime}.
- *
- * @param <M> type of metadata this module needs.
  */
-public interface RuntimeModule<M extends ModuleMetadata> {
+public interface RuntimeModule {
 
     /**
      * Get a human-readable (ideally short) ID of this module. This ID must be unique across all {@link RuntimeModule}s
@@ -37,12 +33,4 @@ public interface RuntimeModule<M extends ModuleMetadata> {
      * Perform cleanup if needed before database shutdown.
      */
     void shutdown();
-
-    /**
-     * Get the concrete class used to hold metadata for this module. This is needed so that the framework knows, which
-     * class has been serialized / needs to be deserialized.
-     *
-     * @return class holding module metadata.
-     */
-    Class<M> getMetadataClass();
 }

@@ -1,13 +1,11 @@
 package com.graphaware.runtime.module;
 
-import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
-import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 
 /**
  * {@link TxDrivenModule} that can be backed by a {@link TransactionSimulatingBatchInserter} (on top of {@link org.neo4j.graphdb.GraphDatabaseService}).
  */
-public interface BatchSupportingTxDrivenModule<M extends TxDrivenModuleMetadata> extends TxDrivenModule<M> {
+public interface BatchSupportingTxDrivenModule extends TxDrivenModule {
 
     /**
      * Initialize this module. This method must bring the module to a state equivalent to a state of the same module that

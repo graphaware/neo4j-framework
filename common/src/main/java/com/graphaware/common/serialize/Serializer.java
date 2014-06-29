@@ -27,6 +27,7 @@ import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.objenesis.strategy.StdInstantiatorStrategy;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -81,6 +82,10 @@ public final class Serializer {
         kryo.register(type, serializer);
     }
 
+    public static void register(Class type, com.esotericsoftware.kryo.Serializer serializer, int id) {
+        kryo.register(type, serializer, id);
+    }
+
     /**
      * Serialize an object to byte array.
      *
@@ -90,7 +95,7 @@ public final class Serializer {
     public static byte[] toByteArray(Object object) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         Output output = new Output(stream);
-        kryo.writeObject(output, object);
+        kryo.writeClassAndObject(output, object);
         output.flush();
         output.close();
 
@@ -111,21 +116,19 @@ public final class Serializer {
      * Read an object from byte array.
      *
      * @param array to read from.
-     * @param clazz to return.
      * @return de-serialized object.
      */
-    public static <T> T fromByteArray(byte[] array, Class<? extends T> clazz) {
-        return kryo.readObject(new Input(array), clazz);
+    public static <T> T fromByteArray(byte[] array) {
+        return (T) kryo.readClassAndObject(new Input(array));
     }
 
     /**
      * Read an object from String.
      *
      * @param string to read from.
-     * @param clazz  to return.
      * @return de-serialized object.
      */
-    public static <T> T fromString(String string, Class<T> clazz, String prefix) {
-        return fromByteArray(Base64.decode(string.substring(prefix.length())), clazz);
+    public static <T> T fromString(String string, String prefix) {
+        return fromByteArray(Base64.decode(string.substring(prefix.length())));
     }
 }

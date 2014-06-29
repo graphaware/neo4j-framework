@@ -1,6 +1,7 @@
 package com.graphaware.runtime.manager;
 
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
+import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.runtime.module.BatchSupportingTxDrivenModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 
@@ -9,7 +10,7 @@ import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
  * <p/>
  * Only supports {@link BatchSupportingTxDrivenModule}s.
  */
-public class BatchModuleManager extends BaseTxDrivenModuleManager<BatchSupportingTxDrivenModule<?>> {
+public class BatchModuleManager extends BaseTxDrivenModuleManager<BatchSupportingTxDrivenModule> {
 
     private final TransactionSimulatingBatchInserter batchInserter;
 

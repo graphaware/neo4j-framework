@@ -10,7 +10,7 @@ import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 /**
  * Base class for {@link TxDrivenModule} implementations.
  */
-public abstract class BaseTxDrivenModule extends BaseRuntimeModule<DefaultTxDrivenModuleMetadata> implements TxDrivenModule<DefaultTxDrivenModuleMetadata> {
+public abstract class BaseTxDrivenModule extends BaseRuntimeModule implements TxDrivenModule {
 
     /**
      * Construct a new module.
@@ -58,13 +58,5 @@ public abstract class BaseTxDrivenModule extends BaseRuntimeModule<DefaultTxDriv
     @Override
     public void shutdown() {
         //to be overridden
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Class<DefaultTxDrivenModuleMetadata> getMetadataClass() {
-        return DefaultTxDrivenModuleMetadata.class;
     }
 }

@@ -19,6 +19,9 @@ package com.graphaware.runtime;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
 import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
+import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
+import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +34,8 @@ import java.util.Iterator;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
@@ -58,6 +63,26 @@ public class RealDatabaseRuntimeTest extends DatabaseBackedRuntimeTest {
             getRuntimeRoot().delete();
             tx.success();
         }
+    }
+
+    @Test
+    public void moduleThrowingExceptionShouldRollbackTransaction() {
+        TxDrivenModule mockModule = mockTxModule(MOCK);
+        doThrow(new DeliberateTransactionRollbackException("Deliberate testing exception")).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule);
+        runtime.start();
+
+        try (Transaction tx = getTransaction()) {
+            Node node = createNode();
+            node.setProperty("test", "test");
+            tx.success();
+        } catch (Exception e) {
+            //ok
+        }
+
+        assertEquals(1, countNodes()); //just the node for storing metadata
     }
 
     protected Node getRuntimeRoot() {

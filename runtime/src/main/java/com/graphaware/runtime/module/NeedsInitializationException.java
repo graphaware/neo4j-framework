@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime;
+package com.graphaware.runtime.module;
 
 /**
  * {@link RuntimeException} indicating a {@link com.graphaware.runtime.module.TxDrivenModule} needs to be (re-)initialized.

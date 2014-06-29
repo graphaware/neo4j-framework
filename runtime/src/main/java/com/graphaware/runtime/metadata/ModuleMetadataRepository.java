@@ -29,7 +29,7 @@ public interface ModuleMetadataRepository {
      * @return module metadata, null if no such metadata exists. This happens, for example, when a module has never been
      *         registered and/or run before.
      */
-    <M extends ModuleMetadata, T extends RuntimeModule<? extends M>> M getModuleMetadata(T module);
+    <M extends ModuleMetadata, T extends RuntimeModule> M getModuleMetadata(T module);
 
     /**
      * Persist metadata of a module.
@@ -39,7 +39,7 @@ public interface ModuleMetadataRepository {
      * @param <M>      type of the metadata.
      * @param <T>      type of the module.
      */
-    <M extends ModuleMetadata, T extends RuntimeModule<? extends M>> void persistModuleMetadata(T module, M metadata);
+    <M extends ModuleMetadata, T extends RuntimeModule> void persistModuleMetadata(T module, M metadata);
 
     /**
      * Get IDs of all modules, for which metadata has been persisted by this repository.

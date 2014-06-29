@@ -1,13 +1,10 @@
 package com.graphaware.runtime.module;
 
-import com.graphaware.runtime.metadata.ModuleMetadata;
-
 /**
  * Base class for {@link com.graphaware.runtime.module.RuntimeModule} implementations.
  *
- * @param <M> type of metadata this module needs.
  */
-public abstract class BaseRuntimeModule<M extends ModuleMetadata> implements RuntimeModule<M> {
+public abstract class BaseRuntimeModule implements RuntimeModule {
 
     private final String moduleId;
 
