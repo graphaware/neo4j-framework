@@ -1,4 +1,4 @@
-package com.graphaware.runtime.timer;
+package com.graphaware.runtime.schedule;
 
 /**
  * {@link TimingStrategy} that causes tasks to be scheduled in regular intervals.

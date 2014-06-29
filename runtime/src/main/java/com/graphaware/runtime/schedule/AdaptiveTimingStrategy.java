@@ -1,4 +1,4 @@
-package com.graphaware.runtime.timer;
+package com.graphaware.runtime.schedule;
 
 import com.graphaware.runtime.monitor.TransactionMonitor;
 

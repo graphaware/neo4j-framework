@@ -17,9 +17,8 @@
 package com.graphaware.runtime;
 
 import com.graphaware.common.util.FakeTransaction;
-import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
-import com.graphaware.runtime.strategy.BatchSupportingTxDrivenModule;
+import com.graphaware.runtime.module.BatchSupportingTxDrivenModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import org.neo4j.graphdb.Transaction;
 

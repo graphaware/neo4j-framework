@@ -1,8 +1,7 @@
 package com.graphaware.runtime.manager;
 
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
-import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
-import com.graphaware.runtime.strategy.BatchSupportingTxDrivenModule;
+import com.graphaware.runtime.module.BatchSupportingTxDrivenModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 
 /**

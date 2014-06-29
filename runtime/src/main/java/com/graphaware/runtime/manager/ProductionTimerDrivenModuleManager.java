@@ -5,7 +5,7 @@ import com.graphaware.runtime.metadata.TimerDrivenModuleMetadata;
 import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.schedule.RotatingTaskScheduler;
 import com.graphaware.runtime.schedule.TaskScheduler;
-import com.graphaware.runtime.timer.FixedDelayTimingStrategy;
+import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
