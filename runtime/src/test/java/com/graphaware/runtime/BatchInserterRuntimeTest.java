@@ -21,7 +21,7 @@ import com.graphaware.common.util.IterableUtils;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
-import com.graphaware.runtime.metadata.BatchSingleNodeModuleMetadataRepository;
+import com.graphaware.runtime.metadata.BatchSingleNodeMetadataRepository;
 import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.module.TxDrivenModule;
@@ -67,7 +67,7 @@ public class BatchInserterRuntimeTest extends GraphAwareRuntimeTest<BatchSupport
     public void setUp() throws IOException {
         temporaryFolder.create();
         batchInserter = new TransactionSimulatingBatchInserterImpl(BatchInserters.inserter(temporaryFolder.getRoot().getAbsolutePath()), 1);
-        repository = new BatchSingleNodeModuleMetadataRepository(batchInserter, DefaultRuntimeConfiguration.getInstance());
+        repository = new BatchSingleNodeMetadataRepository(batchInserter, DefaultRuntimeConfiguration.getInstance());
     }
 
     @After

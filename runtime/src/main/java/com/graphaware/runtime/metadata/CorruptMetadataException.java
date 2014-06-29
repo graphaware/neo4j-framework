@@ -1,7 +1,7 @@
 package com.graphaware.runtime.metadata;
 
 /**
- *
+ * Exception indicating a problem with de-serializing {@link ModuleMetadata}.
  */
 public class CorruptMetadataException extends RuntimeException {
 

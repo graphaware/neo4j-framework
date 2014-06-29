@@ -3,9 +3,10 @@ package com.graphaware.runtime;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.*;
-import com.graphaware.runtime.metadata.BatchSingleNodeModuleMetadataRepository;
+import com.graphaware.runtime.metadata.BatchSingleNodeMetadataRepository;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
-import com.graphaware.runtime.metadata.ProductionSingleNodeModuleMetadataRepository;
+import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
+import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -20,7 +21,7 @@ public final class GraphAwareRuntimeFactory {
     }
 
     public static GraphAwareRuntime createRuntime(GraphDatabaseService database, RuntimeConfiguration configuration) {
-        ModuleMetadataRepository repository = new ProductionSingleNodeModuleMetadataRepository(database, configuration);
+        ModuleMetadataRepository repository = new ProductionSingleNodeMetadataRepository(database, configuration);
         TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, repository);
         TxDrivenModuleManager txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, repository);
 
@@ -32,7 +33,7 @@ public final class GraphAwareRuntimeFactory {
     }
 
     public static GraphAwareRuntime createRuntime(TransactionSimulatingBatchInserter batchInserter, RuntimeConfiguration configuration) {
-        ModuleMetadataRepository metadataRepository = new BatchSingleNodeModuleMetadataRepository(batchInserter, configuration);
+        ModuleMetadataRepository metadataRepository = new BatchSingleNodeMetadataRepository(batchInserter, configuration);
         TxDrivenModuleManager manager = new BatchModuleManager(batchInserter, metadataRepository);
 
         return new BatchInserterBackedRuntime(batchInserter, manager);

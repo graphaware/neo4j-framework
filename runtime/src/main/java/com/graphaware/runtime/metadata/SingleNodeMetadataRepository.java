@@ -17,21 +17,27 @@ import java.util.Set;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
 
 /**
- *
+ * {@link ModuleMetadataRepository} that stores all {@link ModuleMetadata} on a single Neo4j {@link Node}. Each module's
+ * metadata is stored serialized into a byte array as the value of a property, keyed by a key built by
+ * {@link RuntimeConfiguration#createPrefix(String)} + {@link com.graphaware.runtime.module.RuntimeModule#getId()}, where
+ * the argument passed to {@link RuntimeConfiguration#createPrefix(String)} is {@link #RUNTIME}.
  */
-public abstract class SingleNodeModuleMetadataRepository implements ModuleMetadataRepository {
+public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepository {
 
-    private static final Logger LOG = Logger.getLogger(SingleNodeModuleMetadataRepository.class);
+    private static final Logger LOG = Logger.getLogger(SingleNodeMetadataRepository.class);
 
     public static final String RUNTIME = "RUNTIME";
 
     private final RuntimeConfiguration configuration;
 
-    protected SingleNodeModuleMetadataRepository(RuntimeConfiguration configuration) {
+    /**
+     * Create a new repository.
+     *
+     * @param configuration runtime configuration.
+     */
+    protected SingleNodeMetadataRepository(RuntimeConfiguration configuration) {
         this.configuration = configuration;
     }
-
-    protected abstract Node getOrCreateRoot();
 
     /**
      * {@inheritDoc}
@@ -49,29 +55,8 @@ public abstract class SingleNodeModuleMetadataRepository implements ModuleMetada
      * {@inheritDoc}
      */
     @Override
-    public Set<String> getAllModuleIds() {
-        String prefix = configuration.createPrefix(RUNTIME);
-        Set<String> result = new HashSet<>();
-        for (String key : getInternalProperties(getOrCreateRoot()).keySet()) {
-            result.add(key.replace(prefix, ""));
-        }
-        return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeModuleMetadata(String moduleId) {
-        getOrCreateRoot().removeProperty(moduleKey(moduleId));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public <M extends ModuleMetadata, T extends RuntimeModule<? extends M>> M getModuleMetadata(T module) {
-        Map<String, Object> internalProperties = getInternalProperties(getOrCreateRoot());
+        Map<String, Object> internalProperties = getInternalProperties(getOrMetadataNode());
         final String key = moduleKey(module);
 
         try {
@@ -94,8 +79,36 @@ public abstract class SingleNodeModuleMetadataRepository implements ModuleMetada
      */
     @Override
     public <M extends ModuleMetadata, T extends RuntimeModule<? extends M>> void persistModuleMetadata(T module, M metadata) {
-        getOrCreateRoot().setProperty(moduleKey(module), Serializer.toByteArray(metadata));
+        getOrMetadataNode().setProperty(moduleKey(module), Serializer.toByteArray(metadata));
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<String> getAllModuleIds() {
+        String prefix = configuration.createPrefix(RUNTIME);
+        Set<String> result = new HashSet<>();
+        for (String key : getInternalProperties(getOrMetadataNode()).keySet()) {
+            result.add(key.replace(prefix, ""));
+        }
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeModuleMetadata(String moduleId) {
+        getOrMetadataNode().removeProperty(moduleKey(moduleId));
+    }
+
+    /**
+     * Get the node against which to store all metadata, create one if one doesn't exist.
+     *
+     * @return node on which to store metadata.
+     */
+    protected abstract Node getOrMetadataNode();
 
     /**
      * Get properties starting with {@link com.graphaware.runtime.config.RuntimeConfiguration#GA_PREFIX} + {@link #RUNTIME} from a node.
@@ -113,7 +126,7 @@ public abstract class SingleNodeModuleMetadataRepository implements ModuleMetada
     }
 
     /**
-     * Build a module key to use as a property on the root node for storing metadata.
+     * Build a module key to use as a property key on the metadata node.
      *
      * @param module to build a key for.
      * @return module key.
@@ -123,7 +136,7 @@ public abstract class SingleNodeModuleMetadataRepository implements ModuleMetada
     }
 
     /**
-     * Build a module key to use as a property on the root node for storing metadata.
+     * Build a module key to use as a property on the metadata node for storing metadata.
      *
      * @param moduleId to build a key for.
      * @return module key.

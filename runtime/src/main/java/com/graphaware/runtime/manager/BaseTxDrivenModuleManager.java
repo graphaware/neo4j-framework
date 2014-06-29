@@ -68,7 +68,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule<?>> ext
     @Override
     protected TxDrivenModuleMetadata acknowledgeMetadata(T module, TxDrivenModuleMetadata metadata) {
         if (metadata.needsInitialization()) {
-            LOG.info("Module " + module.getId() + " has been marked for re-initialization on " + new Date(metadata.timestamp()).toString() + ". Will re-initialize...");
+            LOG.info("Module " + module.getId() + " has been marked for re-initialization on " + new Date(metadata.problemTimestamp()).toString() + ". Will re-initialize...");
             reinitialize(module);
             return createFreshMetadata(module);
         }

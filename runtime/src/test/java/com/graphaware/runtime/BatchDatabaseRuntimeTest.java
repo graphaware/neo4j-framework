@@ -17,7 +17,8 @@
 package com.graphaware.runtime;
 
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
-import com.graphaware.runtime.metadata.ProductionSingleNodeModuleMetadataRepository;
+import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
+import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +43,7 @@ public class BatchDatabaseRuntimeTest extends DatabaseBackedRuntimeTest {
     public void setUp() throws IOException {
         temporaryFolder.create();
         database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()), 1);
-        repository = new ProductionSingleNodeModuleMetadataRepository(database, DefaultRuntimeConfiguration.getInstance());
+        repository = new ProductionSingleNodeMetadataRepository(database, DefaultRuntimeConfiguration.getInstance());
     }
 
     @After

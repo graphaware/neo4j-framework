@@ -3,7 +3,7 @@ package com.graphaware.runtime.metadata;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 
 /**
- *
+ * Default production implementation of {@link TxDrivenModuleMetadata}.
  */
 public class DefaultTxDrivenModuleMetadata implements TxDrivenModuleMetadata {
 
@@ -11,6 +11,11 @@ public class DefaultTxDrivenModuleMetadata implements TxDrivenModuleMetadata {
     private final boolean needsInitialization;
     private final long timestamp;
 
+    /**
+     * Construct new metadata. {@link #needsInitialization} will return <code>false</code>.
+     *
+     * @param configuration module configuration held by the metadata.
+     */
     public DefaultTxDrivenModuleMetadata(TxDrivenModuleConfiguration configuration) {
         this(configuration, false, -1);
     }
@@ -21,19 +26,32 @@ public class DefaultTxDrivenModuleMetadata implements TxDrivenModuleMetadata {
         this.timestamp = timestamp;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public TxDrivenModuleConfiguration getConfig() {
         return configuration;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean needsInitialization() {
         return needsInitialization;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public long timestamp() {
+    public long problemTimestamp() {
         return timestamp;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DefaultTxDrivenModuleMetadata markedNeedingInitialization() {
         if (needsInitialization) {
