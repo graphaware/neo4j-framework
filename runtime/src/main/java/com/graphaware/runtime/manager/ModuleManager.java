@@ -12,6 +12,14 @@ import com.graphaware.runtime.module.RuntimeModule;
 public interface ModuleManager<T extends RuntimeModule> {
 
     /**
+     * Check that the given module isn't already registered with the manager.
+     *
+     * @param module to check.
+     * @throws IllegalStateException in case the module is already registered.
+     */
+    void checkNotAlreadyRegistered(RuntimeModule module);
+
+    /**
      * Register a module with this manager.
      *
      * @param module to register.

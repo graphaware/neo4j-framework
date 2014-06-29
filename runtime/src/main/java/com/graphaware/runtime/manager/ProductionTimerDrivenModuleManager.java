@@ -1,5 +1,6 @@
 package com.graphaware.runtime.manager;
 
+import com.graphaware.runtime.metadata.DefaultTimerDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TimerDrivenModuleMetadata;
 import com.graphaware.runtime.module.TimerDrivenModule;
@@ -35,7 +36,7 @@ public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerD
      */
     @Override
     protected TimerDrivenModuleMetadata createFreshMetadata(TimerDrivenModule module) {
-        return module.createFirstMetadata(database);
+        return new DefaultTimerDrivenModuleMetadata(module.createInitialContext(database));
     }
 
     /**
@@ -43,7 +44,7 @@ public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerD
      */
     @Override
     protected TimerDrivenModuleMetadata acknowledgeMetadata(TimerDrivenModule module, TimerDrivenModuleMetadata metadata) {
-        taskScheduler.registerModuleAndMetadata(module, metadata);
+        taskScheduler.registerModuleAndContext(module, metadata.getLastContext());
         return metadata;
     }
 

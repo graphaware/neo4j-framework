@@ -34,7 +34,6 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
      */
     @Override
     public final void registerModule(T module) {
-        checkNotAlreadyRegistered(module);
         modules.add(module);
     }
 
@@ -44,13 +43,15 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
      * @param module to check.
      * @throws IllegalStateException in case the module is already registered.
      */
-    private void checkNotAlreadyRegistered(T module) {
+    public void checkNotAlreadyRegistered(RuntimeModule module) {
         if (modules.contains(module)) {
+            LOG.error("Module " + module.getId() + " cannot be registered more than once!");
             throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
         }
 
         for (T existing : modules) {
             if (existing.getId().equals(module.getId())) {
+                LOG.error("Module " + module.getId() + " cannot be registered more than once!");
                 throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
             }
         }

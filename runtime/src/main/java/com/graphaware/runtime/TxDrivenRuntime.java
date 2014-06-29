@@ -46,6 +46,14 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      * {@inheritDoc}
      */
     @Override
+    protected void checkNotAlreadyRegistered(RuntimeModule module) {
+        getTxDrivenModuleManager().checkNotAlreadyRegistered(module);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public final Void beforeCommit(TransactionData data) throws Exception {
         if (!tryToStartIfNotStarted()) {
             return null;

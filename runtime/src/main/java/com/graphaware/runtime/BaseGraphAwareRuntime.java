@@ -73,12 +73,21 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
 
         LOG.info("Registering module " + module.getId() + " with GraphAware Runtime.");
 
+        checkNotAlreadyRegistered(module);
         doRegisterModule(module);
 
         if (module instanceof RuntimeConfigured) {
             ((RuntimeConfigured) module).configurationChanged(configuration);
         }
     }
+
+    /**
+     * Check that the given module isn't already registered with the runtime.
+     *
+     * @param module to check.
+     * @throws IllegalStateException in case the module is already registered.
+     */
+    protected abstract void checkNotAlreadyRegistered(RuntimeModule module);
 
     /**
      * Perform the actual module registration after sanity checks have passed.

@@ -4,9 +4,9 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
 /**
- * {@link GraphPosition} which is a single {@link Node}.
+ * {@link TimerDrivenModuleContext} with {@link Node} as the position representation and no extra data.
  */
-public class NodeInGraph implements GraphPosition<Node> {
+public class NodeBasedContext implements TimerDrivenModuleContext<Node> {
 
     private final long nodeId;
 
@@ -15,7 +15,7 @@ public class NodeInGraph implements GraphPosition<Node> {
      *
      * @param nodeId ID of the node.
      */
-    public NodeInGraph(long nodeId) {
+    public NodeBasedContext(long nodeId) {
         this.nodeId = nodeId;
     }
 

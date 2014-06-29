@@ -1,7 +1,9 @@
 package com.graphaware.runtime.schedule;
 
 import com.graphaware.common.util.Pair;
+import com.graphaware.runtime.metadata.DefaultTimerDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
+import com.graphaware.runtime.metadata.TimerDrivenModuleContext;
 import com.graphaware.runtime.metadata.TimerDrivenModuleMetadata;
 import com.graphaware.runtime.module.TimerDrivenModule;
 import org.apache.log4j.Logger;
@@ -25,8 +27,8 @@ public class RotatingTaskScheduler implements TaskScheduler {
     private final TimingStrategy timingStrategy;
 
     //todo: these two should be made concurrent if we use more than 1 thread for the background work
-    private final Map<TimerDrivenModule, TimerDrivenModuleMetadata> moduleMetadata = new LinkedHashMap<>();
-    private Iterator<Map.Entry<TimerDrivenModule, TimerDrivenModuleMetadata>> moduleMetadataIterator;
+    private final Map<TimerDrivenModule, TimerDrivenModuleContext> moduleContexts = new LinkedHashMap<>();
+    private Iterator<Map.Entry<TimerDrivenModule, TimerDrivenModuleContext>> moduleContextIterator;
 
     private final ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor();
 
@@ -47,13 +49,13 @@ public class RotatingTaskScheduler implements TaskScheduler {
      * {@inheritDoc}
      */
     @Override
-    public <M extends TimerDrivenModuleMetadata, T extends TimerDrivenModule<M>> void registerModuleAndMetadata(T module, M metadata) {
-        if (moduleMetadataIterator != null) {
-            throw new IllegalStateException("Task scheduler can not accept metadata after it has been started. This is a bug.");
+    public <C extends TimerDrivenModuleContext, T extends TimerDrivenModule<C>> void registerModuleAndContext(T module, C context) {
+        if (moduleContextIterator != null) {
+            throw new IllegalStateException("Task scheduler can not accept modules after it has been started. This is a bug.");
         }
 
-        LOG.info("Registering module " + module.getId() + " and its metadata with the task scheduler.");
-        moduleMetadata.put(module, metadata);
+        LOG.info("Registering module " + module.getId() + " and its context with the task scheduler.");
+        moduleContexts.put(module, context);
     }
 
     /**
@@ -61,12 +63,12 @@ public class RotatingTaskScheduler implements TaskScheduler {
      */
     @Override
     public void start() {
-        if (moduleMetadata.isEmpty()) {
+        if (moduleContexts.isEmpty()) {
             LOG.info("There are no timer-driven runtime modules. Not scheduling any tasks.");
             return;
         }
 
-        LOG.info("There are " + moduleMetadata.size() + " timer-driven runtime modules. Scheduling the first task...");
+        LOG.info("There are " + moduleContexts.size() + " timer-driven runtime modules. Scheduling the first task...");
         scheduleNextTask(-1);
     }
 
@@ -126,18 +128,18 @@ public class RotatingTaskScheduler implements TaskScheduler {
     /**
      * Run the next task.
      *
-     * @param <M> metadata type of the metadata passed into the module below.
+     * @param <C> type of the context passed into the module below.
      * @param <T> module type of the module that will be delegated to.
      */
-    private <M extends TimerDrivenModuleMetadata, T extends TimerDrivenModule<M>> void runNextTask() {
-        Pair<T, M> moduleAndMetadata = nextModuleAndMetadata();
-        T module = moduleAndMetadata.first();
-        M metadata = moduleAndMetadata.second();
+    private <C extends TimerDrivenModuleContext, T extends TimerDrivenModule<C>> void runNextTask() {
+        Pair<T, C> moduleAndContext = nextModuleAndContext();
+        T module = moduleAndContext.first();
+        C context = moduleAndContext.second();
 
         try (Transaction tx = database.beginTx()) {
-            M newMetadata = module.doSomeWork(metadata, database);
-            repository.persistModuleMetadata(module, newMetadata);
-            moduleMetadata.put(module, newMetadata);
+            C newContext = module.doSomeWork(context, database);
+            repository.persistModuleMetadata(module, new DefaultTimerDrivenModuleMetadata(newContext));
+            moduleContexts.put(module, newContext);
             tx.success();
         }
     }
@@ -145,18 +147,18 @@ public class RotatingTaskScheduler implements TaskScheduler {
     /**
      * Find the next module to be delegated to and its metadata.
      *
-     * @param <M> metadata type.
+     * @param <C> metadata type.
      * @param <T> module type.
      * @return module & metadata as a {@link Map.Entry}
      */
-    private <M extends TimerDrivenModuleMetadata, T extends TimerDrivenModule<M>> Pair<T, M> nextModuleAndMetadata() {
-        if (moduleMetadataIterator == null || !moduleMetadataIterator.hasNext()) {
-            moduleMetadataIterator = moduleMetadata.entrySet().iterator();
+    private <C extends TimerDrivenModuleContext, T extends TimerDrivenModule<C>> Pair<T, C> nextModuleAndContext() {
+        if (moduleContextIterator == null || !moduleContextIterator.hasNext()) {
+            moduleContextIterator = moduleContexts.entrySet().iterator();
         }
 
-        Map.Entry<TimerDrivenModule, TimerDrivenModuleMetadata> entry = moduleMetadataIterator.next();
+        Map.Entry<TimerDrivenModule, TimerDrivenModuleContext> entry = moduleContextIterator.next();
 
         //noinspection unchecked
-        return new Pair<>((T) entry.getKey(), (M) entry.getValue());
+        return new Pair<>((T) entry.getKey(), (C) entry.getValue());
     }
 }

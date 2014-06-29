@@ -18,7 +18,9 @@ package com.graphaware.runtime;
 
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
+import com.graphaware.runtime.metadata.TimerDrivenModuleContext;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
+import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.junit.After;
@@ -54,6 +56,20 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         database.shutdown();
     }
 
+    private TimerDrivenModule mockTimerModule() {
+        return mockTimerModule(MOCK);
+    }
+
+    private TimerDrivenModule mockTimerModule(String id) {
+        TimerDrivenModuleContext mockContext = mock(TimerDrivenModuleContext.class);
+
+        TimerDrivenModule mockModule = mock(TimerDrivenModule.class);
+        when(mockModule.getId()).thenReturn(id);
+        when(mockModule.createInitialContext(database)).thenReturn(mockContext);
+
+        return mockModule;
+    }
+
     @Test(expected = TransactionFailureException.class)
     public void shouldNotBeAllowedToDeleteRuntimeMetadataNode() {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
@@ -87,11 +103,10 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotBeAbleToRegisterDifferentModulesWithSameId() {
-        final TxDrivenModule mockModule = mockTxModule();
 
         GraphAwareRuntime runtime = createRuntime();
-        runtime.registerModule(mockModule);
-        runtime.registerModule(mockModule);
+        runtime.registerModule(mockTxModule());
+        runtime.registerModule(mockTimerModule());
     }
 
     protected Node getMetadataNode() {

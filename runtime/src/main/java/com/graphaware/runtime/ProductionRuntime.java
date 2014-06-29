@@ -83,6 +83,15 @@ public class ProductionRuntime extends DatabaseRuntime {
      * {@inheritDoc}
      */
     @Override
+    protected void checkNotAlreadyRegistered(RuntimeModule module) {
+        super.checkNotAlreadyRegistered(module);
+        timerDrivenModuleManager.checkNotAlreadyRegistered(module);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void doRegisterModule(RuntimeModule module) {
         super.doRegisterModule(module);
 

@@ -3,12 +3,12 @@ package com.graphaware.runtime.metadata;
 /**
  * {@link ModuleMetadata} for {@link com.graphaware.runtime.module.TimerDrivenModule}s.
  */
-public interface TimerDrivenModuleMetadata<P extends GraphPosition<?>> extends ModuleMetadata {
+public interface TimerDrivenModuleMetadata<P extends TimerDrivenModuleContext<?>> extends ModuleMetadata {
 
     /**
-     * Get the last position where this module did some work.
+     * Get the context that the module produced when it last did some work.
      *
-     * @return last position.
+     * @return last context.
      */
-    P getLastPosition();
+    P getLastContext();
 }
