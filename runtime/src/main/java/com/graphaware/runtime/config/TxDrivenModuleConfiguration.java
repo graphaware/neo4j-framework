@@ -11,7 +11,7 @@ public interface TxDrivenModuleConfiguration {
     /**
      * Get the inclusion strategies used by this module. If unsure, return {@link com.graphaware.common.strategy.InclusionStrategies#all()}.
      *
-     * @return strategy.
+     * @return strategies.
      */
     InclusionStrategies getInclusionStrategies();
 }

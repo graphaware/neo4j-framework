@@ -23,10 +23,9 @@ import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
- * A {@link com.graphaware.runtime.GraphAwareRuntime} module performing some useful work based on
- * about-to-be-committed transaction data.
+ * A {@link RuntimeModule} module performing some useful work based on about-to-be-committed transaction data.
  */
-public interface TxDrivenModule extends RuntimeModule<DefaultTxDrivenModuleMetadata> {
+public interface TxDrivenModule<M extends TxDrivenModuleMetadata> extends RuntimeModule<M> {
 
     /**
      * Perform the core business logic of this module before a transaction commits.

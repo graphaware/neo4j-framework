@@ -12,9 +12,9 @@ public interface ModuleMetadataRepository {
 
     void check(TransactionData transactionData);
 
-    <M extends ModuleMetadata> M getModuleMetadata(RuntimeModule<M> module);
+    <M extends ModuleMetadata, T extends RuntimeModule<? extends M>> M getModuleMetadata(T module);
 
-    <M extends ModuleMetadata> void persistModuleMetadata(RuntimeModule<M> module, M metadata);
+    <M extends ModuleMetadata, T extends RuntimeModule<? extends M>> void persistModuleMetadata(T module, M metadata);
 
     Set<String> getAllModuleIds();
 

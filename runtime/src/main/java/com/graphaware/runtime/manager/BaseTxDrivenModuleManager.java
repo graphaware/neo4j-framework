@@ -1,93 +1,116 @@
 package com.graphaware.runtime.manager;
 
 import com.graphaware.runtime.NeedsInitializationException;
-import com.graphaware.runtime.metadata.CorruptMetadataException;
 import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
-
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.event.TransactionData;
 
 import java.util.Date;
 
 /**
- *
+ * Base {@link ModuleManager} for {@link TxDrivenModule}s.
  */
-public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extends BaseModuleManager<T> implements TxDrivenModuleManager<T> {
+public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule<?>> extends BaseModuleManager<TxDrivenModuleMetadata, T> implements TxDrivenModuleManager<T> {
 
     private static final Logger LOG = Logger.getLogger(BaseTxDrivenModuleManager.class);
 
+    /**
+     * Construct a new manager.
+     *
+     * @param metadataRepository repository for storing module metadata.
+     */
     protected BaseTxDrivenModuleManager(ModuleMetadataRepository metadataRepository) {
         super(metadataRepository);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void throwExceptionIfIllegal(TransactionData transactionData) {
         metadataRepository.check(transactionData);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-	protected void initializeModule(T module) {
-        TxDrivenModuleMetadata moduleMetadata;
-
-        try {
-            moduleMetadata = metadataRepository.getModuleMetadata(module);
-        } catch (CorruptMetadataException e) {
-            doReinitialize(module);
-            recordInitialization(module);
-            return;
-        }
-
-        if (moduleMetadata == null) {
-            LOG.info("Module " + module.getId() + " seems to have been registered for the first time, will initialize...");
-            doInitialize(module);
-            recordInitialization(module);
-            return;
-        }
-
-        if (moduleMetadata.needsInitialization()) {
-            LOG.info("Module " + module.getId() + " has been marked for re-initialization on "
-                    + new Date(moduleMetadata.timestamp()).toString() + ". Will re-initialize...");
-            doReinitialize(module);
-            recordInitialization(module);
-            return;
-        }
-
-        if (!moduleMetadata.getConfig().equals(module.getConfiguration())) {
-            LOG.info("Module " + module.getId() + " seems to have changed configuration since last run, will re-initialize...");
-            doReinitialize(module);
-            recordInitialization(module);
-        } else {
-            LOG.info("Module " + module.getId() + " has not changed configuration since last run, already initialized.");
-        }
+    protected void handleCorruptMetadata(T module) {
+        LOG.info("Module " + module.getId() + " seems to have corrupted metadata, will re-initialize...");
+        doReinitialize(module);
     }
 
     /**
-     * Initialize module.
+     * {@inheritDoc}
+     */
+    @Override
+    protected void handleNoMetadata(T module) {
+        LOG.info("Module " + module.getId() + " seems to have been registered for the first time, will initialize...");
+        doInitialize(module);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected TxDrivenModuleMetadata createFreshMetadata(T module) {
+        return new DefaultTxDrivenModuleMetadata(module.getConfiguration());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected TxDrivenModuleMetadata acknowledgeMetadata(T module, TxDrivenModuleMetadata metadata) {
+        if (metadata.needsInitialization()) {
+            LOG.info("Module " + module.getId() + " has been marked for re-initialization on " + new Date(metadata.timestamp()).toString() + ". Will re-initialize...");
+            doReinitialize(module);
+            return createFreshMetadata(module);
+        }
+
+        if (!metadata.getConfig().equals(module.getConfiguration())) {
+            LOG.info("Module " + module.getId() + " seems to have changed configuration since last run, will re-initialize...");
+            doReinitialize(module);
+            return createFreshMetadata(module);
+        }
+
+        LOG.info("Module " + module.getId() + " has not changed configuration since last run, already initialized.");
+        return metadata;
+    }
+
+    /**
+     * Initialize module. This means doing any work necessary for a module that has been registered for the first time
+     * on an existing database, or that has been previously registered with different configuration.
+     * <p/>
+     * For example, a module that performs some in-graph caching needs to write information into the graph so that when
+     * the method returns, the graph is in the same state as it would be if the module has been running all the time
+     * since the graph was empty.
+     * <p/>
+     * Note that for many modules, it might not be necessary to do anything.
      *
      * @param module to initialize.
      */
     protected abstract void doInitialize(T module);
 
     /**
-     * Re-initialize a module.
+     * Re-initialize module. This means cleaning up all data this module might have ever written to the graph and
+     * doing any work necessary for a module that has been registered for the first time
+     * on an existing database, or that has been previously registered with different configuration.
+     * <p/>
+     * For example, a module that performs some in-graph caching needs to write information into the graph so that when
+     * the method returns, the graph is in the same state as it would be if the module has been running all the time
+     * since the graph was empty.
+     * <p/>
+     * Note that for many modules, it might not be necessary to do anything.
      *
      * @param module to initialize.
      */
     protected abstract void doReinitialize(T module);
-
-    /**
-     * Capture the fact the a module has been (re-)initialized as a root node's property.
-     *
-     * @param module that has been initialized.
-     */
-    private void recordInitialization(final T module) {
-        metadataRepository.persistModuleMetadata(module, new DefaultTxDrivenModuleMetadata(module.getConfiguration()));
-    }
 
     /**
      * {@inheritDoc}
@@ -105,7 +128,8 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
                 module.beforeCommit(filteredTransactionData);
             } catch (NeedsInitializationException e) {
                 LOG.warn("Module " + module.getId() + " seems to have a problem and will be re-initialized next time the database is started. ");
-                metadataRepository.persistModuleMetadata(module, metadataRepository.getModuleMetadata(module).markedNeedingInitialization());
+                TxDrivenModuleMetadata moduleMetadata = metadataRepository.getModuleMetadata(module);
+                metadataRepository.persistModuleMetadata(module, moduleMetadata.markedNeedingInitialization());
             } catch (RuntimeException e) {
                 LOG.warn("Module " + module.getId() + " threw an exception!", e);
             }

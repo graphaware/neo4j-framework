@@ -20,6 +20,7 @@ import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
+import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.runtime.module.TxDrivenModule;
 import org.junit.Test;
 import org.neo4j.graphdb.*;
@@ -55,7 +56,8 @@ public abstract class DatabaseBackedRuntimeTest extends GraphAwareRuntimeTest {
         TxDrivenModule mockModule = mock(TxDrivenModule.class);
         when(mockModule.getId()).thenReturn(id);
         when(mockModule.getConfiguration()).thenReturn(configuration);
-        when(mockModule.getMetadataClass()).thenReturn(DefaultTxDrivenModuleMetadata.class);
+        Class<? extends TxDrivenModuleMetadata> cls = DefaultTxDrivenModuleMetadata.class;
+        when(mockModule.getMetadataClass()).thenReturn(cls);
         return mockModule;
     }
 

@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
-import static com.graphaware.runtime.manager.BaseModuleManager.RUNTIME;
 
 /**
  *
@@ -23,6 +22,8 @@ import static com.graphaware.runtime.manager.BaseModuleManager.RUNTIME;
 public abstract class SingleNodeModuleMetadataRepository implements ModuleMetadataRepository {
 
     private static final Logger LOG = Logger.getLogger(SingleNodeModuleMetadataRepository.class);
+
+    public static final String RUNTIME = "RUNTIME";
 
     private final RuntimeConfiguration configuration;
 
@@ -32,6 +33,9 @@ public abstract class SingleNodeModuleMetadataRepository implements ModuleMetada
 
     protected abstract Node getOrCreateRoot();
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void check(TransactionData transactionData) {
         for (LabelEntry entry : transactionData.removedLabels()) {
@@ -41,6 +45,9 @@ public abstract class SingleNodeModuleMetadataRepository implements ModuleMetada
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<String> getAllModuleIds() {
         String prefix = configuration.createPrefix(RUNTIME);
@@ -51,13 +58,19 @@ public abstract class SingleNodeModuleMetadataRepository implements ModuleMetada
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void removeModuleMetadata(String moduleId) {
         getOrCreateRoot().removeProperty(moduleKey(moduleId));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public <M extends ModuleMetadata> M getModuleMetadata(RuntimeModule<M> module) {
+    public <M extends ModuleMetadata, T extends RuntimeModule<? extends M>> M getModuleMetadata(T module) {
         Map<String, Object> internalProperties = getInternalProperties(getOrCreateRoot());
         final String key = moduleKey(module);
 
@@ -80,7 +93,7 @@ public abstract class SingleNodeModuleMetadataRepository implements ModuleMetada
      * {@inheritDoc}
      */
     @Override
-    public <M extends ModuleMetadata> void persistModuleMetadata(RuntimeModule<M> module, M metadata) {
+    public <M extends ModuleMetadata, T extends RuntimeModule<? extends M>> void persistModuleMetadata(T module, M metadata) {
         getOrCreateRoot().setProperty(moduleKey(module), Serializer.toByteArray(metadata));
     }
 

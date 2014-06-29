@@ -18,5 +18,5 @@ public interface TxDrivenModuleMetadata extends ModuleMetadata {
 
     long timestamp();
 
-    DefaultTxDrivenModuleMetadata markedNeedingInitialization();
+    TxDrivenModuleMetadata markedNeedingInitialization();
 }

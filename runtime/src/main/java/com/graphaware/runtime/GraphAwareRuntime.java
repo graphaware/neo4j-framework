@@ -42,10 +42,10 @@ public interface GraphAwareRuntime {
     void start();
 
     /**
-     * Start the runtime, optionally skipping the initialization phase. It is not recommended to skip initialization;
-     * un-initialized modules might not behave correctly.
+     * Start the runtime, optionally skipping the metadata loading phase. It is not recommended to skip metadata loading;
+     * modules without metadata might not behave correctly.
      *
-     * @param skipInitialization true for skipping initialization.
+     * @param skipLoadingMetadata true for skipping the metadata loading phase.
      */
-    void start(boolean skipInitialization);
+    void start(boolean skipLoadingMetadata);
 }

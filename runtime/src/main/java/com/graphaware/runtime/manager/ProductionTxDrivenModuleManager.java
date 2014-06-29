@@ -8,7 +8,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 /**
  *
  */
-public class ProductionTxDrivenModuleManager extends BaseTxDrivenModuleManager<TxDrivenModule> {
+public class ProductionTxDrivenModuleManager extends BaseTxDrivenModuleManager<TxDrivenModule<?>> {
     private static final Logger LOG = Logger.getLogger(ProductionTxDrivenModuleManager.class);
 
     private final GraphDatabaseService database;
@@ -18,11 +18,17 @@ public class ProductionTxDrivenModuleManager extends BaseTxDrivenModuleManager<T
         this.database = database;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void doInitialize(TxDrivenModule module) {
         module.initialize(database);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void doReinitialize(TxDrivenModule module) {
         module.reinitialize(database);

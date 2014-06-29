@@ -44,7 +44,7 @@ public class ProductionRuntime extends DatabaseBackedRuntime {
      * @param txDrivenModuleManager    manager for transaction-driven modules.
      * @param timerDrivenModuleManager manager for timer-driven modules.
      */
-    protected ProductionRuntime(GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager) {
+    protected ProductionRuntime(GraphDatabaseService database, TxDrivenModuleManager txDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager) {
         super(database, txDrivenModuleManager);
         this.timerDrivenModuleManager = timerDrivenModuleManager;
     }
@@ -53,16 +53,8 @@ public class ProductionRuntime extends DatabaseBackedRuntime {
      * {@inheritDoc}
      */
     @Override
-    protected Set<String> initializeModules() {
-        Set<String> result = new HashSet<>();
-        result.addAll(super.initializeModules());
-        result.addAll(timerDrivenModuleManager.initializeModules());
-        return result;
-    }
-
-    @Override
-    protected void doStart(boolean skipInitialization) {
-        super.doStart(skipInitialization);
+    protected void doStart(boolean skipLoadingMetadata) {
+        super.doStart(skipLoadingMetadata);
         timerDrivenModuleManager.startModules();
     }
 
@@ -70,9 +62,20 @@ public class ProductionRuntime extends DatabaseBackedRuntime {
      * {@inheritDoc}
      */
     @Override
-    protected void performCleanup(Set<String> usedModules) {
-        super.performCleanup(usedModules);
-        timerDrivenModuleManager.removeUnusedModules(usedModules);
+    protected Set<String> loadMetadata() {
+        Set<String> result = new HashSet<>();
+        result.addAll(super.loadMetadata());
+        result.addAll(timerDrivenModuleManager.loadMetadata());
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void cleanupMetadata(Set<String> usedModules) {
+        super.cleanupMetadata(usedModules);
+        timerDrivenModuleManager.cleanupMetadata(usedModules);
     }
 
     /**

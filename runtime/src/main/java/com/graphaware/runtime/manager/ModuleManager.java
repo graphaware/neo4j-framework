@@ -25,14 +25,14 @@ public interface ModuleManager<T extends RuntimeModule> {
      *
      * @return IDs of all registered modules, no matter if they have or have not been initialized.
      */
-    Set<String> initializeModules();
+    Set<String> loadMetadata();
 
     /**
      * Perform cleanup of unused modules that might have written their metadata into the graph but are no longer present.
      *
      * @param usedModules IDs of modules that are known to be used.
      */
-    void removeUnusedModules(Set<String> usedModules);
+    void cleanupMetadata(Set<String> usedModules);
 
     /**
      * Bring all modules to an orderly shutdown, when the database is stopped.

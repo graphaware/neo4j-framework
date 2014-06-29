@@ -114,7 +114,7 @@ public final class Serializer {
      * @param clazz to return.
      * @return de-serialized object.
      */
-    public static <T> T fromByteArray(byte[] array, Class<T> clazz) {
+    public static <T> T fromByteArray(byte[] array, Class<? extends T> clazz) {
         return kryo.readObject(new Input(array), clazz);
     }
 

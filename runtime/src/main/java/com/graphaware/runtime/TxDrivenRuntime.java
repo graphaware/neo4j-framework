@@ -100,16 +100,16 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      * {@inheritDoc}
      */
     @Override
-    protected Set<String> initializeModules() {
-        return txDrivenModuleManager.initializeModules();
+    protected Set<String> loadMetadata() {
+        return txDrivenModuleManager.loadMetadata();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void performCleanup(Set<String> usedModules) {
-        txDrivenModuleManager.removeUnusedModules(usedModules);
+    protected void cleanupMetadata(Set<String> usedModules) {
+        txDrivenModuleManager.cleanupMetadata(usedModules);
     }
 
     /**

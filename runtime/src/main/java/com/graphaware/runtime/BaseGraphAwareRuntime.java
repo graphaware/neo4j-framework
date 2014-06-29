@@ -99,7 +99,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
      * {@inheritDoc}
      */
     @Override
-    public final synchronized void start(boolean skipInitialization) {
+    public final synchronized void start(boolean skipLoadingMetadata) {
         if (State.STARTED.equals(state)) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("GraphAware already started");
@@ -114,23 +114,28 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
         LOG.info("Starting GraphAware...");
         state = State.STARTING;
 
-        doStart(skipInitialization);
+        doStart(skipLoadingMetadata);
 
         state = State.STARTED;
         LOG.info("GraphAware started.");
     }
 
-    protected void doStart(boolean skipInitialization) {
-        if (skipInitialization) {
-            LOG.info("Initialization skipped.");
+    /**
+     * Perform the actual start of the runtime, being certain that it is the right time to do so.
+     *
+     * @param skipLoadingMetadata true for skipping the metadata loading phase.
+     */
+    protected void doStart(boolean skipLoadingMetadata) {
+        if (skipLoadingMetadata) {
+            LOG.info("Metadata loading skipped.");
         } else {
-            LOG.info("Initializing modules...");
+            LOG.info("Loading module metadata...");
             try (Transaction tx = startTransaction()) {
-                Set<String> moduleIds = initializeModules();
-                performCleanup(moduleIds);
+                Set<String> moduleIds = loadMetadata();
+                cleanupMetadata(moduleIds);
                 tx.success();
             }
-            LOG.info("Modules initialized.");
+            LOG.info("Module metadata loaded.");
         }
     }
 
@@ -142,19 +147,19 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
     protected abstract Transaction startTransaction();
 
     /**
-     * Initialize modules if needed. Modules typically need to be initialized only the very first time they are used
-     * with a database instance.
+     * Load module metadata.
      *
-     * @return IDs of all modules registered with the runtime, no matter whether they needed to be initialized or not.
+     * @return IDs of all modules registered with the runtime, no matter whether they previously had some metadata in
+     *         the graph or not.
      */
-    protected abstract Set<String> initializeModules();
+    protected abstract Set<String> loadMetadata();
 
     /**
      * Perform cleanup of metadata potentially written to the graph by modules that aren't used any more.
      *
-     * @param usedModules IDs of all the used modules (should be the same as returned by {@link #initializeModules()}.
+     * @param usedModules IDs of all the used modules (should be the same as returned by {@link #loadMetadata()}.
      */
-    protected abstract void performCleanup(Set<String> usedModules);
+    protected abstract void cleanupMetadata(Set<String> usedModules);
 
     /**
      * Checks to see if this {@link GraphAwareRuntime} has <b>NOT</b> yet been started, starting it if necessary and possible.
