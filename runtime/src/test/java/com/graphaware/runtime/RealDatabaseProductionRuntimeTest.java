@@ -16,9 +16,11 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
-import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
-import com.graphaware.runtime.metadata.TimerDrivenModuleContext;
+import com.graphaware.runtime.config.MinimalTxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
+import com.graphaware.runtime.metadata.*;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
@@ -26,6 +28,7 @@ import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.TransactionFailureException;
@@ -34,6 +37,8 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import java.util.Iterator;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
+import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
+import static com.graphaware.runtime.metadata.SingleNodeMetadataRepository.RUNTIME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
@@ -61,11 +66,9 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
     }
 
     private TimerDrivenModule mockTimerModule(String id) {
-        TimerDrivenModuleContext mockContext = mock(TimerDrivenModuleContext.class);
-
         TimerDrivenModule mockModule = mock(TimerDrivenModule.class);
         when(mockModule.getId()).thenReturn(id);
-        when(mockModule.createInitialContext(database)).thenReturn(mockContext);
+        when(mockModule.createInitialContext(database)).thenReturn(null);
 
         return mockModule;
     }
@@ -103,10 +106,261 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotBeAbleToRegisterDifferentModulesWithSameId() {
-
         GraphAwareRuntime runtime = createRuntime();
         runtime.registerModule(mockTxModule());
         runtime.registerModule(mockTimerModule());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotBeAbleToRegisterSameTimerModuleTwice() {
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockTimerModule());
+        runtime.registerModule(mockTimerModule());
+    }
+
+    @Test
+    public void unusedTimerModulesShouldBeRemoved() {
+        final TimerDrivenModule mockModule = mockTimerModule();
+        final TimerDrivenModule unusedModule = mockTimerModule("UNUSED");
+
+        try (Transaction tx = getTransaction()) {
+            getRepository().persistModuleMetadata(mockModule, new DefaultTimerDrivenModuleMetadata(null));
+            getRepository().persistModuleMetadata(unusedModule, new DefaultTimerDrivenModuleMetadata(null));
+            tx.success();
+        }
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule);
+
+        runtime.start();
+
+        verify(mockModule, atLeastOnce()).getId();
+        verifyNoMoreInteractions(mockModule);
+
+        try (Transaction tx = getTransaction()) {
+            assertEquals(1, getRepository().getAllModuleIds().size());
+        }
+    }
+
+    @Test
+    public void corruptMetadataShouldNotKillTimerModule() {
+        final TimerDrivenModule mockModule = mockTimerModule();
+
+        try (Transaction tx = getTransaction()) {
+            Node root = createMetadataNode();
+            root.setProperty(GA_PREFIX + RUNTIME + "_" + MOCK, "CORRUPT");
+            tx.success();
+        }
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule);
+
+        runtime.start();
+
+        verify(mockModule, atLeastOnce()).getId();
+        verify(mockModule).createInitialContext(database);
+        verifyNoMoreInteractions(mockModule);
+
+        try (Transaction tx = getTransaction()) {
+            TimerDrivenModuleMetadata moduleMetadata = getRepository().getModuleMetadata(mockModule);
+            assertEquals(new DefaultTimerDrivenModuleMetadata(null), moduleMetadata);
+        }
+    }
+
+    @Test
+    public void allRegisteredInterestedTimerModulesShouldBeDelegatedTo() throws InterruptedException {
+        TimerDrivenModule mockModule1 = mockTimerModule(MOCK + "1");
+        TimerDrivenModule mockModule2 = mockTimerModule(MOCK + "2");
+        TimerDrivenModule mockModule3 = mockTimerModule(MOCK + "3");
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule1);
+        runtime.registerModule(mockModule2);
+        runtime.registerModule(mockModule3);
+
+        runtime.start();
+
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule3, atLeastOnce()).getId();
+        verify(mockModule1).createInitialContext(database);
+        verify(mockModule2).createInitialContext(database);
+        verify(mockModule3).createInitialContext(database);
+        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
+
+        Thread.sleep(1900);
+
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule3, atLeastOnce()).getId();
+        verify(mockModule1, times(2)).doSomeWork(null, database);
+        verify(mockModule2, times(2)).doSomeWork(null, database);
+        verify(mockModule3).doSomeWork(null, database);
+
+        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
+    }
+
+    @Test
+    public void allRegisteredInterestedTimerModulesShouldBeDelegatedToWhenRuntimeNotExplicitlyStarted() throws InterruptedException {
+        TimerDrivenModule mockModule1 = mockTimerModule(MOCK + "1");
+        TimerDrivenModule mockModule2 = mockTimerModule(MOCK + "2");
+        TimerDrivenModule mockModule3 = mockTimerModule(MOCK + "3");
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule1);
+        runtime.registerModule(mockModule2);
+        runtime.registerModule(mockModule3);
+
+        //no explicit runtime start!
+        try (Transaction tx = getTransaction()) {
+            createNode();
+            tx.success();
+        }
+
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule3, atLeastOnce()).getId();
+        verify(mockModule1).createInitialContext(database);
+        verify(mockModule2).createInitialContext(database);
+        verify(mockModule3).createInitialContext(database);
+        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
+
+        Thread.sleep(1900);
+
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule3, atLeastOnce()).getId();
+        verify(mockModule1, times(2)).doSomeWork(null, database);
+        verify(mockModule2, times(2)).doSomeWork(null, database);
+        verify(mockModule3).doSomeWork(null, database);
+
+        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
+    }
+
+    @Test
+    public void lastContextShouldBePresentedInNextCallAndPersisted() throws InterruptedException {
+        TimerDrivenModuleContext<Node> firstContext = new NodeBasedContext(1);
+        TimerDrivenModuleContext<Node> secondContext = new NodeBasedContext(2);
+
+        TimerDrivenModule mockModule = mockTimerModule();
+        when(mockModule.doSomeWork(null, database)).thenReturn(firstContext);
+        when(mockModule.doSomeWork(firstContext, database)).thenReturn(secondContext);
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule);
+
+        runtime.start();
+
+        verify(mockModule, atLeastOnce()).getId();
+        verify(mockModule).createInitialContext(database);
+        verifyNoMoreInteractions(mockModule);
+
+        Thread.sleep(1300);
+
+        verify(mockModule, atLeastOnce()).getId();
+        verify(mockModule).doSomeWork(null, database);
+        verify(mockModule).doSomeWork(firstContext, database);
+
+        verifyNoMoreInteractions(mockModule);
+
+        try (Transaction tx = getTransaction()) {
+            TimerDrivenModuleMetadata moduleMetadata = getRepository().getModuleMetadata(mockModule);
+            assertEquals(new DefaultTimerDrivenModuleMetadata(new NodeBasedContext(2)), moduleMetadata);
+        }
+    }
+
+    @Test
+    public void lastContextShouldBePresentedAfterRestart() throws InterruptedException {
+        TimerDrivenModule mockModule = mockTimerModule();
+
+        TimerDrivenModuleContext<Node> lastContext = new NodeBasedContext(1);
+        try (Transaction tx = database.beginTx()) {
+            getRepository().persistModuleMetadata(mockModule, new DefaultTimerDrivenModuleMetadata(lastContext));
+            tx.success();
+        }
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule);
+
+        runtime.start();
+
+        Thread.sleep(1100);
+
+        verify(mockModule, atLeastOnce()).getId();
+        verify(mockModule).doSomeWork(lastContext, database);
+        verifyNoMoreInteractions(mockModule);
+    }
+
+    @Test
+    public void shutdownShouldBeCalledBeforeShutdownOnTimerDrivenModules() {
+        TimerDrivenModule mockModule = mockTimerModule();
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule);
+        runtime.start();
+
+        shutdown();
+
+        verify(mockModule).shutdown();
+    }
+
+    @Test
+    public void whenOneTimerModuleThrowsAnExceptionThenOtherModulesShouldStillBeDelegatedTo() throws InterruptedException {
+        TimerDrivenModule mockModule1 = mockTimerModule(MOCK + "1");
+        when(mockModule1.doSomeWork(any(TimerDrivenModuleContext.class), any(GraphDatabaseService.class))).thenThrow(new RuntimeException());
+
+        TimerDrivenModule mockModule2 = mockTimerModule(MOCK + "2");
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule1);
+        runtime.registerModule(mockModule2);
+
+        runtime.start();
+
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule1).createInitialContext(database);
+        verify(mockModule2).createInitialContext(database);
+        verifyNoMoreInteractions(mockModule1, mockModule2);
+
+        Thread.sleep(1300);
+
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule1).doSomeWork(null, database);
+        verify(mockModule2).doSomeWork(null, database);
+        verifyNoMoreInteractions(mockModule1, mockModule2);
+    }
+
+    @Test
+    public void sameModuleCanActAsTxAndTimerDriven() throws InterruptedException {
+        TxAndTimerDrivenModule mockModule = mock(TxAndTimerDrivenModule.class);
+        when(mockModule.getId()).thenReturn(MOCK);
+        when(mockModule.createInitialContext(database)).thenReturn(null);
+        when(mockModule.getConfiguration()).thenReturn(NullTxDrivenModuleConfiguration.getInstance());
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule);
+
+        runtime.start();
+
+        try (Transaction tx = database.beginTx()) {
+            database.createNode();
+            tx.success();
+        }
+
+        Thread.sleep(200);
+
+        verify(mockModule, atLeastOnce()).getId();
+        verify(mockModule, atLeastOnce()).getConfiguration();
+        verify(mockModule, atLeastOnce()).createInitialContext(database);
+        verify(mockModule, atLeastOnce()).doSomeWork(null, database);
+        verify(mockModule, atLeastOnce()).beforeCommit(any(ImprovedTransactionData.class));
+        verifyNoMoreInteractions(mockModule);
+    }
+
+    interface TxAndTimerDrivenModule extends TxDrivenModule, TimerDrivenModule {
+
     }
 
     protected Node getMetadataNode() {

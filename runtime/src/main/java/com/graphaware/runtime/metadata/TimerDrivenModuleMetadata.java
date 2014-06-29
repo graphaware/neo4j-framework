@@ -8,7 +8,7 @@ public interface TimerDrivenModuleMetadata<P extends TimerDrivenModuleContext<?>
     /**
      * Get the context that the module produced when it last did some work.
      *
-     * @return last context.
+     * @return last context, <code>null</code> if there is no such context (first run).
      */
     P getLastContext();
 }

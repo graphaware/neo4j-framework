@@ -69,7 +69,7 @@ public class RotatingTaskScheduler implements TaskScheduler {
         }
 
         LOG.info("There are " + moduleContexts.size() + " timer-driven runtime modules. Scheduling the first task...");
-        scheduleNextTask(-1);
+        scheduleNextTask(-2);
     }
 
     /**
@@ -77,20 +77,15 @@ public class RotatingTaskScheduler implements TaskScheduler {
      */
     @Override
     public void stop() {
-        worker.shutdown();
-        try {
-            LOG.info("Terminating task scheduler...");
-            worker.awaitTermination(5, TimeUnit.SECONDS);
-            LOG.info("Task scheduler terminated successfully.");
-        } catch (InterruptedException e) {
-            LOG.warn(this.getClass().getName() + " did not properly terminate.", e);
-        }
+        LOG.info("Terminating task scheduler...");
+        worker.shutdownNow();
+        LOG.info("Task scheduler terminated successfully.");
     }
 
     /**
      * Schedule next task.
      *
-     * @param lastTaskDuration duration of the last task in nanoseconds.
+     * @param lastTaskDuration duration of the last task in nanoseconds, negative if unknown.
      */
     private void scheduleNextTask(long lastTaskDuration) {
         long delay = timingStrategy.nextDelay(lastTaskDuration);

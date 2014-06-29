@@ -21,6 +21,9 @@ public class FixedDelayTimingStrategy implements TimingStrategy {
      */
     @Override
     public long nextDelay(long lastTaskDuration) {
+        if (lastTaskDuration == -2) {
+            return 1000; //initial delay of 1s
+        }
         return delay;
     }
 }

@@ -26,4 +26,27 @@ public class NodeBasedContext implements TimerDrivenModuleContext<Node> {
     public Node find(GraphDatabaseService database) {
         return database.getNodeById(nodeId);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NodeBasedContext that = (NodeBasedContext) o;
+
+        if (nodeId != that.nodeId) return false;
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return (int) (nodeId ^ (nodeId >>> 32));
+    }
 }
