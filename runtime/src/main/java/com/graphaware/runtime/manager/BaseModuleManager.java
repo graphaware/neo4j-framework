@@ -33,13 +33,13 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
      * {@inheritDoc}
      */
     @Override
-    public void registerModule(T module) {
+    public final void registerModule(T module) {
         checkNotAlreadyRegistered(module);
         modules.add(module);
     }
 
     /**
-     * Check that the given module isn't already registered with the runtime.
+     * Check that the given module isn't already registered with the manager.
      *
      * @param module to check.
      * @throws IllegalStateException in case the module is already registered.
@@ -60,7 +60,7 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
      * {@inheritDoc}
      */
     @Override
-    public Set<String> loadMetadata() {
+    public final Set<String> loadMetadata() {
         final Set<String> moduleIds = new HashSet<>();
 
         for (final T module : modules) {
@@ -73,16 +73,10 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
     }
 
     /**
-     * Initialize module. This means doing any work necessary for a module that has been registered for the first time
-     * on an existing database, or that has been previously registered with different configuration.
-     * <p/>
-     * For example, a module that performs some in-graph caching needs to write information into the graph so that when
-     * the method returns, the graph is in the same state as it would be if the module has been running all the time
-     * since the graph was empty.
-     * <p/>
-     * Note that for many modules, it might not be necessary to do anything.
+     * Load module metadata from wherever they are stored in between database restarts and do whatever is necessary
+     * to do with this metadata before the module can be used.
      *
-     * @param module to initialize.
+     * @param module to load metadata for.
      */
     private void loadMetadata(T module) {
         M moduleMetadata = null;
@@ -91,6 +85,8 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
             if (moduleMetadata == null) {
                 LOG.info("Module " + module.getId() + " seems to have been registered for the first time.");
                 handleNoMetadata(module);
+            } else {
+                LOG.info("Module " + module.getId() + " seems to have been registered before, metadata loaded successfully.");
             }
         } catch (CorruptMetadataException e) {
             LOG.info("Module " + module.getId() + " seems to have corrupted metadata.");
@@ -98,6 +94,7 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
         }
 
         if (moduleMetadata == null) {
+            LOG.info("Creating fresh metadata for module " + module.getId() + ".");
             moduleMetadata = createFreshMetadata(module);
         }
 
@@ -105,18 +102,60 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
         persistMetadata(module, moduleMetadata);
     }
 
-    protected abstract void handleCorruptMetadata(T module);
+    /**
+     * Handle the fact that metadata for a module has been corrupted. This could be because somebody has manually messed
+     * with the storage of module metadata, or because the implementation of the module metadata has changed and the class
+     * expected is different from the class previously serialized.
+     * <p/>
+     * After this method has returned, it is guaranteed that {@link #createFreshMetadata(com.graphaware.runtime.module.RuntimeModule)}
+     * will be called. This means that if the module doesn't heavily rely on its metadata, there is no need to override
+     * this method.
+     *
+     * @param module that had corrupted metadata.
+     */
+    protected void handleCorruptMetadata(T module) {
+        //for sub-classes
+    }
 
-    protected abstract void handleNoMetadata(T module);
+    /**
+     * Handle the fact that there was no metadata for a module. This could be because it has been registered for the
+     * first time, or because somebody as manually deleted the metadata from wherever {@link ModuleMetadataRepository}
+     * stores them.
+     * <p/>
+     * After this method has returned, it is guaranteed that {@link #createFreshMetadata(com.graphaware.runtime.module.RuntimeModule)}
+     * will be called. This means that there is no need to override this method unless there is some work that needs to
+     * be done in addition to creating new metadata.
+     *
+     * @param module that had no metadata.
+     */
+    protected void handleNoMetadata(T module) {
+        //for sub-classes
+    }
 
+    /**
+     * Create new metadata for a module.
+     *
+     * @param module for which to create metadata.
+     * @return fresh metadata.
+     */
     protected abstract M createFreshMetadata(T module);
 
+    /**
+     * Acknowledge module metadata after it has been created afresh or successfully loaded from a {@link ModuleMetadataRepository}.
+     * The implementation can, for example, choose to let the module know about its own metadata. This method also gives
+     * the subclasses the opportunity to modify the metadata before it is persisted to the database.
+     *
+     * @param module   for which to acknowledge metadata.
+     * @param metadata to acknowledge.
+     * @return the acknowledged metadata (possibly modified).
+     */
     protected abstract M acknowledgeMetadata(T module, M metadata);
 
     /**
-     * Capture the fact the a module has been (re-)initialized as a root node's property.
+     * Persist module metadata.
      *
-     * @param module that has been initialized.
+     * @param module   module.
+     * @param metadata metadata.
      */
     private void persistMetadata(final T module, M metadata) {
         metadataRepository.persistModuleMetadata(module, metadata);

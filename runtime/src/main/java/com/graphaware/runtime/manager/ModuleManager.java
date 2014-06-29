@@ -20,17 +20,17 @@ public interface ModuleManager<T extends RuntimeModule> {
     void registerModule(T module);
 
     /**
-     * Initialize modules if needed. A module should only be "initialised" if it has been established that it has been
-     * registered for the first time, or that its configuration has changed since the last time the database was started.
+     * Load module metadata from wherever they are stored in between database restarts and do whatever is necessary
+     * to do with this metadata before the modules can be used.
      *
-     * @return IDs of all registered modules, no matter if they have or have not been initialized.
+     * @return IDs of all modules registered with this manager.
      */
     Set<String> loadMetadata();
 
     /**
-     * Perform cleanup of unused modules that might have written their metadata into the graph but are no longer present.
+     * Perform cleanup metadata written by modules that are no longer present.
      *
-     * @param usedModules IDs of modules that are known to be used.
+     * @param usedModules IDs of all modules that are known to be used by the runtime during the current run.
      */
     void cleanupMetadata(Set<String> usedModules);
 

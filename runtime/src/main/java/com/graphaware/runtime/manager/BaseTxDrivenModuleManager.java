@@ -13,7 +13,7 @@ import org.neo4j.graphdb.event.TransactionData;
 import java.util.Date;
 
 /**
- * Base {@link ModuleManager} for {@link TxDrivenModule}s.
+ * {@link BaseModuleManager} for {@link TxDrivenModule}s.
  */
 public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule<?>> extends BaseModuleManager<TxDrivenModuleMetadata, T> implements TxDrivenModuleManager<T> {
 
@@ -33,7 +33,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule<?>> ext
      */
     @Override
     public void throwExceptionIfIllegal(TransactionData transactionData) {
-        metadataRepository.check(transactionData);
+        metadataRepository.throwExceptionIfIllegal(transactionData);
     }
 
     /**
@@ -42,7 +42,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule<?>> ext
     @Override
     protected void handleCorruptMetadata(T module) {
         LOG.info("Module " + module.getId() + " seems to have corrupted metadata, will re-initialize...");
-        doReinitialize(module);
+        reinitialize(module);
     }
 
     /**
@@ -51,7 +51,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule<?>> ext
     @Override
     protected void handleNoMetadata(T module) {
         LOG.info("Module " + module.getId() + " seems to have been registered for the first time, will initialize...");
-        doInitialize(module);
+        initialize(module);
     }
 
     /**
@@ -69,13 +69,13 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule<?>> ext
     protected TxDrivenModuleMetadata acknowledgeMetadata(T module, TxDrivenModuleMetadata metadata) {
         if (metadata.needsInitialization()) {
             LOG.info("Module " + module.getId() + " has been marked for re-initialization on " + new Date(metadata.timestamp()).toString() + ". Will re-initialize...");
-            doReinitialize(module);
+            reinitialize(module);
             return createFreshMetadata(module);
         }
 
         if (!metadata.getConfig().equals(module.getConfiguration())) {
             LOG.info("Module " + module.getId() + " seems to have changed configuration since last run, will re-initialize...");
-            doReinitialize(module);
+            reinitialize(module);
             return createFreshMetadata(module);
         }
 
@@ -95,7 +95,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule<?>> ext
      *
      * @param module to initialize.
      */
-    protected abstract void doInitialize(T module);
+    protected abstract void initialize(T module);
 
     /**
      * Re-initialize module. This means cleaning up all data this module might have ever written to the graph and
@@ -110,7 +110,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule<?>> ext
      *
      * @param module to initialize.
      */
-    protected abstract void doReinitialize(T module);
+    protected abstract void reinitialize(T module);
 
     /**
      * {@inheritDoc}
@@ -131,7 +131,8 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule<?>> ext
                 TxDrivenModuleMetadata moduleMetadata = metadataRepository.getModuleMetadata(module);
                 metadataRepository.persistModuleMetadata(module, moduleMetadata.markedNeedingInitialization());
             } catch (RuntimeException e) {
-                LOG.warn("Module " + module.getId() + " threw an exception!", e);
+                LOG.info("Module " + module.getId() + " threw an exception", e);
+                throw e;
             }
         }
     }

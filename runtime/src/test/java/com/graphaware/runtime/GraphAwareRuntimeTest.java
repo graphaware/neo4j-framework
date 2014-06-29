@@ -17,6 +17,7 @@
 package com.graphaware.runtime;
 
 import com.graphaware.common.strategy.InclusionStrategies;
+import com.graphaware.common.util.IterableUtils;
 import com.graphaware.runtime.config.*;
 import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
@@ -48,11 +49,11 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     protected abstract Node createRuntimeRoot();
 
-    protected abstract T createMockModule();
+    protected abstract T mockTxModule();
 
-    protected abstract T createMockModule(String id);
+    protected abstract T mockTxModule(String id);
 
-    protected abstract T createMockModule(String id, TxDrivenModuleConfiguration configuration);
+    protected abstract T mockTxModule(String id, TxDrivenModuleConfiguration configuration);
 
     protected abstract Transaction getTransaction();
 
@@ -66,9 +67,11 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     protected abstract ModuleMetadataRepository getRepository();
 
+    protected abstract long countNodes();
+
     @Test
     public void moduleRegisteredForTheFirstTimeShouldBeInitialized() {
-        final T mockModule = createMockModule();
+        final T mockModule = mockTxModule();
 
         GraphAwareRuntime runtime = createRuntime();
         runtime.registerModule(mockModule);
@@ -90,7 +93,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void moduleAlreadyRegisteredShouldNotBeInitialized() {
-        final TxDrivenModule mockModule = createMockModule();
+        final TxDrivenModule mockModule = mockTxModule();
 
         try (Transaction tx = getTransaction()) {
             getRepository().persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()));
@@ -117,7 +120,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void changedModuleShouldBeReInitialized() {
-        final T mockModule = createMockModule();
+        final T mockModule = mockTxModule();
 
         try (Transaction tx = getTransaction()) {
             getRepository().persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none())));
@@ -145,7 +148,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void forcedModuleShouldBeReInitialized() {
-        final T mockModule = createMockModule();
+        final T mockModule = mockTxModule();
 
         try (Transaction tx = getTransaction()) {
             getRepository().persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()).markedNeedingInitialization());
@@ -173,7 +176,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void changedModuleShouldNotBeReInitializedWhenInitializationSkipped() {
-        final TxDrivenModule mockModule = createMockModule();
+        final TxDrivenModule mockModule = mockTxModule();
 
         try (Transaction tx = getTransaction()) {
             getRepository().persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none())));
@@ -198,7 +201,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotBeAbleToRegisterTheSameModuleTwice() {
-        final TxDrivenModule mockModule = createMockModule();
+        final TxDrivenModule mockModule = mockTxModule();
 
         GraphAwareRuntime runtime = createRuntime();
         runtime.registerModule(mockModule);
@@ -207,8 +210,8 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotBeAbleToRegisterModuleWithTheSameIdTwice() {
-        final TxDrivenModule mockModule1 = createMockModule();
-        final TxDrivenModule mockModule2 = createMockModule();
+        final TxDrivenModule mockModule1 = mockTxModule();
+        final TxDrivenModule mockModule2 = mockTxModule();
         when(mockModule1.getId()).thenReturn("ID");
         when(mockModule2.getId()).thenReturn("ID");
 
@@ -219,8 +222,8 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void unusedModulesShouldBeRemoved() {
-        final TxDrivenModule mockModule = createMockModule();
-        final TxDrivenModule unusedModule = createMockModule("UNUSED");
+        final TxDrivenModule mockModule = mockTxModule();
+        final TxDrivenModule unusedModule = mockTxModule("UNUSED");
 
         try (Transaction tx = getTransaction()) {
             getRepository().persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()));
@@ -245,7 +248,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void usedCorruptModulesShouldBeReInitialized() {
-        final T mockModule = createMockModule();
+        final T mockModule = mockTxModule();
 
         try (Transaction tx = getTransaction()) {
             Node root = createRuntimeRoot();
@@ -273,7 +276,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void usedCorruptModulesShouldBeInitialized2() {
-        final T mockModule = createMockModule();
+        final T mockModule = mockTxModule();
 
         try (Transaction tx = getTransaction()) {
             Node root = createRuntimeRoot();
@@ -302,7 +305,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void unusedCorruptModulesShouldBeRemoved() {
-        final TxDrivenModule mockModule = createMockModule();
+        final TxDrivenModule mockModule = mockTxModule();
 
         try (Transaction tx = getTransaction()) {
             Node root = createRuntimeRoot();
@@ -329,9 +332,9 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void allRegisteredInterestedModulesShouldBeDelegatedTo() {
-        T mockModule1 = createMockModule(MOCK + "1");
-        T mockModule2 = createMockModule(MOCK + "2");
-        T mockModule3 = createMockModule(MOCK + "3", new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none()));
+        T mockModule1 = mockTxModule(MOCK + "1");
+        T mockModule2 = mockTxModule(MOCK + "2");
+        T mockModule3 = mockTxModule(MOCK + "3", new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none()));
 
         GraphAwareRuntime runtime = createRuntime();
         runtime.registerModule(mockModule1);
@@ -367,10 +370,30 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
     }
 
     @Test
+    public void moduleThrowingExceptionShouldRollbackTransaction() {
+        T mockModule = mockTxModule(MOCK);
+        doThrow(new RuntimeException("Deliberate testing exception")).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule);
+        runtime.start();
+
+        try (Transaction tx = getTransaction()) {
+            Node node = createNode();
+            node.setProperty("test", "test");
+            tx.success();
+        } catch (Exception e) {
+            //OK
+        }
+
+        assertEquals(1, countNodes()); //just the node for storing metadata
+    }
+
+    @Test
     public void allRegisteredInterestedModulesShouldBeDelegatedToWhenRuntimeIsNotExplicitlyStarted() {
-        T mockModule1 = createMockModule(MOCK + "1");
-        T mockModule2 = createMockModule(MOCK + "2");
-        T mockModule3 = createMockModule(MOCK + "3", new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none()));
+        T mockModule1 = mockTxModule(MOCK + "1");
+        T mockModule2 = mockTxModule(MOCK + "2");
+        T mockModule3 = mockTxModule(MOCK + "3", new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none()));
 
         GraphAwareRuntime runtime = createRuntime();
         runtime.registerModule(mockModule1);
@@ -405,7 +428,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void moduleThrowingInitExceptionShouldBeMarkedForReinitialization() {
-        final TxDrivenModule mockModule = createMockModule();
+        final TxDrivenModule mockModule = mockTxModule();
         when(mockModule.getConfiguration()).thenReturn(NullTxDrivenModuleConfiguration.getInstance());
         Mockito.doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
@@ -436,7 +459,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void moduleThrowingInitExceptionShouldBeMarkedForReinitializationOnlyTheFirstTime() throws InterruptedException {
-        final TxDrivenModule mockModule = createMockModule();
+        final TxDrivenModule mockModule = mockTxModule();
         when(mockModule.getConfiguration()).thenReturn(NullTxDrivenModuleConfiguration.getInstance());
         doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
@@ -474,7 +497,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test(expected = IllegalStateException.class)
     public void modulesCannotBeRegisteredAfterStart() {
-        final TxDrivenModule mockModule = createMockModule();
+        final TxDrivenModule mockModule = mockTxModule();
 
         GraphAwareRuntime runtime = createRuntime();
         runtime.start(true);
@@ -522,7 +545,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void shutdownShouldBeCalledBeforeShutdown() {
-        TxDrivenModule mockModule = createMockModule();
+        TxDrivenModule mockModule = mockTxModule();
 
         GraphAwareRuntime runtime = createRuntime();
         runtime.registerModule(mockModule);
@@ -532,8 +555,6 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
         verify(mockModule).shutdown();
     }
-
-
 
     @Test(expected = IllegalStateException.class)
     public void shouldFailWhenThereAreTwoRootNodes() {
@@ -549,10 +570,10 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void whenOneModuleThrowsAnExceptionThenOtherModulesShouldStillBeDelegatedTo() {
-        T mockModule1 = createMockModule(MOCK + "1");
+        T mockModule1 = mockTxModule(MOCK + "1");
         doThrow(new RuntimeException()).when(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
 
-        T mockModule2 = createMockModule(MOCK + "2");
+        T mockModule2 = mockTxModule(MOCK + "2");
 
         GraphAwareRuntime runtime = createRuntime();
         runtime.registerModule(mockModule1);
@@ -584,7 +605,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void runtimeShouldBeStartedAutomatically() {
-        final T mockModule = createMockModule();
+        final T mockModule = mockTxModule();
 
         GraphAwareRuntime runtime = createRuntime();
         runtime.registerModule(mockModule);

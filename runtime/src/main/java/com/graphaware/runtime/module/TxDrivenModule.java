@@ -48,6 +48,18 @@ public interface TxDrivenModule<M extends TxDrivenModuleMetadata> extends Runtim
     TxDrivenModuleConfiguration getConfiguration();
 
     /**
+     * Initialize module. This means doing any work necessary for a module that has been registered for the first time
+     * on an existing database, or that has been previously registered with different configuration.
+     * <p/>
+     * For example, a module that performs some in-graph caching needs to write information into the graph so that when
+     * the method returns, the graph is in the same state as it would be if the module has been running all the time
+     * since the graph was empty.
+     * <p/>
+     * Note that for many modules, it might not be necessary to do anything.
+     *
+     * @param module to initialize.
+     */
+    /**
      * Initialize this module. This method must bring the module to a state equivalent to a state of the same module that
      * has been registered at all times since the database was empty. It can perform global-graph operations to achieve
      * this.

@@ -37,7 +37,7 @@ public abstract class SingleNodeModuleMetadataRepository implements ModuleMetada
      * {@inheritDoc}
      */
     @Override
-    public void check(TransactionData transactionData) {
+    public void throwExceptionIfIllegal(TransactionData transactionData) {
         for (LabelEntry entry : transactionData.removedLabels()) {
             if (entry.label().equals(GA_METADATA)) {
                 throw new IllegalStateException("Attempted to delete GraphAware Runtime root node!");

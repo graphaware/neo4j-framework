@@ -10,4 +10,6 @@ import org.neo4j.graphdb.GraphDatabaseService;
 public interface TimerDrivenModule<M extends TimerDrivenModuleMetadata<?>> extends RuntimeModule<M> {
 
 	M doSomeWork(M lastMetadata, GraphDatabaseService database);
+
+    M createFirstMetadata(GraphDatabaseService database);
 }

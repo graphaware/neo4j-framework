@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.common.util.IterableUtils;
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
@@ -42,17 +43,17 @@ public abstract class DatabaseBackedRuntimeTest extends GraphAwareRuntimeTest {
         return GraphAwareRuntimeFactory.createRuntime(database);
     }
 
-    protected TxDrivenModule createMockModule() {
-        return createMockModule(MOCK);
+    protected TxDrivenModule mockTxModule() {
+        return mockTxModule(MOCK);
     }
 
     @Override
-    protected TxDrivenModule createMockModule(String id) {
-        return createMockModule(id, NullTxDrivenModuleConfiguration.getInstance());
+    protected TxDrivenModule mockTxModule(String id) {
+        return mockTxModule(id, NullTxDrivenModuleConfiguration.getInstance());
     }
 
     @Override
-    protected TxDrivenModule createMockModule(String id, TxDrivenModuleConfiguration configuration) {
+    protected TxDrivenModule mockTxModule(String id, TxDrivenModuleConfiguration configuration) {
         TxDrivenModule mockModule = mock(TxDrivenModule.class);
         when(mockModule.getId()).thenReturn(id);
         when(mockModule.getConfiguration()).thenReturn(configuration);
@@ -89,6 +90,16 @@ public abstract class DatabaseBackedRuntimeTest extends GraphAwareRuntimeTest {
         return repository;
     }
 
+    @Override
+    protected long countNodes() {
+        long count;
+        try (Transaction tx = database.beginTx()) {
+            count = IterableUtils.countNodes(database);
+            tx.success();
+        }
+        return count;
+    }
+
     @Test
     public void shouldCreateRuntimeRootNodeAfterFirstStartup() {
         assertNull(getRuntimeRoot());
@@ -101,6 +112,4 @@ public abstract class DatabaseBackedRuntimeTest extends GraphAwareRuntimeTest {
 
         assertNotNull(getRuntimeRoot());
     }
-
-
 }

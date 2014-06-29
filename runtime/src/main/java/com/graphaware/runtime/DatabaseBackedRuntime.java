@@ -25,7 +25,7 @@ import org.neo4j.graphdb.Transaction;
 /**
  * {@link TxDrivenRuntime} that operates on a real {@link org.neo4j.graphdb.GraphDatabaseService}.
  */
-public class DatabaseBackedRuntime extends TxDrivenRuntime<TxDrivenModule> {
+public abstract class DatabaseBackedRuntime extends TxDrivenRuntime<TxDrivenModule> {
 
     private final GraphDatabaseService database;
 

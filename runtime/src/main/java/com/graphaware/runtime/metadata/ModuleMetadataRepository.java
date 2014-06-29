@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public interface ModuleMetadataRepository {
 
-    void check(TransactionData transactionData);
+    void throwExceptionIfIllegal(TransactionData transactionData);
 
     <M extends ModuleMetadata, T extends RuntimeModule<? extends M>> M getModuleMetadata(T module);
 

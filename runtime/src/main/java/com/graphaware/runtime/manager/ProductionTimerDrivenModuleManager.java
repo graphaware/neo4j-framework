@@ -12,52 +12,49 @@ import java.util.Collections;
 import java.util.Set;
 
 /**
- *
+ * Production implementation of {@link TimerDrivenModuleManager}. Must be backed by a {@link GraphDatabaseService},
+ * as there is no support for using {@link TimerDrivenModule}s in batch mode (i.e. with {@link org.neo4j.unsafe.batchinsert.BatchInserter}s).
  */
-public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerDrivenModuleMetadata, TimerDrivenModule<? extends TimerDrivenModuleMetadata<?>>> implements TimerDrivenModuleManager {
+public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerDrivenModuleMetadata, TimerDrivenModule<? extends TimerDrivenModuleMetadata>> implements TimerDrivenModuleManager<TimerDrivenModule<? extends TimerDrivenModuleMetadata>> {
 
     private final GraphDatabaseService database;
     private final TaskScheduler taskScheduler;
 
-    public ProductionTimerDrivenModuleManager(ModuleMetadataRepository metadataRepository, GraphDatabaseService database) {
+    /**
+     * Construct a new manager.
+     *
+     * @param database           storing graph data.
+     * @param metadataRepository for storing module metadata.
+     */
+    public ProductionTimerDrivenModuleManager(GraphDatabaseService database, ModuleMetadataRepository metadataRepository) {
         super(metadataRepository);
         this.database = database;
-        this.taskScheduler = new RotatingTaskScheduler(database, metadataRepository, Collections.<TimerDrivenModule>emptyList(), new FixedDelayTimingStrategy(1000));
+
+        taskScheduler = new RotatingTaskScheduler(database, metadataRepository, new FixedDelayTimingStrategy(200));
     }
 
-    @Override
-    protected void handleCorruptMetadata(TimerDrivenModule module) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    protected void handleNoMetadata(TimerDrivenModule module) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected TimerDrivenModuleMetadata createFreshMetadata(TimerDrivenModule module) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return module.createFirstMetadata(database);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected TimerDrivenModuleMetadata acknowledgeMetadata(TimerDrivenModule module, TimerDrivenModuleMetadata metadata) {
+        taskScheduler.registerMetadata(module, metadata);
         return metadata;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void startModules() {
-        // We will start the scheduling here.
-        /*
-         * I reckon we want to have something here that says "start the scheduler" and then it's off and running.
-         *
-         * The objects that are actually scheduled need to provide the environment in which the modules will operate, namely:
-         * - start and manage a database transaction
-         *   (although our diagram said the tx boundary was just below GraphAwareRuntime, that was only for the init process)
-         * - ensure that exceptions thrown from the modules don't affect the module manager adversely
-         * - ensure persistence of state of module and/or graph walk
-         *   (i.e., make sure that if the database is shut down then we can reinitialise)
-         */
         taskScheduler.start();
     }
 

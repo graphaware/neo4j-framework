@@ -17,12 +17,14 @@
 package com.graphaware.runtime;
 
 import com.graphaware.common.util.FakeTransaction;
+import com.graphaware.common.util.IterableUtils;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.metadata.BatchSingleNodeModuleMetadataRepository;
 import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
+import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.runtime.strategy.BatchSupportingTxDrivenModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserterImpl;
@@ -55,7 +57,7 @@ import static org.mockito.Mockito.*;
 /**
  * Unit test for {@link BatchInserterBackedRuntime}.
  */
-public class BatchInserterBackedRuntimeTest extends GraphAwareRuntimeTest<BatchSupportingTxDrivenModule> {
+public class BatchInserterRuntimeTest extends GraphAwareRuntimeTest<BatchSupportingTxDrivenModule> {
 
     private final TemporaryFolder temporaryFolder = new TemporaryFolder();
     private TransactionSimulatingBatchInserter batchInserter;
@@ -90,17 +92,17 @@ public class BatchInserterBackedRuntimeTest extends GraphAwareRuntimeTest<BatchS
     }
 
     @Override
-    protected BatchSupportingTxDrivenModule createMockModule() {
-        return createMockModule(MOCK);
+    protected BatchSupportingTxDrivenModule mockTxModule() {
+        return mockTxModule(MOCK);
     }
 
     @Override
-    protected BatchSupportingTxDrivenModule createMockModule(String id) {
-        return createMockModule(id, NullTxDrivenModuleConfiguration.getInstance());
+    protected BatchSupportingTxDrivenModule mockTxModule(String id) {
+        return mockTxModule(id, NullTxDrivenModuleConfiguration.getInstance());
     }
 
     @Override
-    protected BatchSupportingTxDrivenModule createMockModule(String id, TxDrivenModuleConfiguration configuration) {
+    protected BatchSupportingTxDrivenModule mockTxModule(String id, TxDrivenModuleConfiguration configuration) {
         BatchSupportingTxDrivenModule mockModule = mock(BatchSupportingTxDrivenModule.class);
         when(mockModule.getId()).thenReturn(id);
         when(mockModule.getConfiguration()).thenReturn(configuration);
@@ -138,6 +140,11 @@ public class BatchInserterBackedRuntimeTest extends GraphAwareRuntimeTest<BatchS
         return repository;
     }
 
+    @Override
+    protected long countNodes() {
+        return IterableUtils.count(batchInserter.getAllNodes());
+    }
+
     @Test
     public void shouldCreateRuntimeRootNodeAfterFirstStartup() {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(batchInserter);
@@ -154,5 +161,18 @@ public class BatchInserterBackedRuntimeTest extends GraphAwareRuntimeTest<BatchS
         });
 
         database.shutdown();
+    }
+
+    @Test
+    public void shouldIgnoreNonCompatibleModules() {
+        TxDrivenModule mockModule = mock(TxDrivenModule.class);
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule);
+
+        runtime.start();
+
+        verify(mockModule, atLeastOnce()).getId();
+        verifyNoMoreInteractions(mockModule);
     }
 }

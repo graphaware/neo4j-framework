@@ -1,23 +1,17 @@
 package com.graphaware.runtime.schedule;
 
-import com.graphaware.runtime.metadata.GraphPosition;
-import com.graphaware.runtime.metadata.ModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TimerDrivenModuleMetadata;
 import com.graphaware.runtime.module.TimerDrivenModule;
-import com.graphaware.runtime.timer.FixedDelayTimingStrategy;
 import com.graphaware.runtime.timer.TimingStrategy;
 import org.apache.log4j.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
@@ -27,17 +21,17 @@ public class RotatingTaskScheduler implements TaskScheduler {
 
     private final GraphDatabaseService database;
     private final ModuleMetadataRepository repository;
-    private final List<TimerDrivenModule> modules;
     private final TimingStrategy timingStrategy;
 
-    private final ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor();
-    private final AtomicInteger lastModule = new AtomicInteger(-1);
-    private final Map<TimerDrivenModule, ModuleMetadata> moduleMetadata = new HashMap<>();
+    //todo: these two should be made concurrent if we use more than 1 thread for the background work
+    private final Map<TimerDrivenModule, TimerDrivenModuleMetadata> moduleMetadata = new LinkedHashMap<>();
+    private Iterator<Map.Entry<TimerDrivenModule, TimerDrivenModuleMetadata>> moduleMetadataIterator;
 
-    public RotatingTaskScheduler(GraphDatabaseService database, ModuleMetadataRepository repository, List<TimerDrivenModule> modules, TimingStrategy timingStrategy) {
+    private final ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor();
+
+    public RotatingTaskScheduler(GraphDatabaseService database, ModuleMetadataRepository repository, TimingStrategy timingStrategy) {
         this.database = database;
         this.repository = repository;
-        this.modules = modules;
         this.timingStrategy = timingStrategy;
     }
 
@@ -45,13 +39,25 @@ public class RotatingTaskScheduler implements TaskScheduler {
      * {@inheritDoc}
      */
     @Override
+    public <M extends TimerDrivenModuleMetadata, T extends TimerDrivenModule<M>> void registerMetadata(T module, M metadata) {
+        if (moduleMetadataIterator != null) {
+            throw new IllegalStateException("Task scheduler can not accept metadata after it has been started. This is a bug.");
+        }
+
+        moduleMetadata.put(module, metadata);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void start() {
-        if (modules.isEmpty()) {
+        if (moduleMetadata.isEmpty()) {
             LOG.info("There are no timer-driven runtime modules. Not scheduling any tasks.");
             return;
         }
 
-        LOG.info("There are " + modules.size() + " timer-driven runtime modules. Starting timer...");
+        LOG.info("There are " + moduleMetadata.size() + " timer-driven runtime modules. Starting timer...");
         scheduleNextTask(-1);
     }
 
@@ -68,12 +74,22 @@ public class RotatingTaskScheduler implements TaskScheduler {
         }
     }
 
+    /**
+     * Schedule next task.
+     *
+     * @param lastTaskDuration duration of the last task in nanoseconds.
+     */
     private void scheduleNextTask(long lastTaskDuration) {
         long delay = timingStrategy.nextDelay(lastTaskDuration);
         LOG.debug("Scheduling next task with a delay of " + delay + " ms.");
         worker.schedule(nextTask(), delay, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Create next task wrapped in a {@link Runnable}. The {@link Runnable} schedules the next task when finished.
+     *
+     * @return next task to be run wrapped in a {@link Runnable}.
+     */
     protected Runnable nextTask() {
         return new Runnable() {
             @Override
@@ -85,8 +101,8 @@ public class RotatingTaskScheduler implements TaskScheduler {
 
                     runNextTask();
 
-                    totalTime = (System.nanoTime() - startTime) / 1000;
-                    LOG.debug("Successfully completed scheduled task in " + totalTime + " microseconds");
+                    totalTime = (System.nanoTime() - startTime);
+                    LOG.debug("Successfully completed scheduled task in " + totalTime / 1000 + " microseconds");
                 } catch (Exception e) {
                     LOG.warn("Task execution threw an exception: " + e.getMessage(), e);
                 } finally {
@@ -96,33 +112,39 @@ public class RotatingTaskScheduler implements TaskScheduler {
         };
     }
 
-    private <M extends TimerDrivenModuleMetadata<?>> void runNextTask() {
-        int nextModuleIndex = lastModule.incrementAndGet() % modules.size();
-        TimerDrivenModule<M> module = modules.get(nextModuleIndex);
+    /**
+     * Run the next task.
+     *
+     * @param <M> metadata type of the metadata passed into the module below.
+     * @param <T> module type of the module that will be delegated to.
+     */
+    private <M extends TimerDrivenModuleMetadata, T extends TimerDrivenModule<M>> void runNextTask() {
+        Map.Entry<T, M> moduleAndMetadata = nextModuleAndMetadata();
+        T module = moduleAndMetadata.getKey();
+        M metadata = moduleAndMetadata.getValue();
 
         try (Transaction tx = database.beginTx()) {
-            M metadata = getMetadata(module);
             M newMetadata = module.doSomeWork(metadata, database);
-            persistMetadata(module, newMetadata);
+            repository.persistModuleMetadata(module, newMetadata);
             moduleMetadata.put(module, newMetadata);
-
             tx.success();
         }
     }
 
-    private <M extends TimerDrivenModuleMetadata<?>> M getMetadata(TimerDrivenModule<M> module) {
-        if (!moduleMetadata.containsKey(module)) {
-            moduleMetadata.put(module, loadMetadata(module));
+    /**
+     * Find the next module to be delegated to and its metadata.
+     *
+     * @param <M> metadata type.
+     * @param <T> module type.
+     * @return module & metadata as a {@link Map.Entry}
+     */
+    private <M extends TimerDrivenModuleMetadata, T extends TimerDrivenModule<M>> Map.Entry<T, M> nextModuleAndMetadata() {
+        if (moduleMetadataIterator == null || !moduleMetadataIterator.hasNext()) {
+            moduleMetadataIterator = moduleMetadata.entrySet().iterator();
         }
 
-        return (M) moduleMetadata.get(module);
-    }
-
-    private <M extends TimerDrivenModuleMetadata<?>> M loadMetadata(TimerDrivenModule<M> module) {
-        return repository.getModuleMetadata(module);
-    }
-
-    private <M extends TimerDrivenModuleMetadata<?>> void persistMetadata(TimerDrivenModule<M> module, M metadata) {
-        repository.persistModuleMetadata(module, metadata);
+        //this class controls the insertion to the map and it is type-safe.
+        //noinspection unchecked
+        return (Map.Entry<T, M>) moduleMetadataIterator.next();
     }
 }
