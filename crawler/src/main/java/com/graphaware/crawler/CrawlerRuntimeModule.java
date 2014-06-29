@@ -1,6 +1,7 @@
 package com.graphaware.crawler;
 
-import com.graphaware.runtime.module.BaseTransactionDrivenRuntimeModule;
+import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
+import com.graphaware.runtime.module.BaseTxDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
@@ -14,7 +15,7 @@ import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
  * @deprecated Consequence of a misunderstanding - this functionality shouldn't be a module but should be part of the runtime
  */
 @Deprecated
-public class CrawlerRuntimeModule extends BaseTransactionDrivenRuntimeModule {
+public class CrawlerRuntimeModule extends BaseTxDrivenModule {
 
 	private final CrawlerModuleConfiguration moduleConfiguration;
 	private final ThingThatGetsCalledWhenWeFindSomething inclusionHandler;
@@ -68,5 +69,4 @@ public class CrawlerRuntimeModule extends BaseTransactionDrivenRuntimeModule {
 		 * Indeed, given that I don't think I want to override this means I'd question extending the base class.
 		 */
 	}
-
 }

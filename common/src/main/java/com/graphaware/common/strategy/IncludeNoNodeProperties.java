@@ -17,6 +17,8 @@
 package com.graphaware.common.strategy;
 
 
+import com.graphaware.common.serialize.Serializer;
+import com.graphaware.common.serialize.SingletonSerializer;
 import org.neo4j.graphdb.Node;
 
 /**
@@ -25,6 +27,10 @@ import org.neo4j.graphdb.Node;
 public final class IncludeNoNodeProperties extends IncludeNoProperties<Node> implements NodePropertyInclusionStrategy {
 
     private static final NodePropertyInclusionStrategy INSTANCE = new IncludeNoNodeProperties();
+
+    static {
+        Serializer.register(IncludeNoNodeProperties.class, new SingletonSerializer());
+    }
 
     public static NodePropertyInclusionStrategy getInstance() {
         return INSTANCE;

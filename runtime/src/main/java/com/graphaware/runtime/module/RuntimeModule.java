@@ -16,11 +16,8 @@
 
 package com.graphaware.runtime.module;
 
-import com.graphaware.runtime.config.RuntimeModuleConfiguration;
-import org.neo4j.graphdb.GraphDatabaseService;
-
 /**
- * A {@link com.graphaware.runtime.ProductionGraphAwareRuntime} module performing some useful work based on about-to-be-committed transaction data.
+ * A module performing some useful work on the graph in the background, being delegated to by {@link com.graphaware.runtime.GraphAwareRuntime}.
  */
 public interface RuntimeModule {
 
@@ -31,33 +28,6 @@ public interface RuntimeModule {
      * @return short ID of this module.
      */
     String getId();
-
-    /**
-     * Return the configuration of this module. Each module must encapsulate its entire configuration in an instance of
-     * a {@link com.graphaware.runtime.config.RuntimeModuleConfiguration} implementation. Use {@link com.graphaware.runtime.config.NullRuntimeModuleConfiguration}
-     * if this module needs no configuration.
-     *
-     * @return module configuration.
-     */
-    RuntimeModuleConfiguration getConfiguration();
-
-    /**
-     * Initialize this module. This method must bring the module to a state equivalent to a state of the same module that
-     * has been registered at all times since the database was empty. It can perform global-graph operations to achieve
-     * this.
-     *
-     * @param database to initialize this module for.
-     */
-    void initialize(GraphDatabaseService database);
-
-    /**
-     * Re-initialize this module. This method must remove all metadata written to the graph by this module and bring the
-     * module to a state equivalent to a state of the same module that has been registered at all times since the
-     * database was empty. It can perform global-graph operations to achieve this.
-     *
-     * @param database to initialize this module for.
-     */
-    void reinitialize(GraphDatabaseService database);
 
     /**
      * Perform cleanup if needed before database shutdown.

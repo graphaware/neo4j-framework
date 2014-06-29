@@ -24,7 +24,7 @@ import org.neo4j.graphdb.PropertyContainer;
  * Base-class for all {@link PropertyInclusionStrategy}
  * implementations that include arbitrary business / application level
  * properties (up to subclasses to decide which ones), but exclude any
- * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link com.graphaware.runtime.module.TransactionDrivenRuntimeModule} internal properties.
+ * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link com.graphaware.runtime.module.TxDrivenModule} internal properties.
  */
 public abstract class IncludeAllBusinessProperties<T extends PropertyContainer> implements PropertyInclusionStrategy<T> {
 

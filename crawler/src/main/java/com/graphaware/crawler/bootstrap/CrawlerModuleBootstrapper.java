@@ -3,7 +3,7 @@ package com.graphaware.crawler.bootstrap;
 import java.util.Map;
 
 import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
-import com.graphaware.runtime.module.TransactionDrivenRuntimeModule;
+import com.graphaware.runtime.module.TxDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import com.graphaware.crawler.CrawlerModuleConfiguration;
@@ -19,7 +19,7 @@ import com.graphaware.crawler.api.ThingThatGetsCalledWhenWeFindSomething;
 public class CrawlerModuleBootstrapper implements RuntimeModuleBootstrapper {
 
 	@Override
-	public TransactionDrivenRuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
+	public TxDrivenModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
 		CrawlerModuleConfiguration moduleConfiguration = new DefaultCrawlerModuleConfiguration();
 
 		// I thought about putting the ThingThatGetsCalled... into the configuration, but keeping it as a separate part of the
