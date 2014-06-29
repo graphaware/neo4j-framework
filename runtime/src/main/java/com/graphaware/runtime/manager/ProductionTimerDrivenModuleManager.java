@@ -8,9 +8,6 @@ import com.graphaware.runtime.schedule.TaskScheduler;
 import com.graphaware.runtime.timer.FixedDelayTimingStrategy;
 import org.neo4j.graphdb.GraphDatabaseService;
 
-import java.util.Collections;
-import java.util.Set;
-
 /**
  * Production implementation of {@link TimerDrivenModuleManager}. Must be backed by a {@link GraphDatabaseService},
  * as there is no support for using {@link TimerDrivenModule}s in batch mode (i.e. with {@link org.neo4j.unsafe.batchinsert.BatchInserter}s).
@@ -46,7 +43,7 @@ public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerD
      */
     @Override
     protected TimerDrivenModuleMetadata acknowledgeMetadata(TimerDrivenModule module, TimerDrivenModuleMetadata metadata) {
-        taskScheduler.registerMetadata(module, metadata);
+        taskScheduler.registerModuleAndMetadata(module, metadata);
         return metadata;
     }
 

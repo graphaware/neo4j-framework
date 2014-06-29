@@ -14,7 +14,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
+ * {@link TaskScheduler} that delegates to the registered {@link TimerDrivenModule}s in round-robin fashion, in the order
+ * in which the modules were registered. All work performed by this implementation is done by a single thread.
  */
 public class RotatingTaskScheduler implements TaskScheduler {
     private static final Logger LOG = Logger.getLogger(RotatingTaskScheduler.class);
@@ -29,6 +30,13 @@ public class RotatingTaskScheduler implements TaskScheduler {
 
     private final ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor();
 
+    /**
+     * Construct a new task scheduler.
+     *
+     * @param database       against which the modules are running.
+     * @param repository     for persisting metadata.
+     * @param timingStrategy strategy for timing the work delegation.
+     */
     public RotatingTaskScheduler(GraphDatabaseService database, ModuleMetadataRepository repository, TimingStrategy timingStrategy) {
         this.database = database;
         this.repository = repository;
@@ -39,11 +47,12 @@ public class RotatingTaskScheduler implements TaskScheduler {
      * {@inheritDoc}
      */
     @Override
-    public <M extends TimerDrivenModuleMetadata, T extends TimerDrivenModule<M>> void registerMetadata(T module, M metadata) {
+    public <M extends TimerDrivenModuleMetadata, T extends TimerDrivenModule<M>> void registerModuleAndMetadata(T module, M metadata) {
         if (moduleMetadataIterator != null) {
             throw new IllegalStateException("Task scheduler can not accept metadata after it has been started. This is a bug.");
         }
 
+        LOG.info("Registering module " + module.getId() + " and its metadata with the task scheduler.");
         moduleMetadata.put(module, metadata);
     }
 
@@ -57,7 +66,7 @@ public class RotatingTaskScheduler implements TaskScheduler {
             return;
         }
 
-        LOG.info("There are " + moduleMetadata.size() + " timer-driven runtime modules. Starting timer...");
+        LOG.info("There are " + moduleMetadata.size() + " timer-driven runtime modules. Scheduling the first task...");
         scheduleNextTask(-1);
     }
 
@@ -68,9 +77,11 @@ public class RotatingTaskScheduler implements TaskScheduler {
     public void stop() {
         worker.shutdown();
         try {
+            LOG.info("Terminating task scheduler...");
             worker.awaitTermination(5, TimeUnit.SECONDS);
+            LOG.info("Task scheduler terminated successfully.");
         } catch (InterruptedException e) {
-            LOG.warn(this.getClass().getName() + " did not properly shut down");
+            LOG.warn(this.getClass().getName() + " did not properly terminate.", e);
         }
     }
 

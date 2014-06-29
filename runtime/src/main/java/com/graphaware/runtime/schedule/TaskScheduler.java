@@ -4,23 +4,28 @@ import com.graphaware.runtime.metadata.TimerDrivenModuleMetadata;
 import com.graphaware.runtime.module.TimerDrivenModule;
 
 /**
- *                       // We will start the scheduling here.
- /*
- * I reckon we want to have something here that says "start the scheduler" and then it's off and running.
- *
- * The objects that are actually scheduled need to provide the environment in which the modules will operate, namely:
- * - start and manage a database transaction
- *   (although our diagram said the tx boundary was just below GraphAwareRuntime, that was only for the init process)
- * - ensure that exceptions thrown from the modules don't affect the module manager adversely
- * - ensure persistence of state of module and/or graph walk
- *   (i.e., make sure that if the database is shut down then we can reinitialise)
+ * A component delegating to registered {@link TimerDrivenModule}s on a scheduled basis.
  */
-
 public interface TaskScheduler {
 
-    <M extends TimerDrivenModuleMetadata, T extends TimerDrivenModule<M>>  void registerMetadata(T module, M metadata);
+    /**
+     * Register a module and its metadata. Registered modules will be delegated to and metadata managed by the implementation
+     * of this interface after the first registration. Must be called before {@link #start()}.
+     *
+     * @param module   to register.
+     * @param metadata of the module.
+     * @param <M>      type of the metadata.
+     * @param <T>      type of the module.
+     */
+    <M extends TimerDrivenModuleMetadata, T extends TimerDrivenModule<M>> void registerModuleAndMetadata(T module, M metadata);
 
+    /**
+     * Start scheduling tasks / delegating work to registered modules.
+     */
     void start();
 
+    /**
+     * Stop scheduling tasks. Perform cleanup. No other methods should be called afterwards as this object will be useless.
+     */
     void stop();
 }
