@@ -5,7 +5,7 @@ GraphAware Neo4j Framework
 [![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework) | <a href="http://graphaware.com/downloads/" target="_blank">Downloads</a> | <a href="http://graphaware.com/site/framework/latest/apidocs/" target="_blank">Javadoc</a> | Latest Releases: 2.1.2.7
 
 GraphAware Framework speeds up development with <a href="http://neo4j.org" target="_blank">Neo4j</a> by providing a
-platform for building useful generic as well as domain-specific functionality, analytical capabilities, graph algorithms,
+platform for building useful generic as well as domain-specific functionality, analytical capabilities, (iterative) graph algorithms,
 etc.
 
 See the <a href="http://graphaware.com/neo4j/2014/05/28/graph-aware-neo4j-framework.html" target="_blank">announcement on our blog</a>.
@@ -18,8 +18,9 @@ On a high level, there are two key pieces of functionality:
 on top of Neo4j using Spring MVC, rather than JAX-RS.
 * [GraphAware Runtime](#graphaware-runtime) is a runtime environment for both embedded and server deployments, which
 allows the use of pre-built as well as custom modules called [GraphAware Runtime Modules](#graphaware-runtime). These
-modules typically extend the core functionality of the database by transparently enriching/modifying/preventing ongoing
-transactions in real-time.
+modules typically extend the core functionality of the database by
+    * transparently enriching/modifying/preventing ongoing transactions in real-time
+    * performing continuous computations on the graph in the background
 
 Additionally, for [Java developers only](#javadev)(1), the following functionality is provided:
 
@@ -139,6 +140,7 @@ controller:
  */
 @Controller
 @RequestMapping("count")
+@Transactional
 public class NodeCountApi {
 
     private final GraphDatabaseService database;
@@ -151,9 +153,7 @@ public class NodeCountApi {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public long count() {
-        try (Transaction tx = database.beginTx()) {
-            return Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
-        }
+        return Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
     }
 }
 ```
@@ -264,24 +264,29 @@ ones that aren't listed above:
 </build>
 ```
 
-
 <a name="runtime"/>
 GraphAware Runtime
 ------------------
 
-GraphAware Runtime is useful when you require functionality that transparently alters transactions or prevents them from
-happening at all. For example, you might want to:
-* Enforce specific constraints on the graph schema
-* Use optimistic locking to prevent updates of out-of-date data
-* Improve performance by building (and keeping in sync) in-graph indices
-* Improve performance of supernodes
-* Prevent certain parts of the graph from being deleted
-* Timestamp modifications
-* Find out what the latest graph modifications that took place were
-* Write trigger-like functionality (which can actually be unit-tested!)
-* ... and much more
+GraphAware Runtime is useful when you:
+* require functionality that transparently alters transactions or prevents them from happening at all. For example, you might want to:
+    * Enforce specific constraints on the graph schema
+    * Use optimistic locking to prevent updates of out-of-date data
+    * Improve performance by building (and keeping in sync) in-graph indices
+    * Improve performance of supernodes
+    * Prevent certain parts of the graph from being deleted
+    * Timestamp modifications
+    * Find out what the latest graph modifications that took place were
+    * Write trigger-like functionality (which can actually be unit-tested!)
+    * ... and much more
+* need to compute something continuously in the background, writing the results back to the graph. For example, you might want to:
+    * compute PageRank
+    * compute maximum flow between points in the network
+    * pre-compute similarities between people
+    * pre-compute recommendations to people
+    * ... and much more
 
-### Building a GraphAware Runtime Module
+### Building a Transaction-Driven GraphAware Runtime Module
 
 **Example:** An example is provided in `examples/friendship-strength-counter-module`.
 
@@ -338,10 +343,21 @@ To start from scratch, you will need the following dependencies in your pom.xml
 
 Again, if using other dependencies, you need to make sure the resulting .jar file includes all the dependencies. [See above](#alldependencies).
 
-Your module then needs to be built by implementing the <a href="http://graphaware.com/site/framework/latest/apidocs/com/graphaware/runtime/GraphAwareRuntimeModule.html" target="_blank">GraphAwareRuntimeModule</a> interface.
+Your module then needs to be built by implementing the <a href="http://graphaware.com/site/framework/latest/apidocs/com/graphaware/runtime/module/TxDrivenModule.html" target="_blank">TxDrivenModule</a> interface.
 An example is provided in `examples/friendship-strength-counter-module`. This computes the sum of all `strength` properties
 on `FRIEND_OF` relationships and keeps it up to data, written to a special node created for that purpose. It also has
 a REST API that can be queried for the total friendship strength value.
+
+### Building a Timer-Driven GraphAware Runtime Module
+
+Similarly, your module can implement the the <a href="http://graphaware.com/site/framework/latest/apidocs/com/graphaware/runtime/module/TimerDrivenModule.html" target="_blank">TimerDrivenModule</a> interface
+in order to be able to perform computations on the graph that are automatically scheduled. The framework will detect quiet
+periods in your database and increase the rate at which modules perform behind-the-scenes computations. During busy periods, naturally,
+the rate is decreased.
+
+Each unit of work, implemented by the `doSomeWork` method on `TimerDrivenModule`, should be a short computation that
+writes some results back to the graph. This is very useful for iterative algorithms like PageRank, which are too expensive
+to compute in real-time.
 
 <a name="server-usage"/>
 ### Using GraphAware Runtime (Server Mode)
@@ -386,7 +402,7 @@ To use the runtime and modules programmatically, all we need to do is instantiat
 
 ```java
 GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //replace with a real DB
-GraphAwareRuntime runtime = ProductionGraphAwareRuntime.forDatabase(database);
+GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
 runtime.registerModule(new FriendshipStrengthModule("FSM", database));
 ```
 
@@ -408,7 +424,8 @@ database = new TestGraphDatabaseFactory()
               .newGraphDatabase();
 ```
 
-**NOTE:** Modules are presented with the about-to-be-committed transaction data in the order in which they've been registered.
+**NOTE:** Modules are presented with the about-to-be-committed  transaction data or asked to do work on scheduled basis
+in the order in which they've been registered.
 
 <a name="javadev"/>
 Features for Java Developers
