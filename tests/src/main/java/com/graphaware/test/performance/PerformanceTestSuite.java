@@ -54,7 +54,7 @@ public abstract class PerformanceTestSuite {
             LOG.info("Started performance test: " + performanceTest.longName());
 
             TestResults testResults = run(performanceTest);
-            testResults.printToFile(performanceTest.longName(), "src/test/resources/" + performanceTest.shortName() + "-" + System.currentTimeMillis() + ".txt");
+            testResults.printToFile(performanceTest.longName(),  performanceTest.shortName() + "-" + System.currentTimeMillis() + ".txt");
 
             LOG.info("Finished performance test: " + performanceTest.longName());
         }
