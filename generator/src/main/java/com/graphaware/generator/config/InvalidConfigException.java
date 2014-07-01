@@ -14,29 +14,29 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.generator.distribution;
+package com.graphaware.generator.config;
 
 /**
- * Exception signifying an invalid distribution used for graph generation.
+ * Exception signifying an invalid config used for graph generation.
  */
-public class InvalidDistributionException extends RuntimeException {
+public class InvalidConfigException extends RuntimeException {
 
-    public InvalidDistributionException() {
+    public InvalidConfigException() {
     }
 
-    public InvalidDistributionException(String message) {
+    public InvalidConfigException(String message) {
         super(message);
     }
 
-    public InvalidDistributionException(String message, Throwable cause) {
+    public InvalidConfigException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public InvalidDistributionException(Throwable cause) {
+    public InvalidConfigException(Throwable cause) {
         super(cause);
     }
 
-    public InvalidDistributionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public InvalidConfigException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

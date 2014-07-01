@@ -1,6 +1,5 @@
 package com.graphaware.generator.config;
 
-import com.graphaware.generator.distribution.DegreeDistribution;
 import com.graphaware.generator.node.NodeCreator;
 import com.graphaware.generator.relationship.RelationshipCreator;
 import com.graphaware.generator.relationship.RelationshipGenerator;

@@ -21,7 +21,7 @@ import com.graphaware.crawler.pagerank.RandomWalkerPageRankModule;
 import com.graphaware.generator.GraphGenerator;
 import com.graphaware.generator.Neo4jGraphGenerator;
 import com.graphaware.generator.config.BasicGeneratorConfiguration;
-import com.graphaware.generator.distribution.SimpleDegreeDistribution;
+import com.graphaware.generator.config.SimpleDegreeDistribution;
 import com.graphaware.generator.node.SocialNetworkNodeCreator;
 import com.graphaware.generator.relationship.SimpleGraphRelationshipGenerator;
 import com.graphaware.generator.relationship.SocialNetworkRelationshipCreator;

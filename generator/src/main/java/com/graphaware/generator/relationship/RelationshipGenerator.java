@@ -16,22 +16,25 @@
 package com.graphaware.generator.relationship;
 
 import com.graphaware.common.util.SameTypePair;
-import com.graphaware.generator.distribution.DegreeDistribution;
-import com.graphaware.generator.distribution.InvalidDistributionException;
+import com.graphaware.generator.config.DegreeDistribution;
+import com.graphaware.generator.config.InvalidConfigException;
+import com.graphaware.generator.config.RelationshipGeneratorConfig;
 
 import java.util.List;
 
 /**
- * A component that generates relationships based on a given {@link DegreeDistribution}.
+ * A component that generates relationships based on a given {@link com.graphaware.generator.config.RelationshipGeneratorConfig}.
+ *
+ * @param <T> type of accepted configuration.
  */
-public interface RelationshipGenerator {
+public interface RelationshipGenerator<T extends RelationshipGeneratorConfig> {
 
     /**
      * Generate edges (relationships) based on a degree distribution.
      *
-     * @param distribution of degrees.
+     * @param config of the generator.
      * @return pairs of node IDs representing edges.
-     * @throws InvalidDistributionException in case the given distribution is invalid for the generator implementation.
+     * @throws com.graphaware.generator.config.InvalidConfigException in case the given distribution is invalid for the generator implementation.
      */
-    List<SameTypePair<Integer>> generateEdges(DegreeDistribution distribution) throws InvalidDistributionException;
+    List<? extends SameTypePair<Integer>> generateEdges(T config) throws InvalidConfigException;
 }

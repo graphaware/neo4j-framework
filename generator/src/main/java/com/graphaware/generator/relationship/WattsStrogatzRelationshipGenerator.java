@@ -2,8 +2,9 @@ package com.graphaware.generator.relationship;
 
 import com.graphaware.common.util.SameTypePair;
 import com.graphaware.common.util.UnorderedPair;
-import com.graphaware.generator.distribution.DegreeDistribution;
-import com.graphaware.generator.distribution.InvalidDistributionException;
+import com.graphaware.generator.config.DegreeDistribution;
+import com.graphaware.generator.config.InvalidConfigException;
+import com.graphaware.generator.config.WattsStrogatzConfig;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -11,29 +12,13 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * Watts-Strogatz model implementation
+ * Watts-Strogatz model implementation.
  */
-public class WattsStrogatzGraphRelationshipGenerator extends BaseRelationshipGenerator {
-
-
-    @Override
-    protected boolean isValidDistribution(DegreeDistribution distribution) {
-        throw new UnsupportedOperationException("Distribution argument not accepted in Watts-Strogatz");
-    }
-
-    /* TODO: change the superclass so it allows for generation of random graphs as well?
-       Comments: The null-model is characterised by a degree distribution specified at the input,
-                 but for some other useful models (Erdos-Reyni, Barabasi-Albert, Watts-Strogatz),
-                 I need just to call doGenerateEdges without different arguments. I am not sure about the
-                 structure og the framework itself, but would like to keep the base class as
-                 flexible and simple as possible.
-    */
-    @Override
-    protected List<SameTypePair<Integer>> doGenerateEdges(DegreeDistribution distribution) {
-        throw new UnsupportedOperationException("Distribution argument not accepted in Watts-Strogatz");
-    }
+public class WattsStrogatzRelationshipGenerator extends BaseRelationshipGenerator<WattsStrogatzConfig> {
 
     /**
+     * {@inheritDoc}
+     *
      * Generates a ring and performs rewiring on the network. This creates
      * a small-world network with high clustering coefficients (ie. there
      * are a lot of triangles present in the network, but the diameter
@@ -43,21 +28,20 @@ public class WattsStrogatzGraphRelationshipGenerator extends BaseRelationshipGen
      * TODO: find a way to control the strength of rewiring in the model
      * @return ring - edge list as a list of unordered integer pairs
      */
-    public List<UnorderedPair<Integer>> doGenerateEdges(int numberOfNodes, int meanDegree, double beta) {
-
-        // Perform a check if the parameter set is valid
-        if(!isValidParameterSet(numberOfNodes, meanDegree, beta))
-            throw new InvalidDistributionException("The supplied parameter set is invalid");
+    @Override
+    protected List<? extends SameTypePair<Integer>> doGenerateEdges(WattsStrogatzConfig config) {
+        int numberOfNodes = config.getNumberOfNodes();
+        int meanDegree = config.getMeanDegree();
+        double beta = config.getBeta();
 
         // Throw warning if no rewiring is possible? Complete graph?
-
         Random random = new Random();
         ArrayList<UnorderedPair<Integer>> ring = new ArrayList<>(numberOfNodes);
 
         // Create a ring network
         // TODO: is it worth to replace the hardcoded integer loops with iterators?
-        for (int i = 0; i < numberOfNodes; ++i ) {
-            for (int j = i + 1; j <= i + meanDegree/2; ++j ) {
+        for (int i = 0; i < numberOfNodes; ++i) {
+            for (int j = i + 1; j <= i + meanDegree / 2; ++j) {
                 int friend = j % numberOfNodes;
                 ring.add(new UnorderedPair<>(i, friend));
             }
@@ -78,15 +62,15 @@ public class WattsStrogatzGraphRelationshipGenerator extends BaseRelationshipGen
 
            Works, but slow and hacked.
         */
-        for (ListIterator<UnorderedPair<Integer>> it = ring.listIterator(); it.hasNext();) {
+        for (ListIterator<UnorderedPair<Integer>> it = ring.listIterator(); it.hasNext(); ) {
             int index = it.nextIndex(); // index
             UnorderedPair<Integer> edge = it.next(); // get the edge present in the iterator
 
-            if(random.nextDouble() <= beta ) {
-                while(true) {
+            if (random.nextDouble() <= beta) {
+                while (true) {
                     // Allow self-rewiring ? (this avoids problems with complete graphs)
                     int choice = random.nextDouble() > .5 ? edge.first() : edge.second(); // select first/second at random
-                    int trial = (int) Math.floor(random.nextDouble() * (numberOfNodes -1));       // skip self node
+                    int trial = (int) Math.floor(random.nextDouble() * (numberOfNodes - 1));       // skip self node
                     int partner = trial < choice ? trial : trial + 1;                     // avoid self-loops
 
                     UnorderedPair<Integer> trialPair = new UnorderedPair<>(choice, partner);
@@ -100,20 +84,7 @@ public class WattsStrogatzGraphRelationshipGenerator extends BaseRelationshipGen
                 }
             }
         }
-        return ring;
-    }
 
-    /**
-     * Returns true if the parameter is valid. Checks if number of edges is integer
-     * and the beta control parameter is valid.
-     * @param meanDegree mean degree of the regular ring network constructed as an initial step for Watts-Strogatz
-     * @param beta probability of edge rewiring at a given step
-     * @return true if the parameter set is valid
-     */
-    protected boolean isValidParameterSet(int numberOfNodes, int meanDegree, double beta) {
-        return !(meanDegree % 2 != 0 ||
-                meanDegree < 3 ||
-                meanDegree > numberOfNodes - 1) &&
-                (0 <= beta && beta <= 1);
+        return ring;
     }
 }

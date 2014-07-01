@@ -17,7 +17,8 @@ package com.graphaware.generator.relationship;
 
 import com.graphaware.common.util.SameTypePair;
 import com.graphaware.common.util.UnorderedPair;
-import com.graphaware.generator.distribution.DegreeDistribution;
+import com.graphaware.generator.config.DegreeDistribution;
+import com.graphaware.generator.config.SimpleDegreeDistribution;
 import com.graphaware.generator.utils.WeightedReservoirSampler;
 
 import java.util.ArrayList;
@@ -36,24 +37,15 @@ import static java.lang.Math.min;
  * A SEQUENTIAL IMPORTANCE SAMPLING ALGORITHM FOR GENERATING RANDOM GRAPHS WITH PRESCRIBED DEGREES
  * By Joseph Blitzstein and Persi Diaconis (Stanford University). (Harvard, June 2006)
  */
-public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator {
+public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator<SimpleDegreeDistribution> {
 
     /**
      * {@inheritDoc}
-     */
-    @Override
-    protected boolean isValidDistribution(DegreeDistribution distribution) {
-        return passesErdosGallaiTest(distribution);
-        //return passesErdosGallaiTest(distribution); //can be swapped for Havel-Hakimi
-    }
-
-    /**
-     * {@inheritDoc}
-     *
+     * <p/>
      * Returns an edge-set corresponding to a randomly chosen simple graph.
      */
     @Override
-    protected List<SameTypePair<Integer>> doGenerateEdges(DegreeDistribution distribution) {
+    protected List<SameTypePair<Integer>> doGenerateEdges(SimpleDegreeDistribution distribution) {
         List<SameTypePair<Integer>> edges = new ArrayList<>();
 
         while (!distribution.isZeroList()) {
@@ -74,7 +66,7 @@ public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator 
 
             // Obtain a candidate list:
             while (true) {
-                DegreeDistribution temp = distribution.duplicate();
+                SimpleDegreeDistribution temp = distribution.duplicate();
                 int candidateIndex = sampler.randomIndexChoice(temp.getDegrees(), index);
 
                 // int rnd =  (int) Math.floor(Math.random() * (length - 1)); // choose an index from one elem. less range. OK
@@ -100,101 +92,14 @@ public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator 
                 temp.decrease(index);
                 temp.decrease(candidateIndex);
 
-                if (isValidDistribution(temp)) {
+                if (temp.isValid()) {
                     distribution = temp;
                     edges.add(edgeCandidate); // edge is allowed, add it.
                     break;
                 }
             }
         }
+
         return edges;
-    }
-
-    /**
-     * All valid distributions must be graphical. This is tested using Erdos-Gallai condition on degree distribution
-     * graphicality. (see Blitzstein-Diaconis paper)
-     *
-     * @param distribution to test.
-     * @return true iff passes.
-     */
-    public boolean passesErdosGallaiTest(DegreeDistribution distribution) {
-        // Do this in-place instead?
-        DegreeDistribution copy = distribution.duplicate();
-
-        int L = copy.size();
-        int degreeSum = 0;           // Has to be even by the handshaking lemma
-
-        for (int degree : copy.getDegrees()) {
-            if (degree < 0) {
-                return false;
-            }
-            degreeSum += degree;
-        }
-
-        if (degreeSum % 2 != 0) {
-            return false;
-        }
-
-        copy.sort(Collections.<Integer>reverseOrder());
-        // Erdos-Gallai test
-        for (int k = 1; k < L; ++k) {
-            int sum = 0;
-            for (int i = 0; i < k; ++i) {
-                sum += copy.get(i);
-            }
-
-            int comp = 0;
-            for (int j = k; j < L; ++j) {
-                comp += min(k, copy.get(j));
-            }
-
-            if (sum > k * (k - 1) + comp) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Havel-Hakimi is a recursive alternative to the Erdos-Gallai condition
-     *
-     * @param distribution to test.
-     * @return true iff passes.
-     */
-    private boolean passesHavelHakimiTest(DegreeDistribution distribution) {
-        /* 
-         * The test fails if there are less available 
-         * nodes to connect to than the degree of lar-
-         * gest node.
-         */
-
-        DegreeDistribution copy = distribution.duplicate();
-
-        int i = 0;
-        int first;
-        int L = distribution.size();
-
-        while (L > 0) {
-            first = copy.get(i);
-            L--;
-
-            int j = 1;
-            for (int k = 0; k < first; ++k) {
-                while (copy.get(j) == 0) {
-
-                    j++;
-                    if (j > L) {
-                        return false;
-                    }
-                }
-
-                copy.set(j, copy.get(j) - 1);
-            }
-
-            copy.set(i, 0);
-            copy.sort(Collections.<Integer>reverseOrder());
-        }
-        return true;
     }
 }

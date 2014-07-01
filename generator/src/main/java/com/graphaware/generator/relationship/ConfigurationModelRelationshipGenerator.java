@@ -21,7 +21,8 @@
 package com.graphaware.generator.relationship;
 
 import com.graphaware.common.util.SameTypePair;
-import com.graphaware.generator.distribution.DegreeDistribution;
+import com.graphaware.generator.config.ConfigurationModelConfig;
+import com.graphaware.generator.config.DegreeDistribution;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,27 +37,13 @@ import static java.util.Collections.shuffle;
  *
  * @see {@link SimpleGraphRelationshipGenerator}.
  */
-public class ConfigurationModelRelationshipGenerator extends BaseRelationshipGenerator {
-
-    /**
-     * {@inheritDoc}
-     * <p/>
-     * All valid distributions must contain even number of stubs.
-     */
-    @Override
-    protected boolean isValidDistribution(DegreeDistribution distribution) {
-        int degreeSum = 0;           // Has to be even by the handshaking lemma
-        for (int degree : distribution.getDegrees()) {
-            degreeSum += degree;
-        }
-        return (degreeSum % 2) == 0;
-    }
+public class ConfigurationModelRelationshipGenerator extends BaseRelationshipGenerator<ConfigurationModelConfig> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected List<SameTypePair<Integer>> doGenerateEdges(DegreeDistribution distribution) {
+    protected List<SameTypePair<Integer>> doGenerateEdges(ConfigurationModelConfig distribution) {
         List<Integer> spread = spreadDistribution(distribution);
         shuffle(spread);
 

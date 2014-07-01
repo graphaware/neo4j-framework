@@ -1,4 +1,4 @@
-package com.graphaware.generator.distribution;
+package com.graphaware.generator.config;
 
 import java.util.Comparator;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * A distribution of node degrees for {@link com.graphaware.generator.relationship.RelationshipGenerator}s.
  */
-public interface DegreeDistribution {
+public interface DegreeDistribution extends RelationshipGeneratorConfig {
 
     /**
      * Get the node degrees produced by this distribution.

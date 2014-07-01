@@ -8,9 +8,9 @@ package com.graphaware.generator;
 
 import com.graphaware.generator.config.BasicGeneratorConfiguration;
 import com.graphaware.generator.config.GeneratorConfiguration;
-import com.graphaware.generator.distribution.DegreeDistribution;
-import com.graphaware.generator.distribution.InvalidDistributionException;
-import com.graphaware.generator.distribution.SimpleDegreeDistribution;
+import com.graphaware.generator.config.DegreeDistribution;
+import com.graphaware.generator.config.InvalidConfigException;
+import com.graphaware.generator.config.SimpleDegreeDistribution;
 import com.graphaware.generator.node.NodeCreator;
 import com.graphaware.generator.node.SocialNetworkNodeCreator;
 import com.graphaware.generator.relationship.RelationshipCreator;
@@ -19,10 +19,8 @@ import com.graphaware.generator.relationship.SimpleGraphRelationshipGenerator;
 import com.graphaware.generator.relationship.SocialNetworkRelationshipCreator;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
 import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Arrays;
 
@@ -58,7 +56,7 @@ public class Neo4jGraphGeneratorTest extends DatabaseIntegrationTest {
         }
     }
 
-    @Test(expected = InvalidDistributionException.class)
+    @Test(expected = InvalidConfigException.class)
     public void invalidDistributionShouldThrowException() {
         NodeCreator nodeCreator = SocialNetworkNodeCreator.getInstance();
         RelationshipCreator relationshipCreator = SocialNetworkRelationshipCreator.getInstance();
