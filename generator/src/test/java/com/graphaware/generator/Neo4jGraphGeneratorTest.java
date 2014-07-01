@@ -35,14 +35,6 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
  */
 public class Neo4jGraphGeneratorTest extends DatabaseIntegrationTest {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected GraphDatabaseService createDatabase() {
-        return new TestGraphDatabaseFactory().newImpermanentDatabase();
-    }
-
     @Test
     public void validDistributionShouldGenerateGraph() {
         NodeCreator nodeCreator = SocialNetworkNodeCreator.getInstance();

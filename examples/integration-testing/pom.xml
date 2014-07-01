@@ -18,12 +18,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.graphaware.neo4j.example</groupId>
-    <artifactId>performance-testing</artifactId>
+    <artifactId>integration-testing</artifactId>
     <version>2.1.2.8-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>GraphAware Neo4j Performance Test Examples</name>
-    <description>Example of a Neo4j Performance Test with GraphAware Framework</description>
+    <name>GraphAware Neo4j Integration Test Examples</name>
+    <description>Examples of Neo4j Integration Tests with GraphAware Framework</description>
     <url>http://graphaware.com</url>
 
     <properties>
@@ -31,6 +31,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <neo4j.version>2.1.2</neo4j.version>
         <graphware.version>2.1.2.8-SNAPSHOT</graphware.version>
+        <spring.version>4.0.0.RELEASE</spring.version>
     </properties>
 
     <profiles>
@@ -57,8 +58,22 @@
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <version>${graphware.version}</version>
-            <artifactId>tx-executor</artifactId>
-            <scope>test</scope>
+            <artifactId>common</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Spring -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Neo4j -->
@@ -69,7 +84,28 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>server-api</artifactId>
+            <version>${neo4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.neo4j.app</groupId>
+            <artifactId>neo4j-server</artifactId>
+            <version>${neo4j.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Testing -->
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>server-community</artifactId>
+            <version>${graphware.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <version>${graphware.version}</version>

@@ -1,7 +1,5 @@
 package com.graphaware.test.integration;
 
-import org.junit.After;
-import org.junit.Before;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.server.WrappingNeoServerBootstrapper;
 import org.neo4j.server.configuration.Configurator;
@@ -13,31 +11,33 @@ import java.util.Map;
 
 /**
  * {@link DatabaseIntegrationTest} that starts the {@link WrappingNeoServerBootstrapper} as well,
- * in order to make the webadmin and potentially custom managed and unmanaged extensions available for testing.
+ * in order to make webadmin and potentially custom managed and unmanaged extensions available for testing.
  * <p/>
  * This is generally useful for developers who use Neo4j in server mode and want to test their extensions, whilst
- * being able to access the {@link org.neo4j.graphdb.GraphDatabaseService} object using {@link #getDatabase()}, for example
- * to run {@link com.graphaware.test.unit.GraphUnit} test cases on it.
+ * being able to access the {@link org.neo4j.graphdb.GraphDatabaseService} object using {@link #getDatabase()},
+ * for example to run {@link com.graphaware.test.unit.GraphUnit} test cases on it.
  * <p/>
  * Unmanaged extensions are registered by overriding the {@link #thirdPartyJaxRsPackageMappings()} and providing
  * key-value pairs, where key is the package in which extensions live and value is the URI of the mount point.
  * <p/>
- * By overriding {@link #neoServerPort()}, you can change the port number of which the server runs (7474 by default).
+ * By overriding {@link #neoServerPort()}, you can change the port number of which the server runs (7575 by default).
  * <p/>
  * By overriding {@link #additionalServerConfiguration()}, you can provide additional server configuration (which would
  * normally live in neo4j-server.properties).
  */
 public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationTest {
 
+    private static final int DEFAULT_NEO_PORT = 7575;
+
     private WrappingNeoServerBootstrapper bootstrapper;
 
-    @Before
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         startServerWrapper();
     }
 
-    @After
+    @Override
     public void tearDown() throws Exception {
         bootstrapper.stop();
         super.tearDown();
@@ -78,7 +78,7 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
      *
      * @return map where the key is the package in which a set of extensions live and value is the mount point of those
      *         extensions, i.e., a URL under which they will be exposed relative to the server address
-     *         (typically http://localhost:7474 for tests).
+     *         (typically http://localhost:7575 for tests).
      */
     protected Map<String, String> thirdPartyJaxRsPackageMappings() {
         return Collections.emptyMap();
@@ -99,7 +99,7 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
      * @return port number.
      */
     protected int neoServerPort() {
-        return Configurator.DEFAULT_WEBSERVER_PORT;
+        return DEFAULT_NEO_PORT;
     }
 
     /**

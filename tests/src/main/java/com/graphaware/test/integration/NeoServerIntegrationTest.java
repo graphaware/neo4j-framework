@@ -16,7 +16,6 @@
 
 package com.graphaware.test.integration;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -27,6 +26,7 @@ import org.neo4j.server.configuration.Configurator;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
@@ -38,35 +38,26 @@ import java.io.IOException;
  * The primary purpose of tests that extend this class should be to verify that given a certain Neo4j configuration,
  * a (possibly runtime) module is bootstrapped and started correctly when the Neo4j server starts.
  * <p/>
- * The configuration is provided using a constructor. It defaults to "neo4j.properties" and if no such file is present
- * on the classpath of the implementing class, one that ships with Neo4j is used.
+ * The configuration file name is provided using a constructor. It defaults to "neo4j.properties" and if no such file is present
+ * on the classpath of the implementing class, the one that ships with Neo4j is used.
  */
 public abstract class NeoServerIntegrationTest {
 
-    private final String neo4jProperties;
     private Bootstrapper bootstrapper;
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
-    protected NeoServerIntegrationTest() {
-        this("neo4j.properties");
-    }
-
-    protected NeoServerIntegrationTest(String neo4jProperties) {
-        this.neo4jProperties = neo4jProperties;
-    }
-
     @Before
     public void setUp() throws IOException, InterruptedException {
-        String serverConfigContents = IOUtils.toString(new ClassPathResource("neo4j-server.properties").getInputStream());
+        String serverConfigContents = IOUtils.toString(new ClassPathResource(neo4jServerConfigFile()).getInputStream());
         serverConfigContents = serverConfigContents.replaceAll("=conf/", "=" + temporaryFolder.getRoot().getAbsolutePath() + "/conf/");
         serverConfigContents = serverConfigContents.replaceAll("=data/", "=" + temporaryFolder.getRoot().getAbsolutePath() + "/data/");
 
         temporaryFolder.newFolder("conf");
         File serverConfig = temporaryFolder.newFile("conf/neo4j-server.properties");
-        FileUtils.copyInputStreamToFile(IOUtils.toInputStream(serverConfigContents), serverConfig);
-        FileUtils.copyInputStreamToFile(new ClassPathResource(neo4jProperties).getInputStream(), temporaryFolder.newFile("conf/neo4j.properties"));
+        IOUtils.copy(IOUtils.toInputStream(serverConfigContents), new FileOutputStream(serverConfig));
+        IOUtils.copy(new ClassPathResource(neo4jConfigFile()).getInputStream(), new FileOutputStream(temporaryFolder.newFile("conf/neo4j.properties")));
 
         System.setProperty(Configurator.NEO_SERVER_CONFIG_FILE_KEY, serverConfig.getAbsolutePath());
 
@@ -77,5 +68,27 @@ public abstract class NeoServerIntegrationTest {
     @After
     public void tearDown() throws IOException, InterruptedException {
         bootstrapper.stop();
+    }
+
+    protected String baseUrl() {
+        return "http://localhost:7575";
+    }
+
+    /**
+     * Get the name of the neo4j config file on the classpath.
+     *
+     * @return config file name.
+     */
+    protected String neo4jConfigFile() {
+        return "neo4j.properties";
+    }
+
+    /**
+     * Get the name of the neo4j server config file on the classpath.
+     *
+     * @return config file name.
+     */
+    protected String neo4jServerConfigFile() {
+        return "neo4j-server.properties";
     }
 }
