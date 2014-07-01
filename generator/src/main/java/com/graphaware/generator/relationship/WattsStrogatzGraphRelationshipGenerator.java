@@ -13,7 +13,7 @@ import java.util.Random;
 /**
  * Watts-Strogatz model implementation
  */
-public class WattsStrogatzGraphGenerator extends BaseRelationshipGenerator {
+public class WattsStrogatzGraphRelationshipGenerator extends BaseRelationshipGenerator {
 
 
     @Override
@@ -21,10 +21,10 @@ public class WattsStrogatzGraphGenerator extends BaseRelationshipGenerator {
         throw new UnsupportedOperationException("Distribution argument not accepted in Watts-Strogatz");
     }
 
-    /* TODO: rebase the superclass so it allows for generation of random graphs as well?
+    /* TODO: change the superclass so it allows for generation of random graphs as well?
        Comments: The null-model is characterised by a degree distribution specified at the input,
                  but for some other useful models (Erdos-Reyni, Barabasi-Albert, Watts-Strogatz),
-                 I need just to call doGenerateEdges without any argument. I am not sure about the
+                 I need just to call doGenerateEdges without different arguments. I am not sure about the
                  structure og the framework itself, but would like to keep the base class as
                  flexible and simple as possible.
     */
