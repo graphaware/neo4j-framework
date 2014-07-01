@@ -31,6 +31,16 @@ public interface ModuleMetadataRepository {
     <M extends ModuleMetadata> M getModuleMetadata(RuntimeModule module);
 
     /**
+     * Get the metadata of a module that has previously been presisted.
+     *
+     * @param moduleId to get metadata for.
+     * @param <M>      type of the metadata.
+     * @return module metadata, null if no such metadata exists. This happens, for example, when a module has never been
+     *         registered and/or run before.
+     */
+    <M extends ModuleMetadata> M getModuleMetadata(String moduleId);
+
+    /**
      * Persist metadata of a module.
      *
      * @param module   for which to persist metadata.
@@ -38,6 +48,15 @@ public interface ModuleMetadataRepository {
      * @param <M>      type of the metadata.
      */
     <M extends ModuleMetadata> void persistModuleMetadata(RuntimeModule module, M metadata);
+
+    /**
+     * Persist metadata of a module.
+     *
+     * @param moduleId for which to persist metadata.
+     * @param metadata to persist.
+     * @param <M>      type of the metadata.
+     */
+    <M extends ModuleMetadata> void persistModuleMetadata(String moduleId, M metadata);
 
     /**
      * Get IDs of all modules, for which metadata has been persisted by this repository.
