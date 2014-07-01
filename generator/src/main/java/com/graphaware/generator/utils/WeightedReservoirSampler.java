@@ -22,7 +22,6 @@ public class WeightedReservoirSampler /*extends ReservoirSampler<T> ? */{
 
     /**
      * Create a new sampler with a certain reservoir size.
-     *
      */
     public WeightedReservoirSampler() {
         random = new Random();
@@ -57,9 +56,9 @@ public class WeightedReservoirSampler /*extends ReservoirSampler<T> ? */{
     /**
      * Returns a randomly chosen index, omitting a given indices.
      * This is very specific override.
-     * @param weights
-     * @param omitIndices
-     * @return
+     * @param weights weights to sample from
+     * @param omitIndices indices to omit from sampling
+     * @return index chosen according to the weight supplied
      */
     public int randomIndexChoice(List<Integer> weights, List<Integer> omitIndices) {
         int result = 0, index;
@@ -92,9 +91,9 @@ public class WeightedReservoirSampler /*extends ReservoirSampler<T> ? */{
      * Returns a randomly chosen index, omitting a given index.
      * This is very specific override used in the Simple graph
      * algorithm.
-     * @param weights
-     * @param omit
-     * @return
+     * @param weights list of weights to sample from
+     * @param omit list of indices to omit
+     * @return randomly (weighted) chosen index
      */
     public int randomIndexChoice(List<Integer> weights, int omit) {
         int result = 0, index;
