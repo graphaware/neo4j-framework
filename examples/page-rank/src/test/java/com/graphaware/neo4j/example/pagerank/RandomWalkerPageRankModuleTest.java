@@ -1,11 +1,13 @@
-package com.graphaware.crawler.pagerank;
+package com.graphaware.neo4j.example.pagerank;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Map;
 
+import com.graphaware.neo4j.example.pagerank.RandomWalkerPageRankModule;
 import com.graphaware.runtime.metadata.NodeBasedContext;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;

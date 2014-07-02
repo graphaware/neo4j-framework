@@ -1,4 +1,4 @@
-package com.graphaware.crawler.pagerank;
+package com.graphaware.neo4j.example.pagerank;
 
 import com.graphaware.runtime.metadata.NodeBasedContext;
 import com.graphaware.runtime.module.BaseRuntimeModule;
