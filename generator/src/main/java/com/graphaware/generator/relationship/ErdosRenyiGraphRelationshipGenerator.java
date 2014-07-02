@@ -13,6 +13,7 @@ import java.util.*;
  * components graph to a completely connected graph is present.
  */
 public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenerator<ErdosRenyiConfig> {
+
     protected List<? extends SameTypePair<Integer>> doGenerateEdges(ErdosRenyiConfig config) {
         int numberOfNodes = config.getNumberOfNodes();
         int numberOfEdges = config.getNumberOfEdges();
@@ -24,7 +25,7 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
             LinkedList<Integer> fromIndices = new LinkedList<>(); // store the from indices which have been already tested for all node connections
             boolean edgeFound = false;
 
-            while(true) {
+            while (true) {
                 LinkedList<Integer> omitIndices = new LinkedList<>();
 
                 int from = reservoirSampler.randomIndexChoice(numberOfNodes, fromIndices);
@@ -43,7 +44,7 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
                         break;
                     }
 
-                    if(omitIndices.size() == numberOfNodes)
+                    if (omitIndices.size() == numberOfNodes)
                         break; // broken without adding edge, skip to new from
 
 
@@ -54,7 +55,6 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
             }
         }
 
-        System.out.println(edges.toString());
         return edges;
     }
 }
