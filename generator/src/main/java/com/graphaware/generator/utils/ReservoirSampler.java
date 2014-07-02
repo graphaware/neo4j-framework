@@ -57,14 +57,42 @@ public class ReservoirSampler<T> {
      */
     public int randomIndexChoice(List<T> items, List<Integer> omitIndices) {
         double maxRnd = 0.0;
+        double rnd;
         int index = 0; // though formally null, non-null guaranteed, provided items are not empty
 
         for (int i = 0; i < items.size(); ++i) {
             if (omitIndices != null && omitIndices.contains(i)) // if an index is present in omit list, skip it.
                 continue;
 
-            if (random.nextDouble() > maxRnd)
+            rnd = random.nextDouble();
+            if (rnd > maxRnd) {
+                maxRnd = rnd;
                 index = i;
+            }
+        }
+
+        return index;
+    }
+
+    /**
+     * Randomly chooses an index and returns it, omiting the chosen indices.
+     * @param length length of the index sequence
+     * @return randomly chosen index, indices omited
+     */
+    public int randomIndexChoice(int length, List<Integer> omitIndices) {
+        double maxRnd = 0.0;
+        double rnd;
+        int index = 0; // though formally null, non-null guaranteed, provided items are not empty
+
+        for (int i = 0; i < length; ++i) {
+            if (omitIndices != null && omitIndices.contains(i)) // if an index is present in omit list, skip it.
+                continue;
+
+            rnd = random.nextDouble();
+            if (rnd > maxRnd) {
+                maxRnd = rnd;
+                index = i;
+            }
         }
 
         return index;
