@@ -18,7 +18,8 @@ public class RandomWalkerPageRankModuleBootstrapper implements RuntimeModuleBoot
 	@Override
 	public RandomWalkerPageRankModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
 		LOG.info("Constructing new module with ID: {}", moduleId);
-System.out.println("Config is: " + config);
+		LOG.trace("Configuration parameter map is: {}", config);
+
 		return new RandomWalkerPageRankModule(moduleId);
 	}
 
