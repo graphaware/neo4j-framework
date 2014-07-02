@@ -5,9 +5,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Map;
 
-import com.graphaware.neo4j.example.pagerank.RandomWalkerPageRankModule;
-import com.graphaware.runtime.metadata.NodeBasedContext;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
@@ -16,6 +13,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
+
+import com.graphaware.runtime.metadata.NodeBasedContext;
 
 public class RandomWalkerPageRankModuleTest {
 

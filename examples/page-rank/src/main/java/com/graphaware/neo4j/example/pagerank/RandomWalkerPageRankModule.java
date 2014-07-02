@@ -3,19 +3,34 @@ package com.graphaware.neo4j.example.pagerank;
 import com.graphaware.runtime.metadata.NodeBasedContext;
 import com.graphaware.runtime.module.BaseRuntimeModule;
 import com.graphaware.runtime.module.TimerDrivenModule;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Relationship;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ * A timer-driven GraphAware module that perpetually walks the graph by randomly following relationships and increments
+ * a node property called <code>pageRankValue</code> as it goes.  Eventually this will converge on a reasonable measure
+ * of the degree to which notes are interconnected, in that the most "popular" nodes will have the highest rank value.
+ */
 public class RandomWalkerPageRankModule extends BaseRuntimeModule implements TimerDrivenModule<NodeBasedContext> {
 
-	/** The name of the property key that is modified on visited nodes by this module. */
+	private static final Logger LOG = LoggerFactory.getLogger(RandomWalkerPageRankModule.class);
+
+	/** The name of the property that is maintained on visited nodes by this module. */
 	public static final String PAGE_RANK_PROPERTY_KEY = "pageRankValue";
 
 	private RandomNodeSelector randomNodeSelector;
 	private RelationshipChooser relationshipChooser;
 
+    /**
+     * Constructs a new {@link RandomWalkerPageRankModule} with the given ID.
+     *
+     * @param moduleId The unique identifier for this module instance in the GraphAware runtime
+     */
     public RandomWalkerPageRankModule(String moduleId) {
         super(moduleId);
         this.randomNodeSelector = new HyperJumpRandomNodeSelector();
@@ -23,31 +38,24 @@ public class RandomWalkerPageRankModule extends BaseRuntimeModule implements Tim
         this.relationshipChooser = new RandomRelationshipChooser();
     }
 
-    /**
-     * {@inheritDoc}
-     */
 	@Override
 	public void shutdown() {
 		//nothing needed for now
 	}
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public NodeBasedContext createInitialContext(GraphDatabaseService database) {
+    	LOG.info("Starting page rank graph walker from random start node...");
         return new NodeBasedContext(randomNodeSelector.selectRandomNode(database).getId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
 	public NodeBasedContext doSomeWork(NodeBasedContext lastContext, GraphDatabaseService database) {
         Node currentNode;
         try {
             currentNode = lastContext.find(database);
         } catch (NotFoundException e) {
+        	LOG.warn("Node referenced in last context with ID: {} was not found in the database.  Selecting new node at random to continue.");
             currentNode = this.randomNodeSelector.selectRandomNode(database);
         }
 
