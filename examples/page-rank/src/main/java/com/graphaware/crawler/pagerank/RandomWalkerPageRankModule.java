@@ -48,7 +48,7 @@ public class RandomWalkerPageRankModule extends BaseRuntimeModule implements Tim
         try {
             currentNode = lastContext.find(database);
         } catch (NotFoundException e) {
-            currentNode = randomNodeSelector.selectRandomNode(database);
+            currentNode = this.randomNodeSelector.selectRandomNode(database);
         }
 
         Node nextNode = determineNextNode(currentNode, database);

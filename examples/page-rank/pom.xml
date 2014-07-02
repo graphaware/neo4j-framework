@@ -30,7 +30,7 @@
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <neo4j.version>2.1.2</neo4j.version>
-        <graphware.version>2.1.2.8-SNAPSHOT</graphware.version>
+        <graphaware.version>2.1.2.8-SNAPSHOT</graphaware.version>
     </properties>
 
     <profiles>
@@ -58,11 +58,29 @@
             <version>${neo4j.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>api</artifactId>
+            <version>${graphaware.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>common</artifactId>
+            <version>${graphaware.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>runtime</artifactId>
+            <version>${graphaware.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- Testing -->
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
-            <version>${graphware.version}</version>
+            <version>${graphaware.version}</version>
             <artifactId>tests</artifactId>
             <scope>test</scope>
         </dependency>
