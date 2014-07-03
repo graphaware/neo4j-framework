@@ -25,7 +25,7 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
             LinkedList<Integer> fromIndices = new LinkedList<>(); // store the from indices which have been already tested for all node connections
             boolean edgeFound = false;
 
-            while (true) {
+            while (!edgeFound) {
                 LinkedList<Integer> omitIndices = new LinkedList<>();
 
                 int from = reservoirSampler.randomIndexChoice(numberOfNodes, fromIndices);
@@ -38,6 +38,7 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
 
                     UnorderedPair<Integer> edge = new UnorderedPair<>(from, to);
 
+                    // bottleneck
                     if (!edges.contains(edge)) {
                         edges.add(edge);
                         edgeFound = true;
@@ -50,8 +51,8 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
 
                 } // If not succeeded, add from to the omit list and select a new one
 
-                if (edgeFound)
-                    break; // Break the outer loop as well if edge was found
+//                if (edgeFound)
+//                    break; // Break the outer loop as well if edge was found
             }
         }
 
