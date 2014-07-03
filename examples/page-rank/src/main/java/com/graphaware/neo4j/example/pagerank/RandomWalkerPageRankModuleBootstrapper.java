@@ -19,6 +19,11 @@ public class RandomWalkerPageRankModuleBootstrapper implements RuntimeModuleBoot
 	public RandomWalkerPageRankModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
 		LOG.info("Constructing new module with ID: {}", moduleId);
 		LOG.trace("Configuration parameter map is: {}", config);
+		// TODO: it'd be nice if we could somehow control the runtime's scheduling too, but that's probably not a job for here
+
+		// properties like Cypher expressions, I reckon:
+		// com.graphaware.module.PageRank.inclusionStrategy.node=Person{name="Gary"}
+		// com.graphaware.module.PageRank.inclusionStrategy.relationship=FRIEND_OF|COLLEAGUE_OF
 
 		return new RandomWalkerPageRankModule(moduleId);
 	}

@@ -27,15 +27,24 @@ public class RandomWalkerPageRankModule extends BaseRuntimeModule implements Tim
 	private RelationshipChooser relationshipChooser;
 
     /**
-     * Constructs a new {@link RandomWalkerPageRankModule} with the given ID.
+     * Constructs a new {@link RandomWalkerPageRankModule} with the given ID using the default module configuration.
      *
      * @param moduleId The unique identifier for this module instance in the GraphAware runtime
      */
     public RandomWalkerPageRankModule(String moduleId) {
-        super(moduleId);
-        this.randomNodeSelector = new HyperJumpRandomNodeSelector();
-        // TODO: add relationship type and direction filtering based on module configuration
-        this.relationshipChooser = new RandomRelationshipChooser();
+    	this(moduleId, PageRankModuleConfiguration.defaultConfiguration());
+    }
+
+    /**
+     * Constructs a new {@link RandomWalkerPageRankModule} with the given ID and configuration settings.
+     *
+     * @param moduleId The unique identifier for this module instance in the GraphAware runtime
+     * @param moduleConfig The {@link PageRankModuleConfiguration} to use
+     */
+    public RandomWalkerPageRankModule(String moduleId, PageRankModuleConfiguration moduleConfig) {
+    	super(moduleId);
+    	this.randomNodeSelector = new HyperJumpRandomNodeSelector(moduleConfig.getNodeInclusionStrategy());
+    	this.relationshipChooser = new RandomRelationshipChooser(moduleConfig.getRelationshipInclusionStrategy());
     }
 
 	@Override

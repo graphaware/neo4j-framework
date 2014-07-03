@@ -51,7 +51,7 @@ public class EmbeddedDatabaseIntegration/*Test*/ {
 		// XXX: This seems well dodgy - is there anything we can do about this?
 		// comment this lot back in to get the test to pass
 //		try (Transaction transaction = database.beginTx()) {
-//			database.createNode();
+//			database.createNode().delete();
 //			transaction.success();
 //		}
 
