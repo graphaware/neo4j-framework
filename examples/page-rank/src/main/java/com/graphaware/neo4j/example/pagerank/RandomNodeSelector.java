@@ -1,4 +1,4 @@
-package com.graphaware.crawler.pagerank;
+package com.graphaware.neo4j.example.pagerank;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;

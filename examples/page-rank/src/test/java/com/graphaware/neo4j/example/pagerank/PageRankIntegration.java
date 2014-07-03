@@ -1,9 +1,8 @@
-package com.graphaware.crawler.integration;
+package com.graphaware.neo4j.example.pagerank;
 
 import java.util.Arrays;
 import java.util.Map;
 
-import com.graphaware.runtime.metadata.NodeBasedContext;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +16,6 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.graphaware.crawler.pagerank.RandomWalkerPageRankModule;
 import com.graphaware.generator.GraphGenerator;
 import com.graphaware.generator.Neo4jGraphGenerator;
 import com.graphaware.generator.config.BasicGeneratorConfiguration;
@@ -25,6 +23,7 @@ import com.graphaware.generator.config.SimpleDegreeDistribution;
 import com.graphaware.generator.node.SocialNetworkNodeCreator;
 import com.graphaware.generator.relationship.SimpleGraphRelationshipGenerator;
 import com.graphaware.generator.relationship.SocialNetworkRelationshipCreator;
+import com.graphaware.runtime.metadata.NodeBasedContext;
 
 /**
  * Integration tests for page rank module.  Note that it's not called "Test" in order to prevent Maven running it.
