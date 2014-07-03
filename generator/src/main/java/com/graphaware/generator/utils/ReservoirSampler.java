@@ -1,7 +1,10 @@
 package com.graphaware.generator.utils;
 
+import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.List;
+
+import static java.util.Collections.sort;
 
 /**
  * Implementation note:
@@ -60,9 +63,17 @@ public class ReservoirSampler<T> {
         double rnd;
         int index = 0; // though formally null, non-null guaranteed, provided items are not empty
 
+        sort(omitIndices); // sort the omit indices - this could be further optimised if omitIndices are guaranteed sorted
+        int j = 0;
+        int omitLength = omitIndices.size();
+
         for (int i = 0; i < items.size(); ++i) {
-            if (omitIndices != null && omitIndices.contains(i)) // if an index is present in omit list, skip it.
+
+            if (omitIndices != null && j < omitLength &&
+                omitIndices.get(j).equals(i)) { // if an index is present in omit list, skip it.
+                j ++ ;
                 continue;
+            }
 
             rnd = random.nextDouble();
             if (rnd > maxRnd) {
@@ -76,6 +87,8 @@ public class ReservoirSampler<T> {
 
     /**
      * Randomly chooses an index and returns it, omiting the chosen indices.
+     *
+     * TODO: make a variant which guarantees sorted input -> no need to call sort explicitly.
      * @param length length of the index sequence
      * @return randomly chosen index, indices omited
      */
@@ -85,8 +98,37 @@ public class ReservoirSampler<T> {
         int index = 0; // though formally null, non-null guaranteed, provided items are not empty
 
         for (int i = 0; i < length; ++i) {
-            if (omitIndices != null && omitIndices.contains(i)) // if an index is present in omit list, skip it.
+            if (omitIndices != null && omitIndices.contains(i))
                 continue;
+
+            rnd = random.nextDouble();
+            if (rnd > maxRnd) {
+                maxRnd = rnd;
+                index = i;
+            }
+        }
+
+        return index;
+    }
+
+    /**
+     * Priority queue variant of the above
+     * @param length
+     * @param omitIndices
+     * @return
+     */
+    public int randomIndexChoice(int length, PriorityQueue<Integer> omitIndices) {
+        double maxRnd = 0.0;
+        double rnd;
+        int index = 0; // though formally null, non-null guaranteed, provided items are not empty
+
+
+        for (int i = 0; i < length; ++i) {
+            if (omitIndices != null && !omitIndices.isEmpty() &&
+                    omitIndices.peek().equals(i)) { // if an index is present in omit list, skip it.
+                omitIndices.poll();
+                continue;
+            }
 
             rnd = random.nextDouble();
             if (rnd > maxRnd) {
