@@ -81,6 +81,12 @@
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <version>${graphaware.version}</version>
+            <artifactId>generator</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <version>${graphaware.version}</version>
             <artifactId>tests</artifactId>
             <scope>test</scope>
         </dependency>
