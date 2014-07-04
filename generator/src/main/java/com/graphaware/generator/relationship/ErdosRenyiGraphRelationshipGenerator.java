@@ -22,7 +22,7 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
      * algorithm (written by myself) is based on careful avoiding edge indices in the
      * selection. There might be some tweaks possible for this approach as well, as at the
      * present stage a PriorityQueue is used and iterated over for the edge label avoidance.
-     *
+     * <p/>
      * The switch allows to generate even complete graphs (eg. (V, E) = (20, 190) in a
      * reasonable time. The switch is turned on to dense graph generator for the case when
      * number of edges requested is a half of total possible edges to be generated.
@@ -30,8 +30,8 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
      * @param config to base the generation on.
      * @return list of edges in the network.
      */
-    protected  List<? extends  SameTypePair<Integer>> doGenerateEdges(ErdosRenyiConfig config) {
-        if (4*config.getNumberOfEdges() > config.getNumberOfNodes()*(config.getNumberOfNodes()-1) ) {
+    protected List<? extends SameTypePair<Integer>> doGenerateEdges(ErdosRenyiConfig config) {
+        if (4 * config.getNumberOfEdges() > config.getNumberOfNodes() * (config.getNumberOfNodes() - 1)) {
             return doGenerateEdgesFaster(config); // Make sure to avoid edges (this takes reasonable time on my system only up till ~ 100000)
         } else {
             return doGenerateEdgesSimpler(config); // Be more heuristic (pajek implementation using HashSet).
@@ -39,15 +39,14 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
     }
 
 
-
     /**
      * Improved implementation of Erdos-Renyi generator based on bijection from
      * edge labels to edge realisations. Works very well for large number of nodes,
      * but is slow with increasing number of edges. Best for denser networks, with
      * a clear giant component.
-     *
+     * <p/>
      * TODO: Remove the bijection iteration and optimise duplicity test?
-     *       (effectivelly hashing)
+     * (effectivelly hashing)
      *
      * @param config configuration of the ER model
      * @return edge list
@@ -59,7 +58,7 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
         long maxEdges = numberOfNodes * (numberOfNodes - 1) / 2; // must be long, as numberOfNodes^2 can be huge
 
         LinkedList<UnorderedPair<Integer>> edges = new LinkedList<>();
-        PriorityQueue<Long> omitList  = new PriorityQueue<>(); // edges to be omited. TODO: Isn't it more efficient to implement this with HashSet?
+        PriorityQueue<Long> omitList = new PriorityQueue<>(); // edges to be omited. TODO: Isn't it more efficient to implement this with HashSet?
         RandomIndexChoice indexChoice = new RandomIndexChoice(); // Index choices with omits
 
         for (int e = 0; e < numberOfEdges; ++e) {
@@ -74,14 +73,14 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
 
     /**
      * TODO: Accept set on the output? (since the graph is simple)
-     *
+     * <p/>
      * This algorithm is implemented as recommended in
-     *
+     * <p/>
      * Efficient generation of large random networks
      * by Vladimir Batagelj and Ulrik Brandes
-     *
+     * <p/>
      * PHYSICAL REVIEW E 71, 036113, 2005
-     *
+     * <p/>
      * and relies on excellent hashing performance of Java
      * implementation of HashSet.
      *
@@ -100,13 +99,13 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
 
         for (int e = 0; e < numberOfEdges; ++e) {
             // Generate a new edge, until you've generated a unique one.
-            while(true) {
+            while (true) {
                 origin = indexChoice.randomIndexChoice(numberOfNodes);
                 target = indexChoice.randomIndexChoice(numberOfNodes, origin);
 
                 UnorderedPair<Integer> candidate = new UnorderedPair<>(origin, target);
 
-                if (! edges.contains(candidate)) {
+                if (!edges.contains(candidate)) {
                     edges.add(candidate);
                     break;
                 }
@@ -120,8 +119,8 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
     /**
      * Maps the edge list to edges.
      * TODO: The iteration over buckets is not optimal. It would be cool if some simple mathematical formula was behind this.
-     *       (at the present stage I wasn't able to find any)
-     *
+     * (at the present stage I wasn't able to find any)
+     * <p/>
      * Note that long indices have to be used to label the edges, since
      * there are numberOfNodes*(numberOfNodes-1) indices available. This
      * is beyond range of int for networks of size above ~ 1 000 000
@@ -148,9 +147,9 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
 
     /**
      * Legacy method for generating edges of an Erdos-Renyi graph.
+     *
      * @param config
      * @return edge list
-     *
      * @deprecated
      */
     @Deprecated
