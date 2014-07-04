@@ -32,7 +32,6 @@ public class RandomIndexChoice {
             offset ++;
 
         return choice + offset;
-
     }
 
     /**
@@ -53,5 +52,46 @@ public class RandomIndexChoice {
 
         return choice + offset;
 
+    }
+
+
+    /**
+     * Random index choice with indices omitted (long)
+     * @param length range to pick indices from
+     * @param omit index to be omited from the selection
+     * @return index from the range specified
+     */
+    public long randomIndexChoice(long length, long omit) {
+        long choice = (long) Math.floor((length - 1) * random.nextDouble());
+        return choice >= omit ? choice + 1 : choice;
+    }
+
+    /**
+     * Random index choice with an index omitted (int)
+     * @param length range to pick indices from
+     * @param omit index to be omited from the selection
+     * @return index from the range specified
+     */
+    public int randomIndexChoice(int length, int omit) {
+        int choice = (int) Math.floor((length - 1) * random.nextDouble());
+        return choice >= omit ? choice + 1 : choice;
+    }
+
+    /**
+     * Random index choice (int)
+     * @param length range to pick indices from
+     * @return index from the range specified
+     */
+    public int randomIndexChoice(int length) {
+        return (int) Math.floor((length - 1) * random.nextDouble());
+    }
+
+    /**
+     * Random index choice (long)
+     * @param length range to pick indices from
+     * @return index from the range specified
+     */
+    public long randomIndexChoice(long length) {
+        return (long) Math.floor((length - 1) * random.nextDouble());
     }
 }
