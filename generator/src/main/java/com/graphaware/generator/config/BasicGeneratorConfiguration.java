@@ -8,20 +8,18 @@ import com.graphaware.generator.relationship.RelationshipGenerator;
  * Basic implementation of {@link GeneratorConfiguration} where everything can be configured by constructor instantiation,
  * except for batch size, which defaults to 1000.
  */
-public class BasicGeneratorConfiguration<C extends RelationshipGeneratorConfig, G extends RelationshipGenerator<C>> implements GeneratorConfiguration<C, G> {
+public class BasicGeneratorConfiguration implements GeneratorConfiguration {
 
     private final int numberOfNodes;
+    private final RelationshipGenerator<?> relationshipGenerator;
     private final NodeCreator nodeCreator;
     private final RelationshipCreator relationshipCreator;
-    private final G relationshipGenerator;
-    private final C config;
 
-    public BasicGeneratorConfiguration(int numberOfNodes, NodeCreator nodeCreator, RelationshipCreator relationshipCreator, G relationshipGenerator, C config) {
+    public BasicGeneratorConfiguration(int numberOfNodes, RelationshipGenerator<?> relationshipGenerator, NodeCreator nodeCreator, RelationshipCreator relationshipCreator) {
         this.numberOfNodes = numberOfNodes;
+        this.relationshipGenerator = relationshipGenerator;
         this.nodeCreator = nodeCreator;
         this.relationshipCreator = relationshipCreator;
-        this.relationshipGenerator = relationshipGenerator;
-        this.config = config;
     }
 
     /**
@@ -52,16 +50,8 @@ public class BasicGeneratorConfiguration<C extends RelationshipGeneratorConfig, 
      * {@inheritDoc}
      */
     @Override
-    public G getRelationshipGenerator() {
+    public RelationshipGenerator<?> getRelationshipGenerator() {
         return relationshipGenerator;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public C getConfig() {
-        return config;
     }
 
     /**

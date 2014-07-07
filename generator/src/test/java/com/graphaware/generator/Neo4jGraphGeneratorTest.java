@@ -40,7 +40,7 @@ public class Neo4jGraphGeneratorTest extends DatabaseIntegrationTest {
         SimpleDegreeDistribution distribution = new SimpleDegreeDistribution(Arrays.asList(2, 2, 2, 2));
         SimpleGraphRelationshipGenerator relationshipGenerator = new SimpleGraphRelationshipGenerator(distribution);
 
-        GeneratorConfiguration config = new BasicGeneratorConfiguration<>(4, nodeCreator, relationshipCreator, relationshipGenerator, distribution);
+        GeneratorConfiguration config = new BasicGeneratorConfiguration(4, relationshipGenerator, nodeCreator, relationshipCreator);
 
         new Neo4jGraphGenerator(getDatabase()).generateGraph(config);
 
@@ -63,7 +63,7 @@ public class Neo4jGraphGeneratorTest extends DatabaseIntegrationTest {
         SimpleDegreeDistribution distribution = new SimpleDegreeDistribution(Arrays.asList(3, 2, 2, 2));
         SimpleGraphRelationshipGenerator relationshipGenerator = new SimpleGraphRelationshipGenerator(distribution);
 
-        GeneratorConfiguration config = new BasicGeneratorConfiguration<>(4, nodeCreator, relationshipCreator, relationshipGenerator, distribution);
+        GeneratorConfiguration config = new BasicGeneratorConfiguration(4, relationshipGenerator, nodeCreator, relationshipCreator);
 
         new Neo4jGraphGenerator(getDatabase()).generateGraph(config);
     }

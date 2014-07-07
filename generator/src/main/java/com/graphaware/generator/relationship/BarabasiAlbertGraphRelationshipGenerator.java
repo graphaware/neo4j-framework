@@ -1,14 +1,15 @@
 package com.graphaware.generator.relationship;
 
+import com.graphaware.common.util.SameTypePair;
+import com.graphaware.common.util.UnorderedPair;
 import com.graphaware.generator.config.BarabasiAlbertConfig;
 import com.graphaware.generator.config.NumberOfNodes;
 import com.graphaware.generator.utils.WeightedReservoirSampler;
-import com.graphaware.common.util.SameTypePair;
-import com.graphaware.common.util.UnorderedPair;
-import com.graphaware.generator.config.DegreeDistribution;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Barabasi-Albert model implementation. The model is
@@ -52,7 +53,7 @@ public class BarabasiAlbertGraphRelationshipGenerator extends BaseRelationshipGe
 
         // Preferentially attach other nodes
         for (int node = edgesPerNewNode + 1; node < getConfiguration().getNumberOfNodes(); ++node) {
-            List<Integer> omit = new ArrayList<>();
+            Set<Integer> omit = new HashSet<>();
 
             for (int edge = 0; edge < edgesPerNewNode; ++edge) {
                 int target = reservoirSampler.randomIndexChoice(degrees, omit); // find a target

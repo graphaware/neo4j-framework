@@ -7,7 +7,7 @@ import com.graphaware.generator.relationship.RelationshipGenerator;
 /**
  * A configuration of a {@link com.graphaware.generator.GraphGenerator}.
  */
-public interface GeneratorConfiguration<C extends RelationshipGeneratorConfig, G extends RelationshipGenerator<C>> {
+public interface GeneratorConfiguration {
 
     /**
      * Get the total number of nodes that will be generated.
@@ -21,14 +21,7 @@ public interface GeneratorConfiguration<C extends RelationshipGeneratorConfig, G
      *
      * @return relationship generator.
      */
-    G getRelationshipGenerator();
-
-    /**
-     * Get the configuration of the relationship generator.
-     *
-     * @return relationship generator config.
-     */
-    C getConfig();
+    RelationshipGenerator<?> getRelationshipGenerator();
 
     /**
      * Get the component creating (populating) nodes.

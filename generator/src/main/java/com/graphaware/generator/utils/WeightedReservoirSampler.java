@@ -3,6 +3,7 @@ package com.graphaware.generator.utils;
 import java.util.Random;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 /**
  * Utility to allow for weighted reservoir sampling
@@ -60,7 +61,7 @@ public class WeightedReservoirSampler /*extends ReservoirSampler<T> ? */{
      * @param omitIndices indices to omit from sampling
      * @return index chosen according to the weight supplied
      */
-    public int randomIndexChoice(List<Integer> weights, List<Integer> omitIndices) {
+    public int randomIndexChoice(List<Integer> weights, Set<Integer> omitIndices) {
         int result = 0, index;
         double maxKey = 0.0;
         double u, key;
