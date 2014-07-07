@@ -8,18 +8,28 @@ import com.graphaware.generator.relationship.RelationshipGenerator;
  * Basic implementation of {@link GeneratorConfiguration} where everything can be configured by constructor instantiation,
  * except for batch size, which defaults to 1000.
  */
-public class BasicGeneratorConfiguration implements GeneratorConfiguration {
+public class BasicGeneratorConfiguration<C extends RelationshipGeneratorConfig, G extends RelationshipGenerator<C>> implements GeneratorConfiguration<C, G> {
 
+    private final int numberOfNodes;
     private final NodeCreator nodeCreator;
     private final RelationshipCreator relationshipCreator;
-    private final RelationshipGenerator relationshipGenerator;
-    private final DegreeDistribution degreeDistribution;
+    private final G relationshipGenerator;
+    private final C config;
 
-    public BasicGeneratorConfiguration(NodeCreator nodeCreator, RelationshipCreator relationshipCreator, RelationshipGenerator relationshipGenerator, DegreeDistribution degreeDistribution) {
+    public BasicGeneratorConfiguration(int numberOfNodes, NodeCreator nodeCreator, RelationshipCreator relationshipCreator, G relationshipGenerator, C config) {
+        this.numberOfNodes = numberOfNodes;
         this.nodeCreator = nodeCreator;
         this.relationshipCreator = relationshipCreator;
         this.relationshipGenerator = relationshipGenerator;
-        this.degreeDistribution = degreeDistribution;
+        this.config = config;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getNumberOfNodes() {
+        return numberOfNodes;
     }
 
     /**
@@ -42,7 +52,7 @@ public class BasicGeneratorConfiguration implements GeneratorConfiguration {
      * {@inheritDoc}
      */
     @Override
-    public RelationshipGenerator getRelationshipGenerator() {
+    public G getRelationshipGenerator() {
         return relationshipGenerator;
     }
 
@@ -50,8 +60,8 @@ public class BasicGeneratorConfiguration implements GeneratorConfiguration {
      * {@inheritDoc}
      */
     @Override
-    public DegreeDistribution getDegreeDistribution() {
-        return degreeDistribution;
+    public C getConfig() {
+        return config;
     }
 
     /**

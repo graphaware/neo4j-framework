@@ -14,23 +14,42 @@ import java.util.List;
  */
 public abstract class BaseRelationshipGenerator<T extends RelationshipGeneratorConfig> implements RelationshipGenerator<T> {
 
+    private final T configuration;
+
+    /**
+     * Construct a new relationship generator.
+     *
+     * @param configuration to base the generation on
+     */
+    protected BaseRelationshipGenerator(T configuration) {
+        this.configuration = configuration;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<? extends SameTypePair<Integer>> generateEdges(T config) throws InvalidConfigException {
-        if (!config.isValid()) {
+    public List<SameTypePair<Integer>> generateEdges() throws InvalidConfigException {
+        if (!configuration.isValid()) {
             throw new InvalidConfigException("The supplied config is not valid");
         }
 
-        return doGenerateEdges(config);
+        return doGenerateEdges();
     }
 
     /**
      * Perform the actual edge generation.
      *
-     * @param config to base the generation on.
      * @return generated edges as pair of node IDs that should be connected.
      */
-    protected abstract List<? extends SameTypePair<Integer>> doGenerateEdges(T config);
+    protected abstract List<SameTypePair<Integer>> doGenerateEdges();
+
+    /**
+     * Get the configuration of this generator.
+     *
+     * @return configuration.
+     */
+    protected T getConfiguration() {
+        return configuration;
+    }
 }

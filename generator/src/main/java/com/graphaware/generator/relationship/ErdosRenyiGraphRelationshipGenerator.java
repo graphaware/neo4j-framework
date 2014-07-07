@@ -15,6 +15,10 @@ import java.util.*;
  */
 public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenerator<ErdosRenyiConfig> {
 
+    public ErdosRenyiGraphRelationshipGenerator(ErdosRenyiConfig configuration) {
+        super(configuration);
+    }
+
     /**
      * The final algorithm has a switch from sparse ER graph to dense ER graph generator.
      * The sparse algorithm is based on trial-correction method as suggested in the paper
@@ -27,14 +31,13 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
      * reasonable time. The switch is turned on to dense graph generator for the case when
      * number of edges requested is a half of total possible edges to be generated.
      *
-     * @param config to base the generation on.
      * @return list of edges in the network.
      */
-    protected List<? extends SameTypePair<Integer>> doGenerateEdges(ErdosRenyiConfig config) {
-        if (4 * config.getNumberOfEdges() > config.getNumberOfNodes() * (config.getNumberOfNodes() - 1)) {
-            return doGenerateEdgesFaster(config); // Make sure to avoid edges (this takes reasonable time on my system only up till ~ 100000)
+    protected List<SameTypePair<Integer>> doGenerateEdges() {
+        if (4 * getConfiguration().getNumberOfEdges() > getConfiguration().getNumberOfNodes() * (getConfiguration().getNumberOfNodes() - 1)) {
+            return doGenerateEdgesFaster(); // Make sure to avoid edges (this takes reasonable time on my system only up till ~ 100000)
         } else {
-            return doGenerateEdgesSimpler(config); // Be more heuristic (pajek implementation using HashSet).
+            return doGenerateEdgesSimpler(); // Be more heuristic (pajek implementation using HashSet).
         }
     }
 
@@ -48,16 +51,15 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
      * TODO: Remove the bijection iteration and optimise duplicity test?
      * (effectivelly hashing)
      *
-     * @param config configuration of the ER model
      * @return edge list
      */
-    protected List<? extends SameTypePair<Integer>> doGenerateEdgesFaster(ErdosRenyiConfig config) {
-        int numberOfNodes = config.getNumberOfNodes();
-        int numberOfEdges = config.getNumberOfEdges();
+    protected List<SameTypePair<Integer>> doGenerateEdgesFaster() {
+        int numberOfNodes = getConfiguration().getNumberOfNodes();
+        int numberOfEdges = getConfiguration().getNumberOfEdges();
 
         long maxEdges = numberOfNodes * (numberOfNodes - 1) / 2; // must be long, as numberOfNodes^2 can be huge
 
-        LinkedList<UnorderedPair<Integer>> edges = new LinkedList<>();
+        LinkedList<SameTypePair<Integer>> edges = new LinkedList<>();
         PriorityQueue<Long> omitList = new PriorityQueue<>(); // edges to be omited. TODO: Isn't it more efficient to implement this with HashSet?
         RandomIndexChoice indexChoice = new RandomIndexChoice(); // Index choices with omits
 
@@ -84,18 +86,17 @@ public class ErdosRenyiGraphRelationshipGenerator extends BaseRelationshipGenera
      * and relies on excellent hashing performance of Java
      * implementation of HashSet.
      *
-     * @param config
      * @return edge list
      */
-    protected List<? extends SameTypePair<Integer>> doGenerateEdgesSimpler(ErdosRenyiConfig config) {
+    protected List<SameTypePair<Integer>> doGenerateEdgesSimpler() {
         // Simplest possible thing to do, believing that hashing algorithm of Java is efficient
-        int numberOfNodes = config.getNumberOfNodes();
-        int numberOfEdges = config.getNumberOfEdges();
+        int numberOfNodes = getConfiguration().getNumberOfNodes();
+        int numberOfEdges = getConfiguration().getNumberOfEdges();
         int origin;
         int target;
 
         RandomIndexChoice indexChoice = new RandomIndexChoice();
-        HashSet<UnorderedPair<Integer>> edges = new HashSet<>();
+        HashSet<SameTypePair<Integer>> edges = new HashSet<>();
 
         for (int e = 0; e < numberOfEdges; ++e) {
             // Generate a new edge, until you've generated a unique one.

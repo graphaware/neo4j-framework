@@ -6,12 +6,13 @@ import junit.framework.TestCase;
 
 public class CompleteGraphRelationshipGeneratorTest extends TestCase {
     public void testDoGenerateEdges() {
-        CompleteGraphRelationshipGenerator cg = new CompleteGraphRelationshipGenerator();
+        CompleteGraphRelationshipGenerator cg1 = new CompleteGraphRelationshipGenerator(new NumberOfNodes(3));
+        System.out.println(cg1.generateEdges().toString());
 
-        System.out.println(cg.generateEdges(new NumberOfNodes(3)).toString());
-        System.out.println(cg.generateEdges(new NumberOfNodes(4)).toString());
-        System.out.println(cg.generateEdges(new NumberOfNodes(5)).toString());
+        CompleteGraphRelationshipGenerator cg2 = new CompleteGraphRelationshipGenerator(new NumberOfNodes(4));
+        System.out.println(cg2.generateEdges().toString());
 
-
+        CompleteGraphRelationshipGenerator cg3 = new CompleteGraphRelationshipGenerator(new NumberOfNodes(5));
+        System.out.println(cg3.generateEdges().toString());
     }
 }

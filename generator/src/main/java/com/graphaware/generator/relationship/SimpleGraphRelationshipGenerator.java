@@ -39,14 +39,19 @@ import static java.lang.Math.min;
  */
 public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator<SimpleDegreeDistribution> {
 
+    public SimpleGraphRelationshipGenerator(SimpleDegreeDistribution configuration) {
+        super(configuration);
+    }
+
     /**
      * {@inheritDoc}
      * <p/>
      * Returns an edge-set corresponding to a randomly chosen simple graph.
      */
     @Override
-    protected List<SameTypePair<Integer>> doGenerateEdges(SimpleDegreeDistribution distribution) {
+    protected List<SameTypePair<Integer>> doGenerateEdges() {
         List<SameTypePair<Integer>> edges = new ArrayList<>();
+        SimpleDegreeDistribution distribution = getConfiguration();
 
         while (!distribution.isZeroList()) {
             // int length = distribution.size();

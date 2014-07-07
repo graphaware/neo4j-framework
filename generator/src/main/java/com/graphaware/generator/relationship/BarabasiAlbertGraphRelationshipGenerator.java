@@ -17,6 +17,10 @@ import java.util.List;
  */
 public class BarabasiAlbertGraphRelationshipGenerator extends BaseRelationshipGenerator<BarabasiAlbertConfig> {
 
+    public BarabasiAlbertGraphRelationshipGenerator(BarabasiAlbertConfig configuration) {
+        super(configuration);
+    }
+
     /**
      * {@inheritDoc}
      * <p/>
@@ -27,12 +31,12 @@ public class BarabasiAlbertGraphRelationshipGenerator extends BaseRelationshipGe
      * model, completelly connected network is used to start up the algorithm
      */
     @Override
-    protected List<? extends SameTypePair<Integer>> doGenerateEdges(BarabasiAlbertConfig config) {
-        int edgesPerNewNode = config.getEdgesPerNewNode();
+    protected List<SameTypePair<Integer>> doGenerateEdges() {
+        int edgesPerNewNode = getConfiguration().getEdgesPerNewNode();
 
         // Create a completely connected network
-        CompleteGraphRelationshipGenerator coreGenerator = new CompleteGraphRelationshipGenerator();
-        List<UnorderedPair<Integer>> edges = coreGenerator.doGenerateEdges(new NumberOfNodes(edgesPerNewNode + 1));
+        CompleteGraphRelationshipGenerator coreGenerator = new CompleteGraphRelationshipGenerator(new NumberOfNodes(edgesPerNewNode + 1));
+        List<SameTypePair<Integer>> edges = coreGenerator.doGenerateEdges();
 
         // Degree list of the network
         ArrayList<Integer> degrees = new ArrayList<>();
@@ -47,7 +51,7 @@ public class BarabasiAlbertGraphRelationshipGenerator extends BaseRelationshipGe
         WeightedReservoirSampler reservoirSampler = new WeightedReservoirSampler();
 
         // Preferentially attach other nodes
-        for (int node = edgesPerNewNode + 1; node < config.getNumberOfNodes(); ++node) {
+        for (int node = edgesPerNewNode + 1; node < getConfiguration().getNumberOfNodes(); ++node) {
             List<Integer> omit = new ArrayList<>();
 
             for (int edge = 0; edge < edgesPerNewNode; ++edge) {

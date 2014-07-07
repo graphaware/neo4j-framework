@@ -39,12 +39,16 @@ import static java.util.Collections.shuffle;
  */
 public class ConfigurationModelRelationshipGenerator extends BaseRelationshipGenerator<ConfigurationModelConfig> {
 
+    public ConfigurationModelRelationshipGenerator(ConfigurationModelConfig configuration) {
+        super(configuration);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected List<SameTypePair<Integer>> doGenerateEdges(ConfigurationModelConfig distribution) {
-        List<Integer> spread = spreadDistribution(distribution);
+    protected List<SameTypePair<Integer>> doGenerateEdges() {
+        List<Integer> spread = spreadDistribution(getConfiguration());
         shuffle(spread);
 
         List<SameTypePair<Integer>> pairs = new ArrayList<>();

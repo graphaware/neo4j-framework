@@ -16,27 +16,32 @@ import java.util.Random;
  */
 public class WattsStrogatzRelationshipGenerator extends BaseRelationshipGenerator<WattsStrogatzConfig> {
 
+    public WattsStrogatzRelationshipGenerator(WattsStrogatzConfig configuration) {
+        super(configuration);
+    }
+
     /**
      * {@inheritDoc}
-     *
+     * <p/>
      * Generates a ring and performs rewiring on the network. This creates
      * a small-world network with high clustering coefficients (ie. there
      * are a lot of triangles present in the network, but the diameter
      * scales as ln(N)). Good choice for modelling simple social network
      * relationships (although hubs are not present).
-     *
+     * <p/>
      * TODO: find a way to control the strength of rewiring in the model
+     *
      * @return ring - edge list as a list of unordered integer pairs
      */
     @Override
-    protected List<? extends SameTypePair<Integer>> doGenerateEdges(WattsStrogatzConfig config) {
-        int numberOfNodes = config.getNumberOfNodes();
-        int meanDegree = config.getMeanDegree();
-        double beta = config.getBeta();
+    protected List<SameTypePair<Integer>> doGenerateEdges() {
+        int numberOfNodes = getConfiguration().getNumberOfNodes();
+        int meanDegree = getConfiguration().getMeanDegree();
+        double beta = getConfiguration().getBeta();
 
         // Throw warning if no rewiring is possible? Complete graph?
         Random random = new Random();
-        ArrayList<UnorderedPair<Integer>> ring = new ArrayList<>(numberOfNodes);
+        ArrayList<SameTypePair<Integer>> ring = new ArrayList<>(numberOfNodes);
 
         // Create a ring network
         // TODO: is it worth to replace the hardcoded integer loops with iterators?
@@ -62,9 +67,9 @@ public class WattsStrogatzRelationshipGenerator extends BaseRelationshipGenerato
 
            Works, but slow and hacked.
         */
-        for (ListIterator<UnorderedPair<Integer>> it = ring.listIterator(); it.hasNext(); ) {
+        for (ListIterator<SameTypePair<Integer>> it = ring.listIterator(); it.hasNext(); ) {
             int index = it.nextIndex(); // index
-            UnorderedPair<Integer> edge = it.next(); // get the edge present in the iterator
+            SameTypePair<Integer> edge = it.next(); // get the edge present in the iterator
 
             if (random.nextDouble() <= beta) {
                 while (true) {

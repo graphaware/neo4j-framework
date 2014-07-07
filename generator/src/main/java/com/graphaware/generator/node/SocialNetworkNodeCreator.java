@@ -26,7 +26,7 @@ public class SocialNetworkNodeCreator implements NodeCreator {
     private List<Pair<Label, String>> gendersAndNames = new ArrayList<>();
     private Random random = new Random();
 
-    private SocialNetworkNodeCreator() {
+    protected SocialNetworkNodeCreator() {
         populateGendersAndNames();
     }
 
@@ -39,14 +39,22 @@ public class SocialNetworkNodeCreator implements NodeCreator {
      */
     @Override
     public Node createNode(GraphDatabaseService database) {
-        Node node = database.createNode(PERSON_LABEL);
+        Node node = database.createNode(getPersonLabel());
 
-        Pair<Label, String> genderAndName = gendersAndNames.get(random.nextInt(gendersAndNames.size()));
+        Pair<Label, String> genderAndName = getGenderAndName();
         node.addLabel(genderAndName.first());
 
         node.setProperty(NAME, genderAndName.second());
 
         return node;
+    }
+
+    protected Pair<Label, String> getGenderAndName() {
+        return gendersAndNames.get(random.nextInt(gendersAndNames.size()));
+    }
+
+    protected Label getPersonLabel() {
+        return PERSON_LABEL;
     }
 
     private void populateGendersAndNames() {

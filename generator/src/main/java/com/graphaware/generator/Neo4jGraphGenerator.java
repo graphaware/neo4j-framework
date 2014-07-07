@@ -2,6 +2,7 @@ package com.graphaware.generator;
 
 import com.graphaware.common.util.SameTypePair;
 import com.graphaware.generator.config.GeneratorConfiguration;
+import com.graphaware.generator.relationship.RelationshipGenerator;
 import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.batch.BatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
@@ -33,7 +34,7 @@ public class Neo4jGraphGenerator implements GraphGenerator {
     }
 
     private void generateNodes(final GeneratorConfiguration config) {
-        int numberOfNodes = config.getDegreeDistribution().size();
+        int numberOfNodes = config.getNumberOfNodes();
 
         BatchTransactionExecutor executor = new NoInputBatchTransactionExecutor(database, config.getBatchSize(), numberOfNodes, new UnitOfWork<NullItem>() {
             @Override
@@ -46,7 +47,8 @@ public class Neo4jGraphGenerator implements GraphGenerator {
     }
 
     private void generateRelationships(final GeneratorConfiguration config) {
-        List<SameTypePair<Integer>> relationships = config.getRelationshipGenerator().generateEdges(config.getDegreeDistribution());
+        RelationshipGenerator<?> relationshipGenerator = config.getRelationshipGenerator();
+        List<SameTypePair<Integer>> relationships = relationshipGenerator.generateEdges();
 
         BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, config.getBatchSize(), relationships, new UnitOfWork<SameTypePair<Integer>>() {
             @Override

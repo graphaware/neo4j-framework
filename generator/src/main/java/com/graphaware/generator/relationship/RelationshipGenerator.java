@@ -32,9 +32,9 @@ public interface RelationshipGenerator<T extends RelationshipGeneratorConfig> {
     /**
      * Generate edges (relationships) based on a degree distribution.
      *
-     * @param config of the generator.
      * @return pairs of node IDs representing edges.
-     * @throws com.graphaware.generator.config.InvalidConfigException in case the given distribution is invalid for the generator implementation.
+     * @throws com.graphaware.generator.config.InvalidConfigException
+     *          in case the given distribution is invalid for the generator implementation.
      */
-    List<? extends SameTypePair<Integer>> generateEdges(T config) throws InvalidConfigException;
+    List<SameTypePair<Integer>> generateEdges() throws InvalidConfigException;
 }

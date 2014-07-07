@@ -37,10 +37,10 @@ public class Neo4jGraphGeneratorTest extends DatabaseIntegrationTest {
     public void validDistributionShouldGenerateGraph() {
         NodeCreator nodeCreator = SocialNetworkNodeCreator.getInstance();
         RelationshipCreator relationshipCreator = SocialNetworkRelationshipCreator.getInstance();
-        RelationshipGenerator relationshipGenerator = new SimpleGraphRelationshipGenerator();
-        DegreeDistribution distribution = new SimpleDegreeDistribution(Arrays.asList(2, 2, 2, 2));
+        SimpleDegreeDistribution distribution = new SimpleDegreeDistribution(Arrays.asList(2, 2, 2, 2));
+        SimpleGraphRelationshipGenerator relationshipGenerator = new SimpleGraphRelationshipGenerator(distribution);
 
-        GeneratorConfiguration config = new BasicGeneratorConfiguration(nodeCreator, relationshipCreator, relationshipGenerator, distribution);
+        GeneratorConfiguration config = new BasicGeneratorConfiguration<>(4, nodeCreator, relationshipCreator, relationshipGenerator, distribution);
 
         new Neo4jGraphGenerator(getDatabase()).generateGraph(config);
 
@@ -60,10 +60,10 @@ public class Neo4jGraphGeneratorTest extends DatabaseIntegrationTest {
     public void invalidDistributionShouldThrowException() {
         NodeCreator nodeCreator = SocialNetworkNodeCreator.getInstance();
         RelationshipCreator relationshipCreator = SocialNetworkRelationshipCreator.getInstance();
-        RelationshipGenerator relationshipGenerator = new SimpleGraphRelationshipGenerator();
-        DegreeDistribution distribution = new SimpleDegreeDistribution(Arrays.asList(3, 2, 2, 2));
+        SimpleDegreeDistribution distribution = new SimpleDegreeDistribution(Arrays.asList(3, 2, 2, 2));
+        SimpleGraphRelationshipGenerator relationshipGenerator = new SimpleGraphRelationshipGenerator(distribution);
 
-        GeneratorConfiguration config = new BasicGeneratorConfiguration(nodeCreator, relationshipCreator, relationshipGenerator, distribution);
+        GeneratorConfiguration config = new BasicGeneratorConfiguration<>(4, nodeCreator, relationshipCreator, relationshipGenerator, distribution);
 
         new Neo4jGraphGenerator(getDatabase()).generateGraph(config);
     }

@@ -18,20 +18,27 @@ import java.util.List;
 public class CompleteGraphRelationshipGenerator extends BaseRelationshipGenerator<NumberOfNodes> {
 
     /**
+     *
+     * @param configuration number of nodes present in the completely connected network
+     */
+    public CompleteGraphRelationshipGenerator(NumberOfNodes configuration) {
+        super(configuration);
+    }
+
+    /**
      * {@inheritDoc}
      * <p/>
      * Generates a completely connected (undirected) graph.
      *
-     * @param config number of nodes present in the completely connected network
      * @return graph
      */
     @Override
-    protected List<UnorderedPair<Integer>> doGenerateEdges(NumberOfNodes config) {
-        ArrayList<UnorderedPair<Integer>> graph = new ArrayList<>();
+    protected List<SameTypePair<Integer>> doGenerateEdges() {
+        ArrayList<SameTypePair<Integer>> graph = new ArrayList<>();
 
         // Create a completely connected undirected network
-        for (int i = 0; i < config.getNumberOfNodes(); ++i)
-            for (int j = i + 1; j < config.getNumberOfNodes(); ++j)
+        for (int i = 0; i < getConfiguration().getNumberOfNodes(); ++i)
+            for (int j = i + 1; j < getConfiguration().getNumberOfNodes(); ++j)
                 graph.add(new UnorderedPair<>(i, j));
 
         return graph;
