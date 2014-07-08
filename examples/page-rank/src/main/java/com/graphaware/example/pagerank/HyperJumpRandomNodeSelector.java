@@ -1,4 +1,4 @@
-package com.graphaware.neo4j.example.pagerank;
+package com.graphaware.example.pagerank;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -31,9 +31,11 @@ public class HyperJumpRandomNodeSelector implements RandomNodeSelector {
 		this.inclusionStrategy = inclusionStrategy;
 	}
 
+    //todo: have a look at com.graphaware.common.util.ReservoirSampler, should do exactly what you need
+    //todo: we should really make this O(1) by finding the highest node id and choosing a random number between 0 and the highest, retrying if the node does not exist
 	@Override
-	public Node selectRandomNode(GraphDatabaseService databaseService) {
-		Iterable<Node> nodes = GlobalGraphOperations.at(databaseService).getAllNodes();
+	public Node selectRandomNode(GraphDatabaseService database) {
+		Iterable<Node> nodes = GlobalGraphOperations.at(database).getAllNodes();
 		Node target = null; // again, could be formulated in a better way.
 
 		double max = 0.0;

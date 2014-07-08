@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
+ * DO NOT USE - WORK IN PROGRESS
+ *
  * Exports the full adjacency matrix.
  *
  * WARNING: This is for testing purposes only and should not

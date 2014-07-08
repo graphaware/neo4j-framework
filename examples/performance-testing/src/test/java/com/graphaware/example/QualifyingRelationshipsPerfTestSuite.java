@@ -36,8 +36,8 @@ public class QualifyingRelationshipsPerfTestSuite extends PerformanceTestSuite {
     protected PerformanceTest[] getPerfTests() {
         return new PerformanceTest[]{
                 new QualifyingRelationshipsWriteTest(),
-//                new QualifyingRelationshipsReadJavaTest(),
-//                new QualifyingRelationshipsReadCypherTest()
+                new QualifyingRelationshipsReadJavaTest(),
+                new QualifyingRelationshipsReadCypherTest()
         };
     }
 }

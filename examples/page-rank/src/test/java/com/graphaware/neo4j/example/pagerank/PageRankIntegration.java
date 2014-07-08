@@ -3,6 +3,7 @@ package com.graphaware.neo4j.example.pagerank;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.graphaware.example.pagerank.RandomWalkerPageRankModule;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,55 +32,56 @@ import com.graphaware.runtime.metadata.NodeBasedContext;
 @RunWith(JUnit4.class)
 public class PageRankIntegration {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PageRankIntegration.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PageRankIntegration.class);
 
-	private RandomWalkerPageRankModule pageRankModule;
-	private GraphDatabaseService database;
-	private ExecutionEngine executionEngine;
+    private RandomWalkerPageRankModule pageRankModule;
+    private GraphDatabaseService database;
+    private ExecutionEngine executionEngine;
 
-	/** */
-	@Before
-	public void setUp() {
-		this.database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-		this.executionEngine = new ExecutionEngine(this.database);
-		this.pageRankModule = new RandomWalkerPageRankModule("TEST");
-	}
+    /** */
+    @Before
+    public void setUp() {
+        this.database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        this.executionEngine = new ExecutionEngine(this.database);
+        this.pageRankModule = new RandomWalkerPageRankModule("TEST");
+    }
 
-	/** */
-	@Test
-	public void generateSocialNetworkAndWorkOutSomePageRankStatistics() {
-		try (Transaction transaction = this.database.beginTx()) {
-			LOG.info("Creating arbitrary social network database...");
+    /** */
+    @Test
+    public void generateSocialNetworkAndWorkOutSomePageRankStatistics() {
+        try (Transaction transaction = this.database.beginTx()) {
+            LOG.info("Creating arbitrary social network database...");
 
-			long time = System.currentTimeMillis();
-			GraphGenerator graphGenerator = new Neo4jGraphGenerator(this.database);
-			graphGenerator.generateGraph(new BasicGeneratorConfiguration(
-					SocialNetworkNodeCreator.getInstance(),
-					SocialNetworkRelationshipCreator.getInstance(),
-					new SimpleGraphRelationshipGenerator(),
-					new SimpleDegreeDistribution(Arrays.asList(1, 1, 1, 2, 3, 4, 4, 3, 3))));
-			time = System.currentTimeMillis() - time;
+            long time = System.currentTimeMillis();
+            GraphGenerator graphGenerator = new Neo4jGraphGenerator(this.database);
+            graphGenerator.generateGraph(new BasicGeneratorConfiguration(
+                    9,
+                    new SimpleGraphRelationshipGenerator(new SimpleDegreeDistribution(Arrays.asList(1, 1, 1, 2, 3, 4, 4, 3, 3))),
+                    SocialNetworkNodeCreator.getInstance(),
+                    SocialNetworkRelationshipCreator.getInstance()));
 
-			LOG.info("Created database in " + time + "ms");
+            time = System.currentTimeMillis() - time;
 
-			final int totalSteps = 100;
-			LOG.info("Performing " + totalSteps + " steps to convergence on page rank");
+            LOG.info("Created database in " + time + "ms");
+
+            final int totalSteps = 100;
+            LOG.info("Performing " + totalSteps + " steps to convergence on page rank");
 
             NodeBasedContext context = this.pageRankModule.createInitialContext(database);
             time = System.currentTimeMillis();
-			for (int i=0 ; i<totalSteps ; i++) {
-				context = this.pageRankModule.doSomeWork(context, this.database);
-			}
-			time = System.currentTimeMillis() - time;
-			LOG.info("All steps completed in " + time + "ms");
+            for (int i = 0; i < totalSteps; i++) {
+                context = this.pageRankModule.doSomeWork(context, this.database);
+            }
+            time = System.currentTimeMillis() - time;
+            LOG.info("All steps completed in " + time + "ms");
 
-			ExecutionResult result = this.executionEngine.execute("MATCH (node) RETURN node ORDER BY node.pageRankValue DESC");
-			for (Map<String, Object> map : result) {
-				Node n = (Node) map.get("node");
-				LOG.info(n.getProperty("name") + " has " + n.getDegree() + " relationships and a page rank value of: "
-						+ n.getProperty(RandomWalkerPageRankModule.PAGE_RANK_PROPERTY_KEY, 0));
-			}
-		}
-	}
+            ExecutionResult result = this.executionEngine.execute("MATCH (node) RETURN node ORDER BY node.pageRankValue DESC");
+            for (Map<String, Object> map : result) {
+                Node n = (Node) map.get("node");
+                LOG.info(n.getProperty("name") + " has " + n.getDegree() + " relationships and a page rank value of: "
+                        + n.getProperty(RandomWalkerPageRankModule.PAGE_RANK_PROPERTY_KEY, 0));
+            }
+        }
+    }
 
 }

@@ -1,4 +1,4 @@
-package com.graphaware.neo4j.example.pagerank;
+package com.graphaware.example.pagerank;
 
 import com.graphaware.runtime.metadata.NodeBasedContext;
 import com.graphaware.runtime.module.BaseRuntimeModule;
@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A timer-driven GraphAware module that perpetually walks the graph by randomly following relationships and increments
+ * A {@link TimerDrivenModule} that perpetually walks the graph by randomly following relationships and increments
  * a node property called <code>pageRankValue</code> as it goes.  Eventually this will converge on a reasonable measure
  * of the degree to which notes are interconnected, in that the most "popular" nodes will have the highest rank value.
  */
@@ -47,17 +47,26 @@ public class RandomWalkerPageRankModule extends BaseRuntimeModule implements Tim
     	this.relationshipChooser = new RandomRelationshipChooser(moduleConfig.getRelationshipInclusionStrategy());
     }
 
+    /**
+     * {@inheritDoc}
+     */
 	@Override
 	public void shutdown() {
 		//nothing needed for now
 	}
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public NodeBasedContext createInitialContext(GraphDatabaseService database) {
     	LOG.info("Starting page rank graph walker from random start node...");
         return new NodeBasedContext(randomNodeSelector.selectRandomNode(database).getId());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
 	public NodeBasedContext doSomeWork(NodeBasedContext lastContext, GraphDatabaseService database) {
         Node currentNode;
@@ -76,12 +85,12 @@ public class RandomWalkerPageRankModule extends BaseRuntimeModule implements Tim
         return new NodeBasedContext(nextNode);
     }
 
-	private Node determineNextNode(Node currentNode, GraphDatabaseService graphDatabaseService) {
+	private Node determineNextNode(Node currentNode, GraphDatabaseService database) {
 		Relationship chosenRelationship = this.relationshipChooser.chooseRelationship(currentNode);
 		if (chosenRelationship != null) {
 			return chosenRelationship.getOtherNode(currentNode);
 		}
-		return this.randomNodeSelector.selectRandomNode(graphDatabaseService);
+		return this.randomNodeSelector.selectRandomNode(database);
 	}
 
 }

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.graphaware.example.pagerank.RandomWalkerPageRankModule;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +32,7 @@ public class EmbeddedDatabaseIntegration/*Test*/ {
 	 * Pre-populates an ephemeral file system in the {@link TestGraphDatabaseFactory} so that when it's used in tests it creates
 	 * and starts a database the already contains data.
 	 */
-	@Before
+	@Before  //todo: MB doesn't understand this - it runs before every test, so does it do what was intended?
 	public void prePopulateDatabase() {
 		this.testGraphDatabaseFactory = new TestGraphDatabaseFactory();
 		this.testGraphDatabaseFactory.setFileSystem(new EphemeralFileSystemAbstraction());

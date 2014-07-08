@@ -1,4 +1,4 @@
-package com.graphaware.neo4j.example.pagerank;
+package com.graphaware.example.pagerank;
 
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;

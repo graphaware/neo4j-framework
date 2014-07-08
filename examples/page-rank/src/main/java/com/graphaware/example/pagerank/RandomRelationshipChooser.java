@@ -1,4 +1,4 @@
-package com.graphaware.neo4j.example.pagerank;
+package com.graphaware.example.pagerank;
 
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -36,6 +36,7 @@ public class RandomRelationshipChooser implements RelationshipChooser {
 		double max = 0.0;
 		Relationship edgeChoice = null;
 		// XXX: This will probably perform pretty poorly on popular nodes - is there an O(1) solution available?
+        //todo: I'd use Reservoir sampler again: it's still O(n) but fewer LOC and tested. There is no O(1) solution AFAIK
 		for (Relationship relationship : node.getRelationships()) {
 			double rnd = Math.random();
 			if (rnd > max) {
