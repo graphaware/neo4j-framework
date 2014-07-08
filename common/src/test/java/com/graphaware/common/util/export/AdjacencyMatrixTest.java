@@ -1,7 +1,8 @@
 package com.graphaware.common.util.export;
 
-import junit.framework.TestCase;
+import org.junit.Ignore;
 
-public class AdjacencyMatrixTest extends TestCase {
+@Ignore
+public class AdjacencyMatrixTest {
 
 }
