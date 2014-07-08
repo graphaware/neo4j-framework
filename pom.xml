@@ -142,7 +142,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <neo4j.version>2.1.2</neo4j.version>
         <spring.version>4.0.0.RELEASE</spring.version>
-        <graphaware.version>${project.version}</graphaware.version>
+        <graphaware.version>2.1.2.8-SNAPSHOT</graphaware.version>
     </properties>
 
     <dependencyManagement>
