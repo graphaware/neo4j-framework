@@ -20,14 +20,13 @@ import com.graphaware.tx.executor.single.TransactionCallback;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.graphaware.common.util.IterableUtils.countNodes;
 import static org.junit.Assert.assertEquals;
@@ -105,5 +104,33 @@ public class IterableInputBatchTransactionExecutorTest {
             assertEquals("Name109", database.getNodeById(98).getProperty("name"));
             assertEquals("Name1010", database.getNodeById(99).getProperty("name"));
         }
+    }
+
+    @Test
+    public void bugTest() {
+        final Label label = DynamicLabel.label("TEST");
+
+        try (Transaction tx = database.beginTx()) {
+            database.createNode(label);
+            database.createNode(label);
+            tx.success();
+        }
+
+        final AtomicInteger count = new AtomicInteger(0);
+
+        new IterableInputBatchTransactionExecutor<>(database, 100, new TransactionCallback<Iterable<Node>>() {
+            @Override
+            public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
+                return GlobalGraphOperations.at(database).getAllNodesWithLabel(label);
+            }
+        }, new UnitOfWork<Node>() {
+            @Override
+            public void execute(GraphDatabaseService database, Node input, int batchNumber, int stepNumber) {
+                count.incrementAndGet();
+            }
+        }
+        ).execute();
+
+        assertEquals(2, count.get());
     }
 }
