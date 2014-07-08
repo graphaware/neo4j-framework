@@ -17,6 +17,8 @@
 package com.graphaware.common.strategy;
 
 
+import com.graphaware.common.serialize.Serializer;
+import com.graphaware.common.serialize.SingletonSerializer;
 import org.neo4j.graphdb.Node;
 
 /**
@@ -26,10 +28,15 @@ public final class IncludeNoNodes extends IncludeNone<Node> implements NodeInclu
 
     private static final NodeInclusionStrategy INSTANCE = new IncludeNoNodes();
 
+    static {
+        Serializer.register(IncludeNoNodes.class, new SingletonSerializer());
+    }
+
     public static NodeInclusionStrategy getInstance() {
         return INSTANCE;
     }
 
     private IncludeNoNodes() {
+
     }
 }

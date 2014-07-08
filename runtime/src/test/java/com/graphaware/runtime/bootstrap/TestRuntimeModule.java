@@ -1,10 +1,8 @@
 package com.graphaware.runtime.bootstrap;
 
-import com.graphaware.runtime.BaseGraphAwareRuntimeModule;
-import com.graphaware.runtime.GraphAwareRuntimeModule;
-import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
-import com.graphaware.runtime.config.RuntimeModuleConfiguration;
-import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
+import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
+import com.graphaware.runtime.module.BaseTxDrivenModule;
+import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -13,9 +11,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {@link com.graphaware.runtime.GraphAwareRuntimeModule} that can tell whether it has been initialized for testing.
+ * {@link com.graphaware.runtime.module.TxDrivenModule} that can tell whether it has been initialized for testing.
  */
-public class TestRuntimeModule extends BaseGraphAwareRuntimeModule {
+public class TestRuntimeModule extends BaseTxDrivenModule<Void> {
 
     public static final List<TestRuntimeModule> TEST_RUNTIME_MODULES = new ArrayList<>();
 
@@ -29,8 +27,8 @@ public class TestRuntimeModule extends BaseGraphAwareRuntimeModule {
     }
 
     @Override
-    public RuntimeModuleConfiguration getConfiguration() {
-        return NullRuntimeModuleConfiguration.getInstance();
+    public TxDrivenModuleConfiguration getConfiguration() {
+        return NullTxDrivenModuleConfiguration.getInstance();
     }
 
     public Map<String, String> getConfig() {
@@ -63,7 +61,12 @@ public class TestRuntimeModule extends BaseGraphAwareRuntimeModule {
     }
 
     @Override
-    public void beforeCommit(ImprovedTransactionData transactionData) {
+    public Void beforeCommit(ImprovedTransactionData transactionData) {
+        return null;
+    }
+
+    @Override
+    public void afterCommit(Void state) {
         //do nothing
     }
 }

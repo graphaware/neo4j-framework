@@ -24,7 +24,7 @@ import org.neo4j.graphdb.Relationship;
 /**
  * Base-class for all {@link RelationshipInclusionStrategy} that include
  * arbitrary business / application level
- * relationships (up to subclasses to decide which ones), but exclude any {@link com.graphaware.runtime.GraphAwareRuntime}/{@link com.graphaware.runtime.GraphAwareRuntimeModule}
+ * relationships (up to subclasses to decide which ones), but exclude any {@link com.graphaware.runtime.GraphAwareRuntime}/{@link com.graphaware.runtime.module.TxDrivenModule}
  * internal relationships.
  */
 public class IncludeAllBusinessRelationships extends IncludeAllRelationships {

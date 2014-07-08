@@ -30,22 +30,26 @@ import static org.junit.Assert.assertEquals;
  */
 public class FriendshipStrengthModuleServerIntegrationTest extends NeoServerIntegrationTest {
 
-    public FriendshipStrengthModuleServerIntegrationTest() {
-        super("neo4j-friendship.properties");
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String neo4jConfigFile() {
+        return "neo4j-friendship.properties";
     }
 
     @Test
     public void totalFriendshipStrengthOnEmptyDatabaseShouldBeZero() {
-         assertEquals("0", get("http://localhost:7474/graphaware/friendship/strength", HttpStatus.SC_OK));
+         assertEquals("0", get(baseUrl()+"/graphaware/friendship/strength", HttpStatus.SC_OK));
     }
 
     @Test
     public void totalFriendshipStrengthShouldBeCorrectlyCalculated() {
-        executeCypher("http://localhost:7474/" ,
+        executeCypher(baseUrl(),
                 "CREATE " +
                 "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
                 "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
 
-        assertEquals("3", get("http://localhost:7474/graphaware/friendship/strength", HttpStatus.SC_OK));
+        assertEquals("3", get(baseUrl()+"/graphaware/friendship/strength", HttpStatus.SC_OK));
     }
 }

@@ -2,10 +2,10 @@
 GraphAware Neo4j Framework
 ==========================
 
-[![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework) | <a href="http://graphaware.com/downloads/" target="_blank">Downloads</a> | <a href="http://graphaware.com/site/framework/latest/apidocs/" target="_blank">Javadoc</a> | Latest Releases: 2.1.2.7
+[![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework) | <a href="http://graphaware.com/downloads/" target="_blank">Downloads</a> | <a href="http://graphaware.com/site/framework/latest/apidocs/" target="_blank">Javadoc</a> | Latest Releases: 2.1.2.8
 
 GraphAware Framework speeds up development with <a href="http://neo4j.org" target="_blank">Neo4j</a> by providing a
-platform for building useful generic as well as domain-specific functionality, analytical capabilities, graph algorithms,
+platform for building useful generic as well as domain-specific functionality, analytical capabilities, (iterative) graph algorithms,
 etc.
 
 See the <a href="http://graphaware.com/neo4j/2014/05/28/graph-aware-neo4j-framework.html" target="_blank">announcement on our blog</a>.
@@ -18,8 +18,9 @@ On a high level, there are two key pieces of functionality:
 on top of Neo4j using Spring MVC, rather than JAX-RS.
 * [GraphAware Runtime](#graphaware-runtime) is a runtime environment for both embedded and server deployments, which
 allows the use of pre-built as well as custom modules called [GraphAware Runtime Modules](#graphaware-runtime). These
-modules typically extend the core functionality of the database by transparently enriching/modifying/preventing ongoing
-transactions in real-time.
+modules typically extend the core functionality of the database by
+    * transparently enriching/modifying/preventing ongoing transactions in real-time
+    * performing continuous computations on the graph in the background
 
 Additionally, for [Java developers only](#javadev)(1), the following functionality is provided:
 
@@ -67,9 +68,9 @@ To use the latest release, download the appropriate version and put it
 the _plugins_ directory in your Neo4j server installation and restart the server (server mode), or on the classpath (embedded mode).
 
 The following downloads are available:
-* [GraphAware Framework for Embedded Mode, version 2.1.2.7](http://graphaware.com/downloads/graphaware-embedded-all-2.1.2.7.jar)
-* [GraphAware Framework for Server Mode (Community), version 2.1.2.7](http://graphaware.com/downloads/graphaware-server-community-all-2.1.2.7.jar)
-* [GraphAware Framework for Server Mode (Enterprise), version 2.1.2.7](http://graphaware.com/downloads/graphaware-server-enterprise-all-2.1.2.7.jar)
+* [GraphAware Framework for Embedded Mode, version 2.1.2.8](http://graphaware.com/downloads/graphaware-embedded-all-2.1.2.8.jar)
+* [GraphAware Framework for Server Mode (Community), version 2.1.2.8](http://graphaware.com/downloads/graphaware-server-community-all-2.1.2.8.jar)
+* [GraphAware Framework for Server Mode (Enterprise), version 2.1.2.8](http://graphaware.com/downloads/graphaware-server-enterprise-all-2.1.2.8.jar)
 
 Releases are synced to <a href="http://search.maven.org/#search%7Cga%7C1%7Ccom.graphaware.neo4j" target="_blank">Maven Central repository</a>. When using Maven for dependency management, include one of more of the following dependencies in your pom.xml. Read further
 down this page to find out which dependencies you will need. The available ones are:
@@ -79,32 +80,32 @@ down this page to find out which dependencies you will need. The available ones 
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>api</artifactId>
-            <version>2.1.2.7</version>
+            <version>2.1.2.8</version>
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>common</artifactId>
-            <version>2.1.2.7</version>
+            <version>2.1.2.8</version>
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>runtime</artifactId>
-            <version>2.1.2.7</version>
+            <version>2.1.2.8</version>
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>tests</artifactId>
-            <version>2.1.2.7</version>
+            <version>2.1.2.8</version>
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>tx-api</artifactId>
-            <version>2.1.2.7</version>
+            <version>2.1.2.8</version>
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>tx-executor</artifactId>
-            <version>2.1.2.7</version>
+            <version>2.1.2.8</version>
         </dependency>
 
         ...
@@ -112,7 +113,7 @@ down this page to find out which dependencies you will need. The available ones 
 
 ### Snapshots
 
-To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.1.2.8-SNAPSHOT
+To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.1.2.9-SNAPSHOT
  jar files. If you need standalone .jar files with all dependencies, look into the `target` folders in the `build` directory.
 
 ### Note on Versioning Scheme
@@ -139,6 +140,7 @@ controller:
  */
 @Controller
 @RequestMapping("count")
+@Transactional
 public class NodeCountApi {
 
     private final GraphDatabaseService database;
@@ -151,9 +153,7 @@ public class NodeCountApi {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public long count() {
-        try (Transaction tx = database.beginTx()) {
-            return Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
-        }
+        return Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
     }
 }
 ```
@@ -180,7 +180,7 @@ there and cannot (yet) be configured.
 
 To get started quickly, use the provided Maven archetype by typing:
 
-    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-springmvc-maven-archetype -DarchetypeVersion=2.1.2.7
+    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-springmvc-maven-archetype -DarchetypeVersion=2.1.2.8
 
 To get started manually, you will need the following dependencies:
 
@@ -191,14 +191,14 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>common</artifactId>
-        <version>2.1.2.7</version>
+        <version>2.1.2.8</version>
         <scope>provided</scope>
     </dependency>
 
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>api</artifactId>
-        <version>2.1.2.7</version>
+        <version>2.1.2.8</version>
         <scope>provided</scope>
     </dependency>
 
@@ -214,7 +214,7 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>org.neo4j</groupId>
         <artifactId>neo4j</artifactId>
-        <version>2.1.2.7</version>
+        <version>2.1.2.8</version>
         <scope>provided</scope>
     </dependency>
 
@@ -222,13 +222,13 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>server-community</artifactId>
-        <version>2.1.2.7</version>
+        <version>2.1.2.8</version>
         <scope>test</scope>
     </dependency>
 
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
-        <version>2.1.2.7</version>
+        <version>2.1.2.8</version>
         <artifactId>tests</artifactId>
         <scope>test</scope>
     </dependency>
@@ -264,30 +264,35 @@ ones that aren't listed above:
 </build>
 ```
 
-
 <a name="runtime"/>
 GraphAware Runtime
 ------------------
 
-GraphAware Runtime is useful when you require functionality that transparently alters transactions or prevents them from
-happening at all. For example, you might want to:
-* Enforce specific constraints on the graph schema
-* Use optimistic locking to prevent updates of out-of-date data
-* Improve performance by building (and keeping in sync) in-graph indices
-* Improve performance of supernodes
-* Prevent certain parts of the graph from being deleted
-* Timestamp modifications
-* Find out what the latest graph modifications that took place were
-* Write trigger-like functionality (which can actually be unit-tested!)
-* ... and much more
+GraphAware Runtime is useful when you:
+* require functionality that transparently alters transactions or prevents them from happening at all. For example, you might want to:
+    * Enforce specific constraints on the graph schema
+    * Use optimistic locking to prevent updates of out-of-date data
+    * Improve performance by building (and keeping in sync) in-graph indices
+    * Improve performance of supernodes
+    * Prevent certain parts of the graph from being deleted
+    * Timestamp modifications
+    * Find out what the latest graph modifications that took place were
+    * Write trigger-like functionality (which can actually be unit-tested!)
+    * ... and much more
+* need to compute something continuously in the background, writing the results back to the graph. For example, you might want to:
+    * compute PageRank
+    * compute maximum flow between points in the network
+    * pre-compute similarities between people
+    * pre-compute recommendations to people
+    * ... and much more
 
-### Building a GraphAware Runtime Module
+### Building a Transaction-Driven GraphAware Runtime Module
 
 **Example:** An example is provided in `examples/friendship-strength-counter-module`.
 
 To get started quickly, use the provided Maven archetype by typing:
 
-    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-runtime-module-maven-archetype -DarchetypeVersion=2.1.2.7
+    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-runtime-module-maven-archetype -DarchetypeVersion=2.1.2.8
 
 To start from scratch, you will need the following dependencies in your pom.xml
 
@@ -298,37 +303,37 @@ To start from scratch, you will need the following dependencies in your pom.xml
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>api</artifactId>
-        <version>2.1.2.7</version>
+        <version>2.1.2.8</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>common</artifactId>
-        <version>2.1.2.7</version>
+        <version>2.1.2.8</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>runtime</artifactId>
-        <version>2.1.2.7</version>
+        <version>2.1.2.8</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tests</artifactId>
-        <version>2.1.2.7</version>
+        <version>2.1.2.8</version>
         <scope>test</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tx-api</artifactId>
-        <version>2.1.2.7</version>
+        <version>2.1.2.8</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tx-executor</artifactId>
-        <version>2.1.2.7</version>
+        <version>2.1.2.8</version>
         <scope>provided</scope>
     </dependency>
 
@@ -338,10 +343,21 @@ To start from scratch, you will need the following dependencies in your pom.xml
 
 Again, if using other dependencies, you need to make sure the resulting .jar file includes all the dependencies. [See above](#alldependencies).
 
-Your module then needs to be built by implementing the <a href="http://graphaware.com/site/framework/latest/apidocs/com/graphaware/runtime/GraphAwareRuntimeModule.html" target="_blank">GraphAwareRuntimeModule</a> interface.
+Your module then needs to be built by implementing the <a href="http://graphaware.com/site/framework/latest/apidocs/com/graphaware/runtime/module/TxDrivenModule.html" target="_blank">TxDrivenModule</a> interface.
 An example is provided in `examples/friendship-strength-counter-module`. This computes the sum of all `strength` properties
 on `FRIEND_OF` relationships and keeps it up to data, written to a special node created for that purpose. It also has
 a REST API that can be queried for the total friendship strength value.
+
+### Building a Timer-Driven GraphAware Runtime Module
+
+Similarly, your module can implement the the <a href="http://graphaware.com/site/framework/latest/apidocs/com/graphaware/runtime/module/TimerDrivenModule.html" target="_blank">TimerDrivenModule</a> interface
+in order to be able to perform computations on the graph that are automatically scheduled. The framework will detect quiet
+periods in your database and increase the rate at which modules perform behind-the-scenes computations. During busy periods, naturally,
+the rate is decreased.
+
+Each unit of work, implemented by the `doSomeWork` method on `TimerDrivenModule`, should be a short computation that
+writes some results back to the graph. This is very useful for iterative algorithms like PageRank, which are too expensive
+to compute in real-time.
 
 <a name="server-usage"/>
 ### Using GraphAware Runtime (Server Mode)
@@ -386,7 +402,7 @@ To use the runtime and modules programmatically, all we need to do is instantiat
 
 ```java
 GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //replace with a real DB
-GraphAwareRuntime runtime = new ProductionGraphAwareRuntime(database);
+GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
 runtime.registerModule(new FriendshipStrengthModule("FSM", database));
 ```
 
@@ -408,7 +424,8 @@ database = new TestGraphDatabaseFactory()
               .newGraphDatabase();
 ```
 
-**NOTE:** Modules are presented with the about-to-be-committed transaction data in the order in which they've been registered.
+**NOTE:** Modules are presented with the about-to-be-committed  transaction data or asked to do work on scheduled basis
+in the order in which they've been registered.
 
 <a name="javadev"/>
 Features for Java Developers
@@ -426,7 +443,7 @@ Add the following snippet to your pom.xml:
  <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>tests</artifactId>
-    <version>2.1.2.7</version>
+    <version>2.1.2.8</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -451,7 +468,178 @@ TBD
 
 <a name="perftest"/>
 #### Performance Testing
-TBD
+
+Sometimes it is necessary to run some experiments on the database to check how your code, queries, or the database
+itself performs. This is tricky because there are many moving parts:
+ * size of transaction (e.g. how often do you commit)?
+ * database contents (you want this to be as realistic as possible)
+ * data in cache (is data on disk? low level cache? high level cache?)
+ * etc...
+
+GraphAware Framework provides a set of classes to simplify performance testing with Neo4j. Start by exploring the JavaDoc
+ of `PerformanceTestSuite` and `PerformanceTest`. Then head to `examples/performance-testing` to see an implementation
+ of a performance test used for <a href="http://graphaware.com/neo4j/2013/10/24/neo4j-qualifying-relationships.html" target="_blank">this blog post</a>.
+
+In essence, each test can define a list of `Parameters` - these are the moving parts. The Framework will then generate
+all permutations and run the performance test with each a specified number of times. Implementations of `PerformanceTest`
+can specify, among other things:
+* how many times the test should be run and measured
+* how many times it should be run before measurements are started to warm up caches (dry runs)
+* what parameters to use
+* when to throw away and re-build the database
+
+Here's a simple example of a performance test.
+
+```java
+/**
+ * A {@link com.graphaware.test.performance.PerformanceTest} for documentation. Runs test for each of the scenarios
+ * with 3 different {@link CacheConfiguration}s.
+ */
+public class DummyTestForDocs implements PerformanceTest {
+
+    enum Scenario {
+        SCENARIO_1,
+        SCENARIO_2
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String shortName() {
+        return "test-short-name";
+    }
+
+    @Override
+    public String longName() {
+        return "Test Long Name";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Parameter> parameters() {
+        List<Parameter> result = new LinkedList<>();
+
+        result.add(new CacheParameter("cache")); //no cache, low-level cache, high-level cache
+        result.add(new EnumParameter("scenario", Scenario.class));
+
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int dryRuns(Map<String, Object> params) {
+        return ((CacheConfiguration) params.get("cache")).needsWarmup() ? 10000 : 100;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int measuredRuns() {
+        return 100;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, String> databaseParameters(Map<String, Object> params) {
+        return ((CacheConfiguration) params.get("cache")).addToConfig(Collections.<String, String>emptyMap());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void prepareDatabase(GraphDatabaseService database, final Map<String, Object> params) {
+        //create 100 nodes in batches of 100
+        new NoInputBatchTransactionExecutor(database, 100, 100, new UnitOfWork<NullItem>() {
+            @Override
+            public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
+                database.createNode();
+            }
+        }).execute();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RebuildDatabase rebuildDatabase() {
+        return RebuildDatabase.AFTER_PARAM_CHANGE;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long run(GraphDatabaseService database, Map<String, Object> params) {
+        Scenario scenario = (Scenario) params.get("scenario");
+        switch (scenario) {
+            case SCENARIO_1:
+                //run test for scenario 1
+                return 20; //the time it took in microseconds
+            case SCENARIO_2:
+                //run test for scenario 2
+                return 20; //the time it took in microseconds
+            default:
+                throw new IllegalStateException("Unknown scenario");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean rebuildDatabase(Map<String, Object> params) {
+        throw new UnsupportedOperationException("never needed, database rebuilt after every param change");
+    }
+}
+```
+
+You would change the `run` method implementation to do some real work. Then add this test to a test suite and run it:
+
+```java
+/**
+ * Dummy {@link PerformanceTestSuite} for documentation. Runs {@link DummyTestForDocs}.
+ */
+public class DummyTestSuiteForDocs extends PerformanceTestSuite {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected PerformanceTest[] getPerfTests() {
+        return new PerformanceTest[]{
+                new DummyTestForDocs()
+        };
+    }
+}
+```
+
+This would result in a total of 6 different parameter permutations (3 cache types x 2 scenarios), each executed 100 times.
+At the end of the run, you get a file called "test-short-name-xxx.txt" (xxx is a timestamp) in the root of your project.
+The contents fo the file are the runtimes of each test, organised by parameter permutations:
+
+```
+Test Long Name
+
+cache;scenario;times in microseconds...
+nocache;SCENARIO_1;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20
+nocache;SCENARIO_2;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20
+lowcache;SCENARIO_1;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20
+lowcache;SCENARIO_2;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20
+highcache;SCENARIO_1;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20
+highcache;SCENARIO_2;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20;20
+```
+
+You can now have some fun analysing the results - a good starting point could be the python scripts on the `resources`
+folder of `examples/performance-testing`.
 
 <a name="tx-api"/>
 ### Improved Transaction Event API
@@ -462,7 +650,7 @@ Add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>tx-api</artifactId>
-    <version>2.1.2.7</version>
+    <version>2.1.2.8</version>
 </dependency>
 ```
 

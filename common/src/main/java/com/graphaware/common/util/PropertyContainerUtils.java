@@ -239,6 +239,92 @@ public final class PropertyContainerUtils {
         return string.toString();
     }
 
+    /**
+     * Get a property from the given property container as int.
+     *
+     * @param propertyContainer to get property from.
+     * @param key               key of the property.
+     * @return value.
+     * @throws ClassCastException if value isn't a number.
+     * @throws org.neo4j.graphdb.NotFoundException
+     *                            if the property doesn't exist.
+     */
+    public static int getInt(PropertyContainer propertyContainer, String key) {
+        return getInt(propertyContainer.toString(), key, propertyContainer.getProperty(key));
+    }
+
+    /**
+     * Get a property from the given property container as int.
+     *
+     * @param propertyContainer to get property from.
+     * @param key               key of the property.
+     * @param defaultValue      value returned if property does not exist.
+     * @return value.
+     * @throws ClassCastException if value isn't a number.
+     */
+    public static int getInt(PropertyContainer propertyContainer, String key, int defaultValue) {
+        return getInt(propertyContainer.toString(), key, propertyContainer.getProperty(key, defaultValue));
+    }
+
+    /**
+     * Get a property from the given property container as long.
+     *
+     * @param propertyContainer to get property from.
+     * @param key               key of the property.
+     * @return value.
+     * @throws ClassCastException if value isn't a number.
+     * @throws org.neo4j.graphdb.NotFoundException
+     *                            if the property doesn't exist.
+     */
+    public static long getLong(PropertyContainer propertyContainer, String key) {
+        return getLong(propertyContainer.toString(), key, propertyContainer.getProperty(key));
+    }
+
+    /**
+     * Get a property from the given property container as long.
+     *
+     * @param propertyContainer to get property from.
+     * @param key               key of the property.
+     * @param defaultValue      value returned if property does not exist.
+     * @return value.
+     * @throws ClassCastException if value isn't a number.
+     */
+    public static long getLong(PropertyContainer propertyContainer, String key, long defaultValue) {
+        return getLong(propertyContainer.toString(), key, propertyContainer.getProperty(key, defaultValue));
+    }
+
+    private static int getInt(String pc, String key, Object value) {
+        if (value instanceof Byte) {
+            return ((Byte) value).intValue();
+        }
+
+        if (value instanceof Integer) {
+            return (Integer) value;
+        }
+
+        if (value instanceof Long) {
+            return ((Long) value).intValue();
+        }
+
+        throw new ClassCastException(value + " is not a number! (" + pc + ", key=" + key + ")");
+    }
+
+    private static long getLong(String pc, String key, Object value) {
+        if (value instanceof Byte) {
+            return ((Byte) value).longValue();
+        }
+
+        if (value instanceof Integer) {
+            return ((Integer) value).longValue();
+        }
+
+        if (value instanceof Long) {
+            return (Long) value;
+        }
+
+        throw new ClassCastException(value + " is not a number! (" + pc + ", key=" + key + ")");
+    }
+
     private PropertyContainerUtils() {
     }
 }

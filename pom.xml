@@ -31,12 +31,12 @@
     <modules>
         <module>api</module>
         <module>common</module>
+        <module>generator</module>
         <module>runtime</module>
         <module>server</module>
         <module>tests</module>
         <module>tx-api</module>
         <module>tx-executor</module>
-        <!--<module>crawler</module>-->
         <module>build</module>
 
         <!--examples-->
@@ -44,6 +44,9 @@
         <module>examples/friendship-strength-counter</module>
         <module>examples/change-logger</module>
         <module>examples/friendship-strength-counter-module</module>
+        <module>examples/performance-testing</module>
+        <module>examples/integration-testing</module>
+        <module>examples/page-rank</module>
     </modules>
 
     <name>GraphAware Neo4j Framework</name>
@@ -151,6 +154,12 @@
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>api</artifactId>
                 <version>${graphaware.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>runtime</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>

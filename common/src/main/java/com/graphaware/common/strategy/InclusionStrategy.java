@@ -30,4 +30,5 @@ public interface InclusionStrategy<T> {
      * @return true iff the given object should be included.
      */
     boolean include(T object);
+    
 }

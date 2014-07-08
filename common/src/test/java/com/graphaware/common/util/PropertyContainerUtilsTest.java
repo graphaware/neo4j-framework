@@ -22,10 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.PropertyContainer;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
@@ -37,6 +34,7 @@ import java.util.Map;
 import static com.graphaware.common.util.ArrayUtils.*;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
@@ -146,6 +144,120 @@ public class PropertyContainerUtilsTest {
 
         try (Transaction tx = database.beginTx()) {
             assertEquals(2, deleteNodeAndRelationships(database.getNodeById(2)));
+            tx.success();
+        }
+    }
+
+    @Test
+    public void shouldSafelyGetInt() {
+        populateDatabaseWithNumberProperties();
+        int expected = 123;
+
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(expected, getInt(database.getNodeById(0), "test"));
+            assertEquals(expected, getInt(database.getNodeById(1), "test"));
+            assertEquals(expected, getInt(database.getNodeById(2), "test"));
+
+            try {
+                getInt(database.getNodeById(3), "test");
+                fail();
+            } catch (ClassCastException e) {
+                //ok
+            }
+
+            try {
+                getInt(database.getNodeById(4), "test");
+                fail();
+            } catch (NotFoundException e) {
+                //ok
+            }
+
+            tx.success();
+        }
+    }
+
+    @Test
+    public void shouldSafelyGetIntWithDefaults() {
+        populateDatabaseWithNumberProperties();
+        int expected = 123;
+
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(expected, getInt(database.getNodeById(0), "test", 123));
+            assertEquals(expected, getInt(database.getNodeById(1), "test", 123));
+            assertEquals(expected, getInt(database.getNodeById(2), "test", 123));
+            assertEquals(expected, getInt(database.getNodeById(4), "test", 123));
+
+            try {
+                getInt(database.getNodeById(3), "test", 123);
+                fail();
+            } catch (ClassCastException e) {
+                //ok
+            }
+
+            tx.success();
+        }
+    }
+
+    @Test
+    public void shouldSafelyGetLong() {
+        populateDatabaseWithNumberProperties();
+        long expected = 123L;
+
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(expected, getLong(database.getNodeById(0), "test"));
+            assertEquals(expected, getLong(database.getNodeById(1), "test"));
+            assertEquals(expected, getLong(database.getNodeById(2), "test"));
+
+            try {
+                getLong(database.getNodeById(3), "test");
+                fail();
+            } catch (ClassCastException e) {
+                //ok
+            }
+
+            try {
+                getLong(database.getNodeById(4), "test");
+                fail();
+            } catch (NotFoundException e) {
+                //ok
+            }
+
+            tx.success();
+        }
+    }
+
+    @Test
+    public void shouldSafelyGetLongWithDefaults() {
+        populateDatabaseWithNumberProperties();
+        long expected = 123L;
+
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(expected, getLong(database.getNodeById(0), "test", 123L));
+            assertEquals(expected, getLong(database.getNodeById(1), "test", 123L));
+            assertEquals(expected, getLong(database.getNodeById(2), "test", 123L));
+            assertEquals(expected, getLong(database.getNodeById(4), "test", 123L));
+
+            try {
+                getLong(database.getNodeById(3), "test", 123L);
+                fail();
+            } catch (ClassCastException e) {
+                //ok
+            }
+
+            tx.success();
+        }
+    }
+
+    private void populateDatabaseWithNumberProperties() {
+        database.shutdown();
+        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+
+        try (Transaction tx = database.beginTx()) {
+            database.createNode().setProperty("test", (byte) 123);
+            database.createNode().setProperty("test", 123);
+            database.createNode().setProperty("test", 123L);
+            database.createNode().setProperty("test", "string");
+            database.createNode();
             tx.success();
         }
     }

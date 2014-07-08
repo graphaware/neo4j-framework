@@ -19,12 +19,13 @@ package com.graphaware.runtime.strategy;
 import com.graphaware.common.strategy.IncludeAllNodes;
 import com.graphaware.common.strategy.NodeInclusionStrategy;
 import com.graphaware.runtime.config.RuntimeConfiguration;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 
 /**
  * Base-class for all {@link NodeInclusionStrategy} implementations
  * that include arbitrary business / application level nodes (up to subclasses to decide which ones), but exclude any
- * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link com.graphaware.runtime.GraphAwareRuntimeModule} internal nodes.
+ * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link com.graphaware.runtime.module.TxDrivenModule} internal nodes.
  */
 public class IncludeAllBusinessNodes extends IncludeAllNodes {
 
@@ -42,8 +43,10 @@ public class IncludeAllBusinessNodes extends IncludeAllNodes {
      */
     @Override
     public final boolean include(Node node) {
-        if (node.hasProperty(RuntimeConfiguration.GA_NODE_PROPERTY_KEY)) {
-            return false;
+        for (Label label : node.getLabels()) {
+            if (label.name().startsWith(RuntimeConfiguration.GA_PREFIX)) {
+                return false;
+            }
         }
 
         return super.include(node);

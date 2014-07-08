@@ -17,16 +17,12 @@
 package com.graphaware.example;
 
 import com.graphaware.example.module.FriendshipStrengthCounter;
-import com.graphaware.example.module.FriendshipStrengthModule;
-import com.graphaware.runtime.GraphAwareRuntime;
-import com.graphaware.runtime.ProductionGraphAwareRuntime;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.springframework.core.io.ClassPathResource;
 
 import static org.junit.Assert.assertEquals;
 
