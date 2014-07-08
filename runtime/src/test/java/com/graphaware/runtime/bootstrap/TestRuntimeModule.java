@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * {@link com.graphaware.runtime.module.TxDrivenModule} that can tell whether it has been initialized for testing.
  */
-public class TestRuntimeModule extends BaseTxDrivenModule {
+public class TestRuntimeModule extends BaseTxDrivenModule<Void> {
 
     public static final List<TestRuntimeModule> TEST_RUNTIME_MODULES = new ArrayList<>();
 
@@ -61,7 +61,12 @@ public class TestRuntimeModule extends BaseTxDrivenModule {
     }
 
     @Override
-    public void beforeCommit(ImprovedTransactionData transactionData) {
+    public Void beforeCommit(ImprovedTransactionData transactionData) {
+        return null;
+    }
+
+    @Override
+    public void afterCommit(Void state) {
         //do nothing
     }
 }

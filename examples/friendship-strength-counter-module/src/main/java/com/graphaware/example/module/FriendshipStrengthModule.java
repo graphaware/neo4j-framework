@@ -24,7 +24,7 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
  * {@link com.graphaware.runtime.module.TxDrivenModule} that counts the total friendship strength in the database
  * and keeps it up to date.
  */
-public class FriendshipStrengthModule extends BaseTxDrivenModule {
+public class FriendshipStrengthModule extends BaseTxDrivenModule<Void> {
 
     private final TxDrivenModuleConfiguration configuration;
     private final FriendshipStrengthCounter counter;
@@ -86,11 +86,21 @@ public class FriendshipStrengthModule extends BaseTxDrivenModule {
      * {@inheritDoc}
      */
     @Override
-    public void beforeCommit(ImprovedTransactionData transactionData) {
+    public Void beforeCommit(ImprovedTransactionData transactionData) {
         if (transactionData.mutationsOccurred()) {
             counter.handleCreatedFriendships(transactionData.getAllCreatedRelationships());
             counter.handleChangedFriendships(transactionData.getAllChangedRelationships());
             counter.handleDeletedFriendships(transactionData.getAllDeletedRelationships());
         }
+
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void afterCommit(Void state) {
+        //do nothing
     }
 }

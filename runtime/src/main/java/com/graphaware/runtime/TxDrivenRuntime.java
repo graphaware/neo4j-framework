@@ -23,6 +23,7 @@ import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 
+import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -33,7 +34,7 @@ import java.util.Set;
  *
  * @param <T> implementation of {@link com.graphaware.runtime.module.TxDrivenModule} that this runtime supports.
  */
-public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGraphAwareRuntime implements TransactionEventHandler<Void> {
+public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGraphAwareRuntime implements TransactionEventHandler<Queue<Object>> {
 
     /**
      * Get the manager for {@link TxDrivenModule}s.
@@ -54,31 +55,33 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      * {@inheritDoc}
      */
     @Override
-    public final Void beforeCommit(TransactionData data) throws Exception {
+    public final Queue<Object> beforeCommit(TransactionData data) throws Exception {
         if (!tryToStartIfNotStarted()) {
             return null;
         }
 
         getTxDrivenModuleManager().throwExceptionIfIllegal(data);
 
-        getTxDrivenModuleManager().beforeCommit(new LazyTransactionData(data));
-
-        return null;
+        return getTxDrivenModuleManager().beforeCommit(new LazyTransactionData(data));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final void afterCommit(TransactionData data, Void state) {
-        //do nothing for now
+    public final void afterCommit(TransactionData data, Queue<Object> states) {
+        if (states == null) {
+            return;
+        }
+
+        getTxDrivenModuleManager().afterCommit(states);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final void afterRollback(TransactionData data, Void state) {
+    public final void afterRollback(TransactionData data, Queue<Object> states) {
         //do nothing for now
     }
 

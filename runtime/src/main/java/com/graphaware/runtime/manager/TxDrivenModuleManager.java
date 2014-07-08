@@ -4,6 +4,8 @@ import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.neo4j.graphdb.event.TransactionData;
 
+import java.util.Queue;
+
 /**
  * {@link ModuleManager} for {@link TxDrivenModule}s.
  */
@@ -23,10 +25,17 @@ public interface TxDrivenModuleManager<T extends TxDrivenModule> extends ModuleM
     void throwExceptionIfIllegal(TransactionData transactionData);
 
     /**
-     * Do the work that is the raison d'etre of this module. This could be logging, writing additional things
-     * into the graph, preventing the transaction from happening by throwing a {@link RuntimeException}, etc.
+     * Delegate work to modules before a transaction is committed.
      *
      * @param transactionData about-to-be-committed transaction data.
+     * @return list of objects (states) returned by the modules, in the order in which they are delegated to.
      */
-    void beforeCommit(TransactionDataContainer transactionData);
+    Queue<Object> beforeCommit(TransactionDataContainer transactionData);
+
+    /**
+     * Delegate work to modules after a transaction is committed.
+     *
+     * @param states returned by {@link #beforeCommit(com.graphaware.tx.event.improved.data.TransactionDataContainer)}.
+     */
+    void afterCommit(Queue<Object> states);
 }

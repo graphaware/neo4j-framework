@@ -354,7 +354,9 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         }
 
         verify(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
+        verify(mockModule1).afterCommit("TEST_" + MOCK + "1");
         verify(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
+        verify(mockModule2).afterCommit("TEST_" + MOCK + "2");
         verify(mockModule1, atLeastOnce()).getConfiguration();
         verify(mockModule2, atLeastOnce()).getConfiguration();
         verify(mockModule3, atLeastOnce()).getConfiguration();
@@ -391,7 +393,9 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         verify(mockModule3, atLeastOnce()).getId();
 
         verify(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
+        verify(mockModule1).afterCommit("TEST_" + MOCK + "1");
         verify(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
+        verify(mockModule2).afterCommit("TEST_" + MOCK + "2");
         verify(mockModule1, atLeastOnce()).getConfiguration();
         verify(mockModule2, atLeastOnce()).getConfiguration();
         verify(mockModule3, atLeastOnce()).getConfiguration();
@@ -570,6 +574,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
         verify(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
         verify(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
+        verify(mockModule2).afterCommit("TEST_" + MOCK + "2");
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule1, atLeastOnce()).getConfiguration();
@@ -596,7 +601,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     }
 
-    protected class RealRuntimeConfiguredRuntimeModule extends BaseTxDrivenModule implements RuntimeConfigured {
+    protected class RealRuntimeConfiguredRuntimeModule extends BaseTxDrivenModule<Void> implements RuntimeConfigured {
 
         private RuntimeConfiguration configuration;
 
@@ -619,7 +624,12 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         }
 
         @Override
-        public void beforeCommit(ImprovedTransactionData transactionData) {
+        public Void beforeCommit(ImprovedTransactionData transactionData) {
+            return null;
+        }
+
+        @Override
+        public void afterCommit(Void state) {
             //do nothing
         }
     }

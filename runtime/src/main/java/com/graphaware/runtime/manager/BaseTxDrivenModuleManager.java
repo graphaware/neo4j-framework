@@ -12,7 +12,7 @@ import org.neo4j.graphdb.event.TransactionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
+import java.util.*;
 
 /**
  * {@link BaseModuleManager} for {@link TxDrivenModule}s.
@@ -118,16 +118,21 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      * {@inheritDoc}
      */
     @Override
-    public void beforeCommit(TransactionDataContainer transactionData) {
+    public Queue<Object> beforeCommit(TransactionDataContainer transactionData) {
+        Queue<Object> result = new LinkedList<>();
+
         for (T module : modules) {
             FilteredTransactionData filteredTransactionData = new FilteredTransactionData(transactionData, module.getConfiguration().getInclusionStrategies());
 
             if (!filteredTransactionData.mutationsOccurred()) {
+                result.add(null);
                 continue;
             }
 
+            Object state = null;
+
             try {
-                module.beforeCommit(filteredTransactionData);
+                state = module.beforeCommit(filteredTransactionData);
             } catch (NeedsInitializationException e) {
                 LOG.warn("Module " + module.getId() + " seems to have a problem and will be re-initialized next time the database is started. ");
                 TxDrivenModuleMetadata moduleMetadata = metadataRepository.getModuleMetadata(module);
@@ -137,6 +142,28 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
                 throw e;
             } catch (RuntimeException e) {
                 LOG.warn("Module " + module.getId() + " threw an exception", e);
+            }
+
+            result.add(state);
+        }
+
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void afterCommit(Queue<Object> states) {
+        for (T module : modules) {
+            if (states.isEmpty()) {
+                LOG.error("States are out of sync with modules. This is a bug");
+                throw new IllegalStateException("States are out of sync with modules. This is a bug");
+            }
+
+            Object next = states.poll();
+            if (next != null) {
+                module.afterCommit(next);
             }
         }
     }

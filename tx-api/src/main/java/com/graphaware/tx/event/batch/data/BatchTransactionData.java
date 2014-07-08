@@ -90,14 +90,20 @@ public class BatchTransactionData implements TransactionData {
         commitInProgress = true;
 
         try {
+            Queue<Object> states = new LinkedList<>();
+
             for (TransactionEventHandler handler : transactionEventHandlers) {
                 try {
-                    Object result = handler.beforeCommit(this);
-                    handler.afterCommit(this, result);
+                    states.add(handler.beforeCommit(this));
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
+
+            for (TransactionEventHandler handler : transactionEventHandlers) {
+                handler.afterCommit(this, states.poll());
+            }
+
         } finally {
             clear();
             commitInProgress = false;

@@ -9,8 +9,12 @@ import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 
 /**
  * Base class for {@link TxDrivenModule} implementations.
+ *
+ * @param <T> The type of a state object that the module can use to
+ *            pass information from the {@link #beforeCommit(com.graphaware.tx.event.improved.api.ImprovedTransactionData)}
+ *            method to the {@link #afterCommit(Object)} method.
  */
-public abstract class BaseTxDrivenModule extends BaseRuntimeModule implements TxDrivenModule {
+public abstract class BaseTxDrivenModule<T> extends BaseRuntimeModule implements TxDrivenModule<T> {
 
     /**
      * Construct a new module.

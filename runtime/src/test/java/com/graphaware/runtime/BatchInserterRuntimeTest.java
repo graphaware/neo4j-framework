@@ -107,6 +107,7 @@ public class BatchInserterRuntimeTest extends GraphAwareRuntimeTest<BatchSupport
         BatchSupportingTxDrivenModule mockModule = mock(BatchSupportingTxDrivenModule.class);
         when(mockModule.getId()).thenReturn(id);
         when(mockModule.getConfiguration()).thenReturn(configuration);
+        when(mockModule.beforeCommit(any(ImprovedTransactionData.class))).thenReturn("TEST_" + id);
         return mockModule;
     }
 
