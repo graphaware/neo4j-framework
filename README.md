@@ -113,7 +113,7 @@ down this page to find out which dependencies you will need. The available ones 
 
 ### Snapshots
 
-To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.1.2.9-SNAPSHOT
+To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.1.2.8-SNAPSHOT
  jar files. If you need standalone .jar files with all dependencies, look into the `target` folders in the `build` directory.
 
 ### Note on Versioning Scheme
