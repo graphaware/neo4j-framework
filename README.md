@@ -28,7 +28,7 @@ Additionally, for [Java developers only](#javadev)(1), the following functionali
     * [GraphUnit](#graphunit) - simple graph unit-testing
     * [Integration Testing](#inttest) - support for integration testing
     * [Performance Testing](#perftest) - support for performance testing
-* [Improved Neo4j Transaction API](#tx-api)
+* [Improved Neo4j Transaction API](tx-api)
 * [Transaction Executor](#tx-executor) and [Batch Transaction Executor](#batch-tx)
 * [Miscellaneous Utilities](#utils)
 
