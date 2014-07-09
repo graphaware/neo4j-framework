@@ -2,11 +2,13 @@ package com.graphaware.tx.executor;
 
 import com.graphaware.tx.executor.batch.*;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
+import com.graphaware.tx.executor.single.TransactionCallback;
 import com.graphaware.tx.executor.single.TransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +44,29 @@ public class JustForDocs {
                 node.setProperty("name", nodeName);
             }
         });
+
+        executor.execute();
+    }
+
+    private void justForDocs5() {
+        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //only for demo, use your own persistent one!
+
+        BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(
+                database,
+                1000,
+                new TransactionCallback<Iterable<Node>>() {
+                    @Override
+                    public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
+                        return GlobalGraphOperations.at(database).getAllNodes();
+                    }
+                },
+                new UnitOfWork<Node>() {
+                    @Override
+                    public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
+                        node.setProperty("uuid", UUID.randomUUID());
+                    }
+                }
+        );
 
         executor.execute();
     }

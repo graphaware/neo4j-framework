@@ -1,4 +1,3 @@
-<a name="top"/>
 Improved Transaction Event API
 ==============================
 
