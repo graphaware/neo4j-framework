@@ -1,4 +1,4 @@
-package com.graphaware.neo4j.example.pagerank;
+package com.graphaware.example.pagerank;
 
 import java.util.Arrays;
 import java.util.Map;
