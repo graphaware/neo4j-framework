@@ -41,7 +41,10 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
 
     public FriendshipStrengthCounter(GraphDatabaseService database) {
         this.database = database;
-        getCounterNode(database); //do this in constructor to prevent multiple threads creating multiple nodes
+        try (Transaction tx = database.beginTx()) {
+            getCounterNode(database); //do this in constructor to prevent multiple threads creating multiple nodes
+            tx.success();
+        }
     }
 
     /**
