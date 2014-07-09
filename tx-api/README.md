@@ -16,8 +16,9 @@ The least you can gain from using this functionality is avoiding `java.lang.Ille
 been deleted in this tx` when trying to access properties of nodes/relationships deleted in a transaction. You can also
 easily access relationships/nodes that were changed and/or deleted in a transaction, again completely exception-free.
 
-The target audience of this module are advanced Neo4j users, mostly Java developers developing Neo4j `TransactionEventHandler`s.
-The module is also one of the core components of GraphAware Runtime.
+The target audience of this module are advanced Neo4j users, mostly Java developers developing Neo4j
+[`TransactionEventHandler`](http://docs.neo4j.org/chunked/2.1.2/javadocs/org/neo4j/graphdb/event/TransactionEventHandler.html)s.
+The module is also one of the core components of [GraphAware Runtime](../runtime).
 
 ### Getting the Module
 
