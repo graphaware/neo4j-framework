@@ -97,23 +97,26 @@ public final class IterableUtils {
     }
 
     /**
-     * Get a random element of the given iterable.
+     * Get a random element of the given {@link Iterable}.  This is functionally equivalent to calling
+     * {@link #random(Iterable, int)} with a sample size of 1.
      *
-     * @param iterable to get a random element from.
-     * @param <T>      type of the element.
-     * @return random element.
+     * @param iterable The {@link Iterable} from which to get a random element.
+     * @param <T> The type of the element, as dictated by the given argument.
+     * @return A random element from the given iterable.
+     * @throws IllegalArgumentException if invoked with an empty {@link Iterable}.
      */
     public static <T> T random(Iterable<T> iterable) {
         return random(iterable, 1).iterator().next();
     }
 
     /**
-     * Sample an iterable using reservoir sampling.
+     * Sample an {@link Iterable} using reservoir sampling.
      *
-     * @param iterable        to sample.
-     * @param numberOfSamples to return.
-     * @param <T>             type of elements in the iterable.
-     * @return sampled iterable.
+     * @param iterable The {@link Iterable} from which to sample.
+     * @param numberOfSamples The number of elements to return.
+     * @param <T> The type of the element, as dictated by the given {@link Iterable}.
+     * @return A new {@link Iterable} containing a number of random elements sampled from the {@link Iterable} argument.
+     * @throws IllegalArgumentException if invoked with an empty {@link Iterable}.
      */
     public static <T> Iterable<T> random(Iterable<T> iterable, int numberOfSamples) {
         if (!iterable.iterator().hasNext()) {
