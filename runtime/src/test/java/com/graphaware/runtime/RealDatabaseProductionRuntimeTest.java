@@ -347,7 +347,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
             tx.success();
         }
 
-        Thread.sleep(INITIAL_TIMER_DELAY);
+        Thread.sleep(INITIAL_TIMER_DELAY + TIMER_DELAY - 100);
 
         verify(mockModule).initialize(database);
         verify(mockModule).createInitialContext(database);
