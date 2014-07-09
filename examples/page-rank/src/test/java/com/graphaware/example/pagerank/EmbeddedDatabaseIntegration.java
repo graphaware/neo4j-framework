@@ -30,9 +30,15 @@ public class EmbeddedDatabaseIntegration/*Test*/ {
 
 	/**
 	 * Pre-populates an ephemeral file system in the {@link TestGraphDatabaseFactory} so that when it's used in tests it creates
-	 * and starts a database the already contains data.
+	 * and starts a database that already contains data.
+	 * <p>
+	 * The reason for this is to verify the behaviour of the module when the database is started but already contains data from
+	 * a previous run.  Therefore, instead of all module tests starting on a blank database, we can start the test with a pre-
+	 * defined graph and see how this affects module bootstrapping.  It ensures that the transactions used to insert the test
+	 * data don't interfere with the module's life cycle.
+	 * </p>
 	 */
-	@Before  //todo: MB doesn't understand this - it runs before every test, so does it do what was intended?
+	@Before
 	public void prePopulateDatabase() {
 		this.testGraphDatabaseFactory = new TestGraphDatabaseFactory();
 		this.testGraphDatabaseFactory.setFileSystem(new EphemeralFileSystemAbstraction());

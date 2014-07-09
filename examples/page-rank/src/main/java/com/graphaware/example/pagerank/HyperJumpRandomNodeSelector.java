@@ -6,6 +6,7 @@ import org.neo4j.tooling.GlobalGraphOperations;
 
 import com.graphaware.common.strategy.IncludeAllNodes;
 import com.graphaware.common.strategy.InclusionStrategy;
+import com.graphaware.common.util.ReservoirSampler;
 
 /**
  * Very simple implementation of {@link RandomNodeSelector} that chooses an arbitrary node from the graph database in O(n) time.
@@ -31,27 +32,19 @@ public class HyperJumpRandomNodeSelector implements RandomNodeSelector {
 		this.inclusionStrategy = inclusionStrategy;
 	}
 
-    //todo: have a look at com.graphaware.common.util.ReservoirSampler, should do exactly what you need
     //todo: we should really make this O(1) by finding the highest node id and choosing a random number between 0 and the highest, retrying if the node does not exist
+	// we should, aye, but first we need to figure out
 	@Override
 	public Node selectRandomNode(GraphDatabaseService database) {
-		Iterable<Node> nodes = GlobalGraphOperations.at(database).getAllNodes();
-		Node target = null; // again, could be formulated in a better way.
+		Iterable<Node> allNodes = GlobalGraphOperations.at(database).getAllNodes();
 
-		double max = 0.0;
-		for (Node temp : nodes) {
-			double rnd = random();
-			if (rnd > max) {
-				max = rnd;
-				target = temp;
+		ReservoirSampler<Node> randomSampler = new ReservoirSampler<>(1);
+		for (Node node : allNodes) {
+			if (this.inclusionStrategy.include(node)) {
+				randomSampler.sample(node);
 			}
 		}
-
-		return target;
-	}
-
-	private double random() {
-		return Math.random();
+		return randomSampler.getSamples().iterator().next();
 	}
 
 }
