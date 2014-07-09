@@ -18,7 +18,7 @@ easily access relationships/nodes that were changed and/or deleted in a transact
 
 The target audience of this module are advanced Neo4j users, mostly Java developers developing Neo4j
 [`TransactionEventHandler`](http://docs.neo4j.org/chunked/2.1.2/javadocs/org/neo4j/graphdb/event/TransactionEventHandler.html)s.
-The module is also one of the core components of [GraphAware Runtime](../runtime).
+The module is also one of the key components of [GraphAware Runtime](../runtime).
 
 ### Getting the Module
 
@@ -34,9 +34,10 @@ Add the following snippet to your pom.xml:
 
 ### Usage
 
-**Example:** An example is provided in `examples/friendship-strength-counter`.
+**Example:** An example is provided in [examples/friendship-strength-counter](../examples/friendship-strength-counter).
 
-To use the API, simply instantiate one of the `ImprovedTransactionData` implementations. `LazyTransactionData` is recommended as it is the easiest one to use.
+To use the API, simply instantiate one of the [`ImprovedTransactionData`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/event/improved/api/ImprovedTransactionData.html) implementations.
+[`LazyTransactionData`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/event/improved/api/LazyTransactionData.html) is recommended as it is the easiest one to use.
 
 ```java
  GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
@@ -63,8 +64,9 @@ To use the API, simply instantiate one of the `ImprovedTransactionData` implemen
 });
 ```
 
-`FilteredTransactionData` can be used instead. They effectively hide portions of the graph, including any changes performed
-on nodes and relationships that are not interesting. `InclusionStrategies` are used to convey the information about
+[`FilteredTransactionData`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/event/improved/api/FilteredTransactionData.html) can be used instead.
+They effectively hide portions of the graph, including any changes performed
+on nodes and relationships that are not interesting. [`InclusionStrategies`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/common/strategy/InclusionStrategies.html) are used to convey the information about
 what is interesting and what is not. For example, of only nodes with name equal to "Two" and no relationships at all
 are of interest, the example above could be modified as follows:
 
@@ -94,7 +96,7 @@ database.registerTransactionEventHandler(new TransactionEventHandler.Adapter<Obj
 
 ### Example Scenario
 
-**Example:** The following example is provided in `examples/friendship-strength-counter`.
+**Example:** The following example is provided in [examples/friendship-strength-counter](../examples/friendship-strength-counter).
 
 Let's illustrate why this might be useful on a very simple example. Let's say we have a `FRIEND_OF` relationship in the
 system and it has a `strength` property indicating the strength of the friendship from 1 to 3. Let's further assume that
@@ -121,6 +123,7 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
 
     public FriendshipStrengthCounter(GraphDatabaseService database) {
         this.database = database;
+        getCounterNode(database); //do this in constructor to prevent multiple threads creating multiple nodes
     }
 
     /**
@@ -130,33 +133,33 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
     public Void beforeCommit(TransactionData data) throws Exception {
         ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data);
 
-        int delta = 0;
+        long delta = 0;
 
         //handle new friendships
         for (Relationship newFriendship : improvedTransactionData.getAllCreatedRelationships()) {
             if (newFriendship.isType(FRIEND_OF)) {
-                delta += (int) newFriendship.getProperty(STRENGTH, 0);
+                delta += (long) newFriendship.getProperty(STRENGTH, 0L);
             }
         }
 
         //handle changed friendships
         for (Change<Relationship> changedFriendship : improvedTransactionData.getAllChangedRelationships()) {
             if (changedFriendship.getPrevious().isType(FRIEND_OF)) {
-                delta -= (int) changedFriendship.getPrevious().getProperty(STRENGTH, 0);
-                delta += (int) changedFriendship.getCurrent().getProperty(STRENGTH, 0);
+                delta -= (long) changedFriendship.getPrevious().getProperty(STRENGTH, 0L);
+                delta += (long) changedFriendship.getCurrent().getProperty(STRENGTH, 0L);
             }
         }
 
         //handle deleted friendships
         for (Relationship deletedFriendship : improvedTransactionData.getAllDeletedRelationships()) {
             if (deletedFriendship.isType(FRIEND_OF)) {
-                delta -= (int) deletedFriendship.getProperty(STRENGTH, 0);
+                delta -= (long) deletedFriendship.getProperty(STRENGTH, 0L);
             }
         }
 
         if (delta != 0) {
             Node root = getCounterNode(database);
-            root.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (int) root.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0) + delta);
+            root.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (long) root.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L) + delta);
         }
 
         return null;
@@ -169,7 +172,7 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
      * @return counter node.
      */
     private static Node getCounterNode(GraphDatabaseService database) {
-        Node result = getSingle(at(database).getAllNodesWithLabel(COUNTER_NODE_LABEL));
+        Node result = IterableUtils.getSingleOrNull(GlobalGraphOperations.at(database).getAllNodesWithLabel(COUNTER_NODE_LABEL));
 
         if (result != null) {
             return result;
@@ -184,11 +187,11 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
      * @param database to find the counter in.
      * @return total friendship strength.
      */
-    public static int getTotalFriendshipStrength(GraphDatabaseService database) {
-        int result = 0;
+    public static long getTotalFriendshipStrength(GraphDatabaseService database) {
+        long result = 0;
 
         try (Transaction tx = database.beginTx()) {
-            result = (int) getCounterNode(database).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0);
+            result = (long) getCounterNode(database).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L);
             tx.success();
         }
 
@@ -205,6 +208,8 @@ database.registerTransactionEventHandler(new FriendshipStrengthCounter(database)
 ```
 
 ### Usage in Detail
+
+Note: have a look at [`ImprovedTransactionData` Javadoc](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/event/improved/api/ImprovedTransactionData.html).
 
 The API categorizes `PropertyContainer`s, i.e. `Node`s and `Relationship`s into:
 
@@ -258,11 +263,11 @@ To summarize, this API gives access to two versions of the same graph. Through c
 ### Batch Usage
 
 In case you would like to use the Neo4j `BatchInserter` API but still get access to `ImprovedTransactionData` during
-batch insert operations, `TransactionSimulatingBatchInserterImpl` is the class for you. It is a `BatchInserter` but
+batch insert operations, [`TransactionSimulatingBatchInserterImpl`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/event/batch/api/TransactionSimulatingBatchInserterImpl.html) is the class for you. It is a `BatchInserter` but
 allows `TransactionEventHandler`s to be registered on it. It then simulates a transaction commit every once in a while
-(configurable, please refer to JavaDoc).
+(configurable, please refer to Javadoc).
 
-As a `GraphDatabaseService` equivalent for batch inserts, this project provides `TransactionSimulatingBatchGraphDatabase`
+As a `GraphDatabaseService` equivalent for batch inserts, this project provides [`TransactionSimulatingBatchGraphDatabase`](http://graphaware.com/site/framework/latest/apidocs/org/neo4j/unsafe/batchinsert/TransactionSimulatingBatchGraphDatabase.html)
 for completeness, but its usage is discouraged.
 
 License

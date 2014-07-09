@@ -16,15 +16,14 @@
 
 package com.graphaware.example;
 
+import com.graphaware.common.util.IterableUtils;
 import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
-
-import static com.graphaware.common.util.IterableUtils.getSingleOrNull;
-import static org.neo4j.tooling.GlobalGraphOperations.at;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * Example of a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler} that uses GraphAware {@link ImprovedTransactionData}
@@ -42,6 +41,7 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
 
     public FriendshipStrengthCounter(GraphDatabaseService database) {
         this.database = database;
+        getCounterNode(database); //do this in constructor to prevent multiple threads creating multiple nodes
     }
 
     /**
@@ -90,7 +90,7 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
      * @return counter node.
      */
     private static Node getCounterNode(GraphDatabaseService database) {
-        Node result = getSingleOrNull(at(database).getAllNodesWithLabel(COUNTER_NODE_LABEL));
+        Node result = IterableUtils.getSingleOrNull(GlobalGraphOperations.at(database).getAllNodesWithLabel(COUNTER_NODE_LABEL));
 
         if (result != null) {
             return result;
