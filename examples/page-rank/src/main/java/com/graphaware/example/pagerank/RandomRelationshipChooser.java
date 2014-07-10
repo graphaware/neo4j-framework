@@ -3,8 +3,10 @@ package com.graphaware.example.pagerank;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
+import com.graphaware.common.strategy.IncludeAllNodes;
 import com.graphaware.common.strategy.IncludeAllRelationships;
 import com.graphaware.common.strategy.InclusionStrategy;
+import com.graphaware.common.util.ReservoirSampler;
 
 /**
  * Simple implementation of {@link RelationshipChooser} that chooses at random one of the appropriate relationships using an
@@ -12,40 +14,41 @@ import com.graphaware.common.strategy.InclusionStrategy;
  */
 public class RandomRelationshipChooser implements RelationshipChooser {
 
-	private final InclusionStrategy<? super Relationship> inclusionStrategy;
+	private final InclusionStrategy<? super Relationship> relationshipInclusionStrategy;
+	private final InclusionStrategy<? super Node> nodeInclusionStrategy;
 
 	/**
 	 * Constructs a new {@link RandomRelationshipChooser} that chooses any type of relationship.
 	 */
 	public RandomRelationshipChooser() {
-		this(IncludeAllRelationships.getInstance());
+		this(IncludeAllRelationships.getInstance(), IncludeAllNodes.getInstance());
 	}
 
 	/**
 	 * Constructs a new {@link RandomRelationshipChooser} that chooses relationships in accordance with the given
 	 * {@link InclusionStrategy}.
 	 *
-	 * @param inclusionStrategy The {@link InclusionStrategy} used to select relationships to follow
+	 * @param relationshipInclusionStrategy The {@link InclusionStrategy} used to select relationships to follow
+	 * @param nodeInclusionStrategy The {@link InclusionStrategy} used to select relationships that point only to certain nodes
 	 */
-	public RandomRelationshipChooser(InclusionStrategy<? super Relationship> inclusionStrategy) {
-		this.inclusionStrategy = inclusionStrategy;
+	public RandomRelationshipChooser(InclusionStrategy<? super Relationship> relationshipInclusionStrategy,
+			InclusionStrategy<? super Node> nodeInclusionStrategy) {
+		this.relationshipInclusionStrategy = relationshipInclusionStrategy;
+		this.nodeInclusionStrategy = nodeInclusionStrategy;
 	}
 
 	@Override
 	public Relationship chooseRelationship(Node node) {
-		double max = 0.0;
-		Relationship edgeChoice = null;
-		// XXX: This will probably perform pretty poorly on popular nodes - is there an O(1) solution available?
-        //todo: I'd use Reservoir sampler again: it's still O(n) but fewer LOC and tested. There is no O(1) solution AFAIK
+		// XXX: This will probably perform pretty poorly on popular nodes, but there's no known O(1) solution
+		ReservoirSampler<Relationship> randomSampler = new ReservoirSampler<>(1);
 		for (Relationship relationship : node.getRelationships()) {
-			double rnd = Math.random();
-			if (rnd > max) {
-				max = rnd;
-				edgeChoice = relationship;
+			if (this.relationshipInclusionStrategy.include(relationship)
+					&& this.nodeInclusionStrategy.include(relationship.getOtherNode(node))) {
+				randomSampler.sample(relationship);
 			}
 		}
 
-		return edgeChoice;
+		return randomSampler.getSamples().iterator().next();
 	}
 
 }

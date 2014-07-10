@@ -41,11 +41,12 @@ public class RandomWalkerPageRankModule extends BaseRuntimeModule implements Tim
      * @param moduleId The unique identifier for this module instance in the GraphAware runtime
      * @param moduleConfig The {@link PageRankModuleConfiguration} to use
      */
-    public RandomWalkerPageRankModule(String moduleId, PageRankModuleConfiguration moduleConfig) {
-    	super(moduleId);
-    	this.randomNodeSelector = new HyperJumpRandomNodeSelector(moduleConfig.getNodeInclusionStrategy());
-    	this.relationshipChooser = new RandomRelationshipChooser(moduleConfig.getRelationshipInclusionStrategy());
-    }
+	public RandomWalkerPageRankModule(String moduleId, PageRankModuleConfiguration moduleConfig) {
+		super(moduleId);
+		this.randomNodeSelector = new HyperJumpRandomNodeSelector(moduleConfig.getNodeInclusionStrategy());
+		this.relationshipChooser = new RandomRelationshipChooser(moduleConfig.getRelationshipInclusionStrategy(),
+				moduleConfig.getNodeInclusionStrategy());
+	}
 
     /**
      * {@inheritDoc}
