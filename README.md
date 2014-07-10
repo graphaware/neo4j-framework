@@ -17,7 +17,7 @@ On a high level, there are two key pieces of functionality:
 * [GraphAware Server](server) is a Neo4j server extension that allows developers to rapidly build (REST) APIs
 on top of Neo4j using Spring MVC, rather than JAX-RS.
 * [GraphAware Runtime](runtime) is a runtime environment for both embedded and server deployments, which
-allows the use of pre-built as well as custom modules called [GraphAware Runtime Modules](#graphaware-runtime). These
+allows the use of pre-built as well as custom modules called [GraphAware Runtime Modules](runtime). These
 modules typically extend the core functionality of the database by
     * transparently enriching/modifying/preventing ongoing transactions in real-time
     * performing continuous computations on the graph in the background
@@ -33,7 +33,7 @@ as a dependency and take advantage of its useful features. For [Java developers 
 * [Transaction Executor](tx-executor) and [Batch Transaction Executor](tx-executor#batch-tx)
 * [Miscellaneous Utilities](common)
 
-(1) i.e., for embedded mode users, managed/unmanaged extensions developers, [GraphAware Runtime Module](#graphaware-runtime)
+(1) i.e., for embedded mode users, managed/unmanaged extensions developers, [GraphAware Runtime Module](runtime)
  developers and framework-powered Spring MVC controller developers
 
 Framework Usage
