@@ -1,12 +1,12 @@
 package com.graphaware.tx.manager.module;
 
+import com.graphaware.runtime.module.BaseTxDrivenModule;
 import com.graphaware.tx.manager.TransactionManager;
 import com.graphaware.tx.manager.TransactionManagerImpl;
-import com.graphaware.runtime.BaseGraphAwareRuntimeModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.GraphDatabaseService;
 
-public class TransactionManagerModule extends BaseGraphAwareRuntimeModule  {
+public class TransactionManagerModule extends BaseTxDrivenModule<Void> {
 
     private final TransactionManager transactionMonitor;
 
@@ -16,8 +16,9 @@ public class TransactionManagerModule extends BaseGraphAwareRuntimeModule  {
     }
 
     @Override
-    public void beforeCommit(ImprovedTransactionData transactionData) {
+    public Void beforeCommit(ImprovedTransactionData transactionData) {
         System.out.println("module beforeCommit was called");
         //transactionMonitor.beforeCommit(transactionData);
+        return null;
     }
 }
