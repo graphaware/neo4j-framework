@@ -7,8 +7,8 @@ import org.neo4j.graphdb.Transaction;
 import org.springframework.stereotype.Component;
 
 /**
- * Very powerful class capable of creating a "Hello World" node. Intended for demonstrating Neo4j integration testing
- * with GraphAware Framework.
+ * Very powerful class capable of creating a "Hello World" node. Intended for
+ * demonstrating Neo4j integration testing with GraphAware Framework.
  */
 public class HelloWorldNodeCreator {
 
