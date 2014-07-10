@@ -14,17 +14,16 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.example.module;
+package com.graphaware.example;
 
 import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.*;
-import org.springframework.transaction.annotation.Transactional;
 
 import static com.graphaware.common.util.IterableUtils.getSingleOrNull;
-import static com.graphaware.example.module.Labels.*;
-import static com.graphaware.example.module.PropertyKeys.*;
-import static com.graphaware.example.module.Relationships.*;
+import static com.graphaware.example.Labels.*;
+import static com.graphaware.example.PropertyKeys.*;
+import static com.graphaware.example.Relationships.*;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
@@ -44,8 +43,8 @@ public class FriendshipStrengthCounter {
         long delta = 0L;
 
         for (Relationship newFriendship : createdRelationships) {
-            if (newFriendship.isType(FRIEND_OF)) {
-                delta += (long) newFriendship.getProperty(STRENGTH, 0L);
+            if (newFriendship.isType(Relationships.FRIEND_OF)) {
+                delta += (long) newFriendship.getProperty(PropertyKeys.STRENGTH, 0L);
             }
         }
 
@@ -56,9 +55,9 @@ public class FriendshipStrengthCounter {
         long delta = 0L;
 
         for (Change<Relationship> changedFriendship : changedRelationships) {
-            if (changedFriendship.getPrevious().isType(FRIEND_OF)) {
-                delta -= (long) changedFriendship.getPrevious().getProperty(STRENGTH, 0L);
-                delta += (long) changedFriendship.getCurrent().getProperty(STRENGTH, 0L);
+            if (changedFriendship.getPrevious().isType(Relationships.FRIEND_OF)) {
+                delta -= (long) changedFriendship.getPrevious().getProperty(PropertyKeys.STRENGTH, 0L);
+                delta += (long) changedFriendship.getCurrent().getProperty(PropertyKeys.STRENGTH, 0L);
             }
         }
 
@@ -69,8 +68,8 @@ public class FriendshipStrengthCounter {
         long delta = 0L;
 
         for (Relationship deletedFriendship : deletedRelationships) {
-            if (deletedFriendship.isType(FRIEND_OF)) {
-                delta -= (long) deletedFriendship.getProperty(STRENGTH, 0L);
+            if (deletedFriendship.isType(Relationships.FRIEND_OF)) {
+                delta -= (long) deletedFriendship.getProperty(PropertyKeys.STRENGTH, 0L);
             }
         }
 
@@ -80,7 +79,7 @@ public class FriendshipStrengthCounter {
     private void applyDelta(long delta) {
         if (delta != 0L) {
             Node root = getCounterNode(database);
-            root.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (long) root.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L) + delta);
+            root.setProperty(PropertyKeys.TOTAL_FRIENDSHIP_STRENGTH, (long) root.getProperty(PropertyKeys.TOTAL_FRIENDSHIP_STRENGTH, 0L) + delta);
         }
     }
 
@@ -91,13 +90,13 @@ public class FriendshipStrengthCounter {
      * @return counter node.
      */
     private static Node getCounterNode(GraphDatabaseService database) {
-        Node result = getSingleOrNull(at(database).getAllNodesWithLabel(FriendshipCounter));
+        Node result = getSingleOrNull(at(database).getAllNodesWithLabel(Labels.FriendshipCounter));
 
         if (result != null) {
             return result;
         }
 
-        return database.createNode(FriendshipCounter);
+        return database.createNode(Labels.FriendshipCounter);
     }
 
     /**
@@ -106,6 +105,6 @@ public class FriendshipStrengthCounter {
      * @return total friendship strength.
      */
     public long getTotalFriendshipStrength() {
-        return (long) getCounterNode(database).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L);
+        return (long) getCounterNode(database).getProperty(PropertyKeys.TOTAL_FRIENDSHIP_STRENGTH, 0L);
     }
 }

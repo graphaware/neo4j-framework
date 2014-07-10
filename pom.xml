@@ -36,6 +36,7 @@
         <module>tests</module>
         <module>tx-api</module>
         <module>tx-executor</module>
+        <module>tx-manager</module>
         <!--<module>crawler</module>-->
         <module>build</module>
 
@@ -44,6 +45,7 @@
         <module>examples/friendship-strength-counter</module>
         <module>examples/change-logger</module>
         <module>examples/friendship-strength-counter-module</module>
+
     </modules>
 
     <name>GraphAware Neo4j Framework</name>

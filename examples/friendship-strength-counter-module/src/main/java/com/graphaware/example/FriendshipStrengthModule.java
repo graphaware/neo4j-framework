@@ -1,4 +1,4 @@
-package com.graphaware.example.module;
+package com.graphaware.example;
 
 import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.common.strategy.RelationshipInclusionStrategy;
@@ -16,8 +16,6 @@ import org.neo4j.graphdb.Transaction;
 
 import java.util.Collections;
 
-import static com.graphaware.example.module.Labels.FriendshipCounter;
-import static com.graphaware.example.module.Relationships.FRIEND_OF;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
@@ -39,7 +37,7 @@ public class FriendshipStrengthModule extends BaseGraphAwareRuntimeModule {
                         new RelationshipInclusionStrategy() {
                             @Override
                             public boolean include(Relationship relationship) {
-                                return relationship.isType(FRIEND_OF);
+                                return relationship.isType(Relationships.FRIEND_OF);
                             }
                         }
                 ));
@@ -59,7 +57,7 @@ public class FriendshipStrengthModule extends BaseGraphAwareRuntimeModule {
     @Override
     public void initialize(GraphDatabaseService database) {
         try (Transaction tx = database.beginTx()) {
-            for (Node counter : at(database).getAllNodesWithLabel(FriendshipCounter)) {
+            for (Node counter : at(database).getAllNodesWithLabel(Labels.FriendshipCounter)) {
                 counter.delete();
             }
             tx.success();

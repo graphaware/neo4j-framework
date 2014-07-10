@@ -1,4 +1,4 @@
-package com.graphaware.example.module;
+package com.graphaware.example;
 
 import com.graphaware.runtime.GraphAwareRuntimeModule;
 import com.graphaware.runtime.GraphAwareRuntimeModuleBootstrapper;

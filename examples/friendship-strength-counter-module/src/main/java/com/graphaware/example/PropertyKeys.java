@@ -1,4 +1,4 @@
-package com.graphaware.example.module;
+package com.graphaware.example;
 
 /**
  *   All property keys used in the project.

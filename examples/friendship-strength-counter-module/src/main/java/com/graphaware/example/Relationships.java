@@ -1,4 +1,4 @@
-package com.graphaware.example.module;
+package com.graphaware.example;
 
 import org.neo4j.graphdb.RelationshipType;
 
