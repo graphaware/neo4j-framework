@@ -22,7 +22,8 @@ modules typically extend the core functionality of the database by
     * transparently enriching/modifying/preventing ongoing transactions in real-time
     * performing continuous computations on the graph in the background
 
-Additionally, for [Java developers only](#javadev)(1), the following functionality is provided:
+Whether or not you use the code in this repository as a framework or runtime as described above, you can always add it
+as a dependency and take advantage of its useful features. For [Java developers only](#javadev)(1), the following functionality is provided:
 
 * [GraphAware Test](tests)
     * [GraphUnit](tests#graphunit) - simple graph unit-testing
@@ -72,44 +73,9 @@ The following downloads are available:
 * [GraphAware Framework for Server Mode (Community), version 2.1.2.9](http://graphaware.com/downloads/graphaware-server-community-all-2.1.2.9.jar)
 * [GraphAware Framework for Server Mode (Enterprise), version 2.1.2.9](http://graphaware.com/downloads/graphaware-server-enterprise-all-2.1.2.9.jar)
 
-Releases are synced to <a href="http://search.maven.org/#search%7Cga%7C1%7Ccom.graphaware.neo4j" target="_blank">Maven Central repository</a>. When using Maven for dependency management, include one of more of the following dependencies in your pom.xml. Read further
-down this page to find out which dependencies you will need. The available ones are:
-
-    <dependencies>
-        ...
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>api</artifactId>
-            <version>2.1.2.9</version>
-        </dependency>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>common</artifactId>
-            <version>2.1.2.9</version>
-        </dependency>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>runtime</artifactId>
-            <version>2.1.2.9</version>
-        </dependency>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>tests</artifactId>
-            <version>2.1.2.9</version>
-        </dependency>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>tx-api</artifactId>
-            <version>2.1.2.9</version>
-        </dependency>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>tx-executor</artifactId>
-            <version>2.1.2.9</version>
-        </dependency>
-
-        ...
-    </dependencies>
+Releases are synced to <a href="http://search.maven.org/#search%7Cga%7C1%7Ccom.graphaware.neo4j" target="_blank">Maven Central
+repository</a>. When using Maven for dependency management, include one or more dependencies in your pom.xml. To find out
+ which ones, read further by clicking on one of the sub-modules of this project.
 
 ### Snapshots
 
@@ -121,13 +87,6 @@ To use the latest development version, just clone this repository and run `mvn c
 The version number has two parts. The first three numbers indicate compatibility with a Neo4j version.
  The last number is the version of the framework. For example, version 2.1.2.3 is version 3 of the framework
  compatible with Neo4j 2.1.2
-
-<a name="javadev"/>
-Features for Java Developers
-----------------------------
-
-Whether or not you use the code in this repository as a framework or runtime as described above, you can always add it
-as a dependency and take advantage of its useful features.
 
 
 License
