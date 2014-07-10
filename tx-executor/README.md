@@ -3,6 +3,8 @@ Transaction Executors
 
 This (Maven) module is part of the [GraphAware Neo4j Framework](https://github.com/graphaware/neo4j-framework).
 
+The target audience of this module are advanced Neo4j users, mostly Java developers.
+
 ### Getting the Module
 
 Add the following snippet to your pom.xml:
