@@ -30,7 +30,7 @@ Additionally, for [Java developers only](#javadev)(1), the following functionali
     * [Performance Testing](tests#perftest) - support for performance testing
 * [Improved Neo4j Transaction API](tx-api)
 * [Transaction Executor](tx-executor) and [Batch Transaction Executor](tx-executor#batch-tx)
-* [Miscellaneous Utilities](#utils)
+* [Miscellaneous Utilities](common)
 
 (1) i.e., for embedded mode users, managed/unmanaged extensions developers, [GraphAware Runtime Module](#graphaware-runtime)
  developers and framework-powered Spring MVC controller developers
@@ -129,33 +129,6 @@ Features for Java Developers
 Whether or not you use the code in this repository as a framework or runtime as described above, you can always add it
 as a dependency and take advantage of its useful features.
 
-<a name="utils"/>
-### Miscellaneous Utilities
-
-The following functionality is also provided:
-
-* Arrays (see `ArrayUtils`)
-    * Determine if an object is a primitive array
-    * Convert an array to a String representation
-    * Check equality of two `Object`s which may or may not be arrays
-    * Check equality of two `Map<String, Object>` instances, where the `Object`-typed values may or may not be arrays
-
-* Property Containers (see `PropertyContainerUtils`)
-    * Convert a `PropertyContainer` to a Map of properties
-    * Delete nodes with all their relationships automatically, avoiding a `org.neo4j.kernel.impl.nioneo.store.ConstraintViolationException: Node record Node[xxx] still has relationships`, using `DeleteUtils.deleteNodeAndRelationships(node);`
-
-* Relationship Directions
-    * The need to determine the direction of a relationship is quite common. The `Relationship` object does not provide the
-      functionality for the obvious reason that it depends on "who's point of view we're talking about". In order to resolve
-      a direction from a specific Node's point of view, use `DirectionUtils.resolveDirection(Relationship relationship, Node pointOfView);`
-
-* Iterables (see `IterableUtils` in tests)
-    * Count iterables by iterating over them, unless they're a collection in which case just return `size()`
-    * Randomize iterables by iterating over them and shuffling them, unless they're a collection in which case just shuffle
-    * Convert iterables to lists
-    * Check if iterable contains an object by iterating over the iterable, unless it's a collection in which case just return `contains(..)`
-
-... and more, please see JavaDoc.
 
 License
 -------
