@@ -95,12 +95,4 @@ public class FriendshipStrengthModule extends BaseTxDrivenModule<Void> {
 
         return null;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void afterCommit(Void state) {
-        //do nothing
-    }
 }

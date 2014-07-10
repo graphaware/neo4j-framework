@@ -38,4 +38,11 @@ public interface TxDrivenModuleManager<T extends TxDrivenModule> extends ModuleM
      * @param states returned by {@link #beforeCommit(com.graphaware.tx.event.improved.data.TransactionDataContainer)}.
      */
     void afterCommit(Queue<Object> states);
+
+    /**
+     * Delegate work to modules after a transaction is rolled back.
+     *
+     * @param states returned by {@link #beforeCommit(com.graphaware.tx.event.improved.data.TransactionDataContainer)}.
+     */
+    void afterRollback(Queue<Object> states);
 }

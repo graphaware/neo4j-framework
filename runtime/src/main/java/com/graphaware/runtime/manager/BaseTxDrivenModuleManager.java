@@ -139,6 +139,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
                 metadataRepository.persistModuleMetadata(module, moduleMetadata.markedNeedingInitialization());
             } catch (DeliberateTransactionRollbackException e) {
                 LOG.debug("Module " + module.getId() + " threw an exception indicating that the transaction should be rolled back.", e);
+                afterRollback(result); //remove this when https://github.com/neo4j/neo4j/issues/2660 is resolved
                 throw e;
             } catch (RuntimeException e) {
                 LOG.warn("Module " + module.getId() + " threw an exception", e);
@@ -164,6 +165,23 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
             Object next = states.poll();
             if (next != null) {
                 module.afterCommit(next);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void afterRollback(Queue<Object> states) {
+        for (T module : modules) {
+            if (states.isEmpty()) {
+                return; //rollback happened before the rest of the modules had a go
+            }
+
+            Object next = states.poll();
+            if (next != null) {
+                module.afterRollback(next);
             }
         }
     }

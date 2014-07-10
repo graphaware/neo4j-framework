@@ -63,4 +63,20 @@ public abstract class BaseTxDrivenModule<T> extends BaseRuntimeModule implements
     public void shutdown() {
         //to be overridden
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void afterCommit(T state) {
+        //allow subclasses to override
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void afterRollback(T state) {
+        //allow subclasses to override
+    }
 }

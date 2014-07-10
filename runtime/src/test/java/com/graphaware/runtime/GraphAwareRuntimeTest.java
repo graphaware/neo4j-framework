@@ -22,6 +22,7 @@ import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.runtime.module.BaseTxDrivenModule;
+import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.NeedsInitializationException;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -583,6 +584,52 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
     }
 
     @Test
+    public void whenOneModuleForcesRollbackThenModulesBeforeItShouldBeAware() {
+        T mockModule1 = mockTxModule(MOCK + "1");
+        T mockModule2 = mockTxModule(MOCK + "2");
+        T mockModule3 = mockTxModule(MOCK + "3");
+
+        doThrow(new DeliberateTransactionRollbackException()).when(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule1);
+        runtime.registerModule(mockModule2);
+        runtime.registerModule(mockModule3);
+
+        runtime.start();
+
+        verifyInitialization(mockModule1);
+        verifyInitialization(mockModule2);
+        verifyInitialization(mockModule3);
+        verify(mockModule1, atLeastOnce()).getConfiguration();
+        verify(mockModule2, atLeastOnce()).getConfiguration();
+        verify(mockModule3, atLeastOnce()).getConfiguration();
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule3, atLeastOnce()).getId();
+        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
+
+        try {
+            try (Transaction tx = getTransaction()) {
+                createNode();
+                tx.success();
+            }
+            fail();
+        } catch (RuntimeException e) {
+            //expected
+        }
+
+        verify(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
+        verify(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
+        verify(mockModule1).afterRollback("TEST_" + MOCK + "1");
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule1, atLeastOnce()).getConfiguration();
+        verify(mockModule2, atLeastOnce()).getConfiguration();
+        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
+    }
+
+    @Test
     public void runtimeShouldBeStartedAutomatically() {
         final T mockModule = mockTxModule();
 
@@ -626,11 +673,6 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         @Override
         public Void beforeCommit(ImprovedTransactionData transactionData) {
             return null;
-        }
-
-        @Override
-        public void afterCommit(Void state) {
-            //do nothing
         }
     }
 }

@@ -64,9 +64,4 @@ public class TestRuntimeModule extends BaseTxDrivenModule<Void> {
     public Void beforeCommit(ImprovedTransactionData transactionData) {
         return null;
     }
-
-    @Override
-    public void afterCommit(Void state) {
-        //do nothing
-    }
 }

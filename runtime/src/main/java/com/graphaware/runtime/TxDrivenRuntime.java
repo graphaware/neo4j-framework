@@ -82,7 +82,11 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      */
     @Override
     public final void afterRollback(TransactionData data, Queue<Object> states) {
-        //do nothing for now
+        if (states == null) {
+            return;
+        }
+
+        getTxDrivenModuleManager().afterRollback(states);
     }
 
     /**

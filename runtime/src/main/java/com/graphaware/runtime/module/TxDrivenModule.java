@@ -56,6 +56,13 @@ public interface TxDrivenModule<T> extends RuntimeModule {
     void afterCommit(T state);
 
     /**
+     * Cleanup if needed after a transaction rolled back.
+     *
+     * @param state returned by {@link #beforeCommit(com.graphaware.tx.event.improved.api.ImprovedTransactionData)}.
+     */
+    void afterRollback(T state);
+
+    /**
      * Return the configuration of this module. Each module must encapsulate its entire configuration in an instance of
      * a {@link com.graphaware.runtime.config.TxDrivenModuleConfiguration} implementation. Use {@link com.graphaware.runtime.config.NullTxDrivenModuleConfiguration}
      * if this module needs no configuration.
