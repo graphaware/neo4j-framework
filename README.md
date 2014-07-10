@@ -23,7 +23,7 @@ modules typically extend the core functionality of the database by
     * performing continuous computations on the graph in the background
 
 Whether or not you use the code in this repository as a framework or runtime as described above, you can always add it
-as a dependency and take advantage of its useful features. For [Java developers only](#javadev)(1), the following functionality is provided:
+as a dependency and take advantage of its useful features. For Java developers only(1), the following functionality is provided:
 
 * [GraphAware Test](tests)
     * [GraphUnit](tests#graphunit) - simple graph unit-testing
@@ -33,7 +33,7 @@ as a dependency and take advantage of its useful features. For [Java developers 
 * [Transaction Executor](tx-executor) and [Batch Transaction Executor](tx-executor#batch-tx)
 * [Miscellaneous Utilities](common)
 
-(1) i.e., for embedded mode users, managed/unmanaged extensions developers, [GraphAware Runtime Module](runtime)
+(1) i.e., for embedded mode users, managed/unmanaged extensions developers, [GraphAware Runtime Module](#runtime)
  developers and framework-powered Spring MVC controller developers
 
 Framework Usage
@@ -47,15 +47,12 @@ deploying the GraphAware Framework (and any code using it) is a matter of [downl
 copying them into the _plugins_ directory in your Neo4j installation, and restarting the server. The framework and modules
 are then used via calls to their REST APIs, if they provide any.
 
-Note that only **Neo4j 2.0.3 and above** are supported. If you see a `java.lang.IllegalAccessError` when starting up the
-server, then you're most likely using a version of Neo4j older than 2.0.3.
-
 ### Embedded Mode / Java Development
 
 Java developers that use Neo4j in <a href="http://docs.neo4j.org/chunked/stable/tutorials-java-embedded.html" target="_blank">embedded mode</a>
 and those developing Neo4j <a href="http://docs.neo4j.org/chunked/stable/server-plugins.html" target="_blank">server plugins</a>,
 <a href="http://docs.neo4j.org/chunked/stable/server-unmanaged-extensions.html" target="_blank">unmanaged extensions</a>,
-[GraphAware Runtime Modules](#graphaware-runtime), or Spring MVC controllers can include use the framework as a dependency
+[GraphAware Runtime Modules](runtime), or Spring MVC controllers can include use the framework as a dependency
 for their Java project and use it as a library of useful tested code, in addition to the functionality provided for
 [server mode](#servermode).
 
