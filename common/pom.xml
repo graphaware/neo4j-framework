@@ -19,7 +19,7 @@
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>framework-parent</artifactId>
-        <version>2.1.2.8-SNAPSHOT</version>
+        <version>2.1.2.10-SNAPSHOT</version>
     </parent>
     <artifactId>common</artifactId>
     <packaging>jar</packaging>
@@ -33,5 +33,6 @@
             <groupId>com.esotericsoftware.kryo</groupId>
             <artifactId>kryo</artifactId>
         </dependency>
+
     </dependencies>
 </project>

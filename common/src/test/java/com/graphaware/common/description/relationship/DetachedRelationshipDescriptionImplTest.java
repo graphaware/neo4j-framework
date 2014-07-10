@@ -97,7 +97,7 @@ public class DetachedRelationshipDescriptionImplTest {
             RelationshipDescription description = literal(database.getRelationshipById(0), database.getNodeById(0));
 
             String serialized = Serializer.toString(description, "testPrefix");
-            RelationshipDescription deserialized = Serializer.fromString(serialized, DetachedRelationshipDescriptionImpl.class, "testPrefix");
+            RelationshipDescription deserialized = Serializer.fromString(serialized, "testPrefix");
 
             assertEquals(deserialized, description);
         }
@@ -121,7 +121,7 @@ public class DetachedRelationshipDescriptionImplTest {
                     .with("k13", equalTo(new String[]{"test1", "test2", "some very long string that should hopefully be long enough, very very very loooooooong string"}));
 
             String serialized = Serializer.toString(description, "testPrefix");
-            RelationshipDescription deserialized = Serializer.fromString(serialized, DetachedRelationshipDescriptionImpl.class, "testPrefix");
+            RelationshipDescription deserialized = Serializer.fromString(serialized, "testPrefix");
 
             assertEquals(deserialized, description);
         }

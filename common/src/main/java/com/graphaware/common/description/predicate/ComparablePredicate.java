@@ -16,9 +16,11 @@
 
 package com.graphaware.common.description.predicate;
 
-import org.apache.log4j.Logger;
-
 import static com.graphaware.common.util.ArrayUtils.arrayFriendlyEquals;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link Predicate} comparing beta (the property value) to the
@@ -28,7 +30,7 @@ import static com.graphaware.common.util.ArrayUtils.arrayFriendlyEquals;
  */
 abstract class ComparablePredicate extends ValueBasedPredicate<Comparable> {
 
-    private static final Logger LOG = Logger.getLogger(ComparablePredicate.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ComparablePredicate.class);
 
     /**
      * Construct a new predicate.

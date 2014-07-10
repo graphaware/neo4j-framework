@@ -27,7 +27,6 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.graphaware.common.util.IterableUtils.getSingleOrNull;
 import static com.graphaware.common.util.PropertyContainerUtils.nodeToString;
 import static com.graphaware.common.util.PropertyContainerUtils.relationshipToString;
 

@@ -4,9 +4,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.test.TestGraphDatabaseFactory;
 
 /**
  * Base class for all kinds of Neo4j integration tests.
+ * <p/>
+ * Creates an {@link org.neo4j.test.ImpermanentGraphDatabase} (by default) at the beginning of each test and allows
+ * subclasses to populate it by overriding the {@link #populateDatabase(org.neo4j.graphdb.GraphDatabaseService)} method,
+ * which is guaranteed to run in a transaction.
+ * <p/>
+ * Shuts the database down at the end of each test.
  */
 public abstract class DatabaseIntegrationTest {
 
@@ -34,11 +41,13 @@ public abstract class DatabaseIntegrationTest {
     }
 
     /**
-     * Instantiate a database.
+     * Instantiate a database. By default this will be {@link org.neo4j.test.ImpermanentGraphDatabase}.
      *
      * @return new database.
      */
-    protected abstract GraphDatabaseService createDatabase();
+    protected GraphDatabaseService createDatabase() {
+        return new TestGraphDatabaseFactory().newImpermanentDatabase();
+    }
 
     /**
      * Populate the database that will drive this test. A transaction is running when this method gets called.

@@ -16,7 +16,8 @@
 
 package com.graphaware.tx.executor.batch;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  * Decorator for a {@link BatchTransactionExecutor}, which allows it to be executed using multiple threads.
  */
 public class MultiThreadedBatchTransactionExecutor extends DisposableBatchTransactionExecutor {
-    private static final Logger LOG = Logger.getLogger(MultiThreadedBatchTransactionExecutor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MultiThreadedBatchTransactionExecutor.class);
 
     private final BatchTransactionExecutor wrappedExecutor;
     private final int numberOfThreads;

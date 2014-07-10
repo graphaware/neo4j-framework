@@ -76,8 +76,8 @@ public class FriendshipStrengthCounterTest {
 
         //delete and change some friendships
         try (Transaction tx = database.beginTx()) {
-            for (Relationship relationship : database.getNodeById(0).getRelationships(FRIEND_OF, Direction.OUTGOING)) {
-                if (relationship.getEndNode().getId() == 1) {
+            for (Relationship relationship : database.getNodeById(1).getRelationships(FRIEND_OF, Direction.OUTGOING)) {
+                if (relationship.getEndNode().getId() == 2) {
                     relationship.delete(); //remove 2 from total strength
                 } else {
                     relationship.setProperty(STRENGTH, 2L); //add 1 to total strength

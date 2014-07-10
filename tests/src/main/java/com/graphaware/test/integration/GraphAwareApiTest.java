@@ -33,20 +33,13 @@ import javax.servlet.ServletException;
  * Starts a Neo4j server on the port specified using {@link #jettyServerPort()} (or 8082 by default) and deploys all
  * {@link org.springframework.stereotype.Controller} annotated controllers.
  * <p/>
- * Requires implementing tests to implement {@link #createDatabase()} and thus allows low-level access to the database
- * even when running within a server by calling {@link #getDatabase()}, for instance to allow using
- * {@link com.graphaware.test.unit.GraphUnit} to assert its state. Before tests are run, the database can be populated
- * by overriding the {@link #populateDatabase(org.neo4j.graphdb.GraphDatabaseService)} method.
+ * Allows implementing tests to call {@link #getDatabase()} and thus gain low-level access to the database
+ * even when running within a server. This is useful, for instance, when using
+ * {@link com.graphaware.test.unit.GraphUnit} to assert the database state state. Before tests are run, the database can be populated
+ * by overriding the {@link #populateDatabase(org.neo4j.graphdb.GraphDatabaseService)} method, which is guaranteed to
+ * run in a transaction.
  */
 public abstract class GraphAwareApiTest extends JettyAndWrappingServerIntegrationTest {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected GraphDatabaseService createDatabase() {
-        return new TestGraphDatabaseFactory().newImpermanentDatabase();
-    }
 
     /**
      * {@inheritDoc}
@@ -71,6 +64,7 @@ public abstract class GraphAwareApiTest extends JettyAndWrappingServerIntegratio
 
     /**
      * Get the URL against which tests would typically be executed.
+     *
      * @return base URL.
      */
     protected String baseUrl() {

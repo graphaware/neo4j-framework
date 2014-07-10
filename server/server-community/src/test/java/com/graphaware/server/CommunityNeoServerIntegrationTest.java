@@ -14,6 +14,6 @@ public class CommunityNeoServerIntegrationTest extends NeoServerIntegrationTest 
 
     @Test
     public void componentsShouldBeWired() {
-        get("http://localhost:7474/graphaware/greeting", HttpStatus.SC_OK);
+        get(baseUrl() + "/graphaware/greeting", HttpStatus.SC_OK);
     }
 }

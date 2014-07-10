@@ -28,17 +28,17 @@ import org.junit.Before;
  */
 public abstract class JettyAndWrappingServerIntegrationTest extends WrappingServerIntegrationTest {
 
-    private static final int DEFAULT_PORT = 8082;
+    private static final int DEFAULT_JETTY_PORT = 8082;
 
     private Server server;
 
-    @Before
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         startJetty();
     }
 
-    @After
+    @Override
     public void tearDown() throws Exception {
         server.stop();
         super.tearDown();
@@ -62,7 +62,7 @@ public abstract class JettyAndWrappingServerIntegrationTest extends WrappingServ
      * @return port number.
      */
     protected int jettyServerPort() {
-        return DEFAULT_PORT;
+        return DEFAULT_JETTY_PORT;
     }
 
     /**

@@ -16,11 +16,16 @@
 
 package com.graphaware.tx.event.batch.propertycontainer.inserter;
 
+import com.graphaware.common.util.IterableUtils;
 import com.graphaware.common.wrapper.NodeWrapper;
 import org.neo4j.graphdb.*;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import static com.graphaware.common.util.IterableUtils.*;
 
 /**
  * {@link org.neo4j.graphdb.Node} proxy to be used in {@link com.graphaware.tx.event.batch.data.BatchTransactionData} when using
@@ -95,6 +100,42 @@ public class BatchInserterNode extends BatchInserterPropertyContainer<Node> impl
      * {@inheritDoc}
      */
     @Override
+    public boolean hasLabel(Label label) {
+        return batchInserter.nodeHasLabel(id, label);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterable<Label> getLabels() {
+        return batchInserter.getNodeLabels(id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addLabel(Label label) {
+        Set<Label> labels = new HashSet<>(toList(batchInserter.getNodeLabels(id)));
+        labels.add(label);
+        batchInserter.setNodeLabels(id, labels.toArray(new Label[labels.size()]));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeLabel(Label label) {
+        Set<Label> labels = new HashSet<>(toList(batchInserter.getNodeLabels(id)));
+        labels.remove(label);
+        batchInserter.setNodeLabels(id, labels.toArray(new Label[labels.size()]));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Iterable<Relationship> getRelationships(Direction direction, RelationshipType... types) {
         return new BatchInserterRelationshipIterator(id, batchInserter, direction, types);
     }
@@ -106,4 +147,37 @@ public class BatchInserterNode extends BatchInserterPropertyContainer<Node> impl
     public Relationship createRelationshipTo(Node otherNode, RelationshipType type) {
         return new BatchInserterRelationship(batchInserter.createRelationship(id, otherNode.getId(), type, Collections.<String, Object>emptyMap()), id, otherNode.getId(), type, batchInserter);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getDegree() {
+        return Long.valueOf(count(getRelationships())).intValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getDegree(RelationshipType type) {
+        return Long.valueOf(count(getRelationships(type))).intValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getDegree(Direction direction) {
+        return Long.valueOf(count(getRelationships(direction))).intValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getDegree(RelationshipType type, Direction direction) {
+        return Long.valueOf(count(getRelationships(type, direction))).intValue();
+    }
+
 }

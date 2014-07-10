@@ -27,7 +27,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ import static org.junit.Assert.*;
  */
 public final class TestUtils {
 
-    private static final Logger LOG = Logger.getLogger(TestUtils.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TestUtils.class);
 
     /**
      * Assert that two JSON objects represented as Strings are semantically equal.

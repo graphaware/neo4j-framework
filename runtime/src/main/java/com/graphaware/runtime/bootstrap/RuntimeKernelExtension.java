@@ -17,9 +17,9 @@
 package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.runtime.GraphAwareRuntime;
-import com.graphaware.runtime.GraphAwareRuntimeModuleBootstrapper;
-import com.graphaware.runtime.ProductionGraphAwareRuntime;
-import org.apache.log4j.Logger;
+import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.helpers.Pair;
@@ -32,13 +32,14 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.graphaware.runtime.GraphAwareRuntimeFactory.*;
 import static org.neo4j.helpers.Settings.*;
 
 /**
- * Neo4j kernel extension that automatically creates the {@link com.graphaware.runtime.ProductionGraphAwareRuntime} and
- * registers {@link com.graphaware.runtime.GraphAwareRuntimeModule}s with it.
+ * Neo4j kernel extension that automatically creates a {@link GraphAwareRuntime} and registers
+ * {@link com.graphaware.runtime.module.RuntimeModule}s with it.
  * <p/>
- * The mechanism of this extension is as follows. Of course, the GraphAware Framework .jar file must be present on
+ * The mechanism of this extension works as follows. Of course, the GraphAware Framework .jar file must be present on
  * classpath (embedded mode), or in the "plugins" directory (server mode).
  * <p/>
  * The Runtime is only created when a setting called "com.graphaware.runtime.enabled" with value equal to "true" or "1"
@@ -48,15 +49,15 @@ import static org.neo4j.helpers.Settings.*;
  * <p/>
  * Modules are registered similarly. For each module that should be registered, there must be an entry in the configuration
  * passed to the database. The key of the entry should be "com.graphaware.module.X.Y", where X becomes the ID
- * of the module ({@link com.graphaware.runtime.GraphAwareRuntimeModule#getId()}) and Y becomes the order in which the
+ * of the module ({@link com.graphaware.runtime.module.RuntimeModule#getId()}) and Y becomes the order in which the
  * module gets registered with respect to other modules. The value of the configuration entry must be a fully qualified
- * class name of a {@link GraphAwareRuntimeModuleBootstrapper} present on the classpath or as a .jar file in the "plugins"
- * directory. Of course, third party modules can be registered as well.
+ * class name of a {@link com.graphaware.runtime.module.RuntimeModuleBootstrapper} present on the classpath or as a .jar
+ * file in the "plugins" directory. Of course, third party modules can be registered as well.
  * <p/>
  * Custom configuration to the modules can be also passed via database configuration in the form of
  * "com.graphaware.module.X.A = B", where X is the module ID, A is the configuration key, and B is the configuration value.
  * <p/>
- * For instance, if you develop a {@link com.graphaware.runtime.GraphAwareRuntimeModule} that is bootstrapped by
+ * For instance, if you develop a {@link com.graphaware.runtime.module.RuntimeModule} that is bootstrapped by
  * <code>com.mycompany.mymodule.MyBootstrapper</code> and want to register it as the first module of the runtime with MyModuleID as
  * the module ID, with an extra configuration called "threshold" equal to 20, then there should be the two following
  * configuration entries passed to the database:
@@ -67,10 +68,10 @@ import static org.neo4j.helpers.Settings.*;
  * com.graphaware.module.MyModuleID.threshold=20
  * </pre>
  *
- * @see GraphAwareRuntimeModuleBootstrapper
+ * @see com.graphaware.runtime.module.RuntimeModuleBootstrapper
  */
 public class RuntimeKernelExtension implements Lifecycle {
-    private static final Logger LOG = Logger.getLogger(RuntimeKernelExtension.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RuntimeKernelExtension.class);
 
     public static final Setting<Boolean> RUNTIME_ENABLED = setting("com.graphaware.runtime.enabled", BOOLEAN, "false");
     public static final String MODULE_CONFIG_KEY = "com.graphaware.module"; //.ID.Order = fully qualified class name of bootstrapper
@@ -104,7 +105,7 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         LOG.info("GraphAware Runtime enabled, bootstrapping...");
 
-        registerModules(new ProductionGraphAwareRuntime(database));
+        registerModules(createRuntime(database));
 
         LOG.info("GraphAware Runtime bootstrapped.");
     }
@@ -116,7 +117,7 @@ public class RuntimeKernelExtension implements Lifecycle {
             LOG.info("Bootstrapping module with ID " + bootstrapperPair.first() + ", using " + bootstrapperPair.other());
 
             try {
-                GraphAwareRuntimeModuleBootstrapper bootstrapper = (GraphAwareRuntimeModuleBootstrapper) Class.forName(bootstrapperPair.other()).newInstance();
+                RuntimeModuleBootstrapper bootstrapper = (RuntimeModuleBootstrapper) Class.forName(bootstrapperPair.other()).newInstance();
                 runtime.registerModule(bootstrapper.bootstrapModule(bootstrapperPair.first(), findModuleConfig(bootstrapperPair.first()), database));
             } catch (Exception e) {
                 LOG.error("Unable to bootstrap module " + bootstrapperPair.first(), e);

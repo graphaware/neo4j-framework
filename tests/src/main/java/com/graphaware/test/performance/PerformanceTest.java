@@ -20,6 +20,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * A performance test. Each implementation should represent one type of test, e.g.:
@@ -28,6 +29,8 @@ import java.util.Map;
  * - ...
  */
 public interface PerformanceTest {
+
+    static final Random RANDOM = new Random(System.currentTimeMillis());
 
     /**
      * Get the name of this test. Will be used in the name of the results file.
@@ -113,15 +116,16 @@ public interface PerformanceTest {
     }
 
     /**
-     * When should the database be rebuild?
+     * When should the database be rebuilt?
      *
-     * @return when the database should be rebuild.
+     * @return when the database should be rebuilt.
      */
     RebuildDatabase rebuildDatabase();
 
     /**
-     * Should the database be rebuild before a run with the given parameters? Never called unless
+     * Should the database be rebuilt before a run with the given parameters? Never called unless
      * {@link #rebuildDatabase()} returns {@link RebuildDatabase#TEST_DECIDES}.
+     *
      * @param params with which the next test will be run.
      * @return true for db rebuild.
      */

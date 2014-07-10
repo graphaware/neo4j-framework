@@ -17,7 +17,7 @@
 package com.graphaware.common.strategy;
 
 /**
- * Base-class for {@link InclusionStrategies} implementations.
+ * Wrapper for {@link InclusionStrategy}s.
  */
 public class InclusionStrategies {
 

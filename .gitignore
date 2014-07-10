@@ -10,3 +10,4 @@ target/
 *.db
 .DS_Store
 .classpath
+/common/src/main/java/com/graphaware/common/generators/configuration/src/main/java/com/graphaware/neo4j/configurationmodel/SimpleBkup.java

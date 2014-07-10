@@ -16,7 +16,8 @@
 
 package com.graphaware.test.unit;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -43,7 +44,7 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
  */
 public final class GraphUnit {
 
-    private static final Logger LOG = Logger.getLogger(GraphUnit.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GraphUnit.class);
 
     /**
      * Private constructor - this class is a utility and should not be instantiated.

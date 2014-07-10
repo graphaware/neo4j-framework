@@ -40,13 +40,13 @@ public class NoCache implements CacheConfiguration {
         Map<String, String> result = new HashMap<>(existingConfig);
 
         //low level cache
-        result.put("neostore.nodestore.db.mapped_memory", "0");
-        result.put("neostore.relationshipstore.db.mapped_memory", "0");
-        result.put("neostore.propertystore.db.index.keys.mapped_memory", "0");
-        result.put("neostore.propertystore.db.index.mapped_memory", "0");
-        result.put("neostore.propertystore.db.mapped_memory", "0");
-        result.put("neostore.propertystore.db.strings.mapped_memory", "0");
-        result.put("neostore.propertystore.db.arrays.mapped_memory", "0");
+        result.put("neostore.nodestore.db.mapped_memory", "0M");
+        result.put("neostore.relationshipstore.db.mapped_memory", "0M");
+        result.put("neostore.propertystore.db.index.keys.mapped_memory", "0M");
+        result.put("neostore.propertystore.db.index.mapped_memory", "0M");
+        result.put("neostore.propertystore.db.mapped_memory", "0M");
+        result.put("neostore.propertystore.db.strings.mapped_memory", "0M");
+        result.put("neostore.propertystore.db.arrays.mapped_memory", "0M");
 
         //high level cache
         result.put("cache_type", "none");

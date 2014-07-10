@@ -14,6 +14,6 @@ public class NodeCountServerIntegrationTest extends NeoServerIntegrationTest {
 
     @Test
     public void apiShouldBeMounted() {
-        assertEquals("0", get("http://localhost:7474/graphaware/count", HttpStatus.SC_OK));
+        assertEquals("0", get(baseUrl() + "/graphaware/count", HttpStatus.SC_OK));
     }
 }

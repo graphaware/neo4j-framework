@@ -16,7 +16,8 @@
 
 package com.graphaware.tx.executor.single;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link ExceptionHandlingStrategy} that logs the exception and re-throws it.
@@ -24,7 +25,7 @@ import org.apache.log4j.Logger;
  * Note that this is a singleton.
  */
 public final class RethrowException implements ExceptionHandlingStrategy {
-    private static final Logger LOG = Logger.getLogger(RethrowException.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RethrowException.class);
 
     private static final RethrowException INSTANCE = new RethrowException();
 
