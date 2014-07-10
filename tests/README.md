@@ -36,6 +36,8 @@ Neo4j internal node/relationship IDs are ignored. In case the graphs aren't iden
 The second method `public static void assertSubgraph(GraphDatabaseService database, String subgraphCypher)` is used to
 verify that the graph created by `sameGraphCypher` statement is a subgraph of the graph in the `database`.
 
+*Note*: It is possible to use this functionality from other languages than Java over REST. Take a look at [GraphAware RestTest](https://github.com/graphaware/neo4j-resttest).
+
 <a name="inttest"/>
 ### Integration Testing
 

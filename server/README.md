@@ -5,11 +5,14 @@ This (Maven) module is part of the [GraphAware Neo4j Framework](https://github.c
 
 ### Introduction
 
-This module allows deploying Spring MVC Controllers into the _plugins_ directory of the Neo4j server and thus provide
+This module allows building APIs by deploying Spring MVC Controllers into the _plugins_ directory of the Neo4j server and thus provide
 and alternative to server plugins and unmanaged server extensions.
 
 There is no need to use this module directly. Just [download](http://graphaware.com/downloads) the appropriate release
 of the GraphAware Framework and place it into the _plugins_ directory of Neo4j.
+
+The following APIs are developed and provided by GraphAware:
+* [TimeTree](https://github.com/graphaware/neo4j-timetree)
 
 ### Usage
 
@@ -58,6 +61,7 @@ public class GraphAwareIntegration {
 ```
 
 Then your controllers can reside in any subpackage of `com.yourdomain`.
+
 **WARNING END**
 
 Compile this code into a .jar file (with dependencies, see below) and place it into the _plugins_ directory of your
@@ -95,6 +99,14 @@ To get started manually, you will need the following dependencies:
         <groupId>org.springframework</groupId>
         <artifactId>spring-webmvc</artifactId>
         <version>4.0.0.RELEASE</version>
+        <scope>provided</scope>
+    </dependency>
+
+    <!-- optional if you want to use @Transactional -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-tx</artifactId>
+        <version>${spring.version}</version>
         <scope>provided</scope>
     </dependency>
 
