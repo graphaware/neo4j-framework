@@ -1,5 +1,5 @@
-Features for Java Developers
-============================
+Utilities
+=========
 
 This (Maven) module is part of the [GraphAware Neo4j Framework](https://github.com/graphaware/neo4j-framework).
 
