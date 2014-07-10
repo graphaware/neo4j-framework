@@ -42,8 +42,8 @@ try (Transaction tx = database.beginTx()) {
 }
  ```
 
-GraphAware provides an alternative, callback-based API called `TransactionExecutor` in `com.graphaware.tx.executor`.
-`SimpleTransactionExecutor` is a simple implementation thereof and can be used on an instance-per-database basis.
+GraphAware provides an alternative, callback-based API called [`TransactionExecutor`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/executor/single/TransactionExecutor.html).
+[`SimpleTransactionExecutor`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/executor/single/SimpleTransactionExecutor.html) is a simple implementation thereof and can be used on an instance-per-database basis.
  Since you will typically run a single in-process database instance, you will also only need a single `SimpleTransactionExecutor`.
 
 To create an empty node in a database, you would write something like this.
@@ -60,12 +60,12 @@ executor.executeInTransaction(new VoidReturningCallback() {
 });
 ```
 
-You have the option of selecting an `ExceptionHandlingStrategy`. By default, if an exception occurs, the transaction will be
+You have the option of selecting an [`ExceptionHandlingStrategy`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/executor/single/ExceptionHandlingStrategy.html). By default, if an exception occurs, the transaction will be
  rolled back and the exception re-thrown. This is true for both application/business exceptions (i.e. the exception your
  code throws in the `doInTx` method above), and Neo4j exceptions (e.g. constraint violations). This default strategy is
- called `RethrowException`.
+ called [`RethrowException`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/executor/single/RethrowException.html).
 
-The other available implementation of `ExceptionHandlingStrategy` is `KeepCalmAndCarryOn`. It still rolls back the transaction
+The other available implementation of `ExceptionHandlingStrategy` is [`KeepCalmAndCarryOn`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/executor/single/KeepCalmAndCarryOn.html). It still rolls back the transaction
 in case an exception occurs, but it does not re-throw it (only logs it). To use a different `ExceptionHandlingStrategy`, perhaps
   one that you implement yourself, just pass it in to the `executeInTransaction` method:
 
@@ -83,13 +83,13 @@ for each operation results in too much overhead. For some use-cases, `BatchInser
 operations performed using these do not run in transactions and have some other limitations (such as no node/relationship
  delete capabilities).
 
-GraphAware can help here with `BatchTransactionExecutor`s. There are a few of them:
+GraphAware can help here with [`BatchTransactionExecutor`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/executor/batch/BatchTransactionExecutor.html)s. There are a few of them:
 
 #### Input-Based Batch Operations
 
 If you have some input, such as lines from a CSV file or a result of a Neo4j traversal, and you want to perform an operation
-for each item of such input, use `IterableInputBatchTransactionExecutor`. As the name suggests, the input needs to be in the form
-of an `Iterable`. Additionally, you need to define a `UnitOfWork`, which will be executed against the database for each
+for each item of such input, use [`IterableInputBatchTransactionExecutor`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/executor/batch/IterableInputBatchTransactionExecutor.html). As the name suggests, the input needs to be in the form
+of an `Iterable`. Additionally, you need to define a [`UnitOfWork`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/executor/batch/UnitOfWork.html), which will be executed against the database for each
 input item. After a specified number of batch operations have been executed, the current transaction is committed and a
 new one started, until we run out of input items to process.
 
@@ -113,7 +113,7 @@ executor.execute();
 ```
 
 In case the input itself is an `Iterable` read from the database, it will need to be read inside a transaction, so an
-`Iterable`-returning `TransactionCallback` should be passed in instead of a pure `Iterable`. For example, to assign a
+`Iterable`-returning [`TransactionCallback`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/executor/single/TransactionCallback.html) should be passed in instead of a pure `Iterable`. For example, to assign a
  UUID to all existing nodes in the database, you would execute the following:
 
 ```java
@@ -168,7 +168,7 @@ public class CreateRandomNode implements UnitOfWork<NullItem> {
 }
 ```
 
-Then, you would use it in `NoInputBatchTransactionExecutor`:
+Then, you would use it in [`NoInputBatchTransactionExecutor`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/executor/batch/NoInputBatchTransactionExecutor.html):
 
 ```java
 //create 100,000 nodes in batches of 1,000:
@@ -180,7 +180,7 @@ batchExecutor.execute();
 
 #### Multi-Threaded Batch Operations
 
-If you wish to execute any batch operation using more than one thread, you can use the `MultiThreadedBatchTransactionExecutor`
+If you wish to execute any batch operation using more than one thread, you can use the [`MultiThreadedBatchTransactionExecutor`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/executor/batch/MultiThreadedBatchTransactionExecutor.html)
  as a decorator of any `BatchTransactionExecutor`. For example, to execute the above example using 4 threads:
 
 ```java
