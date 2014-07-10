@@ -79,8 +79,13 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
         }
 
         if (delta != 0) {
-            Node root = getCounterNode(database);
-            root.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (long) root.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L) + delta);
+            Node counter = getCounterNode(database);
+
+            try (Transaction tx = database.beginTx()) {
+                tx.acquireWriteLock(counter);
+                counter.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (long) counter.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L) + delta);
+                tx.success();
+            }
         }
 
         return null;
