@@ -6,6 +6,7 @@ import org.neo4j.graphdb.Relationship;
 import com.graphaware.common.strategy.IncludeAllNodes;
 import com.graphaware.common.strategy.IncludeAllRelationships;
 import com.graphaware.common.strategy.InclusionStrategy;
+import com.graphaware.common.util.ReservoirSampler;
 
 /**
  * Simple implementation of {@link RelationshipChooser} that chooses at random one of the appropriate relationships using an
@@ -38,22 +39,16 @@ public class RandomRelationshipChooser implements RelationshipChooser {
 
 	@Override
 	public Relationship chooseRelationship(Node node) {
-		double max = 0.0;
-		Relationship edgeChoice = null;
-		// XXX: This will probably perform pretty poorly on popular nodes - is there an O(1) solution available?
-        //todo: I'd use Reservoir sampler again: it's still O(n) but fewer LOC and tested. There is no O(1) solution AFAIK
+		// XXX: This will probably perform pretty poorly on popular nodes, but there's no known O(1) solution
+		ReservoirSampler<Relationship> randomSampler = new ReservoirSampler<>(1);
 		for (Relationship relationship : node.getRelationships()) {
 			if (this.relationshipInclusionStrategy.include(relationship)
 					&& this.nodeInclusionStrategy.include(relationship.getOtherNode(node))) {
-				double rnd = Math.random();
-				if (rnd > max) {
-					max = rnd;
-					edgeChoice = relationship;
-				}
+				randomSampler.sample(relationship);
 			}
 		}
 
-		return edgeChoice;
+		return randomSampler.getSamples().iterator().next();
 	}
 
 }
