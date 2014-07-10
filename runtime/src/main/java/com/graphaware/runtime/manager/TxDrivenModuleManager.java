@@ -4,6 +4,7 @@ import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.neo4j.graphdb.event.TransactionData;
 
+import java.util.Map;
 import java.util.Queue;
 
 /**
@@ -28,21 +29,21 @@ public interface TxDrivenModuleManager<T extends TxDrivenModule> extends ModuleM
      * Delegate work to modules before a transaction is committed.
      *
      * @param transactionData about-to-be-committed transaction data.
-     * @return list of objects (states) returned by the modules, in the order in which they are delegated to.
+     * @return map of objects (states) returned by the modules, keyed by {@link com.graphaware.runtime.module.TxDrivenModule#getId()}.
      */
-    Queue<Object> beforeCommit(TransactionDataContainer transactionData);
+    Map<String, Object> beforeCommit(TransactionDataContainer transactionData);
 
     /**
      * Delegate work to modules after a transaction is committed.
      *
      * @param states returned by {@link #beforeCommit(com.graphaware.tx.event.improved.data.TransactionDataContainer)}.
      */
-    void afterCommit(Queue<Object> states);
+    void afterCommit(Map<String, Object> states);
 
     /**
      * Delegate work to modules after a transaction is rolled back.
      *
      * @param states returned by {@link #beforeCommit(com.graphaware.tx.event.improved.data.TransactionDataContainer)}.
      */
-    void afterRollback(Queue<Object> states);
+    void afterRollback(Map<String, Object> states);
 }

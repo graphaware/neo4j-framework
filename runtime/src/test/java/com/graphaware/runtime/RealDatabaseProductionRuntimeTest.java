@@ -26,16 +26,14 @@ import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.TransactionFailureException;
+import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Iterator;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
@@ -353,9 +351,58 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         verify(mockModule).createInitialContext(database);
         verify(mockModule).doSomeWork(null, database);
         verify(mockModule, times(2)).beforeCommit(any(ImprovedTransactionData.class)); //once normal commit, once timer persisting metadata
+        verify(mockModule, times(2)).afterCommit(null); //once normal commit, once timer persisting metadata
         verify(mockModule, atLeastOnce()).getId();
         verify(mockModule, atLeastOnce()).getConfiguration();
         verifyNoMoreInteractions(mockModule);
+    }
+
+    @Test
+    public void modulesShouldBeAwareOfRollbackAfterConstraintViolation() {
+        Node node1;
+
+        try (Transaction tx = getTransaction()) {
+            node1 = createNode();
+            node1.createRelationshipTo(createNode(), DynamicRelationshipType.withName("TEST"));
+            tx.success();
+        }
+
+        TxDrivenModule mockModule1 = mockTxModule(MOCK + "1");
+        TxDrivenModule mockModule2 = mockTxModule(MOCK + "2");
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule1);
+        runtime.registerModule(mockModule2);
+
+        runtime.start();
+
+        verifyInitialization(mockModule1);
+        verifyInitialization(mockModule2);
+        verify(mockModule1, atLeastOnce()).getConfiguration();
+        verify(mockModule2, atLeastOnce()).getConfiguration();
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verifyNoMoreInteractions(mockModule1, mockModule2);
+
+        try {
+            try (Transaction tx = getTransaction()) {
+                node1.delete();
+                tx.success();
+            }
+            fail();
+        } catch (RuntimeException e) {
+            //expected
+        }
+
+        verify(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
+        verify(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
+        verify(mockModule1).afterRollback("TEST_" + MOCK + "1");
+        verify(mockModule2).afterRollback("TEST_" + MOCK + "2");
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule1, atLeastOnce()).getConfiguration();
+        verify(mockModule2, atLeastOnce()).getConfiguration();
+        verifyNoMoreInteractions(mockModule1, mockModule2);
     }
 
     interface TxAndTimerDrivenModule extends TxDrivenModule, TimerDrivenModule {

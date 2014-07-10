@@ -32,11 +32,18 @@ import org.neo4j.graphdb.GraphDatabaseService;
 public interface TxDrivenModule<T> extends RuntimeModule {
 
     /**
-     * Perform the core business logic of this module before a transaction commits.
+     * Perform the core business logic of this module before a transaction commits. If the framework determines by
+     * looking at {@link #getConfiguration()} that the module isn't interested in this transaction, this method will
+     * not be called.
+     * <p/>
+     * Note that in case this method throws {@link RuntimeException} (including {@link NeedsInitializationException}),
+     * {@link #afterCommit(Object)} will be called with a <code>null</code> argument.
+     * <p/>
+     * Note that in case this method throws {@link DeliberateTransactionRollbackException}, {@link #afterRollback(Object)}
+     * will be called with a <code>null</code> argument.
      *
      * @param transactionData data about the soon-to-be-committed transaction. It is already filtered based on {@link #getConfiguration()}.
-     * @return a state object (or <code>null</code>) that will be passed on to
-     *         {@link #afterCommit(Object)} of this object.
+     * @return a state object (or <code>null</code>) that will be passed on to {@link #afterCommit(Object)} of this object. Only return <code>null</code> if you do nothing in {@link #afterCommit(Object)}.
      * @throws NeedsInitializationException if it detects data is out of sync. {@link #initialize(org.neo4j.graphdb.GraphDatabaseService)}  will be called next
      *                                      time the {@link com.graphaware.runtime.GraphAwareRuntime} is started. Until then, the module
      *                                      should perform on best-effort basis.
@@ -48,17 +55,20 @@ public interface TxDrivenModule<T> extends RuntimeModule {
     /**
      * Perform the core business logic of this module after a transaction commits.
      *
-     * @param state returned by {@link #beforeCommit(com.graphaware.tx.event.improved.api.ImprovedTransactionData)}.
-     * @throws NeedsInitializationException if it detects data is out of sync. {@link #initialize(org.neo4j.graphdb.GraphDatabaseService)}  will be called next
-     *                                      time the {@link com.graphaware.runtime.GraphAwareRuntime} is started. Until then, the module
-     *                                      should perform on best-effort basis.
+     * @param state returned by {@link #beforeCommit(com.graphaware.tx.event.improved.api.ImprovedTransactionData)}. Will
+     *              be <code>null</code> if {@link #beforeCommit(com.graphaware.tx.event.improved.api.ImprovedTransactionData)}
+     *              threw an exception but the transaction still committed. This is the case for all exceptions except {@link DeliberateTransactionRollbackException}.
      */
     void afterCommit(T state);
 
     /**
-     * Cleanup if needed after a transaction rolled back.
+     * Cleanup if needed after a transaction rolled back. Will only be called if this module's {@link #beforeCommit(com.graphaware.tx.event.improved.api.ImprovedTransactionData)}
+     * method was called.
      *
-     * @param state returned by {@link #beforeCommit(com.graphaware.tx.event.improved.api.ImprovedTransactionData)}.
+     * @param state returned by {@link #beforeCommit(com.graphaware.tx.event.improved.api.ImprovedTransactionData)}. Will
+     *              be null if it is this module that caused the rollback by throwing {@link DeliberateTransactionRollbackException}.
+     *              Will also be <code>null</code> if {@link #beforeCommit(com.graphaware.tx.event.improved.api.ImprovedTransactionData)} threw
+     *              a non-rollback-causing exception, but some other module caused rollback after that.
      */
     void afterRollback(T state);
 

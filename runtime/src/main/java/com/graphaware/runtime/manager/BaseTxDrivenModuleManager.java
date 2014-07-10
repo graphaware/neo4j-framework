@@ -118,14 +118,13 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      * {@inheritDoc}
      */
     @Override
-    public Queue<Object> beforeCommit(TransactionDataContainer transactionData) {
-        Queue<Object> result = new LinkedList<>();
+    public Map<String, Object> beforeCommit(TransactionDataContainer transactionData) {
+        Map<String, Object> result = new HashMap<>();
 
         for (T module : modules) {
             FilteredTransactionData filteredTransactionData = new FilteredTransactionData(transactionData, module.getConfiguration().getInclusionStrategies());
 
             if (!filteredTransactionData.mutationsOccurred()) {
-                result.add(null);
                 continue;
             }
 
@@ -139,13 +138,16 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
                 metadataRepository.persistModuleMetadata(module, moduleMetadata.markedNeedingInitialization());
             } catch (DeliberateTransactionRollbackException e) {
                 LOG.debug("Module " + module.getId() + " threw an exception indicating that the transaction should be rolled back.", e);
+
+                result.put(module.getId(), state);      //just so the module gets afterRollback called as well
                 afterRollback(result); //remove this when https://github.com/neo4j/neo4j/issues/2660 is resolved
-                throw e;
+
+                throw e;               //will cause rollback
             } catch (RuntimeException e) {
                 LOG.warn("Module " + module.getId() + " threw an exception", e);
             }
 
-            result.add(state);
+            result.put(module.getId(), state);
         }
 
         return result;
@@ -155,17 +157,13 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      * {@inheritDoc}
      */
     @Override
-    public void afterCommit(Queue<Object> states) {
+    public void afterCommit(Map<String, Object> states) {
         for (T module : modules) {
-            if (states.isEmpty()) {
-                LOG.error("States are out of sync with modules. This is a bug");
-                throw new IllegalStateException("States are out of sync with modules. This is a bug");
+            if (!states.containsKey(module.getId())) {
+                return; //perhaps module wasn't interested, or threw RuntimeException
             }
 
-            Object next = states.poll();
-            if (next != null) {
-                module.afterCommit(next);
-            }
+            module.afterCommit(states.get(module.getId()));
         }
     }
 
@@ -173,16 +171,13 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      * {@inheritDoc}
      */
     @Override
-    public void afterRollback(Queue<Object> states) {
+    public void afterRollback(Map<String, Object> states) {
         for (T module : modules) {
-            if (states.isEmpty()) {
-                return; //rollback happened before the rest of the modules had a go
+            if (!states.containsKey(module.getId())) {
+                return; //rollback happened before this module had a go
             }
 
-            Object next = states.poll();
-            if (next != null) {
-                module.afterRollback(next);
-            }
+            module.afterRollback(states.get(module.getId()));
         }
     }
 }

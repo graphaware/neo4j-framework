@@ -28,6 +28,7 @@ import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -358,8 +359,11 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         verify(mockModule1).afterCommit("TEST_" + MOCK + "1");
         verify(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
         verify(mockModule2).afterCommit("TEST_" + MOCK + "2");
+        verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule1, atLeastOnce()).getConfiguration();
+        verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getConfiguration();
+        verify(mockModule3, atLeastOnce()).getId();
         verify(mockModule3, atLeastOnce()).getConfiguration();
 
         //no interaction with module3, it is not interested!
@@ -575,6 +579,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
         verify(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
         verify(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
+        verify(mockModule1).afterCommit(null); //threw exception
         verify(mockModule2).afterCommit("TEST_" + MOCK + "2");
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
@@ -622,8 +627,10 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         verify(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
         verify(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
         verify(mockModule1).afterRollback("TEST_" + MOCK + "1");
+        verify(mockModule2).afterRollback(null); //didn't produce object, threw exception
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule3, atLeastOnce()).getId();
         verify(mockModule1, atLeastOnce()).getConfiguration();
         verify(mockModule2, atLeastOnce()).getConfiguration();
         verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);

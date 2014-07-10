@@ -23,6 +23,7 @@ import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -34,7 +35,7 @@ import java.util.Set;
  *
  * @param <T> implementation of {@link com.graphaware.runtime.module.TxDrivenModule} that this runtime supports.
  */
-public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGraphAwareRuntime implements TransactionEventHandler<Queue<Object>> {
+public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGraphAwareRuntime implements TransactionEventHandler<Map<String, Object>> {
 
     /**
      * Get the manager for {@link TxDrivenModule}s.
@@ -55,7 +56,7 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      * {@inheritDoc}
      */
     @Override
-    public final Queue<Object> beforeCommit(TransactionData data) throws Exception {
+    public final Map<String, Object> beforeCommit(TransactionData data) throws Exception {
         if (!tryToStartIfNotStarted()) {
             return null;
         }
@@ -69,7 +70,7 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      * {@inheritDoc}
      */
     @Override
-    public final void afterCommit(TransactionData data, Queue<Object> states) {
+    public final void afterCommit(TransactionData data, Map<String, Object> states) {
         if (states == null) {
             return;
         }
@@ -81,7 +82,7 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      * {@inheritDoc}
      */
     @Override
-    public final void afterRollback(TransactionData data, Queue<Object> states) {
+    public final void afterRollback(TransactionData data, Map<String, Object> states) {
         if (states == null) {
             return;
         }
