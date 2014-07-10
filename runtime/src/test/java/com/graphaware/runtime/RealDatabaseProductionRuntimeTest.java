@@ -350,8 +350,8 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         verify(mockModule).initialize(database);
         verify(mockModule).createInitialContext(database);
         verify(mockModule).doSomeWork(null, database);
-        verify(mockModule, times(2)).beforeCommit(any(ImprovedTransactionData.class)); //once normal commit, once timer persisting metadata
-        verify(mockModule, times(2)).afterCommit(null); //once normal commit, once timer persisting metadata
+        verify(mockModule).beforeCommit(any(ImprovedTransactionData.class));
+        verify(mockModule).afterCommit(null);
         verify(mockModule, atLeastOnce()).getId();
         verify(mockModule, atLeastOnce()).getConfiguration();
         verifyNoMoreInteractions(mockModule);

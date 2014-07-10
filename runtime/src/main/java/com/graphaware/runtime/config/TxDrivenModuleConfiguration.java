@@ -9,7 +9,7 @@ import com.graphaware.common.strategy.InclusionStrategies;
 public interface TxDrivenModuleConfiguration {
 
     /**
-     * Get the inclusion strategies used by this module. If unsure, return {@link com.graphaware.common.strategy.InclusionStrategies#all()}.
+     * Get the inclusion strategies used by this module. If unsure, return {@link com.graphaware.runtime.strategy.InclusionStrategiesFactory#allBusiness()}.
      *
      * @return strategies.
      */
