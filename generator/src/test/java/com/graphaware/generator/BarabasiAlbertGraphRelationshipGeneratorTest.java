@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 public class BarabasiAlbertGraphRelationshipGeneratorTest extends TestCase {
 
     public void testDoGenerateEdges() throws Exception {
-        System.out.println(new BarabasiAlbertGraphRelationshipGenerator(new BarabasiAlbertConfig(10000, 3)).generateEdges().toString());
+        new BarabasiAlbertGraphRelationshipGenerator(new BarabasiAlbertConfig(1000000, 3));
 
     }
 }
