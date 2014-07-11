@@ -3,3 +3,4 @@ language: java
 branches:
   except:
     - flow
+    - db_experiment
