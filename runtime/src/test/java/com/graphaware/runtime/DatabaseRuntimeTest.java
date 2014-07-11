@@ -77,6 +77,11 @@ public abstract class DatabaseRuntimeTest extends GraphAwareRuntimeTest {
     }
 
     @Override
+    protected void verifyStart(TxDrivenModule module) {
+        verify(module).start(database);
+    }
+
+    @Override
     protected Node createNode(Label... labels) {
         return database.createNode(labels);
     }

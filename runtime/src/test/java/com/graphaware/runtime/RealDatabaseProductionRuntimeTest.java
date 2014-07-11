@@ -417,6 +417,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         Thread.sleep(INITIAL_TIMER_DELAY + TIMER_DELAY - 100);
 
         verify(mockModule).initialize(database);
+        verify(mockModule).start(database);
         verify(mockModule).createInitialContext(database);
         verify(mockModule).doSomeWork(null, database);
         verify(mockModule).beforeCommit(any(ImprovedTransactionData.class));
@@ -447,6 +448,8 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
 
         verifyInitialization(mockModule1);
         verifyInitialization(mockModule2);
+        verifyStart(mockModule1);
+        verifyStart(mockModule2);
         verify(mockModule1, atLeastOnce()).getConfiguration();
         verify(mockModule2, atLeastOnce()).getConfiguration();
         verify(mockModule1, atLeastOnce()).getId();

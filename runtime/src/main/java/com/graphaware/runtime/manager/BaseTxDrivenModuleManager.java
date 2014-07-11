@@ -86,6 +86,26 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void startModules() {
+        LOG.info("Starting transaction-driven modules...");
+        for (T module : modules) {
+            start(module);
+        }
+        LOG.info("Transaction-driven modules started.");
+    }
+
+    /**
+     * Start module. This means preparing for doing the actual work. Call in a single-thread exactly once on each module
+     * every time the runtime starts.
+     *
+     * @param module to be started.
+     */
+    protected abstract void start(T module);
+
+    /**
      * Initialize module. This means doing any work necessary for a module that has been registered for the first time
      * on an existing database, or that has been previously registered with different configuration.
      * <p/>

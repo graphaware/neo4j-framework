@@ -29,6 +29,14 @@ public class BatchModuleManager extends BaseTxDrivenModuleManager<BatchSupportin
      * {@inheritDoc}
      */
     @Override
+    protected void start(BatchSupportingTxDrivenModule module) {
+        module.start(batchInserter);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void initialize(BatchSupportingTxDrivenModule module) {
         module.initialize(batchInserter);
     }
