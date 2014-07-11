@@ -60,8 +60,8 @@ public class BarabasiAlbertGraphRelationshipGenerator extends BaseRelationshipGe
                 degrees.set(target, degrees.get(target) + 1); // Any better way of incrementing an index in ArrayList?
                 omit.add(target); // Add the target to omit list (and avoid multiedges)
                 edges.add(new UnorderedPair<>(target, node)); // Add the edge
-                degrees.add(node, edgesPerNewNode); // Add the newly added node to the degree set
             }
+            degrees.add(node, edgesPerNewNode); // Add the newly added node to the degree set
         }
 
         return edges;
