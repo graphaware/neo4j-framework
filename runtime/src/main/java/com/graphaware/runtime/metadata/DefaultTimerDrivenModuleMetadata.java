@@ -20,7 +20,7 @@ public class DefaultTimerDrivenModuleMetadata implements TimerDrivenModuleMetada
      * {@inheritDoc}
      */
     @Override
-    public TimerDrivenModuleContext<?> getLastContext() {
+    public TimerDrivenModuleContext<?> lastContext() {
         return context;
     }
 

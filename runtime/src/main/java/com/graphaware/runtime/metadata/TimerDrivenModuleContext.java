@@ -15,6 +15,16 @@ import org.neo4j.graphdb.NotFoundException;
  */
 public interface TimerDrivenModuleContext<T> {
 
+    public static final long ASAP = -1;
+
+    /**
+     * Get the earliest time the {@link com.graphaware.runtime.module.TimerDrivenModule} wishes to be called again.
+     * Modules that want to be called as often as possible should return {@link #ASAP}.
+     *
+     * @return earliest time (in ms since 1/1/1970) this module will be called again.
+     */
+    long earliestNextCall();
+
     /**
      * Find the position in the database.
      *

@@ -10,5 +10,5 @@ public interface TimerDrivenModuleMetadata<P extends TimerDrivenModuleContext<?>
      *
      * @return last context, <code>null</code> if there is no such context (first run).
      */
-    P getLastContext();
+    P lastContext();
 }
