@@ -1,6 +1,8 @@
 package com.graphaware.example.pagerank.parser;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.graphaware.common.strategy.InclusionStrategy;
+import com.graphaware.common.strategy.RelationshipInclusionStrategy;
 
 /**
  * Implementation of {@link ModuleConfigParameterParser} that uses simple regular expressions to parse the configuration
@@ -50,8 +53,20 @@ public class RegexModuleConfigParameterParser implements ModuleConfigParameterPa
 	}
 
 	@Override
-	public InclusionStrategy<Relationship> parseForRelationshipInclusionStrategy(String relationshipExpression) {
-		throw new UnsupportedOperationException("atg hasn't written this method yet");
+	public InclusionStrategy<Relationship> parseForRelationshipInclusionStrategy(String relExpression) {
+		if (relExpression == null) {
+			LOG.info("Null relationship expression specified so no inclusion strategy will be returned");
+			return null;
+		}
+
+		final List<String> relationshipsToMatch = Arrays.asList(relExpression.split("\\|"));
+
+		return new RelationshipInclusionStrategy() {
+			@Override
+			public boolean include(Relationship object) {
+				return relationshipsToMatch.contains(object.getType().name());
+			}
+		};
 	}
 
 }

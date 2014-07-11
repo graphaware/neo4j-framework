@@ -12,8 +12,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 import com.graphaware.common.strategy.InclusionStrategy;
 
@@ -89,6 +91,27 @@ public class RegexModuleConfigParameterParserTest {
 		assertTrue("Additional properties shouldn't affect the inclusion", inclusionStrategy.include(matchWithExtraProperties));
 	}
 
+	@Test
+	public void shouldCreateInclusionStrategyForRelationshipsFromSingleTypeExpression() {
+		InclusionStrategy<Relationship> inclusionStrategy = this.configParameterParser.parseForRelationshipInclusionStrategy("FRIEND_OF");
+
+		assertNotNull("The resultant inclusion strategy shouldn't be null", inclusionStrategy);
+		assertTrue(inclusionStrategy.include(proxyRelationship("FRIEND_OF")));
+		assertFalse(inclusionStrategy.include(proxyRelationship("FOE_OF")));
+	}
+
+	@Test
+	public void shouldCreateInclusionStrategyForRelationshipsFromMultiTypeExpression() {
+		InclusionStrategy<Relationship> inclusionStrategy =
+				this.configParameterParser.parseForRelationshipInclusionStrategy("NORTH|EAST|WEST");
+
+		assertNotNull("The resultant inclusion strategy shouldn't be null", inclusionStrategy);
+		assertTrue(inclusionStrategy.include(proxyRelationship("NORTH")));
+		assertFalse(inclusionStrategy.include(proxyRelationship("SOUTH")));
+		assertTrue(inclusionStrategy.include(proxyRelationship("EAST")));
+		assertTrue(inclusionStrategy.include(proxyRelationship("WEST")));
+	}
+
 	private Node proxyNode(String labelName) {
 		return proxyNode(labelName, Collections.<String, Object>emptyMap());
 	}
@@ -106,10 +129,32 @@ public class RegexModuleConfigParameterParserTest {
 				if (method.getName().equals("getProperty")) {
 					return properties.containsKey(args[0]) ? properties.get(args[0]) : args[1];
 				}
-				return null;
+				if (method.getName().equals("getLabels")) {
+					return labelName != null ? Collections.singleton(labelName) : Collections.emptySet();
+				}
+				if (method.getName().equals("toString")) {
+					return "proxy node: " + labelName + properties;
+				}
+				throw new UnsupportedOperationException("Method " + method + " is not supported by this proxy object");
 			}
 		});
 	}
 
+	private Relationship proxyRelationship(final String relationshipType) {
+		return (Relationship) Proxy.newProxyInstance(getClass().getClassLoader(), new Class<?>[] { Relationship.class }, new InvocationHandler() {
+
+			@Override
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+				if (method.getName().equals("getType")) {
+					return DynamicRelationshipType.withName(relationshipType);
+				}
+				if (method.getName().equals("toString")) {
+					return "proxy relationship: " + relationshipType;
+				}
+				throw new UnsupportedOperationException("Method " + method + " is not supported by this proxy object");
+			}
+
+		});
+	}
 }
 

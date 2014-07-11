@@ -28,6 +28,9 @@ public class RandomWalkerPageRankModuleBootstrapper implements RuntimeModuleBoot
 		// com.graphaware.module.PageRank.inclusionStrategy.relationship=FRIEND_OF|COLLEAGUE_OF
 
         //MB: not a bad idea!
+		/*
+		 config.contains("inclusionStrategy.node") ?: parseToThingy
+		 */
 
 		return new RandomWalkerPageRankModule(moduleId);
 	}
