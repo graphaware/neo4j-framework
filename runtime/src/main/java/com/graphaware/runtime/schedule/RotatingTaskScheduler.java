@@ -128,7 +128,12 @@ public class RotatingTaskScheduler implements TaskScheduler {
      * @param <T> module type of the module that will be delegated to.
      */
     private <C extends TimerDrivenModuleContext, T extends TimerDrivenModule<C>> void runNextTask() {
-        Pair<T, C> moduleAndContext = nextModuleAndContext();
+        Pair<T, C> moduleAndContext = findNextModuleAndContext();
+
+        if (moduleAndContext == null) {
+            return; //no module withes to run
+        }
+
         T module = moduleAndContext.first();
         C context = moduleAndContext.second();
 
@@ -141,11 +146,32 @@ public class RotatingTaskScheduler implements TaskScheduler {
     }
 
     /**
-     * Find the next module to be delegated to and its metadata.
+     * Find the next module that is ready to be delegated to, and its context.
      *
-     * @param <C> metadata type.
+     * @param <C> context type.
      * @param <T> module type.
-     * @return module & metadata as a {@link Map.Entry}
+     * @return module & context.
+     */
+    private <C extends TimerDrivenModuleContext, T extends TimerDrivenModule<C>> Pair<T, C> findNextModuleAndContext() {
+        int totalModules = moduleContexts.size();
+        long now = System.currentTimeMillis();
+
+        for (int i = 0; i < totalModules; i++) {
+            Pair<T, C> candidate = nextModuleAndContext();
+            if (candidate.second() == null || candidate.second().earliestNextCall() <= now) {
+                return candidate;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Find the next module whose turn it would be and its context.
+     *
+     * @param <C> context type.
+     * @param <T> module type.
+     * @return module & context.
      */
     private <C extends TimerDrivenModuleContext, T extends TimerDrivenModule<C>> Pair<T, C> nextModuleAndContext() {
         if (moduleContextIterator == null || !moduleContextIterator.hasNext()) {

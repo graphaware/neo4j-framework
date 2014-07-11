@@ -197,6 +197,75 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
     }
 
     @Test
+    public void earliestNextCallTimeShouldBeRespected() throws InterruptedException {
+        TimerDrivenModule mockModule1 = mockTimerModule(MOCK + "1");
+        TimerDrivenModule mockModule3 = mockTimerModule(MOCK + "3");
+        NodeBasedContext context1 = new NodeBasedContext(0, System.currentTimeMillis() + INITIAL_TIMER_DELAY + 3 * TIMER_DELAY);
+        NodeBasedContext context2 = new NodeBasedContext(1, TimerDrivenModuleContext.ASAP);
+
+        TimerDrivenModule mockModule2 = mock(TimerDrivenModule.class);
+        when(mockModule2.getId()).thenReturn(MOCK + "2");
+        when(mockModule2.createInitialContext(database)).thenReturn(context1);
+        when(mockModule2.doSomeWork(context1, database)).thenReturn(context2);
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule1);
+        runtime.registerModule(mockModule2);
+        runtime.registerModule(mockModule3);
+
+        runtime.start();
+
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule3, atLeastOnce()).getId();
+        verify(mockModule1).createInitialContext(database);
+        verify(mockModule2).createInitialContext(database);
+        verify(mockModule3).createInitialContext(database);
+        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
+
+        Thread.sleep(INITIAL_TIMER_DELAY + 8 * TIMER_DELAY - 100);
+
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule3, atLeastOnce()).getId();
+        verify(mockModule1, times(3)).doSomeWork(null, database);
+        verify(mockModule2).doSomeWork(context1, database);
+        verify(mockModule2).doSomeWork(context2, database);
+        verify(mockModule3, times(3)).doSomeWork(null, database);
+
+        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
+    }
+
+    @Test
+    public void nothingShouldHappenWhenNoModuleWantsToRun() throws InterruptedException {
+        TimerDrivenModule mockModule1 = mockTimerModule(MOCK + "1");
+        TimerDrivenModule mockModule2 = mockTimerModule(MOCK + "2");
+        NodeBasedContext context = new NodeBasedContext(0, System.currentTimeMillis() + 1000000);
+
+        when(mockModule1.createInitialContext(database)).thenReturn(context);
+        when(mockModule2.createInitialContext(database)).thenReturn(context);
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule1);
+        runtime.registerModule(mockModule2);
+
+        runtime.start();
+
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule1).createInitialContext(database);
+        verify(mockModule2).createInitialContext(database);
+        verifyNoMoreInteractions(mockModule1, mockModule2);
+
+        Thread.sleep(INITIAL_TIMER_DELAY + 10 * TIMER_DELAY);
+
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+
+        verifyNoMoreInteractions(mockModule1, mockModule2);
+    }
+
+    @Test
     public void allRegisteredInterestedTimerModulesShouldBeDelegatedToWhenRuntimeNotExplicitlyStarted() throws InterruptedException {
         TimerDrivenModule mockModule1 = mockTimerModule(MOCK + "1");
         TimerDrivenModule mockModule2 = mockTimerModule(MOCK + "2");
@@ -303,7 +372,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
     @Test
     public void whenOneTimerModuleThrowsAnExceptionThenOtherModulesShouldStillBeDelegatedTo() throws InterruptedException {
         TimerDrivenModule mockModule1 = mockTimerModule(MOCK + "1");
-        when(mockModule1.doSomeWork(any(TimerDrivenModuleContext.class), any(GraphDatabaseService.class))).thenThrow(new RuntimeException());
+        when(mockModule1.doSomeWork(any(TimerDrivenModuleContext.class), any(GraphDatabaseService.class))).thenThrow(new RuntimeException("deliberate testing exception"));
 
         TimerDrivenModule mockModule2 = mockTimerModule(MOCK + "2");
 
@@ -348,6 +417,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         Thread.sleep(INITIAL_TIMER_DELAY + TIMER_DELAY - 100);
 
         verify(mockModule).initialize(database);
+        verify(mockModule).start(database);
         verify(mockModule).createInitialContext(database);
         verify(mockModule).doSomeWork(null, database);
         verify(mockModule).beforeCommit(any(ImprovedTransactionData.class));
@@ -378,6 +448,8 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
 
         verifyInitialization(mockModule1);
         verifyInitialization(mockModule2);
+        verifyStart(mockModule1);
+        verifyStart(mockModule2);
         verify(mockModule1, atLeastOnce()).getConfiguration();
         verify(mockModule2, atLeastOnce()).getConfiguration();
         verify(mockModule1, atLeastOnce()).getId();

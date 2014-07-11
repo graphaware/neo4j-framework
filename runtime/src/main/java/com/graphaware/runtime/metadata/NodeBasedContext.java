@@ -4,14 +4,14 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
 /**
- * {@link TimerDrivenModuleContext} with {@link Node} as the position representation and no extra data.
+ * {@link BaseTimerDrivenModuleContext} with {@link Node} as the position representation and no extra data.
  */
-public class NodeBasedContext implements TimerDrivenModuleContext<Node> {
+public class NodeBasedContext extends BaseTimerDrivenModuleContext<Node> {
 
     private final long nodeId;
 
     /**
-     * Construct a new position.
+     * Construct a new context.
      *
      * @param nodeId ID of the node.
      */
@@ -20,12 +20,33 @@ public class NodeBasedContext implements TimerDrivenModuleContext<Node> {
     }
 
     /**
-     * Construct a new position.
+     * Construct a new context.
      *
      * @param node the node. Must not be null.
      */
     public NodeBasedContext(Node node) {
         this(node.getId());
+    }
+
+    /**
+     * Construct a new context.
+     *
+     * @param nodeId           ID of the node.
+     * @param earliestNextCall time in ms since 1/1/1970 when the module wants to be called next at the earliest.
+     */
+    public NodeBasedContext(long nodeId, long earliestNextCall) {
+        super(earliestNextCall);
+        this.nodeId = nodeId;
+    }
+
+    /**
+     * Construct a new context.
+     *
+     * @param node             the node. Must not be null.
+     * @param earliestNextCall time in ms since 1/1/1970 when the module wants to be called next at the earliest.
+     */
+    public NodeBasedContext(Node node, long earliestNextCall) {
+        this(node.getId(), earliestNextCall);
     }
 
     /**
@@ -43,6 +64,7 @@ public class NodeBasedContext implements TimerDrivenModuleContext<Node> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         NodeBasedContext that = (NodeBasedContext) o;
 
@@ -56,6 +78,8 @@ public class NodeBasedContext implements TimerDrivenModuleContext<Node> {
      */
     @Override
     public int hashCode() {
-        return (int) (nodeId ^ (nodeId >>> 32));
+        int result = super.hashCode();
+        result = 31 * result + (int) (nodeId ^ (nodeId >>> 32));
+        return result;
     }
 }

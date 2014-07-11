@@ -127,6 +127,11 @@ public class BatchInserterRuntimeTest extends GraphAwareRuntimeTest<BatchSupport
     }
 
     @Override
+    protected void verifyStart(BatchSupportingTxDrivenModule module) {
+        verify(module).start(batchInserter);
+    }
+
+    @Override
     protected Node createNode(Label... labels) {
         return new BatchInserterNode(batchInserter.createNode(Collections.<String, Object>emptyMap(), labels), batchInserter);
     }

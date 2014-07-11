@@ -28,10 +28,7 @@ import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
@@ -63,6 +60,8 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     protected abstract void verifyReinitialization(T module);
 
+    protected abstract void verifyStart(T module);
+
     protected abstract Node createNode(Label... labels);
 
     protected abstract void shutdown();
@@ -81,6 +80,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         runtime.start();
 
         verifyInitialization(mockModule);
+        verifyStart(mockModule);
         verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
@@ -95,7 +95,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void moduleAlreadyRegisteredShouldNotBeInitialized() {
-        final TxDrivenModule mockModule = mockTxModule();
+        final T mockModule = mockTxModule();
 
         try (Transaction tx = getTransaction()) {
             getTxRepo().persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()));
@@ -107,6 +107,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
         runtime.start();
 
+        verifyStart(mockModule);
         verify(mockModule, atLeastOnce()).getId();
         verify(mockModule, atLeastOnce()).getConfiguration();
         verifyNoMoreInteractions(mockModule);
@@ -134,6 +135,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         runtime.start();
 
         verifyReinitialization(mockModule);
+        verifyStart(mockModule);
         verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
@@ -161,6 +163,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         runtime.start();
 
         verifyReinitialization(mockModule);
+        verifyStart(mockModule);
         verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
@@ -175,7 +178,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void changedModuleShouldNotBeReInitializedWhenInitializationSkipped() {
-        final TxDrivenModule mockModule = mockTxModule();
+        final T mockModule = mockTxModule();
 
         try (Transaction tx = getTransaction()) {
             getTxRepo().persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none())));
@@ -187,6 +190,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
         runtime.start(true);
 
+        verifyStart(mockModule);
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
@@ -221,8 +225,8 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void unusedModulesShouldBeRemoved() {
-        final TxDrivenModule mockModule = mockTxModule();
-        final TxDrivenModule unusedModule = mockTxModule("UNUSED");
+        final T mockModule = mockTxModule();
+        final T unusedModule = mockTxModule("UNUSED");
 
         try (Transaction tx = getTransaction()) {
             getTxRepo().persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()));
@@ -235,6 +239,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
         runtime.start();
 
+        verifyStart(mockModule);
         verify(mockModule, atLeastOnce()).getId();
         verify(mockModule, atLeastOnce()).getConfiguration();
         verifyNoMoreInteractions(mockModule);
@@ -259,6 +264,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
         runtime.start();
 
+        verifyStart(mockModule);
         verify(mockModule, atLeastOnce()).getId();
         verify(mockModule, atLeastOnce()).getConfiguration();
         verifyReinitialization(mockModule);
@@ -287,6 +293,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
         runtime.start();
 
+        verifyStart(mockModule);
         verify(mockModule, atLeastOnce()).getId();
         verify(mockModule, atLeastOnce()).getConfiguration();
         verifyReinitialization(mockModule);
@@ -302,7 +309,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
     @Test
     public void unusedCorruptModulesShouldBeRemoved() {
-        final TxDrivenModule mockModule = mockTxModule();
+        final T mockModule = mockTxModule();
 
         try (Transaction tx = getTransaction()) {
             Node root = createMetadataNode();
@@ -317,6 +324,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
         runtime.start();
 
+        verifyStart(mockModule);
         verify(mockModule, atLeastOnce()).getId();
         verify(mockModule, atLeastOnce()).getConfiguration();
         verifyNoMoreInteractions(mockModule);
@@ -348,6 +356,9 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule3, atLeastOnce()).getId();
+        verifyStart(mockModule1);
+        verifyStart(mockModule2);
+        verifyStart(mockModule3);
         verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
 
         try (Transaction tx = getTransaction()) {
@@ -390,6 +401,11 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         verifyInitialization(mockModule1);
         verifyInitialization(mockModule2);
         verifyInitialization(mockModule3);
+
+        verifyStart(mockModule1);
+        verifyStart(mockModule2);
+        verifyStart(mockModule3);
+
         verify(mockModule1, atLeastOnce()).getConfiguration();
         verify(mockModule2, atLeastOnce()).getConfiguration();
         verify(mockModule3, atLeastOnce()).getConfiguration();
@@ -566,6 +582,9 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
         verifyInitialization(mockModule1);
         verifyInitialization(mockModule2);
+        verifyStart(mockModule1);
+        verifyStart(mockModule2);
+
         verify(mockModule1, atLeastOnce()).getConfiguration();
         verify(mockModule2, atLeastOnce()).getConfiguration();
         verify(mockModule1, atLeastOnce()).getId();
@@ -606,6 +625,11 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         verifyInitialization(mockModule1);
         verifyInitialization(mockModule2);
         verifyInitialization(mockModule3);
+
+        verifyStart(mockModule1);
+        verifyStart(mockModule2);
+        verifyStart(mockModule3);
+
         verify(mockModule1, atLeastOnce()).getConfiguration();
         verify(mockModule2, atLeastOnce()).getConfiguration();
         verify(mockModule3, atLeastOnce()).getConfiguration();

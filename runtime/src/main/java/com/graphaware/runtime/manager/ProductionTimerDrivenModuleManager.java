@@ -46,7 +46,7 @@ public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerD
      */
     @Override
     protected TimerDrivenModuleMetadata acknowledgeMetadata(TimerDrivenModule module, TimerDrivenModuleMetadata metadata) {
-        taskScheduler.registerModuleAndContext(module, metadata.getLastContext());
+        taskScheduler.registerModuleAndContext(module, metadata.lastContext());
         return metadata;
     }
 

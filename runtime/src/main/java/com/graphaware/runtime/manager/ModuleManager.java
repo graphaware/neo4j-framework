@@ -43,6 +43,11 @@ public interface ModuleManager<T extends RuntimeModule> {
     void cleanupMetadata(Set<String> usedModules);
 
     /**
+     * Perform work needed to make modules start doing their job. Called exactly once each time the database is started.
+     */
+    void startModules();
+
+    /**
      * Bring all modules to an orderly shutdown, when the database is stopped.
      */
     void shutdownModules();

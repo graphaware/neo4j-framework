@@ -122,7 +122,10 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
 
     public FriendshipStrengthCounter(GraphDatabaseService database) {
         this.database = database;
-        getCounterNode(database); //do this in constructor to prevent multiple threads creating multiple nodes
+        try (Transaction tx = database.beginTx()) {
+            getCounterNode(database); //do this in constructor to prevent multiple threads creating multiple nodes
+            tx.success();
+        }
     }
 
     /**
@@ -157,8 +160,13 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
         }
 
         if (delta != 0) {
-            Node root = getCounterNode(database);
-            root.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (long) root.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L) + delta);
+            Node counter = getCounterNode(database);
+
+            try (Transaction tx = database.beginTx()) {
+                tx.acquireWriteLock(counter);
+                counter.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (long) counter.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L) + delta);
+                tx.success();
+            }
         }
 
         return null;
