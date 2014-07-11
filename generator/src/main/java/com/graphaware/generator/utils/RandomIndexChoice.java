@@ -3,6 +3,7 @@ package com.graphaware.generator.utils;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Chooses an index at random, omiting certain indices
@@ -28,6 +29,28 @@ public class RandomIndexChoice {
         int offset = 0;
         Iterator<Integer> it = omitIndices.iterator();
 
+        while(it.hasNext() && choice + offset >= it.next())
+            offset ++;
+
+        return choice + offset;
+    }
+
+
+    /**
+     * Random index choice with indices omitted, set implementation.
+     *
+     * TODO: Prepare switch for sparse lookup to speed-up the algorithm
+     *
+     * @param length range to pick indices from
+     * @param omitIndices indices to be omited from the selection
+     * @return index from the range specified
+     */
+    public int randomIndexChoice(int length, Set<Integer> omitIndices) {
+        int omitLength = omitIndices.size();
+        int choice = (int) Math.floor((length - omitLength) * random.nextDouble());
+
+        int offset = 0;
+        Iterator<Integer> it = omitIndices.iterator();
         while(it.hasNext() && choice + offset >= it.next())
             offset ++;
 

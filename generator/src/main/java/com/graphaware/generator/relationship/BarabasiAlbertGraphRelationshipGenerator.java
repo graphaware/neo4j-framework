@@ -2,6 +2,7 @@ package com.graphaware.generator.relationship;
 
 import com.graphaware.common.util.SameTypePair;
 import com.graphaware.common.util.UnorderedPair;
+import com.graphaware.generator.utils.RandomIndexChoice;
 import com.graphaware.generator.config.BarabasiAlbertConfig;
 import com.graphaware.generator.config.NumberOfNodes;
 import com.graphaware.generator.utils.WeightedReservoirSampler;
@@ -43,25 +44,35 @@ public class BarabasiAlbertGraphRelationshipGenerator extends BaseRelationshipGe
         ArrayList<Integer> degrees = new ArrayList<>();
 
         for (int k = 0; k < edgesPerNewNode + 1; ++k) {
-            degrees.add(0);
             for (int l = 0; l < edgesPerNewNode; ++l) {
-                degrees.set(k, degrees.get(k) + 1);
+                degrees.add(k);
+                //degrees.set(k, degrees.get(k) + 1);
             }
         }
 
-        WeightedReservoirSampler reservoirSampler = new WeightedReservoirSampler();
+       // WeightedReservoirSampler reservoirSampler = new WeightedReservoirSampler();
+        RandomIndexChoice randomIndexChoice = new RandomIndexChoice();
 
         // Preferentially attach other nodes
         for (int node = edgesPerNewNode + 1; node < getConfiguration().getNumberOfNodes(); ++node) {
             Set<Integer> omit = new HashSet<>();
 
             for (int edge = 0; edge < edgesPerNewNode; ++edge) {
-                int target = reservoirSampler.randomIndexChoice(degrees, omit); // find a target
-                degrees.set(target, degrees.get(target) + 1); // Any better way of incrementing an index in ArrayList?
-                omit.add(target); // Add the target to omit list (and avoid multiedges)
-                edges.add(new UnorderedPair<>(target, node)); // Add the edge
+                while(true)
+                {
+                    int target = randomIndexChoice.randomIndexChoice(degrees.size());//reservoirSampler.randomIndexChoice(degrees, omit); // find a target
+
+                    if( omit.contains(target))
+                        continue;
+
+                    degrees.set(target, degrees.get(target) + 1); // Any better way of incrementing an index in ArrayList?
+                    omit.add(target); // Add the target to omit list (and avoid multiedges)
+                    edges.add(new UnorderedPair<>(target, node)); // Add the edge
+                    degrees.add(node);
+                    break;
+                }
             }
-            degrees.add(node, edgesPerNewNode); // Add the newly added node to the degree set
+
         }
 
         return edges;

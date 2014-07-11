@@ -5,7 +5,6 @@ import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  * DO NOT USE - WORK IN PROGRESS
