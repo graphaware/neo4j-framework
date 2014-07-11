@@ -1,5 +1,6 @@
 package com.graphaware.example.module;
 
+import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
 import com.graphaware.runtime.module.TxDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -15,7 +16,7 @@ public class FriendshipStrengthModuleBootstrapper implements RuntimeModuleBootst
      * {@inheritDoc}
      */
     @Override
-    public TxDrivenModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
+    public RuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
         return new FriendshipStrengthModule(moduleId, database);
     }
 }

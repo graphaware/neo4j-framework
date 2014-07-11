@@ -1,6 +1,7 @@
 package com.graphaware.runtime.config;
 
 import com.graphaware.common.strategy.InclusionStrategies;
+import com.graphaware.runtime.strategy.InclusionStrategiesFactory;
 
 /**
  * Minimal {@link TxDrivenModuleConfiguration} that can be instantiated and configured further using fluent API.
@@ -8,10 +9,10 @@ import com.graphaware.common.strategy.InclusionStrategies;
 public class MinimalTxDrivenModuleConfiguration extends BaseTxDrivenModuleConfiguration<MinimalTxDrivenModuleConfiguration> {
 
     /**
-     * Create a new configuration with {@link com.graphaware.common.strategy.InclusionStrategies#all()}.
+     * Create a new configuration with {@link com.graphaware.runtime.strategy.InclusionStrategiesFactory#allBusiness()}.
      */
     public MinimalTxDrivenModuleConfiguration() {
-        super(InclusionStrategies.all());
+        super(InclusionStrategiesFactory.allBusiness());
     }
 
     /**

@@ -1,6 +1,5 @@
 package com.graphaware.example.component;
 
-import com.graphaware.example.component.HelloWorldNodeCreator;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
 import com.graphaware.test.unit.GraphUnit;
 import org.junit.Test;
