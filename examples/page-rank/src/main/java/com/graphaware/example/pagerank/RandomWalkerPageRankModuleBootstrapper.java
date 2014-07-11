@@ -3,9 +3,16 @@ package com.graphaware.example.pagerank;
 import java.util.Map;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.graphaware.common.strategy.IncludeAllNodes;
+import com.graphaware.common.strategy.IncludeAllRelationships;
+import com.graphaware.common.strategy.InclusionStrategy;
+import com.graphaware.example.pagerank.parser.ModuleConfigParameterParser;
+import com.graphaware.example.pagerank.parser.RegexModuleConfigParameterParser;
 import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
 
 /**
@@ -16,23 +23,25 @@ public class RandomWalkerPageRankModuleBootstrapper implements RuntimeModuleBoot
 
 	private static final Logger LOG = LoggerFactory.getLogger(RandomWalkerPageRankModuleBootstrapper.class);
 
+	private final ModuleConfigParameterParser configParameterParser = new RegexModuleConfigParameterParser();
+
 	@Override
-	public RandomWalkerPageRankModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
+	public RandomWalkerPageRankModule bootstrapModule(String moduleId, Map<String, String> configParams, GraphDatabaseService database) {
 		LOG.info("Constructing new module with ID: {}", moduleId);
-		LOG.trace("Configuration parameter map is: {}", config);
+		LOG.trace("Configuration parameter map is: {}", configParams);
 		// TODO: it'd be nice if we could somehow control the runtime's scheduling too, but that's probably not a job for here
-        // MB: agreed, that's runtime config
+		// MB: agreed, that's runtime config
 
-		// properties like Cypher expressions, I reckon:
-		// com.graphaware.module.PageRank.inclusionStrategy.node=Person{name="Gary"}
-		// com.graphaware.module.PageRank.inclusionStrategy.relationship=FRIEND_OF|COLLEAGUE_OF
+		// parse Cypher-like expressions to configure inclusion strategies
+		InclusionStrategy<Node> nodeInclusionStrategy = configParams.containsKey("inclusionStrategy.node")
+				? this.configParameterParser.parseForNodeInclusionStrategy(configParams.get("inclusionStrategy.node"))
+				: IncludeAllNodes.getInstance();
+		InclusionStrategy<Relationship> relationshipInclusionStrategy = configParams.containsKey("inclusionStrategy.relationship")
+				? this.configParameterParser.parseForRelationshipInclusionStrategy(configParams.get("inclusionStrategy.relationship"))
+				: IncludeAllRelationships.getInstance();
 
-        //MB: not a bad idea!
-		/*
-		 config.contains("inclusionStrategy.node") ?: parseToThingy
-		 */
-
-		return new RandomWalkerPageRankModule(moduleId);
+		return new RandomWalkerPageRankModule(moduleId,
+				new PageRankModuleConfiguration(nodeInclusionStrategy, relationshipInclusionStrategy));
 	}
 
 }
