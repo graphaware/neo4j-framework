@@ -3,6 +3,7 @@ package com.graphaware.generator.utils;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Random;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -24,38 +25,42 @@ public class RandomIndexChoice {
      */
     public int randomIndexChoice(int length, PriorityQueue<Integer> omitIndices) {
         int omitLength = omitIndices.size();
-        int choice = (int) Math.floor((length - omitLength) * random.nextDouble());
+        int choice = random.nextInt(length - omitLength);
 
-        int offset = 0;
-        Iterator<Integer> it = omitIndices.iterator();
+            int offset = 0;
+            Iterator<Integer> it = omitIndices.iterator();
 
-        while(it.hasNext() && choice + offset >= it.next())
-            offset ++;
+            while (it.hasNext() && choice + offset >= it.next())
+                offset++;
 
-        return choice + offset;
+            return choice + offset;
+
+
     }
 
-
     /**
-     * Random index choice with indices omitted, set implementation.
+     * Random index choice with indices omitted.
      *
-     * TODO: Prepare switch for sparse lookup to speed-up the algorithm
+     * Warning: this algorithm does not terminate if omitIndices contains
+     *          all indices from 0 to length-1. Use this only if number
+     *          of entries in omitIndices is much less than length.
      *
      * @param length range to pick indices from
      * @param omitIndices indices to be omited from the selection
      * @return index from the range specified
      */
-    public int randomIndexChoice(int length, Set<Integer> omitIndices) {
-        int omitLength = omitIndices.size();
-        int choice = (int) Math.floor((length - omitLength) * random.nextDouble());
+    public int randomIndexChoice(int length, HashSet<Integer> omitIndices)
+    {
+        int choice = 0;
+        while (true) {
+            choice = random.nextInt(length);
+            if (!omitIndices.contains(choice))
+                break;
 
-        int offset = 0;
-        Iterator<Integer> it = omitIndices.iterator();
-        while(it.hasNext() && choice + offset >= it.next())
-            offset ++;
-
-        return choice + offset;
+        }
+        return choice;
     }
+
 
     /**
      * Random index choice with indices omitted (long)
