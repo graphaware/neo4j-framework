@@ -20,6 +20,7 @@ import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.helpers.Pair;
@@ -122,14 +123,19 @@ public class RuntimeKernelExtension implements Lifecycle {
             @Override
             public void run() {
                 if (database.isAvailable(5 * 60 * 1000)) {
-                    try (Transaction tx = database.beginTx()) {
-                        //will trigger a tx because of label creation
-                        //it is a hack to prevent deadlocks
-                        database.createNode(DynamicLabel.label(GA_PREFIX + "AUTOSTART"));
-                        tx.failure();
+                    try {
+                        try (Transaction tx = database.beginTx()) {
+                            //will trigger a tx because of label creation
+                            //it is a hack to prevent deadlocks
+                            Node node = database.createNode(DynamicLabel.label(GA_PREFIX + "AUTOSTART"));
+                            node.setProperty(GA_PREFIX + "autostart", "irrelevant");
+                            tx.failure();
+                        }
+                    } catch (Exception e) {
+                        LOG.warn("Could not rollback the Runtime auto-start transaction. This is likely because the database has been shut down", e);
                     }
                 } else {
-                    LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within 5 minutes.");
+                    LOG.warn("Could not start GraphAware Runtime. This is either because the database has been shut down, or didn't get to a usable state within 5 minutes.");
                 }
             }
         }).start();
