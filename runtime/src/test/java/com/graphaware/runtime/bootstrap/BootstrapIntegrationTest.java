@@ -124,6 +124,8 @@ public class BootstrapIntegrationTest {
                 .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
                 .newGraphDatabase();
 
+        Thread.sleep(1000);
+
         assertEquals(1, TEST_RUNTIME_MODULES.size());
         assertTrue(TEST_RUNTIME_MODULES.get(0).isInitialized());
         assertEquals("configValue", TEST_RUNTIME_MODULES.get(0).getConfig().get("configKey"));

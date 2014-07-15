@@ -3,7 +3,9 @@ package com.graphaware.generator;
 import com.graphaware.generator.config.ErdosRenyiConfig;
 import com.graphaware.generator.relationship.ErdosRenyiGraphRelationshipGenerator;
 import junit.framework.TestCase;
+import org.junit.Ignore;
 
+@Ignore
 public class ErdosRenyiGraphRelationshipGeneratorTest extends TestCase {
 
     public void testDoGenerateEdges() {
