@@ -16,12 +16,12 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.manager.*;
+import com.graphaware.runtime.manager.TimerDrivenModuleManager;
+import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,25 +1,29 @@
 package com.graphaware.runtime.schedule;
 
-import com.graphaware.runtime.monitor.TransactionMonitor;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.GraphDatabaseAPI;
+import org.neo4j.kernel.impl.transaction.TxManager;
+
+import static com.graphaware.runtime.config.RuntimeConfiguration.INITIAL_TIMER_DELAY;
+import static com.graphaware.runtime.config.RuntimeConfiguration.TIMER_DELAY;
 
 /**
- * {@link TimingStrategy} that causes tasks to be scheduled adaptively based on busy/quiet periods measured by the
- * provided {@link TransactionMonitor}.
+ *
  */
 public class AdaptiveTimingStrategy implements TimingStrategy {
 
-    private final TransactionMonitor transactionMonitor;
+    private final TxManager transactionManager;
 
-    public AdaptiveTimingStrategy(TransactionMonitor transactionMonitor) {
-        this.transactionMonitor = transactionMonitor;
+    public AdaptiveTimingStrategy(GraphDatabaseService database) {
+        this.transactionManager = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency( TxManager.class );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public long nextDelay(long lastTaskDuration) {
-        //todo implement this
-        throw new UnsupportedOperationException("not yet implemented");
+        if (lastTaskDuration == -2) {
+            return INITIAL_TIMER_DELAY;
+        }
+        System.out.println("Committed tx: " + transactionManager.getCommittedTxCount());
+        return TIMER_DELAY;
     }
 }

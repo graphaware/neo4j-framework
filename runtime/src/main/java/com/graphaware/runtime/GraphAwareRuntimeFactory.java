@@ -8,6 +8,7 @@ import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
 import com.graphaware.runtime.module.BatchSupportingTxDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.GraphDatabaseAPI;
@@ -77,7 +78,8 @@ public final class GraphAwareRuntimeFactory {
     private static GraphAwareRuntime createProductionRuntime(GraphDatabaseService database, RuntimeConfiguration configuration) {
         ModuleMetadataRepository timerRepo = new ProductionSingleNodeMetadataRepository(database, configuration, TIMER_MODULES_PROPERTY_PREFIX);
         ModuleMetadataRepository txRepo = new ProductionSingleNodeMetadataRepository(database, configuration, TX_MODULES_PROPERTY_PREFIX);
-        TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo);
+
+        TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo,  new AdaptiveTimingStrategy(database));
         TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, txRepo);
 
         return new ProductionRuntime(database, txDrivenModuleManager, timerDrivenModuleManager);

@@ -4,12 +4,10 @@ import com.graphaware.runtime.metadata.DefaultTimerDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TimerDrivenModuleMetadata;
 import com.graphaware.runtime.module.TimerDrivenModule;
-import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import com.graphaware.runtime.schedule.RotatingTaskScheduler;
 import com.graphaware.runtime.schedule.TaskScheduler;
+import com.graphaware.runtime.schedule.TimingStrategy;
 import org.neo4j.graphdb.GraphDatabaseService;
-
-import static com.graphaware.runtime.config.RuntimeConfiguration.TIMER_DELAY;
 
 /**
  * Production implementation of {@link TimerDrivenModuleManager}. Must be backed by a {@link GraphDatabaseService},
@@ -26,11 +24,10 @@ public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerD
      * @param database           storing graph data.
      * @param metadataRepository for storing module metadata.
      */
-    public ProductionTimerDrivenModuleManager(GraphDatabaseService database, ModuleMetadataRepository metadataRepository) {
+    public ProductionTimerDrivenModuleManager(GraphDatabaseService database, ModuleMetadataRepository metadataRepository, TimingStrategy timingStrategy) {
         super(metadataRepository);
         this.database = database;
-
-        taskScheduler = new RotatingTaskScheduler(database, metadataRepository, new FixedDelayTimingStrategy(TIMER_DELAY));
+        taskScheduler = new RotatingTaskScheduler(database, metadataRepository, timingStrategy);
     }
 
     /**
