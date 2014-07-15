@@ -189,10 +189,6 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
             return false;
         }
 
-        if (!new LazyTransactionData(data).mutationsOccurred()) {
-            return false;
-        }
-
         synchronized (this) {
             switch (state) {
                 case NONE:

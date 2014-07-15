@@ -20,11 +20,11 @@ import com.graphaware.example.module.FriendshipStrengthCounter;
 import com.graphaware.example.module.FriendshipStrengthModule;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static org.junit.Assert.assertEquals;
@@ -44,6 +44,11 @@ public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
         runtime.registerModule(new FriendshipStrengthModule("FSM", database));
     }
 
+    @After
+    public void tearDown() {
+        database.shutdown();
+    }
+
     @Test
     public void totalFriendshipStrengthOnEmptyDatabaseShouldBeZero() {
         try (Transaction tx = database.beginTx()) {
@@ -57,6 +62,23 @@ public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
         new ExecutionEngine(database).execute("CREATE " +
                 "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
                 "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
+
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(3, new FriendshipStrengthCounter(database).getTotalFriendshipStrength());
+            tx.success();
+        }
+    }
+
+    @Test
+    public void totalFriendshipStrengthShouldBeCorrectlyCalculated2() {
+        try (Transaction tx = database.beginTx()) {
+            Node p1 = database.createNode(DynamicLabel.label("Person"));
+            Node p2 = database.createNode(DynamicLabel.label("Person"));
+            Node p3 = database.createNode(DynamicLabel.label("Person"));
+            p1.createRelationshipTo(p2, DynamicRelationshipType.withName("FRIEND_OF")).setProperty("strength", 1L);
+            p1.createRelationshipTo(p3, DynamicRelationshipType.withName("FRIEND_OF")).setProperty("strength", 2L);
+            tx.success();
+        }
 
         try (Transaction tx = database.beginTx()) {
             assertEquals(3, new FriendshipStrengthCounter(database).getTotalFriendshipStrength());
