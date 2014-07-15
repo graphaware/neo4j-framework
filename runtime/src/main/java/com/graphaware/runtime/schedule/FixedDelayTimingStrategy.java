@@ -9,6 +9,8 @@ import static com.graphaware.runtime.config.RuntimeConfiguration.*;
  */
 public class FixedDelayTimingStrategy implements TimingStrategy {
 
+    private static final long INITIAL_TIMER_DELAY = 1000;
+
     private final long delay;
 
     /**

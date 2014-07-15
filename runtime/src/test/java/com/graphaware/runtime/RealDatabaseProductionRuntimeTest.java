@@ -43,7 +43,10 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
  */
 public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
 
-    protected ModuleMetadataRepository timerRepo;
+    private static final int INITIAL_TIMER_DELAY = 1000;
+	private static final int TIMER_DELAY = 200;
+
+	protected ModuleMetadataRepository timerRepo;
 
     @Before
     public void setUp() {
@@ -481,7 +484,8 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
 
     }
 
-    protected Node getMetadataNode() {
+    @Override
+	protected Node getMetadataNode() {
         Node root = null;
 
         try (Transaction tx = database.beginTx()) {
@@ -500,7 +504,8 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         return root;
     }
 
-    protected Node createMetadataNode() {
+    @Override
+	protected Node createMetadataNode() {
         Node root;
 
         try (Transaction tx = database.beginTx()) {

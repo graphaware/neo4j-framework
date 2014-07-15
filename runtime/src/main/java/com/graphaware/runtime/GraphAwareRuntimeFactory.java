@@ -1,8 +1,18 @@
 package com.graphaware.runtime;
 
+import static com.graphaware.runtime.config.RuntimeConfiguration.TIMER_MODULES_PROPERTY_PREFIX;
+import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROPERTY_PREFIX;
+
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.GraphDatabaseAPI;
+
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.manager.*;
+import com.graphaware.runtime.manager.BatchModuleManager;
+import com.graphaware.runtime.manager.ProductionTimerDrivenModuleManager;
+import com.graphaware.runtime.manager.ProductionTxDrivenModuleManager;
+import com.graphaware.runtime.manager.TimerDrivenModuleManager;
+import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.metadata.BatchSingleNodeMetadataRepository;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
@@ -10,10 +20,6 @@ import com.graphaware.runtime.module.BatchSupportingTxDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.GraphDatabaseAPI;
-
-import static com.graphaware.runtime.config.RuntimeConfiguration.*;
 
 /**
  * Factory producing {@link GraphAwareRuntime}. This should be the only way a runtime is created.
@@ -79,7 +85,8 @@ public final class GraphAwareRuntimeFactory {
         ModuleMetadataRepository timerRepo = new ProductionSingleNodeMetadataRepository(database, configuration, TIMER_MODULES_PROPERTY_PREFIX);
         ModuleMetadataRepository txRepo = new ProductionSingleNodeMetadataRepository(database, configuration, TX_MODULES_PROPERTY_PREFIX);
 
-        TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo,  new AdaptiveTimingStrategy(database));
+        TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo,
+        		new AdaptiveTimingStrategy(database, 1000)); // TODO: make the default delay configurable, bearing in mind the tests
         TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, txRepo);
 
         return new ProductionRuntime(database, txDrivenModuleManager, timerDrivenModuleManager);
