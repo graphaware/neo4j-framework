@@ -54,14 +54,6 @@ public class EmbeddedDatabaseIntegration/*Test*/ {
 				.loadPropertiesFromFile("src/test/resources/test-neo4j.properties")
 				.newGraphDatabase();
 
-		// A write operation is necessary in a successful transaction or the module won't actually start!
-		// XXX: This seems well dodgy - is there anything we can do about this?
-		// comment this lot back in to get the test to pass
-//		try (Transaction transaction = database.beginTx()) {
-//			database.createNode().delete();
-//			transaction.success();
-//		}
-
 		try (Transaction transaction = database.beginTx()) {
 			ExecutionResult executionResult = new ExecutionEngine(database).execute(
 					String.format("MATCH (p:Person) WHERE p.%s > 0 RETURN p", RandomWalkerPageRankModule.PAGE_RANK_PROPERTY_KEY));
