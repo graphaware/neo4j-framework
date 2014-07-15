@@ -18,13 +18,15 @@ package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.helpers.Pair;
 import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.lifecycle.Lifecycle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +34,8 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.graphaware.runtime.GraphAwareRuntimeFactory.*;
+import static com.graphaware.runtime.GraphAwareRuntimeFactory.createRuntime;
+import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
 import static org.neo4j.helpers.Settings.*;
 
 /**
@@ -105,23 +108,26 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         LOG.info("GraphAware Runtime enabled, bootstrapping...");
 
-        GraphAwareRuntime runtime = createRuntime(database);
-
-        registerModules(runtime);
+        registerModules(createRuntime(database));
 
         LOG.info("GraphAware Runtime bootstrapped, starting the Runtime...");
 
-        startRuntime(runtime);
+        startRuntime();
 
         LOG.info("GraphAware Runtime automatically started.");
     }
 
-    private void startRuntime(final GraphAwareRuntime runtime) {
+    private void startRuntime() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 if (database.isAvailable(5 * 60 * 1000)) {
-                    runtime.start();
+                    try (Transaction tx = database.beginTx()) {
+                        //will trigger a tx because of label creation
+                        //it is a hack to prevent deadlocks
+                        database.createNode(DynamicLabel.label(GA_PREFIX + "AUTOSTART"));
+                        tx.failure();
+                    }
                 } else {
                     LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within 5 minutes.");
                 }

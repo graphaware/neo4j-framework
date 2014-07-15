@@ -57,7 +57,7 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      */
     @Override
     public Map<String, Object> beforeCommit(TransactionData data) throws Exception {
-        if (!tryToStartIfNotStarted()) {
+        if (!tryToStartIfNotStarted(data)) {
             return null;
         }
 

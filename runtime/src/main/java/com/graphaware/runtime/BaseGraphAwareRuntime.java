@@ -20,9 +20,11 @@ import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfigured;
 import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.ErrorState;
 import org.neo4j.graphdb.event.KernelEventHandler;
+import org.neo4j.graphdb.event.TransactionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,7 +179,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
      * @return <code>false</code> if the database isn't yet available or the runtime is currently starting,
      *         <code>true</code> if it's alright to delegate onto modules.
      */
-    protected final boolean tryToStartIfNotStarted() {
+    protected final boolean tryToStartIfNotStarted(TransactionData data) {
         //perf optimisation
         if (State.STARTED.equals(state)) {
             return true;
