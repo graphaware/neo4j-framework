@@ -24,7 +24,6 @@ import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 /**
@@ -57,7 +56,7 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      */
     @Override
     public Map<String, Object> beforeCommit(TransactionData data) throws Exception {
-        if (!tryToStartIfNotStarted(data)) {
+        if (isStarting()) {
             return null;
         }
 

@@ -42,6 +42,7 @@ public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
         runtime.registerModule(new FriendshipStrengthModule("FSM", database));
+        runtime.start();
     }
 
     @After

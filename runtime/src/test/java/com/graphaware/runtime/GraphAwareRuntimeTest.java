@@ -382,50 +382,6 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
     }
 
     @Test
-    public void allRegisteredInterestedModulesShouldBeDelegatedToWhenRuntimeIsNotExplicitlyStarted() {
-        T mockModule1 = mockTxModule(MOCK + "1");
-        T mockModule2 = mockTxModule(MOCK + "2");
-        T mockModule3 = mockTxModule(MOCK + "3", new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none()));
-
-        GraphAwareRuntime runtime = createRuntime();
-        runtime.registerModule(mockModule1);
-        runtime.registerModule(mockModule2);
-        runtime.registerModule(mockModule3);
-
-        //no explicit runtime start!
-        try (Transaction tx = getTransaction()) {
-            createNode();
-            tx.success();
-        }
-
-        verifyInitialization(mockModule1);
-        verifyInitialization(mockModule2);
-        verifyInitialization(mockModule3);
-
-        verifyStart(mockModule1);
-        verifyStart(mockModule2);
-        verifyStart(mockModule3);
-
-        verify(mockModule1, atLeastOnce()).getConfiguration();
-        verify(mockModule2, atLeastOnce()).getConfiguration();
-        verify(mockModule3, atLeastOnce()).getConfiguration();
-        verify(mockModule1, atLeastOnce()).getId();
-        verify(mockModule2, atLeastOnce()).getId();
-        verify(mockModule3, atLeastOnce()).getId();
-
-        verify(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
-        verify(mockModule1).afterCommit("TEST_" + MOCK + "1");
-        verify(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
-        verify(mockModule2).afterCommit("TEST_" + MOCK + "2");
-        verify(mockModule1, atLeastOnce()).getConfiguration();
-        verify(mockModule2, atLeastOnce()).getConfiguration();
-        verify(mockModule3, atLeastOnce()).getConfiguration();
-
-        //no interaction with module3, it is not interested!
-        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
-    }
-
-    @Test
     public void moduleThrowingInitExceptionShouldBeMarkedForReinitialization() {
         final TxDrivenModule mockModule = mockTxModule();
         when(mockModule.getConfiguration()).thenReturn(NullTxDrivenModuleConfiguration.getInstance());
@@ -660,19 +616,14 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
     }
 
-    @Test
-    public void runtimeShouldBeStartedAutomatically() {
-        final T mockModule = mockTxModule();
-
-        GraphAwareRuntime runtime = createRuntime();
-        runtime.registerModule(mockModule);
+    @Test(expected = RuntimeException.class)
+    public void whenRuntimeIsNotStartedExceptionShouldBeThrown() {
+        createRuntime();
 
         try (Transaction tx = getTransaction()) {
             createNode();
             tx.success();
         }
-
-        verifyInitialization(mockModule);
     }
 
     protected interface RuntimeConfiguredRuntimeModule extends TxDrivenModule, RuntimeConfigured {
