@@ -178,11 +178,15 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
      *         <code>true</code> if it's alright to delegate onto modules.
      */
     protected final boolean tryToStartIfNotStarted() {
+        //perf optimisation
+        if (State.STARTED.equals(state)) {
+            return true;
+        }
+
         if (!databaseAvailable()) {
             return false;
         }
 
-        //todo: is this a bottleneck? all transactions arrive here!
         synchronized (this) {
             switch (state) {
                 case NONE:
