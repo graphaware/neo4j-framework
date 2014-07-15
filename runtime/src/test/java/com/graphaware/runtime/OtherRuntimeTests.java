@@ -4,10 +4,7 @@ import com.graphaware.runtime.bootstrap.RuntimeKernelExtension;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.test.RepeatRule;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -40,6 +37,30 @@ public class OtherRuntimeTests {
         try (Transaction tx = database.beginTx()) {
             Node node = database.createNode(DynamicLabel.label("TEST"));
             node.setProperty("test", "test");
+            tx.success();
+        }
+
+        Thread.sleep(random.nextInt(200));
+
+        database.shutdown();
+    }
+
+    @Test(timeout = 5000)
+    @RepeatRule.Repeat(times = 100)
+    public void makeSureDeadlockDoesNotOccur1() throws InterruptedException {
+        GraphDatabaseService database = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
+                .newGraphDatabase();
+
+        Thread.sleep(random.nextInt(10));
+
+
+        try (Transaction tx = database.beginTx()) {
+            Node node1 = database.createNode();
+            node1.setProperty("name", "MB");
+            node1.addLabel(DynamicLabel.label("Person"));
+
             tx.success();
         }
 
