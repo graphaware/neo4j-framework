@@ -56,7 +56,7 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      * {@inheritDoc}
      */
     @Override
-    public final Map<String, Object> beforeCommit(TransactionData data) throws Exception {
+    public Map<String, Object> beforeCommit(TransactionData data) throws Exception {
         if (!tryToStartIfNotStarted()) {
             return null;
         }

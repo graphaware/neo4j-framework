@@ -19,8 +19,12 @@ package com.graphaware.runtime;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.runtime.monitor.TransactionMonitor;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.event.TransactionData;
+
+import java.util.Map;
 
 
 /**
@@ -34,6 +38,7 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
 
     private final GraphDatabaseService database;
     private final TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager;
+    private final TransactionMonitor transactionMonitor;
 
     /**
      * Construct a new runtime. Protected, please use {@link com.graphaware.runtime.GraphAwareRuntimeFactory}.
@@ -46,6 +51,14 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
         this.txDrivenModuleManager = txDrivenModuleManager;
         database.registerTransactionEventHandler(this);
         database.registerKernelEventHandler(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, Object> beforeCommit(TransactionData data) throws Exception {
+        return super.beforeCommit(data);
     }
 
     /**
