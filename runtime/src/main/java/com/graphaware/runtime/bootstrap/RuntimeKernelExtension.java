@@ -105,9 +105,28 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         LOG.info("GraphAware Runtime enabled, bootstrapping...");
 
-        registerModules(createRuntime(database));
+        GraphAwareRuntime runtime = createRuntime(database);
 
-        LOG.info("GraphAware Runtime bootstrapped.");
+        registerModules(runtime);
+
+        LOG.info("GraphAware Runtime bootstrapped, starting the Runtime...");
+
+        startRuntime(runtime);
+
+        LOG.info("GraphAware Runtime automatically started.");
+    }
+
+    private void startRuntime(final GraphAwareRuntime runtime) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (database.isAvailable(5 * 60 * 1000)) {
+                    runtime.start();
+                } else {
+                    LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within 5 minutes.");
+                }
+            }
+        }).start();
     }
 
     private void registerModules(GraphAwareRuntime runtime) {

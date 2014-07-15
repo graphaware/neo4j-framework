@@ -116,6 +116,26 @@ public class BootstrapIntegrationTest {
     }
 
     @Test
+    public void moduleShouldBeInitializedWhenRuntimeIsEnabledWithoutAnyTransactions() throws InterruptedException {
+        GraphDatabaseService database = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig(RUNTIME_ENABLED, "true")
+                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
+                .newGraphDatabase();
+
+        Thread.sleep(1000);
+
+        assertEquals(1, TEST_RUNTIME_MODULES.size());
+        assertTrue(TEST_RUNTIME_MODULES.get(0).isInitialized());
+        assertEquals("configValue", TEST_RUNTIME_MODULES.get(0).getConfig().get("configKey"));
+
+        database.shutdown();
+
+        assertFalse(TEST_RUNTIME_MODULES.get(0).isInitialized());
+    }
+
+    @Test
     public void moduleShouldBeInitializedWhenModuleIsDisabled() throws InterruptedException {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
