@@ -44,12 +44,10 @@ public class AdjacencyMatrixTest {
                 person.createRelationshipTo(colleague, relationshipType);
             }
 
-
-            System.out.println(mtx.get().toString());
+            System.out.println(mtx.getAdjacencyMatrix().toString());
+            System.out.println(mtx.getTransitionMatrix().toString());
             transaction.success();
         }
-
-
     }
 
     private static Node findOrCreateNode(Label label, String name, GraphDatabaseService database) {
