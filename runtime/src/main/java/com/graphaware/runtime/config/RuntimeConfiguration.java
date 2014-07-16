@@ -19,6 +19,8 @@ package com.graphaware.runtime.config;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.Label;
 
+import com.graphaware.runtime.schedule.TimingStrategy;
+
 /**
  * {@link com.graphaware.runtime.GraphAwareRuntime} configuration.
  */
@@ -52,4 +54,12 @@ public interface RuntimeConfiguration {
      * @return prefix of the form {@link #GA_PREFIX} + id + "_"
      */
     String createPrefix(String id);
+
+	/**
+	 * Provides a timing strategy to use for configuring the way in which timer-driven modules are managed.
+	 *
+	 * @return The {@link TimingStrategy} to use in the <code>GraphAwareRuntime</code>
+	 */
+	TimingStrategy provideTimingStrategy();
+
 }

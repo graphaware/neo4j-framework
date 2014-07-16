@@ -86,12 +86,12 @@ public class RotatingTaskScheduler implements TaskScheduler {
     /**
      * Schedule next task.
      *
-     * @param lastTaskDuration duration of the last task in nanoseconds, negative if unknown.
+     * @param lastTaskDurationNanos duration of the last task in nanoseconds, negative if unknown.
      */
-    private void scheduleNextTask(long lastTaskDuration) {
-        long delay = timingStrategy.nextDelay(lastTaskDuration);
-        LOG.debug("Scheduling next task with a delay of " + delay + " ms.");
-        worker.schedule(nextTask(), delay, TimeUnit.MILLISECONDS);
+    private void scheduleNextTask(long lastTaskDurationNanos) {
+        long nextDelayMillis = timingStrategy.nextDelay(lastTaskDurationNanos);
+        LOG.debug("Scheduling next task with a delay of " + nextDelayMillis + " ms.");
+        worker.schedule(nextTask(), nextDelayMillis, TimeUnit.MILLISECONDS);
     }
 
     /**

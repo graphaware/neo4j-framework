@@ -16,6 +16,9 @@
 
 package com.graphaware.runtime.config;
 
+import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
+import com.graphaware.runtime.schedule.TimingStrategy;
+
 /**
  * Default {@link RuntimeConfiguration} for {@link com.graphaware.runtime.GraphAwareRuntime}. Singleton.
  */
@@ -28,5 +31,12 @@ public final class DefaultRuntimeConfiguration extends BaseRuntimeConfiguration 
     }
 
     private DefaultRuntimeConfiguration() {
+    	// no instantiation permitted
     }
+
+	@Override
+	public TimingStrategy provideTimingStrategy() {
+		return new FixedDelayTimingStrategy(200);
+	}
+
 }

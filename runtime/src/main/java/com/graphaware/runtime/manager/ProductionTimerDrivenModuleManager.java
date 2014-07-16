@@ -1,12 +1,13 @@
 package com.graphaware.runtime.manager;
 
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.metadata.DefaultTimerDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TimerDrivenModuleMetadata;
 import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.schedule.RotatingTaskScheduler;
 import com.graphaware.runtime.schedule.TaskScheduler;
-import com.graphaware.runtime.schedule.TimingStrategy;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
@@ -23,11 +24,12 @@ public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerD
      *
      * @param database           storing graph data.
      * @param metadataRepository for storing module metadata.
+     * @param runtimeConfig      the {@link RuntimeConfiguration} of the Runtime in which this module manager works.
      */
-    public ProductionTimerDrivenModuleManager(GraphDatabaseService database, ModuleMetadataRepository metadataRepository, TimingStrategy timingStrategy) {
+    public ProductionTimerDrivenModuleManager(GraphDatabaseService database, ModuleMetadataRepository metadataRepository, RuntimeConfiguration runtimeConfig) {
         super(metadataRepository);
         this.database = database;
-        taskScheduler = new RotatingTaskScheduler(database, metadataRepository, timingStrategy);
+        taskScheduler = new RotatingTaskScheduler(database, metadataRepository, runtimeConfig.provideTimingStrategy());
     }
 
     /**

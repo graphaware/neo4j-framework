@@ -85,8 +85,7 @@ public final class GraphAwareRuntimeFactory {
         ModuleMetadataRepository timerRepo = new ProductionSingleNodeMetadataRepository(database, configuration, TIMER_MODULES_PROPERTY_PREFIX);
         ModuleMetadataRepository txRepo = new ProductionSingleNodeMetadataRepository(database, configuration, TX_MODULES_PROPERTY_PREFIX);
 
-        TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo,
-        		new AdaptiveTimingStrategy(database, 1000)); // TODO: make the default delay configurable, bearing in mind the tests
+        TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo, configuration);
         TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, txRepo);
 
         return new ProductionRuntime(database, txDrivenModuleManager, timerDrivenModuleManager);

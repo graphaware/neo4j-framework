@@ -16,6 +16,7 @@ public class AdaptiveTimingStrategy implements TimingStrategy {
 	private static final Logger LOG = LoggerFactory.getLogger(AdaptiveTimingStrategy.class);
 
 	private final TxManager transactionManager;
+	private final DelayAdjuster delayAdjuster;
 	private final long defaultDelayMillis;
 	private final int threshold;
 
@@ -30,6 +31,7 @@ public class AdaptiveTimingStrategy implements TimingStrategy {
 	 */
 	public AdaptiveTimingStrategy(GraphDatabaseService database, long defaultDelayMillis) {
 		this.transactionManager = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(TxManager.class);
+		this.delayAdjuster = new ConstantDeltaDelayAdjuster(100);
 		this.defaultDelayMillis = defaultDelayMillis;
 		this.threshold = 10; // TODO what constitutes busy?  Make this a configurable threshold
 		this.txCountAtPreviousInvocation = -1;
@@ -52,13 +54,7 @@ public class AdaptiveTimingStrategy implements TimingStrategy {
 			LOG.debug("First request for timing delay so returning default of: {}ms", defaultDelayMillis);
 			return defaultDelayMillis;
 		}
-		if (currentTxCount - txCountAtPreviousInvocation > threshold) {
-			// had a lot of transactions since last time so back off a bit
-			return delayAtPreviousInvocation + 100; //TODO: introduce a mechanism with which the delay adjustment can be discerned
-		}
-		// no significant increase so let's get aggressive!
-		return delayAtPreviousInvocation - 100;
-
+		return delayAdjuster.determineNextDelay(delayAtPreviousInvocation, currentTxCount - txCountAtPreviousInvocation, threshold);
 	}
 
 }
