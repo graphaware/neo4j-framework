@@ -29,8 +29,6 @@ public class RandomWalkerPageRankModuleBootstrapper implements RuntimeModuleBoot
 	public RandomWalkerPageRankModule bootstrapModule(String moduleId, Map<String, String> configParams, GraphDatabaseService database) {
 		LOG.info("Constructing new module with ID: {}", moduleId);
 		LOG.trace("Configuration parameter map is: {}", configParams);
-		// TODO: it'd be nice if we could somehow control the runtime's scheduling too, but that's probably not a job for here
-		// MB: agreed, that's runtime config
 
 		// parse Cypher-like expressions to configure inclusion strategies
 		InclusionStrategy<Node> nodeInclusionStrategy = configParams.containsKey("inclusionStrategy.node")
