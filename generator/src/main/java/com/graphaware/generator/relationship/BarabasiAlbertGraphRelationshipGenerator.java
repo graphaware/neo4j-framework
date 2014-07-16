@@ -40,6 +40,9 @@ public class BarabasiAlbertGraphRelationshipGenerator extends BaseRelationshipGe
         CompleteGraphRelationshipGenerator coreGenerator = new CompleteGraphRelationshipGenerator(new NumberOfNodes(edgesPerNewNode + 1));
         List<SameTypePair<Integer>> edges = coreGenerator.doGenerateEdges();
 
+
+        System.out.println(edges);
+
         // Degree list of the network
         ArrayList<Integer> degrees = new ArrayList<>();
 
@@ -61,7 +64,6 @@ public class BarabasiAlbertGraphRelationshipGenerator extends BaseRelationshipGe
                 while(true)
                 {
                     int target = randomIndexChoice.randomIndexChoice(degrees.size());//reservoirSampler.randomIndexChoice(degrees, omit); // find a target
-
                     if( omit.contains(degrees.get(target)))
                         continue;
 
