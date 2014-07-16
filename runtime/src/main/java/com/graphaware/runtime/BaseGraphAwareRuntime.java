@@ -20,11 +20,9 @@ import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfigured;
 import com.graphaware.runtime.module.RuntimeModule;
-import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.ErrorState;
 import org.neo4j.graphdb.event.KernelEventHandler;
-import org.neo4j.graphdb.event.TransactionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,42 +172,31 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
     protected abstract void cleanupMetadata(Set<String> usedModules);
 
     /**
-     * Checks to see if this {@link GraphAwareRuntime} has <b>NOT</b> yet been started, starting it if necessary and possible.
+     * Checks to see if this {@link GraphAwareRuntime} is starting.
      *
-     * @return <code>false</code> if the database isn't yet available or the runtime is currently starting,
-     *         <code>true</code> if it's alright to delegate onto modules.
+     * @return <code>true</code> iff the runtime is currently starting,
+     *         <code>false</code> if it's alright to delegate onto modules.
+     * @throws IllegalStateException in case the runtime isn't started or starting.
      */
-    protected final boolean tryToStartIfNotStarted(TransactionData data) {
+    protected final boolean isStarting() {
         //perf optimisation
         if (State.STARTED.equals(state)) {
-            return true;
-        }
-
-        if (!databaseAvailable()) {
             return false;
         }
 
         synchronized (this) {
             switch (state) {
                 case NONE:
-                    start();
-                    return true;
+                    throw new IllegalStateException("Runtime has not been started!");
                 case STARTING:
-                    return false;
-                case STARTED:
                     return true;
+                case STARTED:
+                    return false;
                 default:
                     throw new IllegalStateException("Unknown GraphAware Runtime state. This is a bug.");
             }
         }
     }
-
-    /**
-     * Find out whether the database is available and ready for use.
-     *
-     * @return true iff the database is ready.
-     */
-    protected abstract boolean databaseAvailable();
 
     /**
      * {@inheritDoc}

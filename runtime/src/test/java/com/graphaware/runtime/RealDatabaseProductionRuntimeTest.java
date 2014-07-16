@@ -269,43 +269,6 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
     }
 
     @Test
-    public void allRegisteredInterestedTimerModulesShouldBeDelegatedToWhenRuntimeNotExplicitlyStarted() throws InterruptedException {
-        TimerDrivenModule mockModule1 = mockTimerModule(MOCK + "1");
-        TimerDrivenModule mockModule2 = mockTimerModule(MOCK + "2");
-        TimerDrivenModule mockModule3 = mockTimerModule(MOCK + "3");
-
-        GraphAwareRuntime runtime = createRuntime();
-        runtime.registerModule(mockModule1);
-        runtime.registerModule(mockModule2);
-        runtime.registerModule(mockModule3);
-
-        //no explicit runtime start!
-        try (Transaction tx = getTransaction()) {
-            createNode();
-            tx.success();
-        }
-
-        verify(mockModule1, atLeastOnce()).getId();
-        verify(mockModule2, atLeastOnce()).getId();
-        verify(mockModule3, atLeastOnce()).getId();
-        verify(mockModule1).createInitialContext(database);
-        verify(mockModule2).createInitialContext(database);
-        verify(mockModule3).createInitialContext(database);
-        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
-
-        Thread.sleep(INITIAL_TIMER_DELAY + 5 * TIMER_DELAY - 100);
-
-        verify(mockModule1, atLeastOnce()).getId();
-        verify(mockModule2, atLeastOnce()).getId();
-        verify(mockModule3, atLeastOnce()).getId();
-        verify(mockModule1, times(2)).doSomeWork(null, database);
-        verify(mockModule2, times(2)).doSomeWork(null, database);
-        verify(mockModule3).doSomeWork(null, database);
-
-        verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
-    }
-
-    @Test
     public void lastContextShouldBePresentedInNextCallAndPersisted() throws InterruptedException {
         TimerDrivenModuleContext<Node> firstContext = new NodeBasedContext(1);
         TimerDrivenModuleContext<Node> secondContext = new NodeBasedContext(2);

@@ -70,14 +70,6 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
      * {@inheritDoc}
      */
     @Override
-    protected boolean databaseAvailable() {
-        return database.isAvailable(0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected Transaction startTransaction() {
         return database.beginTx();
     }

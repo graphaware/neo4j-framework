@@ -95,6 +95,8 @@ public class BatchTransactionData implements TransactionData {
             for (TransactionEventHandler handler : transactionEventHandlers) {
                 try {
                     states.add(handler.beforeCommit(this));
+                } catch (RuntimeException e) {
+                    throw e;
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }

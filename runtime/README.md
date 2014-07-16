@@ -76,14 +76,13 @@ Module registered with the Runtime with ID equal to "FSM".
 
 ### Using GraphAware Runtime (Embedded Mode)
 
-To use the runtime and modules programmatically, all we need to do is instantiate the runtime and register the module with it:
+To use the runtime and modules programmatically, all we need to do is instantiate the runtime, register the module with it,
+and start the runtime:
 
 ```java
 GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //replace with a real DB
 GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
 runtime.registerModule(new FriendshipStrengthModule("FSM", database));
-
-//optionally start the runtime - it will start automatically if this isn't done
 runtime.start();
 ```
 
