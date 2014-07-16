@@ -1,8 +1,5 @@
 package com.graphaware.runtime.schedule;
 
-import com.graphaware.runtime.config.RuntimeConfiguration;
-
-import static com.graphaware.runtime.config.RuntimeConfiguration.*;
 
 /**
  * {@link TimingStrategy} that causes tasks to be scheduled in regular intervals.
@@ -32,4 +29,5 @@ public class FixedDelayTimingStrategy implements TimingStrategy {
         }
         return delay;
     }
+
 }

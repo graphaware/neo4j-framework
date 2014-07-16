@@ -18,11 +18,17 @@ package com.graphaware.runtime;
 
 import com.graphaware.common.util.IterableUtils;
 import com.graphaware.common.util.PropertyContainerUtils;
+import com.graphaware.runtime.config.BaseRuntimeConfiguration;
+import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
+import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
+
 import org.junit.Test;
 import org.neo4j.graphdb.*;
 
@@ -39,9 +45,20 @@ public abstract class DatabaseRuntimeTest extends GraphAwareRuntimeTest {
 
     protected abstract Node getMetadataNode();
 
-    protected GraphAwareRuntime createRuntime() {
-        return GraphAwareRuntimeFactory.createRuntime(database);
+    @Override
+	protected GraphAwareRuntime createRuntime() {
+        return GraphAwareRuntimeFactory.createRuntime(database, createTestRuntimeConfiguration());
     }
+
+	/**
+	 * Constructs a new {@link RuntimeConfiguration} for use in the tests.  Individual tests are free to override this without
+	 * any need to call <code>super</code>.
+	 *
+	 * @return The {@link RuntimeConfiguration} to use for constructing the test {@link GraphAwareRuntime}
+	 */
+	protected RuntimeConfiguration createTestRuntimeConfiguration() {
+		return DefaultRuntimeConfiguration.getInstance();
+	}
 
     @Override
     protected TxDrivenModule mockTxModule() {
@@ -62,7 +79,8 @@ public abstract class DatabaseRuntimeTest extends GraphAwareRuntimeTest {
         return mockModule;
     }
 
-    protected Transaction getTransaction() {
+    @Override
+	protected Transaction getTransaction() {
         return database.beginTx();
     }
 
@@ -86,7 +104,8 @@ public abstract class DatabaseRuntimeTest extends GraphAwareRuntimeTest {
         return database.createNode(labels);
     }
 
-    protected void shutdown() {
+    @Override
+	protected void shutdown() {
         database.shutdown();
     }
 

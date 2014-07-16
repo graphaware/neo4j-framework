@@ -24,10 +24,10 @@ public class AdaptiveTimingStrategy implements TimingStrategy {
 	private long delayAtPreviousInvocation;
 
 	/**
-	 * Work in progress...
+	 * Constructs a new {@link AdaptiveTimingStrategy} based on the given argument.
 	 *
-	 * @param database
-	 * @param defaultDelayMillis
+	 * @param database The {@link GraphDatabaseService} to monitor for activity and adapt accordingly
+	 * @param defaultDelayMillis The default initial timing delay in milliseconds
 	 */
 	public AdaptiveTimingStrategy(GraphDatabaseService database, long defaultDelayMillis) {
 		this.transactionManager = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(TxManager.class);

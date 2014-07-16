@@ -4,7 +4,6 @@ import com.graphaware.common.util.Pair;
 import com.graphaware.runtime.metadata.DefaultTimerDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TimerDrivenModuleContext;
-import com.graphaware.runtime.metadata.TimerDrivenModuleMetadata;
 import com.graphaware.runtime.module.TimerDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;

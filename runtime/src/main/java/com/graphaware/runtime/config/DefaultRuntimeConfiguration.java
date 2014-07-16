@@ -16,7 +16,9 @@
 
 package com.graphaware.runtime.config;
 
-import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
+import org.neo4j.graphdb.GraphDatabaseService;
+
+import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
 
 /**
@@ -35,8 +37,8 @@ public final class DefaultRuntimeConfiguration extends BaseRuntimeConfiguration 
     }
 
 	@Override
-	public TimingStrategy provideTimingStrategy() {
-		return new FixedDelayTimingStrategy(200);
+	public TimingStrategy provideTimingStrategy(GraphDatabaseService graphDatabaseService) {
+		return new AdaptiveTimingStrategy(graphDatabaseService, 200); //TODO: this and the threshold need to be made configurable
 	}
 
 }

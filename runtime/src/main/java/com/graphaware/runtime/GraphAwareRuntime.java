@@ -1,9 +1,6 @@
 package com.graphaware.runtime;
 
 import com.graphaware.runtime.module.RuntimeModule;
-import com.graphaware.runtime.module.RuntimeModule;
-import org.neo4j.graphdb.event.KernelEventHandler;
-import org.neo4j.graphdb.event.TransactionEventHandler;
 
 /**
  * Runtime that delegates to registered {@link com.graphaware.runtime.module.RuntimeModule}s to perform useful work.

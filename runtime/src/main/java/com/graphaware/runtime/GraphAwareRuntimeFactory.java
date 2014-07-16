@@ -18,7 +18,6 @@ import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
 import com.graphaware.runtime.module.BatchSupportingTxDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
-import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 
 /**

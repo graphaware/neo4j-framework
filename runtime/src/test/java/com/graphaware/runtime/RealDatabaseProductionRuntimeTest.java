@@ -16,13 +16,18 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.runtime.config.BaseRuntimeConfiguration;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.metadata.*;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
+import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,6 +63,16 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
     @After
     public void tearDown() {
         database.shutdown();
+    }
+
+    @Override
+    protected RuntimeConfiguration createTestRuntimeConfiguration() {
+    	return new BaseRuntimeConfiguration() {
+			@Override
+			public TimingStrategy provideTimingStrategy(GraphDatabaseService graphDatabaseService) {
+				return new FixedDelayTimingStrategy(TIMER_DELAY);
+			}
+		};
     }
 
     private TimerDrivenModule mockTimerModule() {

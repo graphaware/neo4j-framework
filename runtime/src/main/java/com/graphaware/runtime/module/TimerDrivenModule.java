@@ -1,7 +1,6 @@
 package com.graphaware.runtime.module;
 
 import com.graphaware.runtime.metadata.TimerDrivenModuleContext;
-import com.graphaware.runtime.metadata.TimerDrivenModuleMetadata;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**

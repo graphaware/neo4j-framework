@@ -29,7 +29,7 @@ public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerD
     public ProductionTimerDrivenModuleManager(GraphDatabaseService database, ModuleMetadataRepository metadataRepository, RuntimeConfiguration runtimeConfig) {
         super(metadataRepository);
         this.database = database;
-        taskScheduler = new RotatingTaskScheduler(database, metadataRepository, runtimeConfig.provideTimingStrategy());
+        taskScheduler = new RotatingTaskScheduler(database, metadataRepository, runtimeConfig.provideTimingStrategy(database));
     }
 
     /**
