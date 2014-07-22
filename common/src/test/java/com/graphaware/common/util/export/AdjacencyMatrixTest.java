@@ -1,9 +1,11 @@
 package com.graphaware.common.util.export;
 
+import com.graphaware.common.util.testing.PageRank;
 import org.junit.Test;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.Pair;
 import org.neo4j.test.TestGraphDatabaseFactory;
+
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +18,6 @@ public class AdjacencyMatrixTest {
     {
 
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        AdjacencyMatrix mtx = new AdjacencyMatrix(database);
 
         List<Pair<String, String>> folks = new LinkedList<Pair<String, String>>() {
             {
@@ -35,6 +36,7 @@ public class AdjacencyMatrixTest {
         };
 
         try (org.neo4j.graphdb.Transaction transaction = database.beginTx()) {
+
             Label personLabel = DynamicLabel.label("Person");
             DynamicRelationshipType relationshipType = DynamicRelationshipType.withName("BOSS_OF");
 
@@ -44,9 +46,18 @@ public class AdjacencyMatrixTest {
                 person.createRelationshipTo(colleague, relationshipType);
             }
 
+            AdjacencyMatrix mtx = new AdjacencyMatrix(database);
+            PageRank pageRank = new PageRank();
+
+
             System.out.println(mtx.getAdjacencyMatrix().toString());
             System.out.println(mtx.getTransitionMatrix().toString());
             transaction.success();
+
+            // ------- calculate the page rank ----------
+            System.out.println(pageRank.getPageRank(mtx, 0.85).toString());
+
+
         }
     }
 

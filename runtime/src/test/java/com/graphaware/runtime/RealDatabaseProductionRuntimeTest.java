@@ -276,7 +276,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         runtime.registerModule(mockModule2);
         runtime.registerModule(mockModule3);
 
-        //no explicit runtime start!
+        //no testing runtime start!
         try (Transaction tx = getTransaction()) {
             createNode();
             tx.success();

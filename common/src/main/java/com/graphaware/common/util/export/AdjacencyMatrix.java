@@ -1,5 +1,7 @@
 package com.graphaware.common.util.export;
 
+import org.la4j.factory.CRSFactory;
+import org.la4j.factory.Factory;
 import org.la4j.matrix.Matrix;
 import org.la4j.matrix.sparse.CRSMatrix;
 import org.neo4j.graphdb.*;
@@ -15,12 +17,16 @@ import java.util.HashMap;
  * WARNING: This is for testing purposes only and should not
  *          be executed on a regular basis.
  *
- * TODO: Use la4j for internal matrix storage to allow for sparse matrices?
  * TODO: Allow for directed edges?
+ * TODO: Return the index <-> node map as well. Possibly return a pair, or some custom class?
+ *       UPDATE: this is done by a simple workaround now not to waste time on this too much,
+ *               but it could be definitelly more cleaner.
+ * 
  */
 
-public class AdjacencyMatrix{
+public class AdjacencyMatrix {
     private final GraphDatabaseService database;
+    private HashMap<Node, Integer> indexMap; // matrix index <-> node pairs
 
     public AdjacencyMatrix(GraphDatabaseService database) {
         this.database = database;
@@ -52,7 +58,6 @@ public class AdjacencyMatrix{
             if(!matrixIndices.containsKey(origin)) {
                 matrixIndices.put(origin, discoveredIndex);
                 originIndex = discoveredIndex;
-//                System.out.println(origin.toString() + " " + originIndex);
                 discoveredIndex ++;
             }else
                 originIndex = matrixIndices.get(origin);
@@ -65,17 +70,15 @@ public class AdjacencyMatrix{
                    if (!matrixIndices.containsKey(target)) {
                        matrixIndices.put(target, discoveredIndex);
                        targetIndex = discoveredIndex;
-//                       System.out.println(target.toString() + " " + targetIndex);
                        discoveredIndex ++;
                    } else
                        targetIndex = matrixIndices.get(target);
 
-//                  System.out.println(targetIndex + " : " + originIndex);
                   adjacency.set(originIndex, targetIndex, 1);
                   adjacency.set(targetIndex, originIndex, 1);
              }
         }
-
+        this.indexMap = matrixIndices; // TODO: Work around doing this.
         return adjacency;
     }
 
@@ -93,7 +96,7 @@ public class AdjacencyMatrix{
         int targetIndex;
 
         // TODO: avoid iterating over all nodes to obtain the length, or find a dynamic sparse matrix storage
-        for (Node node : nodes)
+        for (Node ignored : nodes)
             length ++;
 
         CRSMatrix adjacency = new CRSMatrix(length, length);
@@ -104,7 +107,6 @@ public class AdjacencyMatrix{
             if(!matrixIndices.containsKey(origin)) {
                 matrixIndices.put(origin, discoveredIndex);
                 originIndex = discoveredIndex;
-//                System.out.println(origin.toString() + " " + originIndex);
                 discoveredIndex ++;
             }else
                 originIndex = matrixIndices.get(origin);
@@ -118,18 +120,47 @@ public class AdjacencyMatrix{
                 if (!matrixIndices.containsKey(target)) {
                     matrixIndices.put(target, discoveredIndex);
                     targetIndex = discoveredIndex;
-//                       System.out.println(target.toString() + " " + targetIndex);
                     discoveredIndex ++;
                 } else
                     targetIndex = matrixIndices.get(target);
 
-//                  System.out.println(targetIndex + " : " + originIndex);
                 adjacency.set(originIndex, targetIndex, 1.0/ ((float) target.getDegree()));
                 adjacency.set(targetIndex, originIndex, 1.0/ ((float) origin.getDegree()));
             }
         }
 
+        this.indexMap = matrixIndices; // TODO: Work around doing this.
         return adjacency;
+    }
 
+    /**
+     * Returns a google matrix given the specified damping constant.
+     * The Google matrix is an iterative mtx for the pageRank algorithm.
+     *
+     * See.: The Anatomy of a Large-Scale Hypertextual Web Search Engine by Brin & Page
+     *
+     * @return Google matrix of the database, given the damping
+     */
+    public Matrix getGoogleMatrix(double damping) {
+        Factory matrixFactory = new CRSFactory();
+
+        Matrix transitionMatrix = getTransitionMatrix();
+        int size = transitionMatrix.rows();
+        Matrix identityMatrix =  matrixFactory.createIdentityMatrix(size);
+
+
+        // return delta_ij * (1-d) / N + d*T_ij
+        return identityMatrix.multiply((1-damping)/((float) size)).add(transitionMatrix.multiply(damping));
+
+    }
+
+    /**
+     * Returns an node <-> index map. This is useful to identify the indices with
+     * Node objects in Page Rank algorithm.
+     * @return
+     */
+    public HashMap<Node, Integer> getIndexMap()
+    {
+        return indexMap;
     }
 }
