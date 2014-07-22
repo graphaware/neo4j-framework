@@ -17,7 +17,9 @@
 package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.config.Neo4jConfigBasedRuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.helpers.Pair;
@@ -107,7 +109,7 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         LOG.info("GraphAware Runtime enabled, bootstrapping...");
 
-        GraphAwareRuntime runtime = createRuntime(database);
+        GraphAwareRuntime runtime = createRuntime(database, new Neo4jConfigBasedRuntimeConfiguration(config));
 
         startWhenDatabaseAvailable(runtime);
 
