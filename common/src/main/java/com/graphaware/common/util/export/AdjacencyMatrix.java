@@ -7,7 +7,9 @@ import org.la4j.matrix.sparse.CRSMatrix;
 import org.neo4j.graphdb.*;
 import org.neo4j.tooling.GlobalGraphOperations;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * EXPERIMENTAL - WORK IN PROGRESS
@@ -26,7 +28,7 @@ import java.util.HashMap;
 
 public class AdjacencyMatrix {
     private final GraphDatabaseService database;
-    private HashMap<Node, Integer> indexMap; // matrix index <-> node pairs
+    private ArrayList<Node> indexMap; // matrix index <-> node pairs
 
     public AdjacencyMatrix(GraphDatabaseService database) {
         this.database = database;
@@ -39,6 +41,7 @@ public class AdjacencyMatrix {
      */
     public Matrix getAdjacencyMatrix() {
         Iterable<Node> nodes = GlobalGraphOperations.at(database).getAllNodes();
+        indexMap = new ArrayList<>();
         HashMap<Node, Integer> matrixIndices = new HashMap<>();
 
         int length = 0;
@@ -57,6 +60,7 @@ public class AdjacencyMatrix {
 
             if(!matrixIndices.containsKey(origin)) {
                 matrixIndices.put(origin, discoveredIndex);
+                indexMap.add(origin);
                 originIndex = discoveredIndex;
                 discoveredIndex ++;
             }else
@@ -69,6 +73,7 @@ public class AdjacencyMatrix {
 
                    if (!matrixIndices.containsKey(target)) {
                        matrixIndices.put(target, discoveredIndex);
+                       indexMap.add(target);
                        targetIndex = discoveredIndex;
                        discoveredIndex ++;
                    } else
@@ -78,7 +83,6 @@ public class AdjacencyMatrix {
                   adjacency.set(targetIndex, originIndex, 1);
              }
         }
-        this.indexMap = matrixIndices; // TODO: Work around doing this.
         return adjacency;
     }
 
@@ -88,6 +92,7 @@ public class AdjacencyMatrix {
      */
     public Matrix getTransitionMatrix() {
         Iterable<Node> nodes = GlobalGraphOperations.at(database).getAllNodes();
+        indexMap = new ArrayList<>();
         HashMap<Node, Integer> matrixIndices = new HashMap<>();
 
         int length = 0;
@@ -106,6 +111,7 @@ public class AdjacencyMatrix {
 
             if(!matrixIndices.containsKey(origin)) {
                 matrixIndices.put(origin, discoveredIndex);
+                indexMap.add(origin);
                 originIndex = discoveredIndex;
                 discoveredIndex ++;
             }else
@@ -119,6 +125,7 @@ public class AdjacencyMatrix {
 
                 if (!matrixIndices.containsKey(target)) {
                     matrixIndices.put(target, discoveredIndex);
+                    indexMap.add(target);
                     targetIndex = discoveredIndex;
                     discoveredIndex ++;
                 } else
@@ -129,7 +136,6 @@ public class AdjacencyMatrix {
             }
         }
 
-        this.indexMap = matrixIndices; // TODO: Work around doing this.
         return adjacency;
     }
 
@@ -159,8 +165,7 @@ public class AdjacencyMatrix {
      * Node objects in Page Rank algorithm.
      * @return
      */
-    public HashMap<Node, Integer> getIndexMap()
-    {
+    public ArrayList<Node> getIndexMap() {
         return indexMap;
     }
 }

@@ -56,6 +56,8 @@ public class AdjacencyMatrixTest {
 
             // ------- calculate the page rank ----------
             System.out.println(pageRank.getPageRank(mtx, 0.85).toString());
+            System.out.println("The highest PageRank in the network has: " + mtx.getIndexMap().get(1).getProperty("name").toString());
+
 
 
         }
