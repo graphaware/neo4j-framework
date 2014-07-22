@@ -16,15 +16,13 @@
 
 package com.graphaware.runtime.config;
 
-import org.neo4j.graphdb.GraphDatabaseService;
-
-import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
-import com.graphaware.runtime.schedule.TimingStrategy;
+import com.graphaware.runtime.bootstrap.ComponentFactory;
+import com.graphaware.runtime.bootstrap.DefaultImplementationComponentFactory;
 
 /**
  * Default {@link RuntimeConfiguration} for {@link com.graphaware.runtime.GraphAwareRuntime}. Singleton.
  */
-public final class DefaultRuntimeConfiguration extends BaseRuntimeConfiguration {
+public final class DefaultRuntimeConfiguration extends BaseRuntimeConfiguration implements ScheduleConfiguration {
 
     public static final DefaultRuntimeConfiguration INSTANCE = new DefaultRuntimeConfiguration();
 
@@ -36,9 +34,34 @@ public final class DefaultRuntimeConfiguration extends BaseRuntimeConfiguration 
     	// no instantiation permitted
     }
 
+    @Override
+    public long defaultDelayMillis() {
+    	return 2000L;
+    }
+
+    @Override
+    public long minimumDelayMillis() {
+    	return 0L;
+    }
+
+    @Override
+    public long maximumDelayMillis() {
+    	return 10_000L;
+    }
+
+    @Override
+    public int databaseActivityThreshold() {
+    	return 10; // number of transactions between timer-driven module invocations
+    }
+
+    @Override
+    public ScheduleConfiguration getScheduleConfiguration() {
+    	return this;
+    }
+
 	@Override
-	public TimingStrategy provideTimingStrategy(GraphDatabaseService graphDatabaseService) {
-		return new AdaptiveTimingStrategy(graphDatabaseService, 200, 10); //TODO: this and the threshold need to be made configurable
+	public ComponentFactory getComponentFactory() {
+		return new DefaultImplementationComponentFactory();
 	}
 
 }

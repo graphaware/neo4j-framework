@@ -1,5 +1,7 @@
 package com.graphaware.runtime.manager;
 
+import org.neo4j.graphdb.GraphDatabaseService;
+
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.metadata.DefaultTimerDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
@@ -7,8 +9,7 @@ import com.graphaware.runtime.metadata.TimerDrivenModuleMetadata;
 import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.schedule.RotatingTaskScheduler;
 import com.graphaware.runtime.schedule.TaskScheduler;
-
-import org.neo4j.graphdb.GraphDatabaseService;
+import com.graphaware.runtime.schedule.TimingStrategy;
 
 /**
  * Production implementation of {@link TimerDrivenModuleManager}. Must be backed by a {@link GraphDatabaseService},
@@ -20,16 +21,16 @@ public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerD
     private final TaskScheduler taskScheduler;
 
     /**
-     * Construct a new manager.
+     * Constructs a new {@link ProductionTimerDrivenModuleManager} based on the given arguments.
      *
      * @param database           storing graph data.
      * @param metadataRepository for storing module metadata.
-     * @param runtimeConfig      the {@link RuntimeConfiguration} of the Runtime in which this module manager works.
+     * @param timingStrategy     the {@link TimingStrategy} to use for scheduling the timer-driven modules.
      */
-    public ProductionTimerDrivenModuleManager(GraphDatabaseService database, ModuleMetadataRepository metadataRepository, RuntimeConfiguration runtimeConfig) {
-        super(metadataRepository);
-        this.database = database;
-        taskScheduler = new RotatingTaskScheduler(database, metadataRepository, runtimeConfig.provideTimingStrategy(database));
+    public ProductionTimerDrivenModuleManager(GraphDatabaseService database, ModuleMetadataRepository metadataRepository, TimingStrategy timingStrategy) {
+    	super(metadataRepository);
+    	this.database = database;
+    	taskScheduler = new RotatingTaskScheduler(database, metadataRepository, timingStrategy);
     }
 
     /**

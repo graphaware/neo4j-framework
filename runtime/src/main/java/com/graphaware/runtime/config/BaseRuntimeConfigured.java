@@ -19,7 +19,6 @@ package com.graphaware.runtime.config;
 /**
  * Convenience base-class for {@link RuntimeConfigured} components.
  */
-@SuppressWarnings("UnusedDeclaration") //used by GraphAware modules
 public abstract class BaseRuntimeConfigured implements RuntimeConfigured {
 
     private RuntimeConfiguration configuration;

@@ -16,10 +16,12 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.runtime.bootstrap.ComponentFactory;
 import com.graphaware.runtime.config.BaseRuntimeConfiguration;
 import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
+import com.graphaware.runtime.config.ScheduleConfiguration;
 import com.graphaware.runtime.metadata.*;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.TimerDrivenModule;
@@ -67,12 +69,20 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
 
     @Override
     protected RuntimeConfiguration createTestRuntimeConfiguration() {
+    	final ComponentFactory componentFactory = mock(ComponentFactory.class);
+    	stub(componentFactory.createTimingStrategy(database, null)).toReturn(new FixedDelayTimingStrategy(TIMER_DELAY));
+
     	return new BaseRuntimeConfiguration() {
-			@Override
-			public TimingStrategy provideTimingStrategy(GraphDatabaseService graphDatabaseService) {
-				return new FixedDelayTimingStrategy(TIMER_DELAY);
+    		@Override
+			public ScheduleConfiguration getScheduleConfiguration() {
+				return null; // not actually being used for this test
 			}
-		};
+
+			@Override
+			public ComponentFactory getComponentFactory() {
+				return componentFactory;
+			}
+    	};
     }
 
     private TimerDrivenModule mockTimerModule() {
@@ -202,7 +212,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         verify(mockModule3).createInitialContext(database);
         verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
 
-        Thread.sleep(INITIAL_TIMER_DELAY + 5 * TIMER_DELAY - 100);
+        Thread.sleep(INITIAL_TIMER_DELAY + 5 * TIMER_DELAY - 50);
 
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();

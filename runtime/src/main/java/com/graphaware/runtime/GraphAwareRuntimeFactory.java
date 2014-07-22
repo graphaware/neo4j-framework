@@ -18,6 +18,7 @@ import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
 import com.graphaware.runtime.module.BatchSupportingTxDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 
 /**
@@ -84,7 +85,9 @@ public final class GraphAwareRuntimeFactory {
         ModuleMetadataRepository timerRepo = new ProductionSingleNodeMetadataRepository(database, configuration, TIMER_MODULES_PROPERTY_PREFIX);
         ModuleMetadataRepository txRepo = new ProductionSingleNodeMetadataRepository(database, configuration, TX_MODULES_PROPERTY_PREFIX);
 
-        TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo, configuration);
+        TimingStrategy timingStrategy = configuration.getComponentFactory()
+        		.createTimingStrategy(database, configuration.getScheduleConfiguration());
+        TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo, timingStrategy);
         TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, txRepo);
 
         return new ProductionRuntime(database, txDrivenModuleManager, timerDrivenModuleManager);

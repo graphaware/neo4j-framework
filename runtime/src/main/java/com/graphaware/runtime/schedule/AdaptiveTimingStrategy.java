@@ -6,6 +6,8 @@ import org.neo4j.kernel.impl.transaction.TxManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.graphaware.runtime.config.ScheduleConfiguration;
+
 /**
  * Implementation of {@link TimingStrategy} that pays attention to the current level of activity in the database in order to
  * decide how long to wait before scheduling the next task.
@@ -24,19 +26,17 @@ public class AdaptiveTimingStrategy implements TimingStrategy {
 	private long delayAtPreviousInvocation;
 
 	/**
-	 * Constructs a new {@link AdaptiveTimingStrategy} based on the given argument.
+	 * Constructs a new {@link AdaptiveTimingStrategy} based on the activity in the given database and tuned with the specified
+	 * configuration settings.
 	 *
 	 * @param database The {@link GraphDatabaseService} to monitor for activity and adapt accordingly.
-	 * @param defaultDelayMillis The default initial timing delay in milliseconds.
-	 * @param txDeltaThreshold A setting related to the number of transactions happening between invocations of
-	 *        {@link #nextDelay(long)} that determines how many transactions between invocations is required to constitute a
-	 *        busy period of activity.  The higher the number, the more throughput is needed to constitute busy.
+	 * @param config The {@link ScheduleConfiguration} containing the settings for this timing strategy.
 	 */
-	public AdaptiveTimingStrategy(GraphDatabaseService database, long defaultDelayMillis, int txDeltaThreshold) {
+	public AdaptiveTimingStrategy(GraphDatabaseService database, ScheduleConfiguration config) {
 		this.transactionManager = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(TxManager.class);
-		this.delayAdjuster = new ConstantDeltaDelayAdjuster(100);
-		this.defaultDelayMillis = defaultDelayMillis;
-		this.threshold = txDeltaThreshold;
+		this.delayAdjuster = new ConstantDeltaDelayAdjuster(100, config.minimumDelayMillis(), config.maximumDelayMillis());
+		this.defaultDelayMillis = config.defaultDelayMillis();
+		this.threshold = config.databaseActivityThreshold();
 		this.txCountAtPreviousInvocation = -1;
 	}
 
@@ -45,7 +45,7 @@ public class AdaptiveTimingStrategy implements TimingStrategy {
 		int currentTxCount = transactionManager.getStartedTxCount();
 		long newDelay = determineNewDelay(currentTxCount);
 
-		LOG.debug("Next delay updated to {}ms", newDelay);
+		LOG.trace("Next delay updated to {}ms", newDelay);
 
 		txCountAtPreviousInvocation = currentTxCount;
 		delayAtPreviousInvocation = newDelay;

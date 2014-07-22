@@ -12,6 +12,8 @@ import org.neo4j.graphdb.DependencyResolver;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.impl.transaction.TxManager;
 
+import com.graphaware.runtime.config.ScheduleConfiguration;
+
 @SuppressWarnings("deprecation")
 public class AdaptiveTimingStrategyTest {
 
@@ -29,7 +31,13 @@ public class AdaptiveTimingStrategyTest {
 		Mockito.stub(graphDatabase.getDependencyResolver()).toReturn(dependencyResolver);
 		Mockito.stub(dependencyResolver.resolveDependency(TxManager.class)).toReturn(txManager);
 
-		timingStrategy = new AdaptiveTimingStrategy(graphDatabase, 2000, 10);
+		ScheduleConfiguration scheduleConfiguration = Mockito.mock(ScheduleConfiguration.class);
+		Mockito.stub(scheduleConfiguration.databaseActivityThreshold()).toReturn(10);
+		Mockito.stub(scheduleConfiguration.defaultDelayMillis()).toReturn(2000L);
+		Mockito.stub(scheduleConfiguration.maximumDelayMillis()).toReturn(10_000L);
+		Mockito.stub(scheduleConfiguration.minimumDelayMillis()).toReturn(100L);
+
+		timingStrategy = new AdaptiveTimingStrategy(graphDatabase, scheduleConfiguration);
 	}
 
 	@Test

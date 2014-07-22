@@ -89,7 +89,7 @@ public class RotatingTaskScheduler implements TaskScheduler {
      */
     private void scheduleNextTask(long lastTaskDurationNanos) {
         long nextDelayMillis = timingStrategy.nextDelay(lastTaskDurationNanos);
-        LOG.debug("Scheduling next task with a delay of " + nextDelayMillis + " ms.");
+        LOG.debug("Scheduling next task with a delay of {} ms.", nextDelayMillis);
         worker.schedule(nextTask(), nextDelayMillis, TimeUnit.MILLISECONDS);
     }
 

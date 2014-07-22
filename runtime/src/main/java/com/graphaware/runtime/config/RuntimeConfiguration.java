@@ -20,6 +20,7 @@ import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 
+import com.graphaware.runtime.bootstrap.ComponentFactory;
 import com.graphaware.runtime.schedule.TimingStrategy;
 
 /**
@@ -57,11 +58,13 @@ public interface RuntimeConfiguration {
     String createPrefix(String id);
 
 	/**
-	 * Provides a timing strategy to use for configuring the way in which timer-driven modules are managed for the given database.
+	 * Retrieves the {@link ScheduleConfiguration} to be used for configuring the timer-driven scheduling components of the
+	 * GraphAware runtime.
 	 *
-	 * @param graphDatabaseService The {@link GraphDatabaseService} in which the <code>GraphAwareRuntime</code> will be used
-	 * @return The {@link TimingStrategy} to use in the <code>GraphAwareRuntime</code>
+	 * @return The {@link ScheduleConfiguration}, which may not be <code>null</code>
 	 */
-	TimingStrategy provideTimingStrategy(GraphDatabaseService graphDatabaseService);
+	ScheduleConfiguration getScheduleConfiguration();
+
+	ComponentFactory getComponentFactory();
 
 }
