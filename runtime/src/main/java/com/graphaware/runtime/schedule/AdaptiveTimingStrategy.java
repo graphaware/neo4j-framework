@@ -26,14 +26,17 @@ public class AdaptiveTimingStrategy implements TimingStrategy {
 	/**
 	 * Constructs a new {@link AdaptiveTimingStrategy} based on the given argument.
 	 *
-	 * @param database The {@link GraphDatabaseService} to monitor for activity and adapt accordingly
-	 * @param defaultDelayMillis The default initial timing delay in milliseconds
+	 * @param database The {@link GraphDatabaseService} to monitor for activity and adapt accordingly.
+	 * @param defaultDelayMillis The default initial timing delay in milliseconds.
+	 * @param txDeltaThreshold A setting related to the number of transactions happening between invocations of
+	 *        {@link #nextDelay(long)} that determines how many transactions between invocations is required to constitute a
+	 *        busy period of activity.  The higher the number, the more throughput is needed to constitute busy.
 	 */
-	public AdaptiveTimingStrategy(GraphDatabaseService database, long defaultDelayMillis) {
+	public AdaptiveTimingStrategy(GraphDatabaseService database, long defaultDelayMillis, int txDeltaThreshold) {
 		this.transactionManager = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(TxManager.class);
 		this.delayAdjuster = new ConstantDeltaDelayAdjuster(100);
 		this.defaultDelayMillis = defaultDelayMillis;
-		this.threshold = 10; // TODO what constitutes busy?  Make this a configurable threshold
+		this.threshold = txDeltaThreshold;
 		this.txCountAtPreviousInvocation = -1;
 	}
 

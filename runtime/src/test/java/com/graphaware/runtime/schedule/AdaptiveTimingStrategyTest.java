@@ -29,7 +29,7 @@ public class AdaptiveTimingStrategyTest {
 		Mockito.stub(graphDatabase.getDependencyResolver()).toReturn(dependencyResolver);
 		Mockito.stub(dependencyResolver.resolveDependency(TxManager.class)).toReturn(txManager);
 
-		timingStrategy = new AdaptiveTimingStrategy(graphDatabase, 2000);
+		timingStrategy = new AdaptiveTimingStrategy(graphDatabase, 2000, 10);
 	}
 
 	@Test

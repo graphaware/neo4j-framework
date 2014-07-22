@@ -38,7 +38,7 @@ public final class DefaultRuntimeConfiguration extends BaseRuntimeConfiguration 
 
 	@Override
 	public TimingStrategy provideTimingStrategy(GraphDatabaseService graphDatabaseService) {
-		return new AdaptiveTimingStrategy(graphDatabaseService, 200); //TODO: this and the threshold need to be made configurable
+		return new AdaptiveTimingStrategy(graphDatabaseService, 200, 10); //TODO: this and the threshold need to be made configurable
 	}
 
 }
