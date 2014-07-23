@@ -172,13 +172,39 @@ a REST API that can be queried for the total friendship strength value.
 ### Building a Timer-Driven GraphAware Runtime Module
 
 Similarly, your module can implement the the [`TimerDrivenModule`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/runtime/module/TimerDrivenModule.html) interface
-in order to be able to perform computations on the graph that are automatically scheduled. The framework will detect quiet
-periods in your database and increase the rate at which modules perform behind-the-scenes computations. During busy periods, naturally,
-the rate is decreased.
+in order to be able to perform computations on the graph that are automatically scheduled. 
 
 Each unit of work, implemented by the `doSomeWork` method on `TimerDrivenModule`, should be a short computation that
 writes some results back to the graph. This is very useful for iterative algorithms like PageRank, which are too expensive
 to compute in real-time.
+
+The frequency with which the timer-driven modules have their `doSomeWork` method invoked is managed by the GraphAware
+runtime internally.  In order to remain unintrusive, it's designed to recognise busy periods of database activity and
+throttle back the regularity with which timer-driven modules are invoked.  Similarly, if the runtime realises that the
+database is less busy, it will increase the invocation rate so that background processing performed by these scheduled
+modules isn't delayed unnecessarily.
+
+As of GraphAware Framework version 2.1.2.10, the following configuration properties can be added to _neo4j.properties_ in
+order to configure the scheduling of these timer-driven modules.  The default values for each setting are also shown below.
+
+
+```
+# Timer-Driven Module Scheduling Configuration Settings
+
+# The number of transactions that must have been started between scheduled task executions in 
+# order for the runtime to consider the database to be in a busy period.
+com.graphaware.runtime.schedule.activityThreshold = 10
+
+# The default number of milliseconds to wait between timer-driven module invocations
+com.graphaware.runtime.schedule.defaultDelay = 2000
+
+# The maximum number of milliseconds to wait between timer-driven module invocations
+com.graphaware.runtime.schedule.maxDelay = 10000
+
+# The minimum number of milliseconds to wait between timer-driven module invocations
+com.graphaware.runtime.schedule.minDelay = 0
+```
+
 
 ### Building a Module Bootstrapper
 
