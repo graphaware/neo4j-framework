@@ -45,7 +45,7 @@ public class AdaptiveTimingStrategy implements TimingStrategy {
 		int currentTxCount = transactionManager.getStartedTxCount();
 		long newDelay = determineNewDelay(currentTxCount);
 
-		LOG.trace("Next delay updated to {}ms", newDelay);
+		LOG.trace("Next delay updated to {}ms based on transaction count difference of {}", newDelay, currentTxCount - txCountAtPreviousInvocation);
 
 		txCountAtPreviousInvocation = currentTxCount;
 		delayAtPreviousInvocation = newDelay;

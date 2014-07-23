@@ -17,11 +17,9 @@
 package com.graphaware.runtime.config;
 
 import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 
 import com.graphaware.runtime.bootstrap.ComponentFactory;
-import com.graphaware.runtime.schedule.TimingStrategy;
 
 /**
  * {@link com.graphaware.runtime.GraphAwareRuntime} configuration.
@@ -53,7 +51,7 @@ public interface RuntimeConfiguration {
      * Create prefix a component should use for internal data it reads/writes (nodes, relationships, properties).
      *
      * @param id of the component/module.
-     * @return prefix of the form {@link #GA_PREFIX} + id + "_"
+     * @return prefix of the form <code>{@link #GA_PREFIX} + id + "_"</code>.
      */
     String createPrefix(String id);
 
@@ -61,10 +59,17 @@ public interface RuntimeConfiguration {
 	 * Retrieves the {@link ScheduleConfiguration} to be used for configuring the timer-driven scheduling components of the
 	 * GraphAware runtime.
 	 *
-	 * @return The {@link ScheduleConfiguration}, which may not be <code>null</code>
+	 * @return The {@link ScheduleConfiguration}, which may not be <code>null</code>.
 	 */
 	ScheduleConfiguration getScheduleConfiguration();
 
+	/**
+	 * Retrieves the {@link ComponentFactory} used to create the objects required to build the constituents of a GraphAware
+	 * runtime.  The resultant factory can itself be configured by the settings of this {@link RuntimeConfiguration} to use
+	 * different implementations.
+	 *
+	 * @return A {@link ComponentFactory} for making the appropriate objects for use in this Runtime.
+	 */
 	ComponentFactory getComponentFactory();
 
 }
