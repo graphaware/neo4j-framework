@@ -31,7 +31,11 @@
     <dependencies>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>graphaware-framework-embedded</artifactId>
+            <artifactId>api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>runtime</artifactId>
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>

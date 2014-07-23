@@ -41,7 +41,7 @@ public class AdjacencyMatrix {
      */
     public Matrix getAdjacencyMatrix() {
         Iterable<Node> nodes = GlobalGraphOperations.at(database).getAllNodes();
-        indexMap = new ArrayList<>();
+        indexMap = new ArrayList<Node>();
         HashMap<Node, Integer> matrixIndices = new HashMap<>();
 
         int length = 0;

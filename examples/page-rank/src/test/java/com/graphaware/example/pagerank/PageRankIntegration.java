@@ -123,10 +123,21 @@ public class PageRankIntegration {
 
 			// thirdly, compute the page rank of this graph based on the adjacency matrix
 			PageRank pageRank = new PageRank();
-			Vector pageRankTopTen = pageRank.getPageRank(adjacencyMatrix, 0.5); // XXX: no idea what the damping constant should be
+			Vector pageRankResult = pageRank.getPageRank(adjacencyMatrix, 0.85); // Sergei's & Larry's suggestion is to use .85 to become rich;)
 
-			LOG.info(pageRankTopTen.toString());
+			LOG.info(pageRankResult.toString());
 			LOG.info("Applying random graph walker module to page rank graph");
+
+            // find the index of a max element
+            int    maxIndex = 0;
+            double maxValue = 0;
+            for(int i = 0; i < pageRankResult.length(); ++i) {
+                double temp = pageRankResult.get(i);
+                if (temp > maxValue) {
+                    maxValue = temp;
+                    maxIndex = i;
+                }
+            }
 
 			// fourthly, run the rage rank module to compute the random walker's page rank
 			GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
@@ -138,13 +149,17 @@ public class PageRankIntegration {
 
 			// finally, compare both page rank metrics and verify the module is producing what it should
 			// XXX: I understand this is WIP, but why does this return a list if it's called get..Map?
+            // YYY: I call it a Map, since it is effectivelly the inverse of the Node, Integer hashMap from the AdjacencyMatrix
+            //      and it is used only to map the indices from of the pagerank values back to the Nodes. Quite clumsy, on tdo list ;)
 			List<Node> indexMap = adjacencyMatrix.getIndexMap();
-			LOG.info("Top of the index map is: {}", indexMap.get(0).getProperty("name"));
+
+            LOG.info("The highest PageRank in the network is: " + indexMap.get(maxIndex).getProperty("name").toString());
+            //LOG.info("Top of the index map is: {}", indexMap.get(0).getProperty("name"));
 			for (int i=0 ; i<indexMap.size() ; i++) {
 				Node node = indexMap.get(i);
 				System.out.printf("%s\t%s\t%s\n", node.getProperty("name"),
-						node.getProperty(RandomWalkerPageRankModule.PAGE_RANK_PROPERTY_KEY).toString(),
-						pageRankTopTen.get(i));
+                        node.getProperty(RandomWalkerPageRankModule.PAGE_RANK_PROPERTY_KEY).toString(),
+                        pageRankResult.get(i));
 			}
 
 		}
