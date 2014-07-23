@@ -52,13 +52,13 @@ public class AdjacencyMatrixTest {
 
             System.out.println(mtx.getAdjacencyMatrix().toString());
             System.out.println(mtx.getTransitionMatrix().toString());
-            transaction.success();
+
 
             // ------- calculate the page rank ----------
             System.out.println(pageRank.getPageRank(mtx, 0.85).toString());
             System.out.println("The highest PageRank in the network has: " + mtx.getIndexMap().get(1).getProperty("name").toString());
 
-
+            transaction.success();
 
         }
     }
