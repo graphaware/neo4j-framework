@@ -24,34 +24,111 @@ import com.graphaware.runtime.bootstrap.DefaultImplementationComponentFactory;
  */
 public final class DefaultRuntimeConfiguration extends BaseRuntimeConfiguration implements ScheduleConfiguration {
 
-    public static final DefaultRuntimeConfiguration INSTANCE = new DefaultRuntimeConfiguration();
+	private static final DefaultRuntimeConfiguration INSTANCE = new DefaultRuntimeConfiguration();
 
+	private final ComponentFactory componentFactory;
+	private final int activityThreshold;
+    private final long defaultDelayMillis;
+    private final long minimumDelayMillis;
+    private final long maximumDelayMillis;
+
+    /**
+     * Retrieves the singleton instance of the {@link DefaultRuntimeConfiguration}.
+     *
+     * @return The {@link DefaultRuntimeConfiguration} instance
+     */
     public static DefaultRuntimeConfiguration getInstance() {
         return INSTANCE;
     }
 
     private DefaultRuntimeConfiguration() {
-    	// no instantiation permitted
+    	this(10, 2000, 0, 10_000, new DefaultImplementationComponentFactory());
+    }
+
+	private DefaultRuntimeConfiguration(int activityThreshold, long defaultDelayMillis, long minimumDelayMillis, long maximumDelayMillis,
+			ComponentFactory componentFactory) {
+		this.activityThreshold = activityThreshold;
+		this.defaultDelayMillis = defaultDelayMillis;
+		this.minimumDelayMillis = minimumDelayMillis;
+		this.maximumDelayMillis = maximumDelayMillis;
+		this.componentFactory = componentFactory;
+	}
+
+	/**
+	 * Returns a copy of this {@link DefaultRuntimeConfiguration} reconfigured to use the given database activity threshold.
+	 *
+	 * @see ScheduleConfiguration
+	 * @param databaseActivityThreshold The new database activity threshold to use.
+	 * @return A new {@link DefaultRuntimeConfiguration}.
+	 */
+	public DefaultRuntimeConfiguration withDatabaseActivityThreshold(int databaseActivityThreshold) {
+		return new DefaultRuntimeConfiguration(databaseActivityThreshold, this.defaultDelayMillis, this.minimumDelayMillis, this.maximumDelayMillis, this.componentFactory);
+	}
+
+	/**
+	 * Returns a copy of this {@link DefaultRuntimeConfiguration} reconfigured to use the specified default timer-driven
+	 * module scheduling delay.
+	 *
+	 * @see ScheduleConfiguration
+	 * @param defaultDelayMilllis The new default scheduling delay in milliseconds.
+	 * @return A new {@link DefaultRuntimeConfiguration}.
+	 */
+    public DefaultRuntimeConfiguration withDefaultDelayMillis(long defaultDelayMillis) {
+    	return new DefaultRuntimeConfiguration(this.activityThreshold, defaultDelayMillis, this.minimumDelayMillis, this.maximumDelayMillis, this.componentFactory);
+    }
+
+	/**
+	 * Returns a copy of this {@link DefaultRuntimeConfiguration} reconfigured to use the specified minimum delay between
+	 * timer-driven module invocations.
+	 *
+	 * @see ScheduleConfiguration
+	 * @param minimumDelayMillis The new minimum delay between timer-driven module invocations.
+	 * @return A new {@link DefaultRuntimeConfiguration}.
+	 */
+    public DefaultRuntimeConfiguration withMinimumDelayMillis(long minimumDelayMillis) {
+    	return new DefaultRuntimeConfiguration(this.activityThreshold, this.defaultDelayMillis, minimumDelayMillis, this.maximumDelayMillis, this.componentFactory);
+    }
+
+	/**
+	 * Returns a copy of this {@link DefaultRuntimeConfiguration} reconfigured to use the specified maximum delay between
+	 * timer-driven module invocations.
+	 *
+	 * @see ScheduleConfiguration
+	 * @param maximumDelayMillis The new maximum delay between timer-driven module invocations.
+	 * @return A new {@link DefaultRuntimeConfiguration}.
+	 */
+    public DefaultRuntimeConfiguration withMaximumDelayMillis(long maximumDelayMillis) {
+    	return new DefaultRuntimeConfiguration(this.activityThreshold, this.defaultDelayMillis, this.minimumDelayMillis, maximumDelayMillis, this.componentFactory);
+    }
+
+    /**
+     * Returns a copy of this {@link DefaultRuntimeConfiguration} reconfigured to use the specified {@link ComponentFactory}.
+     *
+     * @param componentFactory The {@link ComponentFactory} to use.
+     * @return A new {@link DefaultRuntimeConfiguration}.
+     */
+    public DefaultRuntimeConfiguration withComponentFactory(ComponentFactory componentFactory) {
+    	return new DefaultRuntimeConfiguration(this.activityThreshold, this.defaultDelayMillis, this.minimumDelayMillis, this.maximumDelayMillis, componentFactory);
     }
 
     @Override
     public long defaultDelayMillis() {
-    	return 2000L;
+		return defaultDelayMillis;
     }
 
     @Override
     public long minimumDelayMillis() {
-    	return 0L;
+		return minimumDelayMillis;
     }
 
     @Override
     public long maximumDelayMillis() {
-    	return 10_000L;
+    	return maximumDelayMillis;
     }
 
     @Override
     public int databaseActivityThreshold() {
-    	return 10; // number of transactions between timer-driven module invocations
+    	return activityThreshold; // number of transactions between timer-driven module invocations
     }
 
     @Override
@@ -61,7 +138,7 @@ public final class DefaultRuntimeConfiguration extends BaseRuntimeConfiguration 
 
 	@Override
 	public ComponentFactory getComponentFactory() {
-		return new DefaultImplementationComponentFactory();
+		return componentFactory;
 	}
 
 }

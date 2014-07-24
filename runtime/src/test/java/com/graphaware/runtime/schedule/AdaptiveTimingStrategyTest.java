@@ -53,8 +53,8 @@ public class AdaptiveTimingStrategyTest {
 		Mockito.stub(txManager.getStartedTxCount()).toReturn(15).toReturn(32).toReturn(49);
 
 		// set the state so that we have established a concept of business
-		timingStrategy.nextDelay(30L);
-		timingStrategy.nextDelay(27L);
+		timingStrategy.nextDelay(30_000_000L);
+		timingStrategy.nextDelay(27_000_000L);
 
 		long nextDelay = timingStrategy.nextDelay(0L);
 		assertTrue(nextDelay > 1000L);
@@ -64,9 +64,9 @@ public class AdaptiveTimingStrategyTest {
 	public void shouldDecreaseDelayFromPreviousIfCurrentPeriodIsDeemedToBeQuiet() {
 		Mockito.stub(txManager.getStartedTxCount()).toReturn(25).toReturn(29).toReturn(32).toReturn(35);
 
-		timingStrategy.nextDelay(16L);
-		timingStrategy.nextDelay(12L);
-		timingStrategy.nextDelay(14L);
+		timingStrategy.nextDelay(16_000_000L);
+		timingStrategy.nextDelay(12_000_000L);
+		timingStrategy.nextDelay(14_000_000L);
 
 		long nextDelay = timingStrategy.nextDelay(0L);
 		assertTrue(nextDelay < 1000L);
@@ -76,14 +76,14 @@ public class AdaptiveTimingStrategyTest {
 	public void shouldNotShortenNextDelayToLessThanTheExecutionTimeOfPreviousInvocation() {
 		Mockito.stub(txManager.getStartedTxCount()).toReturn(2);
 
-		timingStrategy.nextDelay(390L);
-		timingStrategy.nextDelay(400L);
-		timingStrategy.nextDelay(380L);
-		timingStrategy.nextDelay(410L);
-		timingStrategy.nextDelay(390L);
-		timingStrategy.nextDelay(420L);
+		timingStrategy.nextDelay(390_000_000L);
+		timingStrategy.nextDelay(400_000_000L);
+		timingStrategy.nextDelay(380_000_000L);
+		timingStrategy.nextDelay(410_000_000L);
+		timingStrategy.nextDelay(390_000_000L);
+		timingStrategy.nextDelay(420_000_000L);
 
-		long nextDelay = timingStrategy.nextDelay(410L);
+		long nextDelay = timingStrategy.nextDelay(410_000_000L);
 		assertTrue("The delay should've been shortened", nextDelay < 1000L);
 		assertTrue("The new delay was less than 125% of the last execution time", nextDelay > 500L);
 	}

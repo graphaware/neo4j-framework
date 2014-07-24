@@ -24,6 +24,8 @@ import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
+import com.sun.org.apache.xerces.internal.impl.dv.xs.AnyURIDV;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,19 +66,10 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
     @Override
     protected RuntimeConfiguration createTestRuntimeConfiguration() {
     	final ComponentFactory componentFactory = mock(ComponentFactory.class);
-    	stub(componentFactory.createTimingStrategy(database, null)).toReturn(new FixedDelayTimingStrategy(TIMER_DELAY));
+    	stub(componentFactory.createTimingStrategy(same(database), any(ScheduleConfiguration.class)))
+    		.toReturn(new FixedDelayTimingStrategy(TIMER_DELAY));
 
-    	return new BaseRuntimeConfiguration() {
-    		@Override
-			public ScheduleConfiguration getScheduleConfiguration() {
-				return null; // not actually being used for this test
-			}
-
-			@Override
-			public ComponentFactory getComponentFactory() {
-				return componentFactory;
-			}
-    	};
+    	return DefaultRuntimeConfiguration.getInstance().withComponentFactory(componentFactory);
     }
 
     private TimerDrivenModule mockTimerModule() {

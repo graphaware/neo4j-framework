@@ -1,5 +1,7 @@
 package com.graphaware.runtime.schedule;
 
+import java.util.concurrent.TimeUnit;
+
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.impl.transaction.TxManager;
@@ -41,9 +43,9 @@ public class AdaptiveTimingStrategy implements TimingStrategy {
 	}
 
 	@Override
-	public long nextDelay(long lastTaskDuration) {
+	public long nextDelay(long lastTaskDurationNanos) {
 		int currentTxCount = transactionManager.getStartedTxCount();
-		long newDelay = determineNewDelay(currentTxCount, lastTaskDuration);
+		long newDelay = determineNewDelay(currentTxCount, TimeUnit.NANOSECONDS.toMillis(lastTaskDurationNanos));
 
 		LOG.trace("Next delay updated to {}ms based on transaction count difference of {}", newDelay, currentTxCount - txCountAtPreviousInvocation);
 
@@ -52,12 +54,12 @@ public class AdaptiveTimingStrategy implements TimingStrategy {
 		return newDelay;
 	}
 
-	private long determineNewDelay(int currentTxCount, long lastTaskDuration) {
+	private long determineNewDelay(int currentTxCount, long lastTaskDurationMillis) {
 		if (txCountAtPreviousInvocation == -1) {
 			LOG.debug("First request for timing delay so returning default of: {}ms", defaultDelayMillis);
 			return defaultDelayMillis;
 		}
-		return delayAdjuster.determineNextDelay(delayAtPreviousInvocation, lastTaskDuration, currentTxCount - txCountAtPreviousInvocation, threshold);
+		return delayAdjuster.determineNextDelay(delayAtPreviousInvocation, lastTaskDurationMillis, currentTxCount - txCountAtPreviousInvocation, threshold);
 	}
 
 }
