@@ -29,18 +29,18 @@ public class ConstantDeltaDelayAdjuster implements DelayAdjuster {
 	 * This implementation adjusts the delay by a predefined amount based on whether or not the difference is above or below the
 	 * given threshold.
 	 * </p>
-	 *
 	 * @param threshold The minimum difference in transaction count between invocations of this method that is considered to
 	 *        constitute a busy period of database activity
 	 */
 	@Override
-	public long determineNextDelay(long currentDelay, int txCountDifference, int threshold) {
+	public long determineNextDelay(long currentDelay, long lastTaskDuration, int txCountDifference, int threshold) {
 		if (txCountDifference > threshold) {
 			// had a lot of transactions since last time so back off a bit
 			return Math.min(currentDelay + adjustmentAmount, maxDelay);
 		}
 		// no significant increase so shorten amount
-		return Math.max(currentDelay - adjustmentAmount, minDelay);
+		final long constrainedMinimum = Math.max(minDelay, (long) (lastTaskDuration * 1.25));
+		return Math.max(currentDelay - adjustmentAmount, constrainedMinimum);
 	}
 
 }

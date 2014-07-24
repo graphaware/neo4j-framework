@@ -33,7 +33,7 @@ public class AdaptiveTimingStrategyTest {
 
 		ScheduleConfiguration scheduleConfiguration = Mockito.mock(ScheduleConfiguration.class);
 		Mockito.stub(scheduleConfiguration.databaseActivityThreshold()).toReturn(10);
-		Mockito.stub(scheduleConfiguration.defaultDelayMillis()).toReturn(2000L);
+		Mockito.stub(scheduleConfiguration.defaultDelayMillis()).toReturn(1000L);
 		Mockito.stub(scheduleConfiguration.maximumDelayMillis()).toReturn(10_000L);
 		Mockito.stub(scheduleConfiguration.minimumDelayMillis()).toReturn(100L);
 
@@ -44,8 +44,8 @@ public class AdaptiveTimingStrategyTest {
 	public void shouldUseInitialDelayFromGivenConfiguration() {
 		Mockito.stub(txManager.getStartedTxCount()).toReturn(9);
 
-		long nextDelay = timingStrategy.nextDelay(9L);
-		assertThat(nextDelay, is(equalTo(2000L)));
+		long nextDelay = timingStrategy.nextDelay(0L);
+		assertThat(nextDelay, is(equalTo(1000L)));
 	}
 
 	@Test
@@ -56,8 +56,8 @@ public class AdaptiveTimingStrategyTest {
 		timingStrategy.nextDelay(30L);
 		timingStrategy.nextDelay(27L);
 
-		long nextDelay = timingStrategy.nextDelay(19L);
-		assertTrue(nextDelay > 2000L);
+		long nextDelay = timingStrategy.nextDelay(0L);
+		assertTrue(nextDelay > 1000L);
 	}
 
 	@Test
@@ -68,8 +68,24 @@ public class AdaptiveTimingStrategyTest {
 		timingStrategy.nextDelay(12L);
 		timingStrategy.nextDelay(14L);
 
-		long nextDelay = timingStrategy.nextDelay(40L);
-		assertTrue(nextDelay < 2000L);
+		long nextDelay = timingStrategy.nextDelay(0L);
+		assertTrue(nextDelay < 1000L);
+	}
+
+	@Test
+	public void shouldNotShortenNextDelayToLessThanTheExecutionTimeOfPreviousInvocation() {
+		Mockito.stub(txManager.getStartedTxCount()).toReturn(2);
+
+		timingStrategy.nextDelay(390L);
+		timingStrategy.nextDelay(400L);
+		timingStrategy.nextDelay(380L);
+		timingStrategy.nextDelay(410L);
+		timingStrategy.nextDelay(390L);
+		timingStrategy.nextDelay(420L);
+
+		long nextDelay = timingStrategy.nextDelay(410L);
+		assertTrue("The delay should've been shortened", nextDelay < 1000L);
+		assertTrue("The new delay was less than 125% of the last execution time", nextDelay > 500L);
 	}
 
 }

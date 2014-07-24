@@ -43,7 +43,7 @@ public class AdaptiveTimingStrategy implements TimingStrategy {
 	@Override
 	public long nextDelay(long lastTaskDuration) {
 		int currentTxCount = transactionManager.getStartedTxCount();
-		long newDelay = determineNewDelay(currentTxCount);
+		long newDelay = determineNewDelay(currentTxCount, lastTaskDuration);
 
 		LOG.trace("Next delay updated to {}ms based on transaction count difference of {}", newDelay, currentTxCount - txCountAtPreviousInvocation);
 
@@ -52,12 +52,12 @@ public class AdaptiveTimingStrategy implements TimingStrategy {
 		return newDelay;
 	}
 
-	private long determineNewDelay(int currentTxCount) {
+	private long determineNewDelay(int currentTxCount, long lastTaskDuration) {
 		if (txCountAtPreviousInvocation == -1) {
 			LOG.debug("First request for timing delay so returning default of: {}ms", defaultDelayMillis);
 			return defaultDelayMillis;
 		}
-		return delayAdjuster.determineNextDelay(delayAtPreviousInvocation, currentTxCount - txCountAtPreviousInvocation, threshold);
+		return delayAdjuster.determineNextDelay(delayAtPreviousInvocation, lastTaskDuration, currentTxCount - txCountAtPreviousInvocation, threshold);
 	}
 
 }
