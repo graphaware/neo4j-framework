@@ -70,7 +70,7 @@ public final class DefaultRuntimeConfiguration extends BaseRuntimeConfiguration 
 	 * module scheduling delay.
 	 *
 	 * @see ScheduleConfiguration
-	 * @param defaultDelayMilllis The new default scheduling delay in milliseconds.
+	 * @param defaultDelayMillis The new default scheduling delay in milliseconds.
 	 * @return A new {@link DefaultRuntimeConfiguration}.
 	 */
     public DefaultRuntimeConfiguration withDefaultDelayMillis(long defaultDelayMillis) {
