@@ -37,6 +37,7 @@
         <module>tests</module>
         <module>tx-api</module>
         <module>tx-executor</module>
+        <module>tx-manager</module>
         <module>build</module>
 
         <!--examples-->
@@ -185,7 +186,7 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>timetree</artifactId>
-                <version>2.1.2.7.9</version>
+                <version>2.1.2.9.10</version>
                 <scope>test</scope>
             </dependency>
 
