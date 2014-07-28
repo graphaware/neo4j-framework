@@ -125,7 +125,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         final T mockModule = mockTxModule();
 
         try (Transaction tx = getTransaction()) {
-            getTxRepo().persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none())));
+            getTxRepo().persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(FluentTxDrivenModuleConfiguration.defaultConfiguration().with(InclusionStrategies.none())));
             tx.success();
         }
 
@@ -181,7 +181,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         final T mockModule = mockTxModule();
 
         try (Transaction tx = getTransaction()) {
-            getTxRepo().persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none())));
+            getTxRepo().persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(FluentTxDrivenModuleConfiguration.defaultConfiguration().with(InclusionStrategies.none())));
             tx.success();
         }
 
@@ -196,7 +196,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
 
         try (Transaction tx = getTransaction()) {
             TxDrivenModuleMetadata moduleMetadata = getTxRepo().getModuleMetadata(mockModule);
-            assertEquals(new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none()), moduleMetadata.getConfig());
+            assertEquals(FluentTxDrivenModuleConfiguration.defaultConfiguration().with(InclusionStrategies.none()), moduleMetadata.getConfig());
             assertFalse(moduleMetadata.needsInitialization());
             assertEquals(-1, moduleMetadata.problemTimestamp());
         }
@@ -338,7 +338,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
     public void allRegisteredInterestedModulesShouldBeDelegatedTo() {
         T mockModule1 = mockTxModule(MOCK + "1");
         T mockModule2 = mockTxModule(MOCK + "2");
-        T mockModule3 = mockTxModule(MOCK + "3", new MinimalTxDrivenModuleConfiguration(InclusionStrategies.none()));
+        T mockModule3 = mockTxModule(MOCK + "3", FluentTxDrivenModuleConfiguration.defaultConfiguration().with(InclusionStrategies.none()));
 
         GraphAwareRuntime runtime = createRuntime();
         runtime.registerModule(mockModule1);
@@ -477,7 +477,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         GraphAwareRuntime runtime = createRuntime();
         runtime.registerModule(mockModule);
 
-        verify(mockModule).configurationChanged(DefaultRuntimeConfiguration.getInstance());
+        verify(mockModule).configurationChanged(FluentRuntimeConfiguration.defaultConfiguration());
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
     }
@@ -489,7 +489,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         GraphAwareRuntime runtime = createRuntime();
         runtime.registerModule(module);
 
-        assertEquals(DefaultRuntimeConfiguration.getInstance(), module.getConfig());
+        assertEquals(FluentRuntimeConfiguration.defaultConfiguration(), module.getConfig());
     }
 
     @Test(expected = IllegalStateException.class)

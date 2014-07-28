@@ -1,11 +1,9 @@
 package com.graphaware.example.module;
 
-import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.common.strategy.RelationshipInclusionStrategy;
-import com.graphaware.runtime.config.MinimalTxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.FluentTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.module.BaseTxDrivenModule;
-import com.graphaware.runtime.strategy.InclusionStrategiesFactory;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.UnitOfWork;
@@ -35,16 +33,16 @@ public class FriendshipStrengthModule extends BaseTxDrivenModule<Void> {
         this.counter = new FriendshipStrengthCounter(database);
 
         //only take into account relationships with FRIEND_OF type:
-        configuration = new MinimalTxDrivenModuleConfiguration(
-                InclusionStrategiesFactory.allBusiness()
-                        .with(
-                                new RelationshipInclusionStrategy() {
-                                    @Override
-                                    public boolean include(Relationship relationship) {
-                                        return relationship.isType(FRIEND_OF);
-                                    }
-                                }
-                        ));
+        configuration = FluentTxDrivenModuleConfiguration
+                .defaultConfiguration()
+                .with(
+                        new RelationshipInclusionStrategy() {
+                            @Override
+                            public boolean include(Relationship relationship) {
+                                return relationship.isType(FRIEND_OF);
+                            }
+                        }
+                );
     }
 
     /**

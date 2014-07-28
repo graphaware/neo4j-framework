@@ -1,65 +1,204 @@
 package com.graphaware.runtime.schedule;
 
-import java.util.concurrent.TimeUnit;
-
+import com.graphaware.runtime.monitor.DatabaseLoadMonitor;
+import com.graphaware.runtime.monitor.RunningWindowAverage;
+import com.graphaware.runtime.monitor.StartedTxBasedLoadMonitor;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.impl.transaction.TxManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.graphaware.runtime.config.ScheduleConfiguration;
-
 /**
- * Implementation of {@link TimingStrategy} that pays attention to the current level of activity in the database in order to
- * decide how long to wait before scheduling the next task.
+ * Implementation of {@link TimingStrategy} that pays attention to the current level of activity in the database, i.e.
+ * the number of started transactions, in order to decide how long to wait before scheduling the next task.
  */
-@SuppressWarnings("deprecation")
 public class AdaptiveTimingStrategy implements TimingStrategy {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AdaptiveTimingStrategy.class);
+    private final long delta;
+    private final long defaultDelay;
+    private final long minDelay;
+    private final long maxDelay;
+    private final long busyThreshold;
+    private final int maxSamples;
+    private final int maxTime;
 
-	private final TxManager transactionManager;
-	private final DelayAdjuster delayAdjuster;
-	private final long defaultDelayMillis;
-	private final int threshold;
+    private DelayAdjuster delayAdjuster;
+    private DatabaseLoadMonitor loadMonitor;
 
-	private int txCountAtPreviousInvocation;
-	private long delayAtPreviousInvocation;
+    private long previousDelay = UNKNOWN;
 
-	/**
-	 * Constructs a new {@link AdaptiveTimingStrategy} based on the activity in the given database and tuned with the specified
-	 * configuration settings.
-	 *
-	 * @param database The {@link GraphDatabaseService} to monitor for activity and adapt accordingly.
-	 * @param config The {@link ScheduleConfiguration} containing the settings for this timing strategy.
-	 */
-	public AdaptiveTimingStrategy(GraphDatabaseService database, ScheduleConfiguration config) {
-		this.transactionManager = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(TxManager.class);
-		this.delayAdjuster = new ConstantDeltaDelayAdjuster(100, config.minimumDelayMillis(), config.maximumDelayMillis());
-		this.defaultDelayMillis = config.defaultDelayMillis();
-		this.threshold = config.databaseActivityThreshold();
-		this.txCountAtPreviousInvocation = -1;
-	}
+    /**
+     * Create a new instance of this strategy with default configuration, which is:
+     * <ul>
+     * <li>delta = 100ms</li>
+     * <li>default delay = 2s</li>
+     * <li>minimum delay = 5ms</li>
+     * <li>maximum delay = 10s</li>
+     * <li>busy threshold = 100</li>
+     * <li>maximum samples = 200</li>
+     * <li>maximum time = 2s</li>
+     * </ul>
+     *
+     * @return instance of this strategy.
+     */
+    public static AdaptiveTimingStrategy defaultConfiguration() {
+        return new AdaptiveTimingStrategy(100, 2000, 5, 5_000, 100, 200, 2000);
+    }
 
-	@Override
-	public long nextDelay(long lastTaskDurationNanos) {
-		int currentTxCount = transactionManager.getStartedTxCount();
-		long newDelay = determineNewDelay(currentTxCount, TimeUnit.NANOSECONDS.toMillis(lastTaskDurationNanos));
+    /**
+     * Constructs a new instance of this strategy with the specified configuration settings.
+     *
+     * @param delta         The number of milliseconds by which to adjust the current delay.
+     * @param defaultDelay  The number of milliseconds to return if there is not enough information to make a better decision.
+     * @param minDelay      The lower limit to the delay that can be returned as the next delay.
+     * @param maxDelay      The upper limit to the delay that can be returned as the next delay.
+     * @param busyThreshold The number of transactions per second, above which the database is deemed
+     *                      to be busy.
+     * @param maxSamples    The maximum number of running window average samples. See {@link RunningWindowAverage}.
+     * @param maxTime       The maximum amount of running window average time. See {@link RunningWindowAverage}.
+     */
+    private AdaptiveTimingStrategy(long delta, long defaultDelay, long minDelay, long maxDelay, long busyThreshold, int maxSamples, int maxTime) {
+        this.delta = delta;
+        this.defaultDelay = defaultDelay;
+        this.minDelay = minDelay;
+        this.maxDelay = maxDelay;
+        this.busyThreshold = busyThreshold;
+        this.maxSamples = maxSamples;
+        this.maxTime = maxTime;
+    }
 
-		LOG.trace("Next delay updated to {}ms based on transaction count difference of {}", newDelay, currentTxCount - txCountAtPreviousInvocation);
+    /**
+     * Returns a copy of this {@link AdaptiveTimingStrategy} reconfigured to use the specified delta.
+     *
+     * @param delta The new delta in milliseconds.
+     * @return A new {@link AdaptiveTimingStrategy}.
+     */
+    public AdaptiveTimingStrategy withDelta(long delta) {
+        return new AdaptiveTimingStrategy(delta, this.defaultDelay, this.minDelay, this.maxDelay, this.busyThreshold, this.maxSamples, this.maxTime);
+    }
 
-		txCountAtPreviousInvocation = currentTxCount;
-		delayAtPreviousInvocation = newDelay;
-		return newDelay;
-	}
+    /**
+     * Returns a copy of this {@link AdaptiveTimingStrategy} reconfigured to use the specified default timer-driven
+     * module scheduling delay.
+     *
+     * @param defaultDelay The new default scheduling delay in milliseconds.
+     * @return A new {@link AdaptiveTimingStrategy}.
+     */
+    public AdaptiveTimingStrategy withDefaultDelayMillis(long defaultDelay) {
+        return new AdaptiveTimingStrategy(this.delta, defaultDelay, this.minDelay, this.maxDelay, this.busyThreshold, this.maxSamples, this.maxTime);
+    }
 
-	private long determineNewDelay(int currentTxCount, long lastTaskDurationMillis) {
-		if (txCountAtPreviousInvocation == -1) {
-			LOG.debug("First request for timing delay so returning default of: {}ms", defaultDelayMillis);
-			return defaultDelayMillis;
-		}
-		return delayAdjuster.determineNextDelay(delayAtPreviousInvocation, lastTaskDurationMillis, currentTxCount - txCountAtPreviousInvocation, threshold);
-	}
+    /**
+     * Returns a copy of this {@link AdaptiveTimingStrategy} reconfigured to use the specified minimum delay between
+     * timer-driven module invocations.
+     *
+     * @param minDelay The new minimum delay between timer-driven module invocations.
+     * @return A new {@link AdaptiveTimingStrategy}.
+     */
+    public AdaptiveTimingStrategy withMinimumDelayMillis(long minDelay) {
+        return new AdaptiveTimingStrategy(this.delta, this.defaultDelay, minDelay, this.maxDelay, this.busyThreshold, this.maxSamples, this.maxTime);
+    }
 
+    /**
+     * Returns a copy of this {@link AdaptiveTimingStrategy} reconfigured to use the specified maximum delay between
+     * timer-driven module invocations.
+     *
+     * @param maxDelay The new maximum delay between timer-driven module invocations.
+     * @return A new {@link AdaptiveTimingStrategy}.
+     */
+    public AdaptiveTimingStrategy withMaximumDelayMillis(long maxDelay) {
+        return new AdaptiveTimingStrategy(this.delta, this.defaultDelay, this.minDelay, maxDelay, this.busyThreshold, this.maxSamples, this.maxTime);
+    }
+
+    /**
+     * Returns a copy of this {@link AdaptiveTimingStrategy} reconfigured to use the given busy threshold.
+     *
+     * @param busyThreshold The new busy threshold to use.
+     * @return A new {@link AdaptiveTimingStrategy}.
+     */
+    public AdaptiveTimingStrategy withBusyThreshold(int busyThreshold) {
+        return new AdaptiveTimingStrategy(this.delta, this.defaultDelay, this.minDelay, this.maxDelay, busyThreshold, this.maxSamples, this.maxTime);
+    }
+
+    /**
+     * Returns a copy of this {@link AdaptiveTimingStrategy} reconfigured to use the maximum number of samples.
+     *
+     * @param maxSamples The new maximum number of samples to use.
+     * @return A new {@link AdaptiveTimingStrategy}.
+     */
+    public AdaptiveTimingStrategy withMaxSamples(int maxSamples) {
+        return new AdaptiveTimingStrategy(this.delta, this.defaultDelay, this.minDelay, this.maxDelay, this.busyThreshold, maxSamples, this.maxTime);
+    }
+
+    /**
+     * Returns a copy of this {@link AdaptiveTimingStrategy} reconfigured to use the given maximum running average window time span.
+     *
+     * @param maxTime The new maximum time to use.
+     * @return A new {@link AdaptiveTimingStrategy}.
+     */
+    public AdaptiveTimingStrategy withMaxTime(int maxTime) {
+        return new AdaptiveTimingStrategy(this.delta, this.defaultDelay, this.minDelay, this.maxDelay, this.busyThreshold, this.maxSamples, maxTime);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void initialize(GraphDatabaseService database) {
+        this.delayAdjuster = new ConstantDeltaDelayAdjuster(this.delta, this.defaultDelay, this.minDelay, this.maxDelay, this.busyThreshold);
+        this.loadMonitor = new StartedTxBasedLoadMonitor(database, new RunningWindowAverage(this.maxSamples, this.maxTime));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long nextDelay(long lastTaskDuration) {
+        if (delayAdjuster == null || loadMonitor == null) {
+            throw new IllegalStateException("Initialization hasn't been performed, this is a bug.");
+        }
+
+        long newDelay = delayAdjuster.determineNextDelay(previousDelay, lastTaskDuration, loadMonitor.getLoad());
+
+        previousDelay = newDelay;
+
+        return newDelay;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AdaptiveTimingStrategy that = (AdaptiveTimingStrategy) o;
+
+        if (busyThreshold != that.busyThreshold) return false;
+        if (defaultDelay != that.defaultDelay) return false;
+        if (delta != that.delta) return false;
+        if (maxDelay != that.maxDelay) return false;
+        if (maxSamples != that.maxSamples) return false;
+        if (maxTime != that.maxTime) return false;
+        if (minDelay != that.minDelay) return false;
+
+        return true;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int result = (int) (delta ^ (delta >>> 32));
+        result = 31 * result + (int) (defaultDelay ^ (defaultDelay >>> 32));
+        result = 31 * result + (int) (minDelay ^ (minDelay >>> 32));
+        result = 31 * result + (int) (maxDelay ^ (maxDelay >>> 32));
+        result = 31 * result + (int) (busyThreshold ^ (busyThreshold >>> 32));
+        result = 31 * result + maxSamples;
+        result = 31 * result + maxTime;
+        return result;
+    }
 }

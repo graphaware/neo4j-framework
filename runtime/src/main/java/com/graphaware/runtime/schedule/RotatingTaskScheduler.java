@@ -15,6 +15,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.graphaware.runtime.schedule.TimingStrategy.*;
+
 /**
  * {@link TaskScheduler} that delegates to the registered {@link TimerDrivenModule}s in round-robin fashion, in the order
  * in which the modules were registered. All work performed by this implementation is done by a single thread.
@@ -26,7 +28,7 @@ public class RotatingTaskScheduler implements TaskScheduler {
     private final ModuleMetadataRepository repository;
     private final TimingStrategy timingStrategy;
 
-    //todo: these two should be made concurrent if we use more than 1 thread for the background work
+    //these two should be made concurrent if we use more than 1 thread for the background work
     private final Map<TimerDrivenModule, TimerDrivenModuleContext> moduleContexts = new LinkedHashMap<>();
     private Iterator<Map.Entry<TimerDrivenModule, TimerDrivenModuleContext>> moduleContextIterator;
 
@@ -69,7 +71,10 @@ public class RotatingTaskScheduler implements TaskScheduler {
         }
 
         LOG.info("There are " + moduleContexts.size() + " timer-driven runtime modules. Scheduling the first task...");
-        scheduleNextTask(-2); //-2 here is to indicate initial task, a bit of a hack for now to allow longer delay for the very first timer firing
+
+        timingStrategy.initialize(database);
+
+        scheduleNextTask(NEVER_RUN);
     }
 
     /**
@@ -78,17 +83,22 @@ public class RotatingTaskScheduler implements TaskScheduler {
     @Override
     public void stop() {
         LOG.info("Terminating task scheduler...");
-        worker.shutdownNow();
+        worker.shutdown();
+        try {
+            worker.awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            LOG.warn("Did not manage to finish all tasks in 5 seconds.");
+        }
         LOG.info("Task scheduler terminated successfully.");
     }
 
     /**
      * Schedule next task.
      *
-     * @param lastTaskDurationNanos duration of the last task in nanoseconds, negative if unknown.
+     * @param lastTaskDuration duration of the last task in millis, negative if unknown.
      */
-    private void scheduleNextTask(long lastTaskDurationNanos) {
-        long nextDelayMillis = timingStrategy.nextDelay(lastTaskDurationNanos);
+    private void scheduleNextTask(long lastTaskDuration) {
+        long nextDelayMillis = timingStrategy.nextDelay(lastTaskDuration);
         LOG.debug("Scheduling next task with a delay of {} ms.", nextDelayMillis);
         worker.schedule(nextTask(), nextDelayMillis, TimeUnit.MILLISECONDS);
     }
@@ -102,15 +112,15 @@ public class RotatingTaskScheduler implements TaskScheduler {
         return new Runnable() {
             @Override
             public void run() {
-                long totalTime = -1;
+                long totalTime = UNKNOWN;
                 try {
                     LOG.debug("Running a scheduled task...");
-                    long startTime = System.nanoTime();
+                    long startTime = System.currentTimeMillis();
 
                     runNextTask();
 
-                    totalTime = (System.nanoTime() - startTime);
-                    LOG.debug("Successfully completed scheduled task in " + totalTime / 1000 + " microseconds");
+                    totalTime = (System.currentTimeMillis() - startTime);
+                    LOG.debug("Successfully completed scheduled task in " + totalTime + " ms");
                 } catch (Exception e) {
                     LOG.warn("Task execution threw an exception: " + e.getMessage(), e);
                 } finally {
@@ -127,6 +137,11 @@ public class RotatingTaskScheduler implements TaskScheduler {
      * @param <T> module type of the module that will be delegated to.
      */
     private <C extends TimerDrivenModuleContext, T extends TimerDrivenModule<C>> void runNextTask() {
+        if (!database.isAvailable(0)) {
+            LOG.warn("Database not available, probably shutting down...");
+            return;
+        }
+
         Pair<T, C> moduleAndContext = findNextModuleAndContext();
 
         if (moduleAndContext == null) {

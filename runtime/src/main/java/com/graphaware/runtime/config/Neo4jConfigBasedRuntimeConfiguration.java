@@ -4,69 +4,122 @@ import static org.neo4j.helpers.Settings.INTEGER;
 import static org.neo4j.helpers.Settings.LONG;
 import static org.neo4j.helpers.Settings.setting;
 
+import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
+import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
+import com.graphaware.runtime.schedule.TimingStrategy;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.kernel.configuration.Config;
 
-import com.graphaware.runtime.bootstrap.ComponentFactory;
-
 /**
  * Implementation of {@link RuntimeConfiguration} that loads bespoke settings from Neo4j's configuration properties, falling
- * back to the corresponding {@link DefaultRuntimeConfiguration} when overrides aren't available.
+ * back to default values when overrides aren't available. Intended for internal framework use, mainly for server deployments.
+ * <p/>
+ * So far, the only thing that is configured using this mechanism is the {@link TimingStrategy} for the {@link com.graphaware.runtime.GraphAwareRuntime}.
+ * <p/>
+ * There are two choices: {@link AdaptiveTimingStrategy}, configured by using the following settings
+ * <pre>
+ *     com.graphaware.runtime.timing.strategy=adaptive
+ *     com.graphaware.runtime.timing.delay=2000
+ *     com.graphaware.runtime.timing.maxDelay=5000
+ *     com.graphaware.runtime.timing.minDelay=5
+ *     com.graphaware.runtime.timing.activityThreshold=100
+ *     com.graphaware.runtime.timing.maxSamples=200
+ *     com.graphaware.runtime.timing.maxTime=200
+ *
+ * </pre>
+ * The above are also the default values, if no configuration is provided. For exact meaning of the values, please refer
+ * to the Javadoc of {@link AdaptiveTimingStrategy}.
+ * <p/>
+ * The other option is {@link FixedDelayTimingStrategy}, configured by using the following settings
+ * <pre>
+ *     com.graphaware.runtime.timing.strategy=fixed
+ *     com.graphaware.runtime.timing.delay=200
+ *     com.graphaware.runtime.timing.initialDelay=1000
+ * </pre>
  */
-public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfiguration implements ScheduleConfiguration {
+public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfiguration {
 
-	private static final Setting<Integer> ACTIVITY_THRESHOLD_SETTING = setting("com.graphaware.runtime.schedule.activityThreshold", INTEGER, (String) null);
-	private static final Setting<Long> DEFAULT_DELAY_SETTING = setting("com.graphaware.runtime.schedule.defaultDelay", LONG, (String) null);
-	private static final Setting<Long> MAX_DELAY_SETTING = setting("com.graphaware.runtime.schedule.maxDelay", LONG, (String) null);
-	private static final Setting<Long> MIN_DELAY_SETTING = setting("com.graphaware.runtime.schedule.minDelay", LONG, (String) null);
+    private static final Setting<TimingStrategy> TIMING_STRATEGY_SETTING = setting("com.graphaware.runtime.timing.strategy", StringToTimingStrategy.getInstance(), (String) null);
 
-	private final Config config;
+    //for both strategies, this is the main (default, mean, whatever) delay
+    private static final Setting<Long> DELAY_SETTING = setting("com.graphaware.runtime.timing.delay", LONG, (String) null);
 
-	/**
-	 * Constructs a new {@link Neo4jConfigBasedRuntimeConfiguration} based on the given Neo4j {@link Config}.
-	 *
-	 * @param config The {@link Config} containing the settings used to configure the runtime
-	 */
-	public Neo4jConfigBasedRuntimeConfiguration(Config config) {
-		this.config = config;
-	}
+    //for FixedDelayTimingStrategy only
+    private static final Setting<Long> INITIAL_DELAY_SETTING = setting("com.graphaware.runtime.timing.initialDelay", LONG, (String) null);
 
-	@Override
-	public int databaseActivityThreshold() {
-		Integer result = config.get(ACTIVITY_THRESHOLD_SETTING);
-		return result != null ? result : getDefault().databaseActivityThreshold();
-	}
+    //for AdaptiveTimingStrategy only
+    private static final Setting<Long> MAX_DELAY_SETTING = setting("com.graphaware.runtime.timing.maxDelay", LONG, (String) null);
+    private static final Setting<Long> MIN_DELAY_SETTING = setting("com.graphaware.runtime.timing.minDelay", LONG, (String) null);
+    private static final Setting<Integer> ACTIVITY_THRESHOLD_SETTING = setting("com.graphaware.runtime.timing.activityThreshold", INTEGER, (String) null);
+    private static final Setting<Integer> MAX_SAMPLES_SETTING = setting("com.graphaware.runtime.timing.maxSamples", INTEGER, (String) null);
+    private static final Setting<Integer> MAX_TIME_SETTING = setting("com.graphaware.runtime.timing.maxTime", INTEGER, (String) null);
 
-	@Override
-	public long defaultDelayMillis() {
-		Long result = config.get(DEFAULT_DELAY_SETTING);
-		return result != null ? result : getDefault().defaultDelayMillis();
-	}
+    private final Config config;
 
-	@Override
-	public long maximumDelayMillis() {
-		Long result = config.get(MAX_DELAY_SETTING);
-		return result != null ? result : getDefault().maximumDelayMillis();
-	}
+    /**
+     * Constructs a new {@link Neo4jConfigBasedRuntimeConfiguration} based on the given Neo4j {@link Config}.
+     *
+     * @param config The {@link Config} containing the settings used to configure the runtime
+     */
+    public Neo4jConfigBasedRuntimeConfiguration(Config config) {
+        this.config = config;
+    }
 
-	@Override
-	public long minimumDelayMillis() {
-		Long result = config.get(MIN_DELAY_SETTING);
-		return result != null ? result : getDefault().minimumDelayMillis();
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public TimingStrategy getTimingStrategy() {
+        TimingStrategy timingStrategy = config.get(TIMING_STRATEGY_SETTING);
 
-	@Override
-	public ScheduleConfiguration getScheduleConfiguration() {
-		return this;
-	}
+        if (timingStrategy == null) {
+            return AdaptiveTimingStrategy.defaultConfiguration();
+        }
 
-	@Override
-	public ComponentFactory getComponentFactory() {
-		return getDefault().getComponentFactory();
-	}
+        if (timingStrategy instanceof FixedDelayTimingStrategy) {
+            FixedDelayTimingStrategy strategy = (FixedDelayTimingStrategy) timingStrategy;
 
-	private DefaultRuntimeConfiguration getDefault() {
-		return DefaultRuntimeConfiguration.getInstance();
-	}
+            if (config.get(INITIAL_DELAY_SETTING) != null) {
+                strategy = strategy.withInitialDelay(config.get(INITIAL_DELAY_SETTING));
+            }
 
+            if (config.get(DELAY_SETTING) != null) {
+                strategy = strategy.withDelay(config.get(DELAY_SETTING));
+            }
+
+            return strategy;
+        }
+
+        if (timingStrategy instanceof AdaptiveTimingStrategy) {
+            AdaptiveTimingStrategy strategy = (AdaptiveTimingStrategy) timingStrategy;
+
+            if (config.get(DELAY_SETTING) != null) {
+                strategy = strategy.withDefaultDelayMillis(config.get(DELAY_SETTING));
+            }
+
+            if (config.get(MAX_DELAY_SETTING) != null) {
+                strategy = strategy.withMaximumDelayMillis(config.get(MAX_DELAY_SETTING));
+            }
+
+            if (config.get(MIN_DELAY_SETTING) != null) {
+                strategy = strategy.withMinimumDelayMillis(config.get(MIN_DELAY_SETTING));
+            }
+
+            if (config.get(ACTIVITY_THRESHOLD_SETTING) != null) {
+                strategy = strategy.withBusyThreshold(config.get(ACTIVITY_THRESHOLD_SETTING));
+            }
+
+            if (config.get(MAX_SAMPLES_SETTING) != null) {
+                strategy = strategy.withMaxSamples(config.get(MAX_SAMPLES_SETTING));
+            }
+
+            if (config.get(MAX_TIME_SETTING) != null) {
+                strategy = strategy.withMaxTime(config.get(MAX_TIME_SETTING));
+            }
+
+            return strategy;
+        }
+
+        throw new IllegalStateException("Unknown timing strategy!");
+    }
 }

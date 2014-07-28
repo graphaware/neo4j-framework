@@ -25,7 +25,7 @@ public class OtherRuntimeTests {
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Test(timeout = 5000)
-    @RepeatRule.Repeat(times = 100)
+    @RepeatRule.Repeat(times = 10)
     public void makeSureDeadlockDoesNotOccur() throws InterruptedException {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
@@ -46,7 +46,7 @@ public class OtherRuntimeTests {
     }
 
     @Test(timeout = 5000)
-    @RepeatRule.Repeat(times = 100)
+    @RepeatRule.Repeat(times = 10)
     public void makeSureDeadlockDoesNotOccur1() throws InterruptedException {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
@@ -70,7 +70,7 @@ public class OtherRuntimeTests {
     }
 
     @Test(timeout = 5000)
-    @RepeatRule.Repeat(times = 100)
+    @RepeatRule.Repeat(times = 10)
     public void makeSureDeadlockDoesNotOccur2() {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
@@ -87,7 +87,7 @@ public class OtherRuntimeTests {
     }
 
     @Test(timeout = 5000)
-    @RepeatRule.Repeat(times = 100)
+    @RepeatRule.Repeat(times = 10)
     public void makeSureDeadlockDoesNotOccur3() {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
@@ -103,7 +103,7 @@ public class OtherRuntimeTests {
     }
 
     @Test(timeout = 5000)
-    @RepeatRule.Repeat(times = 100)
+    @RepeatRule.Repeat(times = 10)
     public void makeSureDeadlockDoesNotOccur4() {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
@@ -119,7 +119,7 @@ public class OtherRuntimeTests {
     }
 
     @Test(timeout = 5000)
-    @RepeatRule.Repeat(times = 100)
+    @RepeatRule.Repeat(times = 10)
     public void makeSureDeadlockDoesNotOccur5() {
         GraphDatabaseService database = new GraphDatabaseFactory()
                 .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot().getPath())
@@ -136,7 +136,7 @@ public class OtherRuntimeTests {
     }
 
     @Test(timeout = 5000)
-    @RepeatRule.Repeat(times = 100)
+    @RepeatRule.Repeat(times = 10)
     public void makeSureDeadlockDoesNotOccur6() throws InterruptedException {
         GraphDatabaseService database = new GraphDatabaseFactory()
                 .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot().getPath())

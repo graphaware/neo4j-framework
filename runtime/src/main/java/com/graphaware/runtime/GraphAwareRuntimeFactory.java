@@ -3,10 +3,10 @@ package com.graphaware.runtime;
 import static com.graphaware.runtime.config.RuntimeConfiguration.TIMER_MODULES_PROPERTY_PREFIX;
 import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROPERTY_PREFIX;
 
+import com.graphaware.runtime.config.FluentRuntimeConfiguration;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.GraphDatabaseAPI;
 
-import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.BatchModuleManager;
 import com.graphaware.runtime.manager.ProductionTimerDrivenModuleManager;
@@ -18,7 +18,6 @@ import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
 import com.graphaware.runtime.module.BatchSupportingTxDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
-import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 
 /**
@@ -36,7 +35,7 @@ public final class GraphAwareRuntimeFactory {
      * @return runtime.
      */
     public static GraphAwareRuntime createRuntime(GraphDatabaseService database) {
-        return createRuntime(database, DefaultRuntimeConfiguration.getInstance());
+        return createRuntime(database, FluentRuntimeConfiguration.defaultConfiguration());
     }
 
     /**
@@ -64,7 +63,7 @@ public final class GraphAwareRuntimeFactory {
      * @return runtime.
      */
     public static GraphAwareRuntime createRuntime(TransactionSimulatingBatchInserter batchInserter) {
-        return createRuntime(batchInserter, DefaultRuntimeConfiguration.getInstance());
+        return createRuntime(batchInserter, FluentRuntimeConfiguration.defaultConfiguration());
     }
 
     /**
@@ -85,9 +84,7 @@ public final class GraphAwareRuntimeFactory {
         ModuleMetadataRepository timerRepo = new ProductionSingleNodeMetadataRepository(database, configuration, TIMER_MODULES_PROPERTY_PREFIX);
         ModuleMetadataRepository txRepo = new ProductionSingleNodeMetadataRepository(database, configuration, TX_MODULES_PROPERTY_PREFIX);
 
-        TimingStrategy timingStrategy = configuration.getComponentFactory()
-        		.createTimingStrategy(database, configuration.getScheduleConfiguration());
-        TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo, timingStrategy);
+        TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo, configuration.getTimingStrategy());
         TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, txRepo);
 
         return new ProductionRuntime(database, txDrivenModuleManager, timerDrivenModuleManager);

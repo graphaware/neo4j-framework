@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
+import com.graphaware.runtime.config.FluentRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfigured;
 import com.graphaware.runtime.module.RuntimeModule;
@@ -47,10 +47,10 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
     }
 
     /**
-     * Create a new instance of the runtime with {@link com.graphaware.runtime.config.DefaultRuntimeConfiguration}.
+     * Create a new instance of the runtime with {@link com.graphaware.runtime.config.FluentRuntimeConfiguration}.
      */
     protected BaseGraphAwareRuntime() {
-        this(DefaultRuntimeConfiguration.getInstance());
+        this(FluentRuntimeConfiguration.defaultConfiguration());
     }
 
     /**

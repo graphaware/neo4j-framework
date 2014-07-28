@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.DefaultRuntimeConfiguration;
+import com.graphaware.runtime.config.FluentRuntimeConfiguration;
 import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.TxDrivenModule;
@@ -50,7 +50,7 @@ public class BatchDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
     public void setUp() throws IOException {
         temporaryFolder.create();
         database = new TransactionSimulatingBatchGraphDatabase(BatchInserters.batchDatabase(temporaryFolder.getRoot().getAbsolutePath()), 1);
-        txRepo = new ProductionSingleNodeMetadataRepository(database, DefaultRuntimeConfiguration.getInstance(), TX_MODULES_PROPERTY_PREFIX);
+        txRepo = new ProductionSingleNodeMetadataRepository(database, FluentRuntimeConfiguration.defaultConfiguration(), TX_MODULES_PROPERTY_PREFIX);
     }
 
     @After

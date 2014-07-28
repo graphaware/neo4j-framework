@@ -16,10 +16,9 @@
 
 package com.graphaware.runtime.config;
 
+import com.graphaware.runtime.schedule.TimingStrategy;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.Label;
-
-import com.graphaware.runtime.bootstrap.ComponentFactory;
 
 /**
  * {@link com.graphaware.runtime.GraphAwareRuntime} configuration.
@@ -47,6 +46,7 @@ public interface RuntimeConfiguration {
      */
     public static final String TIMER_MODULES_PROPERTY_PREFIX = "TIMER_MODULE";
 
+
     /**
      * Create prefix a component should use for internal data it reads/writes (nodes, relationships, properties).
      *
@@ -55,21 +55,10 @@ public interface RuntimeConfiguration {
      */
     String createPrefix(String id);
 
-	/**
-	 * Retrieves the {@link ScheduleConfiguration} to be used for configuring the timer-driven scheduling components of the
-	 * GraphAware runtime.
-	 *
-	 * @return The {@link ScheduleConfiguration}, which may not be <code>null</code>.
-	 */
-	ScheduleConfiguration getScheduleConfiguration();
-
-	/**
-	 * Retrieves the {@link ComponentFactory} used to create the objects required to build the constituents of a GraphAware
-	 * runtime.  The resultant factory can itself be configured by the settings of this {@link RuntimeConfiguration} to use
-	 * different implementations.
-	 *
-	 * @return A {@link ComponentFactory} for making the appropriate objects for use in this Runtime.
-	 */
-	ComponentFactory getComponentFactory();
-
+    /**
+     * Retrieves the {@link TimingStrategy} used for scheduling of work for {@link com.graphaware.runtime.module.TimerDrivenModule}s.
+     *
+     * @return The {@link TimingStrategy}, which may not be <code>null</code>.
+     */
+    TimingStrategy getTimingStrategy();
 }

@@ -4,7 +4,7 @@ import com.graphaware.common.strategy.InclusionStrategies;
 
 /**
  * Encapsulates all configuration of a single {@link com.graphaware.runtime.module.TxDrivenModule}. Modules that need
- * no configuration should use {@link NullTxDrivenModuleConfiguration}.
+ * no configuration should use {@link NullTxDrivenModuleConfiguration}. Otherwise, start with {@link FluentTxDrivenModuleConfiguration}.
  */
 public interface TxDrivenModuleConfiguration {
 

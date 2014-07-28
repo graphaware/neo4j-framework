@@ -71,6 +71,16 @@ public abstract class BaseTxDrivenModuleConfiguration<T extends BaseTxDrivenModu
     }
 
     /**
+     * Create w new instance of {@link TxDrivenModuleConfiguration} with different {@link InclusionStrategies}.
+     *
+     * @param inclusionStrategies of the new instance.
+     * @return new instance.
+     */
+    public T with(InclusionStrategies inclusionStrategies) {
+        return newInstance(inclusionStrategies);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

@@ -16,15 +16,15 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.bootstrap.ComponentFactory;
 import com.graphaware.runtime.config.*;
 import com.graphaware.runtime.metadata.*;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
+import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import com.sun.org.apache.xerces.internal.impl.dv.xs.AnyURIDV;
 
 import org.junit.After;
 import org.junit.Before;
@@ -46,16 +46,21 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
  */
 public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
 
-    private static final int INITIAL_TIMER_DELAY = 1000;
-	private static final int TIMER_DELAY = 200;
+    public static final int DELAY = 200;
+    public static final int INITIAL_DELAY = 1000;
 
-	protected ModuleMetadataRepository timerRepo;
+    public static final TimingStrategy TIMING_STRATEGY = FixedDelayTimingStrategy
+            .getInstance()
+            .withDelay(DELAY)
+            .withInitialDelay(INITIAL_DELAY);
+
+    protected ModuleMetadataRepository timerRepo;
 
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        txRepo = new ProductionSingleNodeMetadataRepository(database, DefaultRuntimeConfiguration.getInstance(), TX_MODULES_PROPERTY_PREFIX);
-        timerRepo = new ProductionSingleNodeMetadataRepository(database, DefaultRuntimeConfiguration.getInstance(), TIMER_MODULES_PROPERTY_PREFIX);
+        txRepo = new ProductionSingleNodeMetadataRepository(database, FluentRuntimeConfiguration.defaultConfiguration(), TX_MODULES_PROPERTY_PREFIX);
+        timerRepo = new ProductionSingleNodeMetadataRepository(database, FluentRuntimeConfiguration.defaultConfiguration(), TIMER_MODULES_PROPERTY_PREFIX);
     }
 
     @After
@@ -65,11 +70,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
 
     @Override
     protected RuntimeConfiguration createTestRuntimeConfiguration() {
-    	final ComponentFactory componentFactory = mock(ComponentFactory.class);
-    	stub(componentFactory.createTimingStrategy(same(database), any(ScheduleConfiguration.class)))
-    		.toReturn(new FixedDelayTimingStrategy(TIMER_DELAY));
-
-    	return DefaultRuntimeConfiguration.getInstance().withComponentFactory(componentFactory);
+        return FluentRuntimeConfiguration.defaultConfiguration().withTimingStrategy(TIMING_STRATEGY);
     }
 
     private TimerDrivenModule mockTimerModule() {
@@ -199,7 +200,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         verify(mockModule3).createInitialContext(database);
         verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
 
-        Thread.sleep(INITIAL_TIMER_DELAY + 5 * TIMER_DELAY - 50);
+        Thread.sleep(INITIAL_DELAY + 5 * DELAY - 50);
 
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
@@ -212,10 +213,43 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
     }
 
     @Test
+    public void allRegisteredInterestedTimerModulesShouldBeDelegatedToWithAdaptiveStrategy() throws InterruptedException {
+        TimerDrivenModule mockModule1 = mockTimerModule(MOCK + "1");
+        TimerDrivenModule mockModule2 = mockTimerModule(MOCK + "2");
+
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database, FluentRuntimeConfiguration
+                .defaultConfiguration()
+                .withTimingStrategy(
+                        AdaptiveTimingStrategy
+                                .defaultConfiguration()
+                                .withDefaultDelayMillis(50)));
+
+        runtime.registerModule(mockModule1);
+        runtime.registerModule(mockModule2);
+
+        runtime.start();
+
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule1).createInitialContext(database);
+        verify(mockModule2).createInitialContext(database);
+        verifyNoMoreInteractions(mockModule1, mockModule2);
+
+        Thread.sleep(80);
+
+        verify(mockModule1, atLeastOnce()).getId();
+        verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule1, atLeastOnce()).doSomeWork(null, database);
+        verify(mockModule2, atLeastOnce()).doSomeWork(null, database);
+
+        verifyNoMoreInteractions(mockModule1, mockModule2);
+    }
+
+    @Test
     public void earliestNextCallTimeShouldBeRespected() throws InterruptedException {
         TimerDrivenModule mockModule1 = mockTimerModule(MOCK + "1");
         TimerDrivenModule mockModule3 = mockTimerModule(MOCK + "3");
-        NodeBasedContext context1 = new NodeBasedContext(0, System.currentTimeMillis() + INITIAL_TIMER_DELAY + 3 * TIMER_DELAY);
+        NodeBasedContext context1 = new NodeBasedContext(0, System.currentTimeMillis() + INITIAL_DELAY + 3 * DELAY);
         NodeBasedContext context2 = new NodeBasedContext(1, TimerDrivenModuleContext.ASAP);
 
         TimerDrivenModule mockModule2 = mock(TimerDrivenModule.class);
@@ -238,7 +272,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         verify(mockModule3).createInitialContext(database);
         verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
 
-        Thread.sleep(INITIAL_TIMER_DELAY + 8 * TIMER_DELAY - 100);
+        Thread.sleep(INITIAL_DELAY + 8 * DELAY - 100);
 
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
@@ -272,7 +306,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         verify(mockModule2).createInitialContext(database);
         verifyNoMoreInteractions(mockModule1, mockModule2);
 
-        Thread.sleep(INITIAL_TIMER_DELAY + 10 * TIMER_DELAY);
+        Thread.sleep(INITIAL_DELAY + 10 * DELAY);
 
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
@@ -298,7 +332,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         verify(mockModule).createInitialContext(database);
         verifyNoMoreInteractions(mockModule);
 
-        Thread.sleep(INITIAL_TIMER_DELAY + 2 * TIMER_DELAY - 100);
+        Thread.sleep(INITIAL_DELAY + 2 * DELAY - 100);
 
         verify(mockModule, atLeastOnce()).getId();
         verify(mockModule).doSomeWork(null, database);
@@ -327,7 +361,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
 
         runtime.start();
 
-        Thread.sleep(INITIAL_TIMER_DELAY + TIMER_DELAY - 100);
+        Thread.sleep(INITIAL_DELAY + DELAY - 100);
 
         verify(mockModule, atLeastOnce()).getId();
         verify(mockModule).doSomeWork(lastContext, database);
@@ -366,7 +400,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         verify(mockModule2).createInitialContext(database);
         verifyNoMoreInteractions(mockModule1, mockModule2);
 
-        Thread.sleep(INITIAL_TIMER_DELAY + 2 * TIMER_DELAY - 100);
+        Thread.sleep(INITIAL_DELAY + 2 * DELAY - 100);
 
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
@@ -392,7 +426,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
             tx.success();
         }
 
-        Thread.sleep(INITIAL_TIMER_DELAY + TIMER_DELAY - 100);
+        Thread.sleep(INITIAL_DELAY + DELAY - 100);
 
         verify(mockModule).initialize(database);
         verify(mockModule).start(database);
@@ -460,7 +494,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
     }
 
     @Override
-	protected Node getMetadataNode() {
+    protected Node getMetadataNode() {
         Node root = null;
 
         try (Transaction tx = database.beginTx()) {
@@ -480,7 +514,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
     }
 
     @Override
-	protected Node createMetadataNode() {
+    protected Node createMetadataNode() {
         Node root;
 
         try (Transaction tx = database.beginTx()) {

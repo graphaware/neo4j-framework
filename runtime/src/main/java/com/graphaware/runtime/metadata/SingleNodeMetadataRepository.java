@@ -142,16 +142,6 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
     }
 
     /**
-     * Build a module key to use as a property key on the metadata node.
-     *
-     * @param module to build a key for.
-     * @return module key.
-     */
-    protected final String moduleKey(RuntimeModule module) {
-        return moduleKey(module.getId());
-    }
-
-    /**
      * Build a module key to use as a property on the metadata node for storing metadata.
      *
      * @param moduleId to build a key for.
