@@ -74,8 +74,8 @@ public class SimpleGraphRelationshipGenerator extends BaseRelationshipGenerator<
                 SimpleDegreeDistribution temp = distribution.duplicate();
                 int candidateIndex = sampler.randomIndexChoice(temp.getDegrees(), index);
 
-                // int rnd =  (int) Math.floor(Math.random() * (length - 1)); // choose an index from one elem. less range. OK
-                // int candidateIndex = rnd >= index ? rnd + 1 : rnd;         // skip index.
+                // int rnd =  (int) Math.floor(Math.random() * (length - 1)); // choose an rank from one elem. less range. OK
+                // int candidateIndex = rnd >= rank ? rnd + 1 : rnd;         // skip rank.
 
                 SameTypePair<Integer> edgeCandidate = new UnorderedPair<>(candidateIndex, index);
 

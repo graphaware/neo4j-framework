@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.graphaware.common.util.export.NetworkMatrix;
+import com.graphaware.common.util.export.NetworkMatrixFactory;
+import com.graphaware.common.util.testing.RankNodePair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +23,6 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.graphaware.common.util.export.AdjacencyMatrix;
 import com.graphaware.common.util.testing.PageRank;
 import com.graphaware.generator.GraphGenerator;
 import com.graphaware.generator.Neo4jGraphGenerator;
@@ -116,28 +118,19 @@ public class PageRankIntegration {
 		LOG.info("Computing adjacency matrix for graph...");
 
 		// secondly, compute the adjacency matrix for this graph
-		AdjacencyMatrix adjacencyMatrix = new AdjacencyMatrix(database);
+		NetworkMatrixFactory networkMatrixFactory = new NetworkMatrixFactory(database);
 
 		try (Transaction tx = database.beginTx()) {
 			LOG.info("Computing page rank based on adjacency matrix...");
 
 			// thirdly, compute the page rank of this graph based on the adjacency matrix
 			PageRank pageRank = new PageRank();
-			Vector pageRankResult = pageRank.getPageRank(adjacencyMatrix, 0.85); // Sergei's & Larry's suggestion is to use .85 to become rich;)
 
-			LOG.info(pageRankResult.toString());
+            NetworkMatrix transitionMatrix = networkMatrixFactory.getTransitionMatrix();
+			List<RankNodePair> pageRankResult = pageRank.getPageRankPairs(transitionMatrix, 0.85); // Sergei's & Larry's suggestion is to use .85 to become rich;)
+
+            LOG.info(pageRankResult.toString());
 			LOG.info("Applying random graph walker module to page rank graph");
-
-            // find the index of a max element
-            int    maxIndex = 0;
-            double maxValue = 0;
-            for(int i = 0; i < pageRankResult.length(); ++i) {
-                double temp = pageRankResult.get(i);
-                if (temp > maxValue) {
-                    maxValue = temp;
-                    maxIndex = i;
-                }
-            }
 
 			// fourthly, run the rage rank module to compute the random walker's page rank
 			GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
@@ -149,19 +142,28 @@ public class PageRankIntegration {
 
 			// finally, compare both page rank metrics and verify the module is producing what it should
 			// XXX: I understand this is WIP, but why does this return a list if it's called get..Map?
-            // YYY: I call it a Map, since it is effectivelly the inverse of the Node, Integer hashMap from the AdjacencyMatrix
-            //      and it is used only to map the indices from of the pagerank values back to the Nodes. Quite clumsy, on tdo list ;)
-			List<Node> indexMap = adjacencyMatrix.getIndexMap();
+            // YYY: I call it a Map, since it is effectivelly the inverse of the Node, Integer hashMap from the NetworkMatrixFactory
+            //      and it is used only to map the indices from of the pagerank values back to the Nodes. Quite clumsy, on todo list ;)
+//			List<Node> indexMap = networkMatrixFactory.getIndexMap();
 
-            LOG.info("The highest PageRank in the network is: " + indexMap.get(maxIndex).getProperty("name").toString());
-            //LOG.info("Top of the index map is: {}", indexMap.get(0).getProperty("name"));
-			for (int i=0 ; i<indexMap.size() ; i++) {
-				Node node = indexMap.get(i);
-				System.out.printf("%s\t%s\t%s\n", node.getProperty("name"),
-                        node.getProperty(RandomWalkerPageRankModule.PAGE_RANK_PROPERTY_KEY).toString(),
-                        pageRankResult.get(i));
+            LOG.info("The highest PageRank in the network is: " + pageRankResult.get(0).node().getProperty("name").toString());
+            //LOG.info("Top of the rank map is: {}", indexMap.get(0).getProperty("name"));
+
+            int topRank  = 0;
+            Node topNode = null;
+
+			for (RankNodePair pair : pageRankResult) {
+                System.out.printf("%s\t%s\t%s\n", pair.node().getProperty("name"),
+                        "NeoRank: " + pair.node().getProperty(RandomWalkerPageRankModule.PAGE_RANK_PROPERTY_KEY).toString(),  "PageRank: " + pair.rank());
+
+                int rank = (int) pair.node().getProperty(RandomWalkerPageRankModule.PAGE_RANK_PROPERTY_KEY);
+
+                if (rank > topRank) {
+                    topRank = rank;
+                    topNode = pair.node();
+                }
 			}
-
+            LOG.info("The highest NeoRank in the network is: " + topNode.getProperty("name").toString());
 		}
 	}
 

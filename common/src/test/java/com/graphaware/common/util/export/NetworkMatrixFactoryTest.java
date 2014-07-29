@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-public class AdjacencyMatrixTest {
+public class NetworkMatrixFactoryTest {
 
     @Test
     public void test()
@@ -46,17 +46,19 @@ public class AdjacencyMatrixTest {
                 person.createRelationshipTo(colleague, relationshipType);
             }
 
-            AdjacencyMatrix mtx = new AdjacencyMatrix(database);
+            NetworkMatrixFactory networkMatrixFactory = new NetworkMatrixFactory(database);
             PageRank pageRank = new PageRank();
 
+            NetworkMatrix adjacencyMatrix  = networkMatrixFactory.getAdjacencyMatrix();
+            NetworkMatrix transitionMatrix = networkMatrixFactory.getTransitionMatrix();
 
-            System.out.println(mtx.getAdjacencyMatrix().toString());
-            System.out.println(mtx.getTransitionMatrix().toString());
+            System.out.println(adjacencyMatrix.getMatrix().toString());
+            System.out.println(transitionMatrix.getMatrix().toString());
 
 
             // ------- calculate the page rank ----------
-            System.out.println(pageRank.getPageRank(mtx, 0.85).toString());
-            System.out.println("The highest PageRank in the network has: " + mtx.getIndexMap().get(1).getProperty("name").toString());
+            System.out.println(pageRank.getPageRankVector(transitionMatrix, 0.85));
+            System.out.println("The highest PageRank in the network is: " + pageRank.getPageRank(transitionMatrix, 0.85).get(0).getProperty("name"));
 
             transaction.success();
 

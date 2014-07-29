@@ -10,7 +10,7 @@ public class ErdosRenyiGraphRelationshipGeneratorTest extends TestCase {
 
     public void testDoGenerateEdges() {
         // EXPERIMENTAL:
-        ErdosRenyiConfig config = new ErdosRenyiConfig(1000000, 5000000); // Works fine up to ~ 1000000
+        ErdosRenyiConfig config = new ErdosRenyiConfig(10000, 50000); // Works fine up to ~ 1000000
         ErdosRenyiGraphRelationshipGenerator er = new ErdosRenyiGraphRelationshipGenerator(config);
         System.out.println(er.generateEdges().size());
 

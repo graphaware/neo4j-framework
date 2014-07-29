@@ -43,10 +43,10 @@ public class ReservoirSampler<T> {
     }
 
     /**
-     * Randomly chooses an index and returns it.
+     * Randomly chooses an rank and returns it.
      * Good for lists without random access
      * @param items list to sample from
-     * @return randomly chosen index
+     * @return randomly chosen rank
      */
     public int randomIndexChoice(List<T> items)
     {
@@ -54,9 +54,9 @@ public class ReservoirSampler<T> {
     }
 
     /**
-     * Randomly chooses an index and returns it, omiting the chosen indices.
+     * Randomly chooses an rank and returns it, omiting the chosen indices.
      * @param items list to sample from
-     * @return randomly chosen index, indices omited
+     * @return randomly chosen rank, indices omited
      */
     public int randomIndexChoice(List<T> items, List<Integer> omitIndices) {
         double maxRnd = 0.0;
@@ -70,7 +70,7 @@ public class ReservoirSampler<T> {
         for (int i = 0; i < items.size(); ++i) {
 
             if (omitIndices != null && j < omitLength &&
-                omitIndices.get(j).equals(i)) { // if an index is present in omit list, skip it.
+                omitIndices.get(j).equals(i)) { // if an rank is present in omit list, skip it.
                 j ++ ;
                 continue;
             }
@@ -86,11 +86,11 @@ public class ReservoirSampler<T> {
     }
 
     /**
-     * Randomly chooses an index and returns it, omiting the chosen indices.
+     * Randomly chooses an rank and returns it, omiting the chosen indices.
      *
      * TODO: make a variant which guarantees sorted input -> no need to call sort explicitly.
-     * @param length length of the index sequence
-     * @return randomly chosen index, indices omited
+     * @param length length of the rank sequence
+     * @return randomly chosen rank, indices omited
      */
     public int randomIndexChoice(int length, List<Integer> omitIndices) {
         double maxRnd = 0.0;
@@ -125,7 +125,7 @@ public class ReservoirSampler<T> {
 
         for (int i = 0; i < length; ++i) {
             if (omitIndices != null && !omitIndices.isEmpty() &&
-                    omitIndices.peek().equals(i)) { // if an index is present in omit list, skip it.
+                    omitIndices.peek().equals(i)) { // if an rank is present in omit list, skip it.
                 omitIndices.poll();
                 continue;
             }

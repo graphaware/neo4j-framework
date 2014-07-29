@@ -9,7 +9,6 @@ import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * EXPERIMENTAL - WORK IN PROGRESS
@@ -20,17 +19,16 @@ import java.util.List;
  *          be executed on a regular basis.
  *
  * TODO: Allow for directed edges?
- * TODO: Return the index <-> node map as well. Possibly return a pair, or some custom class?
+ * TODO: Return the rank <-> node map as well. Possibly return a pair, or some custom class?
  *       UPDATE: this is done by a simple workaround now not to waste time on this too much,
  *               but it could be definitelly more cleaner.
  * 
  */
 
-public class AdjacencyMatrix {
+public class NetworkMatrixFactory {
     private final GraphDatabaseService database;
-    private ArrayList<Node> indexMap; // matrix index <-> node pairs
 
-    public AdjacencyMatrix(GraphDatabaseService database) {
+    public NetworkMatrixFactory(GraphDatabaseService database) {
         this.database = database;
     }
 
@@ -39,9 +37,9 @@ public class AdjacencyMatrix {
      * TODO: Allow for weights & inclusion strategies?
      * @return la4j matrix sparse matrix
      */
-    public Matrix getAdjacencyMatrix() {
+    public NetworkMatrix getAdjacencyMatrix() {
         Iterable<Node> nodes = GlobalGraphOperations.at(database).getAllNodes();
-        indexMap = new ArrayList<Node>();
+        ArrayList<Node> nodeList = new ArrayList<Node>();
         HashMap<Node, Integer> matrixIndices = new HashMap<>();
 
         int length = 0;
@@ -56,11 +54,11 @@ public class AdjacencyMatrix {
         CRSMatrix adjacency = new CRSMatrix(length, length);
 
         for (Node origin : nodes) {
-            // if node is not yet present in the matrix, index it
+            // if node is not yet present in the matrix, rank it
 
             if(!matrixIndices.containsKey(origin)) {
                 matrixIndices.put(origin, discoveredIndex);
-                indexMap.add(origin);
+                nodeList.add(origin);
                 originIndex = discoveredIndex;
                 discoveredIndex ++;
             }else
@@ -73,26 +71,28 @@ public class AdjacencyMatrix {
 
                    if (!matrixIndices.containsKey(target)) {
                        matrixIndices.put(target, discoveredIndex);
-                       indexMap.add(target);
+                       nodeList.add(target);
                        targetIndex = discoveredIndex;
                        discoveredIndex ++;
                    } else
                        targetIndex = matrixIndices.get(target);
 
-                  adjacency.set(originIndex, targetIndex, 1);
+                  adjacency.set(originIndex, targetIndex, 1); // The only difference between the two methods is here
                   adjacency.set(targetIndex, originIndex, 1);
              }
         }
-        return adjacency;
+
+        NetworkMatrix toReturn = new NetworkMatrix(adjacency, nodeList);
+        return toReturn;
     }
 
     /**
      * Returns a Markov transition matrix (all entries are weighted by their out degree)
      * The matrix is in format (i <- j), the sum of any column is 1.
      */
-    public Matrix getTransitionMatrix() {
+    public NetworkMatrix getTransitionMatrix() {
         Iterable<Node> nodes = GlobalGraphOperations.at(database).getAllNodes();
-        indexMap = new ArrayList<>();
+        ArrayList<Node> nodeList = new ArrayList<>();
         HashMap<Node, Integer> matrixIndices = new HashMap<>();
 
         int length = 0;
@@ -107,11 +107,11 @@ public class AdjacencyMatrix {
         CRSMatrix adjacency = new CRSMatrix(length, length);
 
         for (Node origin : nodes) {
-            // if node is not yet present in the matrix, index it
+            // if node is not yet present in the matrix, rank it
 
             if(!matrixIndices.containsKey(origin)) {
                 matrixIndices.put(origin, discoveredIndex);
-                indexMap.add(origin);
+                nodeList.add(origin);
                 originIndex = discoveredIndex;
                 discoveredIndex ++;
             }else
@@ -125,7 +125,7 @@ public class AdjacencyMatrix {
 
                 if (!matrixIndices.containsKey(target)) {
                     matrixIndices.put(target, discoveredIndex);
-                    indexMap.add(target);
+                    nodeList.add(target);
                     targetIndex = discoveredIndex;
                     discoveredIndex ++;
                 } else
@@ -136,7 +136,8 @@ public class AdjacencyMatrix {
             }
         }
 
-        return adjacency;
+        NetworkMatrix toReturn = new NetworkMatrix(adjacency, nodeList);
+        return toReturn;
     }
 
     /**
@@ -147,25 +148,28 @@ public class AdjacencyMatrix {
      *
      * @return Google matrix of the database, given the damping
      */
-    public Matrix getGoogleMatrix(double damping) {
+    public NetworkMatrix getGoogleMatrix(double damping) {
         Factory matrixFactory = new CRSFactory();
 
-        Matrix transitionMatrix = getTransitionMatrix();
+        NetworkMatrix transitionMatrixData = getTransitionMatrix();
+        ArrayList<Node> nodeList = transitionMatrixData.getNodeList();
+        Matrix transitionMatrix = getTransitionMatrix().getMatrix();
+
         int size = transitionMatrix.rows();
         Matrix identityMatrix =  matrixFactory.createIdentityMatrix(size);
+        Matrix googleMatrix = identityMatrix.multiply((1-damping)/((float) size)).add(transitionMatrix.multiply(damping));
 
-
-        // return delta_ij * (1-d) / N + d*T_ij
-        return identityMatrix.multiply((1-damping)/((float) size)).add(transitionMatrix.multiply(damping));
+        NetworkMatrix toReturn = new NetworkMatrix(googleMatrix, nodeList);
+        return toReturn;
 
     }
 
     /**
-     * Returns an node <-> index map. This is useful to identify the indices with
+     * Returns an node <-> rank map. This is useful to identify the indices with
      * Node objects in Page Rank algorithm.
      * @return
      */
-    public ArrayList<Node> getIndexMap() {
+    /* public ArrayList<Node> getIndexMap() {
         return indexMap;
-    }
+    } */
 }
