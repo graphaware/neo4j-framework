@@ -30,7 +30,7 @@ public class WeightedReservoirSampler /*extends ReservoirSampler<T> ? */{
 
 
     /**
-     * Returns an index of the weight at random, but weighted accordingly
+     * Returns an rank of the weight at random, but weighted accordingly
      * @return result
      */
     public int randomIndexChoice(List<Integer> weights) {
@@ -55,11 +55,11 @@ public class WeightedReservoirSampler /*extends ReservoirSampler<T> ? */{
     }
 
     /**
-     * Returns a randomly chosen index, omitting a given indices.
+     * Returns a randomly chosen rank, omitting a given indices.
      * This is very specific override.
      * @param weights weights to sample from
      * @param omitIndices indices to omit from sampling
-     * @return index chosen according to the weight supplied
+     * @return rank chosen according to the weight supplied
      */
     public int randomIndexChoice(List<Integer> weights, Set<Integer> omitIndices) {
         int result = 0, index;
@@ -89,12 +89,12 @@ public class WeightedReservoirSampler /*extends ReservoirSampler<T> ? */{
 
 
     /**
-     * Returns a randomly chosen index, omitting a given index.
+     * Returns a randomly chosen rank, omitting a given rank.
      * This is very specific override used in the Simple graph
      * algorithm.
      * @param weights list of weights to sample from
      * @param omit list of indices to omit
-     * @return randomly (weighted) chosen index
+     * @return randomly (weighted) chosen rank
      */
     public int randomIndexChoice(List<Integer> weights, int omit) {
         int result = 0, index;
