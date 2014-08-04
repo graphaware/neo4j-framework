@@ -17,8 +17,9 @@
 package com.graphaware.example;
 
 import com.graphaware.test.util.TestUtils;
-import org.apache.log4j.Logger;
 import org.neo4j.graphdb.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -27,7 +28,7 @@ import java.util.Map;
  */
 public class QualifyingRelationshipsReadJavaTest extends QualifyingRelationshipsReadTest {
 
-    private static final Logger LOG = Logger.getLogger(QualifyingRelationshipsReadJavaTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(QualifyingRelationshipsReadJavaTest.class);
 
     /**
      * {@inheritDoc}
@@ -68,7 +69,7 @@ public class QualifyingRelationshipsReadJavaTest extends QualifyingRelationships
                                         count++;
                                     }
                                 }
-                                LOG.trace(count);
+                                LOG.trace(""+ count);
                                 break;
                             case RELATIONSHIP_TYPE:
                                 count = 0;
@@ -81,7 +82,7 @@ public class QualifyingRelationshipsReadJavaTest extends QualifyingRelationships
                                     count++;
                                 }
 
-                                LOG.trace(count);
+                                LOG.trace("" + count);
                                 break;
                         }
                     }
