@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 @RequestMapping(value = "/greeting")
-public class HelloWorldController {
+public class GreetingController {
 
     @Autowired
     private GreetingService greetingService;
