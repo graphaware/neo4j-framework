@@ -49,7 +49,7 @@ add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>runtime</artifactId>
-    <version>2.1.2.9</version>
+    <version>2.1.3.10</version>
 </dependency>
 ```
 
@@ -113,7 +113,7 @@ in the order in which they've been registered.
 
 To get started quickly, use the provided Maven archetype by typing:
 
-    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-runtime-module-maven-archetype -DarchetypeVersion=2.1.2.9
+    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-runtime-module-maven-archetype -DarchetypeVersion=2.1.3.10
 
 To start from scratch, you will need the following dependencies in your pom.xml
 
@@ -124,37 +124,37 @@ To start from scratch, you will need the following dependencies in your pom.xml
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>api</artifactId>
-        <version>2.1.2.9</version>
+        <version>2.1.3.10</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>common</artifactId>
-        <version>2.1.2.9</version>
+        <version>2.1.3.10</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>runtime</artifactId>
-        <version>2.1.2.9</version>
+        <version>2.1.3.10</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tests</artifactId>
-        <version>2.1.2.9</version>
+        <version>2.1.3.10</version>
         <scope>test</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tx-api</artifactId>
-        <version>2.1.2.9</version>
+        <version>2.1.3.10</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tx-executor</artifactId>
-        <version>2.1.2.9</version>
+        <version>2.1.3.10</version>
         <scope>provided</scope>
     </dependency>
 
@@ -184,7 +184,7 @@ throttle back the regularity with which timer-driven modules are invoked.  Simil
 database is less busy, it will increase the invocation rate so that background processing performed by these scheduled
 modules isn't delayed unnecessarily.
 
-As of GraphAware Framework version 2.1.2.10, the following configuration properties can be added to _neo4j.properties_ in
+As of GraphAware Framework version 2.1.3.10, the following configuration properties can be added to _neo4j.properties_ in
 order to configure the scheduling of these timer-driven modules.  The default values for each setting are also shown below.
 
 
