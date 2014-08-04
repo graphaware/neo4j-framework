@@ -1,13 +1,13 @@
 package com.graphaware.example.pagerank;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import com.graphaware.common.util.export.NetworkMatrix;
 import com.graphaware.common.util.export.NetworkMatrixFactory;
 import com.graphaware.common.util.testing.RankNodePair;
+import com.graphaware.common.util.testing.RankNodePairComparator;
+import com.graphaware.common.util.testing.SimilarityComparison;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +37,8 @@ import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.runtime.metadata.NodeBasedContext;
 
+import static java.util.Collections.sort;
+
 /**
  * Integration tests for page rank module.  Note that it's not called "Test" in order to prevent Maven running it.
  */
@@ -63,24 +65,25 @@ public class PageRankIntegration {
     }
 
     /** */
-    @Test
+
+   /*  @Test
     public void generateSocialNetworkAndWorkOutSomePageRankStatistics() {
         try (Transaction transaction = this.database.beginTx()) {
-            LOG.info("Creating arbitrary social network database...");
+            // LOG.info("Creating arbitrary social network database...");
 
-            long time = System.currentTimeMillis();
-            GraphGenerator graphGenerator = new Neo4jGraphGenerator(this.database);
-            graphGenerator.generateGraph(new BasicGeneratorConfiguration(
-                    9,
-                    new SimpleGraphRelationshipGenerator(new SimpleDegreeDistribution(Arrays.asList(1, 1, 1, 2, 3, 4, 4, 3, 3))),
-                    SocialNetworkNodeCreator.getInstance(),
-                    SocialNetworkRelationshipCreator.getInstance()));
+            long time; //= System.currentTimeMillis();
+            // GraphGenerator graphGenerator = new Neo4jGraphGenerator(this.database);
+            // graphGenerator.generateGraph(new BasicGeneratorConfiguration(
+                //    9,
+              //      new SimpleGraphRelationshipGenerator(new SimpleDegreeDistribution(Arrays.asList(1, 1, 1, 2, 3, 4, 4, 3, 3))),
+                  //  SocialNetworkNodeCreator.getInstance(),
+                   // SocialNetworkRelationshipCreator.getInstance()));
 
-            time = System.currentTimeMillis() - time;
+            //time = System.currentTimeMillis() - time;
 
-            LOG.info("Created database in " + time + "ms");
+            //LOG.info("Created database in " + time + "ms");
 
-            final int totalSteps = 100;
+            final int totalSteps = 500;
             LOG.info("Performing " + totalSteps + " steps to convergence on page rank");
 
             NodeBasedContext context = this.pageRankModule.createInitialContext(database);
@@ -98,7 +101,7 @@ public class PageRankIntegration {
                         + n.getProperty(RandomWalkerPageRankModule.PAGE_RANK_PROPERTY_KEY, 0));
             }
         }
-    }
+    }*/
 
 	/**
 	 * @throws InterruptedException If the test is interrupted when waiting for the page rank module to do its work
@@ -106,13 +109,13 @@ public class PageRankIntegration {
 	@Test
 	public void verifyRandomWalkerModuleCorrectlyGeneratesReasonablePageRankMeasurements() throws InterruptedException {
 		// firstly, generate a graph
-		final int numberOfNodes = 10;
+		final int numberOfNodes = 50;
 		GraphGenerator graphGenerator = new Neo4jGraphGenerator(database);
 
 		LOG.info("Generating Barabasi-Albert social network graph with {} nodes...", numberOfNodes);
 
 		graphGenerator.generateGraph(new BasicGeneratorConfiguration(numberOfNodes, new BarabasiAlbertGraphRelationshipGenerator(
-				new BarabasiAlbertConfig(numberOfNodes, 5)), SocialNetworkNodeCreator.getInstance(), SocialNetworkRelationshipCreator
+				new BarabasiAlbertConfig(numberOfNodes, 2)), SocialNetworkNodeCreator.getInstance(), SocialNetworkRelationshipCreator
 				.getInstance()));
 
 		LOG.info("Computing adjacency matrix for graph...");
@@ -129,7 +132,7 @@ public class PageRankIntegration {
             NetworkMatrix transitionMatrix = networkMatrixFactory.getTransitionMatrix();
 			List<RankNodePair> pageRankResult = pageRank.getPageRankPairs(transitionMatrix, 0.85); // Sergei's & Larry's suggestion is to use .85 to become rich;)
 
-            LOG.info(pageRankResult.toString());
+            //LOG.info(pageRankResult.toString());
 			LOG.info("Applying random graph walker module to page rank graph");
 
 			// fourthly, run the rage rank module to compute the random walker's page rank
@@ -141,30 +144,50 @@ public class PageRankIntegration {
 			TimeUnit.SECONDS.sleep(30);
 
 			// finally, compare both page rank metrics and verify the module is producing what it should
-			// XXX: I understand this is WIP, but why does this return a list if it's called get..Map?
-            // YYY: I call it a Map, since it is effectivelly the inverse of the Node, Integer hashMap from the NetworkMatrixFactory
-            //      and it is used only to map the indices from of the pagerank values back to the Nodes. Quite clumsy, on todo list ;)
 //			List<Node> indexMap = networkMatrixFactory.getIndexMap();
 
             LOG.info("The highest PageRank in the network is: " + pageRankResult.get(0).node().getProperty("name").toString());
             //LOG.info("Top of the rank map is: {}", indexMap.get(0).getProperty("name"));
 
-            int topRank  = 0;
-            Node topNode = null;
-
+            ArrayList<RankNodePair> neoRank = new ArrayList<>();
 			for (RankNodePair pair : pageRankResult) {
-                System.out.printf("%s\t%s\t%s\n", pair.node().getProperty("name"),
-                        "NeoRank: " + pair.node().getProperty(RandomWalkerPageRankModule.PAGE_RANK_PROPERTY_KEY).toString(),  "PageRank: " + pair.rank());
-
+                Node node = pair.node();
                 int rank = (int) pair.node().getProperty(RandomWalkerPageRankModule.PAGE_RANK_PROPERTY_KEY);
 
-                if (rank > topRank) {
-                    topRank = rank;
-                    topNode = pair.node();
-                }
+                //System.out.printf("%s\t%s\t%s\n", node.getProperty("name"),
+                  //      "NeoRank: " + rank, "PageRank: " + pair.rank());
+
+                neoRank.add(new RankNodePair(rank, node));
 			}
-            LOG.info("The highest NeoRank in the network is: " + topNode.getProperty("name").toString());
+
+            sort(neoRank, new RankNodePairComparator());
+            LOG.info("The highest NeoRank in the network is: " + neoRank.get(0).node().getProperty("name").toString());
+
+            // Perform an analysis of the results:
+            LOG.info("Analysing results:");
+            analyseResults(RankNodePair.convertToRankedNodeList(pageRankResult), RankNodePair.convertToRankedNodeList(neoRank));
 		}
 	}
+
+    /**
+     * Analyses and compares
+     * the results of PageRank and NeoRank
+     *
+     * The input lists have to be
+     * in descending order and have the same length
+     */
+    private void analyseResults(List<Node> pageRank, List<Node> neoRank) {
+        SimilarityComparison similarityComparison = new SimilarityComparison();
+        LOG.info("Similarity of all entries: " + similarityComparison.compareListsOfEqualLength(pageRank, neoRank));
+
+        List<Node> pageRank20 = pageRank.subList(0, (int) (pageRank.size()*.2));
+        List<Node> neoRank20 = neoRank.subList(0, (int) (neoRank.size()*.2));
+        LOG.info("Similarity of top 20% entries: " + similarityComparison.compareListsOfEqualLength(pageRank20, neoRank20));
+
+        List<Node> pageRank5 = pageRank.subList(0, 5);
+        List<Node> neoRank5 = neoRank.subList(0, 5);
+        LOG.info("Unordered similarity of the top 5 entries: " + 100*similarityComparison.unorderedComparisonOfEqualLengthLists(pageRank5, neoRank5) + "%");
+
+    }
 
 }
