@@ -20,7 +20,7 @@ public class Neo4jConfigBasedRuntimeConfigurationTest {
         parameterMap.put("com.graphaware.runtime.timing.delay", "50");
         parameterMap.put("com.graphaware.runtime.timing.maxDelay", "100");
         parameterMap.put("com.graphaware.runtime.timing.minDelay", "10");
-        parameterMap.put("com.graphaware.runtime.timing.activityThreshold", "94");
+        parameterMap.put("com.graphaware.runtime.timing.busyThreshold", "94");
         parameterMap.put("com.graphaware.runtime.timing.maxSamples", "201");
         parameterMap.put("com.graphaware.runtime.timing.maxTime", "2001");
         Config config = new Config(parameterMap);
