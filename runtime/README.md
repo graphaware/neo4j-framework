@@ -206,10 +206,10 @@ com.graphaware.runtime.timing.minDelay=10
 # The number of transactions per second that must be executed before the database is deemed to be busy (default = 100)
 com.graphaware.runtime.timing.busyThreshold=100
 
-# The maximum number of samples based on which the business of the database is determined (default = 200)
+# The maximum number of samples based on which the busyness of the database is determined (default = 200)
 com.graphaware.runtime.timing.maxSamples=200
 
-# The maximum number of milliseconds over which to measure the average business of the database (default = 2000)
+# The maximum number of milliseconds over which to measure the average busyness of the database (default = 2000)
 com.graphaware.runtime.timing.maxTime=2000
 ```
 
