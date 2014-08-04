@@ -10,6 +10,7 @@ import org.la4j.vector.Vector;
 import org.neo4j.graphdb.Node;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.Collections.sort;
 
@@ -67,19 +68,15 @@ public class PageRank {
      */
     public ArrayList<Node> getPageRank(NetworkMatrix transitionMatrix, double damping) {
 
-        ArrayList<RankNodePair> indexNodePairs = getPageRankPairs(transitionMatrix, damping);
-        ArrayList<Node> toReturn = new ArrayList<>();
-
-        // I am sure there is a plenty of room for improvement here ;)
-        for (RankNodePair indexNodePair : indexNodePairs) {
-            toReturn.add(indexNodePair.node());
-        }
-
-        return toReturn;
+        ArrayList<RankNodePair> rankNodePairs = getPageRankPairs(transitionMatrix, damping);
+        return RankNodePair.convertToRankedNodeList(rankNodePairs);
     }
+
+
 
     /**
      * Returns (rank, node) pairs
+     * sorted in descending order by pageRank
      * @param transitionMatrix
      * @param damping
      * @return
@@ -87,14 +84,14 @@ public class PageRank {
     public ArrayList<RankNodePair> getPageRankPairs(NetworkMatrix transitionMatrix, double damping) {
         Vector pageRankVector = getPageRankVector(transitionMatrix, damping);
         ArrayList<Node> nodeList = transitionMatrix.getNodeList();
-        ArrayList<RankNodePair> indexNodePairs = new ArrayList<>(pageRankVector.length());
+        ArrayList<RankNodePair> rankNodePairs = new ArrayList<>(pageRankVector.length());
 
         for (int i = 0; i < pageRankVector.length(); ++i)
-            indexNodePairs.add(new RankNodePair(pageRankVector.get(i), nodeList.get(i))); // prepare the pairs
+            rankNodePairs.add(new RankNodePair(pageRankVector.get(i), nodeList.get(i))); // prepare the pairs
 
-        sort(indexNodePairs, new RankNodePairComparator());
+        sort(rankNodePairs, new RankNodePairComparator());
 
-        return  indexNodePairs;
+        return  rankNodePairs;
     }
 
     /**
