@@ -4,11 +4,16 @@ import org.la4j.factory.CRSFactory;
 import org.la4j.factory.Factory;
 import org.la4j.matrix.Matrix;
 import org.la4j.matrix.sparse.CRSMatrix;
-import org.neo4j.graphdb.*;
-import org.neo4j.tooling.GlobalGraphOperations;
+import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static com.graphaware.common.util.IterableUtils.count;
+import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
  * EXPERIMENTAL - WORK IN PROGRESS
@@ -38,20 +43,23 @@ public class NetworkMatrixFactory {
      * @return la4j matrix sparse matrix
      */
     public NetworkMatrix getAdjacencyMatrix() {
-        Iterable<Node> nodes = GlobalGraphOperations.at(database).getAllNodes();
+        Iterable<Node> nodes = at(database).getAllNodes();
         ArrayList<Node> nodeList = new ArrayList<Node>();
         HashMap<Node, Integer> matrixIndices = new HashMap<>();
 
-        int length = 0;
         int discoveredIndex = 0;
         int originIndex;
         int targetIndex;
 
-        // TODO: avoid iterating over all nodes to obtain the length, or find a dynamic sparse matrix storage
-        for (Node ignored : nodes)
-            length ++;
+        long length = count(at(database).getAllNodes());
 
-        CRSMatrix adjacency = new CRSMatrix(length, length);
+        if (length > Integer.MAX_VALUE) {
+            throw new IllegalStateException("too much");
+        }
+
+        int smallLength = Long.valueOf(length).intValue();
+
+        CRSMatrix adjacency = new CRSMatrix(smallLength, smallLength);
 
         for (Node origin : nodes) {
             // if node is not yet present in the matrix, rank it
@@ -91,7 +99,7 @@ public class NetworkMatrixFactory {
      * The matrix is in format (i <- j), the sum of any column is 1.
      */
     public NetworkMatrix getTransitionMatrix() {
-        Iterable<Node> nodes = GlobalGraphOperations.at(database).getAllNodes();
+        Iterable<Node> nodes = at(database).getAllNodes();
         ArrayList<Node> nodeList = new ArrayList<>();
         HashMap<Node, Integer> matrixIndices = new HashMap<>();
 

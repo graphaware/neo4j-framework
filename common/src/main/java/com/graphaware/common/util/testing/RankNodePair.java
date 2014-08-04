@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * IndexNode pair, used for sorting the results of Page Rank algorithm
  */
-public class RankNodePair extends Pair {
+public class RankNodePair extends Pair<Double, Node> {
 
     /**
      * Construct a new pair.
@@ -23,19 +23,17 @@ public class RankNodePair extends Pair {
 
     /**
      * Return rank stored in the INP
-     * TODO: Optimise?
      * @return
      */
     public double rank() {
-        return (double) first();
+        return first();
     }
 
     /**
      * Returns node stored in the INP
-     * TODO: Optimise, clean up?
      */
     public Node node() {
-        return (Node) second();
+        return second();
     }
 
     /**
@@ -43,8 +41,8 @@ public class RankNodePair extends Pair {
      * @param rankNodePairs
      * @return
      */
-    public static ArrayList<Node> convertToRankedNodeList(List<RankNodePair> rankNodePairs) {
-        ArrayList<Node> toReturn = new ArrayList<>();
+    public static List<Node> convertToRankedNodeList(List<RankNodePair> rankNodePairs) {
+        List<Node> toReturn = new ArrayList<>();
 
         // I am sure there is a plenty of room for improvement here ;)
         for (RankNodePair indexNodePair : rankNodePairs) {
