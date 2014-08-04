@@ -12,6 +12,7 @@ public final class EmptyContext extends BaseTimerDrivenModuleContext<Void> {
      * Construct an empty context requesting that the module be called again ASAP.
      */
     public EmptyContext() {
+        this(ASAP);
     }
 
     /**

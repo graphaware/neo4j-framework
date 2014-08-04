@@ -66,7 +66,7 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
     @Override
     public <M extends ModuleMetadata> M getModuleMetadata(String moduleId) {
         final String key = moduleKey(moduleId);
-        Map<String, Object> internalProperties = getInternalProperties(getOrMetadataNode());
+        Map<String, Object> internalProperties = getInternalProperties(getOrCreateMetadataNode());
 
         try {
             byte[] serializedMetadata = (byte[]) internalProperties.get(key);
@@ -96,7 +96,7 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
      */
     @Override
     public <M extends ModuleMetadata> void persistModuleMetadata(String moduleId, M metadata) {
-        getOrMetadataNode().setProperty(moduleKey(moduleId), Serializer.toByteArray(metadata));
+        getOrCreateMetadataNode().setProperty(moduleKey(moduleId), Serializer.toByteArray(metadata));
     }
 
     /**
@@ -105,7 +105,7 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
     @Override
     public Set<String> getAllModuleIds() {
         Set<String> result = new HashSet<>();
-        for (String key : getInternalProperties(getOrMetadataNode()).keySet()) {
+        for (String key : getInternalProperties(getOrCreateMetadataNode()).keySet()) {
             result.add(key.replace(propertyPrefix, ""));
         }
         return result;
@@ -116,7 +116,7 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
      */
     @Override
     public void removeModuleMetadata(String moduleId) {
-        getOrMetadataNode().removeProperty(moduleKey(moduleId));
+        getOrCreateMetadataNode().removeProperty(moduleKey(moduleId));
     }
 
     /**
@@ -124,7 +124,7 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
      *
      * @return node on which to store metadata.
      */
-    protected abstract Node getOrMetadataNode();
+    protected abstract Node getOrCreateMetadataNode();
 
     /**
      * Get properties starting with {@link #propertyPrefix} from a node.

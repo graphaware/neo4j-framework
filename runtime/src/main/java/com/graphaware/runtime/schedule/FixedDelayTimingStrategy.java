@@ -26,10 +26,22 @@ public class FixedDelayTimingStrategy implements TimingStrategy {
         this.delay = delay;
     }
 
+    /**
+     * Create a new strategy with a different initial delay.
+     *
+     * @param initialDelay of the new strategy.
+     * @return new strategy.
+     */
     public FixedDelayTimingStrategy withInitialDelay(long initialDelay) {
         return new FixedDelayTimingStrategy(initialDelay, this.delay);
     }
 
+    /**
+     * Create a new strategy with a different fixed delay.
+     *
+     * @param delay of the new strategy.
+     * @return new strategy.
+     */
     public FixedDelayTimingStrategy withDelay(long delay) {
         return new FixedDelayTimingStrategy(this.initialDelay, delay);
     }

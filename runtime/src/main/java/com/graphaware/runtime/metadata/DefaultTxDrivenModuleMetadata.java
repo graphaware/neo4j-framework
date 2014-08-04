@@ -9,7 +9,7 @@ public class DefaultTxDrivenModuleMetadata implements TxDrivenModuleMetadata {
 
     private final TxDrivenModuleConfiguration configuration;
     private final boolean needsInitialization;
-    private final long timestamp;
+    private final long problemTimestamp;
 
     /**
      * Construct new metadata. {@link #needsInitialization} will return <code>false</code>.
@@ -20,10 +20,10 @@ public class DefaultTxDrivenModuleMetadata implements TxDrivenModuleMetadata {
         this(configuration, false, -1);
     }
 
-    private DefaultTxDrivenModuleMetadata(TxDrivenModuleConfiguration configuration, boolean needsInitialization, long timestamp) {
+    private DefaultTxDrivenModuleMetadata(TxDrivenModuleConfiguration configuration, boolean needsInitialization, long problemTimestamp) {
         this.configuration = configuration;
         this.needsInitialization = needsInitialization;
-        this.timestamp = timestamp;
+        this.problemTimestamp = problemTimestamp;
     }
 
     /**
@@ -46,7 +46,7 @@ public class DefaultTxDrivenModuleMetadata implements TxDrivenModuleMetadata {
      */
     @Override
     public long problemTimestamp() {
-        return timestamp;
+        return problemTimestamp;
     }
 
     /**

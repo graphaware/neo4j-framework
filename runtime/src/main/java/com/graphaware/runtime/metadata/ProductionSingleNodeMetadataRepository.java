@@ -38,7 +38,7 @@ public class ProductionSingleNodeMetadataRepository extends SingleNodeMetadataRe
      * {@inheritDoc}
      */
     @Override
-    protected Node getOrMetadataNode() {
+    protected Node getOrCreateMetadataNode() {
         Iterator<Node> nodes;
 
         if (database instanceof GraphDatabaseAPI) {

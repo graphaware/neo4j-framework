@@ -41,7 +41,7 @@ public class AdaptiveTimingStrategy implements TimingStrategy {
      * @return instance of this strategy.
      */
     public static AdaptiveTimingStrategy defaultConfiguration() {
-        return new AdaptiveTimingStrategy(100, 2000, 5, 5_000, 100, 200, 2000);
+        return new AdaptiveTimingStrategy(100, 2_000, 5, 5_000, 100, 200, 2_000);
     }
 
     /**

@@ -41,13 +41,4 @@ public class FluentTxDrivenModuleConfiguration extends BaseTxDrivenModuleConfigu
     protected FluentTxDrivenModuleConfiguration newInstance(InclusionStrategies inclusionStrategies) {
         return new FluentTxDrivenModuleConfiguration(inclusionStrategies);
     }
-
-    /**
-     *
-     * @param inclusionStrategies
-     * @return
-     */
-    public FluentTxDrivenModuleConfiguration with(InclusionStrategies inclusionStrategies) {
-        return newInstance(inclusionStrategies);
-    }
 }

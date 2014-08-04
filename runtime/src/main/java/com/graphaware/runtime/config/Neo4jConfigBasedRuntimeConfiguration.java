@@ -22,9 +22,9 @@ import org.neo4j.kernel.configuration.Config;
  *     com.graphaware.runtime.timing.delay=2000
  *     com.graphaware.runtime.timing.maxDelay=5000
  *     com.graphaware.runtime.timing.minDelay=5
- *     com.graphaware.runtime.timing.activityThreshold=100
+ *     com.graphaware.runtime.timing.busyThreshold=100
  *     com.graphaware.runtime.timing.maxSamples=200
- *     com.graphaware.runtime.timing.maxTime=200
+ *     com.graphaware.runtime.timing.maxTime=2000
  *
  * </pre>
  * The above are also the default values, if no configuration is provided. For exact meaning of the values, please refer
@@ -50,7 +50,7 @@ public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfigurati
     //for AdaptiveTimingStrategy only
     private static final Setting<Long> MAX_DELAY_SETTING = setting("com.graphaware.runtime.timing.maxDelay", LONG, (String) null);
     private static final Setting<Long> MIN_DELAY_SETTING = setting("com.graphaware.runtime.timing.minDelay", LONG, (String) null);
-    private static final Setting<Integer> ACTIVITY_THRESHOLD_SETTING = setting("com.graphaware.runtime.timing.activityThreshold", INTEGER, (String) null);
+    private static final Setting<Integer> BUSY_THRESHOLD_SETTING = setting("com.graphaware.runtime.timing.busyThreshold", INTEGER, (String) null);
     private static final Setting<Integer> MAX_SAMPLES_SETTING = setting("com.graphaware.runtime.timing.maxSamples", INTEGER, (String) null);
     private static final Setting<Integer> MAX_TIME_SETTING = setting("com.graphaware.runtime.timing.maxTime", INTEGER, (String) null);
 
@@ -105,8 +105,8 @@ public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfigurati
                 strategy = strategy.withMinimumDelayMillis(config.get(MIN_DELAY_SETTING));
             }
 
-            if (config.get(ACTIVITY_THRESHOLD_SETTING) != null) {
-                strategy = strategy.withBusyThreshold(config.get(ACTIVITY_THRESHOLD_SETTING));
+            if (config.get(BUSY_THRESHOLD_SETTING) != null) {
+                strategy = strategy.withBusyThreshold(config.get(BUSY_THRESHOLD_SETTING));
             }
 
             if (config.get(MAX_SAMPLES_SETTING) != null) {

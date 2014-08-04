@@ -36,13 +36,13 @@ public class BatchSingleNodeMetadataRepository extends SingleNodeMetadataReposit
      * {@inheritDoc}
      */
     @Override
-    protected Node getOrMetadataNode() {
-        Node root = null;
+    protected Node getOrCreateMetadataNode() {
+        Node metadataNode = null;
 
         for (long candidate : batchInserter.getAllNodes()) {
             if (batchInserter.nodeHasLabel(candidate, GA_METADATA)) {
-                if (root == null) {
-                    root = new BatchInserterNode(candidate, batchInserter);
+                if (metadataNode == null) {
+                    metadataNode = new BatchInserterNode(candidate, batchInserter);
                 } else {
                     LOG.error("There is more than 1 runtime metadata node! Cannot start GraphAware Runtime.");
                     throw new IllegalStateException("There is more than 1 runtime metadata node! Cannot start GraphAware Runtime.");
@@ -50,8 +50,8 @@ public class BatchSingleNodeMetadataRepository extends SingleNodeMetadataReposit
             }
         }
 
-        if (root != null) {
-            return root;
+        if (metadataNode != null) {
+            return metadataNode;
         }
 
         return new BatchInserterNode(batchInserter.createNode(new HashMap<String, Object>(), GA_METADATA), batchInserter);
