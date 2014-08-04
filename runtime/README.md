@@ -162,7 +162,7 @@ To start from scratch, you will need the following dependencies in your pom.xml
 </dependencies>
 ```
 
-Again, if using other dependencies, you need to make sure the resulting .jar file includes all the dependencies. [See here](../server#alldependencies).
+If using other dependencies, you need to make sure the resulting .jar file includes all the dependencies. [See here](../server#alldependencies).
 
 Your module then needs to be built by implementing the [`TxDrivenModule`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/runtime/module/TxDrivenModule.html) interface.
 An example is provided in [examples/friendship-strength-counter-module](../examples/friendship-strength-counter-module). This computes the sum of all `strength` properties
@@ -187,24 +187,31 @@ modules isn't delayed unnecessarily.
 As of GraphAware Framework version 2.1.3.10, the following configuration properties can be added to _neo4j.properties_ in
 order to configure the scheduling of these timer-driven modules.  The default values for each setting are also shown below.
 
-
 ```
 # Timer-Driven Module Scheduling Configuration Settings
 
-# The number of transactions that must have been started between scheduled task executions in 
-# order for the runtime to consider the database to be in a busy period.
-com.graphaware.runtime.schedule.activityThreshold = 10
+# Strategy used for timing - the options are "adaptive" (default) or "fixed". Fixed strategy uses the same delay all the
+# time, whilst the adaptive one takes into account how busy the database is, as described above
+com.graphaware.runtime.timing.strategy=adaptive
 
-# The default number of milliseconds to wait between timer-driven module invocations
-com.graphaware.runtime.schedule.defaultDelay = 2000
+# The default number of milliseconds to wait between timer-driven module invocations (default = 2000)
+com.graphaware.runtime.timing.delay=50
 
-# The maximum number of milliseconds to wait between timer-driven module invocations
-com.graphaware.runtime.schedule.maxDelay = 10000
+# The maximum number of milliseconds to wait between timer-driven module invocations (default = 5000)
+com.graphaware.runtime.timing.maxDelay=100
 
-# The minimum number of milliseconds to wait between timer-driven module invocations
-com.graphaware.runtime.schedule.minDelay = 0
+# The minimum number of milliseconds to wait between timer-driven module invocations (default = 5)
+com.graphaware.runtime.timing.minDelay=10
+
+# The number of transactions per second that must be executed before the database is deemed to be busy (default = 100)
+com.graphaware.runtime.timing.busyThreshold=100
+
+# The maximum number of samples based on which the business of the database is determined (default = 200)
+com.graphaware.runtime.timing.maxSamples=200
+
+# The maximum number of milliseconds over which to measure the average business of the database (default = 2000)
+com.graphaware.runtime.timing.maxTime=2000
 ```
-
 
 ### Building a Module Bootstrapper
 
