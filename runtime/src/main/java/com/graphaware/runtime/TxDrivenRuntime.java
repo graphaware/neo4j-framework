@@ -56,13 +56,15 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      */
     @Override
     public Map<String, Object> beforeCommit(TransactionData data) throws Exception {
-        if (isStarting()) {
+        LazyTransactionData transactionData = new LazyTransactionData(data);
+
+        if (!isStarted(transactionData)) {
             return null;
         }
 
         getTxDrivenModuleManager().throwExceptionIfIllegal(data);
 
-        return getTxDrivenModuleManager().beforeCommit(new LazyTransactionData(data));
+        return getTxDrivenModuleManager().beforeCommit(transactionData);
     }
 
     /**

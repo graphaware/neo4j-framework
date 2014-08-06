@@ -19,12 +19,9 @@ package com.graphaware.runtime.bootstrap;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.config.Neo4jConfigBasedRuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
-
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.helpers.Pair;
-import org.neo4j.kernel.AvailabilityGuard;
-import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 import org.slf4j.Logger;
@@ -113,28 +110,23 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         LOG.info("GraphAware Runtime enabled, bootstrapping...");
 
-        GraphAwareRuntime runtime = createRuntime(database, new Neo4jConfigBasedRuntimeConfiguration(config));
-
-        startWhenDatabaseAvailable(runtime);
+        final GraphAwareRuntime runtime = createRuntime(database, new Neo4jConfigBasedRuntimeConfiguration(config));
 
         registerModules(runtime);
 
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (database.isAvailable(5 * 60 * 1000)) {
+                    runtime.start();
+                    LOG.info("GraphAware Runtime automatically started.");
+                } else {
+                    LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within 5 minutes.");
+                }
+            }
+        }).start();
+
         LOG.info("GraphAware Runtime bootstrapped, starting the Runtime...");
-    }
-
-    private void startWhenDatabaseAvailable(final GraphAwareRuntime runtime) {
-        ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(AvailabilityGuard.class).addListener(new AvailabilityGuard.AvailabilityListener() {
-            @Override
-            public void available() {
-                runtime.start();
-                LOG.info("GraphAware Runtime automatically started.");
-            }
-
-            @Override
-            public void unavailable() {
-                //do nothing, other mechanisms will shut everything down
-            }
-        });
     }
 
     private void registerModules(GraphAwareRuntime runtime) {

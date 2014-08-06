@@ -47,6 +47,7 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
     public void throwExceptionIfIllegal(TransactionData transactionData) {
         for (LabelEntry entry : transactionData.removedLabels()) {
             if (entry.label().equals(GA_METADATA)) {
+                LOG.warn("Attempted to delete GraphAware Runtime root node! Will not commit this transaction.");
                 throw new IllegalStateException("Attempted to delete GraphAware Runtime root node!");
             }
         }

@@ -20,6 +20,7 @@ import com.graphaware.runtime.config.FluentRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfigured;
 import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.ErrorState;
 import org.neo4j.graphdb.event.KernelEventHandler;
@@ -27,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Abstract base-class for {@link GraphAwareRuntime} implementations. Handles lifecycle of the runtime and basic
@@ -36,9 +38,16 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseGraphAwareRuntime.class);
 
+    private static final ThreadLocal<Boolean> startingThread = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return false;
+        }
+    };
+
     private final RuntimeConfiguration configuration;
 
-    private State state = State.NONE;
+    private volatile State state = State.NONE;
 
     private enum State {
         NONE,
@@ -121,6 +130,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
             throw new IllegalStateException("Attempt to start GraphAware from multiple different threads. This is a bug");
         }
 
+        startingThread.set(true);
         LOG.info("Starting GraphAware...");
         state = State.STARTING;
 
@@ -128,6 +138,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
 
         state = State.STARTED;
         LOG.info("GraphAware started.");
+        startingThread.set(false);
     }
 
     /**
@@ -172,30 +183,43 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
     protected abstract void cleanupMetadata(Set<String> usedModules);
 
     /**
-     * Checks to see if this {@link GraphAwareRuntime} is starting.
+     * Checks to see if this {@link GraphAwareRuntime} is started. Blocks until it is started, unless one of the following
+     * conditions is met:
+     * <ul>
+     * <li>it's already started, in which case the method returns <code>true</code></li>
+     * <li>hasn't even started starting for more than 1s, in which case an exception is thrown</li>
+     * <li>hasn't been started yet, but the transaction triggering the call of this method isn't mutating, in which case it returns <code>false</code></li>
+     * <li>it's starting but the caller is the thread that starts the runtime itself, in which case it returns <code>false</code></li>
+     * </ul>
      *
-     * @return <code>true</code> iff the runtime is currently starting,
-     *         <code>false</code> if it's alright to delegate onto modules.
-     * @throws IllegalStateException in case the runtime isn't started or starting.
+     * @return <code>true</code> iff the runtime is started.
+     *         <code>false</code> iff the runtime isn't started but it is safe to proceed.
+     * @throws IllegalStateException in case the runtime hasn't been started at all.
      */
-    protected final boolean isStarting() {
-        //perf optimisation
-        if (State.STARTED.equals(state)) {
-            return false;
-        }
+    protected final boolean isStarted(ImprovedTransactionData transactionData) {
+        int attempts = 0;
 
-        synchronized (this) {
-            switch (state) {
-                case NONE:
+        while (!State.STARTED.equals(state)) {
+            if (!transactionData.mutationsOccurred()) {
+                return false;
+            }
+
+            if (State.STARTING.equals(state) && startingThread.get()) {
+                return false;
+            }
+
+            try {
+                attempts++;
+                if (attempts > 100 && State.NONE.equals(state)) {
                     throw new IllegalStateException("Runtime has not been started!");
-                case STARTING:
-                    return true;
-                case STARTED:
-                    return false;
-                default:
-                    throw new IllegalStateException("Unknown GraphAware Runtime state. This is a bug.");
+                }
+                TimeUnit.MILLISECONDS.sleep(10);
+            } catch (InterruptedException e) {
+                //just continue
             }
         }
+
+        return true;
     }
 
     /**

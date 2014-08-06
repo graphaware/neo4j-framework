@@ -36,7 +36,7 @@ import static com.graphaware.common.util.PropertyContainerUtils.id;
  * {@link LazyPropertyContainerTransactionData} for {@link org.neo4j.graphdb.Node}s.
  */
 public class LazyNodeTransactionData extends LazyPropertyContainerTransactionData<Node> implements NodeTransactionData {
-    private static final Logger LOG = LoggerFactory.getLogger(LazyPropertyContainerTransactionData.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LazyNodeTransactionData.class);
 
     private final TransactionData transactionData;
     private final TransactionDataContainer transactionDataContainer;
