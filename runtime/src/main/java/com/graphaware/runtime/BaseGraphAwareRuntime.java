@@ -223,6 +223,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
         int attempts = 0;
 
         while (!State.STARTED.equals(state)) {
+            //workaround for https://github.com/neo4j/neo4j/issues/2804
             if (transactionData != null && !transactionData.mutationsOccurred()) {
                 return false;
             }
