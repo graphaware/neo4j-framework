@@ -51,6 +51,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
 
     private enum State {
         NONE,
+        REGISTERED,
         STARTING,
         STARTED
     }
@@ -69,6 +70,12 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
      */
     private BaseGraphAwareRuntime(RuntimeConfiguration configuration) {
         this.configuration = configuration;
+
+        if (!State.NONE.equals(state)) {
+            throw new IllegalStateException("Only one instance of the GraphAware Runtime should ever be instantiated and started.");
+        }
+
+        state = State.REGISTERED;
     }
 
     /**
@@ -76,7 +83,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
      */
     @Override
     public final synchronized void registerModule(RuntimeModule module) {
-        if (!State.NONE.equals(state)) {
+        if (!State.REGISTERED.equals(state)) {
             LOG.error("Modules must be registered before GraphAware Runtime is started!");
             throw new IllegalStateException("Modules must be registered before GraphAware Runtime is started!");
         }
@@ -120,14 +127,16 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
     @Override
     public final synchronized void start(boolean skipLoadingMetadata) {
         if (State.STARTED.equals(state)) {
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("GraphAware already started");
-            }
+            LOG.debug("GraphAware already started");
             return;
         }
 
         if (State.STARTING.equals(state)) {
             throw new IllegalStateException("Attempt to start GraphAware from multiple different threads. This is a bug");
+        }
+
+        if (!State.REGISTERED.equals(state)) {
+            throw new IllegalStateException("Illegal Runtime state " + state + "! This is a bug");
         }
 
         startingThread.set(true);
@@ -183,6 +192,16 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
     protected abstract void cleanupMetadata(Set<String> usedModules);
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final void waitUntilStarted() {
+        if (!isStarted(null)) {
+            throw new IllegalStateException("It appears that the thread starting the runtime called waitUntilStarted() before it's finished its job. This is a bug");
+        }
+    }
+
+    /**
      * Checks to see if this {@link GraphAwareRuntime} is started. Blocks until it is started, unless one of the following
      * conditions is met:
      * <ul>
@@ -197,10 +216,14 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
      * @throws IllegalStateException in case the runtime hasn't been started at all.
      */
     protected final boolean isStarted(ImprovedTransactionData transactionData) {
+        if (State.NONE.equals(state)) {
+            throw new IllegalStateException("Runtime has not been registered! This is a bug.");
+        }
+
         int attempts = 0;
 
         while (!State.STARTED.equals(state)) {
-            if (!transactionData.mutationsOccurred()) {
+            if (transactionData != null && !transactionData.mutationsOccurred()) {
                 return false;
             }
 
@@ -210,7 +233,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
 
             try {
                 attempts++;
-                if (attempts > 100 && State.NONE.equals(state)) {
+                if (attempts > 100 && State.REGISTERED.equals(state)) {
                     throw new IllegalStateException("Runtime has not been started!");
                 }
                 TimeUnit.MILLISECONDS.sleep(10);

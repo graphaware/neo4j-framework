@@ -23,7 +23,9 @@ import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -35,6 +37,8 @@ import java.util.Set;
  * To use this {@link GraphAwareRuntime}, please construct it using {@link GraphAwareRuntimeFactory}.
  */
 public class ProductionRuntime extends DatabaseRuntime {
+
+    private static final Map<GraphDatabaseService, ProductionRuntime> RUNTIMES = new HashMap<>();
 
     private final TimerDrivenModuleManager timerDrivenModuleManager;
 
@@ -48,6 +52,22 @@ public class ProductionRuntime extends DatabaseRuntime {
     protected ProductionRuntime(GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager) {
         super(database, txDrivenModuleManager);
         this.timerDrivenModuleManager = timerDrivenModuleManager;
+
+        if (getRuntime(database) != null) {
+            throw new IllegalStateException("It is not possible to create multiple runtimes for a single database!");
+        }
+
+        RUNTIMES.put(database, this);
+    }
+
+    /**
+     * Get the {@link ProductionRuntime} registered with the given database.
+     *
+     * @param database for which to get runtime.
+     * @return the runtime, null if none registered.
+     */
+    public static ProductionRuntime getRuntime(GraphDatabaseService database) {
+        return RUNTIMES.get(database);
     }
 
     /**

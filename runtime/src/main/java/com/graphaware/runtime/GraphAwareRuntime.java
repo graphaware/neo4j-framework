@@ -39,6 +39,11 @@ public interface GraphAwareRuntime {
     void start();
 
     /**
+     * Blocks until this runtime has been started and is ready to use.
+     */
+    void waitUntilStarted();
+
+    /**
      * Start the runtime, optionally skipping the metadata loading phase. It is not recommended to skip metadata loading;
      * modules without metadata might not behave correctly.
      *

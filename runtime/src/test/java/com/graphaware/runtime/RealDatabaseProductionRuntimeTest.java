@@ -33,10 +33,10 @@ import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
@@ -84,6 +84,67 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
 
         return mockModule;
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldNotBeAllowedToCreateTwoRuntimes() {
+        GraphAwareRuntimeFactory.createRuntime(database);
+        GraphAwareRuntimeFactory.createRuntime(database);
+    }
+
+    @Test
+    public void nullShouldBeReturnedWhenNoRuntimeHasBeenRegisteredForDatabase() {
+        assertNull(ProductionRuntime.getRuntime(database));
+    }
+
+    @Test
+    public void registeredRuntimeShouldBeRetrieved() {
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
+        assertEquals(runtime, ProductionRuntime.getRuntime(database));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldFailWaitingForRuntimeThatHasNotBeenStarted() {
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
+        runtime.waitUntilStarted();
+    }
+
+    @Test
+    public void shouldWaitForRuntimeToStart() {
+        final GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
+
+        final AtomicBoolean finished = new AtomicBoolean(false);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                runtime.start();
+                finished.set(true);
+            }
+        }).start();
+
+        runtime.waitUntilStarted();
+
+        assertTrue(finished.get());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldFailWhenStartIsNotCalledInOneSecond() {
+        final GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1200);
+                } catch (InterruptedException e) {
+                    //do nothing
+                }
+                runtime.start();
+            }
+        }).start();
+
+        runtime.waitUntilStarted();
+    }
+
 
     @Test(expected = TransactionFailureException.class)
     public void shouldNotBeAllowedToDeleteRuntimeMetadataNode() {
