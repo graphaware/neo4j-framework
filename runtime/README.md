@@ -34,7 +34,7 @@ A single module can implement both interfaces and thus be driven by both transac
 
 The following Runtime Modules are developed and provided by GraphAware:
 * [Relationship Count Module](https://github.com/graphaware/neo4j-relcount)
-* [Change Feed Module](https://github.com/graphaware/neo4j-changefeed) (Work In Progress!)
+* [Change Feed Module](https://github.com/graphaware/neo4j-changefeed)
 
 ### Getting the Runtime
 
