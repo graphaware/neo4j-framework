@@ -38,7 +38,7 @@ public class ProductionSingleNodeMetadataRepository extends SingleNodeMetadataRe
      * {@inheritDoc}
      */
     @Override
-    protected Node getOrCreateMetadataNode() {
+    protected Node getMetadataNode() {
         Iterator<Node> nodes;
 
         if (database instanceof GraphDatabaseAPI) {
@@ -49,18 +49,32 @@ public class ProductionSingleNodeMetadataRepository extends SingleNodeMetadataRe
         }
 
         if (!nodes.hasNext()) {
-            LOG.info("GraphAware Runtime has never been run before on this database. Creating runtime metadata node...");
-            return database.createNode(GA_METADATA);
+            return null;
         }
 
         Node result = nodes.next();
 
         if (nodes.hasNext()) {
-            LOG.error("There is more than 1 runtime metadata node! Cannot start GraphAware Runtime.");
-            throw new IllegalStateException("There is more than 1 runtime metadata node! Cannot start GraphAware Runtime.");
+            LOG.error("There is more than 1 runtime metadata node! Cannot start/use GraphAware Runtime.");
+            throw new IllegalStateException("There is more than 1 runtime metadata node! Cannot start/use GraphAware Runtime.");
         }
 
         return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Node getOrCreateMetadataNode() {
+        Node metadataNode = getMetadataNode();
+
+        if (metadataNode != null) {
+            return metadataNode;
+        }
+
+        LOG.info("GraphAware Runtime has never been run before on this database. Creating runtime metadata node...");
+        return database.createNode(GA_METADATA);
     }
 
     private static class MetadataNodeIterator extends PrefetchingIterator<Node> {

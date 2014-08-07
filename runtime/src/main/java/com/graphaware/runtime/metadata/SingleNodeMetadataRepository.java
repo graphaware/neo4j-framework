@@ -67,7 +67,13 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
     @Override
     public <M extends ModuleMetadata> M getModuleMetadata(String moduleId) {
         final String key = moduleKey(moduleId);
-        Map<String, Object> internalProperties = getInternalProperties(getOrCreateMetadataNode());
+        Node metadataNode = getMetadataNode();
+
+        if (metadataNode == null) {
+            return null;
+        }
+
+        Map<String, Object> internalProperties = getInternalProperties(metadataNode);
 
         try {
             byte[] serializedMetadata = (byte[]) internalProperties.get(key);
@@ -119,6 +125,13 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
     public void removeModuleMetadata(String moduleId) {
         getOrCreateMetadataNode().removeProperty(moduleKey(moduleId));
     }
+
+    /**
+     * Get the node against which to store all metadata.
+     *
+     * @return node on which metadata is stored, null if one doesn't exist.
+     */
+    protected abstract Node getMetadataNode();
 
     /**
      * Get the node against which to store all metadata, create one if one doesn't exist.
