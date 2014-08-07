@@ -129,4 +129,13 @@ public class ProductionRuntime extends DatabaseRuntime {
 
         timerDrivenModuleManager.shutdownModules();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void afterShutdown(GraphDatabaseService database) {
+        super.afterShutdown(database);
+        RUNTIMES.remove(database);
+    }
 }

@@ -38,8 +38,8 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
     /**
      * Construct a new runtime. Protected, please use {@link com.graphaware.runtime.GraphAwareRuntimeFactory}.
      *
-     * @param database                 on which the runtime operates.
-     * @param txDrivenModuleManager    manager for transaction-driven modules.
+     * @param database              on which the runtime operates.
+     * @param txDrivenModuleManager manager for transaction-driven modules.
      */
     protected DatabaseRuntime(GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager) {
         this.database = database;
@@ -72,5 +72,23 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
     @Override
     protected Transaction startTransaction() {
         return database.beginTx();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected final void afterShutdown() {
+        super.afterShutdown();
+        afterShutdown(database);
+    }
+
+    /**
+     * React to shutdown.
+     *
+     * @param database which has been shut down.
+     */
+    protected void afterShutdown(GraphDatabaseService database) {
+        //for subclasses
     }
 }

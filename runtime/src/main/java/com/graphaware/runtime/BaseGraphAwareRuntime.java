@@ -53,7 +53,8 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
         NONE,
         REGISTERED,
         STARTING,
-        STARTED
+        STARTED,
+        SHUTDOWN
     }
 
     /**
@@ -220,6 +221,10 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
             throw new IllegalStateException("Runtime has not been registered! This is a bug.");
         }
 
+        if (State.SHUTDOWN.equals(state)) {
+            throw new IllegalStateException("Runtime is being / has been shut down.");
+        }
+
         int attempts = 0;
 
         while (!State.STARTED.equals(state)) {
@@ -252,8 +257,17 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
     @Override
     public final void beforeShutdown() {
         LOG.info("Shutting down GraphAware Runtime... ");
+        state = State.SHUTDOWN;
         shutdownModules();
+        afterShutdown();
         LOG.info("GraphAware Runtime shut down.");
+    }
+
+    /**
+     * React to shutdown.
+     */
+    protected void afterShutdown() {
+        //for subclasses
     }
 
     /**
