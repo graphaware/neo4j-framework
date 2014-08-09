@@ -86,6 +86,14 @@ The version number has two parts. The first three numbers indicate compatibility
  compatible with Neo4j 2.1.2
 
 
+Data Collection
+---------------
+
+Note that framework sends a POST request to Google Analytics 30 seconds after start just so we know how many people
+actually use it. The only data transmitted are module class names, version and edition of the framework,
+and an anonymous UUID that changes with restart.
+
+
 License
 -------
 

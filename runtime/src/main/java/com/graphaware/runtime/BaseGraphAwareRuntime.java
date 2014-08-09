@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
 import com.graphaware.runtime.config.FluentRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfigured;
@@ -97,6 +98,8 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
         if (module instanceof RuntimeConfigured) {
             ((RuntimeConfigured) module).configurationChanged(configuration);
         }
+
+        GoogleAnalyticsStatsCollector.getInstance().moduleStart(module.getClass().getCanonicalName());
     }
 
     /**
@@ -143,6 +146,8 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
         startingThread.set(true);
         LOG.info("Starting GraphAware...");
         state = State.STARTING;
+
+        GoogleAnalyticsStatsCollector.getInstance().runtimeStart();
 
         doStart(skipLoadingMetadata);
 

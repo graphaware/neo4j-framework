@@ -16,6 +16,7 @@
 
 package com.graphaware.server;
 
+import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
 import com.graphaware.server.web.GraphAwareJetty9WebServer;
 import org.neo4j.kernel.logging.Logging;
 import org.neo4j.server.configuration.Configurator;
@@ -36,6 +37,8 @@ public class GraphAwareEnterpriseNeoServer extends EnterpriseNeoServer {
      */
     @Override
     protected WebServer createWebServer() {
+        GoogleAnalyticsStatsCollector.getInstance().frameworkStart("enterprise");
+
         return new GraphAwareJetty9WebServer(logging);
     }
 }
