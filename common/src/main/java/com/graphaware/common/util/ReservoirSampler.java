@@ -6,6 +6,7 @@ import java.util.Vector;
 /**
  * Sampler that uses the reservoir sampling algorithm, which is useful when the total number of items from which the sample
  * is being taken is unknown in advance.
+ *
  * @param <T> type of sampled item.
  */
 public class ReservoirSampler<T> {
@@ -55,5 +56,14 @@ public class ReservoirSampler<T> {
      */
     public Iterable<T> getSamples() {
         return reservoir;
+    }
+
+    /**
+     * Is the reservoir empty?
+     *
+     * @return true iff empty.
+     */
+    public boolean isEmpty() {
+        return reservoir.isEmpty();
     }
 }

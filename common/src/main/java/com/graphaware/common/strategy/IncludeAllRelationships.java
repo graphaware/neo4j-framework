@@ -19,12 +19,13 @@ package com.graphaware.common.strategy;
 
 import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.serialize.SingletonSerializer;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 /**
  * Strategy that includes all relationships. Singleton.
  */
-public class IncludeAllRelationships extends IncludeAll<Relationship> implements RelationshipInclusionStrategy {
+public class IncludeAllRelationships extends IncludeAll<Relationship> implements NodeCentricRelationshipInclusionStrategy {
 
     private static final RelationshipInclusionStrategy INSTANCE = new IncludeAllRelationships();
 
@@ -37,5 +38,13 @@ public class IncludeAllRelationships extends IncludeAll<Relationship> implements
     }
 
     protected IncludeAllRelationships() {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean include(Relationship relationship, Node pointOfView) {
+        return include(relationship);
     }
 }

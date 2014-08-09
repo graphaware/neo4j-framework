@@ -29,9 +29,9 @@ import org.neo4j.graphdb.Relationship;
  */
 public class IncludeAllBusinessRelationships extends IncludeAllRelationships {
 
-    private static final RelationshipInclusionStrategy INSTANCE = new IncludeAllBusinessRelationships();
+    private static final IncludeAllBusinessRelationships INSTANCE = new IncludeAllBusinessRelationships();
 
-    public static RelationshipInclusionStrategy getInstance() {
+    public static IncludeAllBusinessRelationships getInstance() {
         return INSTANCE;
     }
 

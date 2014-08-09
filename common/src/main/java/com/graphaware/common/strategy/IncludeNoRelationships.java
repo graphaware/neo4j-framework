@@ -19,12 +19,13 @@ package com.graphaware.common.strategy;
 
 import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.serialize.SingletonSerializer;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 /**
  * Strategy that ignores all relationships. Singleton.
  */
-public final class IncludeNoRelationships extends IncludeNone<Relationship> implements RelationshipInclusionStrategy {
+public final class IncludeNoRelationships extends IncludeNone<Relationship> implements NodeCentricRelationshipInclusionStrategy {
 
     private static final RelationshipInclusionStrategy INSTANCE = new IncludeNoRelationships();
 
@@ -37,5 +38,13 @@ public final class IncludeNoRelationships extends IncludeNone<Relationship> impl
     }
 
     private IncludeNoRelationships() {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean include(Relationship relationship, Node pointOfView) {
+        return false;
     }
 }
