@@ -1,76 +1,54 @@
 package com.graphaware.common.strategy;
 
-import com.graphaware.common.util.DirectionUtils;
+import com.graphaware.common.description.predicate.Predicate;
+import com.graphaware.common.description.property.DetachedPropertiesDescription;
+import com.graphaware.common.description.property.WildcardPropertiesDescription;
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.RelationshipType;
 
+import java.util.Collections;
+
 /**
- * {@link NodeCentricRelationshipInclusionStrategy} including {@link Relationship}s with specific types and directions.
+ * An implementation of {@link RelationshipInclusionStrategy} that is entirely configurable using its fluent interface.
  */
-public class IncludeRelationships implements NodeCentricRelationshipInclusionStrategy {
-
-    public static final IncludeRelationships ALL = new IncludeRelationships(Direction.BOTH);
-    public static final IncludeRelationships OUTGOING = new IncludeRelationships(Direction.OUTGOING);
-    public static final IncludeRelationships INCOMING = new IncludeRelationships(Direction.INCOMING);
-
-    private final Direction direction;
-    private final RelationshipType[] relationshipTypes;
+public class IncludeRelationships extends BaseIncludeRelationships<IncludeRelationships> {
 
     /**
-     * Construct a strategy that only includes relationships with a specific direction.
+     * Get a relationship inclusion strategy that includes all relationships as the base-line for further configuration.
+     * <p/>
+     * Note that if you want to simply include all relationships, it is more efficient to use {@link IncludeAllRelationships}.
      *
-     * @param direction of the relationships to include.
+     * @return a strategy including all relationships.
      */
-    public IncludeRelationships(Direction direction) {
-        this(direction, new RelationshipType[0]);
+    public static IncludeRelationships all() {
+        return new IncludeRelationships(Direction.BOTH, new RelationshipType[0], new WildcardPropertiesDescription(Collections.<String, Predicate>emptyMap()));
     }
 
     /**
-     * Construct a strategy that only includes relationships that have one of the specific types.
+     * Create a new strategy.
      *
-     * @param relationshipTypes to include.
+     * @param direction             that matching relationships must have, {@link Direction#BOTH} for both.
+     * @param relationshipTypes     one of which the matching relationships must have, empty for all.
+     * @param propertiesDescription of the matching relationships.
      */
-    public IncludeRelationships(RelationshipType... relationshipTypes) {
-        this(Direction.BOTH, relationshipTypes);
-    }
-
-    /**
-     * Construct a strategy which only includes relationships with a specific direction and one of the specific types.
-     *
-     * @param direction         of the relationships to include.
-     * @param relationshipTypes to include.
-     */
-    public IncludeRelationships(Direction direction, RelationshipType... relationshipTypes) {
-        this.direction = direction;
-        this.relationshipTypes = relationshipTypes;
+    protected IncludeRelationships(Direction direction, RelationshipType[] relationshipTypes, DetachedPropertiesDescription propertiesDescription) {
+        super(direction, relationshipTypes, propertiesDescription);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean include(Relationship relationship) {
-        if (relationshipTypes == null || relationshipTypes.length == 0) {
-            return true;
-        }
-
-        for (RelationshipType type : relationshipTypes) {
-            if (relationship.isType(type)) {
-                return true;
-            }
-        }
-
-        return false;
+    protected IncludeRelationships newInstance(Direction direction, RelationshipType... relationshipTypes) {
+        return new IncludeRelationships(direction, relationshipTypes, getPropertiesDescription());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean include(Relationship relationship, Node pointOfView) {
-        return include(relationship)
-                && DirectionUtils.matches(this.direction, DirectionUtils.resolveDirection(relationship, pointOfView));
+    protected IncludeRelationships newInstance(DetachedPropertiesDescription propertiesDescription) {
+        return new IncludeRelationships(getDirection(), getRelationshipTypes(), propertiesDescription);
     }
 }

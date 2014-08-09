@@ -22,12 +22,10 @@ import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.neo4j.graphdb.Relationship;
 
 /**
- * Base-class for all {@link RelationshipInclusionStrategy} that include
- * arbitrary business / application level
- * relationships (up to subclasses to decide which ones), but exclude any {@link com.graphaware.runtime.GraphAwareRuntime}/{@link com.graphaware.runtime.module.TxDrivenModule}
- * internal relationships.
+ * Strategy that includes all business / application level relationships, but exclude any
+ * {@link com.graphaware.runtime.GraphAwareRuntime} internal relationships. Singleton.
  */
-public class IncludeAllBusinessRelationships extends IncludeAllRelationships {
+public final class IncludeAllBusinessRelationships extends IncludeAllRelationships {
 
     private static final IncludeAllBusinessRelationships INSTANCE = new IncludeAllBusinessRelationships();
 
@@ -42,7 +40,7 @@ public class IncludeAllBusinessRelationships extends IncludeAllRelationships {
      * {@inheritDoc}
      */
     @Override
-    public final boolean include(Relationship relationship) {
+    public boolean include(Relationship relationship) {
         if (relationship.getType().name().startsWith(RuntimeConfiguration.GA_PREFIX)) {
             return false;
         }

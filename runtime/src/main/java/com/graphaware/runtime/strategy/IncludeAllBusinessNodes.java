@@ -23,11 +23,10 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 
 /**
- * Base-class for all {@link NodeInclusionStrategy} implementations
- * that include arbitrary business / application level nodes (up to subclasses to decide which ones), but exclude any
- * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link com.graphaware.runtime.module.TxDrivenModule} internal nodes.
+ * Strategy that includes all business / application level nodes, but exclude any
+ * {@link com.graphaware.runtime.GraphAwareRuntime} internal nodes. Singleton.
  */
-public class IncludeAllBusinessNodes extends IncludeAllNodes {
+public final class IncludeAllBusinessNodes extends IncludeAllNodes {
 
     private static final NodeInclusionStrategy INSTANCE = new IncludeAllBusinessNodes();
 
@@ -42,7 +41,7 @@ public class IncludeAllBusinessNodes extends IncludeAllNodes {
      * {@inheritDoc}
      */
     @Override
-    public final boolean include(Node node) {
+    public boolean include(Node node) {
         for (Label label : node.getLabels()) {
             if (label.name().startsWith(RuntimeConfiguration.GA_PREFIX)) {
                 return false;
