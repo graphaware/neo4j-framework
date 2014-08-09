@@ -27,13 +27,13 @@ import org.neo4j.graphdb.Relationship;
  */
 public class IncludeAllRelationships extends IncludeAll<Relationship> implements NodeCentricRelationshipInclusionStrategy {
 
-    private static final RelationshipInclusionStrategy INSTANCE = new IncludeAllRelationships();
+    private static final NodeCentricRelationshipInclusionStrategy INSTANCE = new IncludeAllRelationships();
 
     static {
         Serializer.register(IncludeAllRelationships.class, new SingletonSerializer());
     }
 
-    public static RelationshipInclusionStrategy getInstance() {
+    public static NodeCentricRelationshipInclusionStrategy getInstance() {
         return INSTANCE;
     }
 
