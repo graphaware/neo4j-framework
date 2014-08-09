@@ -296,7 +296,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         verify(mockModule2).createInitialContext(database);
         verifyNoMoreInteractions(mockModule1, mockModule2);
 
-        Thread.sleep(80);
+        Thread.sleep(200);
 
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
