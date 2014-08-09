@@ -4,6 +4,7 @@ import com.graphaware.common.description.property.DetachedPropertiesDescription;
 import com.graphaware.common.util.DirectionUtils;
 import org.neo4j.graphdb.*;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -166,5 +167,33 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
         }
 
         return types.toArray(new RelationshipType[types.size()]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        BaseIncludeRelationships that = (BaseIncludeRelationships) o;
+
+        if (direction != that.direction) return false;
+        if (!Arrays.equals(relationshipTypes, that.relationshipTypes)) return false;
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + direction.hashCode();
+        result = 31 * result + Arrays.hashCode(relationshipTypes);
+        return result;
     }
 }

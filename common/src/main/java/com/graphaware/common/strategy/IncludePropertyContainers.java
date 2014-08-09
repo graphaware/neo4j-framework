@@ -60,4 +60,27 @@ public abstract class IncludePropertyContainers<C extends IncludePropertyContain
     public boolean include(T propertyContainer) {
         return new LiteralPropertiesDescription(propertyContainer).isMoreSpecificThan(propertiesDescription);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        IncludePropertyContainers that = (IncludePropertyContainers) o;
+
+        if (!propertiesDescription.equals(that.propertiesDescription)) return false;
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return propertiesDescription.hashCode();
+    }
 }
