@@ -4,6 +4,7 @@ import com.graphaware.common.description.property.DetachedPropertiesDescription;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+import org.parboiled.common.StringUtils;
 
 /**
  * Abstract base class for the most powerful (i.e., including properties) {@link NodeInclusionStrategy} implementations
@@ -31,6 +32,14 @@ public abstract class BaseIncludeNodes<T extends BaseIncludeNodes<T>> extends In
      * @return reconfigured strategy.
      */
     public T with(String label) {
+        if (label == null) {
+            return with((Label) null);
+        }
+
+        if (StringUtils.isEmpty(label)) {
+            throw new IllegalArgumentException("Empty labels are not supported"); //just because it's not a good idea and usually indicates a bug
+        }
+
         return with(DynamicLabel.label(label));
     }
 
