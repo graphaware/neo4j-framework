@@ -71,7 +71,7 @@ there and cannot (yet) be configured.
 
 To get started quickly, use the provided Maven archetype by typing:
 
-    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-springmvc-maven-archetype -DarchetypeVersion=2.1.3.10
+    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-springmvc-maven-archetype -DarchetypeVersion=2.1.3.11
 
 To get started manually, you will need the following dependencies:
 
@@ -82,7 +82,7 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>common</artifactId>
-        <version>2.1.3.10</version>
+        <version>2.1.3.11</version>
         <scope>provided</scope>
     </dependency>
 
@@ -90,7 +90,7 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>api</artifactId>
-        <version>2.1.3.10</version>
+        <version>2.1.3.11</version>
         <scope>provided</scope>
     </dependency>
 
@@ -122,13 +122,13 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>server-community</artifactId>
-        <version>2.1.3.10</version>
+        <version>2.1.3.11</version>
         <scope>test</scope>
     </dependency>
 
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
-        <version>2.1.3.10</version>
+        <version>2.1.3.11</version>
         <artifactId>tests</artifactId>
         <scope>test</scope>
     </dependency>
