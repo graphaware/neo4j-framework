@@ -136,7 +136,11 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
         return executor.executeInTransaction(new TransactionCallback<Boolean>() {
             @Override
             public Boolean doInTransaction(GraphDatabaseService database) {
-                return iterator.hasNext();
+                try {
+                    return iterator.hasNext();
+                } catch (RuntimeException e) {
+                    return false;
+                }
             }
         });
     }
