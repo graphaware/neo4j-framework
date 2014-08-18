@@ -98,7 +98,6 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
             NullItem result = executor.executeInTransaction(new TransactionCallback<NullItem>() {
                 @Override
                 public NullItem doInTransaction(GraphDatabaseService database) {
-
                     while (iterator.hasNext() && currentBatchSteps.get() < batchSize) {
                         try {
                             currentBatchSteps.incrementAndGet();
