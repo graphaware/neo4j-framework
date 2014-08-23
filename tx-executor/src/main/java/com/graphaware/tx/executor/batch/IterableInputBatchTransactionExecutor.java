@@ -58,7 +58,7 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
     public IterableInputBatchTransactionExecutor(GraphDatabaseService database, int batchSize, Iterable<T> input, UnitOfWork<T> unitOfWork) {
         this.batchSize = batchSize;
         this.unitOfWork = unitOfWork;
-        this.iterator = input.iterator();
+        this.iterator = new SynchronizedIterator<>(input.iterator());
         this.executor = new SimpleTransactionExecutor(database);
     }
 
@@ -77,7 +77,7 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
         this.iterator = executor.executeInTransaction(new TransactionCallback<Iterator<T>>() {
             @Override
             public Iterator<T> doInTransaction(GraphDatabaseService database) throws Exception {
-                return callback.doInTransaction(database).iterator();
+                return new SynchronizedIterator<>(callback.doInTransaction(database).iterator());
             }
         });
     }
@@ -87,11 +87,11 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
      */
     @Override
     public void execute() {
-        while (hasNext()) {
-            batches.incrementAndGet();
+        while (true) {
+            final int batchNo = batches.incrementAndGet();
 
             if (LOG.isTraceEnabled()) {
-                LOG.trace("Starting a transaction for batch number " + batches);
+                LOG.trace("Starting a transaction for batch number " + batchNo);
             }
 
             final AtomicInteger currentBatchSteps = new AtomicInteger(0);
@@ -99,29 +99,36 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
                 @Override
                 public NullItem doInTransaction(GraphDatabaseService database) {
                     while (iterator.hasNext() && currentBatchSteps.get() < batchSize) {
+                        T next;
                         try {
-                            currentBatchSteps.incrementAndGet();
-                            totalSteps.incrementAndGet();
-                            unitOfWork.execute(database, iterator.next(), batches.get(), currentBatchSteps.get());
+                            next = iterator.next();
                         } catch (NoSuchElementException e) {
                             //this is OK, another thread could have gotten the item after this one called hasNext().
                             //Simply means there's no more items to process.
                             break;
                         }
+
+                        totalSteps.incrementAndGet();
+                        unitOfWork.execute(database, next, batchNo, currentBatchSteps.incrementAndGet());
                     }
                     return NullItem.getInstance();
 
                 }
             }, KeepCalmAndCarryOn.getInstance());
 
+            int attemptedSteps = currentBatchSteps.get();
+            if (attemptedSteps == 0) {
+                batches.decrementAndGet();
+                break;
+            }
 
             if (result != null) {
-                successfulSteps.addAndGet(currentBatchSteps.get());
+                successfulSteps.addAndGet(attemptedSteps);
                 if (LOG.isTraceEnabled()) {
-                    LOG.trace("Committed transaction for batch number " + batches);
+                    LOG.trace("Committed transaction for batch number " + batchNo);
                 }
             } else {
-                LOG.warn("Rolled back transaction for batch number " + batches);
+                LOG.warn("Rolled back transaction for batch number " + batchNo);
             }
         }
 
@@ -129,18 +136,5 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
         if (successfulSteps.get() != totalSteps.get()) {
             LOG.warn("Failed to execute " + (totalSteps.get() - successfulSteps.get()) + " steps!");
         }
-    }
-
-    private Boolean hasNext() {
-        return executor.executeInTransaction(new TransactionCallback<Boolean>() {
-            @Override
-            public Boolean doInTransaction(GraphDatabaseService database) {
-                try {
-                    return iterator.hasNext();
-                } catch (RuntimeException e) {
-                    return false;
-                }
-            }
-        });
     }
 }

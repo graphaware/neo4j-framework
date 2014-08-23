@@ -33,6 +33,15 @@ public class MultiThreadedBatchTransactionExecutor extends DisposableBatchTransa
     private final int numberOfThreads;
 
     /**
+     * Create a new instance of this executor with as many threads as there are CPU cores.
+     *
+     * @param wrappedExecutor the executor to which each thread will delegate work.
+     */
+    public MultiThreadedBatchTransactionExecutor(BatchTransactionExecutor wrappedExecutor) {
+        this(wrappedExecutor, Runtime.getRuntime().availableProcessors());
+    }
+
+    /**
      * Create a new instance of this executor.
      *
      * @param wrappedExecutor the executor to which each thread will delegate work.
