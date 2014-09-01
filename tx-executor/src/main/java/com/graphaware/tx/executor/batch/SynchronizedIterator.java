@@ -23,7 +23,7 @@ public class SynchronizedIterator<T> implements Iterator<T> {
      * {@inheritDoc}
      */
     @Override
-    public boolean hasNext() {
+    public synchronized boolean hasNext() {
         return wrapped.hasNext();
     }
 
