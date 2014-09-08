@@ -563,8 +563,7 @@ public class LazyTransactionDataComprehensiveTest {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData td) {
                         Map<Long, Change<Node>> changed = changesToMap(td.getAllChangedNodes());
-                        assertEquals(5, changed.size()); //todo wait for https://github.com/neo4j/neo4j/issues/2534 to be resolved, then change to 4
-//                        assertEquals(4, changed.size());
+                        assertEquals(4, changed.size());
 
                         Node previous1 = changed.get(1L).getPrevious();
                         assertEquals(3, count(previous1.getPropertyKeys()));
@@ -617,7 +616,7 @@ public class LazyTransactionDataComprehensiveTest {
                         assertTrue(td.hasBeenChanged(current3));
                         assertTrue(td.hasBeenChanged(current4));
                         assertFalse(td.hasBeenChanged(db.getNodeById(4)));
-                        //assertFalse(td.hasBeenChanged(db.getNodeById(0)));  //todo wait for https://github.com/neo4j/neo4j/issues/2534 to be resolved, then uncomment
+                        assertFalse(td.hasBeenChanged(db.getNodeById(0)));
 
                         try {
                             td.getChanged(db.getNodeById(4));
@@ -1584,7 +1583,7 @@ public class LazyTransactionDataComprehensiveTest {
                         assertEquals(0, onePrevious.getDegree(R1, INCOMING));
 
                         Node two = td.getDeleted(db.getNodeById(2L));
-                        assertEquals(3, two.getDegree()); //todo loops only count as 1 - emailed Neo if this is a deliberate choice
+                        assertEquals(3, two.getDegree()); //loops only count as 1
                         assertEquals(2, two.getDegree(R2));
                         assertEquals(1, two.getDegree(R2, INCOMING));
                         assertEquals(2, two.getDegree(R2, OUTGOING));
