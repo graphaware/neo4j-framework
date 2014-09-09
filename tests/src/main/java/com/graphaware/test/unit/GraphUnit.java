@@ -16,6 +16,9 @@
 
 package com.graphaware.test.unit;
 
+import com.graphaware.common.strategy.IncludeAll;
+import com.graphaware.common.strategy.IncludeAllNodes;
+import com.graphaware.common.strategy.InclusionStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
@@ -25,9 +28,7 @@ import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.*;
 
-import static com.graphaware.common.util.PropertyContainerUtils.nodeToString;
-import static com.graphaware.common.util.PropertyContainerUtils.relationshipToString;
-import static com.graphaware.common.util.PropertyContainerUtils.valueToString;
+import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.neo4j.graphdb.Direction.OUTGOING;
@@ -104,6 +105,28 @@ public final class GraphUnit {
             assertSubgraph(database, otherDatabase);
         } finally {
             otherDatabase.shutdown();
+        }
+    }
+
+    /**
+     * Clear the database by deleting all nodes and relationships.
+     * @param database the graph,typically the one that has been created by some code that is being tested by
+     *                       this library.
+     */
+    public static void clearGraph(GraphDatabaseService database, List<InclusionStrategy> inclusionStrategies) {
+        if(inclusionStrategies==null) {
+            inclusionStrategies=new ArrayList<>();
+            inclusionStrategies.add(IncludeAllNodes.getInstance());
+        }
+        try(Transaction tx = database.beginTx()) {
+            for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+                for(InclusionStrategy inclusionStrategy : inclusionStrategies) {
+                    if(inclusionStrategy.include(node)) {
+                        deleteNodeAndRelationships(node);
+                    }
+                }
+            }
+            tx.success();
         }
     }
 

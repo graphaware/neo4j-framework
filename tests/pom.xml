@@ -28,6 +28,10 @@
     <description>Tools for testing Neo4j-related and GraphAware-related code</description>
     <url>http://graphaware.com</url>
 
+    <properties>
+        <graphware.version>2.1.3.11</graphware.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.neo4j</groupId>
@@ -102,6 +106,14 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
+        </dependency>
+
+        <!--to test inclusion strategies -->
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>runtime</artifactId>
+            <version>${graphware.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
