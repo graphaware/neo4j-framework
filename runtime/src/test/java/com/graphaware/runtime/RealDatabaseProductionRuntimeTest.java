@@ -109,7 +109,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
     }
 
     @Test
-    public void shouldWaitForRuntimeToStart() {
+    public void shouldWaitForRuntimeToStart() throws InterruptedException {
         final GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
 
         final AtomicBoolean finished = new AtomicBoolean(false);
@@ -122,6 +122,7 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         }).start();
 
         runtime.waitUntilStarted();
+        Thread.sleep(5);
 
         assertTrue(finished.get());
     }
