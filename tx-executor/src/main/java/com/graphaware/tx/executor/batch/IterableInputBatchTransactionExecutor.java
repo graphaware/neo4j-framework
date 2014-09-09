@@ -98,18 +98,15 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
             NullItem result = executor.executeInTransaction(new TransactionCallback<NullItem>() {
                 @Override
                 public NullItem doInTransaction(GraphDatabaseService database) {
-                    while (iterator.hasNext() && currentBatchSteps.get() < batchSize) {
-                        T next;
-                        try {
-                            next = iterator.next();
-                        } catch (NoSuchElementException e) {
-                            //this is OK, another thread could have gotten the item after this one called hasNext().
-                            //Simply means there's no more items to process.
-                            break;
+                    try {
+                        while (iterator.hasNext() && currentBatchSteps.get() < batchSize) {
+                            T next = iterator.next();
+                            totalSteps.incrementAndGet();
+                            unitOfWork.execute(database, next, batchNo, currentBatchSteps.incrementAndGet());
                         }
-
-                        totalSteps.incrementAndGet();
-                        unitOfWork.execute(database, next, batchNo, currentBatchSteps.incrementAndGet());
+                    } catch (NoSuchElementException | NullPointerException e) {
+                        //this is OK, simply means there's no more items to process. The NPE comes from
+                        //org.neo4j.collection.primitive.PrimitiveLongCollections$PrimitiveLongConcatingIterator.fetchNext(PrimitiveLongCollections.java:195)
                     }
                     return NullItem.getInstance();
 
