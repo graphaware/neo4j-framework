@@ -16,15 +16,14 @@
 
 package com.graphaware.test.unit;
 
-import com.graphaware.common.strategy.IncludeAll;
 import com.graphaware.common.strategy.IncludeAllNodes;
 import com.graphaware.common.strategy.InclusionStrategy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -110,8 +109,9 @@ public final class GraphUnit {
 
     /**
      * Clear the database by deleting all nodes and relationships.
-     * @param database the graph,typically the one that has been created by some code that is being tested by
-     *                       this library.
+     * @param database              the graph,typically the one that has been created by some code that is being tested by
+     *                              this library.
+     * @param inclusionStrategies   List of InclusionStrategy specifying which nodes are to be cleared from the graph
      */
     public static void clearGraph(GraphDatabaseService database, List<InclusionStrategy> inclusionStrategies) {
         if(inclusionStrategies==null) {

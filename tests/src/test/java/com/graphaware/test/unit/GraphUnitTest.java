@@ -605,16 +605,5 @@ public class GraphUnitTest {
         }
     }
 
-    @Test
-    public void equalGraphsWithLabelsAndGARuntimeShouldPassSameGraphTest() {
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
-        runtime.start();
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
-                "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)";
 
-        populateDatabase(assertCypher);
-
-        assertSameGraph(database, assertCypher);
-    }
 }
