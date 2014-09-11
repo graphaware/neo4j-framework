@@ -16,8 +16,6 @@
 
 package com.graphaware.test.unit;
 
-import com.graphaware.common.strategy.IncludeAllNodes;
-import com.graphaware.common.strategy.InclusionStrategy;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -107,28 +105,7 @@ public final class GraphUnit {
         }
     }
 
-    /**
-     * Clear the database by deleting all nodes and relationships.
-     * @param database              the graph,typically the one that has been created by some code that is being tested by
-     *                              this library.
-     * @param inclusionStrategies   List of InclusionStrategy specifying which nodes are to be cleared from the graph
-     */
-    public static void clearGraph(GraphDatabaseService database, List<InclusionStrategy> inclusionStrategies) {
-        if(inclusionStrategies==null) {
-            inclusionStrategies=new ArrayList<>();
-            inclusionStrategies.add(IncludeAllNodes.getInstance());
-        }
-        try(Transaction tx = database.beginTx()) {
-            for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
-                for(InclusionStrategy inclusionStrategy : inclusionStrategies) {
-                    if(inclusionStrategy.include(node)) {
-                        deleteNodeAndRelationships(node);
-                    }
-                }
-            }
-            tx.success();
-        }
-    }
+
 
     private static void assertSameGraph(GraphDatabaseService database, GraphDatabaseService otherDatabase) {
         try (Transaction tx = database.beginTx()) {

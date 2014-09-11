@@ -16,12 +16,6 @@
 
 package com.graphaware.test.unit;
 
-import com.graphaware.common.strategy.InclusionStrategy;
-import com.graphaware.runtime.GraphAwareRuntime;
-import com.graphaware.runtime.GraphAwareRuntimeFactory;
-import com.graphaware.runtime.strategy.IncludeAllBusinessNodes;
-import com.graphaware.runtime.strategy.IncludeAllBusinessRelationships;
-import com.graphaware.runtime.strategy.IncludeBusinessNodes;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,15 +24,8 @@ import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 import static com.graphaware.test.unit.GraphUnit.assertSubgraph;
-import static com.graphaware.test.unit.GraphUnit.clearGraph;
-import static org.junit.Assert.assertEquals;
-import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 
 /**
@@ -570,39 +557,6 @@ public class GraphUnitTest {
         String cypher = "CREATE (n)";
 
         assertSameGraph(database, cypher);
-    }
-
-    @Test
-    public void clearGraphShouldEmptyTheDatabase() {   //Without the GA Runtime
-        String populateCypher = "CREATE " +
-                "(blue {name:'Blue'})<-[:REL]-(red1 {name:'Red'})-[:REL]->(black1 {name:'Black'})-[:REL]->(green {name:'Green'})," +
-                "(red2 {name:'Red'})-[:REL]->(black2 {name:'Black'})";
-
-        populateDatabase(populateCypher);
-        clearGraph(database, null);
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(0, count(at(database).getAllNodes()));
-            tx.success();
-        }
-
-    }
-
-    @Test
-    public void clearGraphShouldRemoveIncludedNodesOnly() {
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
-        runtime.start();
-        String populateCypher = "CREATE " +
-                "(blue {name:'Blue'})<-[:REL]-(red1 {name:'Red'})-[:REL]->(black1 {name:'Black'})-[:REL]->(green {name:'Green'})," +
-                "(red2 {name:'Red'})-[:REL]->(black2 {name:'Black'})";
-
-        populateDatabase(populateCypher);
-        List<InclusionStrategy> inclusionStrategies = new ArrayList<>();
-        inclusionStrategies.add(IncludeAllBusinessNodes.getInstance());
-        clearGraph(database, inclusionStrategies);
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(1, count(at(database).getAllNodes())); //GA root shouldn't be deleted
-            tx.success();
-        }
     }
 
 
