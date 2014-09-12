@@ -18,6 +18,7 @@ package com.graphaware.server.web;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ArrayUtil;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
@@ -44,10 +45,20 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
 
     @Override
     protected void startJetty() {
+        HandlerList handlerList;
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/graphaware");
         context.addLifeCycleListener(new JettyStartingListener(context.getServletContext()));
-        ((HandlerList) getJetty().getHandler()).setHandlers(ArrayUtil.prependToArray(context, ((HandlerList) getJetty().getHandler()).getHandlers(), Handler.class));
+
+        //If http logging is turned on, the jetty handler is a RequestLogHandler with a different type hierarchy than
+        //the HandlerList returned when http logging is off
+        if(getJetty().getHandler().getClass().equals(RequestLogHandler.class)) {
+            handlerList = (HandlerList)((RequestLogHandler)getJetty().getHandler()).getHandler();
+        }
+        else {
+            handlerList = (HandlerList) getJetty().getHandler();
+        }
+        handlerList.setHandlers(ArrayUtil.prependToArray(context, handlerList.getHandlers(), Handler.class));
 
         super.startJetty();
     }

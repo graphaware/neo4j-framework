@@ -234,6 +234,36 @@ public class FriendshipStrengthModuleBootstrapper implements RuntimeModuleBootst
 }
 ```
 
+### Logging
+To enable logging from your GraphAware Runtime Modules, set up a dependency on `slf4j-api` like this:
+
+```xml
+<dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-api</artifactId>
+    <version>${slf4j.version}</version>
+    <scope>provided</scope>
+</dependency>
+```
+Make sure you do not include any other slf4j implementations.
+
+Modify conf/custom-logback.xml in your Neo4j install path and add at the end
+
+```xml
+<appender name="EXTENSIONLOG"  class="ch.qos.logback.core.FileAppender">
+    <file>data/log/extensions.log</file>
+    <encoder>
+        <pattern>%date{yyyy-MM-dd HH:mm:ss.SSSZ} %-5level [%logger{15}]: %message%n</pattern>
+    </encoder>
+</appender>
+
+<logger name="com.mycompany" level="debug">
+    <appender-ref ref="EXTENSIONLOG"/>
+</logger>
+```
+
+In the example above, logging is set to `debug` level and log statements are written to an extensions.log file in the Neo4j data/log directory.
+
 License
 -------
 
