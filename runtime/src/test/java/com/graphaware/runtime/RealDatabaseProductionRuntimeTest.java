@@ -303,8 +303,6 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule1, atLeastOnce()).doSomeWork(null, database);
         verify(mockModule2, atLeastOnce()).doSomeWork(null, database);
-
-        verifyNoMoreInteractions(mockModule1, mockModule2);
     }
 
     @Test
