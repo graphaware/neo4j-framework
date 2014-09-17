@@ -1,18 +1,20 @@
 package com.graphaware.runtime.walk;
 
-import com.graphaware.common.strategy.IncludeAllNodes;
-import com.graphaware.common.strategy.IncludeNodes;
 import com.graphaware.common.strategy.IncludeRelationships;
+import com.graphaware.common.strategy.expression.SpelRelationshipInclusionStrategy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.neo4j.graphdb.Direction.*;
-import static org.neo4j.graphdb.DynamicLabel.*;
+import static org.neo4j.graphdb.Direction.INCOMING;
+import static org.neo4j.graphdb.Direction.OUTGOING;
+import static org.neo4j.graphdb.DynamicLabel.label;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
@@ -55,9 +57,9 @@ public class RandomRelationshipSelectorTest {
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertNull(new RandomRelationshipSelector(IncludeRelationships.all().with(withName("NOT_EXIST")), IncludeAllNodes.getInstance()).selectRelationship(database.getNodeById(0)));
-            assertNull(new RandomRelationshipSelector(IncludeRelationships.all().with(INCOMING), IncludeAllNodes.getInstance()).selectRelationship(database.getNodeById(0)));
-            assertNull(new RandomRelationshipSelector(IncludeRelationships.all().with(OUTGOING), IncludeNodes.all().with(label("Test"))).selectRelationship(database.getNodeById(0)));
+            assertNull(new RandomRelationshipSelector(IncludeRelationships.all().with(withName("NOT_EXIST"))).selectRelationship(database.getNodeById(0)));
+            assertNull(new RandomRelationshipSelector(IncludeRelationships.all().with(INCOMING)).selectRelationship(database.getNodeById(0)));
+            assertNull(new RandomRelationshipSelector(new SpelRelationshipInclusionStrategy("isOutgoing() && otherNode.hasLabel('Test')")).selectRelationship(database.getNodeById(0)));
             tx.success();
         }
     }
@@ -72,8 +74,8 @@ public class RandomRelationshipSelectorTest {
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(0, new RandomRelationshipSelector(IncludeRelationships.all().with(OUTGOING), IncludeAllNodes.getInstance()).selectRelationship(database.getNodeById(0)).getId());
-            assertEquals(0, new RandomRelationshipSelector(IncludeRelationships.all().with(OUTGOING), IncludeNodes.all().with(label("Test"))).selectRelationship(database.getNodeById(0)).getId());
+            assertEquals(0, new RandomRelationshipSelector(IncludeRelationships.all().with(OUTGOING)).selectRelationship(database.getNodeById(0)).getId());
+            assertEquals(0, new RandomRelationshipSelector(new SpelRelationshipInclusionStrategy("isOutgoing() && otherNode.hasLabel('Test')")).selectRelationship(database.getNodeById(0)).getId());
             tx.success();
         }
     }

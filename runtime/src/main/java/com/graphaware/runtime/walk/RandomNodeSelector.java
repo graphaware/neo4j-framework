@@ -47,9 +47,9 @@ public class RandomNodeSelector implements NodeSelector {
 
     /**
      * Constructs a new {@link RandomNodeSelector} that selects a random node that matches the given
-     * {@link com.graphaware.common.strategy.InclusionStrategy}.
+     * {@link NodeInclusionStrategy}.
      *
-     * @param inclusionStrategy The {@link com.graphaware.common.strategy.InclusionStrategy} to consider when selecting
+     * @param inclusionStrategy The {@link NodeInclusionStrategy} to consider when selecting
      *                          nodes.
      */
     public RandomNodeSelector(NodeInclusionStrategy inclusionStrategy) {

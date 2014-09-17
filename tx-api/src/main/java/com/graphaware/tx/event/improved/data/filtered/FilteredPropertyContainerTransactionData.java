@@ -17,6 +17,8 @@
 package com.graphaware.tx.event.improved.data.filtered;
 
 import com.graphaware.common.strategy.*;
+import com.graphaware.common.strategy.none.IncludeNoProperties;
+import com.graphaware.common.strategy.none.IncludeNone;
 import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import org.neo4j.graphdb.PropertyContainer;

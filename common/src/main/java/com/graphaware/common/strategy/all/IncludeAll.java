@@ -16,12 +16,12 @@
 
 package com.graphaware.common.strategy.all;
 
-import com.graphaware.common.strategy.InclusionStrategy;
+import com.graphaware.common.strategy.ObjectInclusionStrategy;
 
 /**
- * {@link com.graphaware.common.strategy.InclusionStrategy} that includes all objects.
+ * {@link com.graphaware.common.strategy.ObjectInclusionStrategy} that includes all objects.
  */
-public class IncludeAll<T> implements InclusionStrategy<T> {
+public class IncludeAll<T> implements ObjectInclusionStrategy<T> {
 
     /**
      * {@inheritDoc}

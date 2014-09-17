@@ -17,6 +17,10 @@
 package com.graphaware.tx.event.improved.api;
 
 import com.graphaware.common.strategy.*;
+import com.graphaware.common.strategy.none.IncludeNoNodeProperties;
+import com.graphaware.common.strategy.none.IncludeNoNodes;
+import com.graphaware.common.strategy.none.IncludeNoRelationshipProperties;
+import com.graphaware.common.strategy.none.IncludeNoRelationships;
 import com.graphaware.tx.event.improved.data.BaseImprovedTransactionData;
 import com.graphaware.tx.event.improved.data.NodeTransactionData;
 import com.graphaware.tx.event.improved.data.RelationshipTransactionData;

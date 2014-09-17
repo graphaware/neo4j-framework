@@ -1,4 +1,4 @@
-package com.graphaware.runtime.config;
+package com.graphaware.runtime.config.function;
 
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;

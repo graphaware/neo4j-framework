@@ -26,34 +26,30 @@ import org.neo4j.graphdb.Relationship;
 /**
  * {@link RelationshipSelector} that selects a {@link org.neo4j.graphdb.Relationship} at random from all the given
  * {@link org.neo4j.graphdb.Node}'s {@link org.neo4j.graphdb.Relationship}s, such that match the selected
- * {@link org.neo4j.graphdb.Relationship} matches the provided {@link com.graphaware.common.strategy.RelationshipInclusionStrategy}
- * and the other {@link Node} of that {@link Relationship} matches the provided {@link com.graphaware.common.strategy.NodeInclusionStrategy}.
+ * {@link org.neo4j.graphdb.Relationship} matches the provided {@link com.graphaware.common.strategy.RelationshipInclusionStrategy}.
  * <p/>
  * This is an O(n) algorithm.
  */
 public class RandomRelationshipSelector implements RelationshipSelector {
 
     private final NodeCentricRelationshipInclusionStrategy relationshipInclusionStrategy;
-    private final NodeInclusionStrategy nodeInclusionStrategy;
 
     /**
      * Constructs a new {@link RandomRelationshipSelector} that selects any relationship that isn't
      * framework-internal and doesn't link to a framework-internal node.
      */
     public RandomRelationshipSelector() {
-        this(IncludeAllBusinessRelationships.getInstance(), IncludeAllBusinessNodes.getInstance());
+        this(IncludeAllBusinessRelationships.getInstance());
     }
 
     /**
      * Constructs a new {@link RandomRelationshipSelector} that chooses relationships in accordance with the given
-     * {@link com.graphaware.common.strategy.InclusionStrategy}.
+     * {@link com.graphaware.common.strategy.ObjectInclusionStrategy}.
      *
-     * @param relationshipInclusionStrategy The {@link com.graphaware.common.strategy.InclusionStrategy} used to select relationships to follow.
-     * @param nodeInclusionStrategy         The {@link com.graphaware.common.strategy.InclusionStrategy} used to select relationships that point only to certain nodes.
+     * @param relationshipInclusionStrategy The {@link com.graphaware.common.strategy.ObjectInclusionStrategy} used to select relationships to follow.
      */
-    public RandomRelationshipSelector(NodeCentricRelationshipInclusionStrategy relationshipInclusionStrategy, NodeInclusionStrategy nodeInclusionStrategy) {
+    public RandomRelationshipSelector(NodeCentricRelationshipInclusionStrategy relationshipInclusionStrategy) {
         this.relationshipInclusionStrategy = relationshipInclusionStrategy;
-        this.nodeInclusionStrategy = nodeInclusionStrategy;
     }
 
     /**
@@ -63,8 +59,7 @@ public class RandomRelationshipSelector implements RelationshipSelector {
     public Relationship selectRelationship(Node node) {
         ReservoirSampler<Relationship> randomSampler = new ReservoirSampler<>(1);
         for (Relationship relationship : node.getRelationships()) {
-            if (this.relationshipInclusionStrategy.include(relationship, node)
-                    && this.nodeInclusionStrategy.include(relationship.getOtherNode(node))) {
+            if (this.relationshipInclusionStrategy.include(relationship, node)) {
                 randomSampler.sample(relationship);
             }
         }

@@ -16,8 +16,8 @@
 
 package com.graphaware.runtime.strategy;
 
-import com.graphaware.common.strategy.IncludeAllNodes;
 import com.graphaware.common.strategy.NodeInclusionStrategy;
+import com.graphaware.common.strategy.all.IncludeAllNodes;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;

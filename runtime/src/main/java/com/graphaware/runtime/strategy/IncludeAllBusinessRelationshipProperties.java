@@ -16,8 +16,8 @@
 
 package com.graphaware.runtime.strategy;
 
-import com.graphaware.common.strategy.IncludeAllRelationshipProperties;
 import com.graphaware.common.strategy.RelationshipPropertyInclusionStrategy;
+import com.graphaware.common.strategy.all.IncludeAllRelationshipProperties;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.neo4j.graphdb.Relationship;
 

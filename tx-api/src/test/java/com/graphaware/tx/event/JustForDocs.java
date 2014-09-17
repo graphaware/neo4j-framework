@@ -1,8 +1,8 @@
 package com.graphaware.tx.event;
 
-import com.graphaware.common.strategy.IncludeNoRelationships;
 import com.graphaware.common.strategy.InclusionStrategies;
 import com.graphaware.common.strategy.NodeInclusionStrategy;
+import com.graphaware.common.strategy.none.IncludeNoRelationships;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;

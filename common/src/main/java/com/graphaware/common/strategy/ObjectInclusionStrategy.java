@@ -16,21 +16,19 @@
 
 package com.graphaware.common.strategy;
 
-import org.neo4j.graphdb.PropertyContainer;
-
 /**
- * Strategy deciding whether to include properties of some {@link PropertyContainer} or not.
+ * Strategy deciding whether to include something or not.
  *
- * @param <T> type of the property container.
+ * @param <T> type of the object to make a decision about.
  */
-public interface PropertyInclusionStrategy<T extends PropertyContainer> extends InclusionStrategy {
+public interface ObjectInclusionStrategy<T> extends InclusionStrategy {
 
     /**
-     * Should a property with the given key of the given property container be included?
+     * Include the given object?
      *
-     * @param key               of the property.
-     * @param propertyContainer containing the property.
-     * @return true iff the property should be included.
+     * @param object to check.
+     * @return true iff the given object should be included.
      */
-    boolean include(String key, T propertyContainer);
+    boolean include(T object);
+    
 }

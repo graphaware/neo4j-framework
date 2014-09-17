@@ -1,7 +1,7 @@
 package com.graphaware.runtime.walk;
 
-import com.graphaware.common.strategy.IncludeNoNodes;
 import com.graphaware.common.strategy.NodeInclusionStrategy;
+import com.graphaware.common.strategy.none.IncludeNoNodes;
 import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor;

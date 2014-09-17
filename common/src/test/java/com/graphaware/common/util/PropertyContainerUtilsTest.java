@@ -16,7 +16,7 @@
 
 package com.graphaware.common.util;
 
-import com.graphaware.common.strategy.InclusionStrategy;
+import com.graphaware.common.strategy.ObjectInclusionStrategy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
-import static com.graphaware.common.util.ArrayUtils.*;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -123,7 +122,7 @@ public class PropertyContainerUtilsTest {
 
             assertEquals(Collections.singletonMap("key", (Object) "value"), propertiesToMap(database.getNodeById(2)));
 
-            assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(database.getNodeById(2), new InclusionStrategy<String>() {
+            assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(database.getNodeById(2), new ObjectInclusionStrategy<String>() {
                 @Override
                 public boolean include(String object) {
                     return !"key".equals(object);

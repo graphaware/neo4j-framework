@@ -17,9 +17,9 @@
 package com.graphaware.runtime.strategy;
 
 import com.graphaware.common.serialize.Serializer;
-import com.graphaware.common.strategy.IncludeAllNodeProperties;
-import com.graphaware.common.strategy.IncludeNoNodeProperties;
 import com.graphaware.common.strategy.InclusionStrategies;
+import com.graphaware.common.strategy.all.IncludeAllNodeProperties;
+import com.graphaware.common.strategy.none.IncludeNoNodeProperties;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
