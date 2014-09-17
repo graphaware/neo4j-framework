@@ -16,6 +16,7 @@
 
 package com.graphaware.test.unit;
 
+import com.graphaware.common.strategy.*;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -68,7 +69,19 @@ public final class GraphUnit {
         new ExecutionEngine(otherDatabase).execute(sameGraphCypher);
 
         try {
-            assertSameGraph(database, otherDatabase);
+            assertSameGraph(database, otherDatabase,null);
+        } finally {
+            otherDatabase.shutdown();
+        }
+    }
+
+    public static void assertSameGraph(GraphDatabaseService database, String sameGraphCypher, InclusionStrategies inclusionStrategies) {
+        GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
+
+        new ExecutionEngine(otherDatabase).execute(sameGraphCypher);
+
+        try {
+            assertSameGraph(database, otherDatabase,inclusionStrategies);
         } finally {
             otherDatabase.shutdown();
         }
@@ -105,13 +118,43 @@ public final class GraphUnit {
         }
     }
 
+    /**
+     * Clear the graph by deleting all nodes and relationships
+     * @param database graph, typically the one that has been created by some code that is being tested.
+     *
+     */
+    public static void clearGraph(GraphDatabaseService database) {
+        clearGraph(database, InclusionStrategies.all());
+    }
+
+    /**
+     * Clear the graph by deleting all nodes and relationships specified by inclusionStrategies
+     * @param database              graph, typically the one that has been created by some code that is being tested.
+     * @param inclusionStrategies   {@link com.graphaware.common.strategy.InclusionStrategies} deciding whether to include nodes/relationships or not.
+     *                              Note that property inclusion strategies are ignored when clearing the graph.
+     */
+    public static void clearGraph(GraphDatabaseService database, InclusionStrategies inclusionStrategies) {
 
 
-    private static void assertSameGraph(GraphDatabaseService database, GraphDatabaseService otherDatabase) {
+        for (Relationship rel : GlobalGraphOperations.at(database).getAllRelationships()) {
+            if (isRelationshipIncluded(rel,inclusionStrategies)) {
+                rel.delete();
+            }
+        }
+
+        for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+            if (isNodeIncluded(node,inclusionStrategies)) {
+                node.delete();
+            }
+        }
+    }
+
+
+    private static void assertSameGraph(GraphDatabaseService database, GraphDatabaseService otherDatabase,InclusionStrategies inclusionStrategies) {
         try (Transaction tx = database.beginTx()) {
             try (Transaction tx2 = otherDatabase.beginTx()) {
-                assertSameNumbersOfElements(database, otherDatabase);
-                doAssertSubgraph(database, otherDatabase);
+                assertSameNumbersOfElements(database, otherDatabase,inclusionStrategies);
+                doAssertSubgraph(database, otherDatabase, inclusionStrategies);
                 tx2.failure();
             }
             tx.failure();
@@ -121,7 +164,7 @@ public final class GraphUnit {
     private static void assertSubgraph(GraphDatabaseService database, GraphDatabaseService otherDatabase) {
         try (Transaction tx = database.beginTx()) {
             try (Transaction tx2 = otherDatabase.beginTx()) {
-                doAssertSubgraph(database, otherDatabase);
+                doAssertSubgraph(database, otherDatabase, null);
                 tx2.failure();
             }
             tx.failure();
@@ -133,8 +176,47 @@ public final class GraphUnit {
         assertEquals("There are different numbers of relationships in the two graphs", count(at(otherDatabase).getAllRelationships()), count(at(database).getAllRelationships()));
     }
 
-    private static void doAssertSubgraph(GraphDatabaseService database, GraphDatabaseService otherDatabase) {
-        Map<Long, Long[]> sameNodesMap = buildSameNodesMap(database, otherDatabase);
+    private static void assertSameNumbersOfElements(GraphDatabaseService database, GraphDatabaseService otherDatabase,InclusionStrategies inclusionStrategies) {
+        if(inclusionStrategies==null) {
+            assertEquals("There are different numbers of nodes in the two graphs", count(at(otherDatabase).getAllNodes()), count(at(database).getAllNodes()));
+            assertEquals("There are different numbers of relationships in the two graphs", count(at(otherDatabase).getAllRelationships()), count(at(database).getAllRelationships()));
+        }
+        else {
+
+            int nodeCount=0, otherNodeCount=0;
+            for(Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+                if(isNodeIncluded(node,inclusionStrategies)) {
+                    nodeCount++;
+                }
+            }
+            for(Node node : GlobalGraphOperations.at(otherDatabase).getAllNodes()) {
+                if(isNodeIncluded(node,inclusionStrategies)) {
+                    otherNodeCount++;
+                }
+            }
+            assertEquals("There are different numbers of nodes in the two graphs",otherNodeCount,nodeCount);
+
+
+            int relCount=0,otherRelCount=0;
+            for(Relationship rel : GlobalGraphOperations.at(database).getAllRelationships()) {
+                if(isRelationshipIncluded(rel,inclusionStrategies)) {
+                    relCount++;
+                }
+            }
+            for(Relationship rel : GlobalGraphOperations.at(otherDatabase).getAllRelationships()) {
+                if(isRelationshipIncluded(rel,inclusionStrategies)) {
+                    otherRelCount++;
+                }
+            }
+            assertEquals("There are different numbers of relationships in the two graphs", otherRelCount, relCount);
+
+        }
+
+
+    }
+
+    private static void doAssertSubgraph(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionStrategies inclusionStrategies) {
+        Map<Long, Long[]> sameNodesMap = buildSameNodesMap(database, otherDatabase, inclusionStrategies);
         Set<Map<Long, Long>> nodeMappings = buildNodeMappingPermutations(sameNodesMap, database, otherDatabase);
 
         if (nodeMappings.size() == 1) {
@@ -151,11 +233,16 @@ public final class GraphUnit {
         fail("There is no corresponding relationship mapping for any of the possible node mappings");
     }
 
-    private static Map<Long, Long[]> buildSameNodesMap(GraphDatabaseService database, GraphDatabaseService otherDatabase) {
-        Map<Long, Long[]> sameNodesMap = new HashMap<>();
+    private static Map<Long, Long[]> buildSameNodesMap(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionStrategies inclusionStrategies) {
+        Map<Long, Long[]> sameNodesMap = new HashMap<>();  //map of nodeID and IDs of nodes that match
 
         for (Node node : at(otherDatabase).getAllNodes()) {
-            Iterable<Node> sameNodes = findSameNodes(database, node);
+            if(inclusionStrategies!=null) {
+                if(!isNodeIncluded(node,inclusionStrategies)) {
+                    continue;
+                }
+            }
+            Iterable<Node> sameNodes = findSameNodes(database, node, inclusionStrategies);    //List of all nodes that match this
 
             //fail fast
             if (!sameNodes.iterator().hasNext()) {
@@ -239,33 +326,37 @@ public final class GraphUnit {
         return false;
     }
 
-    private static Iterable<Node> findSameNodes(GraphDatabaseService database, Node node) {
+    private static Iterable<Node> findSameNodes(GraphDatabaseService database, Node node, InclusionStrategies inclusionStrategies) {
         Iterator<Label> labels = node.getLabels().iterator();
         if (labels.hasNext()) {
-            return findSameNodesByLabel(database, node, labels.next());
+            return findSameNodesByLabel(database, node, labels.next(), inclusionStrategies);
         }
 
-        return findSameNodesWithoutLabel(database, node);
+        return findSameNodesWithoutLabel(database, node, inclusionStrategies);
     }
 
-    private static Iterable<Node> findSameNodesByLabel(GraphDatabaseService database, Node node, Label label) {
+    private static Iterable<Node> findSameNodesByLabel(GraphDatabaseService database, Node node, Label label, InclusionStrategies inclusionStrategies) {
         Set<Node> result = new HashSet<>();
 
         for (Node candidate : GlobalGraphOperations.at(database).getAllNodesWithLabel(label)) {
-            if (areSame(node, candidate)) {
-                result.add(candidate);
+            if(isNodeIncluded(candidate,inclusionStrategies)) {
+                if (areSame(node, candidate)) {
+                    result.add(candidate);
+                }
             }
         }
 
         return result;
     }
 
-    private static Iterable<Node> findSameNodesWithoutLabel(GraphDatabaseService database, Node node) {
+    private static Iterable<Node> findSameNodesWithoutLabel(GraphDatabaseService database, Node node, InclusionStrategies inclusionStrategies) {
         Set<Node> result = new HashSet<>();
 
         for (Node candidate : GlobalGraphOperations.at(database).getAllNodes()) {
-            if (areSame(node, candidate)) {
-                result.add(candidate);
+            if(isNodeIncluded(candidate,inclusionStrategies)) {
+                if (areSame(node, candidate)) {
+                    result.add(candidate);
+                }
             }
         }
 
@@ -329,6 +420,24 @@ public final class GraphUnit {
             }
         }
 
+        return true;
+    }
+
+    private static boolean isNodeIncluded(Node node, InclusionStrategies inclusionStrategies) {
+        if(inclusionStrategies!=null) {
+            NodeInclusionStrategy nodeInclusionStrategy = inclusionStrategies.getNodeInclusionStrategy() == null ?
+                    IncludeAllNodes.getInstance() : inclusionStrategies.getNodeInclusionStrategy();
+            return nodeInclusionStrategy.include(node);
+        }
+        return true;
+    }
+
+    private static boolean isRelationshipIncluded(Relationship rel, InclusionStrategies inclusionStrategies) {
+        if(inclusionStrategies!=null) {
+            RelationshipInclusionStrategy relInclusionStrategy = inclusionStrategies.getRelationshipInclusionStrategy() == null ?
+                    IncludeAllRelationships.getInstance() : inclusionStrategies.getRelationshipInclusionStrategy();
+            return relInclusionStrategy.include(rel);
+        }
         return true;
     }
 }
