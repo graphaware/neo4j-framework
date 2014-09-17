@@ -16,9 +16,7 @@
 
 package com.graphaware.test.unit;
 
-import com.graphaware.common.strategy.InclusionStrategies;
-import com.graphaware.common.strategy.NodeInclusionStrategy;
-import com.graphaware.common.strategy.RelationshipInclusionStrategy;
+import com.graphaware.common.strategy.*;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.runtime.strategy.IncludeAllBusinessNodes;
@@ -670,7 +668,7 @@ public class GraphUnitTest {
     }
 
     @Test
-    public void equalGraphsWithLabelsShouldPassSameGraphTestWithInclusionStrategies() {
+    public void equalGraphsShouldPassSameGraphTestWithNodeRelInclusionStrategies() {
         String dbCypher = "CREATE " +
                 "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
                 "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'}), (c1:ChangeSet)-[:NEXT]->(c2:ChangeSet)";
@@ -681,6 +679,49 @@ public class GraphUnitTest {
                 "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
 
         assertSameGraph(database, assertCypher,new InclusionStrategies(new ExcludeChangeSetNodeInclusionStrategy(),null, new ExcludeNextInclusionStrategy(),null));
+    }
+
+    @Test
+    public void equalGraphsShouldPassSameGraphTestWithPropertyInclusionStrategies() {
+        String dbCypher = "CREATE " +
+                "(blue:Blue {name:'Blue', createdOn: 12233322232})<-[:REL {count: 1}]-(red1:Red {name:'Red'})-[:REL {count:2}]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'}), (c1:ChangeSet)-[:NEXT]->(c2:ChangeSet)";
+        populateDatabase(dbCypher);
+
+        String assertCypher = "CREATE " +
+                "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
+
+        assertSameGraph(database, assertCypher,new InclusionStrategies(new ExcludeChangeSetNodeInclusionStrategy(),new ExcludeCreatedOnPropertyInclusionStrategy(), new ExcludeNextInclusionStrategy(),new ExcludeCountPropertyInclusionStrategy()));
+    }
+
+
+    @Test
+    public void equalGraphsShouldPassSubgraphTestWithNodeRelInclusionStrategies() {
+        String dbCypher = "CREATE " +
+                "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'}), (c1:ChangeSet)-[:NEXT]->(c2:ChangeSet)";
+        populateDatabase(dbCypher);
+
+        String assertCypher = "CREATE " +
+                "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
+
+        assertSubgraph(database, assertCypher,new InclusionStrategies(new ExcludeChangeSetNodeInclusionStrategy(),null, new ExcludeNextInclusionStrategy(),null));
+    }
+
+    @Test
+    public void equalGraphsShouldPassSubgraphTestWithPropertyInclusionStrategies() {
+        String dbCypher = "CREATE " +
+                "(blue:Blue {name:'Blue', createdOn: 12233322232})<-[:REL {count: 1}]-(red1:Red {name:'Red'})-[:REL {count:2}]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'}), (c1:ChangeSet)-[:NEXT]->(c2:ChangeSet)";
+        populateDatabase(dbCypher);
+
+        String assertCypher = "CREATE " +
+                "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
+
+        assertSubgraph(database, assertCypher,new InclusionStrategies(new ExcludeChangeSetNodeInclusionStrategy(),new ExcludeCreatedOnPropertyInclusionStrategy(), new ExcludeNextInclusionStrategy(),new ExcludeCountPropertyInclusionStrategy()));
     }
 
 
@@ -725,6 +766,22 @@ public class GraphUnitTest {
         @Override
         public boolean include(Relationship relationship) {
             return !(relationship.getType().name().equals("NEXT"));
+        }
+    }
+
+    class ExcludeCountPropertyInclusionStrategy implements RelationshipPropertyInclusionStrategy {
+
+        @Override
+        public boolean include(String s, Relationship relationship) {
+            return !s.equals("count");
+        }
+    }
+
+    class ExcludeCreatedOnPropertyInclusionStrategy implements NodePropertyInclusionStrategy {
+
+        @Override
+        public boolean include(String s, Node node) {
+            return !s.equals("createdOn");
         }
     }
 }
