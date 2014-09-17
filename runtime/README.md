@@ -49,7 +49,7 @@ add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>runtime</artifactId>
-    <version>2.1.4.17</version>
+    <version>2.1.4.18</version>
 </dependency>
 ```
 
@@ -115,7 +115,7 @@ in the order in which they've been registered.
 
 To get started quickly, use the provided Maven archetype by typing:
 
-    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-runtime-module-maven-archetype -DarchetypeVersion=2.1.4.17
+    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-runtime-module-maven-archetype -DarchetypeVersion=2.1.4.18
 
 To start from scratch, you will need the following dependencies in your pom.xml
 
@@ -126,37 +126,37 @@ To start from scratch, you will need the following dependencies in your pom.xml
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>api</artifactId>
-        <version>2.1.4.17</version>
+        <version>2.1.4.18</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>common</artifactId>
-        <version>2.1.4.17</version>
+        <version>2.1.4.18</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>runtime</artifactId>
-        <version>2.1.4.17</version>
+        <version>2.1.4.18</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tests</artifactId>
-        <version>2.1.4.17</version>
+        <version>2.1.4.18</version>
         <scope>test</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tx-api</artifactId>
-        <version>2.1.4.17</version>
+        <version>2.1.4.18</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tx-executor</artifactId>
-        <version>2.1.4.17</version>
+        <version>2.1.4.18</version>
         <scope>provided</scope>
     </dependency>
 

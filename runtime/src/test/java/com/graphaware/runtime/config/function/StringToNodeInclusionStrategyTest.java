@@ -25,4 +25,11 @@ public class StringToNodeInclusionStrategyTest {
 
         assertEquals(new SpelNodeInclusionStrategy("hasLabel('Test')"), strategy);
     }
+
+    @Test
+    public void shouldConstructSpelStrategy2() {
+        NodeInclusionStrategy strategy = StringToNodeInclusionStrategy.getInstance().apply("isType('R1')");
+
+        assertEquals(new SpelNodeInclusionStrategy("isType('R1')"), strategy);
+    }
 }
