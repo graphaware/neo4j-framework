@@ -19,3 +19,13 @@ notes:
     removing a git tag:
         git tag -d tag_name
         git push origin :refs/tags/tag_name
+
+List of modules to upgrade:
+        relcount
+        warmup
+        changefeed
+        uuid
+        timetree
+        resttest
+        noderank
+        algorithms

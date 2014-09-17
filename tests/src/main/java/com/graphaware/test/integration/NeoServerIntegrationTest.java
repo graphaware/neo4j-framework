@@ -68,6 +68,7 @@ public abstract class NeoServerIntegrationTest {
     @After
     public void tearDown() throws IOException, InterruptedException {
         bootstrapper.stop();
+        temporaryFolder.delete();
     }
 
     protected String baseUrl() {
