@@ -14,12 +14,13 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.common.strategy;
+package com.graphaware.common.strategy.all;
 
+import com.graphaware.common.strategy.PropertyInclusionStrategy;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
- * Base-class for {@link PropertyInclusionStrategy}s that includes all properties.
+ * Base-class for {@link com.graphaware.common.strategy.PropertyInclusionStrategy}s that includes all properties.
  */
 public abstract class IncludeAllProperties<T extends PropertyContainer> implements PropertyInclusionStrategy<T> {
 

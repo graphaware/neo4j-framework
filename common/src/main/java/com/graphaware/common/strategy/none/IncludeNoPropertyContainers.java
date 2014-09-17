@@ -14,8 +14,9 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.common.strategy;
+package com.graphaware.common.strategy.none;
 
+import com.graphaware.common.strategy.PropertyContainerInclusionStrategy;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**

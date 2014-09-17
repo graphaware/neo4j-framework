@@ -14,11 +14,12 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.common.strategy;
+package com.graphaware.common.strategy.none;
 
 
 import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.serialize.SingletonSerializer;
+import com.graphaware.common.strategy.NodePropertyInclusionStrategy;
 import org.neo4j.graphdb.Node;
 
 /**

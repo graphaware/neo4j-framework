@@ -14,27 +14,39 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.common.strategy;
+package com.graphaware.common.strategy.none;
+
 
 import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.serialize.SingletonSerializer;
+import com.graphaware.common.strategy.NodeCentricRelationshipInclusionStrategy;
+import com.graphaware.common.strategy.RelationshipInclusionStrategy;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 /**
- * Strategy that includes all relationship properties. Singleton.
+ * Strategy that ignores all relationships. Singleton.
  */
-public class IncludeAllRelationshipProperties extends IncludeAllProperties<Relationship> implements RelationshipPropertyInclusionStrategy {
+public final class IncludeNoRelationships extends IncludeNone<Relationship> implements NodeCentricRelationshipInclusionStrategy {
 
-    private static final RelationshipPropertyInclusionStrategy INSTANCE = new IncludeAllRelationshipProperties();
+    private static final RelationshipInclusionStrategy INSTANCE = new IncludeNoRelationships();
 
     static {
-        Serializer.register(IncludeAllRelationshipProperties.class, new SingletonSerializer());
+        Serializer.register(IncludeNoRelationships.class, new SingletonSerializer());
     }
 
-    public static RelationshipPropertyInclusionStrategy getInstance() {
+    public static RelationshipInclusionStrategy getInstance() {
         return INSTANCE;
     }
 
-    protected IncludeAllRelationshipProperties() {
+    private IncludeNoRelationships() {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean include(Relationship relationship, Node pointOfView) {
+        return false;
     }
 }

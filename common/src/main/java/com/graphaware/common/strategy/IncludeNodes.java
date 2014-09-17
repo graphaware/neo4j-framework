@@ -15,7 +15,7 @@ public class IncludeNodes extends BaseIncludeNodes<IncludeNodes> {
     /**
      * Get a node inclusion strategy that includes all nodes as the base-line for further configuration.
      * <p/>
-     * Note that if you want to simply include all nodes, it is more efficient to use {@link IncludeAllNodes}.
+     * Note that if you want to simply include all nodes, it is more efficient to use {@link com.graphaware.common.strategy.all.IncludeAllNodes}.
      *
      * @return a strategy including all nodes.
      */

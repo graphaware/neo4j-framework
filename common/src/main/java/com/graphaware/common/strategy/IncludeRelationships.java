@@ -4,7 +4,6 @@ import com.graphaware.common.description.predicate.Predicate;
 import com.graphaware.common.description.property.DetachedPropertiesDescription;
 import com.graphaware.common.description.property.WildcardPropertiesDescription;
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.RelationshipType;
 
 import java.util.Collections;
@@ -17,7 +16,7 @@ public class IncludeRelationships extends BaseIncludeRelationships<IncludeRelati
     /**
      * Get a relationship inclusion strategy that includes all relationships as the base-line for further configuration.
      * <p/>
-     * Note that if you want to simply include all relationships, it is more efficient to use {@link IncludeAllRelationships}.
+     * Note that if you want to simply include all relationships, it is more efficient to use {@link com.graphaware.common.strategy.all.IncludeAllRelationships}.
      *
      * @return a strategy including all relationships.
      */

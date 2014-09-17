@@ -14,28 +14,30 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.common.strategy;
+package com.graphaware.common.strategy.none;
 
 
 import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.serialize.SingletonSerializer;
+import com.graphaware.common.strategy.NodeInclusionStrategy;
 import org.neo4j.graphdb.Node;
 
 /**
- * Strategy that includes all nodes. Singleton.
+ * Strategy that ignores all nodes. Singleton.
  */
-public class IncludeAllNodes extends IncludeAll<Node> implements NodeInclusionStrategy {
+public final class IncludeNoNodes extends IncludeNone<Node> implements NodeInclusionStrategy {
 
-    private static final NodeInclusionStrategy INSTANCE = new IncludeAllNodes();
+    private static final NodeInclusionStrategy INSTANCE = new IncludeNoNodes();
 
     static {
-        Serializer.register(IncludeAllNodes.class, new SingletonSerializer());
+        Serializer.register(IncludeNoNodes.class, new SingletonSerializer());
     }
 
     public static NodeInclusionStrategy getInstance() {
         return INSTANCE;
     }
 
-    protected IncludeAllNodes() {
+    private IncludeNoNodes() {
+
     }
 }

@@ -16,6 +16,15 @@
 
 package com.graphaware.common.strategy;
 
+import com.graphaware.common.strategy.all.IncludeAllNodeProperties;
+import com.graphaware.common.strategy.all.IncludeAllNodes;
+import com.graphaware.common.strategy.all.IncludeAllRelationshipProperties;
+import com.graphaware.common.strategy.all.IncludeAllRelationships;
+import com.graphaware.common.strategy.none.IncludeNoNodeProperties;
+import com.graphaware.common.strategy.none.IncludeNoNodes;
+import com.graphaware.common.strategy.none.IncludeNoRelationshipProperties;
+import com.graphaware.common.strategy.none.IncludeNoRelationships;
+
 /**
  * Wrapper for {@link InclusionStrategy}s.
  */
