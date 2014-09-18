@@ -19,7 +19,10 @@ package com.graphaware.test.unit;
 import com.graphaware.common.strategy.*;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
+import com.graphaware.runtime.strategy.IncludeAllBusinessNodeProperties;
 import com.graphaware.runtime.strategy.IncludeAllBusinessNodes;
+import com.graphaware.runtime.strategy.IncludeAllBusinessRelationshipProperties;
+import com.graphaware.runtime.strategy.IncludeAllBusinessRelationships;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -722,6 +725,19 @@ public class GraphUnitTest {
                 "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
 
         assertSubgraph(database, assertCypher,new InclusionStrategies(new ExcludeChangeSetNodeInclusionStrategy(),new ExcludeCreatedOnPropertyInclusionStrategy(), new ExcludeNextInclusionStrategy(),new ExcludeCountPropertyInclusionStrategy()));
+    }
+
+    @Test
+    public void equalGraphsWithRuntimeShouldPassSameGraphTestBusinessStrategies() {
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
+        runtime.start();
+
+        String assertCypher = "CREATE " +
+                "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
+        populateDatabase(assertCypher);
+
+        assertSameGraph(database, assertCypher,new InclusionStrategies(IncludeAllBusinessNodes.getInstance(), IncludeAllBusinessNodeProperties.getInstance(), IncludeAllBusinessRelationships.getInstance(), IncludeAllBusinessRelationshipProperties.getInstance()));
     }
 
 
