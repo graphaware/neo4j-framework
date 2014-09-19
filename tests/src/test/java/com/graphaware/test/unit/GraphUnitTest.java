@@ -16,6 +16,13 @@
 
 package com.graphaware.test.unit;
 
+import com.graphaware.common.strategy.*;
+import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.GraphAwareRuntimeFactory;
+import com.graphaware.runtime.strategy.IncludeAllBusinessNodeProperties;
+import com.graphaware.runtime.strategy.IncludeAllBusinessNodes;
+import com.graphaware.runtime.strategy.IncludeAllBusinessRelationshipProperties;
+import com.graphaware.runtime.strategy.IncludeAllBusinessRelationships;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,8 +31,12 @@ import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
+import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 import static com.graphaware.test.unit.GraphUnit.assertSubgraph;
+import static com.graphaware.test.unit.GraphUnit.clearGraph;
+import static org.junit.Assert.assertEquals;
+import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 
 /**
@@ -559,5 +570,234 @@ public class GraphUnitTest {
         assertSameGraph(database, cypher);
     }
 
+    @Test
+    public void clearGraphWithoutRuntimeShouldDeleteAllNodesAndRels() {
+        try (Transaction tx = database.beginTx()) {
+            String cypher = "CREATE " +
+                    "(blue {name:'Blue'})<-[:REL]-(red1 {name:'Red'})-[:REL]->(black1 {name:'Black'})-[:REL]->(green {name:'Green'})," +
+                    "(red2 {name:'Red'})-[:REL]->(black2 {name:'Black'})";
 
+            populateDatabase(cypher);
+            tx.success();
+        }
+
+        try (Transaction tx = database.beginTx()) {
+            clearGraph(database);
+            tx.success();
+        }
+
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(0, count(at(database).getAllNodes()));
+            tx.success();
+        }
+
+    }
+
+    @Test
+    public void clearGraphWithoutRuntimeShouldDeleteBasedOnNodeInclusionStrategy() {
+        try (Transaction tx = database.beginTx()) {
+            String cypher = "CREATE " +
+                    "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                    "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
+
+            populateDatabase(cypher);
+            tx.success();
+        }
+
+        InclusionStrategies inclusionStrategies = new InclusionStrategies(new BlueNodeInclusionStrategy(),null,null,null);
+        try (Transaction tx = database.beginTx()) {
+            clearGraph(database,inclusionStrategies);
+            tx.success();
+        }
+
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(5, count(at(database).getAllNodes()));
+            tx.success();
+        }
+
+    }
+
+
+    @Test
+    public void clearGraphWithoutRuntimeShouldDeleteBasedOnRelInclusionStrategy() {
+        try (Transaction tx = database.beginTx()) {
+            String cypher = "CREATE " +
+                    "(purple:Purple {name:'Purple'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                    "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'}), (blue1:Blue)-[:REL2]->(blue2:Blue)";
+
+            populateDatabase(cypher);
+            tx.success();
+        }
+
+        InclusionStrategies inclusionStrategies = new InclusionStrategies(new BlueNodeInclusionStrategy(),null,new Rel2InclusionStrategy(),null);
+        try (Transaction tx = database.beginTx()) {
+            clearGraph(database,inclusionStrategies);
+            tx.success();
+        }
+
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(6, count(at(database).getAllNodes()));
+            assertEquals(4, count(at(database).getAllRelationships()));
+            tx.success();
+        }
+
+    }
+
+
+    @Test
+    public void clearGraphWithRuntimeShouldDeleteAllNodesAndRelsExceptRoot() {
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
+        runtime.start();
+
+        try (Transaction tx = database.beginTx()) {
+            String cypher = "CREATE " +
+                    "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                    "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
+
+            populateDatabase(cypher);
+            tx.success();
+        }
+
+        try (Transaction tx = database.beginTx()) {
+            clearGraph(database,new InclusionStrategies(IncludeAllBusinessNodes.getInstance(),null,null,null));
+            tx.success();
+        }
+
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(1, count(at(database).getAllNodes())); //The GA root
+            tx.success();
+        }
+
+    }
+
+    @Test
+    public void equalGraphsShouldPassSameGraphTestWithNodeRelInclusionStrategies() {
+        String dbCypher = "CREATE " +
+                "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'}), (c1:ChangeSet)-[:NEXT]->(c2:ChangeSet)";
+        populateDatabase(dbCypher);
+
+        String assertCypher = "CREATE " +
+                "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
+
+        assertSameGraph(database, assertCypher,new InclusionStrategies(new ExcludeChangeSetNodeInclusionStrategy(),null, new ExcludeNextInclusionStrategy(),null));
+    }
+
+    @Test
+    public void equalGraphsShouldPassSameGraphTestWithPropertyInclusionStrategies() {
+        String dbCypher = "CREATE " +
+                "(blue:Blue {name:'Blue', createdOn: 12233322232})<-[:REL {count: 1}]-(red1:Red {name:'Red'})-[:REL {count:2}]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'}), (c1:ChangeSet)-[:NEXT]->(c2:ChangeSet)";
+        populateDatabase(dbCypher);
+
+        String assertCypher = "CREATE " +
+                "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
+
+        assertSameGraph(database, assertCypher,new InclusionStrategies(new ExcludeChangeSetNodeInclusionStrategy(),new ExcludeCreatedOnPropertyInclusionStrategy(), new ExcludeNextInclusionStrategy(),new ExcludeCountPropertyInclusionStrategy()));
+    }
+
+
+    @Test
+    public void equalGraphsShouldPassSubgraphTestWithNodeRelInclusionStrategies() {
+        String dbCypher = "CREATE " +
+                "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'}), (c1:ChangeSet)-[:NEXT]->(c2:ChangeSet)";
+        populateDatabase(dbCypher);
+
+        String assertCypher = "CREATE " +
+                "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
+
+        assertSubgraph(database, assertCypher,new InclusionStrategies(new ExcludeChangeSetNodeInclusionStrategy(),null, new ExcludeNextInclusionStrategy(),null));
+    }
+
+    @Test
+    public void equalGraphsShouldPassSubgraphTestWithPropertyInclusionStrategies() {
+        String dbCypher = "CREATE " +
+                "(blue:Blue {name:'Blue', createdOn: 12233322232})<-[:REL {count: 1}]-(red1:Red {name:'Red'})-[:REL {count:2}]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'}), (c1:ChangeSet)-[:NEXT]->(c2:ChangeSet)";
+        populateDatabase(dbCypher);
+
+        String assertCypher = "CREATE " +
+                "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
+
+        assertSubgraph(database, assertCypher,new InclusionStrategies(new ExcludeChangeSetNodeInclusionStrategy(),new ExcludeCreatedOnPropertyInclusionStrategy(), new ExcludeNextInclusionStrategy(),new ExcludeCountPropertyInclusionStrategy()));
+    }
+
+    @Test
+    public void equalGraphsWithRuntimeShouldPassSameGraphTestBusinessStrategies() {
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
+        runtime.start();
+
+        String assertCypher = "CREATE " +
+                "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
+                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
+        populateDatabase(assertCypher);
+
+        assertSameGraph(database, assertCypher,new InclusionStrategies(IncludeAllBusinessNodes.getInstance(), IncludeAllBusinessNodeProperties.getInstance(), IncludeAllBusinessRelationships.getInstance(), IncludeAllBusinessRelationshipProperties.getInstance()));
+    }
+
+
+    /**
+     * Include only nodes with label 'Blue'
+     */
+    class BlueNodeInclusionStrategy implements NodeInclusionStrategy {
+
+        @Override
+        public boolean include(Node node) {
+            return node.hasLabel(DynamicLabel.label("Blue"));
+        }
+    }
+
+    /**
+     * Include everything except nodes labelled 'ChangeSet'
+     */
+    class ExcludeChangeSetNodeInclusionStrategy implements NodeInclusionStrategy {
+
+        @Override
+        public boolean include(Node node) {
+            return !(node.hasLabel(DynamicLabel.label("ChangeSet")));
+        }
+    }
+
+    /**
+     * Include only relationships with type 'REL2'
+     */
+    class Rel2InclusionStrategy implements RelationshipInclusionStrategy {
+
+        @Override
+        public boolean include(Relationship relationship) {
+            return relationship.getType().name().equals("REL2");
+        }
+    }
+
+    /**
+     * Include everything except  relationships with type 'NEXT'
+     */
+    class ExcludeNextInclusionStrategy implements RelationshipInclusionStrategy {
+
+        @Override
+        public boolean include(Relationship relationship) {
+            return !(relationship.getType().name().equals("NEXT"));
+        }
+    }
+
+    class ExcludeCountPropertyInclusionStrategy implements RelationshipPropertyInclusionStrategy {
+
+        @Override
+        public boolean include(String s, Relationship relationship) {
+            return !s.equals("count");
+        }
+    }
+
+    class ExcludeCreatedOnPropertyInclusionStrategy implements NodePropertyInclusionStrategy {
+
+        @Override
+        public boolean include(String s, Node node) {
+            return !s.equals("createdOn");
+        }
+    }
 }
