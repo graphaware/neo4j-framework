@@ -71,6 +71,10 @@ public class InclusionPolicies {
      *                                      policy.
      */
     public InclusionPolicies(NodeInclusionPolicy nodeInclusionPolicy, NodePropertyInclusionPolicy nodePropertyInclusionPolicy, RelationshipInclusionPolicy relationshipInclusionPolicy, RelationshipPropertyInclusionPolicy relationshipPropertyInclusionPolicy) {
+        if (nodeInclusionPolicy == null || nodePropertyInclusionPolicy == null || relationshipInclusionPolicy == null || relationshipPropertyInclusionPolicy == null) {
+            throw new IllegalArgumentException("An inclusion policy must not be null");
+        }
+
         this.nodeInclusionPolicy = nodeInclusionPolicy;
         this.nodePropertyInclusionPolicy = nodePropertyInclusionPolicy;
         this.relationshipInclusionPolicy = relationshipInclusionPolicy;

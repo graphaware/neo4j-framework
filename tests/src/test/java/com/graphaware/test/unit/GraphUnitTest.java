@@ -16,13 +16,7 @@
 
 package com.graphaware.test.unit;
 
-import com.graphaware.common.strategy.*;
-import com.graphaware.runtime.GraphAwareRuntime;
-import com.graphaware.runtime.GraphAwareRuntimeFactory;
-import com.graphaware.runtime.strategy.IncludeAllBusinessNodeProperties;
-import com.graphaware.runtime.strategy.IncludeAllBusinessNodes;
-import com.graphaware.runtime.strategy.IncludeAllBusinessRelationshipProperties;
-import com.graphaware.runtime.strategy.IncludeAllBusinessRelationships;
+import com.graphaware.common.policy.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,8 +58,8 @@ public class GraphUnitTest {
 
     @Test
     public void equalGraphsWithLabelsShouldPassSameGraphTest() {
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)";
 
         populateDatabase(assertCypher);
@@ -75,8 +69,8 @@ public class GraphUnitTest {
 
     @Test
     public void equalGraphsWithLabelsShouldPassSubgraphTest() {
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)";
 
         populateDatabase(assertCypher);
@@ -86,8 +80,8 @@ public class GraphUnitTest {
 
     @Test
     public void equalGraphsWithoutLabelsShouldPassSameGraphTest() {
-        String assertCypher = "CREATE \n" +
-                "(m {name:'Michal'})-[:WORKS_FOR]->(c {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(m {name:'Michal'})-[:WORKS_FOR]->(c {name:'GraphAware'})," +
                 "(d {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)";
 
         populateDatabase(assertCypher);
@@ -97,8 +91,8 @@ public class GraphUnitTest {
 
     @Test
     public void equalGraphsWithoutLabelsShouldPassSubgraphTest() {
-        String assertCypher = "CREATE \n" +
-                "(m {name:'Michal'})-[:WORKS_FOR]->(c {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(m {name:'Michal'})-[:WORKS_FOR]->(c {name:'GraphAware'})," +
                 "(d {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)";
 
         populateDatabase(assertCypher);
@@ -157,12 +151,12 @@ public class GraphUnitTest {
 
     @Test(expected = AssertionError.class)
     public void extraRelationshipPropertyShouldFailSameGraphTest() {
-        String populateCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String populateCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR {since:2014}]->(c)";
 
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)";
 
         populateDatabase(populateCypher);
@@ -172,12 +166,12 @@ public class GraphUnitTest {
 
     @Test(expected = AssertionError.class)
     public void extraRelationshipPropertyShouldFailSubgraphTest() {
-        String populateCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String populateCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR {since:2014}]->(c)";
 
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)";
 
         populateDatabase(populateCypher);
@@ -187,12 +181,12 @@ public class GraphUnitTest {
 
     @Test(expected = AssertionError.class)
     public void differentRelTypesShouldFailSameGraphTest() {
-        String populateCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR1]->(c:Company {name:'GraphAware'}),\n" +
+        String populateCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR1]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR2]->(c)";
 
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR2]->(c:Company {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR2]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR1]->(c)";
 
         populateDatabase(populateCypher);
@@ -202,12 +196,12 @@ public class GraphUnitTest {
 
     @Test(expected = AssertionError.class)
     public void differentRelTypesShouldFailSubgraphTest() {
-        String populateCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR1]->(c:Company {name:'GraphAware'}),\n" +
+        String populateCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR1]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR2]->(c)";
 
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR2]->(c:Company {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR2]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR1]->(c)";
 
         populateDatabase(populateCypher);
@@ -217,12 +211,12 @@ public class GraphUnitTest {
 
     @Test(expected = AssertionError.class)
     public void extraRelationshipPropertyShouldFailSameGraphTest2() {
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR {since:2014}]->(c)";
 
-        String populateCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String populateCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)";
 
         populateDatabase(populateCypher);
@@ -232,12 +226,12 @@ public class GraphUnitTest {
 
     @Test(expected = AssertionError.class)
     public void missingRelationshipShouldFailSameGraphTest() {
-        String populateCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String populateCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})";
 
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)";
 
         populateDatabase(populateCypher);
@@ -247,12 +241,12 @@ public class GraphUnitTest {
 
     @Test(expected = AssertionError.class)
     public void missingRelationshipShouldFailSameGraphTest2() {
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})";
 
-        String populateCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String populateCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)";
 
         populateDatabase(populateCypher);
@@ -262,12 +256,12 @@ public class GraphUnitTest {
 
     @Test(expected = AssertionError.class)
     public void missingRelationshipInDatabaseShouldFailSubgraphTest() {
-        String populateCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String populateCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})";
 
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)";
 
         populateDatabase(populateCypher);
@@ -277,12 +271,12 @@ public class GraphUnitTest {
 
     @Test
     public void missingRelationshipInSubgraphShouldPassSubgraphTest() {
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})";
 
-        String populateCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String populateCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)";
 
         populateDatabase(populateCypher);
@@ -292,12 +286,12 @@ public class GraphUnitTest {
 
     @Test(expected = AssertionError.class)
     public void missingNodePropertyShouldFailSameGraphTest() {
-        String populateCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String populateCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela'})-[:WORKS_FOR]->(c)";
 
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)";
 
         populateDatabase(populateCypher);
@@ -307,12 +301,12 @@ public class GraphUnitTest {
 
     @Test(expected = AssertionError.class)
     public void missingNodePropertyShouldFailSubgraphTest() {
-        String populateCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String populateCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela'})-[:WORKS_FOR]->(c)";
 
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)";
 
         populateDatabase(populateCypher);
@@ -322,13 +316,13 @@ public class GraphUnitTest {
 
     @Test
     public void correctSubgraphShouldPassSubgraphTest() {
-        String populateCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
-                "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)\n," +
+        String populateCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
+                "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)," +
                 "(:Person {name:'Adam'})-[:WORKS_FOR]->(c)";
 
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela', role:'Operations Director'})-[:WORKS_FOR]->(c)";
 
         populateDatabase(populateCypher);
@@ -338,16 +332,16 @@ public class GraphUnitTest {
 
     @Test
     public void correctSubgraphShouldPassSubgraphTest2() {
-        String populateCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
-                "(:Person {name:'Daniela'})-[:WORKS_FOR]->(c),\n" +
-                "(:Person {name:'Adam'})-[:WORKS_FOR]->(c),\n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c2:Company {name:'GraphAware'}),\n" +
-                "(:Person {name:'Daniela'})-[:WORKS_FOR]->(c2),\n" +
+        String populateCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
+                "(:Person {name:'Daniela'})-[:WORKS_FOR]->(c)," +
+                "(:Person {name:'Adam'})-[:WORKS_FOR]->(c)," +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c2:Company {name:'GraphAware'})," +
+                "(:Person {name:'Daniela'})-[:WORKS_FOR]->(c2)," +
                 "(:Person {name:'Adam'})-[:WORKS_FOR]->(c2)";
 
-        String assertCypher = "CREATE \n" +
-                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'}),\n" +
+        String assertCypher = "CREATE " +
+                "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
                 "(:Person {name:'Daniela'})-[:WORKS_FOR]->(c)";
 
         populateDatabase(populateCypher);
@@ -452,7 +446,7 @@ public class GraphUnitTest {
     @Test
     public void equalArraysWithDifferentTypeShouldBeEqual() {
         try (Transaction tx = database.beginTx()) {
-            database.createNode().setProperty("number", new int[]{123,124});
+            database.createNode().setProperty("number", new int[]{123, 124});
             tx.success();
         }
 
@@ -594,7 +588,7 @@ public class GraphUnitTest {
     }
 
     @Test
-    public void clearGraphWithoutRuntimeShouldDeleteBasedOnNodeInclusionStrategy() {
+    public void clearGraphWithoutRuntimeShouldDeleteBasedOnNodeInclusionPolicy() {
         try (Transaction tx = database.beginTx()) {
             String cypher = "CREATE " +
                     "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
@@ -604,9 +598,9 @@ public class GraphUnitTest {
             tx.success();
         }
 
-        InclusionStrategies inclusionStrategies = new InclusionStrategies(new BlueNodeInclusionStrategy(),null,null,null);
+        InclusionPolicies inclusionPolicies = InclusionPolicies.all().with(new BlueNodeInclusionPolicy());
         try (Transaction tx = database.beginTx()) {
-            clearGraph(database,inclusionStrategies);
+            clearGraph(database, inclusionPolicies);
             tx.success();
         }
 
@@ -619,7 +613,7 @@ public class GraphUnitTest {
 
 
     @Test
-    public void clearGraphWithoutRuntimeShouldDeleteBasedOnRelInclusionStrategy() {
+    public void clearGraphWithoutRuntimeShouldDeleteBasedOnRelInclusionPolicy() {
         try (Transaction tx = database.beginTx()) {
             String cypher = "CREATE " +
                     "(purple:Purple {name:'Purple'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
@@ -629,9 +623,9 @@ public class GraphUnitTest {
             tx.success();
         }
 
-        InclusionStrategies inclusionStrategies = new InclusionStrategies(new BlueNodeInclusionStrategy(),null,new Rel2InclusionStrategy(),null);
+        InclusionPolicies inclusionPolicies = InclusionPolicies.all().with(new BlueNodeInclusionPolicy()).with(new Rel2InclusionPolicy());
         try (Transaction tx = database.beginTx()) {
-            clearGraph(database,inclusionStrategies);
+            clearGraph(database, inclusionPolicies);
             tx.success();
         }
 
@@ -643,35 +637,8 @@ public class GraphUnitTest {
 
     }
 
-
     @Test
-    public void clearGraphWithRuntimeShouldDeleteAllNodesAndRelsExceptRoot() {
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
-        runtime.start();
-
-        try (Transaction tx = database.beginTx()) {
-            String cypher = "CREATE " +
-                    "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
-                    "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
-
-            populateDatabase(cypher);
-            tx.success();
-        }
-
-        try (Transaction tx = database.beginTx()) {
-            clearGraph(database,new InclusionStrategies(IncludeAllBusinessNodes.getInstance(),null,null,null));
-            tx.success();
-        }
-
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(1, count(at(database).getAllNodes())); //The GA root
-            tx.success();
-        }
-
-    }
-
-    @Test
-    public void equalGraphsShouldPassSameGraphTestWithNodeRelInclusionStrategies() {
+    public void equalGraphsShouldPassSameGraphTestWithNodeRelInclusionPolicies() {
         String dbCypher = "CREATE " +
                 "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
                 "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'}), (c1:ChangeSet)-[:NEXT]->(c2:ChangeSet)";
@@ -681,11 +648,11 @@ public class GraphUnitTest {
                 "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
                 "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
 
-        assertSameGraph(database, assertCypher,new InclusionStrategies(new ExcludeChangeSetNodeInclusionStrategy(),null, new ExcludeNextInclusionStrategy(),null));
+        assertSameGraph(database, assertCypher, InclusionPolicies.all().with(new ExcludeChangeSetNodeInclusionPolicy()).with(new ExcludeNextInclusionPolicy()));
     }
 
     @Test
-    public void equalGraphsShouldPassSameGraphTestWithPropertyInclusionStrategies() {
+    public void equalGraphsShouldPassSameGraphTestWithPropertyInclusionPolicies() {
         String dbCypher = "CREATE " +
                 "(blue:Blue {name:'Blue', createdOn: 12233322232})<-[:REL {count: 1}]-(red1:Red {name:'Red'})-[:REL {count:2}]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
                 "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'}), (c1:ChangeSet)-[:NEXT]->(c2:ChangeSet)";
@@ -695,12 +662,12 @@ public class GraphUnitTest {
                 "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
                 "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
 
-        assertSameGraph(database, assertCypher,new InclusionStrategies(new ExcludeChangeSetNodeInclusionStrategy(),new ExcludeCreatedOnPropertyInclusionStrategy(), new ExcludeNextInclusionStrategy(),new ExcludeCountPropertyInclusionStrategy()));
+        assertSameGraph(database, assertCypher, new InclusionPolicies(new ExcludeChangeSetNodeInclusionPolicy(), new ExcludeCreatedOnPropertyInclusionPolicy(), new ExcludeNextInclusionPolicy(), new ExcludeCountPropertyInclusionPolicy()));
     }
 
 
     @Test
-    public void equalGraphsShouldPassSubgraphTestWithNodeRelInclusionStrategies() {
+    public void equalGraphsShouldPassSubgraphTestWithNodeRelInclusionPolicies() {
         String dbCypher = "CREATE " +
                 "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
                 "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'}), (c1:ChangeSet)-[:NEXT]->(c2:ChangeSet)";
@@ -710,11 +677,11 @@ public class GraphUnitTest {
                 "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
                 "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
 
-        assertSubgraph(database, assertCypher,new InclusionStrategies(new ExcludeChangeSetNodeInclusionStrategy(),null, new ExcludeNextInclusionStrategy(),null));
+        assertSubgraph(database, assertCypher, InclusionPolicies.all().with(new ExcludeChangeSetNodeInclusionPolicy()).with(new ExcludeNextInclusionPolicy()));
     }
 
     @Test
-    public void equalGraphsShouldPassSubgraphTestWithPropertyInclusionStrategies() {
+    public void equalGraphsShouldPassSubgraphTestWithPropertyInclusionPolicies() {
         String dbCypher = "CREATE " +
                 "(blue:Blue {name:'Blue', createdOn: 12233322232})<-[:REL {count: 1}]-(red1:Red {name:'Red'})-[:REL {count:2}]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
                 "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'}), (c1:ChangeSet)-[:NEXT]->(c2:ChangeSet)";
@@ -724,27 +691,13 @@ public class GraphUnitTest {
                 "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
                 "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
 
-        assertSubgraph(database, assertCypher,new InclusionStrategies(new ExcludeChangeSetNodeInclusionStrategy(),new ExcludeCreatedOnPropertyInclusionStrategy(), new ExcludeNextInclusionStrategy(),new ExcludeCountPropertyInclusionStrategy()));
+        assertSubgraph(database, assertCypher, new InclusionPolicies(new ExcludeChangeSetNodeInclusionPolicy(), new ExcludeCreatedOnPropertyInclusionPolicy(), new ExcludeNextInclusionPolicy(), new ExcludeCountPropertyInclusionPolicy()));
     }
-
-    @Test
-    public void equalGraphsWithRuntimeShouldPassSameGraphTestBusinessStrategies() {
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
-        runtime.start();
-
-        String assertCypher = "CREATE " +
-                "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
-                "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
-        populateDatabase(assertCypher);
-
-        assertSameGraph(database, assertCypher,new InclusionStrategies(IncludeAllBusinessNodes.getInstance(), IncludeAllBusinessNodeProperties.getInstance(), IncludeAllBusinessRelationships.getInstance(), IncludeAllBusinessRelationshipProperties.getInstance()));
-    }
-
 
     /**
      * Include only nodes with label 'Blue'
      */
-    class BlueNodeInclusionStrategy implements NodeInclusionStrategy {
+    class BlueNodeInclusionPolicy implements NodeInclusionPolicy {
 
         @Override
         public boolean include(Node node) {
@@ -755,7 +708,7 @@ public class GraphUnitTest {
     /**
      * Include everything except nodes labelled 'ChangeSet'
      */
-    class ExcludeChangeSetNodeInclusionStrategy implements NodeInclusionStrategy {
+    class ExcludeChangeSetNodeInclusionPolicy implements NodeInclusionPolicy {
 
         @Override
         public boolean include(Node node) {
@@ -766,7 +719,7 @@ public class GraphUnitTest {
     /**
      * Include only relationships with type 'REL2'
      */
-    class Rel2InclusionStrategy implements RelationshipInclusionStrategy {
+    class Rel2InclusionPolicy extends RelationshipInclusionPolicy.Adapter {
 
         @Override
         public boolean include(Relationship relationship) {
@@ -777,7 +730,7 @@ public class GraphUnitTest {
     /**
      * Include everything except  relationships with type 'NEXT'
      */
-    class ExcludeNextInclusionStrategy implements RelationshipInclusionStrategy {
+    class ExcludeNextInclusionPolicy extends RelationshipInclusionPolicy.Adapter {
 
         @Override
         public boolean include(Relationship relationship) {
@@ -785,7 +738,7 @@ public class GraphUnitTest {
         }
     }
 
-    class ExcludeCountPropertyInclusionStrategy implements RelationshipPropertyInclusionStrategy {
+    class ExcludeCountPropertyInclusionPolicy implements RelationshipPropertyInclusionPolicy {
 
         @Override
         public boolean include(String s, Relationship relationship) {
@@ -793,7 +746,7 @@ public class GraphUnitTest {
         }
     }
 
-    class ExcludeCreatedOnPropertyInclusionStrategy implements NodePropertyInclusionStrategy {
+    class ExcludeCreatedOnPropertyInclusionPolicy implements NodePropertyInclusionPolicy {
 
         @Override
         public boolean include(String s, Node node) {
