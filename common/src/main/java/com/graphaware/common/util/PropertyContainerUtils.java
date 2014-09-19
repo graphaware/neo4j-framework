@@ -16,8 +16,8 @@
 
 package com.graphaware.common.util;
 
-import com.graphaware.common.strategy.all.IncludeAll;
-import com.graphaware.common.strategy.ObjectInclusionStrategy;
+import com.graphaware.common.policy.ObjectInclusionPolicy;
+import com.graphaware.common.policy.all.IncludeAll;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
@@ -122,13 +122,13 @@ public final class PropertyContainerUtils {
      * or empty. <code>Null</code> values are fine.
      *
      * @param propertyContainer         to convert properties from.
-     * @param propertyInclusionStrategy strategy to select which properties to include. Decides based on the property key.
+     * @param propertyInclusionPolicy policy to select which properties to include. Decides based on the property key.
      * @return converted properties.
      */
-    public static Map<String, Object> propertiesToMap(PropertyContainer propertyContainer, ObjectInclusionStrategy<String> propertyInclusionStrategy) {
+    public static Map<String, Object> propertiesToMap(PropertyContainer propertyContainer, ObjectInclusionPolicy<String> propertyInclusionPolicy) {
         Map<String, Object> result = new HashMap<>();
         for (String key : propertyContainer.getPropertyKeys()) {
-            if (propertyInclusionStrategy.include(key)) {
+            if (propertyInclusionPolicy.include(key)) {
                 result.put(key, propertyContainer.getProperty(key));
             }
         }

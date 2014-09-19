@@ -16,23 +16,22 @@
 
 package com.graphaware.runtime.walk;
 
-import com.graphaware.common.strategy.*;
+import com.graphaware.common.policy.RelationshipInclusionPolicy;
 import com.graphaware.common.util.ReservoirSampler;
-import com.graphaware.runtime.strategy.IncludeAllBusinessNodes;
-import com.graphaware.runtime.strategy.IncludeAllBusinessRelationships;
+import com.graphaware.runtime.policy.all.IncludeAllBusinessRelationships;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 /**
  * {@link RelationshipSelector} that selects a {@link org.neo4j.graphdb.Relationship} at random from all the given
  * {@link org.neo4j.graphdb.Node}'s {@link org.neo4j.graphdb.Relationship}s, such that match the selected
- * {@link org.neo4j.graphdb.Relationship} matches the provided {@link com.graphaware.common.strategy.RelationshipInclusionStrategy}.
+ * {@link org.neo4j.graphdb.Relationship} matches the provided {@link com.graphaware.common.policy.RelationshipInclusionPolicy}.
  * <p/>
  * This is an O(n) algorithm.
  */
 public class RandomRelationshipSelector implements RelationshipSelector {
 
-    private final NodeCentricRelationshipInclusionStrategy relationshipInclusionStrategy;
+    private final RelationshipInclusionPolicy relationshipInclusionPolicy;
 
     /**
      * Constructs a new {@link RandomRelationshipSelector} that selects any relationship that isn't
@@ -44,12 +43,12 @@ public class RandomRelationshipSelector implements RelationshipSelector {
 
     /**
      * Constructs a new {@link RandomRelationshipSelector} that chooses relationships in accordance with the given
-     * {@link com.graphaware.common.strategy.ObjectInclusionStrategy}.
+     * {@link com.graphaware.common.policy.ObjectInclusionPolicy}.
      *
-     * @param relationshipInclusionStrategy The {@link com.graphaware.common.strategy.ObjectInclusionStrategy} used to select relationships to follow.
+     * @param relationshipInclusionPolicy The {@link com.graphaware.common.policy.ObjectInclusionPolicy} used to select relationships to follow.
      */
-    public RandomRelationshipSelector(NodeCentricRelationshipInclusionStrategy relationshipInclusionStrategy) {
-        this.relationshipInclusionStrategy = relationshipInclusionStrategy;
+    public RandomRelationshipSelector(RelationshipInclusionPolicy relationshipInclusionPolicy) {
+        this.relationshipInclusionPolicy = relationshipInclusionPolicy;
     }
 
     /**
@@ -59,7 +58,7 @@ public class RandomRelationshipSelector implements RelationshipSelector {
     public Relationship selectRelationship(Node node) {
         ReservoirSampler<Relationship> randomSampler = new ReservoirSampler<>(1);
         for (Relationship relationship : node.getRelationships()) {
-            if (this.relationshipInclusionStrategy.include(relationship, node)) {
+            if (this.relationshipInclusionPolicy.include(relationship, node)) {
                 randomSampler.sample(relationship);
             }
         }

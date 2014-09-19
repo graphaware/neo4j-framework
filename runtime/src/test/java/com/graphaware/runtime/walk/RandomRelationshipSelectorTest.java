@@ -1,7 +1,7 @@
 package com.graphaware.runtime.walk;
 
-import com.graphaware.common.strategy.IncludeRelationships;
-import com.graphaware.common.strategy.expression.SpelRelationshipInclusionStrategy;
+import com.graphaware.common.policy.spel.SpelRelationshipInclusionPolicy;
+import com.graphaware.common.policy.fluent.IncludeRelationships;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +59,7 @@ public class RandomRelationshipSelectorTest {
         try (Transaction tx = database.beginTx()) {
             assertNull(new RandomRelationshipSelector(IncludeRelationships.all().with(withName("NOT_EXIST"))).selectRelationship(database.getNodeById(0)));
             assertNull(new RandomRelationshipSelector(IncludeRelationships.all().with(INCOMING)).selectRelationship(database.getNodeById(0)));
-            assertNull(new RandomRelationshipSelector(new SpelRelationshipInclusionStrategy("isOutgoing() && otherNode.hasLabel('Test')")).selectRelationship(database.getNodeById(0)));
+            assertNull(new RandomRelationshipSelector(new SpelRelationshipInclusionPolicy("isOutgoing() && otherNode.hasLabel('Test')")).selectRelationship(database.getNodeById(0)));
             tx.success();
         }
     }
@@ -75,7 +75,7 @@ public class RandomRelationshipSelectorTest {
 
         try (Transaction tx = database.beginTx()) {
             assertEquals(0, new RandomRelationshipSelector(IncludeRelationships.all().with(OUTGOING)).selectRelationship(database.getNodeById(0)).getId());
-            assertEquals(0, new RandomRelationshipSelector(new SpelRelationshipInclusionStrategy("isOutgoing() && otherNode.hasLabel('Test')")).selectRelationship(database.getNodeById(0)).getId());
+            assertEquals(0, new RandomRelationshipSelector(new SpelRelationshipInclusionPolicy("isOutgoing() && otherNode.hasLabel('Test')")).selectRelationship(database.getNodeById(0)).getId());
             tx.success();
         }
     }

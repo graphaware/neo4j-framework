@@ -16,7 +16,9 @@
 
 package com.graphaware.tx.event.improved;
 
-import com.graphaware.common.strategy.*;
+import com.graphaware.common.policy.*;
+import com.graphaware.common.policy.NodePropertyInclusionPolicy;
+import com.graphaware.common.policy.RelationshipPropertyInclusionPolicy;
 import com.graphaware.test.util.TestDataBuilder;
 import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
@@ -111,13 +113,13 @@ public class FilteredLazyTransactionDataIntegrationTest {
     }
 
     @Test
-    public void strategiesThatIgnoreEverythingShouldBeHonoured() {
+    public void policiesThatIgnoreEverythingShouldBeHonoured() {
         createTestDatabase();
 
         database.registerTransactionEventHandler(new TransactionEventHandler.Adapter<Void>() {
             @Override
             public Void beforeCommit(TransactionData data) throws Exception {
-                ImprovedTransactionData improvedTransactionData = new FilteredTransactionData(new LazyTransactionData(data), InclusionStrategies.none());
+                ImprovedTransactionData improvedTransactionData = new FilteredTransactionData(new LazyTransactionData(data), InclusionPolicies.none());
                 assertFalse(improvedTransactionData.mutationsOccurred());
                 assertTrue(improvedTransactionData.hasBeenChanged(database.getNodeById(1)));
                 assertTrue(improvedTransactionData.changedProperties(database.getNodeById(1)).isEmpty());
@@ -1437,26 +1439,26 @@ public class FilteredLazyTransactionDataIntegrationTest {
         public Object beforeCommit(TransactionData data) throws Exception {
             LazyTransactionData lazyTransactionData = new LazyTransactionData(data);
 
-            beforeCommitCallback.doBeforeCommit(new FilteredTransactionData(lazyTransactionData, new InclusionStrategies(
-                    new NodeInclusionStrategy() {
+            beforeCommitCallback.doBeforeCommit(new FilteredTransactionData(lazyTransactionData, new InclusionPolicies(
+                    new NodeInclusionPolicy() {
                         @Override
                         public boolean include(Node node) {
                             return !node.getProperty("name", "").equals("Four") && !node.hasProperty(INTERNAL_NODE_PROPERTY);
                         }
                     },
-                    new NodePropertyInclusionStrategy() {
+                    new NodePropertyInclusionPolicy() {
                         @Override
                         public boolean include(String key, Node propertyContainer) {
                             return !"place".equals(key) && !key.startsWith(INTERNAL_PREFIX);
                         }
                     },
-                    new RelationshipInclusionStrategy() {
+                    new RelationshipInclusionPolicy.Adapter() {
                         @Override
                         public boolean include(Relationship relationship) {
                             return !relationship.isType(withName("R3")) && !relationship.getType().name().startsWith(INTERNAL_PREFIX);
                         }
                     }
-                    , new RelationshipPropertyInclusionStrategy() {
+                    , new RelationshipPropertyInclusionPolicy() {
                 @Override
                 public boolean include(String key, Relationship propertyContainer) {
                     return !"time".equals(key) && !key.startsWith(INTERNAL_PREFIX);

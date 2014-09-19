@@ -1,8 +1,8 @@
 package com.graphaware.tx.event;
 
-import com.graphaware.common.strategy.InclusionStrategies;
-import com.graphaware.common.strategy.NodeInclusionStrategy;
-import com.graphaware.common.strategy.none.IncludeNoRelationships;
+import com.graphaware.common.policy.InclusionPolicies;
+import com.graphaware.common.policy.NodeInclusionPolicy;
+import com.graphaware.common.policy.none.IncludeNoRelationships;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
@@ -46,8 +46,8 @@ public class JustForDocs {
         database.registerTransactionEventHandler(new TransactionEventHandler.Adapter<Object>() {
             @Override
             public Object beforeCommit(TransactionData data) throws Exception {
-                InclusionStrategies inclusionStrategies = InclusionStrategies.all()
-                        .with(new NodeInclusionStrategy() {
+                InclusionPolicies inclusionPolicies = InclusionPolicies.all()
+                        .with(new NodeInclusionPolicy() {
                             @Override
                             public boolean include(Node node) {
                                 return node.getProperty("name", "default").equals("Two");
@@ -56,7 +56,7 @@ public class JustForDocs {
                         .with(IncludeNoRelationships.getInstance());
 
                 ImprovedTransactionData improvedTransactionData
-                        = new FilteredTransactionData(new LazyTransactionData(data), inclusionStrategies);
+                        = new FilteredTransactionData(new LazyTransactionData(data), inclusionPolicies);
 
                 //have fun here with improvedTransactionData!
 

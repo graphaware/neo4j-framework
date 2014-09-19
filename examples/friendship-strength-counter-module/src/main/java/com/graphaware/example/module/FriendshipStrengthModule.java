@@ -1,6 +1,6 @@
 package com.graphaware.example.module;
 
-import com.graphaware.common.strategy.RelationshipInclusionStrategy;
+import com.graphaware.common.policy.RelationshipInclusionPolicy;
 import com.graphaware.runtime.config.FluentTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.module.BaseTxDrivenModule;
@@ -36,7 +36,7 @@ public class FriendshipStrengthModule extends BaseTxDrivenModule<Void> {
         configuration = FluentTxDrivenModuleConfiguration
                 .defaultConfiguration()
                 .with(
-                        new RelationshipInclusionStrategy() {
+                        new RelationshipInclusionPolicy.Adapter() {
                             @Override
                             public boolean include(Relationship relationship) {
                                 return relationship.isType(FRIEND_OF);

@@ -65,7 +65,7 @@ To use the API, simply instantiate one of the [`ImprovedTransactionData`](http:/
 
 [`FilteredTransactionData`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/event/improved/api/FilteredTransactionData.html) can be used instead.
 They effectively hide portions of the graph, including any changes performed
-on nodes and relationships that are not interesting. [`InclusionStrategies`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/common/strategy/InclusionStrategies.html) are used to convey the information about
+on nodes and relationships that are not interesting. [`InclusionPolicies`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/common/policy/InclusionPolicies.html) are used to convey the information about
 what is interesting and what is not. For example, of only nodes with name equal to "Two" and no relationships at all
 are of interest, the example above could be modified as follows:
 
@@ -74,8 +74,8 @@ GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDat
 database.registerTransactionEventHandler(new TransactionEventHandler.Adapter<Object>() {
     @Override
     public Object beforeCommit(TransactionData data) throws Exception {
-        InclusionStrategies inclusionStrategies = InclusionStrategies.all()
-                .with(new NodeInclusionStrategy() {
+        InclusionPolicies inclusionPolicies = InclusionPolicies.all()
+                .with(new NodeInclusionPolicy() {
                     @Override
                     public boolean include(Node node) {
                         return node.getProperty("name", "default").equals("Two");
@@ -84,7 +84,7 @@ database.registerTransactionEventHandler(new TransactionEventHandler.Adapter<Obj
                 .with(IncludeNoRelationships.getInstance());
 
         ImprovedTransactionData improvedTransactionData
-                = new FilteredTransactionData(new LazyTransactionData(data), inclusionStrategies);
+                = new FilteredTransactionData(new LazyTransactionData(data), inclusionPolicies);
 
         //have fun here with improvedTransactionData!
 

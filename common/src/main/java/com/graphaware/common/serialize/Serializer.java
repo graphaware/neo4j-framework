@@ -22,6 +22,14 @@ import com.esotericsoftware.kryo.io.Output;
 import com.graphaware.common.description.predicate.Predicates;
 import com.graphaware.common.description.property.LiteralPropertiesDescription;
 import com.graphaware.common.description.relationship.DetachedRelationshipDescriptionImpl;
+import com.graphaware.common.policy.all.IncludeAllNodeProperties;
+import com.graphaware.common.policy.all.IncludeAllNodes;
+import com.graphaware.common.policy.all.IncludeAllRelationshipProperties;
+import com.graphaware.common.policy.all.IncludeAllRelationships;
+import com.graphaware.common.policy.none.IncludeNoNodeProperties;
+import com.graphaware.common.policy.none.IncludeNoNodes;
+import com.graphaware.common.policy.none.IncludeNoRelationshipProperties;
+import com.graphaware.common.policy.none.IncludeNoRelationships;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -69,6 +77,14 @@ public final class Serializer {
         kryo.register(String[].class, 108);
 
         //todo do we need to register anything else?
+        register(IncludeAllNodeProperties.class, new SingletonSerializer());
+        register(IncludeAllNodes.class, new SingletonSerializer());
+        register(IncludeAllRelationshipProperties.class, new SingletonSerializer());
+        register(IncludeAllRelationships.class, new SingletonSerializer());
+        register(IncludeNoNodeProperties.class, new SingletonSerializer());
+        register(IncludeNoNodes.class, new SingletonSerializer());
+        register(IncludeNoRelationshipProperties.class, new SingletonSerializer());
+        register(IncludeNoRelationships.class, new SingletonSerializer());
     }
 
     private Serializer() {

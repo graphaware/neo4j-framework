@@ -16,8 +16,8 @@
 
 package com.graphaware.tx.event.improved.propertycontainer.filtered;
 
-import com.graphaware.common.strategy.InclusionStrategies;
-import com.graphaware.common.strategy.PropertyInclusionStrategy;
+import com.graphaware.common.policy.PropertyInclusionPolicy;
+import com.graphaware.common.policy.InclusionPolicies;
 import com.graphaware.common.wrapper.NodeWrapper;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
@@ -33,10 +33,10 @@ public class FilteredNode extends FilteredPropertyContainer<Node> implements Nod
      * Create a new filtering node decorator.
      *
      * @param wrapped    decorated node.
-     * @param strategies for filtering.
+     * @param policies for filtering.
      */
-    public FilteredNode(Node wrapped, InclusionStrategies strategies) {
-        super(wrapped, strategies);
+    public FilteredNode(Node wrapped, InclusionPolicies policies) {
+        super(wrapped, policies);
     }
 
     /**
@@ -51,8 +51,8 @@ public class FilteredNode extends FilteredPropertyContainer<Node> implements Nod
      * {@inheritDoc}
      */
     @Override
-    protected PropertyInclusionStrategy<Node> getPropertyInclusionStrategy() {
-        return strategies.getNodePropertyInclusionStrategy();
+    protected PropertyInclusionPolicy<Node> getPropertyInclusionPolicy() {
+        return policies.getNodePropertyInclusionPolicy();
     }
 
     /**
@@ -60,7 +60,7 @@ public class FilteredNode extends FilteredPropertyContainer<Node> implements Nod
      */
     @Override
     protected Iterable<Relationship> wrapRelationships(Iterable<Relationship> relationships, Direction direction, RelationshipType... relationshipTypes) {
-        return new FilteredRelationshipIterator(relationships, strategies);
+        return new FilteredRelationshipIterator(relationships, policies);
     }
 
     /**
@@ -68,6 +68,6 @@ public class FilteredNode extends FilteredPropertyContainer<Node> implements Nod
      */
     @Override
     protected Relationship wrapRelationship(Relationship relationship) {
-        return new FilteredRelationship(relationship, strategies);
+        return new FilteredRelationship(relationship, policies);
     }
 }

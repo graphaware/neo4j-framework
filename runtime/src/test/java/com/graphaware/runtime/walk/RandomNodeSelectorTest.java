@@ -1,7 +1,7 @@
 package com.graphaware.runtime.walk;
 
-import com.graphaware.common.strategy.NodeInclusionStrategy;
-import com.graphaware.common.strategy.none.IncludeNoNodes;
+import com.graphaware.common.policy.NodeInclusionPolicy;
+import com.graphaware.common.policy.none.IncludeNoNodes;
 import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor;
@@ -92,7 +92,7 @@ public class RandomNodeSelectorTest {
         try (Transaction tx = database.beginTx()) {
             assertNotNull(new RandomNodeSelector().selectNode(database));
 
-            Node node = new RandomNodeSelector(new NodeInclusionStrategy() {
+            Node node = new RandomNodeSelector(new NodeInclusionPolicy() {
                 @Override
                 public boolean include(Node object) {
                     return object.hasLabel(DynamicLabel.label("Label4"));

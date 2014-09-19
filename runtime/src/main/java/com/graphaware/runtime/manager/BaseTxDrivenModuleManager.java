@@ -142,7 +142,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
         Map<String, Object> result = new HashMap<>();
 
         for (T module : modules) {
-            FilteredTransactionData filteredTransactionData = new FilteredTransactionData(transactionData, module.getConfiguration().getInclusionStrategies());
+            FilteredTransactionData filteredTransactionData = new FilteredTransactionData(transactionData, module.getConfiguration().getInclusionPolicies());
 
             if (!filteredTransactionData.mutationsOccurred()) {
                 continue;

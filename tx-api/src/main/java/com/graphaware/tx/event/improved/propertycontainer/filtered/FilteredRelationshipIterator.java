@@ -16,7 +16,7 @@
 
 package com.graphaware.tx.event.improved.propertycontainer.filtered;
 
-import com.graphaware.common.strategy.InclusionStrategies;
+import com.graphaware.common.policy.InclusionPolicies;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.helpers.collection.PrefetchingIterator;
 
@@ -24,23 +24,23 @@ import java.util.Iterator;
 
 /**
  * A {@link org.neo4j.graphdb.Relationship} {@link java.util.Iterator} decorator that filters out {@link org.neo4j.graphdb.Relationship}s not needed by the
- * {@link com.graphaware.common.strategy.RelationshipInclusionStrategy} contained in the provided
- * {@link com.graphaware.common.strategy.InclusionStrategies}.
+ * {@link com.graphaware.common.policy.RelationshipInclusionPolicy} contained in the provided
+ * {@link com.graphaware.common.policy.InclusionPolicies}.
  */
 public class FilteredRelationshipIterator extends PrefetchingIterator<Relationship> implements Iterator<Relationship>, Iterable<Relationship> {
 
     private final Iterator<Relationship> wrappedIterator;
-    private final InclusionStrategies strategies;
+    private final InclusionPolicies policies;
 
     /**
      * Construct the iterator.
      *
      * @param wrappedIterable this decorates.
-     * @param strategies      for filtering.
+     * @param policies      for filtering.
      */
-    public FilteredRelationshipIterator(Iterable<Relationship> wrappedIterable, InclusionStrategies strategies) {
+    public FilteredRelationshipIterator(Iterable<Relationship> wrappedIterable, InclusionPolicies policies) {
         this.wrappedIterator = wrappedIterable.iterator();
-        this.strategies = strategies;
+        this.policies = policies;
     }
 
     /**
@@ -58,11 +58,11 @@ public class FilteredRelationshipIterator extends PrefetchingIterator<Relationsh
     protected Relationship fetchNextOrNull() {
         while (wrappedIterator.hasNext()) {
             Relationship next = wrappedIterator.next();
-            if (!strategies.getRelationshipInclusionStrategy().include(next)) {
+            if (!policies.getRelationshipInclusionPolicy().include(next)) {
                 continue;
             }
 
-            return new FilteredRelationship(next, strategies);
+            return new FilteredRelationship(next, policies);
         }
 
         return null;

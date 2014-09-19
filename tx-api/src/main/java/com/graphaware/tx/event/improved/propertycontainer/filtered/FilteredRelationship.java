@@ -16,8 +16,8 @@
 
 package com.graphaware.tx.event.improved.propertycontainer.filtered;
 
-import com.graphaware.common.strategy.InclusionStrategies;
-import com.graphaware.common.strategy.PropertyInclusionStrategy;
+import com.graphaware.common.policy.InclusionPolicies;
+import com.graphaware.common.policy.PropertyInclusionPolicy;
 import com.graphaware.common.wrapper.RelationshipWrapper;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -31,18 +31,18 @@ public class FilteredRelationship extends FilteredPropertyContainer<Relationship
      * Create a new filtering relationship decorator.
      *
      * @param wrapped    decorated relationship.
-     * @param strategies for filtering.
+     * @param policies for filtering.
      */
-    public FilteredRelationship(Relationship wrapped, InclusionStrategies strategies) {
-        super(wrapped, strategies);
+    public FilteredRelationship(Relationship wrapped, InclusionPolicies policies) {
+        super(wrapped, policies);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected PropertyInclusionStrategy<Relationship> getPropertyInclusionStrategy() {
-        return strategies.getRelationshipPropertyInclusionStrategy();
+    protected PropertyInclusionPolicy<Relationship> getPropertyInclusionPolicy() {
+        return policies.getRelationshipPropertyInclusionPolicy();
     }
 
     /**
@@ -66,7 +66,7 @@ public class FilteredRelationship extends FilteredPropertyContainer<Relationship
      */
     @Override
     protected Node wrapNode(Node node) {
-        return new FilteredNode(node, strategies);
+        return new FilteredNode(node, policies);
     }
 }
 

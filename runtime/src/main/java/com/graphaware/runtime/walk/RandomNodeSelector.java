@@ -16,9 +16,9 @@
 
 package com.graphaware.runtime.walk;
 
-import com.graphaware.common.strategy.NodeInclusionStrategy;
+import com.graphaware.common.policy.NodeInclusionPolicy;
 import com.graphaware.common.util.ReservoirSampler;
-import com.graphaware.runtime.strategy.IncludeAllBusinessNodes;
+import com.graphaware.runtime.policy.all.IncludeAllBusinessNodes;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -29,13 +29,13 @@ import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * {@link NodeSelector} that selects a {@link Node} at random from all {@link Node}s available in the database that match
- * the provided {@link com.graphaware.common.strategy.NodeInclusionStrategy}.
+ * the provided {@link com.graphaware.common.policy.NodeInclusionPolicy}.
  */
 public class RandomNodeSelector implements NodeSelector {
 
     private static final int MAX_EFFICIENT_ATTEMPTS = 10;
 
-    private final NodeInclusionStrategy inclusionStrategy;
+    private final NodeInclusionPolicy inclusionPolicy;
     private final RandomDataGenerator random = new RandomDataGenerator();
 
     /**
@@ -47,13 +47,13 @@ public class RandomNodeSelector implements NodeSelector {
 
     /**
      * Constructs a new {@link RandomNodeSelector} that selects a random node that matches the given
-     * {@link NodeInclusionStrategy}.
+     * {@link com.graphaware.common.policy.NodeInclusionPolicy}.
      *
-     * @param inclusionStrategy The {@link NodeInclusionStrategy} to consider when selecting
+     * @param inclusionPolicy The {@link com.graphaware.common.policy.NodeInclusionPolicy} to consider when selecting
      *                          nodes.
      */
-    public RandomNodeSelector(NodeInclusionStrategy inclusionStrategy) {
-        this.inclusionStrategy = inclusionStrategy;
+    public RandomNodeSelector(NodeInclusionPolicy inclusionPolicy) {
+        this.inclusionPolicy = inclusionPolicy;
     }
 
     /**
@@ -87,7 +87,7 @@ public class RandomNodeSelector implements NodeSelector {
             long randomId = random.nextLong(0, highestId);
             try {
                 Node node = database.getNodeById(randomId);
-                if (inclusionStrategy.include(node)) {
+                if (inclusionPolicy.include(node)) {
                     return node;
                 }
             } catch (NotFoundException e) {
@@ -109,7 +109,7 @@ public class RandomNodeSelector implements NodeSelector {
 
         ReservoirSampler<Node> randomSampler = new ReservoirSampler<>(1);
         for (Node node : allNodes) {
-            if (this.inclusionStrategy.include(node)) {
+            if (this.inclusionPolicy.include(node)) {
                 randomSampler.sample(node);
             }
         }

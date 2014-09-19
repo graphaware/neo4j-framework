@@ -992,7 +992,7 @@ public class TransactionSimulatingBatchGraphDatabaseIntegrationTest {
     }
 
     @Test
-    public void propertyExtractionStrategySmokeTest() {
+    public void propertyExtractionPolicySmokeTest() {
         createTestDatabase();
         mutateGraph(
                 new BeforeCommitCallback() {

@@ -16,32 +16,32 @@
 
 package com.graphaware.tx.event.improved.propertycontainer.filtered;
 
-import com.graphaware.common.strategy.PropertyInclusionStrategy;
+import com.graphaware.common.policy.PropertyInclusionPolicy;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.helpers.collection.PrefetchingIterator;
 
 import java.util.Iterator;
 
 /**
- * A property key {@link java.util.Iterator} decorator that filters out keys not needed by the contained {@link com.graphaware.common.strategy.PropertyInclusionStrategy}.
+ * A property key {@link java.util.Iterator} decorator that filters out keys not needed by the contained {@link com.graphaware.common.policy.PropertyInclusionPolicy}.
  */
 public class FilteredPropertyKeyIterator<T extends PropertyContainer> extends PrefetchingIterator<String> implements Iterable<String> {
 
     private final Iterator<String> wrappedIterator;
     private final T wrappedPropertyContainer;
-    private final PropertyInclusionStrategy<T> propertyInclusionStrategy;
+    private final PropertyInclusionPolicy<T> propertyInclusionPolicy;
 
     /**
      * Construct the iterator.
      *
      * @param wrappedIterator           wrapped iterator that this decorates (and filters).
      * @param wrappedPropertyContainer  property container that the iterator belongs to.
-     * @param propertyInclusionStrategy strategy used for filtering.
+     * @param propertyInclusionPolicy policy used for filtering.
      */
-    public FilteredPropertyKeyIterator(Iterable<String> wrappedIterator, T wrappedPropertyContainer, PropertyInclusionStrategy<T> propertyInclusionStrategy) {
+    public FilteredPropertyKeyIterator(Iterable<String> wrappedIterator, T wrappedPropertyContainer, PropertyInclusionPolicy<T> propertyInclusionPolicy) {
         this.wrappedIterator = wrappedIterator.iterator();
         this.wrappedPropertyContainer = wrappedPropertyContainer;
-        this.propertyInclusionStrategy = propertyInclusionStrategy;
+        this.propertyInclusionPolicy = propertyInclusionPolicy;
     }
 
     /**
@@ -59,7 +59,7 @@ public class FilteredPropertyKeyIterator<T extends PropertyContainer> extends Pr
     protected String fetchNextOrNull() {
         while (wrappedIterator.hasNext()) {
             String key = wrappedIterator.next();
-            if (propertyInclusionStrategy.include(key, wrappedPropertyContainer)) {
+            if (propertyInclusionPolicy.include(key, wrappedPropertyContainer)) {
                 return key;
             }
         }

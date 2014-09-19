@@ -1,7 +1,7 @@
 package com.graphaware.runtime.config;
 
-import com.graphaware.common.strategy.InclusionStrategies;
-import com.graphaware.runtime.strategy.InclusionStrategiesFactory;
+import com.graphaware.common.policy.InclusionPolicies;
+import com.graphaware.runtime.policy.InclusionPoliciesFactory;
 
 /**
  * {@link TxDrivenModuleConfiguration} with fluent interface.
@@ -10,7 +10,7 @@ import com.graphaware.runtime.strategy.InclusionStrategiesFactory;
 public class FluentTxDrivenModuleConfiguration extends BaseTxDrivenModuleConfiguration<FluentTxDrivenModuleConfiguration> {
 
     /**
-     * Creates an instance with default values, i.e., with {@link com.graphaware.runtime.strategy.InclusionStrategiesFactory#allBusiness()}.
+     * Creates an instance with default values, i.e., with {@link com.graphaware.runtime.policy.InclusionPoliciesFactory#allBusiness()}.
      *
      * @return The {@link FluentRuntimeConfiguration} instance.
      */
@@ -19,26 +19,26 @@ public class FluentTxDrivenModuleConfiguration extends BaseTxDrivenModuleConfigu
     }
 
     /**
-     * Create a new configuration with {@link com.graphaware.runtime.strategy.InclusionStrategiesFactory#allBusiness()}.
+     * Create a new configuration with {@link com.graphaware.runtime.policy.InclusionPoliciesFactory#allBusiness()}.
      */
     private FluentTxDrivenModuleConfiguration() {
-        super(InclusionStrategiesFactory.allBusiness());
+        super(InclusionPoliciesFactory.allBusiness());
     }
 
     /**
      * Create a new configuration.
      *
-     * @param inclusionStrategies of the configuration.
+     * @param inclusionPolicies of the configuration.
      */
-    private FluentTxDrivenModuleConfiguration(InclusionStrategies inclusionStrategies) {
-        super(inclusionStrategies);
+    private FluentTxDrivenModuleConfiguration(InclusionPolicies inclusionPolicies) {
+        super(inclusionPolicies);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected FluentTxDrivenModuleConfiguration newInstance(InclusionStrategies inclusionStrategies) {
-        return new FluentTxDrivenModuleConfiguration(inclusionStrategies);
+    protected FluentTxDrivenModuleConfiguration newInstance(InclusionPolicies inclusionPolicies) {
+        return new FluentTxDrivenModuleConfiguration(inclusionPolicies);
     }
 }

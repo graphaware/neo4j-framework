@@ -16,11 +16,11 @@
 
 package com.graphaware.tx.event.improved.api;
 
-import com.graphaware.common.strategy.*;
-import com.graphaware.common.strategy.none.IncludeNoNodeProperties;
-import com.graphaware.common.strategy.none.IncludeNoNodes;
-import com.graphaware.common.strategy.none.IncludeNoRelationshipProperties;
-import com.graphaware.common.strategy.none.IncludeNoRelationships;
+import com.graphaware.common.policy.InclusionPolicies;
+import com.graphaware.common.policy.none.IncludeNoNodeProperties;
+import com.graphaware.common.policy.none.IncludeNoNodes;
+import com.graphaware.common.policy.none.IncludeNoRelationshipProperties;
+import com.graphaware.common.policy.none.IncludeNoRelationships;
 import com.graphaware.tx.event.improved.data.BaseImprovedTransactionData;
 import com.graphaware.tx.event.improved.data.NodeTransactionData;
 import com.graphaware.tx.event.improved.data.RelationshipTransactionData;
@@ -29,23 +29,23 @@ import com.graphaware.tx.event.improved.data.filtered.FilteredNodeTransactionDat
 import com.graphaware.tx.event.improved.data.filtered.FilteredRelationshipTransactionData;
 
 /**
- * {@link ImprovedTransactionData} with filtering capabilities defined by {@link com.graphaware.common.strategy.InclusionStrategies}, delegating to
+ * {@link ImprovedTransactionData} with filtering capabilities defined by {@link com.graphaware.common.policy.InclusionPolicies}, delegating to
  * {@link com.graphaware.tx.event.improved.data.filtered.FilteredNodeTransactionData} and {@link com.graphaware.tx.event.improved.data.filtered.FilteredRelationshipTransactionData}.
  * <p/>
  * Results of methods returning {@link java.util.Collection}s and {@link java.util.Map}s will be filtered. <code>boolean</code>
- * and single object returning methods will always return the full truth no matter the strategies. So for example:
+ * and single object returning methods will always return the full truth no matter the policies. So for example:
  * <p/>
  * {@link #getAllCreatedNodes()} can return 5 nodes, but {@link #hasBeenCreated(org.neo4j.graphdb.Node)}  can
  * return true for more of them, as it ignores the filtering.
  * <p/>
  * When traversing the graph using an object returned by this API (such as {@link com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode}),
- * nodes, properties, and relationships not included by the {@link com.graphaware.common.strategy.InclusionStrategies} will be excluded. The only exception
+ * nodes, properties, and relationships not included by the {@link com.graphaware.common.policy.InclusionPolicies} will be excluded. The only exception
  * to this are relationship start and end nodes - they are returned even if they would normally be filtered out. This is
  * a design decision in order to honor the requirement that relationships must have start and end node.
  */
 public class FilteredTransactionData extends BaseImprovedTransactionData implements ImprovedTransactionData, TransactionDataContainer {
 
-    private final InclusionStrategies inclusionStrategies;
+    private final InclusionPolicies inclusionPolicies;
     private final NodeTransactionData nodeTransactionData;
     private final RelationshipTransactionData relationshipTransactionData;
 
@@ -53,12 +53,12 @@ public class FilteredTransactionData extends BaseImprovedTransactionData impleme
      * Construct a new filtered transaction data.
      *
      * @param transactionDataContainer container for original unfiltered transaction data.
-     * @param inclusionStrategies      strategies for filtering.
+     * @param inclusionPolicies      policies for filtering.
      */
-    public FilteredTransactionData(TransactionDataContainer transactionDataContainer, InclusionStrategies inclusionStrategies) {
-        this.inclusionStrategies = inclusionStrategies;
-        nodeTransactionData = new FilteredNodeTransactionData(transactionDataContainer.getNodeTransactionData(), inclusionStrategies);
-        relationshipTransactionData = new FilteredRelationshipTransactionData(transactionDataContainer.getRelationshipTransactionData(), inclusionStrategies);
+    public FilteredTransactionData(TransactionDataContainer transactionDataContainer, InclusionPolicies inclusionPolicies) {
+        this.inclusionPolicies = inclusionPolicies;
+        nodeTransactionData = new FilteredNodeTransactionData(transactionDataContainer.getNodeTransactionData(), inclusionPolicies);
+        relationshipTransactionData = new FilteredRelationshipTransactionData(transactionDataContainer.getRelationshipTransactionData(), inclusionPolicies);
     }
 
     /**
@@ -83,11 +83,11 @@ public class FilteredTransactionData extends BaseImprovedTransactionData impleme
     @Override
     public boolean mutationsOccurred() {
         //overridden for optimization - we don't want to load things (and especially properties) if we don't need to
-        return (!inclusionStrategies.getNodeInclusionStrategy().equals(IncludeNoNodes.getInstance()) && !getAllCreatedNodes().isEmpty())
-                || (!inclusionStrategies.getRelationshipInclusionStrategy().equals(IncludeNoRelationships.getInstance()) && !getAllCreatedRelationships().isEmpty())
-                || (!inclusionStrategies.getNodeInclusionStrategy().equals(IncludeNoNodes.getInstance()) && !getAllDeletedNodes().isEmpty())
-                || (!inclusionStrategies.getRelationshipInclusionStrategy().equals(IncludeNoRelationships.getInstance()) && !getAllDeletedRelationships().isEmpty())
-                || (!inclusionStrategies.getNodePropertyInclusionStrategy().equals(IncludeNoNodeProperties.getInstance()) && !getAllChangedNodes().isEmpty())
-                || (!inclusionStrategies.getRelationshipPropertyInclusionStrategy().equals(IncludeNoRelationshipProperties.getInstance()) && !getAllChangedRelationships().isEmpty());
+        return (!inclusionPolicies.getNodeInclusionPolicy().equals(IncludeNoNodes.getInstance()) && !getAllCreatedNodes().isEmpty())
+                || (!inclusionPolicies.getRelationshipInclusionPolicy().equals(IncludeNoRelationships.getInstance()) && !getAllCreatedRelationships().isEmpty())
+                || (!inclusionPolicies.getNodeInclusionPolicy().equals(IncludeNoNodes.getInstance()) && !getAllDeletedNodes().isEmpty())
+                || (!inclusionPolicies.getRelationshipInclusionPolicy().equals(IncludeNoRelationships.getInstance()) && !getAllDeletedRelationships().isEmpty())
+                || (!inclusionPolicies.getNodePropertyInclusionPolicy().equals(IncludeNoNodeProperties.getInstance()) && !getAllChangedNodes().isEmpty())
+                || (!inclusionPolicies.getRelationshipPropertyInclusionPolicy().equals(IncludeNoRelationshipProperties.getInstance()) && !getAllChangedRelationships().isEmpty());
     }
 }

@@ -1,7 +1,7 @@
 package com.graphaware.runtime.metadata;
 
 import com.graphaware.common.serialize.Serializer;
-import com.graphaware.common.strategy.ObjectInclusionStrategy;
+import com.graphaware.common.policy.ObjectInclusionPolicy;
 import com.graphaware.common.util.PropertyContainerUtils;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModule;
@@ -147,7 +147,7 @@ public abstract class SingleNodeMetadataRepository implements ModuleMetadataRepo
      * @return map of properties (key-value).
      */
     private Map<String, Object> getInternalProperties(Node node) {
-        return PropertyContainerUtils.propertiesToMap(node, new ObjectInclusionStrategy<String>() {
+        return PropertyContainerUtils.propertiesToMap(node, new ObjectInclusionPolicy<String>() {
             @Override
             public boolean include(String s) {
                 return s.startsWith(propertyPrefix);

@@ -16,30 +16,30 @@
 
 package com.graphaware.tx.event.improved.propertycontainer.filtered;
 
-import com.graphaware.common.strategy.InclusionStrategies;
-import com.graphaware.common.strategy.PropertyInclusionStrategy;
+import com.graphaware.common.policy.InclusionPolicies;
+import com.graphaware.common.policy.PropertyInclusionPolicy;
 import com.graphaware.common.wrapper.BasePropertyContainerWrapper;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
  * A {@link org.neo4j.graphdb.PropertyContainer} decorator that transparently filters out properties and (where relevant) other containers
- * according to the provided {@link com.graphaware.common.strategy.InclusionStrategies}. Mutating operations are passed through to the decorated
+ * according to the provided {@link com.graphaware.common.policy.InclusionPolicies}. Mutating operations are passed through to the decorated
  * {@link org.neo4j.graphdb.PropertyContainer} without modifications.
  */
 public abstract class FilteredPropertyContainer<T extends PropertyContainer> extends BasePropertyContainerWrapper<T> {
 
     protected final T wrapped;
-    protected final InclusionStrategies strategies;
+    protected final InclusionPolicies policies;
 
     /**
      * Create a new filtering decorator.
      *
      * @param wrapped    decorated property container.
-     * @param strategies for filtering.
+     * @param policies for filtering.
      */
-    protected FilteredPropertyContainer(T wrapped, InclusionStrategies strategies) {
+    protected FilteredPropertyContainer(T wrapped, InclusionPolicies policies) {
         this.wrapped = wrapped;
-        this.strategies = strategies;
+        this.policies = policies;
     }
 
     /**
@@ -51,18 +51,18 @@ public abstract class FilteredPropertyContainer<T extends PropertyContainer> ext
     }
 
     /**
-     * Get appropriate property inclusion strategy.
+     * Get appropriate property inclusion policy.
      *
-     * @return strategy.
+     * @return policy.
      */
-    protected abstract PropertyInclusionStrategy<T> getPropertyInclusionStrategy();
+    protected abstract PropertyInclusionPolicy<T> getPropertyInclusionPolicy();
 
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean hasProperty(String key) {
-        if (!getPropertyInclusionStrategy().include(key, self())) {
+        if (!getPropertyInclusionPolicy().include(key, self())) {
             return false;
         }
         return super.hasProperty(key);
@@ -73,6 +73,6 @@ public abstract class FilteredPropertyContainer<T extends PropertyContainer> ext
      */
     @Override
     public Iterable<String> getPropertyKeys() {
-        return new FilteredPropertyKeyIterator<>(super.getPropertyKeys(), self(), getPropertyInclusionStrategy());
+        return new FilteredPropertyKeyIterator<>(super.getPropertyKeys(), self(), getPropertyInclusionPolicy());
     }
 }

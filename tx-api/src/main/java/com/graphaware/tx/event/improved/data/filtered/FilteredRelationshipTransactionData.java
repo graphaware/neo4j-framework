@@ -16,9 +16,9 @@
 
 package com.graphaware.tx.event.improved.data.filtered;
 
-import com.graphaware.common.strategy.InclusionStrategies;
-import com.graphaware.common.strategy.PropertyContainerInclusionStrategy;
-import com.graphaware.common.strategy.PropertyInclusionStrategy;
+import com.graphaware.common.policy.InclusionPolicies;
+import com.graphaware.common.policy.PropertyContainerInclusionPolicy;
+import com.graphaware.common.policy.PropertyInclusionPolicy;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import com.graphaware.tx.event.improved.data.RelationshipTransactionData;
 import com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredRelationship;
@@ -40,10 +40,10 @@ public class FilteredRelationshipTransactionData extends FilteredPropertyContain
      * Construct filtered relationship transaction data.
      *
      * @param wrapped    wrapped relationship transaction data.
-     * @param strategies for filtering.
+     * @param policies for filtering.
      */
-    public FilteredRelationshipTransactionData(RelationshipTransactionData wrapped, InclusionStrategies strategies) {
-        super(strategies);
+    public FilteredRelationshipTransactionData(RelationshipTransactionData wrapped, InclusionPolicies policies) {
+        super(policies);
         this.wrapped = wrapped;
     }
 
@@ -60,7 +60,7 @@ public class FilteredRelationshipTransactionData extends FilteredPropertyContain
      */
     @Override
     protected Relationship filtered(Relationship original) {
-        return new FilteredRelationship(original, strategies);
+        return new FilteredRelationship(original, policies);
     }
 
     /**
@@ -99,15 +99,15 @@ public class FilteredRelationshipTransactionData extends FilteredPropertyContain
      * {@inheritDoc}
      */
     @Override
-    protected PropertyContainerInclusionStrategy<Relationship> getPropertyContainerInclusionStrategy() {
-        return strategies.getRelationshipInclusionStrategy();
+    protected PropertyContainerInclusionPolicy<Relationship> getPropertyContainerInclusionPolicy() {
+        return policies.getRelationshipInclusionPolicy();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected PropertyInclusionStrategy<Relationship> getPropertyInclusionStrategy() {
-        return strategies.getRelationshipPropertyInclusionStrategy();
+    protected PropertyInclusionPolicy<Relationship> getPropertyInclusionPolicy() {
+        return policies.getRelationshipPropertyInclusionPolicy();
     }
 }

@@ -16,11 +16,10 @@
 
 package com.graphaware.tx.event.improved.data.filtered;
 
-import com.graphaware.common.strategy.InclusionStrategies;
-import com.graphaware.common.strategy.PropertyContainerInclusionStrategy;
-import com.graphaware.common.strategy.PropertyInclusionStrategy;
+import com.graphaware.common.policy.PropertyContainerInclusionPolicy;
+import com.graphaware.common.policy.PropertyInclusionPolicy;
+import com.graphaware.common.policy.InclusionPolicies;
 import com.graphaware.tx.event.improved.data.NodeTransactionData;
-import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
@@ -38,10 +37,10 @@ public class FilteredNodeTransactionData extends FilteredPropertyContainerTransa
      * Construct filtered node transaction data.
      *
      * @param wrapped    wrapped node transaction data.
-     * @param strategies for filtering.
+     * @param policies for filtering.
      */
-    public FilteredNodeTransactionData(NodeTransactionData wrapped, InclusionStrategies strategies) {
-        super(strategies);
+    public FilteredNodeTransactionData(NodeTransactionData wrapped, InclusionPolicies policies) {
+        super(policies);
         this.wrapped = wrapped;
     }
 
@@ -58,23 +57,23 @@ public class FilteredNodeTransactionData extends FilteredPropertyContainerTransa
      */
     @Override
     protected Node filtered(Node original) {
-        return new FilteredNode(original, strategies);
+        return new FilteredNode(original, policies);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected PropertyContainerInclusionStrategy<Node> getPropertyContainerInclusionStrategy() {
-        return strategies.getNodeInclusionStrategy();
+    protected PropertyContainerInclusionPolicy<Node> getPropertyContainerInclusionPolicy() {
+        return policies.getNodeInclusionPolicy();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected PropertyInclusionStrategy<Node> getPropertyInclusionStrategy() {
-        return strategies.getNodePropertyInclusionStrategy();
+    protected PropertyInclusionPolicy<Node> getPropertyInclusionPolicy() {
+        return policies.getNodePropertyInclusionPolicy();
     }
 
     /**

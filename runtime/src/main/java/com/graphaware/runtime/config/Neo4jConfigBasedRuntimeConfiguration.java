@@ -42,7 +42,7 @@ public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfigurati
 
     private static final Setting<TimingStrategy> TIMING_STRATEGY_SETTING = setting("com.graphaware.runtime.timing.strategy", StringToTimingStrategy.getInstance(), (String) null);
 
-    //for both strategies, this is the main (default, mean, whatever) delay
+    //for both policies, this is the main (default, mean, whatever) delay
     private static final Setting<Long> DELAY_SETTING = setting("com.graphaware.runtime.timing.delay", LONG, (String) null);
 
     //for FixedDelayTimingStrategy only

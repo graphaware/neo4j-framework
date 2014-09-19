@@ -1,83 +1,85 @@
 package com.graphaware.runtime.config;
 
-import com.graphaware.common.strategy.*;
+import com.graphaware.common.policy.*;
+import com.graphaware.common.policy.NodePropertyInclusionPolicy;
+import com.graphaware.common.policy.RelationshipPropertyInclusionPolicy;
 
 /**
  * Base-class for {@link TxDrivenModuleConfiguration} implementations.
  */
 public abstract class BaseTxDrivenModuleConfiguration<T extends BaseTxDrivenModuleConfiguration<T>> implements TxDrivenModuleConfiguration {
 
-    private final InclusionStrategies inclusionStrategies;
+    private final InclusionPolicies inclusionPolicies;
 
-    protected BaseTxDrivenModuleConfiguration(InclusionStrategies inclusionStrategies) {
-        this.inclusionStrategies = inclusionStrategies;
+    protected BaseTxDrivenModuleConfiguration(InclusionPolicies inclusionPolicies) {
+        this.inclusionPolicies = inclusionPolicies;
     }
 
     /**
-     * Create a new instance of this {@link TxDrivenModuleConfiguration} with different inclusion strategies.
+     * Create a new instance of this {@link TxDrivenModuleConfiguration} with different inclusion policies.
      *
-     * @param inclusionStrategies of the new instance.
+     * @param inclusionPolicies of the new instance.
      * @return new instance.
      */
-    protected abstract T newInstance(InclusionStrategies inclusionStrategies);
+    protected abstract T newInstance(InclusionPolicies inclusionPolicies);
 
     /**
-     * Get inclusion strategies encapsulated by this configuration.
+     * Get inclusion policies encapsulated by this configuration.
      *
-     * @return strategies.
+     * @return policies.
      */
-    public InclusionStrategies getInclusionStrategies() {
-        return inclusionStrategies;
+    public InclusionPolicies getInclusionPolicies() {
+        return inclusionPolicies;
     }
 
     /**
-     * Create a new instance of this {@link TxDrivenModuleConfiguration} with different node inclusion strategy.
+     * Create a new instance of this {@link TxDrivenModuleConfiguration} with different node inclusion policy.
      *
-     * @param nodeInclusionStrategy of the new instance.
+     * @param nodeInclusionPolicy of the new instance.
      * @return new instance.
      */
-    public T with(NodeInclusionStrategy nodeInclusionStrategy) {
-        return newInstance(inclusionStrategies.with(nodeInclusionStrategy));
+    public T with(NodeInclusionPolicy nodeInclusionPolicy) {
+        return newInstance(inclusionPolicies.with(nodeInclusionPolicy));
     }
 
     /**
-     * Create a new instance of this {@link TxDrivenModuleConfiguration} with different node property inclusion strategy.
+     * Create a new instance of this {@link TxDrivenModuleConfiguration} with different node property inclusion policy.
      *
-     * @param nodePropertyInclusionStrategy of the new instance.
+     * @param nodePropertyInclusionPolicy of the new instance.
      * @return new instance.
      */
-    public T with(NodePropertyInclusionStrategy nodePropertyInclusionStrategy) {
-        return newInstance(inclusionStrategies.with(nodePropertyInclusionStrategy));
+    public T with(NodePropertyInclusionPolicy nodePropertyInclusionPolicy) {
+        return newInstance(inclusionPolicies.with(nodePropertyInclusionPolicy));
     }
 
     /**
-     * Create a new instance of this {@link TxDrivenModuleConfiguration} with different relationship inclusion strategy.
+     * Create a new instance of this {@link TxDrivenModuleConfiguration} with different relationship inclusion policy.
      *
-     * @param relationshipInclusionStrategy of the new instance.
+     * @param relationshipInclusionPolicy of the new instance.
      * @return new instance.
      */
-    public T with(RelationshipInclusionStrategy relationshipInclusionStrategy) {
-        return newInstance(inclusionStrategies.with(relationshipInclusionStrategy));
+    public T with(RelationshipInclusionPolicy relationshipInclusionPolicy) {
+        return newInstance(inclusionPolicies.with(relationshipInclusionPolicy));
     }
 
     /**
-     * Create a new instance of this {@link TxDrivenModuleConfiguration} with different relationship property inclusion strategy.
+     * Create a new instance of this {@link TxDrivenModuleConfiguration} with different relationship property inclusion policy.
      *
-     * @param relationshipPropertyInclusionStrategy of the new instance.
+     * @param relationshipPropertyInclusionPolicy of the new instance.
      * @return new instance.
      */
-    public T with(RelationshipPropertyInclusionStrategy relationshipPropertyInclusionStrategy) {
-        return newInstance(inclusionStrategies.with(relationshipPropertyInclusionStrategy));
+    public T with(RelationshipPropertyInclusionPolicy relationshipPropertyInclusionPolicy) {
+        return newInstance(inclusionPolicies.with(relationshipPropertyInclusionPolicy));
     }
 
     /**
-     * Create w new instance of {@link TxDrivenModuleConfiguration} with different {@link InclusionStrategies}.
+     * Create w new instance of {@link TxDrivenModuleConfiguration} with different {@link com.graphaware.common.policy.InclusionPolicies}.
      *
-     * @param inclusionStrategies of the new instance.
+     * @param inclusionPolicies of the new instance.
      * @return new instance.
      */
-    public T with(InclusionStrategies inclusionStrategies) {
-        return newInstance(inclusionStrategies);
+    public T with(InclusionPolicies inclusionPolicies) {
+        return newInstance(inclusionPolicies);
     }
 
     /**
@@ -90,7 +92,7 @@ public abstract class BaseTxDrivenModuleConfiguration<T extends BaseTxDrivenModu
 
         BaseTxDrivenModuleConfiguration that = (BaseTxDrivenModuleConfiguration) o;
 
-        if (!inclusionStrategies.equals(that.inclusionStrategies)) return false;
+        if (!inclusionPolicies.equals(that.inclusionPolicies)) return false;
 
         return true;
     }
@@ -100,6 +102,6 @@ public abstract class BaseTxDrivenModuleConfiguration<T extends BaseTxDrivenModu
      */
     @Override
     public int hashCode() {
-        return inclusionStrategies.hashCode();
+        return inclusionPolicies.hashCode();
     }
 }

@@ -1,6 +1,6 @@
 package com.graphaware.runtime.config;
 
-import com.graphaware.common.strategy.InclusionStrategies;
+import com.graphaware.common.policy.InclusionPolicies;
 
 /**
  * Encapsulates all configuration of a single {@link com.graphaware.runtime.module.TxDrivenModule}. Modules that need
@@ -9,9 +9,9 @@ import com.graphaware.common.strategy.InclusionStrategies;
 public interface TxDrivenModuleConfiguration {
 
     /**
-     * Get the inclusion strategies used by this module. If unsure, return {@link com.graphaware.runtime.strategy.InclusionStrategiesFactory#allBusiness()}.
+     * Get the inclusion policies used by this module. If unsure, return {@link com.graphaware.runtime.policy.InclusionPoliciesFactory#allBusiness()}.
      *
-     * @return strategies.
+     * @return policies.
      */
-    InclusionStrategies getInclusionStrategies();
+    InclusionPolicies getInclusionPolicies();
 }
