@@ -30,7 +30,6 @@ controller:
  */
 @Controller
 @RequestMapping("count")
-@Transactional
 public class NodeCountApi {
 
     private final GraphDatabaseService database;
@@ -43,7 +42,9 @@ public class NodeCountApi {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public long count() {
-        return Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
+        try (Transaction tx = database.beginTx()) {
+            return Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
+        }
     }
 }
 ```
@@ -99,14 +100,6 @@ To get started manually, you will need the following dependencies:
         <groupId>org.springframework</groupId>
         <artifactId>spring-webmvc</artifactId>
         <version>4.0.0.RELEASE</version>
-        <scope>provided</scope>
-    </dependency>
-
-    <!-- optional if you want to use @Transactional -->
-    <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-tx</artifactId>
-        <version>${spring.version}</version>
         <scope>provided</scope>
     </dependency>
 

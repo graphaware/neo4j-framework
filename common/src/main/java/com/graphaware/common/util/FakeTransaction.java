@@ -10,6 +10,11 @@ import org.neo4j.graphdb.Transaction;
 public final class FakeTransaction implements Transaction {
 
     @Override
+    public void terminate() {
+        //intentionally do nothing, this is a fake tx
+    }
+
+    @Override
     public void failure() {
         //intentionally do nothing, this is a fake tx
     }

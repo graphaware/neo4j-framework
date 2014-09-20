@@ -349,9 +349,11 @@ public class FilteredLazyTransactionDataIntegrationTest {
     public void deletedRelationshipsShouldBeCorrectlyIdentified() {
         createTestDatabase();
 
-        final AtomicLong deletedRelId = new AtomicLong();
+        final Holder<Relationship> deletedRelationship = new Holder<>();
+        final Holder<Node> deletedNode = new Holder<>();
         try (Transaction tx = database.beginTx()) {
-            deletedRelId.set(database.getNodeById(1).getSingleRelationship(withName("R3"), OUTGOING).getId());
+            deletedRelationship.set(database.getNodeById(1).getSingleRelationship(withName("R3"), OUTGOING));
+            deletedNode.set(database.getNodeById(2));
         }
 
         mutateGraph(
@@ -386,7 +388,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         assertEquals("nothing", r3.getProperty("time", "nothing"));
                         assertEquals(0, count(r3.getPropertyKeys()));
 
-                        Relationship r4 = transactionData.getDeleted(database.getRelationshipById(deletedRelId.get()));
+                        Relationship r4 = transactionData.getDeleted(deletedRelationship.get());
                         assertEquals(0, count(r4.getPropertyKeys()));
 
                         assertTrue(transactionData.hasBeenDeleted(r1));
@@ -395,13 +397,13 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         assertTrue(transactionData.hasBeenDeleted(r4));
                         assertFalse(transactionData.hasBeenDeleted(database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING)));
 
-                        assertEquals(3, count(transactionData.getDeletedRelationships(database.getNodeById(2))));
-                        assertEquals(3, count(transactionData.getDeletedRelationships(database.getNodeById(2), withName("R2"), withName("R1"))));
-                        assertEquals(2, count(transactionData.getDeletedRelationships(database.getNodeById(2), withName("R2"))));
-                        assertEquals(2, count(transactionData.getDeletedRelationships(database.getNodeById(2), OUTGOING)));
-                        assertEquals(2, count(transactionData.getDeletedRelationships(database.getNodeById(2), OUTGOING, withName("R2"))));
-                        assertEquals(1, count(transactionData.getDeletedRelationships(database.getNodeById(2), INCOMING, withName("R2"))));
-                        assertEquals(0, count(transactionData.getDeletedRelationships(database.getNodeById(2), withName("R3"))));
+                        assertEquals(3, count(transactionData.getDeletedRelationships(deletedNode.get())));
+                        assertEquals(3, count(transactionData.getDeletedRelationships(deletedNode.get(), withName("R2"), withName("R1"))));
+                        assertEquals(2, count(transactionData.getDeletedRelationships(deletedNode.get(), withName("R2"))));
+                        assertEquals(2, count(transactionData.getDeletedRelationships(deletedNode.get(), OUTGOING)));
+                        assertEquals(2, count(transactionData.getDeletedRelationships(deletedNode.get(), OUTGOING, withName("R2"))));
+                        assertEquals(1, count(transactionData.getDeletedRelationships(deletedNode.get(), INCOMING, withName("R2"))));
+                        assertEquals(0, count(transactionData.getDeletedRelationships(deletedNode.get(), withName("R3"))));
                     }
                 }
         );
@@ -411,9 +413,9 @@ public class FilteredLazyTransactionDataIntegrationTest {
     public void startingWithDeletedRelationshipPreviousGraphVersionShouldBeTraversedUsingNativeApi() {
         createTestDatabase();
 
-        final AtomicLong deletedRelId = new AtomicLong();
+        final Holder<Relationship> deletedRel = new Holder<>();
         try (Transaction tx = database.beginTx()) {
-            deletedRelId.set(database.getNodeById(1).getSingleRelationship(withName("R3"), OUTGOING).getId());
+            deletedRel.set(database.getNodeById(1).getSingleRelationship(withName("R3"), OUTGOING));
         }
 
         mutateGraph(
@@ -422,7 +424,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
 
-                        Relationship r4 = transactionData.getDeleted(database.getRelationshipById(deletedRelId.get()));
+                        Relationship r4 = transactionData.getDeleted(deletedRel.get());
 
                         Relationship deletedRel = transactionData.getDeleted(r4);
 
@@ -452,9 +454,9 @@ public class FilteredLazyTransactionDataIntegrationTest {
     public void startingWithDeletedRelationshipPreviousGraphVersionShouldBeTraversedUsingTraversalApi() {
         createTestDatabase();
 
-        final AtomicLong deletedRelId = new AtomicLong();
+        final Holder<Relationship> deletedRelationship = new Holder<>();
         try (Transaction tx = database.beginTx()) {
-            deletedRelId.set(database.getNodeById(1).getSingleRelationship(withName("R3"), OUTGOING).getId());
+            deletedRelationship.set(database.getNodeById(1).getSingleRelationship(withName("R3"), OUTGOING));
         }
 
         mutateGraph(
@@ -463,7 +465,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
 
-                        Relationship deletedRel = transactionData.getDeleted(database.getRelationshipById(deletedRelId.get()));
+                        Relationship deletedRel = transactionData.getDeleted(deletedRelationship.get());
 
                         TraversalDescription traversalDescription = database.traversalDescription()
                                 .relationships(withName("R1"), OUTGOING)
@@ -1615,6 +1617,18 @@ public class FilteredLazyTransactionDataIntegrationTest {
             Node four = database.getNodeById(4);
             four.setProperty("name", "Three");
             four.setProperty("name", "Four");
+        }
+    }
+
+    private class Holder<T> {
+        private T held;
+
+        private T get() {
+            return held;
+        }
+
+        private void set(T held) {
+            this.held = held;
         }
     }
 }

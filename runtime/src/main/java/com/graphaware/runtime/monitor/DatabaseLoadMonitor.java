@@ -10,5 +10,5 @@ public interface DatabaseLoadMonitor {
      *
      * @return load in tx per second.
      */
-    int getLoad();
+    long getLoad();
 }

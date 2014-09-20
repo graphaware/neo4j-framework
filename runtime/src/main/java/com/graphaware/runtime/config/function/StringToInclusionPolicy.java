@@ -1,14 +1,13 @@
 package com.graphaware.runtime.config.function;
 
 import com.graphaware.common.policy.InclusionPolicy;
-import org.neo4j.helpers.Function;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.regex.Pattern;
+import org.neo4j.function.Function;
 
 /**
- * A {@link org.neo4j.helpers.Function} that converts String to {@link com.graphaware.common.policy.InclusionPolicy}.
+ * A {@link Function} that converts String to {@link com.graphaware.common.policy.InclusionPolicy}.
  * <p/>
  * Converts a fully qualified class name to an instance of the class, or a SPEL expression to {@link com.graphaware.common.policy.ObjectInclusionPolicy}.
  */

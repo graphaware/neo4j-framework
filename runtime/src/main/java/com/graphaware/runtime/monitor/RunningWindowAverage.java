@@ -12,7 +12,7 @@ import java.util.Iterator;
  */
 public class RunningWindowAverage {
 
-    private final BoundedConcurrentStack<Pair<Long, Integer>> timesAndValues;
+    private final BoundedConcurrentStack<Pair<Long, Long>> timesAndValues;
     private final int maxTime;
 
     /**
@@ -32,7 +32,7 @@ public class RunningWindowAverage {
      * @param time  at which the value was taken.
      * @param value sample value.
      */
-    public void sample(long time, int value) {
+    public void sample(long time, long value) {
         timesAndValues.push(new Pair<>(time, value));
     }
 
@@ -43,25 +43,25 @@ public class RunningWindowAverage {
      *
      * @return average of the value as described, rounded down to the nearest integer.
      */
-    public int getAverage() {
+    public long getAverage() {
         if (timesAndValues.isEmpty()) {
             return TimingStrategy.UNKNOWN;
         }
 
-        Iterator<Pair<Long, Integer>> iterator = timesAndValues.iterator();
-        Pair<Long, Integer> latest = iterator.next();
+        Iterator<Pair<Long, Long>> iterator = timesAndValues.iterator();
+        Pair<Long, Long> latest = iterator.next();
         long latestTime = latest.first();
-        int latestValue = latest.second();
+        long latestValue = latest.second();
 
         if (!iterator.hasNext()) {
             return TimingStrategy.UNKNOWN;
         }
 
         long pastTime = 0;
-        int pastValue = 0;
+        long pastValue = 0;
 
         while (iterator.hasNext()) {
-            Pair<Long, Integer> next = iterator.next();
+            Pair<Long, Long> next = iterator.next();
 
             if (latestTime - next.first() > maxTime) {
                 break;

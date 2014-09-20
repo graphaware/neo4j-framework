@@ -14,5 +14,5 @@ public interface DelayAdjuster {
      * @param load             The load on the database in tx/s.
      * @return The absolute number of milliseconds that should be used for the next scheduling delay.
      */
-    long determineNextDelay(long currentDelay, long lastTaskDuration, int load);
+    long determineNextDelay(long currentDelay, long lastTaskDuration, long load);
 }

@@ -10,12 +10,13 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.neo4j.graphdb.DependencyResolver;
 import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.impl.transaction.TxManager;
+import org.neo4j.kernel.impl.transaction.xaframework.TransactionCounters;
+import org.neo4j.management.TransactionManager;
 
 @SuppressWarnings("deprecation")
 public class AdaptiveTimingStrategyTest {
 
-    private TxManager txManager;
+    private TransactionCounters txCounters;
     private AdaptiveTimingStrategy timingStrategy;
 
     /**
@@ -23,11 +24,11 @@ public class AdaptiveTimingStrategyTest {
      */
     @Before
     public void setUp() {
-        txManager = Mockito.mock(TxManager.class);
+        txCounters = Mockito.mock(TransactionCounters.class);
         GraphDatabaseAPI graphDatabase = Mockito.mock(GraphDatabaseAPI.class);
         DependencyResolver dependencyResolver = Mockito.mock(DependencyResolver.class);
         Mockito.stub(graphDatabase.getDependencyResolver()).toReturn(dependencyResolver);
-        Mockito.stub(dependencyResolver.resolveDependency(TxManager.class)).toReturn(txManager);
+        Mockito.stub(dependencyResolver.resolveDependency(TransactionCounters.class)).toReturn(txCounters);
 
         timingStrategy = AdaptiveTimingStrategy
                 .defaultConfiguration()
@@ -44,7 +45,7 @@ public class AdaptiveTimingStrategyTest {
 
     @Test
     public void shouldUseInitialDelayFromGivenConfiguration() {
-        Mockito.stub(txManager.getStartedTxCount()).toReturn(9);
+        Mockito.stub(txCounters.getNumberOfStartedTransactions()).toReturn(9L);
 
         long nextDelay = timingStrategy.nextDelay(0L);
         assertThat(nextDelay, is(equalTo(1000L)));
@@ -52,7 +53,7 @@ public class AdaptiveTimingStrategyTest {
 
     @Test
     public void shouldIncreaseDelayFromPreviousIfCurrentPeriodIsDeemedToBeBusy() throws InterruptedException {
-        Mockito.stub(txManager.getStartedTxCount()).toReturn(10).toReturn(20).toReturn(30);
+        Mockito.stub(txCounters.getNumberOfStartedTransactions()).toReturn(10L).toReturn(20L).toReturn(30L);
 
         // set the state so that we have established a concept of business
         timingStrategy.nextDelay(30_000_000L);
@@ -66,7 +67,7 @@ public class AdaptiveTimingStrategyTest {
 
     @Test
     public void shouldDecreaseDelayFromPreviousIfCurrentPeriodIsDeemedToBeQuiet() throws InterruptedException {
-        Mockito.stub(txManager.getStartedTxCount()).toReturn(1).toReturn(2).toReturn(3).toReturn(3);
+        Mockito.stub(txCounters.getNumberOfStartedTransactions()).toReturn(1L).toReturn(2L).toReturn(3L).toReturn(3L);
 
         timingStrategy.nextDelay(16_000_000L);
         Thread.sleep(100);

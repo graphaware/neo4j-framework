@@ -2,7 +2,7 @@ package com.graphaware.runtime.monitor;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.impl.transaction.TxManager;
+import org.neo4j.kernel.impl.transaction.xaframework.TransactionCounters;
 
 /**
  * {@link DatabaseLoadMonitor} returning the database load based on the number of transactions started in a period of time.
@@ -13,7 +13,7 @@ import org.neo4j.kernel.impl.transaction.TxManager;
  */
 public class StartedTxBasedLoadMonitor implements DatabaseLoadMonitor {
 
-    private final TxManager txManager;
+    private final TransactionCounters txCounters;
     private final RunningWindowAverage runningWindowAverage;
 
     /**
@@ -23,7 +23,7 @@ public class StartedTxBasedLoadMonitor implements DatabaseLoadMonitor {
      * @param runningWindowAverage to use for the monitoring.
      */
     public StartedTxBasedLoadMonitor(GraphDatabaseService database, RunningWindowAverage runningWindowAverage) {
-        this.txManager = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(TxManager.class);
+        this.txCounters = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(TransactionCounters.class);
         this.runningWindowAverage = runningWindowAverage;
     }
 
@@ -31,8 +31,8 @@ public class StartedTxBasedLoadMonitor implements DatabaseLoadMonitor {
      * {@inheritDoc}
      */
     @Override
-    public int getLoad() {
-        runningWindowAverage.sample(System.currentTimeMillis(), txManager.getStartedTxCount());
+    public long getLoad() {
+        runningWindowAverage.sample(System.currentTimeMillis(), txCounters.getNumberOfStartedTransactions());
         return runningWindowAverage.getAverage();
     }
 }

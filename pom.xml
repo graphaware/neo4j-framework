@@ -210,6 +210,21 @@
 
             <dependency>
                 <groupId>org.neo4j</groupId>
+                <artifactId>neo4j-primitive-collections</artifactId>
+                <version>${neo4j.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.neo4j</groupId>
+                <artifactId>neo4j-io</artifactId>
+                <version>${neo4j.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.neo4j</groupId>
                 <artifactId>neo4j-kernel</artifactId>
                 <version>${neo4j.version}</version>
                 <type>test-jar</type>
@@ -277,14 +292,14 @@
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
-                <version>9.0.5.v20130815</version>
+                <version>9.2.1.v20140609</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-servlet</artifactId>
-                <version>9.0.5.v20130815</version>
+                <version>9.2.1.v20140609</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -368,12 +383,6 @@
 
             <dependency>
                 <groupId>org.springframework</groupId>
-                <artifactId>spring-tx</artifactId>
-                <version>${spring.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.springframework</groupId>
                 <artifactId>spring-expression</artifactId>
                 <version>${spring.version}</version>
             </dependency>
@@ -398,7 +407,18 @@
 
         <dependency>
             <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-primitive-collections</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.neo4j</groupId>
             <artifactId>neo4j-kernel</artifactId>
+            <type>test-jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-io</artifactId>
             <type>test-jar</type>
         </dependency>
 

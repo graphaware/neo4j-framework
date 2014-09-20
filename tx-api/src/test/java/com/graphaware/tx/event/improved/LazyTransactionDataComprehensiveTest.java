@@ -306,6 +306,14 @@ public class LazyTransactionDataComprehensiveTest {
     @Test
     public void deletedRelationshipsShouldBeCorrectlyIdentified() {
         createTestDatabase();
+
+        final Holder<Node> deletedNode = new Holder<>();
+
+        try (Transaction tx = db.beginTx()) {
+            deletedNode.set(db.getNodeById(2));
+            tx.success();
+        }
+
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
@@ -341,13 +349,13 @@ public class LazyTransactionDataComprehensiveTest {
                         assertTrue(td.hasBeenDeleted(r4));
                         assertFalse(td.hasBeenDeleted(db.getNodeById(3).getSingleRelationship(R3, OUTGOING)));
 
-                        assertEquals(3, count(td.getDeletedRelationships(db.getNodeById(2))));
-                        assertEquals(3, count(td.getDeletedRelationships(db.getNodeById(2), R2, R1)));
-                        assertEquals(2, count(td.getDeletedRelationships(db.getNodeById(2), R2)));
-                        assertEquals(2, count(td.getDeletedRelationships(db.getNodeById(2), OUTGOING)));
-                        assertEquals(2, count(td.getDeletedRelationships(db.getNodeById(2), OUTGOING, R2)));
-                        assertEquals(1, count(td.getDeletedRelationships(db.getNodeById(2), INCOMING, R2)));
-                        assertEquals(0, count(td.getDeletedRelationships(db.getNodeById(2), R3)));
+                        assertEquals(3, count(td.getDeletedRelationships(deletedNode.get())));
+                        assertEquals(3, count(td.getDeletedRelationships(deletedNode.get(), R2, R1)));
+                        assertEquals(2, count(td.getDeletedRelationships(deletedNode.get(), R2)));
+                        assertEquals(2, count(td.getDeletedRelationships(deletedNode.get(), OUTGOING)));
+                        assertEquals(2, count(td.getDeletedRelationships(deletedNode.get(), OUTGOING, R2)));
+                        assertEquals(1, count(td.getDeletedRelationships(deletedNode.get(), INCOMING, R2)));
+                        assertEquals(0, count(td.getDeletedRelationships(deletedNode.get(), R3)));
                     }
                 }
         );
@@ -1556,6 +1564,14 @@ public class LazyTransactionDataComprehensiveTest {
     @Test
     public void verifyDegrees() {
         createTestDatabase();
+
+        final Holder<Node> deletedNode = new Holder<>();
+
+        try (Transaction tx = db.beginTx()) {
+            deletedNode.set(db.getNodeById(2));
+            tx.success();
+        }
+
         mutateGraph(
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
@@ -1582,7 +1598,7 @@ public class LazyTransactionDataComprehensiveTest {
                         assertEquals(1, onePrevious.getDegree(R1, OUTGOING));
                         assertEquals(0, onePrevious.getDegree(R1, INCOMING));
 
-                        Node two = td.getDeleted(db.getNodeById(2L));
+                        Node two = td.getDeleted(deletedNode.get());
                         assertEquals(3, two.getDegree()); //loops only count as 1
                         assertEquals(2, two.getDegree(R2));
                         assertEquals(1, two.getDegree(R2, INCOMING));
@@ -1771,5 +1787,17 @@ public class LazyTransactionDataComprehensiveTest {
 
     private static <K, V> V getSingleValue(Map<K, V> map) {
         return getSingleOrNull(map.entrySet()).getValue();
+    }
+
+    private class Holder<T> {
+        private T held;
+
+        private T get() {
+            return held;
+        }
+
+        private void set(T held) {
+            this.held = held;
+        }
     }
 }

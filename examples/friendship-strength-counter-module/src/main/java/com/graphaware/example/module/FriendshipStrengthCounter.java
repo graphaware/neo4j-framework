@@ -18,13 +18,15 @@ package com.graphaware.example.module;
 
 import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import org.neo4j.graphdb.*;
-import org.springframework.transaction.annotation.Transactional;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 import static com.graphaware.common.util.IterableUtils.getSingleOrNull;
-import static com.graphaware.example.module.Labels.*;
-import static com.graphaware.example.module.PropertyKeys.*;
-import static com.graphaware.example.module.Relationships.*;
+import static com.graphaware.example.module.Labels.FriendshipCounter;
+import static com.graphaware.example.module.PropertyKeys.STRENGTH;
+import static com.graphaware.example.module.PropertyKeys.TOTAL_FRIENDSHIP_STRENGTH;
+import static com.graphaware.example.module.Relationships.FRIEND_OF;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**

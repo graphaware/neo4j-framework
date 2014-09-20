@@ -6,7 +6,6 @@ import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
  */
 @Controller
 @RequestMapping("count")
-@Transactional
 public class NodeCountApi {
 
     private final GraphDatabaseService database;
@@ -29,6 +27,13 @@ public class NodeCountApi {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public long count() {
-        return Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
+        long count;
+
+        try (Transaction tx = database.beginTx()) {
+            count = Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
+            tx.success();
+        }
+
+        return count;
     }
 }

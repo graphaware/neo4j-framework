@@ -39,7 +39,7 @@ public class ConstantDeltaDelayAdjuster implements DelayAdjuster {
      * {@inheritDoc}
      */
     @Override
-    public long determineNextDelay(long currentDelay, long lastTaskDuration, int load) {
+    public long determineNextDelay(long currentDelay, long lastTaskDuration, long load) {
         if (currentDelay < 0) {
             return defaultDelay;
         }

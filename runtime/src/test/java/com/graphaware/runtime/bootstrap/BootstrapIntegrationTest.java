@@ -156,7 +156,7 @@ public class BootstrapIntegrationTest {
                 .newImpermanentDatabaseBuilder()
                 .setConfig(RUNTIME_ENABLED, "true")
                 .setConfig("com.graphaware.module.wrong1.enabled", "com.not.existent.Bootstrapper")
-                .setConfig("com.graphaware.module.wrong2.1", "com.not.existent.Bootstrapper")
+                .setConfig("com.graphaware.module.wrong2.2", "com.not.existent.Bootstrapper")
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
                 .newGraphDatabase();
