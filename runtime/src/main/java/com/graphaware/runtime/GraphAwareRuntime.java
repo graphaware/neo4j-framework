@@ -1,5 +1,6 @@
 package com.graphaware.runtime;
 
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModule;
 import org.neo4j.graphdb.NotFoundException;
 
@@ -54,6 +55,13 @@ public interface GraphAwareRuntime {
      * @throws NotFoundException in case no such module has been registered.
      */
     <T extends RuntimeModule> T getModule(String moduleId, Class<T> clazz) throws NotFoundException;
+
+    /**
+     * Get the configuration of this runtime.
+     *
+     * @return config.
+     */
+    RuntimeConfiguration getConfiguration();
 
     /**
      * Start the runtime, optionally skipping the metadata loading phase. It is not recommended to skip metadata loading;
