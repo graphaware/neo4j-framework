@@ -29,6 +29,10 @@ public class JsonNode extends JsonPropertyContainer {
 
     private String[] labels;
 
+    public JsonNode(Node node) {
+        this(node, new JsonInput());
+    }
+
     public JsonNode(Node node, JsonInput jsonInput) {
         super(node.getId());
 
@@ -38,9 +42,13 @@ public class JsonNode extends JsonPropertyContainer {
                     putProperty(property, node.getProperty(property));
                 }
             }
+        } else {
+            for (String property : node.getPropertyKeys()) {
+                putProperty(property, node.getProperty(property));
+            }
         }
 
-        if (Boolean.TRUE.equals(jsonInput.getIncludeNodeLabels())) {
+        if (!Boolean.FALSE.equals(jsonInput.getIncludeNodeLabels())) {
             setLabels(labelsToStringArray(node.getLabels()));
         }
     }

@@ -29,6 +29,10 @@ public class JsonRelationship extends JsonPropertyContainer {
     private String type;
     private Direction direction = Direction.BOTH;
 
+    public JsonRelationship(Relationship relationship, Node pointOfView) {
+        this(relationship, new JsonInput(), pointOfView);
+    }
+
     public JsonRelationship(Relationship relationship, JsonInput jsonInput, Node pointOfView) {
         super(relationship.getId());
 
@@ -37,6 +41,10 @@ public class JsonRelationship extends JsonPropertyContainer {
                 if (relationship.hasProperty(property)) {
                     putProperty(property, relationship.getProperty(property));
                 }
+            }
+        } else {
+            for (String property : relationship.getPropertyKeys()) {
+                putProperty(property, relationship.getProperty(property));
             }
         }
 
