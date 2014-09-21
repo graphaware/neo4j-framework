@@ -549,6 +549,61 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         verifyNoMoreInteractions(mockModule1, mockModule2);
     }
 
+    @Test
+    public void shouldObtainModulesOfCorrectTypes() {
+        TxAndTimerDrivenModule mockModule1 = mock(TxAndTimerDrivenModule.class);
+        when(mockModule1.getId()).thenReturn(MOCK + "1");
+        TxDrivenModule mockModule2 = mockTxModule(MOCK + "2");
+        TimerDrivenModule mockModule3 = mockTimerModule(MOCK + "3");
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule1);
+        runtime.registerModule(mockModule2);
+        runtime.registerModule(mockModule3);
+
+        assertEquals(mockModule1, runtime.getModule(MOCK + "1", TxAndTimerDrivenModule.class));
+        assertEquals(mockModule1, runtime.getModule(MOCK + "1", TxDrivenModule.class));
+        assertEquals(mockModule1, runtime.getModule(MOCK + "1", TimerDrivenModule.class));
+        assertEquals(mockModule2, runtime.getModule(MOCK + "2", TxDrivenModule.class));
+        assertEquals(mockModule3, runtime.getModule(MOCK + "3", TimerDrivenModule.class));
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void shouldThrowExceptionWhenAskedForNonExistingModule() {
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.getModule("non-existing", TxAndTimerDrivenModule.class);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void shouldThrowExceptionWhenAskedForWrongModuleType() {
+        TxAndTimerDrivenModule mockModule1 = mock(TxAndTimerDrivenModule.class);
+        when(mockModule1.getId()).thenReturn(MOCK + "1");
+        TxDrivenModule mockModule2 = mockTxModule(MOCK + "2");
+        TimerDrivenModule mockModule3 = mockTimerModule(MOCK + "3");
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule1);
+        runtime.registerModule(mockModule2);
+        runtime.registerModule(mockModule3);
+
+        runtime.getModule(MOCK + "3", TxDrivenModule.class);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void shouldThrowExceptionWhenAskedForWrongModuleType2() {
+        TxAndTimerDrivenModule mockModule1 = mock(TxAndTimerDrivenModule.class);
+        when(mockModule1.getId()).thenReturn(MOCK + "1");
+        TxDrivenModule mockModule2 = mockTxModule(MOCK + "2");
+        TimerDrivenModule mockModule3 = mockTimerModule(MOCK + "3");
+
+        GraphAwareRuntime runtime = createRuntime();
+        runtime.registerModule(mockModule1);
+        runtime.registerModule(mockModule2);
+        runtime.registerModule(mockModule3);
+
+        runtime.getModule(MOCK + "2", TimerDrivenModule.class);
+    }
+
     interface TxAndTimerDrivenModule extends TxDrivenModule, TimerDrivenModule {
 
     }

@@ -22,6 +22,7 @@ import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.NotFoundException;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -117,6 +118,24 @@ public class ProductionRuntime extends DatabaseRuntime {
 
         if (module instanceof TimerDrivenModule) {
             timerDrivenModuleManager.registerModule((TimerDrivenModule) module);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <M extends RuntimeModule> M getModule(String moduleId, Class<M> clazz) throws NotFoundException {
+        try {
+            return super.getModule(moduleId, clazz);
+        } catch (NotFoundException e) {
+            M module = timerDrivenModuleManager.getModule(moduleId, clazz);
+
+            if (module == null) {
+                throw new NotFoundException("No module of type " + clazz.getName() + " with ID " + moduleId + " has been registered");
+            }
+
+            return module;
         }
     }
 

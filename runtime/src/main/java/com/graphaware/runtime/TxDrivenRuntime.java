@@ -20,6 +20,7 @@ import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
+import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 
@@ -89,6 +90,20 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
         }
 
         getTxDrivenModuleManager().afterRollback(states);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <M extends RuntimeModule> M getModule(String moduleId, Class<M> clazz) throws NotFoundException {
+        M module = getTxDrivenModuleManager().getModule(moduleId, clazz);
+
+        if (module == null) {
+            throw new NotFoundException("No module of type " + clazz.getName() + " with ID " + moduleId + " has been registered");
+        }
+
+        return module;
     }
 
     /**

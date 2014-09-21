@@ -1,9 +1,6 @@
 package com.graphaware.runtime.manager;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import com.graphaware.runtime.metadata.*;
 
@@ -18,7 +15,7 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseModuleManager.class);
 
-    protected final List<T> modules = new LinkedList<>();
+    protected final Map<String, T> modules = new LinkedHashMap<>();
     protected final ModuleMetadataRepository metadataRepository;
 
     /**
@@ -35,7 +32,25 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
      */
     @Override
     public final void registerModule(T module) {
-        modules.add(module);
+        modules.put(module.getId(), module);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <M extends RuntimeModule> M getModule(String moduleId, Class<M> clazz) {
+        if (!modules.containsKey(moduleId)) {
+            return null;
+        }
+
+        T module = modules.get(moduleId);
+        if (!clazz.isAssignableFrom(module.getClass())) {
+            LOG.warn("Module " + moduleId + " is not a " + clazz.getName());
+            return null;
+        }
+
+        return (M) module;
     }
 
     /**
@@ -45,16 +60,14 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
      * @throws IllegalStateException in case the module is already registered.
      */
     public void checkNotAlreadyRegistered(RuntimeModule module) {
-        if (modules.contains(module)) {
+        if (modules.values().contains(module)) {
             LOG.error("Module " + module.getId() + " cannot be registered more than once!");
             throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
         }
 
-        for (T existing : modules) {
-            if (existing.getId().equals(module.getId())) {
-                LOG.error("Module " + module.getId() + " cannot be registered more than once!");
-                throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
-            }
+        if (modules.containsKey(module.getId())) {
+            LOG.error("Module " + module.getId() + " cannot be registered more than once!");
+            throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
         }
     }
 
@@ -65,7 +78,7 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
     public final Set<String> loadMetadata() {
         final Set<String> moduleIds = new HashSet<>();
 
-        for (final T module : modules) {
+        for (final T module : modules.values()) {
             moduleIds.add(module.getId());
             LOG.info("Loading metadata for module " + module.getId());
             loadMetadata(module);
@@ -181,7 +194,7 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
      */
     @Override
     public void shutdownModules() {
-        for (T module : modules) {
+        for (T module : modules.values()) {
             LOG.info("Shutting down module " + module.getId());
             module.shutdown();
         }

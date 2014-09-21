@@ -91,7 +91,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
     @Override
     public void startModules() {
         LOG.info("Starting transaction-driven modules...");
-        for (T module : modules) {
+        for (T module : modules.values()) {
             start(module);
         }
         LOG.info("Transaction-driven modules started.");
@@ -141,7 +141,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
     public Map<String, Object> beforeCommit(TransactionDataContainer transactionData) {
         Map<String, Object> result = new HashMap<>();
 
-        for (T module : modules) {
+        for (T module : modules.values()) {
             FilteredTransactionData filteredTransactionData = new FilteredTransactionData(transactionData, module.getConfiguration().getInclusionPolicies());
 
             if (!filteredTransactionData.mutationsOccurred()) {
@@ -178,7 +178,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      */
     @Override
     public void afterCommit(Map<String, Object> states) {
-        for (T module : modules) {
+        for (T module : modules.values()) {
             if (!states.containsKey(module.getId())) {
                 return; //perhaps module wasn't interested, or threw RuntimeException
             }
@@ -192,7 +192,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      */
     @Override
     public void afterRollback(Map<String, Object> states) {
-        for (T module : modules) {
+        for (T module : modules.values()) {
             if (!states.containsKey(module.getId())) {
                 return; //rollback happened before this module had a go
             }
