@@ -72,6 +72,22 @@ public class ProductionRuntime extends DatabaseRuntime {
     }
 
     /**
+     * Get the {@link ProductionRuntime} registered with the given database.
+     *
+     * @param database for which to get runtime.
+     * @return the runtime, which is guaranteed to be started upon return.
+     * @throws IllegalStateException in case no runtime is registered with this database.
+     */
+    public static ProductionRuntime getStartedRuntime(GraphDatabaseService database) {
+        ProductionRuntime runtime = getRuntime(database);
+        if (runtime == null) {
+            throw new IllegalStateException("No GraphAware Runtime is registered with the given database");
+        }
+        runtime.waitUntilStarted();
+        return runtime;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
