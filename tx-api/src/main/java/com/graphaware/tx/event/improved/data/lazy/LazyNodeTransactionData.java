@@ -112,7 +112,7 @@ public class LazyNodeTransactionData extends LazyPropertyContainerTransactionDat
         initializeChanged();
 
         if (!hasBeenChanged(node)) {
-            LOG.warn(node + " has not been changed but the caller thinks it should have assigned labels.");
+//            LOG.warn(node + " has not been changed but the caller thinks it should have assigned labels.");
             return false;
         }
 

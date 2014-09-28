@@ -17,6 +17,8 @@
 package com.graphaware.runtime.policy.all;
 
 import com.graphaware.common.policy.RelationshipInclusionPolicy;
+import com.graphaware.common.serialize.Serializer;
+import com.graphaware.common.serialize.SingletonSerializer;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -26,6 +28,10 @@ import org.neo4j.graphdb.Relationship;
  * {@link com.graphaware.runtime.GraphAwareRuntime} internal relationships. Singleton.
  */
 public final class IncludeAllBusinessRelationships extends RelationshipInclusionPolicy.Adapter {
+
+    static {
+        Serializer.register(IncludeAllBusinessRelationships.class, new SingletonSerializer());
+    }
 
     private static final IncludeAllBusinessRelationships INSTANCE = new IncludeAllBusinessRelationships();
 

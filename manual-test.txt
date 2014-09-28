@@ -1,0 +1,4 @@
+Change settings to:
+
+curl -X POST http://localhost:7474/graphaware/algorithm/generator/social/barabasi-albert/1000/3
+curl http://localhost:7474/graphaware/noderank/noderank
