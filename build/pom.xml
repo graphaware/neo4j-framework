@@ -32,8 +32,6 @@
         <module>graphaware-framework-embedded</module>
         <module>graphaware-framework-server-community</module>
         <module>graphaware-framework-server-enterprise</module>
-        <module>graphaware-runtime-module-maven-archetype</module>
-        <module>graphaware-springmvc-maven-archetype</module>
     </modules>
 
     <dependencyManagement>

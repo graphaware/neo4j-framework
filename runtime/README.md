@@ -113,9 +113,7 @@ in the order in which they've been registered.
 
 **Example:** An example is provided in [examples/friendship-strength-counter-module](../examples/friendship-strength-counter-module).
 
-To get started quickly, use the provided Maven archetype by typing:
-
-    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-runtime-module-maven-archetype -DarchetypeVersion=2.1.4.18
+To get started quickly, copy the example above and modify to your needs.
 
 To start from scratch, you will need the following dependencies in your pom.xml
 
