@@ -78,7 +78,7 @@ public class BoundedSortedList<T, C extends Comparable<C>> {
         this.comparator = new Comparator<ComparableItem<T, C>>() {
             @Override
             public int compare(ComparableItem<T, C> o1, ComparableItem<T, C> o2) {
-                return comparator.compare(o1.quantity, o2.quantity);
+                return comparator.compare(o1.getQuantity(), o2.getQuantity());
             }
         };
         this.capacity = capacity;
@@ -140,44 +140,6 @@ public class BoundedSortedList<T, C extends Comparable<C>> {
             }
         } finally {
             lock.writeLock().unlock();
-        }
-    }
-
-    private static class ComparableItem<T, C extends Comparable<C>> {
-
-        private final T item;
-        private final C quantity;
-
-        private ComparableItem(T item, C quantity) {
-            this.item = item;
-            this.quantity = quantity;
-        }
-
-        private T getItem() {
-            return item;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            ComparableItem that = (ComparableItem) o;
-
-            if (!item.equals(that.item)) return false;
-
-            return true;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int hashCode() {
-            return item.hashCode();
         }
     }
 }
