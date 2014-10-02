@@ -49,9 +49,15 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
     /**
      * Start the processing of tasks.
      */
-    @PostConstruct
     public void start() {
         startAsync();
+    }
+
+    /**
+     * Stop the processing of tasks.
+     */
+    public void stop() {
+        stopAsync();
     }
 
     /**
