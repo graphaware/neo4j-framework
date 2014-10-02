@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.config.InvalidSettingException;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
@@ -62,7 +63,7 @@ public class BootstrapIntegrationTest {
         assertTrue(TEST_RUNTIME_MODULES.isEmpty());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = InvalidSettingException.class)
     public void misconfiguredRuntimeShouldFailStartup() throws InterruptedException {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
