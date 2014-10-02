@@ -41,7 +41,7 @@ public class ContinuousNodeSelector implements NodeSelector {
     private static final Logger LOG = LoggerFactory.getLogger(ContinuousNodeSelector.class);
 
     private final NodeInclusionPolicy inclusionPolicy;
-    private final AtomicLong lastId = new AtomicLong(-1);
+    private final AtomicLong lastId;
 
     /**
      * Constructs a new {@link com.graphaware.runtime.walk.ContinuousNodeSelector} that selects any node which isn't a
@@ -55,11 +55,34 @@ public class ContinuousNodeSelector implements NodeSelector {
      * Constructs a new {@link com.graphaware.runtime.walk.ContinuousNodeSelector} that selects a node that matches
      * the given {@link com.graphaware.common.policy.NodeInclusionPolicy}.
      *
+     * @param lastNodeId ID of the last node selected by this selector.
+     */
+    public ContinuousNodeSelector(long lastNodeId) {
+        this(IncludeAllBusinessNodes.getInstance(), lastNodeId);
+    }
+
+    /**
+     * Constructs a new {@link com.graphaware.runtime.walk.ContinuousNodeSelector} that selects a node that matches
+     * the given {@link com.graphaware.common.policy.NodeInclusionPolicy}.
+     *
      * @param inclusionPolicy The {@link com.graphaware.common.policy.NodeInclusionPolicy} to consider when selecting
      *                        nodes.
      */
     public ContinuousNodeSelector(NodeInclusionPolicy inclusionPolicy) {
+        this(inclusionPolicy, -1);
+    }
+
+    /**
+     * Constructs a new {@link com.graphaware.runtime.walk.ContinuousNodeSelector} that selects a node that matches
+     * the given {@link com.graphaware.common.policy.NodeInclusionPolicy}.
+     *
+     * @param inclusionPolicy The {@link com.graphaware.common.policy.NodeInclusionPolicy} to consider when selecting
+     *                        nodes.
+     * @param lastNodeId      ID of the last node selected by this selector.
+     */
+    public ContinuousNodeSelector(NodeInclusionPolicy inclusionPolicy, long lastNodeId) {
         this.inclusionPolicy = inclusionPolicy;
+        this.lastId = new AtomicLong(lastNodeId);
     }
 
     /**

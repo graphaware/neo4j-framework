@@ -44,6 +44,20 @@ public class ContinuousNodeSelectorTest extends DatabaseIntegrationTest {
     }
 
     @Test
+    public void shouldResumeFromLastNode() {
+        NodeSelector selector = new ContinuousNodeSelector(IncludeNodes.all().with(label("Person")), 2L);
+
+        try (Transaction tx = getDatabase().beginTx()) {
+            assertEquals("Adam", selector.selectNode(getDatabase()).getProperty("name"));
+            assertEquals("Michal", selector.selectNode(getDatabase()).getProperty("name"));
+            assertEquals("Daniela", selector.selectNode(getDatabase()).getProperty("name"));
+            assertEquals("Adam", selector.selectNode(getDatabase()).getProperty("name"));
+
+            tx.success();
+        }
+    }
+
+    @Test
     public void shouldTerminateWhenNoSuitableNodesExist() {
         NodeSelector selector = new ContinuousNodeSelector(IncludeNoNodes.getInstance());
 
