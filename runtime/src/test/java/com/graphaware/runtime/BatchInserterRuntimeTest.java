@@ -20,6 +20,7 @@ import com.graphaware.common.util.FakeTransaction;
 import com.graphaware.common.util.IterableUtils;
 import com.graphaware.runtime.config.FluentRuntimeConfiguration;
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.metadata.BatchSingleNodeMetadataRepository;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
@@ -79,6 +80,11 @@ public class BatchInserterRuntimeTest extends GraphAwareRuntimeTest<BatchSupport
     @Override
     protected GraphAwareRuntime createRuntime() {
         return GraphAwareRuntimeFactory.createRuntime(batchInserter);
+    }
+
+    @Override
+    protected GraphAwareRuntime createRuntime(RuntimeConfiguration config) {
+        return GraphAwareRuntimeFactory.createRuntime(batchInserter, config);
     }
 
     @Override

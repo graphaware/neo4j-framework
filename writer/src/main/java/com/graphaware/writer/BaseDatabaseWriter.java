@@ -13,6 +13,22 @@ public abstract class BaseDatabaseWriter implements DatabaseWriter {
      * {@inheritDoc}
      */
     @Override
+    public void start() {
+        //no-op by default
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void stop() {
+        //no-op by default
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void write(GraphDatabaseService database, Runnable task) {
         write(database, task, "UNKNOWN");
     }

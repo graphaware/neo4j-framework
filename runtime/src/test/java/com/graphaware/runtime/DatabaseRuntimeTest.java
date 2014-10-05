@@ -47,7 +47,12 @@ public abstract class DatabaseRuntimeTest extends GraphAwareRuntimeTest {
         return GraphAwareRuntimeFactory.createRuntime(database, createTestRuntimeConfiguration());
     }
 
-	/**
+    @Override
+    protected GraphAwareRuntime createRuntime(RuntimeConfiguration config) {
+        return GraphAwareRuntimeFactory.createRuntime(database, config);
+    }
+
+    /**
 	 * Constructs a new {@link RuntimeConfiguration} for use in the tests.  Individual tests are free to override this without
 	 * any need to call <code>super</code>.
 	 *

@@ -26,13 +26,19 @@ import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.NeedsInitializationException;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
+import com.graphaware.writer.BaseDatabaseWriter;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.event.KernelEventHandler;
 
-import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
-import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
-import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROPERTY_PREFIX;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.graphaware.runtime.config.RuntimeConfiguration.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -45,6 +51,8 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
     protected static final String MOCK = "MOCK";
 
     protected abstract GraphAwareRuntime createRuntime();
+
+    protected abstract GraphAwareRuntime createRuntime(RuntimeConfiguration config);
 
     protected abstract Node createMetadataNode();
 
@@ -628,6 +636,40 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
             createNode();
             tx.success();
         }
+    }
+
+    @Test
+    public void shouldStartAndStopDatabaseWriter() {
+        final AtomicBoolean started = new AtomicBoolean(false);
+
+        BaseDatabaseWriter dummyWriter = new BaseDatabaseWriter() {
+            @Override
+            public void start() {
+                started.set(true);
+            }
+
+            @Override
+            public void stop() {
+                started.set(false);
+            }
+
+            @Override
+            public <T> T write(GraphDatabaseService database, Callable<T> task, String id, int waitMillis) {
+                return null;
+            }
+        };
+
+        GraphAwareRuntime runtime = createRuntime(FluentRuntimeConfiguration.defaultConfiguration().withDatabaseWriter(dummyWriter));
+
+        assertFalse(started.get());
+
+        runtime.start();
+
+        assertTrue(started.get());
+
+        ((KernelEventHandler) runtime).beforeShutdown();
+
+        assertFalse(started.get());
     }
 
     protected interface RuntimeConfiguredRuntimeModule extends TxDrivenModule, RuntimeConfigured {

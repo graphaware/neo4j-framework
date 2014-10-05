@@ -136,8 +136,8 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      * {@inheritDoc}
      */
     @Override
-    protected void doStart(boolean skipLoadingMetadata) {
-        super.doStart(skipLoadingMetadata);
+    protected void startModules(boolean skipLoadingMetadata) {
+        super.startModules(skipLoadingMetadata);
         getTxDrivenModuleManager().startModules();
     }
 

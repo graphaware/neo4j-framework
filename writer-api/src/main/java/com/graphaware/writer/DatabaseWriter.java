@@ -13,6 +13,16 @@ import java.util.concurrent.Callable;
 public interface DatabaseWriter {
 
     /**
+     * Start the writer.
+     */
+    void start();
+
+    /**
+     * Stop the writer.
+     */
+    void stop();
+
+    /**
      * Write to the database without waiting for the result of the write.
      *
      * @param database to write to.

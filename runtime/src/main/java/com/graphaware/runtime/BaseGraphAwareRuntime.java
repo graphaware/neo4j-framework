@@ -17,7 +17,6 @@
 package com.graphaware.runtime;
 
 import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
-import com.graphaware.runtime.config.FluentRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfigured;
 import com.graphaware.runtime.module.RuntimeModule;
@@ -148,9 +147,9 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
         LOG.info("Starting GraphAware...");
         state = State.STARTING;
 
-        GoogleAnalyticsStatsCollector.getInstance().runtimeStart();
-
-        doStart(skipLoadingMetadata);
+        startStatsCollector();
+        startModules(skipLoadingMetadata);
+        startWriter();
 
         state = State.STARTED;
         LOG.info("GraphAware started.");
@@ -158,11 +157,18 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
     }
 
     /**
+     * Start stats collector.
+     */
+    private void startStatsCollector() {
+        GoogleAnalyticsStatsCollector.getInstance().runtimeStart();
+    }
+
+    /**
      * Perform the actual start of the runtime, being certain that it is the right time to do so.
      *
      * @param skipLoadingMetadata true for skipping the metadata loading phase.
      */
-    protected void doStart(boolean skipLoadingMetadata) {
+    protected void startModules(boolean skipLoadingMetadata) {
         if (skipLoadingMetadata) {
             LOG.info("Metadata loading skipped.");
         } else {
@@ -174,6 +180,13 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
             }
             LOG.info("Module metadata loaded.");
         }
+    }
+
+    /**
+     * Start the database writer.
+     */
+    private void startWriter() {
+        configuration.getDatabaseWriter().start();
     }
 
     /**
@@ -265,6 +278,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
         LOG.info("Shutting down GraphAware Runtime... ");
         state = State.SHUTDOWN;
         shutdownModules();
+        stopWriter();
         afterShutdown();
         LOG.info("GraphAware Runtime shut down.");
     }
@@ -280,6 +294,13 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
      * Shutdown all modules.
      */
     protected abstract void shutdownModules();
+
+    /**
+     * Stop database writer.
+     */
+    private void stopWriter() {
+        configuration.getDatabaseWriter().stop();
+    }
 
     /**
      * {@inheritDoc}
