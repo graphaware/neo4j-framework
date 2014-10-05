@@ -27,9 +27,6 @@ import com.graphaware.writer.DefaultWriter;
  */
 public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
 
-    private final TimingStrategy timingStrategy;
-    private final DatabaseWriter databaseWriter;
-
     /**
      * Creates an instance with default values.
      *
@@ -40,8 +37,7 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
     }
 
     private FluentRuntimeConfiguration(TimingStrategy timingStrategy, DatabaseWriter databaseWriter) {
-        this.timingStrategy = timingStrategy;
-        this.databaseWriter = databaseWriter;
+        super(timingStrategy, databaseWriter);
     }
 
     /**
@@ -55,14 +51,6 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TimingStrategy getTimingStrategy() {
-        return timingStrategy;
-    }
-
-    /**
      * Create an instance with different {@link DatabaseWriter}.
      *
      * @param databaseWriter of the new instance.
@@ -70,39 +58,5 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      */
     public FluentRuntimeConfiguration withDatabaseWriter(DatabaseWriter databaseWriter) {
         return new FluentRuntimeConfiguration(getTimingStrategy(), databaseWriter);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DatabaseWriter getDatabaseWriter() {
-        return databaseWriter;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        FluentRuntimeConfiguration that = (FluentRuntimeConfiguration) o;
-
-        if (!databaseWriter.equals(that.databaseWriter)) return false;
-        if (!timingStrategy.equals(that.timingStrategy)) return false;
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        int result = timingStrategy.hashCode();
-        result = 31 * result + databaseWriter.hashCode();
-        return result;
     }
 }

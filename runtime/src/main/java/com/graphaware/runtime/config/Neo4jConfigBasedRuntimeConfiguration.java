@@ -9,8 +9,7 @@ import com.graphaware.runtime.config.function.StringToTimingStrategy;
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
-import com.graphaware.writer.DatabaseWriter;
-import com.graphaware.writer.DefaultWriter;
+import com.graphaware.writer.*;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.kernel.configuration.Config;
 
@@ -43,8 +42,12 @@ import org.neo4j.kernel.configuration.Config;
  */
 public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfiguration {
 
-    private static final Setting<TimingStrategy> TIMING_STRATEGY_SETTING = setting("com.graphaware.runtime.timing.strategy", StringToTimingStrategy.getInstance(), (String) null);
+    //writer
     private static final Setting<DatabaseWriter> DATABASE_WRITER_SETTING = setting("com.graphaware.runtime.db.writer", StringToDatabaseWriter.getInstance(), (String) null);
+    private static final Setting<Integer> WRITER_QUEUE_SIZE = setting("com.graphaware.runtime.db.writer.queueSize", INTEGER, (String) null);
+
+    //timing
+    private static final Setting<TimingStrategy> TIMING_STRATEGY_SETTING = setting("com.graphaware.runtime.timing.strategy", StringToTimingStrategy.getInstance(), (String) null);
 
     //for both policies, this is the main (default, mean, whatever) delay
     private static final Setting<Long> DELAY_SETTING = setting("com.graphaware.runtime.timing.delay", LONG, (String) null);
@@ -59,22 +62,16 @@ public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfigurati
     private static final Setting<Integer> MAX_SAMPLES_SETTING = setting("com.graphaware.runtime.timing.maxSamples", INTEGER, (String) null);
     private static final Setting<Integer> MAX_TIME_SETTING = setting("com.graphaware.runtime.timing.maxTime", INTEGER, (String) null);
 
-    private final Config config;
-
     /**
      * Constructs a new {@link Neo4jConfigBasedRuntimeConfiguration} based on the given Neo4j {@link Config}.
      *
      * @param config The {@link Config} containing the settings used to configure the runtime
      */
     public Neo4jConfigBasedRuntimeConfiguration(Config config) {
-        this.config = config;
+        super(createTimingStrategy(config), createDatabaseWriter(config));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TimingStrategy getTimingStrategy() {
+    private static TimingStrategy createTimingStrategy(Config config) {
         TimingStrategy timingStrategy = config.get(TIMING_STRATEGY_SETTING);
 
         if (timingStrategy == null) {
@@ -128,15 +125,19 @@ public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfigurati
         throw new IllegalStateException("Unknown timing strategy!");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DatabaseWriter getDatabaseWriter() {
+    private static DatabaseWriter createDatabaseWriter(Config config) {
         DatabaseWriter writer = config.get(DATABASE_WRITER_SETTING);
 
         if (writer == null) {
             return DefaultWriter.getInstance();
+        }
+
+        if (writer instanceof TxPerTaskWriter && config.get(WRITER_QUEUE_SIZE) != null) {
+            writer = new TxPerTaskWriter(config.get(WRITER_QUEUE_SIZE));
+        }
+
+        if (writer instanceof BatchWriter && config.get(WRITER_QUEUE_SIZE) != null) {
+            writer = new BatchWriter(config.get(WRITER_QUEUE_SIZE));
         }
 
         return writer;

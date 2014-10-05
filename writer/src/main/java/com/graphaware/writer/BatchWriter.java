@@ -24,6 +24,21 @@ public class BatchWriter extends SingleThreadedWriter implements DatabaseWriter 
     private volatile GraphDatabaseService database;
 
     /**
+     * Construct a new writer with a default queue capacity of 10,000.
+     */
+    public BatchWriter() {
+    }
+
+    /**
+     * Construct a new writer.
+     *
+     * @param queueCapacity capacity of the queue.
+     */
+    public BatchWriter(int queueCapacity) {
+        super(queueCapacity);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

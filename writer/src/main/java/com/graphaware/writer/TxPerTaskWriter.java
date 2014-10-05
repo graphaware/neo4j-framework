@@ -24,7 +24,7 @@ public class TxPerTaskWriter extends SingleThreadedWriter implements DatabaseWri
     }
 
     /**
-     * Construct a new writer with.
+     * Construct a new writer.
      *
      * @param queueCapacity capacity of the queue.
      */
