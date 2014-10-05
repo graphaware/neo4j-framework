@@ -477,7 +477,7 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         GraphAwareRuntime runtime = createRuntime();
         runtime.registerModule(mockModule);
 
-        verify(mockModule).configurationChanged(FluentRuntimeConfiguration.defaultConfiguration());
+        verify(mockModule).configurationChanged(getExpectedConifg());
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
     }
@@ -489,7 +489,11 @@ public abstract class GraphAwareRuntimeTest<T extends TxDrivenModule> {
         GraphAwareRuntime runtime = createRuntime();
         runtime.registerModule(module);
 
-        assertEquals(FluentRuntimeConfiguration.defaultConfiguration(), module.getConfig());
+        assertEquals(getExpectedConifg(), module.getConfig());
+    }
+
+    protected FluentRuntimeConfiguration getExpectedConifg() {
+        return FluentRuntimeConfiguration.defaultConfiguration();
     }
 
     @Test(expected = IllegalStateException.class)

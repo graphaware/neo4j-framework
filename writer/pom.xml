@@ -24,8 +24,8 @@
     <artifactId>writer</artifactId>
     <packaging>jar</packaging>
 
-    <name>GraphAware Transaction Executor</name>
-    <description>Single and Batch Transaction Executor</description>
+    <name>GraphAware Database Writer</name>
+    <description>Alternative Database Writing Strategies</description>
     <url>http://graphaware.com</url>
 
     <dependencies>

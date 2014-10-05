@@ -73,6 +73,11 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         return FluentRuntimeConfiguration.defaultConfiguration().withTimingStrategy(TIMING_STRATEGY);
     }
 
+    @Override
+    protected FluentRuntimeConfiguration getExpectedConifg() {
+        return FluentRuntimeConfiguration.defaultConfiguration().withTimingStrategy(TIMING_STRATEGY);
+    }
+
     private TimerDrivenModule mockTimerModule() {
         return mockTimerModule(MOCK);
     }
