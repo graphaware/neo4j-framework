@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TxDrivenModule;
@@ -36,6 +37,15 @@ import java.util.Set;
  * @param <T> implementation of {@link com.graphaware.runtime.module.TxDrivenModule} that this runtime supports.
  */
 public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGraphAwareRuntime implements TransactionEventHandler<Map<String, Object>> {
+
+    /**
+     * Create a new instance.
+     *
+     * @param configuration config.
+     */
+    protected TxDrivenRuntime(RuntimeConfiguration configuration) {
+        super(configuration);
+    }
 
     /**
      * Get the manager for {@link TxDrivenModule}s.

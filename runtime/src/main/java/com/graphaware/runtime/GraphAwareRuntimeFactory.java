@@ -77,7 +77,7 @@ public final class GraphAwareRuntimeFactory {
         ModuleMetadataRepository metadataRepository = new BatchSingleNodeMetadataRepository(batchInserter, configuration, TX_MODULES_PROPERTY_PREFIX);
         TxDrivenModuleManager<BatchSupportingTxDrivenModule> manager = new BatchModuleManager(batchInserter, metadataRepository);
 
-        return new BatchInserterRuntime(batchInserter, manager);
+        return new BatchInserterRuntime(configuration, batchInserter, manager);
     }
 
     private static GraphAwareRuntime createProductionRuntime(GraphDatabaseService database, RuntimeConfiguration configuration) {
@@ -87,14 +87,14 @@ public final class GraphAwareRuntimeFactory {
         TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo, configuration.getTimingStrategy());
         TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, txRepo);
 
-        return new ProductionRuntime(database, txDrivenModuleManager, timerDrivenModuleManager);
+        return new ProductionRuntime(configuration, database, txDrivenModuleManager, timerDrivenModuleManager);
     }
 
     private static GraphAwareRuntime createBatchRuntime(GraphDatabaseService database, RuntimeConfiguration configuration) {
         ModuleMetadataRepository repository = new ProductionSingleNodeMetadataRepository(database, configuration, TX_MODULES_PROPERTY_PREFIX);
         TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, repository);
 
-        return new DatabaseRuntime(database, txDrivenModuleManager);
+        return new DatabaseRuntime(configuration, database, txDrivenModuleManager);
     }
 
     private GraphAwareRuntimeFactory() {

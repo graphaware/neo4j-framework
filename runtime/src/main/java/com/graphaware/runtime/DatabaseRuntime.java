@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TxDrivenModule;
@@ -38,10 +39,12 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
     /**
      * Construct a new runtime. Protected, please use {@link com.graphaware.runtime.GraphAwareRuntimeFactory}.
      *
+     * @param configuration config.
      * @param database              on which the runtime operates.
      * @param txDrivenModuleManager manager for transaction-driven modules.
      */
-    protected DatabaseRuntime(GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager) {
+    protected DatabaseRuntime(RuntimeConfiguration configuration, GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager) {
+        super(configuration);
         this.database = database;
         this.txDrivenModuleManager = txDrivenModuleManager;
         database.registerTransactionEventHandler(this);

@@ -59,18 +59,11 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
     }
 
     /**
-     * Create a new instance of the runtime with {@link com.graphaware.runtime.config.FluentRuntimeConfiguration}.
-     */
-    protected BaseGraphAwareRuntime() {
-        this(FluentRuntimeConfiguration.defaultConfiguration());
-    }
-
-    /**
      * Create a new instance.
      *
      * @param configuration config.
      */
-    private BaseGraphAwareRuntime(RuntimeConfiguration configuration) {
+    protected BaseGraphAwareRuntime(RuntimeConfiguration configuration) {
         this.configuration = configuration;
 
         if (!State.NONE.equals(state)) {

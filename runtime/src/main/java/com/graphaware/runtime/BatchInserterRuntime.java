@@ -17,6 +17,7 @@
 package com.graphaware.runtime;
 
 import com.graphaware.common.util.FakeTransaction;
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.BatchSupportingTxDrivenModule;
 import com.graphaware.runtime.module.RuntimeModule;
@@ -40,10 +41,12 @@ public class BatchInserterRuntime extends TxDrivenRuntime<BatchSupportingTxDrive
     /**
      * Construct a new runtime. This method is protected, please use {@link GraphAwareRuntimeFactory}.
      *
+     * @param configuration         config.
      * @param batchInserter         against which this runtime runs.
      * @param txDrivenModuleManager module manager.
      */
-    protected BatchInserterRuntime(TransactionSimulatingBatchInserter batchInserter, TxDrivenModuleManager<BatchSupportingTxDrivenModule> txDrivenModuleManager) {
+    protected BatchInserterRuntime(RuntimeConfiguration configuration, TransactionSimulatingBatchInserter batchInserter, TxDrivenModuleManager<BatchSupportingTxDrivenModule> txDrivenModuleManager) {
+        super(configuration);
         this.txDrivenModuleManager = txDrivenModuleManager;
         batchInserter.registerTransactionEventHandler(this);
         batchInserter.registerKernelEventHandler(this);

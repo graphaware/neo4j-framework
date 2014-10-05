@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.TimerDrivenModuleManager;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
@@ -24,9 +25,7 @@ import com.graphaware.runtime.module.TxDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.NotFoundException;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -44,12 +43,13 @@ public class ProductionRuntime extends DatabaseRuntime {
     /**
      * Construct a new runtime. Protected, please use {@link GraphAwareRuntimeFactory}.
      *
+     * @param configuration            config.
      * @param database                 on which the runtime operates.
      * @param txDrivenModuleManager    manager for transaction-driven modules.
      * @param timerDrivenModuleManager manager for timer-driven modules.
      */
-    protected ProductionRuntime(GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager) {
-        super(database, txDrivenModuleManager);
+    protected ProductionRuntime(RuntimeConfiguration configuration, GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager) {
+        super(configuration, database, txDrivenModuleManager);
         this.timerDrivenModuleManager = timerDrivenModuleManager;
 
         if (RuntimeRegistry.getRuntime(database) != null) {
@@ -58,7 +58,6 @@ public class ProductionRuntime extends DatabaseRuntime {
 
         RuntimeRegistry.registerRuntime(database, this);
     }
-
 
 
     /**
