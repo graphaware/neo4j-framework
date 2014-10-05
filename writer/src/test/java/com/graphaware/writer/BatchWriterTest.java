@@ -1,8 +1,13 @@
-package com.graphaware.tx.writer;
+package com.graphaware.writer;
 
 import com.graphaware.common.util.IterableUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
+import com.graphaware.writer.BatchWriter;
+import com.graphaware.writer.DatabaseWriter;
+import com.graphaware.writer.SingleThreadedWriter;
+import com.graphaware.writer.TxPerTaskWriter;
 import org.junit.Test;
+import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Transaction;
 
 import java.io.IOException;
@@ -11,22 +16,28 @@ import java.util.concurrent.Callable;
 import static org.junit.Assert.*;
 
 /**
- * Test for {@link TxPerTaskWriter}.
+ * Test for {@link com.graphaware.writer.TxPerTaskWriter}.
  */
-public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
+public class BatchWriterTest extends DatabaseIntegrationTest {
 
     private DatabaseWriter writer;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        writer = new TxPerTaskWriter(getDatabase());
-        ((TxPerTaskWriter) writer).start();
+        writer = new BatchWriter();
+        ((SingleThreadedWriter) writer).start();
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+        ((SingleThreadedWriter) writer).stop();
     }
 
     @Test
     public void shouldExecuteRunnable() {
-        writer.write(new Runnable() {
+        writer.write(getDatabase(), new Runnable() {
             @Override
             public void run() {
                 getDatabase().createNode();
@@ -43,7 +54,7 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void shouldNotWaitForResult() {
-        Boolean result = writer.write(new Callable<Boolean>() {
+        Boolean result = writer.write(getDatabase(), new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 Thread.sleep(50);
@@ -68,7 +79,7 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void shouldWaitForResult() {
-        Boolean result = writer.write(new Callable<Boolean>() {
+        Boolean result = writer.write(getDatabase(), new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 getDatabase().createNode();
@@ -85,7 +96,7 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void shouldNotWaitForLongTakingResult() {
-        Boolean result = writer.write(new Callable<Boolean>() {
+        Boolean result = writer.write(getDatabase(), new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 Thread.sleep(20);
@@ -110,7 +121,7 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void whenQueueIsFullTasksGetDropped() {
-        writer = new TxPerTaskWriter(getDatabase(), 2);
+        writer = new TxPerTaskWriter(2);
         ((TxPerTaskWriter) writer).start();
 
         Runnable task = new Runnable() {
@@ -121,7 +132,7 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
         };
 
         for (int i = 0; i < 10; i++) {
-            writer.write(task);
+            writer.write(getDatabase(), task);
         }
 
         waitABit();
@@ -134,7 +145,7 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
 
     @Test(expected = RuntimeException.class)
     public void runtimeExceptionFromTaskGetsPropagatedIfWaiting() {
-        writer.write(new Callable<Boolean>() {
+        writer.write(getDatabase(), new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 throw new RuntimeException("Deliberate Testing Exception");
@@ -144,7 +155,7 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
 
     @Test(expected = RuntimeException.class)
     public void checkedExceptionFromTaskGetsTranslatedIfWaiting() {
-        writer.write(new Callable<Boolean>() {
+        writer.write(getDatabase(), new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 throw new IOException("Deliberate Testing Exception");
@@ -154,19 +165,106 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void runtimeExceptionFromTaskGetsIgnoredIfNotWaiting() {
-        writer.write(new Callable<Boolean>() {
+        writer.write(getDatabase(), new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 throw new RuntimeException("Deliberate Testing Exception");
             }
         }, "test", 0);
 
-        writer.write(new Runnable() {
+        writer.write(getDatabase(), new Runnable() {
             @Override
             public void run() {
                 throw new RuntimeException("Deliberate Testing Exception");
             }
         });
+    }
+
+    @Test
+    public void oneFailingTransactionDoesntRollbackTheWholeBatch() {
+        writer.write(getDatabase(), new Runnable() {
+            @Override
+            public void run() {
+                getDatabase().createNode();
+            }
+        });
+        writer.write(getDatabase(), new Runnable() {
+            @Override
+            public void run() {
+                getDatabase().createNode();
+            }
+        });
+        writer.write(getDatabase(), new Runnable() {
+            @Override
+            public void run() {
+                throw new RuntimeException("Deliberate Testing Exception");
+            }
+        });
+        writer.write(getDatabase(), new Runnable() {
+            @Override
+            public void run() {
+                getDatabase().createNode();
+            }
+        });
+        writer.write(getDatabase(), new Runnable() {
+            @Override
+            public void run() {
+                getDatabase().createNode();
+            }
+        });
+        writer.write(getDatabase(), new Runnable() {
+            @Override
+            public void run() {
+                getDatabase().createNode();
+            }
+        });
+
+        waitABit();
+
+        try (Transaction tx = getDatabase().beginTx()) {
+            assertEquals(5, IterableUtils.countNodes(getDatabase()));
+            tx.success();
+        }
+    }
+
+    @Test
+    public void constraintViolationRollsBackTheWholeBatch() {
+        try (Transaction tx = getDatabase().beginTx()) {
+            getDatabase().createNode().createRelationshipTo(getDatabase().createNode(), DynamicRelationshipType.withName("test"));
+            tx.success();
+        }
+
+        for (int i = 0; i < 5; i++) {
+            writer.write(getDatabase(), new Runnable() {
+                @Override
+                public void run() {
+                    getDatabase().createNode();
+                }
+            });
+        }
+
+        writer.write(getDatabase(), new Runnable() {
+            @Override
+            public void run() {
+                getDatabase().getNodeById(0).delete();
+            }
+        });
+
+        for (int i = 0; i < 5; i++) {
+            writer.write(getDatabase(), new Runnable() {
+                @Override
+                public void run() {
+                    getDatabase().createNode();
+                }
+            });
+        }
+
+        waitABit();
+
+        try (Transaction tx = getDatabase().beginTx()) {
+            assertTrue(10 > IterableUtils.countNodes(getDatabase()));
+            tx.success();
+        }
     }
 
     private void waitABit() {

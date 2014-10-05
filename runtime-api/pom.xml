@@ -18,44 +18,20 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>build</artifactId>
+        <artifactId>framework-parent</artifactId>
         <version>2.1.5.20-SNAPSHOT</version>
     </parent>
-    <artifactId>graphaware-framework-server-community</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>runtime-api</artifactId>
 
-    <name>GraphAware Framework Server Build (Community)</name>
-    <description>Technical Maven Module for Building the Framework for Standalone Use (Community)</description>
+    <name>GraphAware Runtime</name>
+    <description>Runtime for GraphAware Runtime Modules</description>
     <url>http://graphaware.com</url>
 
     <dependencies>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>server-community</artifactId>
+            <artifactId>writer-api</artifactId>
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attached</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <finalName>graphaware-server-community-all-${project.version}</finalName>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

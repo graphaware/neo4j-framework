@@ -1,4 +1,4 @@
-package com.graphaware.tx.writer;
+package com.graphaware.writer;
 
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.UnitOfWork;
@@ -19,17 +19,19 @@ import java.util.concurrent.RunnableFuture;
 public class BatchWriter extends SingleThreadedWriter implements DatabaseWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(BatchWriter.class);
-    private static final int BATCH_SIZE = 100;
+    private static final int DEFAULT_BATCH_SIZE = 100;
 
-    public BatchWriter(GraphDatabaseService database) {
-        super(database);
-    }
+    private volatile GraphDatabaseService database;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected <T> RunnableFuture<T> createTask(Callable<T> task) {
+    protected <T> RunnableFuture<T> createTask(GraphDatabaseService database, Callable<T> task) {
+        if (this.database == null) {
+            this.database = database;
+        }
+
         return new FutureTask<>(task);
     }
 
@@ -38,6 +40,11 @@ public class BatchWriter extends SingleThreadedWriter implements DatabaseWriter 
      */
     @Override
     protected void runOneIteration() throws Exception {
+        if (database == null) {
+            LOG.debug("No tasks submitted yet.");
+            return;
+        }
+
         logQueueSizeIfNeeded();
 
         if (queue.isEmpty()) {
@@ -47,7 +54,7 @@ public class BatchWriter extends SingleThreadedWriter implements DatabaseWriter 
         List<Runnable> tasks = new LinkedList<>();
         queue.drainTo(tasks);
 
-        new IterableInputBatchTransactionExecutor<>(database, BATCH_SIZE, tasks, new UnitOfWork<Runnable>() {
+        new IterableInputBatchTransactionExecutor<>(database, DEFAULT_BATCH_SIZE, tasks, new UnitOfWork<Runnable>() {
             @Override
             public void execute(GraphDatabaseService database, Runnable input, int batchNumber, int stepNumber) {
                 try {

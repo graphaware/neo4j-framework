@@ -1,4 +1,4 @@
-package com.graphaware.tx.writer;
+package com.graphaware.writer;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
@@ -18,28 +18,25 @@ public class TxPerTaskWriter extends SingleThreadedWriter implements DatabaseWri
 
     /**
      * Construct a new writer with a default queue capacity of 10,000.
-     *
-     * @param database to write to.
      */
-    public TxPerTaskWriter(GraphDatabaseService database) {
-        super(database);
+    public TxPerTaskWriter() {
+        super();
     }
 
     /**
      * Construct a new writer with.
      *
-     * @param database      to write to.
      * @param queueCapacity capacity of the queue.
      */
-    public TxPerTaskWriter(GraphDatabaseService database, int queueCapacity) {
-        super(database, queueCapacity);
+    public TxPerTaskWriter(int queueCapacity) {
+        super(queueCapacity);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected <T> RunnableFuture<T> createTask(final Callable<T> task) {
+    protected <T> RunnableFuture<T> createTask(final GraphDatabaseService database, final Callable<T> task) {
         return new FutureTask<>(new Callable<T>() {
             @Override
             public T call() {

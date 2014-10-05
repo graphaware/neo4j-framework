@@ -1,4 +1,6 @@
-package com.graphaware.tx.writer;
+package com.graphaware.writer;
+
+import org.neo4j.graphdb.GraphDatabaseService;
 
 import java.util.concurrent.Callable;
 
@@ -13,21 +15,24 @@ public interface DatabaseWriter {
     /**
      * Write to the database without waiting for the result of the write.
      *
-     * @param task that writes to the database.
+     * @param database to write to.
+     * @param task     that writes to the database.
      */
-    void write(Runnable task);
+    void write(GraphDatabaseService database, Runnable task);
 
     /**
      * Write to the database without waiting for the result of the write.
      *
-     * @param task that writes to the database.
-     * @param id   of the task for logging purposes.
+     * @param database to write to.
+     * @param task     that writes to the database.
+     * @param id       of the task for logging purposes.
      */
-    void write(Runnable task, String id);
+    void write(GraphDatabaseService database, Runnable task, String id);
 
     /**
      * Write to the database.
      *
+     * @param database   to write to.
      * @param task       that writes to the database and returns a result.
      * @param id         of the task for logging purposes.
      * @param waitMillis maximum number of ms to wait for the task to be executed.
@@ -35,5 +40,5 @@ public interface DatabaseWriter {
      * @return value returned by the task. <code>null</code> of the tasks didn't complete in the specified waiting time,
      *         or if it didn't execute successfully.
      */
-    <T> T write(Callable<T> task, String id, int waitMillis);
+    <T> T write(GraphDatabaseService database, Callable<T> task, String id, int waitMillis);
 }

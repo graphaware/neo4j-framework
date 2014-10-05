@@ -1,6 +1,7 @@
 package com.graphaware.server;
 
 import com.graphaware.common.util.IterableUtils;
+import com.graphaware.writer.DatabaseWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.springframework.beans.factory.annotation.Autowired;

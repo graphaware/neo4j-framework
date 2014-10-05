@@ -1,11 +1,10 @@
-package com.graphaware.tx.writer;
+package com.graphaware.writer;
 
 import com.google.common.util.concurrent.AbstractScheduledService;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import java.util.concurrent.*;
 
 import static java.util.concurrent.Executors.callable;
@@ -15,34 +14,33 @@ import static java.util.concurrent.Executors.callable;
  * pulling the tasks from the head of the queue in a single thread.
  * <p/>
  * If the queue capacity is full, tasks are dropped and a warning is logged.
+ * <p/>
+ * Note that {@link #start()} must be called in order to start processing the queue and {@link #stop()} should be called
+ * before the application is shut down.
  */
 public abstract class SingleThreadedWriter extends AbstractScheduledService implements DatabaseWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SingleThreadedWriter.class);
 
+    private final int queueCapacity;
     protected final LinkedBlockingQueue<RunnableFuture<?>> queue;
 
     private volatile long lastLoggedTime = System.currentTimeMillis();
 
-    protected final GraphDatabaseService database;
-
     /**
      * Construct a new writer with a default queue capacity of 10,000.
-     *
-     * @param database to write to.
      */
-    protected SingleThreadedWriter(GraphDatabaseService database) {
-        this(database, 10000);
+    protected SingleThreadedWriter() {
+        this(10000);
     }
 
     /**
      * Construct a new writer with.
      *
-     * @param database      to write to.
      * @param queueCapacity capacity of the queue.
      */
-    protected SingleThreadedWriter(GraphDatabaseService database, int queueCapacity) {
-        this.database = database;
+    protected SingleThreadedWriter(int queueCapacity) {
+        this.queueCapacity = queueCapacity;
         queue = new LinkedBlockingQueue<>(queueCapacity);
     }
 
@@ -64,24 +62,24 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
      * {@inheritDoc}
      */
     @Override
-    public void write(Runnable task) {
-        write(task, "UNKNOWN");
+    public void write(GraphDatabaseService database, Runnable task) {
+        write(database, task, "UNKNOWN");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void write(Runnable task, String id) {
-        write(callable(task), id, 0);
+    public void write(GraphDatabaseService database, Runnable task, String id) {
+        write(database, callable(task), id, 0);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public <T> T write(final Callable<T> task, String id, int waitMillis) {
-        RunnableFuture<T> futureTask = createTask(task);
+    public <T> T write(GraphDatabaseService database, final Callable<T> task, String id, int waitMillis) {
+        RunnableFuture<T> futureTask = createTask(database, task);
 
         if (!queue.offer(futureTask)) {
             LOG.warn("Could not write task to queue as it is too full. We're losing writes now.");
@@ -102,7 +100,7 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
      * @param task task.
      * @return future.
      */
-    protected abstract <T> RunnableFuture<T> createTask(final Callable<T> task);
+    protected abstract <T> RunnableFuture<T> createTask(final GraphDatabaseService database, final Callable<T> task);
 
     private <T> T block(RunnableFuture<T> futureTask, String id, int waitMillis) {
         try {
@@ -137,5 +135,28 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
     @Override
     protected Scheduler scheduler() {
         return Scheduler.newFixedDelaySchedule(0, 5, TimeUnit.MILLISECONDS);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SingleThreadedWriter that = (SingleThreadedWriter) o;
+
+        if (queueCapacity != that.queueCapacity) return false;
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return queueCapacity;
     }
 }

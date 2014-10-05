@@ -3,6 +3,7 @@ package com.graphaware.runtime.spring;
 import com.graphaware.module.changefeed.cache.CachingGraphChangeReader;
 import com.graphaware.module.changefeed.io.GraphChangeReader;
 import com.graphaware.runtime.ProductionRuntime;
+import com.graphaware.runtime.RuntimeRegistry;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +20,7 @@ import org.springframework.context.annotation.Configuration;
                             Config.class.getClassLoader().getResource("com/graphaware/runtime/spring/neo4j.properties"))
                     .newGraphDatabase();
 
-            ProductionRuntime.getRuntime(database).waitUntilStarted();
+            RuntimeRegistry.getRuntime(database).waitUntilStarted();
 
             return database;
         }

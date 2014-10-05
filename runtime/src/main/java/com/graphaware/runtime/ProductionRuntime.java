@@ -39,8 +39,6 @@ import java.util.Set;
  */
 public class ProductionRuntime extends DatabaseRuntime {
 
-    private static final Map<GraphDatabaseService, ProductionRuntime> RUNTIMES = new HashMap<>();
-
     private final TimerDrivenModuleManager timerDrivenModuleManager;
 
     /**
@@ -54,38 +52,14 @@ public class ProductionRuntime extends DatabaseRuntime {
         super(database, txDrivenModuleManager);
         this.timerDrivenModuleManager = timerDrivenModuleManager;
 
-        if (getRuntime(database) != null) {
+        if (RuntimeRegistry.getRuntime(database) != null) {
             throw new IllegalStateException("It is not possible to create multiple runtimes for a single database!");
         }
 
-        RUNTIMES.put(database, this);
+        RuntimeRegistry.registerRuntime(database, this);
     }
 
-    /**
-     * Get the {@link ProductionRuntime} registered with the given database.
-     *
-     * @param database for which to get runtime.
-     * @return the runtime, null if none registered.
-     */
-    public static ProductionRuntime getRuntime(GraphDatabaseService database) {
-        return RUNTIMES.get(database);
-    }
 
-    /**
-     * Get the {@link ProductionRuntime} registered with the given database.
-     *
-     * @param database for which to get runtime.
-     * @return the runtime, which is guaranteed to be started upon return.
-     * @throws IllegalStateException in case no runtime is registered with this database.
-     */
-    public static ProductionRuntime getStartedRuntime(GraphDatabaseService database) {
-        ProductionRuntime runtime = getRuntime(database);
-        if (runtime == null) {
-            throw new IllegalStateException("No GraphAware Runtime is registered with the given database");
-        }
-        runtime.waitUntilStarted();
-        return runtime;
-    }
 
     /**
      * {@inheritDoc}
@@ -171,6 +145,6 @@ public class ProductionRuntime extends DatabaseRuntime {
     @Override
     protected void afterShutdown(GraphDatabaseService database) {
         super.afterShutdown(database);
-        RUNTIMES.remove(database);
+        RuntimeRegistry.removeRuntime(database);
     }
 }

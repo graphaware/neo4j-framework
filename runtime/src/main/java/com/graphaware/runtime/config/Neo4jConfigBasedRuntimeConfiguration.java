@@ -4,10 +4,13 @@ import static org.neo4j.helpers.Settings.INTEGER;
 import static org.neo4j.helpers.Settings.LONG;
 import static org.neo4j.helpers.Settings.setting;
 
+import com.graphaware.runtime.config.function.StringToDatabaseWriter;
 import com.graphaware.runtime.config.function.StringToTimingStrategy;
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
+import com.graphaware.writer.DatabaseWriter;
+import com.graphaware.writer.DefaultWriter;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.kernel.configuration.Config;
 
@@ -41,6 +44,7 @@ import org.neo4j.kernel.configuration.Config;
 public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfiguration {
 
     private static final Setting<TimingStrategy> TIMING_STRATEGY_SETTING = setting("com.graphaware.runtime.timing.strategy", StringToTimingStrategy.getInstance(), (String) null);
+    private static final Setting<DatabaseWriter> DATABASE_WRITER_SETTING = setting("com.graphaware.runtime.db.writer", StringToDatabaseWriter.getInstance(), (String) null);
 
     //for both policies, this is the main (default, mean, whatever) delay
     private static final Setting<Long> DELAY_SETTING = setting("com.graphaware.runtime.timing.delay", LONG, (String) null);
@@ -122,5 +126,19 @@ public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfigurati
         }
 
         throw new IllegalStateException("Unknown timing strategy!");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DatabaseWriter getDatabaseWriter() {
+        DatabaseWriter writer = config.get(DATABASE_WRITER_SETTING);
+
+        if (writer == null) {
+            return DefaultWriter.getInstance();
+        }
+
+        return writer;
     }
 }

@@ -28,17 +28,6 @@
     <description>Technical Maven Module for Building the Framework for Embedded Use</description>
     <url>http://graphaware.com</url>
 
-    <dependencies>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>runtime</artifactId>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>

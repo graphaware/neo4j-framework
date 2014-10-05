@@ -18,6 +18,8 @@ package com.graphaware.runtime.config;
 
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
+import com.graphaware.writer.DatabaseWriter;
+import com.graphaware.writer.DefaultWriter;
 
 /**
  * {@link RuntimeConfiguration} for {@link com.graphaware.runtime.GraphAwareRuntime} with fluent interface.
@@ -26,6 +28,7 @@ import com.graphaware.runtime.schedule.TimingStrategy;
 public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
 
     private final TimingStrategy timingStrategy;
+    private final DatabaseWriter databaseWriter;
 
     /**
      * Creates an instance with default values.
@@ -33,11 +36,12 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      * @return The {@link FluentRuntimeConfiguration} instance.
      */
     public static FluentRuntimeConfiguration defaultConfiguration() {
-        return new FluentRuntimeConfiguration(AdaptiveTimingStrategy.defaultConfiguration());
+        return new FluentRuntimeConfiguration(AdaptiveTimingStrategy.defaultConfiguration(), DefaultWriter.getInstance());
     }
 
-    private FluentRuntimeConfiguration(TimingStrategy timingStrategy) {
+    private FluentRuntimeConfiguration(TimingStrategy timingStrategy, DatabaseWriter databaseWriter) {
         this.timingStrategy = timingStrategy;
+        this.databaseWriter = databaseWriter;
     }
 
     /**
@@ -47,7 +51,7 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      * @return new instance.
      */
     public FluentRuntimeConfiguration withTimingStrategy(TimingStrategy timingStrategy) {
-        return new FluentRuntimeConfiguration(timingStrategy);
+        return new FluentRuntimeConfiguration(timingStrategy, getDatabaseWriter());
     }
 
     /**
@@ -56,6 +60,24 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
     @Override
     public TimingStrategy getTimingStrategy() {
         return timingStrategy;
+    }
+
+    /**
+     * Create an instance with different {@link DatabaseWriter}.
+     *
+     * @param databaseWriter of the new instance.
+     * @return new instance.
+     */
+    public FluentRuntimeConfiguration withDatabaseWriter(DatabaseWriter databaseWriter) {
+        return new FluentRuntimeConfiguration(getTimingStrategy(), databaseWriter);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DatabaseWriter getDatabaseWriter() {
+        return databaseWriter;
     }
 
     /**
@@ -68,6 +90,7 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
 
         FluentRuntimeConfiguration that = (FluentRuntimeConfiguration) o;
 
+        if (!databaseWriter.equals(that.databaseWriter)) return false;
         if (!timingStrategy.equals(that.timingStrategy)) return false;
 
         return true;
@@ -78,6 +101,8 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      */
     @Override
     public int hashCode() {
-        return timingStrategy.hashCode();
+        int result = timingStrategy.hashCode();
+        result = 31 * result + databaseWriter.hashCode();
+        return result;
     }
 }

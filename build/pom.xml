@@ -56,4 +56,15 @@
         </dependencies>
     </dependencyManagement>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>runtime</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>

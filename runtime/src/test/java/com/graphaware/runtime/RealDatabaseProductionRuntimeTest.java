@@ -93,31 +93,31 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
 
     @Test
     public void nullShouldBeReturnedWhenNoRuntimeHasBeenRegisteredForDatabase() {
-        assertNull(ProductionRuntime.getRuntime(database));
+        assertNull(RuntimeRegistry.getRuntime(database));
     }
 
     @Test(expected = IllegalStateException.class)
     public void exceptionShouldBeThrownWhenNoRuntimeHasBeenRegisteredForDatabase() {
-        assertNull(ProductionRuntime.getStartedRuntime(database));
+        assertNull(RuntimeRegistry.getStartedRuntime(database));
     }
 
     @Test(expected = IllegalStateException.class)
     public void exceptionShouldBeThrownWhenRuntimeHasNotBeenStarted() {
         GraphAwareRuntimeFactory.createRuntime(database);
-        ProductionRuntime.getStartedRuntime(database);
+        RuntimeRegistry.getStartedRuntime(database);
     }
 
     @Test
     public void registeredRuntimeShouldBeRetrieved() {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
-        assertEquals(runtime, ProductionRuntime.getRuntime(database));
+        assertEquals(runtime, RuntimeRegistry.getRuntime(database));
     }
 
     @Test
     public void registeredRuntimeShouldBeRetrieved2() {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
         runtime.start();
-        assertEquals(runtime, ProductionRuntime.getStartedRuntime(database));
+        assertEquals(runtime, RuntimeRegistry.getStartedRuntime(database));
     }
 
     @Test(expected = IllegalStateException.class)

@@ -21,32 +21,15 @@
         <artifactId>framework-parent</artifactId>
         <version>2.1.5.20-SNAPSHOT</version>
     </parent>
-    <artifactId>server-parent</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>writer-api</artifactId>
+    <packaging>jar</packaging>
 
-    <name>GraphAware Server</name>
-    <description>Parent Project for GraphAware Neo4j Server Extensions</description>
+    <name>GraphAware Transaction Executor</name>
+    <description>Single and Batch Transaction Executor</description>
     <url>http://graphaware.com</url>
 
-    <modules>
-        <module>server-common</module>
-        <module>server-community</module>
-        <module>server-enterprise</module>
-    </modules>
-
     <dependencies>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>runtime-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>common</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j.app</groupId>
-            <artifactId>neo4j-server</artifactId>
-        </dependency>
+
     </dependencies>
 
 </project>

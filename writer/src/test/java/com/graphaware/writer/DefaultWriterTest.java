@@ -1,7 +1,9 @@
-package com.graphaware.tx.writer;
+package com.graphaware.writer;
 
 import com.graphaware.common.util.IterableUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
+import com.graphaware.writer.DatabaseWriter;
+import com.graphaware.writer.DefaultWriter;
 import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
 
@@ -11,7 +13,7 @@ import java.util.concurrent.Callable;
 import static org.junit.Assert.*;
 
 /**
- * Test for {@link com.graphaware.tx.writer.TxPerTaskWriter}.
+ * Test for {@link com.graphaware.writer.TxPerTaskWriter}.
  */
 public class DefaultWriterTest extends DatabaseIntegrationTest {
 
@@ -20,12 +22,12 @@ public class DefaultWriterTest extends DatabaseIntegrationTest {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        writer = new DefaultWriter(getDatabase());
+        writer = DefaultWriter.getInstance();
     }
 
     @Test
     public void shouldExecuteRunnable() {
-        writer.write(new Runnable() {
+        writer.write(getDatabase(), new Runnable() {
             @Override
             public void run() {
                 getDatabase().createNode();
@@ -40,7 +42,7 @@ public class DefaultWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void shouldWaitForResult() {
-        Boolean result = writer.write(new Callable<Boolean>() {
+        Boolean result = writer.write(getDatabase(), new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 getDatabase().createNode();
@@ -57,7 +59,7 @@ public class DefaultWriterTest extends DatabaseIntegrationTest {
 
     @Test(expected = RuntimeException.class)
     public void runtimeExceptionFromTaskGetsPropagated() {
-        writer.write(new Callable<Boolean>() {
+        writer.write(getDatabase(), new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 throw new RuntimeException("Deliberate Testing Exception");
@@ -67,7 +69,7 @@ public class DefaultWriterTest extends DatabaseIntegrationTest {
 
     @Test(expected = RuntimeException.class)
     public void checkedExceptionFromTaskGetsTranslated() {
-        writer.write(new Callable<Boolean>() {
+        writer.write(getDatabase(), new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 throw new IOException("Deliberate Testing Exception");

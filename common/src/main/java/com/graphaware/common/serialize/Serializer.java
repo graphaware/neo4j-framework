@@ -76,7 +76,6 @@ public final class Serializer {
         kryo.register(float[].class, 107);
         kryo.register(String[].class, 108);
 
-        //todo do we need to register anything else?
         register(IncludeAllNodeProperties.class, new SingletonSerializer());
         register(IncludeAllNodes.class, new SingletonSerializer());
         register(IncludeAllRelationshipProperties.class, new SingletonSerializer());
