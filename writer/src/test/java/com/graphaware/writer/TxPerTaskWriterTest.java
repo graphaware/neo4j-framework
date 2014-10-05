@@ -2,14 +2,14 @@ package com.graphaware.writer;
 
 import com.graphaware.common.util.IterableUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
-import com.graphaware.writer.DatabaseWriter;
-import com.graphaware.writer.SingleThreadedWriter;
-import com.graphaware.writer.TxPerTaskWriter;
 import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
@@ -24,13 +24,13 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
     public void setUp() throws Exception {
         super.setUp();
         writer = new TxPerTaskWriter();
-        ((SingleThreadedWriter) writer).start();
+        writer.start();
     }
 
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
-        ((SingleThreadedWriter) writer).stop();
+        writer.stop();
     }
 
     @Test
@@ -120,7 +120,7 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
     @Test
     public void whenQueueIsFullTasksGetDropped() {
         writer = new TxPerTaskWriter(2);
-        ((TxPerTaskWriter) writer).start();
+        writer.start();
 
         Runnable task = new Runnable() {
             @Override
@@ -176,6 +176,69 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
                 throw new RuntimeException("Deliberate Testing Exception");
             }
         });
+    }
+
+    @Test
+    public void multipleThreadsCanSubmitTasks() {
+        writer = new TxPerTaskWriter();
+        writer.start();
+
+        final Runnable task = new Runnable() {
+            @Override
+            public void run() {
+                getDatabase().createNode();
+            }
+        };
+
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        for (int i = 0; i < 100; i++) {
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    writer.write(getDatabase(), task);
+                }
+            });
+
+        }
+
+        waitABit();
+
+        try (Transaction tx = getDatabase().beginTx()) {
+            assertEquals(100, IterableUtils.countNodes(getDatabase()));
+            tx.success();
+        }
+    }
+
+    @Test
+    public void tasksAreFinishedBeforeShutdown() throws InterruptedException {
+        writer = new TxPerTaskWriter();
+        writer.start();
+
+        final Runnable task = new Runnable() {
+            @Override
+            public void run() {
+                getDatabase().createNode();
+            }
+        };
+
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        for (int i = 0; i < 100; i++) {
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    writer.write(getDatabase(), task);
+                }
+            });
+        }
+        executorService.shutdown();
+        executorService.awaitTermination(1, TimeUnit.SECONDS);
+
+        writer.stop();
+
+        try (Transaction tx = getDatabase().beginTx()) {
+            assertEquals(100, IterableUtils.countNodes(getDatabase()));
+            tx.success();
+        }
     }
 
     private void waitABit() {

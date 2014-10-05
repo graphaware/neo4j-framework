@@ -49,6 +49,7 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
      */
     public void start() {
         startAsync();
+        awaitRunning();
     }
 
     /**
@@ -56,6 +57,15 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
      */
     public void stop() {
         stopAsync();
+        awaitTerminated();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void shutDown() throws Exception {
+        runOneIteration();
     }
 
     /**
@@ -79,6 +89,10 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
      */
     @Override
     public <T> T write(GraphDatabaseService database, final Callable<T> task, String id, int waitMillis) {
+        if (!state().equals(State.NEW) && !state().equals(State.STARTING) && !state().equals(State.RUNNING)) {
+            throw new IllegalStateException("Database writer is not running!");
+        }
+
         RunnableFuture<T> futureTask = createTask(database, task);
 
         if (!queue.offer(futureTask)) {
