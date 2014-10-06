@@ -294,6 +294,8 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
         }
 
         waitABit();
+        waitABit();
+        waitABit();
 
         try (Transaction tx = getDatabase().beginTx()) {
             assertEquals(100, IterableUtils.countNodes(getDatabase()));
