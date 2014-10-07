@@ -30,7 +30,7 @@
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <neo4j.version>2.1.4</neo4j.version>
-        <graphware.version>2.1.4.19</graphware.version>
+        <graphware.version>2.1.5.20-SNAPSHOT</graphware.version>
     </properties>
 
     <profiles>
