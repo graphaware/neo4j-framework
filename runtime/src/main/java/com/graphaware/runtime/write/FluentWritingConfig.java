@@ -1,9 +1,6 @@
 package com.graphaware.runtime.write;
 
-import com.graphaware.writer.BatchWriter;
-import com.graphaware.writer.DatabaseWriter;
-import com.graphaware.writer.DefaultWriter;
-import com.graphaware.writer.TxPerTaskWriter;
+import com.graphaware.writer.*;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
@@ -21,7 +18,7 @@ public class FluentWritingConfig implements WritingConfig {
      * @return instance.
      */
     public static FluentWritingConfig defaultConfiguration() {
-        return new FluentWritingConfig(DatabaseWriterType.DEFAULT, 0, 0);
+        return new FluentWritingConfig(DatabaseWriterType.DEFAULT, SingleThreadedWriter.DEFAULT_QUEUE_CAPACITY, BatchWriter.DEFAULT_BATCH_SIZE);
     }
 
     /**

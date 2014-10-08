@@ -24,6 +24,7 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
 
     private static final Logger LOG = LoggerFactory.getLogger(SingleThreadedWriter.class);
     private static final int LOGGING_FREQUENCY_MS = 5000;
+    public static final int DEFAULT_QUEUE_CAPACITY = 10000;
 
     private final int queueCapacity;
     protected final LinkedBlockingQueue<RunnableFuture<?>> queue;
@@ -37,7 +38,7 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
      * @param database to write to.
      */
     protected SingleThreadedWriter(GraphDatabaseService database) {
-        this(database, 10000);
+        this(database, DEFAULT_QUEUE_CAPACITY);
     }
 
     /**

@@ -19,7 +19,7 @@ import java.util.concurrent.RunnableFuture;
 public class BatchWriter extends SingleThreadedWriter implements DatabaseWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(BatchWriter.class);
-    private static final int DEFAULT_BATCH_SIZE = 1000;
+    public static final int DEFAULT_BATCH_SIZE = 1000;
     private final int batchSize;
 
     /**
