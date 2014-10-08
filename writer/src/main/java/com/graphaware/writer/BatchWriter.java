@@ -19,34 +19,36 @@ import java.util.concurrent.RunnableFuture;
 public class BatchWriter extends SingleThreadedWriter implements DatabaseWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(BatchWriter.class);
-    private static final int DEFAULT_BATCH_SIZE = 100;
-
-    private volatile GraphDatabaseService database;
+    private static final int DEFAULT_BATCH_SIZE = 1000;
+    private final int batchSize;
 
     /**
-     * Construct a new writer with a default queue capacity of 10,000.
+     * Construct a new writer with a default queue capacity of 10,000 and a batch size of 1,000.
+     *
+     * @param database to write to.
      */
-    public BatchWriter() {
+    public BatchWriter(GraphDatabaseService database) {
+        super(database);
+        this.batchSize = DEFAULT_BATCH_SIZE;
     }
 
     /**
      * Construct a new writer.
      *
+     * @param database      to write to.
      * @param queueCapacity capacity of the queue.
+     * @param batchSize     batch size.
      */
-    public BatchWriter(int queueCapacity) {
-        super(queueCapacity);
+    public BatchWriter(GraphDatabaseService database, int queueCapacity, int batchSize) {
+        super(database, queueCapacity);
+        this.batchSize = batchSize;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected <T> RunnableFuture<T> createTask(GraphDatabaseService database, Callable<T> task) {
-        if (this.database == null) {
-            this.database = database;
-        }
-
+    protected <T> RunnableFuture<T> createTask(Callable<T> task) {
         return new FutureTask<>(task);
     }
 
@@ -55,11 +57,6 @@ public class BatchWriter extends SingleThreadedWriter implements DatabaseWriter 
      */
     @Override
     protected void runOneIteration() throws Exception {
-        if (database == null) {
-            LOG.debug("No tasks submitted yet.");
-            return;
-        }
-
         logQueueSizeIfNeeded();
 
         if (queue.isEmpty()) {
@@ -69,7 +66,7 @@ public class BatchWriter extends SingleThreadedWriter implements DatabaseWriter 
         List<Runnable> tasks = new LinkedList<>();
         queue.drainTo(tasks);
 
-        new IterableInputBatchTransactionExecutor<>(database, DEFAULT_BATCH_SIZE, tasks, new UnitOfWork<Runnable>() {
+        new IterableInputBatchTransactionExecutor<>(database, batchSize, tasks, new UnitOfWork<Runnable>() {
             @Override
             public void execute(GraphDatabaseService database, Runnable input, int batchNumber, int stepNumber) {
                 try {

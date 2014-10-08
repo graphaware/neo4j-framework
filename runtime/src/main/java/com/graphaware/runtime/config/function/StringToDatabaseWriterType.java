@@ -1,9 +1,6 @@
 package com.graphaware.runtime.config.function;
 
-import com.graphaware.writer.BatchWriter;
-import com.graphaware.writer.DatabaseWriter;
-import com.graphaware.writer.DefaultWriter;
-import com.graphaware.writer.TxPerTaskWriter;
+import com.graphaware.runtime.write.DatabaseWriterType;
 import org.neo4j.helpers.Function;
 
 /**
@@ -11,15 +8,15 @@ import org.neo4j.helpers.Function;
  * <p/>
  * Converts "fixed" to {@link com.graphaware.runtime.schedule.FixedDelayTimingStrategy} and "adaptive" to {@link com.graphaware.runtime.schedule.AdaptiveTimingStrategy}.
  */
-public final class StringToDatabaseWriter implements Function<String, DatabaseWriter> {
+public final class StringToDatabaseWriterType implements Function<String, DatabaseWriterType> {
 
     public static final String DEFAULT = "default";
     public static final String SINGLE_THREAD = "single";
     public static final String BATCH = "batch";
 
-    private static StringToDatabaseWriter INSTANCE = new StringToDatabaseWriter();
+    private static StringToDatabaseWriterType INSTANCE = new StringToDatabaseWriterType();
 
-    public static StringToDatabaseWriter getInstance() {
+    public static StringToDatabaseWriterType getInstance() {
         return INSTANCE;
     }
 
@@ -27,19 +24,17 @@ public final class StringToDatabaseWriter implements Function<String, DatabaseWr
      * {@inheritDoc}
      */
     @Override
-    public DatabaseWriter apply(String s) {
+    public DatabaseWriterType apply(String s) {
         if (s.equalsIgnoreCase(DEFAULT)) {
-            return DefaultWriter.getInstance();
+            return DatabaseWriterType.DEFAULT;
         }
 
         if (s.equalsIgnoreCase(SINGLE_THREAD)) {
-            //todo configure queue size
-            return new TxPerTaskWriter();
+            return DatabaseWriterType.SINGLE_THREADED;
         }
 
         if (s.equalsIgnoreCase(BATCH)) {
-            //todo configure queue size
-            return new BatchWriter();
+            return DatabaseWriterType.BATCH;
         }
 
         throw new IllegalStateException("Unknown database writer: " + s);

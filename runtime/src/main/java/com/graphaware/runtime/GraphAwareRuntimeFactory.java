@@ -4,6 +4,7 @@ import static com.graphaware.runtime.config.RuntimeConfiguration.TIMER_MODULES_P
 import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROPERTY_PREFIX;
 
 import com.graphaware.runtime.config.FluentRuntimeConfiguration;
+import com.graphaware.writer.NullWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.GraphDatabaseAPI;
 
@@ -87,14 +88,14 @@ public final class GraphAwareRuntimeFactory {
         TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo, configuration.getTimingStrategy());
         TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, txRepo);
 
-        return new ProductionRuntime(configuration, database, txDrivenModuleManager, timerDrivenModuleManager);
+        return new ProductionRuntime(configuration, database, txDrivenModuleManager, timerDrivenModuleManager, configuration.getWritingConfig().produceWriter(database));
     }
 
     private static GraphAwareRuntime createBatchRuntime(GraphDatabaseService database, RuntimeConfiguration configuration) {
         ModuleMetadataRepository repository = new ProductionSingleNodeMetadataRepository(database, configuration, TX_MODULES_PROPERTY_PREFIX);
         TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, repository);
 
-        return new DatabaseRuntime(configuration, database, txDrivenModuleManager);
+        return new DatabaseRuntime(configuration, database, txDrivenModuleManager, NullWriter.getInstance());
     }
 
     private GraphAwareRuntimeFactory() {

@@ -22,6 +22,8 @@ import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.BatchSupportingTxDrivenModule;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
+import com.graphaware.writer.DatabaseWriter;
+import com.graphaware.writer.NullWriter;
 import org.neo4j.graphdb.Transaction;
 
 
@@ -76,5 +78,13 @@ public class BatchInserterRuntime extends TxDrivenRuntime<BatchSupportingTxDrive
     @Override
     protected Transaction startTransaction() {
         return new FakeTransaction();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DatabaseWriter getDatabaseWriter() {
+        return NullWriter.getInstance();
     }
 }

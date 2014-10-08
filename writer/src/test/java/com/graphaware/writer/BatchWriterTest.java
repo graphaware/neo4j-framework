@@ -28,7 +28,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        writer = new BatchWriter();
+        writer = new BatchWriter(getDatabase());
         writer.start();
     }
 
@@ -40,7 +40,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void shouldExecuteRunnable() {
-        writer.write(getDatabase(), new Runnable() {
+        writer.write(new Runnable() {
             @Override
             public void run() {
                 getDatabase().createNode();
@@ -57,7 +57,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void shouldNotWaitForResult() {
-        Boolean result = writer.write(getDatabase(), new Callable<Boolean>() {
+        Boolean result = writer.write(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 Thread.sleep(50);
@@ -82,7 +82,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void shouldWaitForResult() {
-        Boolean result = writer.write(getDatabase(), new Callable<Boolean>() {
+        Boolean result = writer.write(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 getDatabase().createNode();
@@ -99,7 +99,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void shouldNotWaitForLongTakingResult() {
-        Boolean result = writer.write(getDatabase(), new Callable<Boolean>() {
+        Boolean result = writer.write(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 Thread.sleep(20);
@@ -124,7 +124,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void whenQueueIsFullTasksGetDropped() {
-        writer = new TxPerTaskWriter(2);
+        writer = new BatchWriter(getDatabase(), 2, 100);
         writer.start();
 
         Runnable task = new Runnable() {
@@ -135,7 +135,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
         };
 
         for (int i = 0; i < 10; i++) {
-            writer.write(getDatabase(), task);
+            writer.write(task);
         }
 
         waitABit();
@@ -148,7 +148,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
 
     @Test(expected = RuntimeException.class)
     public void runtimeExceptionFromTaskGetsPropagatedIfWaiting() {
-        writer.write(getDatabase(), new Callable<Boolean>() {
+        writer.write(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 throw new RuntimeException("Deliberate Testing Exception");
@@ -158,7 +158,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
 
     @Test(expected = RuntimeException.class)
     public void checkedExceptionFromTaskGetsTranslatedIfWaiting() {
-        writer.write(getDatabase(), new Callable<Boolean>() {
+        writer.write(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 throw new IOException("Deliberate Testing Exception");
@@ -168,14 +168,14 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void runtimeExceptionFromTaskGetsIgnoredIfNotWaiting() {
-        writer.write(getDatabase(), new Callable<Boolean>() {
+        writer.write(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 throw new RuntimeException("Deliberate Testing Exception");
             }
         }, "test", 0);
 
-        writer.write(getDatabase(), new Runnable() {
+        writer.write(new Runnable() {
             @Override
             public void run() {
                 throw new RuntimeException("Deliberate Testing Exception");
@@ -185,37 +185,37 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void oneFailingTransactionDoesntRollbackTheWholeBatch() {
-        writer.write(getDatabase(), new Runnable() {
+        writer.write(new Runnable() {
             @Override
             public void run() {
                 getDatabase().createNode();
             }
         });
-        writer.write(getDatabase(), new Runnable() {
+        writer.write(new Runnable() {
             @Override
             public void run() {
                 getDatabase().createNode();
             }
         });
-        writer.write(getDatabase(), new Runnable() {
+        writer.write(new Runnable() {
             @Override
             public void run() {
                 throw new RuntimeException("Deliberate Testing Exception");
             }
         });
-        writer.write(getDatabase(), new Runnable() {
+        writer.write(new Runnable() {
             @Override
             public void run() {
                 getDatabase().createNode();
             }
         });
-        writer.write(getDatabase(), new Runnable() {
+        writer.write(new Runnable() {
             @Override
             public void run() {
                 getDatabase().createNode();
             }
         });
-        writer.write(getDatabase(), new Runnable() {
+        writer.write(new Runnable() {
             @Override
             public void run() {
                 getDatabase().createNode();
@@ -238,7 +238,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
         }
 
         for (int i = 0; i < 5; i++) {
-            writer.write(getDatabase(), new Runnable() {
+            writer.write(new Runnable() {
                 @Override
                 public void run() {
                     getDatabase().createNode();
@@ -246,7 +246,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
             });
         }
 
-        writer.write(getDatabase(), new Runnable() {
+        writer.write(new Runnable() {
             @Override
             public void run() {
                 getDatabase().getNodeById(0).delete();
@@ -254,7 +254,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
         });
 
         for (int i = 0; i < 5; i++) {
-            writer.write(getDatabase(), new Runnable() {
+            writer.write(new Runnable() {
                 @Override
                 public void run() {
                     getDatabase().createNode();
@@ -272,7 +272,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void multipleThreadsCanSubmitTasks() {
-        writer = new TxPerTaskWriter();
+        writer = new BatchWriter(getDatabase());
         writer.start();
 
         final Runnable task = new Runnable() {
@@ -287,7 +287,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    writer.write(getDatabase(), task);
+                    writer.write(task);
                 }
             });
 
@@ -305,7 +305,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void tasksAreFinishedBeforeShutdown() throws InterruptedException {
-        writer = new TxPerTaskWriter();
+        writer = new BatchWriter(getDatabase());
         writer.start();
 
         final Runnable task = new Runnable() {
@@ -320,7 +320,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    writer.write(getDatabase(), task);
+                    writer.write(task);
                 }
             });
         }

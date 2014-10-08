@@ -22,6 +22,7 @@ import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.writer.DatabaseWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.NotFoundException;
 
@@ -47,9 +48,10 @@ public class ProductionRuntime extends DatabaseRuntime {
      * @param database                 on which the runtime operates.
      * @param txDrivenModuleManager    manager for transaction-driven modules.
      * @param timerDrivenModuleManager manager for timer-driven modules.
+     * @param databaseWriter           to use when writing to the database.
      */
-    protected ProductionRuntime(RuntimeConfiguration configuration, GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager) {
-        super(configuration, database, txDrivenModuleManager);
+    protected ProductionRuntime(RuntimeConfiguration configuration, GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager, DatabaseWriter databaseWriter) {
+        super(configuration, database, txDrivenModuleManager, databaseWriter);
         this.timerDrivenModuleManager = timerDrivenModuleManager;
 
         if (RuntimeRegistry.getRuntime(database) != null) {

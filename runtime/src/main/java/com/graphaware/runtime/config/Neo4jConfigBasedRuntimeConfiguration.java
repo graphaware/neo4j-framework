@@ -4,12 +4,14 @@ import static org.neo4j.helpers.Settings.INTEGER;
 import static org.neo4j.helpers.Settings.LONG;
 import static org.neo4j.helpers.Settings.setting;
 
-import com.graphaware.runtime.config.function.StringToDatabaseWriter;
+import com.graphaware.runtime.config.function.StringToDatabaseWriterType;
 import com.graphaware.runtime.config.function.StringToTimingStrategy;
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
-import com.graphaware.writer.*;
+import com.graphaware.runtime.write.DatabaseWriterType;
+import com.graphaware.runtime.write.FluentWritingConfig;
+import com.graphaware.runtime.write.WritingConfig;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.kernel.configuration.Config;
 
@@ -43,8 +45,9 @@ import org.neo4j.kernel.configuration.Config;
 public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfiguration {
 
     //writer
-    private static final Setting<DatabaseWriter> DATABASE_WRITER_SETTING = setting("com.graphaware.runtime.db.writer", StringToDatabaseWriter.getInstance(), (String) null);
+    private static final Setting<DatabaseWriterType> DATABASE_WRITER_TYPE_SETTING = setting("com.graphaware.runtime.db.writer", StringToDatabaseWriterType.getInstance(), (String) null);
     private static final Setting<Integer> WRITER_QUEUE_SIZE = setting("com.graphaware.runtime.db.writer.queueSize", INTEGER, (String) null);
+    private static final Setting<Integer> WRITER_BATCH_SIZE = setting("com.graphaware.runtime.db.writer.batchSize", INTEGER, (String) null);
 
     //timing
     private static final Setting<TimingStrategy> TIMING_STRATEGY_SETTING = setting("com.graphaware.runtime.timing.strategy", StringToTimingStrategy.getInstance(), (String) null);
@@ -68,7 +71,7 @@ public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfigurati
      * @param config The {@link Config} containing the settings used to configure the runtime
      */
     public Neo4jConfigBasedRuntimeConfiguration(Config config) {
-        super(createTimingStrategy(config), createDatabaseWriter(config));
+        super(createTimingStrategy(config), createWritingConfig(config));
     }
 
     private static TimingStrategy createTimingStrategy(Config config) {
@@ -125,21 +128,25 @@ public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfigurati
         throw new IllegalStateException("Unknown timing strategy!");
     }
 
-    private static DatabaseWriter createDatabaseWriter(Config config) {
-        DatabaseWriter writer = config.get(DATABASE_WRITER_SETTING);
+    private static WritingConfig createWritingConfig(Config config) {
+        DatabaseWriterType databaseWriterType = config.get(DATABASE_WRITER_TYPE_SETTING);
 
-        if (writer == null) {
-            return DefaultWriter.getInstance();
+        FluentWritingConfig result = FluentWritingConfig.defaultConfiguration();
+
+        if (databaseWriterType != null) {
+            result = result.withWriterType(databaseWriterType);
         }
 
-        if (writer instanceof TxPerTaskWriter && config.get(WRITER_QUEUE_SIZE) != null) {
-            writer = new TxPerTaskWriter(config.get(WRITER_QUEUE_SIZE));
+        if (config.get(WRITER_QUEUE_SIZE) != null) {
+            result = result.withQueueSize(config.get(WRITER_QUEUE_SIZE));
         }
 
-        if (writer instanceof BatchWriter && config.get(WRITER_QUEUE_SIZE) != null) {
-            writer = new BatchWriter(config.get(WRITER_QUEUE_SIZE));
+        if (config.get(WRITER_BATCH_SIZE) != null) {
+            result = result.withBatchSize(config.get(WRITER_BATCH_SIZE));
         }
 
-        return writer;
+        return result;
     }
+
+
 }

@@ -11,13 +11,13 @@ import java.util.concurrent.Callable;
  */
 public class DefaultWriter extends BaseDatabaseWriter {
 
-    private static final DatabaseWriter INSTANCE = new DefaultWriter();
-
-    public static DatabaseWriter getInstance() {
-        return INSTANCE;
-    }
-
-    private DefaultWriter() {
+    /**
+     * Create a new writer.
+     *
+     * @param database to write to.
+     */
+    public DefaultWriter(GraphDatabaseService database) {
+        super(database);
     }
 
     /**
@@ -26,7 +26,7 @@ public class DefaultWriter extends BaseDatabaseWriter {
      * Note that waitInMillis is ignored. The thread blocks until the write is complete.
      */
     @Override
-    public <T> T write(GraphDatabaseService database, Callable<T> task, String id, int waitMillis) {
+    public <T> T write(Callable<T> task, String id, int waitMillis) {
         T result;
         try (Transaction tx = database.beginTx()) {
             result = task.call();

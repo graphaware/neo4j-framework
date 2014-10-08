@@ -186,7 +186,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
      * Start the database writer.
      */
     private void startWriter() {
-        configuration.getDatabaseWriter().start();
+        getDatabaseWriter().start();
     }
 
     /**
@@ -299,7 +299,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
      * Stop database writer.
      */
     private void stopWriter() {
-        configuration.getDatabaseWriter().stop();
+        getDatabaseWriter().stop();
     }
 
     /**

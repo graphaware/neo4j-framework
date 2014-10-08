@@ -43,7 +43,7 @@ public class WebAppInitializer extends AbstractDispatcherServletInitializer {
         GraphAwareRuntime runtime = RuntimeRegistry.getRuntime(database);
         if (runtime != null) {
             runtime.waitUntilStarted();
-            parent.getBeanFactory().registerSingleton("databaseWriter", runtime.getConfiguration().getDatabaseWriter());
+            parent.getBeanFactory().registerSingleton("databaseWriter", runtime.getDatabaseWriter());
         }
 
         parent.refresh();

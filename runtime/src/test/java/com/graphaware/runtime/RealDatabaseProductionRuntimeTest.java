@@ -24,15 +24,20 @@ import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
+import com.graphaware.runtime.write.WritingConfig;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 
+import com.graphaware.writer.BaseDatabaseWriter;
+import com.graphaware.writer.DatabaseWriter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Iterator;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.*;
@@ -664,5 +669,43 @@ public class RealDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         }
 
         return root;
+    }
+
+    @Test
+    public void shouldStartAndStopDatabaseWriter() {
+        final AtomicBoolean started = new AtomicBoolean(false);
+
+        GraphAwareRuntime runtime = createRuntime(FluentRuntimeConfiguration.defaultConfiguration().withWritingConfig(new WritingConfig() {
+            @Override
+            public DatabaseWriter produceWriter(GraphDatabaseService database) {
+                return new BaseDatabaseWriter(database) {
+                    @Override
+                    public void start() {
+                        started.set(true);
+                    }
+
+                    @Override
+                    public void stop() {
+                        started.set(false);
+                    }
+
+                    @Override
+                    public <T> T write(Callable<T> task, String id, int waitMillis) {
+                        return null;
+                    }
+                };
+            }
+        }));
+
+
+        assertFalse(started.get());
+
+        runtime.start();
+
+        assertTrue(started.get());
+
+        ((KernelEventHandler) runtime).beforeShutdown();
+
+        assertFalse(started.get());
     }
 }

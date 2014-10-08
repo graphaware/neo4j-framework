@@ -2,6 +2,7 @@ package com.graphaware.runtime;
 
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.writer.DatabaseWriter;
 import org.neo4j.graphdb.NotFoundException;
 
 /**
@@ -70,4 +71,12 @@ public interface GraphAwareRuntime {
      * @param skipLoadingMetadata true for skipping the metadata loading phase.
      */
     void start(boolean skipLoadingMetadata);
+
+    /**
+     * Get an instance of database writer associated with this runtime. Modules should use this writer to execute database
+     * modifications. This allows the framework (and its configuration) to optimize write throughput.
+     *
+     * @return writer associated with this runtime.
+     */
+    DatabaseWriter getDatabaseWriter();
 }

@@ -5,6 +5,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.concurrent.*;
 
 import static java.util.concurrent.Executors.callable;
@@ -21,25 +23,31 @@ import static java.util.concurrent.Executors.callable;
 public abstract class SingleThreadedWriter extends AbstractScheduledService implements DatabaseWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SingleThreadedWriter.class);
+    private static final int LOGGING_FREQUENCY_MS = 5000;
 
     private final int queueCapacity;
     protected final LinkedBlockingQueue<RunnableFuture<?>> queue;
+    protected final GraphDatabaseService database;
 
     private volatile long lastLoggedTime = System.currentTimeMillis();
 
     /**
      * Construct a new writer with a default queue capacity of 10,000.
+     *
+     * @param database to write to.
      */
-    protected SingleThreadedWriter() {
-        this(10000);
+    protected SingleThreadedWriter(GraphDatabaseService database) {
+        this(database, 10000);
     }
 
     /**
-     * Construct a new writer with.
+     * Construct a new writer.
      *
+     * @param database      to write to.
      * @param queueCapacity capacity of the queue.
      */
-    protected SingleThreadedWriter(int queueCapacity) {
+    protected SingleThreadedWriter(GraphDatabaseService database, int queueCapacity) {
+        this.database = database;
         this.queueCapacity = queueCapacity;
         queue = new LinkedBlockingQueue<>(queueCapacity);
     }
@@ -47,6 +55,7 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
     /**
      * Start the processing of tasks.
      */
+    @PostConstruct
     public void start() {
         startAsync();
         awaitRunning();
@@ -55,6 +64,7 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
     /**
      * Stop the processing of tasks.
      */
+    @PreDestroy
     public void stop() {
         stopAsync();
         awaitTerminated();
@@ -72,28 +82,28 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
      * {@inheritDoc}
      */
     @Override
-    public void write(GraphDatabaseService database, Runnable task) {
-        write(database, task, "UNKNOWN");
+    public void write(Runnable task) {
+        write(task, "UNKNOWN");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void write(GraphDatabaseService database, Runnable task, String id) {
-        write(database, callable(task), id, 0);
+    public void write(Runnable task, String id) {
+        write(callable(task), id, 0);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public <T> T write(GraphDatabaseService database, final Callable<T> task, String id, int waitMillis) {
+    public <T> T write(final Callable<T> task, String id, int waitMillis) {
         if (!state().equals(State.NEW) && !state().equals(State.STARTING) && !state().equals(State.RUNNING)) {
             throw new IllegalStateException("Database writer is not running!");
         }
 
-        RunnableFuture<T> futureTask = createTask(database, task);
+        RunnableFuture<T> futureTask = createTask(task);
 
         if (!queue.offer(futureTask)) {
             LOG.warn("Could not write task to queue as it is too full. We're losing writes now.");
@@ -114,7 +124,7 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
      * @param task task.
      * @return future.
      */
-    protected abstract <T> RunnableFuture<T> createTask(final GraphDatabaseService database, final Callable<T> task);
+    protected abstract <T> RunnableFuture<T> createTask(final Callable<T> task);
 
     private <T> T block(RunnableFuture<T> futureTask, String id, int waitMillis) {
         try {
@@ -137,7 +147,7 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
 
     protected void logQueueSizeIfNeeded() {
         long now = System.currentTimeMillis();
-        if (now - lastLoggedTime > 5000 && queue.size() > 0) {
+        if (now - lastLoggedTime > LOGGING_FREQUENCY_MS && queue.size() > 0) {
             LOG.info("Queue size: " + queue.size());
             lastLoggedTime = now;
         }

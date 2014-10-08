@@ -16,27 +16,31 @@ public class TxPerTaskWriter extends SingleThreadedWriter implements DatabaseWri
 
     private static final Logger LOG = LoggerFactory.getLogger(TxPerTaskWriter.class);
 
+
     /**
      * Construct a new writer with a default queue capacity of 10,000.
+     *
+     * @param database to write to.
      */
-    public TxPerTaskWriter() {
-        super();
+    public TxPerTaskWriter(GraphDatabaseService database) {
+        super(database);
     }
 
     /**
      * Construct a new writer.
      *
+     * @param database to write to.
      * @param queueCapacity capacity of the queue.
      */
-    public TxPerTaskWriter(int queueCapacity) {
-        super(queueCapacity);
+    public TxPerTaskWriter(GraphDatabaseService database, int queueCapacity) {
+        super(database, queueCapacity);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected <T> RunnableFuture<T> createTask(final GraphDatabaseService database, final Callable<T> task) {
+    protected <T> RunnableFuture<T> createTask(final Callable<T> task) {
         return new FutureTask<>(new Callable<T>() {
             @Override
             public T call() {

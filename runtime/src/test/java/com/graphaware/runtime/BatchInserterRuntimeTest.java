@@ -27,12 +27,16 @@ import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.runtime.module.BatchSupportingTxDrivenModule;
+import com.graphaware.runtime.write.WritingConfig;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserter;
 import com.graphaware.tx.event.batch.api.TransactionSimulatingBatchInserterImpl;
 import com.graphaware.tx.event.batch.propertycontainer.inserter.BatchInserterNode;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
+import com.graphaware.writer.BaseDatabaseWriter;
+import com.graphaware.writer.DatabaseWriter;
+import com.graphaware.writer.NullWriter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,6 +45,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.tooling.GlobalGraphOperations;
@@ -49,10 +54,13 @@ import org.neo4j.unsafe.batchinsert.BatchInserters;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
 import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROPERTY_PREFIX;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.doThrow;
 
@@ -204,5 +212,44 @@ public class BatchInserterRuntimeTest extends GraphAwareRuntimeTest<BatchSupport
         }
 
         fail();
+    }
+
+    @Test
+    public void shouldUseNullWriterNoMatterWhat() {
+        final AtomicBoolean started = new AtomicBoolean(false);
+
+        GraphAwareRuntime runtime = createRuntime(FluentRuntimeConfiguration.defaultConfiguration().withWritingConfig(new WritingConfig() {
+            @Override
+            public DatabaseWriter produceWriter(GraphDatabaseService database) {
+                return new BaseDatabaseWriter(database) {
+                    @Override
+                    public void start() {
+                        started.set(true);
+                    }
+
+                    @Override
+                    public void stop() {
+                        started.set(false);
+                    }
+
+                    @Override
+                    public <T> T write(Callable<T> task, String id, int waitMillis) {
+                        return null;
+                    }
+                };
+            }
+        }));
+
+        assertEquals(NullWriter.getInstance(), runtime.getDatabaseWriter());
+
+        assertFalse(started.get());
+
+        runtime.start();
+
+        assertFalse(started.get());
+
+        ((KernelEventHandler) runtime).beforeShutdown();
+
+        assertFalse(started.get());
     }
 }

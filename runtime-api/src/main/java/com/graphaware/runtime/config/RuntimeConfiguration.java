@@ -17,6 +17,7 @@
 package com.graphaware.runtime.config;
 
 import com.graphaware.runtime.schedule.TimingStrategy;
+import com.graphaware.runtime.write.WritingConfig;
 import com.graphaware.writer.DatabaseWriter;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.Label;
@@ -64,9 +65,9 @@ public interface RuntimeConfiguration {
     TimingStrategy getTimingStrategy();
 
     /**
-     * Retrieves the {@link DatabaseWriter} used by the runtime to write changes to the database.
+     * Retrieves the {@link WritingConfig} used for configuring a {@link DatabaseWriter}.
      *
-     * @return The {@link DatabaseWriter}, may not be null.
+     * @return The {@link WritingConfig}, may not be null.
      */
-    DatabaseWriter getDatabaseWriter();
+    WritingConfig getWritingConfig();
 }

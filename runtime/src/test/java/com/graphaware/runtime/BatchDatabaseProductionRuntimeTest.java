@@ -20,21 +20,30 @@ import com.graphaware.runtime.config.FluentRuntimeConfiguration;
 import com.graphaware.runtime.metadata.ProductionSingleNodeMetadataRepository;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.runtime.write.WritingConfig;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
+import com.graphaware.writer.BaseDatabaseWriter;
+import com.graphaware.writer.DatabaseWriter;
+import com.graphaware.writer.NullWriter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.unsafe.batchinsert.BatchInserters;
 import org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase;
 
 import java.io.IOException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
 import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROPERTY_PREFIX;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -121,5 +130,44 @@ public class BatchDatabaseProductionRuntimeTest extends DatabaseRuntimeTest {
         }
 
         return root;
+    }
+
+    @Test
+    public void shouldUseNullWriterNoMatterWhat() {
+        final AtomicBoolean started = new AtomicBoolean(false);
+
+        GraphAwareRuntime runtime = createRuntime(FluentRuntimeConfiguration.defaultConfiguration().withWritingConfig(new WritingConfig() {
+            @Override
+            public DatabaseWriter produceWriter(GraphDatabaseService database) {
+                return new BaseDatabaseWriter(database) {
+                    @Override
+                    public void start() {
+                        started.set(true);
+                    }
+
+                    @Override
+                    public void stop() {
+                        started.set(false);
+                    }
+
+                    @Override
+                    public <T> T write(Callable<T> task, String id, int waitMillis) {
+                        return null;
+                    }
+                };
+            }
+        }));
+
+        assertEquals(NullWriter.getInstance(), runtime.getDatabaseWriter());
+
+        assertFalse(started.get());
+
+        runtime.start();
+
+        assertFalse(started.get());
+
+        ((KernelEventHandler) runtime).beforeShutdown();
+
+        assertFalse(started.get());
     }
 }

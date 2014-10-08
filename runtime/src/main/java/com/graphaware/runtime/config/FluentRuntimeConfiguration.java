@@ -18,8 +18,8 @@ package com.graphaware.runtime.config;
 
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
-import com.graphaware.writer.DatabaseWriter;
-import com.graphaware.writer.DefaultWriter;
+import com.graphaware.runtime.write.FluentWritingConfig;
+import com.graphaware.runtime.write.WritingConfig;
 
 /**
  * {@link RuntimeConfiguration} for {@link com.graphaware.runtime.GraphAwareRuntime} with fluent interface.
@@ -33,11 +33,11 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      * @return The {@link FluentRuntimeConfiguration} instance.
      */
     public static FluentRuntimeConfiguration defaultConfiguration() {
-        return new FluentRuntimeConfiguration(AdaptiveTimingStrategy.defaultConfiguration(), DefaultWriter.getInstance());
+        return new FluentRuntimeConfiguration(AdaptiveTimingStrategy.defaultConfiguration(), FluentWritingConfig.defaultConfiguration());
     }
 
-    private FluentRuntimeConfiguration(TimingStrategy timingStrategy, DatabaseWriter databaseWriter) {
-        super(timingStrategy, databaseWriter);
+    private FluentRuntimeConfiguration(TimingStrategy timingStrategy, WritingConfig writingConfig) {
+        super(timingStrategy, writingConfig);
     }
 
     /**
@@ -47,16 +47,16 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      * @return new instance.
      */
     public FluentRuntimeConfiguration withTimingStrategy(TimingStrategy timingStrategy) {
-        return new FluentRuntimeConfiguration(timingStrategy, getDatabaseWriter());
+        return new FluentRuntimeConfiguration(timingStrategy, getWritingConfig());
     }
 
     /**
-     * Create an instance with different {@link DatabaseWriter}.
+     * Create an instance with different {@link WritingConfig}.
      *
-     * @param databaseWriter of the new instance.
+     * @param writingConfig of the new instance.
      * @return new instance.
      */
-    public FluentRuntimeConfiguration withDatabaseWriter(DatabaseWriter databaseWriter) {
-        return new FluentRuntimeConfiguration(getTimingStrategy(), databaseWriter);
+    public FluentRuntimeConfiguration withWritingConfig(WritingConfig writingConfig) {
+        return new FluentRuntimeConfiguration(getTimingStrategy(), writingConfig);
     }
 }

@@ -9,6 +9,17 @@ import static java.util.concurrent.Executors.callable;
  */
 public abstract class BaseDatabaseWriter implements DatabaseWriter {
 
+    protected final GraphDatabaseService database;
+
+    /**
+     * Create a new database writer.
+     *
+     * @param database to write to.
+     */
+    protected BaseDatabaseWriter(GraphDatabaseService database) {
+        this.database = database;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -29,15 +40,15 @@ public abstract class BaseDatabaseWriter implements DatabaseWriter {
      * {@inheritDoc}
      */
     @Override
-    public void write(GraphDatabaseService database, Runnable task) {
-        write(database, task, "UNKNOWN");
+    public void write(Runnable task) {
+        write(task, "UNKNOWN");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void write(GraphDatabaseService database, Runnable task, String id) {
-        write(database, callable(task), id, 0);
+    public void write(Runnable task, String id) {
+        write(callable(task), id, 0);
     }
 }

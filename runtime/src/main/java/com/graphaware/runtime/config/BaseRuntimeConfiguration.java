@@ -17,7 +17,7 @@
 package com.graphaware.runtime.config;
 
 import com.graphaware.runtime.schedule.TimingStrategy;
-import com.graphaware.writer.DatabaseWriter;
+import com.graphaware.runtime.write.WritingConfig;
 
 /**
  * Base-class for {@link RuntimeConfiguration} implementations.
@@ -25,11 +25,11 @@ import com.graphaware.writer.DatabaseWriter;
 public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
 
     private final TimingStrategy timingStrategy;
-    private final DatabaseWriter databaseWriter;
+    private final WritingConfig writingConfig;
 
-    protected BaseRuntimeConfiguration(TimingStrategy timingStrategy, DatabaseWriter databaseWriter) {
+    protected BaseRuntimeConfiguration(TimingStrategy timingStrategy, WritingConfig writingConfig) {
         this.timingStrategy = timingStrategy;
-        this.databaseWriter = databaseWriter;
+        this.writingConfig = writingConfig;
     }
 
     /**
@@ -44,8 +44,8 @@ public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
      * {@inheritDoc}
      */
     @Override
-    public DatabaseWriter getDatabaseWriter() {
-        return databaseWriter;
+    public WritingConfig getWritingConfig() {
+        return writingConfig;
     }
 
     /**
@@ -66,7 +66,7 @@ public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
 
         BaseRuntimeConfiguration that = (BaseRuntimeConfiguration) o;
 
-        if (!databaseWriter.equals(that.databaseWriter)) return false;
+        if (!writingConfig.equals(that.writingConfig)) return false;
         if (!timingStrategy.equals(that.timingStrategy)) return false;
 
         return true;
@@ -78,7 +78,7 @@ public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
     @Override
     public int hashCode() {
         int result = timingStrategy.hashCode();
-        result = 31 * result + databaseWriter.hashCode();
+        result = 31 * result + writingConfig.hashCode();
         return result;
     }
 }
