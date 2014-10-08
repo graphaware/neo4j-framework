@@ -80,7 +80,7 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>common</artifactId>
-        <version>2.1.4.19</version>
+        <version>2.1.5.20</version>
         <scope>provided</scope>
     </dependency>
 
@@ -88,7 +88,7 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>api</artifactId>
-        <version>2.1.4.19</version>
+        <version>2.1.5.20</version>
         <scope>provided</scope>
     </dependency>
 
@@ -108,11 +108,25 @@ To get started manually, you will need the following dependencies:
         <scope>provided</scope>
     </dependency>
 
+    <!-- optional if you want to use GraphAware DatabaseWriter -->
+    <dependency>
+        <groupId>com.graphaware.neo4j</groupId>
+        <artifactId>writer-api</artifactId>
+        <version>2.1.5.20</version>
+        <scope>provided</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.graphaware.neo4j</groupId>
+        <artifactId>writer</artifactId>
+        <version>2.1.5.20</version>
+        <scope>provided</scope>
+    </dependency>
+
     <!-- Neo4j -->
     <dependency>
         <groupId>org.neo4j</groupId>
         <artifactId>neo4j</artifactId>
-        <version>2.1.4</version>
+        <version>2.1.5</version>
         <scope>provided</scope>
     </dependency>
 
@@ -120,13 +134,13 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>server-community</artifactId>
-        <version>2.1.4.19</version>
+        <version>2.1.5.20</version>
         <scope>test</scope>
     </dependency>
 
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
-        <version>2.1.4.19</version>
+        <version>2.1.5.20</version>
         <artifactId>tests</artifactId>
         <scope>test</scope>
     </dependency>
