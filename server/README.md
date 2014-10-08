@@ -96,7 +96,7 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-webmvc</artifactId>
-        <version>4.0.0.RELEASE</version>
+        <version>4.1.1.RELEASE</version>
         <scope>provided</scope>
     </dependency>
 
