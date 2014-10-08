@@ -1,8 +1,11 @@
 package com.graphaware.writer;
 
 import com.graphaware.common.util.IterableUtils;
+import com.graphaware.common.util.PropertyContainerUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
 import org.junit.Test;
+import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
 import java.io.IOException;
@@ -229,6 +232,43 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
                 @Override
                 public void run() {
                     writer.write(task);
+                }
+            });
+        }
+        executorService.shutdown();
+        executorService.awaitTermination(1, TimeUnit.SECONDS);
+
+        writer.stop();
+
+        try (Transaction tx = getDatabase().beginTx()) {
+            assertEquals(100, IterableUtils.countNodes(getDatabase()));
+            tx.success();
+        }
+    }
+
+    @Test
+    public void callablesWork() throws InterruptedException {
+        writer = new TxPerTaskWriter(getDatabase());
+        writer.start();
+
+        final Callable<Long> task = new Callable<Long>() {
+            @Override
+            public Long call() throws Exception {
+                for (Node node : getDatabase().findNodesByLabelAndProperty(DynamicLabel.label("test"), "test", "test")) {
+                    System.out.println(PropertyContainerUtils.nodeToString(node));
+                }
+                Node test = getDatabase().createNode(DynamicLabel.label("test"));
+                test.setProperty("test","test");
+                return test.getId();
+            }
+        };
+
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        for (int i = 0; i < 100; i++) {
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    writer.write(task, "test", 0);
                 }
             });
         }
