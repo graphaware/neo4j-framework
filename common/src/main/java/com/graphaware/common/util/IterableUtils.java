@@ -101,7 +101,7 @@ public final class IterableUtils {
      * {@link #random(Iterable, int)} with a sample size of 1.
      *
      * @param iterable The {@link Iterable} from which to get a random element.
-     * @param <T> The type of the element, as dictated by the given argument.
+     * @param <T>      The type of the element, as dictated by the given argument.
      * @return A random element from the given iterable.
      * @throws IllegalArgumentException if invoked with an empty {@link Iterable}.
      */
@@ -112,9 +112,9 @@ public final class IterableUtils {
     /**
      * Sample an {@link Iterable} using reservoir sampling.
      *
-     * @param iterable The {@link Iterable} from which to sample.
+     * @param iterable        The {@link Iterable} from which to sample.
      * @param numberOfSamples The number of elements to return.
-     * @param <T> The type of the element, as dictated by the given {@link Iterable}.
+     * @param <T>             The type of the element, as dictated by the given {@link Iterable}.
      * @return A new {@link Iterable} containing a number of random elements sampled from the {@link Iterable} argument.
      * @throws IllegalArgumentException if invoked with an empty {@link Iterable}.
      */
@@ -222,6 +222,70 @@ public final class IterableUtils {
      */
     public static <T> T getSingleOrNull(Iterable<T> iterable) {
         return getSingleOrNull(iterable.iterator());
+    }
+
+    /**
+     * Get the first element from iterator.
+     *
+     * @param iterator        to find the first element.
+     * @param notFoundMessage exception message if there are no elements.
+     * @param <T>             type of the element.
+     * @return the element iff there is one or more.
+     * @throws NotFoundException in case there are no elements.
+     */
+    public static <T> T getFirst(Iterator<T> iterator, String notFoundMessage) {
+        T result = null;
+
+        if (iterator.hasNext()) {
+            result = iterator.next();
+        }
+
+        if (result == null) {
+            throw new NotFoundException(notFoundMessage);
+        }
+
+        return result;
+    }
+
+    /**
+     * Get the first element from iterable.
+     *
+     * @param iterable        to find the first element.
+     * @param notFoundMessage exception message if there are no elements.
+     * @param <T>             type of the element.
+     * @return the element iff there is one or more.
+     * @throws NotFoundException in case there are no elements.
+     */
+    public static <T> T getFirst(Iterable<T> iterable, String notFoundMessage) {
+        return getFirst(iterable.iterator(), notFoundMessage);
+    }
+
+    /**
+     * Get the first element from iterator.
+     *
+     * @param iterator        to find the first element.
+     * @param <T>             type of the element.
+     * @return the element iff there is one or more, null if there is none.
+     */
+    public static <T> T getFirstOrNull(Iterator<T> iterator) {
+        T result = null;
+
+        if (iterator.hasNext()) {
+            result = iterator.next();
+        }
+
+        return result;
+    }
+
+    /**
+     * Get the first element from iterable.
+     *
+     * @param iterable        to find the first element.
+     * @param <T>             type of the element.
+     * @return the element iff there is one or more, null if there is none.
+     */
+    public static <T> T getFirstOrNull(Iterable<T> iterable) {
+        return getFirstOrNull(iterable.iterator());
     }
 
     /**

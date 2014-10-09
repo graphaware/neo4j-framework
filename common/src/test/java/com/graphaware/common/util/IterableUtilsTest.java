@@ -169,6 +169,48 @@ public class IterableUtilsTest {
         getSingle(Arrays.asList("test1", "test2"));
     }
 
+    //
+
+    @Test
+    public void firstElementShouldBeReturnedWhenIterableHasOneElement() {
+        assertEquals("test", getFirstOrNull(Collections.singletonList("test")));
+    }
+
+    @Test
+    public void firstElementShouldBeReturnedWhenIterableHasOneElement2() {
+        assertEquals("test", getFirst(Collections.singletonList("test"), "test"));
+    }
+
+    @Test
+    public void nullShouldBeReturnedWhenIterableHasNoElementsWhenRequestingFirst() {
+        assertNull(getFirstOrNull(Collections.emptyList()));
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void exceptionShouldBeThrownWhenIterableHasNoElementsWhenRequestingFirst() {
+        getFirst(Collections.emptyList(), "test");
+    }
+
+    @Test
+    public void exceptionShouldBeThrownWhenIterableHasNoElements2WhenRequestingFirst() {
+        try {
+            getFirst(Collections.emptyList(), "test");
+        } catch (NotFoundException e) {
+            assertEquals("test", e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldReturnFirstWhenThereIsMoreThanOne() {
+        assertEquals("test1", getFirstOrNull(Arrays.asList("test1", "test2")));
+    }
+
+    @Test
+    public void exceptionShouldBeThrownWhenIterableHasMoreThanOneElement2WhenRequestingFirst() {
+        assertEquals("test1", getFirst(Arrays.asList("test1", "test2"), "test"));
+    }
+
+
     @Test
     public void shouldSampleIterable() {
         Iterable<Long> sampled = random(asList(1L, 2L, 3L, 4L, 5L), 2);
