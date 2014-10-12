@@ -28,13 +28,16 @@ GraphAware Runtime is useful when you:
 
 To achieve any of the above, developers need to create a GraphAware Runtime Module. There are two types:
 * [`TxDrivenModule`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/runtime/module/TxDrivenModule.html) driven by ongoing transactions
-* [`TimerDrivenModule`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/runtime/module/TimerDrivenModule.html) driven by a timer (periodic)
+* [`TimerDrivenModule`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/runtime/module/TimerDrivenModule.html) driven by a clever adaptive timer
 
 A single module can implement both interfaces and thus be driven by both transactions and the timer.
 
-The following Runtime Modules are developed and provided by GraphAware:
+The following Runtime Modules are developed and provided by GraphAware. They are useful in their own right, but also serve as reference implementations:
 * [Relationship Count Module](https://github.com/graphaware/neo4j-relcount)
 * [Change Feed Module](https://github.com/graphaware/neo4j-changefeed)
+* [Node Rank Module](https://github.com/graphaware/neo4j-noderank)
+* [UUID Module](https://github.com/graphaware/neo4j-uuid)
+
 
 ### Getting the Runtime
 
@@ -48,12 +51,12 @@ add the following snippet to your pom.xml:
 ```xml
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
-    <artifactId>runtime</artifactId>
+    <artifactId>runtime-api</artifactId>
     <version>2.1.5.20</version>
 </dependency>
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
-    <artifactId>runtime-api</artifactId>
+    <artifactId>runtime</artifactId>
     <version>2.1.5.20</version>
 </dependency>
 ```
@@ -108,7 +111,7 @@ database = new TestGraphDatabaseFactory()
               .loadPropertiesFromFile("neo4j-friendship.properties")
               .newGraphDatabase();
 
-ProductionRuntime.getRuntime(database).waitUntilStarted();  //this line is needed when configuring with properties file
+RuntimeRegistry.getRuntime(database).waitUntilStarted();  //this line is needed when configuring with properties file
 ```
 
 **NOTE:** Modules are presented with the about-to-be-committed transaction data or asked to do work on scheduled basis
@@ -286,6 +289,10 @@ Modify conf/custom-logback.xml in your Neo4j install path and add at the end
 ```
 
 In the example above, logging is set to `debug` level and log statements are written to an extensions.log file in the Neo4j data/log directory.
+
+### Inclusion Policies
+
+todo document Spel inclusion policies
 
 License
 -------

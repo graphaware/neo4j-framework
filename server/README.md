@@ -12,7 +12,9 @@ There is no need to use this module directly. Just [download](http://graphaware.
 of the GraphAware Framework and place it into the _plugins_ directory of Neo4j.
 
 The following APIs are developed and provided by GraphAware:
+* [Algorithms](https://github.com/graphaware/neo4j-algorithms)
 * [TimeTree](https://github.com/graphaware/neo4j-timetree)
+* [WarmUp](https://github.com/graphaware/neo4j-warmup)
 
 ### Usage
 
@@ -51,7 +53,7 @@ public class NodeCountApi {
 **WARNING** Your class must reside in a `com`, `net`, or `org` top-level
 package and one of the package levels must be called `graphaware`. For example, `com.mycompany.graphaware.NodeCountApi`
  will do. Alternatively, if you do not want the class to reside in the specified package, you need to put the following
- class in a package that follows the specification:
+ class in a package that follows the specification, for instance `com.mycompany.graphaware`:
 
 ```java
 @Configuration
@@ -104,7 +106,7 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-tx</artifactId>
-        <version>${spring.version}</version>
+        <version>4.1.1.RELEASE</version>
         <scope>provided</scope>
     </dependency>
 

@@ -4,14 +4,12 @@ import com.graphaware.runtime.write.DatabaseWriterType;
 import org.neo4j.helpers.Function;
 
 /**
- * A {@link org.neo4j.helpers.Function} that converts String to {@link com.graphaware.runtime.schedule.TimingStrategy}. Singleton.
- * <p/>
- * Converts "fixed" to {@link com.graphaware.runtime.schedule.FixedDelayTimingStrategy} and "adaptive" to {@link com.graphaware.runtime.schedule.AdaptiveTimingStrategy}.
+ * A {@link org.neo4j.helpers.Function} that converts String to {@link DatabaseWriterType}. Singleton.
  */
 public final class StringToDatabaseWriterType implements Function<String, DatabaseWriterType> {
 
     public static final String DEFAULT = "default";
-    public static final String SINGLE_THREAD = "single";
+    public static final String SINGLE_THREADED = "single";
     public static final String BATCH = "batch";
 
     private static StringToDatabaseWriterType INSTANCE = new StringToDatabaseWriterType();
@@ -29,7 +27,7 @@ public final class StringToDatabaseWriterType implements Function<String, Databa
             return DatabaseWriterType.DEFAULT;
         }
 
-        if (s.equalsIgnoreCase(SINGLE_THREAD)) {
+        if (s.equalsIgnoreCase(SINGLE_THREADED)) {
             return DatabaseWriterType.SINGLE_THREADED;
         }
 

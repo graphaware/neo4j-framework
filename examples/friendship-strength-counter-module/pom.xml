@@ -23,7 +23,7 @@
     <packaging>jar</packaging>
 
     <name>GraphAware Friendship Strength Counter Runtime Module</name>
-    <description>Example of a GraphAware Runtime Module</description>
+    <description>Example of a GraphAware Transaction-Driven Runtime Module</description>
     <url>http://graphaware.com</url>
 
     <properties>

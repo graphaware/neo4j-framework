@@ -30,9 +30,7 @@ public interface TimerDrivenModuleContext<T> {
      *
      * @param database The {@link GraphDatabaseService} in which to find the position.
      * @return A representation of the position.
-     * @throws NotFoundException if the position could not be found. Callers must handle this.
+     * @throws PositionNotFoundException if the position could not be found. Callers must handle this.
      */
-	//TODO: make this throw a checked exception because we want module authors to handle this situation in their code
-    T find(GraphDatabaseService database) throws NotFoundException;
-
+    T find(GraphDatabaseService database) throws PositionNotFoundException;
 }

@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  * {@link DatabaseIntegrationTest} that starts the {@link WrappingNeoServerBootstrapper} as well,
- * in order to make webadmin and potentially custom managed and unmanaged extensions available for testing.
+ * in order to make the Neo4j browser and potentially custom managed and unmanaged extensions available for testing.
  * <p/>
  * This is generally useful for developers who use Neo4j in server mode and want to test their extensions, whilst
  * being able to access the {@link org.neo4j.graphdb.GraphDatabaseService} object using {@link #getDatabase()},

@@ -258,7 +258,7 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
                     System.out.println(PropertyContainerUtils.nodeToString(node));
                 }
                 Node test = getDatabase().createNode(DynamicLabel.label("test"));
-                test.setProperty("test","test");
+                test.setProperty("test", "test");
                 return test.getId();
             }
         };

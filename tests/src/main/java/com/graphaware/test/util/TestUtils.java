@@ -214,11 +214,13 @@ public final class TestUtils {
      * @return body of the server response.
      */
     public static String executeCypher(String serverUrl, String... cypherStatements) {
-        StringBuilder stringBuilder = new StringBuilder("{\"statements\" : [ {");
+        StringBuilder stringBuilder = new StringBuilder("{\"statements\" : [");
         for (String statement : cypherStatements) {
-            stringBuilder.append("\"statement\" : \"").append(statement).append("\"");
+            stringBuilder.append("{\"statement\" : \"").append(statement).append("\"}").append(",");
         }
-        stringBuilder.append("}]}");
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+
+        stringBuilder.append("]}");
 
         while (serverUrl.endsWith("/")) {
             serverUrl = serverUrl.substring(0, serverUrl.length() - 1);

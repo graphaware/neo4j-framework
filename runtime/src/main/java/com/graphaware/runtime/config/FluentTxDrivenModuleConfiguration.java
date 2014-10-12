@@ -7,7 +7,7 @@ import com.graphaware.runtime.policy.InclusionPoliciesFactory;
  * {@link TxDrivenModuleConfiguration} with fluent interface.
  * Intended for users of Neo4j in embedded mode to programatically configure the runtime.
  */
-public class FluentTxDrivenModuleConfiguration extends BaseTxDrivenModuleConfiguration<FluentTxDrivenModuleConfiguration> {
+public final class FluentTxDrivenModuleConfiguration extends BaseTxDrivenModuleConfiguration<FluentTxDrivenModuleConfiguration> {
 
     /**
      * Creates an instance with default values, i.e., with {@link com.graphaware.runtime.policy.InclusionPoliciesFactory#allBusiness()}.

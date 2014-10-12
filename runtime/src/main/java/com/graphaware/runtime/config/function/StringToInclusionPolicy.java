@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 /**
  * A {@link org.neo4j.helpers.Function} that converts String to {@link com.graphaware.common.policy.InclusionPolicy}.
  * <p/>
- * Converts a fully qualified class name to an instance of the class, or a SPEL expression to {@link com.graphaware.common.policy.ObjectInclusionPolicy}.
+ * Converts a fully qualified class name to an instance of the class, or a SPEL expression to {@link com.graphaware.common.policy.InclusionPolicy}.
  */
 public abstract class StringToInclusionPolicy<T extends InclusionPolicy> implements Function<String, T> {
 

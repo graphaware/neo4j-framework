@@ -25,7 +25,7 @@
     <packaging>pom</packaging>
 
     <name>GraphAware Build</name>
-    <description>Technical Maven Module for Building the Framework and Maven Archetypes</description>
+    <description>Technical Maven Module for Building the Framework</description>
     <url>http://graphaware.com</url>
 
     <modules>

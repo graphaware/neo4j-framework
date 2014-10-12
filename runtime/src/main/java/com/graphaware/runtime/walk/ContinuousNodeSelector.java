@@ -97,7 +97,7 @@ public class ContinuousNodeSelector implements NodeSelector {
                     LOG.warn("Did not find a suitable node in 1000 attempts. Are you sure the node inclusion policy is set correctly for ContinuousNodeSelector?");
                 }
                 if (attempt == 1_000_000) {
-                    LOG.error("Did not find a suitable node in 1M attempts. Aborting...");
+                    LOG.warn("Did not find a suitable node in 1M attempts. Aborting...");
                     return null;
                 }
                 Node node = database.getNodeById(nextId(database));

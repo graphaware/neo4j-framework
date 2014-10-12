@@ -18,7 +18,10 @@ package com.graphaware.runtime.config;
 
 /**
  * Convenience base-class for {@link RuntimeConfigured} components.
+ *
+ * @deprecated this is a legacy class and should not need to be used.
  */
+@Deprecated
 public abstract class BaseRuntimeConfigured implements RuntimeConfigured {
 
     private RuntimeConfiguration configuration;
