@@ -1,18 +1,19 @@
 package com.graphaware.runtime.manager;
 
-import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
-import com.graphaware.runtime.module.NeedsInitializationException;
 import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
+import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
+import com.graphaware.runtime.module.NeedsInitializationException;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
-import org.neo4j.graphdb.event.TransactionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * {@link BaseModuleManager} for {@link TxDrivenModule}s.
@@ -28,14 +29,6 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      */
     protected BaseTxDrivenModuleManager(ModuleMetadataRepository metadataRepository) {
         super(metadataRepository);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void throwExceptionIfIllegal(TransactionData transactionData) {
-        metadataRepository.throwExceptionIfIllegal(transactionData);
     }
 
     /**

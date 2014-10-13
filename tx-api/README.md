@@ -267,16 +267,6 @@ To summarize, this API gives access to two versions of the same graph. Through c
  Through deleted and/or previous versions of `PropertyContainer`s, one can traverse the previous snapshot of the graph,
  as it was before the transaction started.
 
-### Batch Usage
-
-In case you would like to use the Neo4j `BatchInserter` API but still get access to `ImprovedTransactionData` during
-batch insert operations, [`TransactionSimulatingBatchInserterImpl`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/event/batch/api/TransactionSimulatingBatchInserterImpl.html) is the class for you. It is a `BatchInserter` but
-allows `TransactionEventHandler`s to be registered on it. It then simulates a transaction commit every once in a while
-(configurable, please refer to Javadoc).
-
-As a `GraphDatabaseService` equivalent for batch inserts, this project provides [`TransactionSimulatingBatchGraphDatabase`](http://graphaware.com/site/framework/latest/apidocs/org/neo4j/unsafe/batchinsert/TransactionSimulatingBatchGraphDatabase.html)
-for completeness, but its usage is discouraged.
-
 License
 -------
 

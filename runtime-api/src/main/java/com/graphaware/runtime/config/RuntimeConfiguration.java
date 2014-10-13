@@ -34,9 +34,9 @@ public interface RuntimeConfiguration {
     public static final String GA_PREFIX = "_GA_";
 
     /**
-     * Label of the runtime metadata node.
+     * Identifier of Framework Metadata in metadata repositories.
      */
-    public static final Label GA_METADATA = DynamicLabel.label(GA_PREFIX + "METADATA");
+    public static final String GA_METADATA = GA_PREFIX + "METADATA";
 
     /**
      * Prefix for property keys of properties storing {@link com.graphaware.runtime.metadata.TxDrivenModuleMetadata}.

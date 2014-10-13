@@ -73,8 +73,6 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
             return null;
         }
 
-        getTxDrivenModuleManager().throwExceptionIfIllegal(data);
-
         return getTxDrivenModuleManager().beforeCommit(transactionData);
     }
 

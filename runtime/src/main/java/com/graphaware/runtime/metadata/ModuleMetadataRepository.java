@@ -11,16 +11,6 @@ import java.util.Set;
 public interface ModuleMetadataRepository {
 
     /**
-     * Throw an exception if about-to-be-committed transaction would interfere with the work this repository is trying
-     * to do. For example, if this repository stores metadata on a special node in the graph, this method should throw
-     * an exception when an attempt is made to delete the node.
-     *
-     * @param transactionData data representing about-to-be-committed changes.
-     * @throws IllegalStateException in case the transaction is illegal from this class' point of view.
-     */
-    void throwExceptionIfIllegal(TransactionData transactionData) throws IllegalStateException;
-
-    /**
      * Get the metadata of a module that has previously been presisted.
      *
      * @param module to get metadata for.

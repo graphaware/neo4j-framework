@@ -111,7 +111,7 @@ database = new TestGraphDatabaseFactory()
               .loadPropertiesFromFile("neo4j-friendship.properties")
               .newGraphDatabase();
 
-RuntimeRegistry.getRuntime(database).waitUntilStarted();  //this line is needed when configuring with properties file
+RuntimeRegistry.getStartedRuntime(database);  //this line is needed when configuring with properties file
 ```
 
 **NOTE:** Modules are presented with the about-to-be-committed transaction data or asked to do work on scheduled basis

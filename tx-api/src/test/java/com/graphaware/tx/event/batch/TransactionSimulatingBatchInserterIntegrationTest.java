@@ -53,7 +53,7 @@ import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
- * Integration test for {@link org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase}.
+ * Integration test for {@link TransactionSimulatingBatchInserter}.
  */
 public class TransactionSimulatingBatchInserterIntegrationTest {
 
