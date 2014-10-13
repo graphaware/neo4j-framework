@@ -22,7 +22,7 @@ public abstract class SpelInclusionPolicy {
      */
     @Override
     public String toString() {
-        return "SpelInclusionPolicy{exp=" + exp + "}";
+        return expression;
     }
 
     /**
