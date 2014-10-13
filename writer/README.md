@@ -15,13 +15,13 @@ Add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>writer-api</artifactId>
-    <version>2.1.5.20</version>
+    <version>2.1.5.21</version>
 </dependency>
 
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>writer</artifactId>
-    <version>2.1.5.20</version>
+    <version>2.1.5.21</version>
 </dependency>
 ```
 
