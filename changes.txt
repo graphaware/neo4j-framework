@@ -1,0 +1,3 @@
+2.1.5.21:
+    - removed metadata node, the framework no longer pollutes the graph
+    -
