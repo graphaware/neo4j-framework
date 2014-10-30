@@ -30,3 +30,4 @@ List of modules to upgrade:
         noderank
         algorithms
         reco
+        schema
