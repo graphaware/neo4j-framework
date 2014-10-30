@@ -32,7 +32,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
  * Spring transactions-related application config.
  */
 @Configuration
-@EnableTransactionManagement
 public class TxConfig {
 
     @Autowired(required = false)
