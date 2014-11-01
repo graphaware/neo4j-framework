@@ -123,9 +123,9 @@ public class GraphUnitTest {
 
     @Test(expected = AssertionError.class)
     public void singleNodeGraphsWithDifferentLabelsShouldFailSubgraphTest2() {
-        populateDatabase("CREATE (m:Male {name:'Michal'}), (d:Female {name:'Daniela'})");
+        populateDatabase("CREATE (m:Female {name:'Michal'}), (d:Male {name:'Daniela'})");
 
-        assertSubgraph(database, "CREATE (m:Female {name:'Michal'}), (d:Male {name:'Daniela'})");
+        assertSubgraph(database, "CREATE (m:Male {name:'Michal'}), (d:Female {name:'Daniela'})");
     }
 
     @Test(expected = AssertionError.class)
@@ -140,6 +140,13 @@ public class GraphUnitTest {
         populateDatabase("CREATE (m:Person:Human {name:'Michal'})");
 
         assertSubgraph(database, "CREATE (m:Person {name:'Michal'})");
+    }
+
+    @Test(expected = AssertionError.class)
+    public void singleNodeGraphsWithDifferentLabelsShouldFailSubgraphTest3() {
+        populateDatabase("CREATE (m:Person:Human {name:'Michal'})");
+
+        assertSubgraph(database, "CREATE (m:Person:Developer {name:'Michal'})");
     }
 
     @Test(expected = AssertionError.class)
