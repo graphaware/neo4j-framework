@@ -17,8 +17,8 @@ go to https://oss.sonatype.org/, login as graphaware, promote released library
 
 notes:
     removing a git tag:
-        git tag -d framework-parent-2.1.5.21
-        git push origin :refs/tags/framework-parent-2.1.5.21
+        git tag -d framework-parent-2.1.5.22
+        git push origin :refs/tags/framework-parent-2.1.5.22
 
 List of modules to upgrade:
         relcount
