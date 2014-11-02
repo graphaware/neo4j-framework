@@ -32,7 +32,6 @@ controller:
  */
 @Controller
 @RequestMapping("count")
-@Transactional
 public class NodeCountApi {
 
     private final GraphDatabaseService database;
@@ -45,7 +44,14 @@ public class NodeCountApi {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
     public long count() {
-        return Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
+        long count;
+
+        try (Transaction tx = database.beginTx()) {
+            count = Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
+            tx.success();
+        }
+
+        return count;
     }
 }
 ```
@@ -63,6 +69,17 @@ public class GraphAwareIntegration {
 ```
 
 Then your controllers can reside in any subpackage of `com.yourdomain`.
+
+If you want to use `@Transactional` instead of explicitly starting and committing transactions, the above snippet can
+be changed to
+
+```java
+@Configuration
+@ComponentScan(basePackages = {"com.yourdomain.**"})
+@EnableTransactionManagement
+public class GraphAwareIntegration {
+}
+```
 
 **WARNING END**
 
