@@ -76,7 +76,7 @@ public final class TestUtils {
      * @return JSON as String.
      */
     public static String jsonAsString(Class caller, String fileName) {
-        return jsonAsString(caller.getClass().getPackage().getName().replace(".", "/") + "/", fileName);
+        return jsonAsString(caller.getPackage().getName().replace(".", "/") + "/", fileName);
     }
 
     /**
