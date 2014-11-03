@@ -107,7 +107,7 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
         RunnableFuture<T> futureTask = createTask(task);
 
         if (!queue.offer(futureTask)) {
-            LOG.warn("Could not write task to queue as it is too full. We're losing writes now.");
+            LOG.warn("Could not write task " + id + " to queue as it is too full. We're losing writes now.");
             return null;
         }
 
