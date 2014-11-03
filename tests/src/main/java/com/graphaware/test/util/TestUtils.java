@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import static org.junit.Assert.*;
 
@@ -89,7 +90,7 @@ public final class TestUtils {
      */
     public static String jsonAsString(String packagePath, String fileName) {
         try {
-            return IOUtils.toString(new ClassPathResource(packagePath + fileName + ".json").getInputStream());
+            return IOUtils.toString(new ClassPathResource(packagePath + fileName + ".json").getInputStream(), Charset.forName("UTF-8"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
