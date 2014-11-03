@@ -1,3 +1,6 @@
+2.1.5.23:
+    - minor bugfixes and enhancements for testing
+
 2.1.5.22:
     - removed explicit @EnableTransactionManagement, modules have to add this themselves
     - improved GraphUnit test failure messages
