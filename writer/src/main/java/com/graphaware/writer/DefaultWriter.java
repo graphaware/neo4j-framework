@@ -2,6 +2,8 @@ package com.graphaware.writer;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Callable;
 
@@ -10,6 +12,8 @@ import java.util.concurrent.Callable;
  * until the write is finished. In other words, this is no different from writing directly to the database.
  */
 public class DefaultWriter extends BaseDatabaseWriter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultWriter.class);
 
     /**
      * Create a new writer.
@@ -32,6 +36,7 @@ public class DefaultWriter extends BaseDatabaseWriter {
             result = task.call();
             tx.success();
         } catch (Exception e) {
+            LOG.warn("Execution threw and exception.", e);
             if (e instanceof RuntimeException) {
                 throw (RuntimeException) e;
             }

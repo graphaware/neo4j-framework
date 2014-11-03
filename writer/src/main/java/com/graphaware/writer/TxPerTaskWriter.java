@@ -49,6 +49,7 @@ public class TxPerTaskWriter extends SingleThreadedWriter implements DatabaseWri
                     tx.success();
                     return result;
                 } catch (Exception e) {
+                    LOG.warn("Execution threw and exception.", e);
                     throw new RuntimeException(e);
                 }
             }

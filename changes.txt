@@ -1,6 +1,7 @@
 2.1.5.22:
     - removed explicit @EnableTransactionManagement, modules have to add this themselves
     - improved GraphUnit test failure messages
+    - improved Writer logging
 
 2.1.5.21:
     - removed metadata node, the framework no longer pollutes the graph
