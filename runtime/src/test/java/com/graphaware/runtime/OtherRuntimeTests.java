@@ -1,6 +1,7 @@
 package com.graphaware.runtime;
 
 import com.graphaware.runtime.bootstrap.RuntimeKernelExtension;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -23,6 +24,11 @@ public class OtherRuntimeTests {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    @After
+    public void deleteTempFolder() {
+        temporaryFolder.delete();
+    }
 
     @Test(timeout = 5000)
     @RepeatRule.Repeat(times = 10)
