@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 import static com.graphaware.common.util.PropertyContainerUtils.*;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.helpers.collection.Iterables.count;
@@ -218,11 +217,11 @@ public final class GraphUnit {
     }
 
     private static void doAssertSubgraph(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies inclusionPolicies, String firstDatabaseName) {
-        Map<Long, Long[]> sameNodesMap = buildSameNodesMap(database, otherDatabase, inclusionPolicies, "existing database");
+        Map<Long, Long[]> sameNodesMap = buildSameNodesMap(database, otherDatabase, inclusionPolicies, firstDatabaseName);
         Set<Map<Long, Long>> nodeMappings = buildNodeMappingPermutations(sameNodesMap, otherDatabase);
 
         if (nodeMappings.size() == 1) {
-            assertRelationshipsMappingExistsForSingleNodeMapping(database, otherDatabase, nodeMappings.iterator().next(), inclusionPolicies, "existing database");
+            assertRelationshipsMappingExistsForSingleNodeMapping(database, otherDatabase, nodeMappings.iterator().next(), inclusionPolicies, firstDatabaseName);
             return;
         }
 
