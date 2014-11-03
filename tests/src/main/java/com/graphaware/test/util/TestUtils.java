@@ -185,12 +185,12 @@ public final class TestUtils {
             ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
                 @Override
                 public String handleResponse(final HttpResponse response) throws IOException {
-                    assertEquals(expectedStatusCode, response.getStatusLine().getStatusCode());
+                    String body = null;
                     if (response.getEntity() != null) {
-                        return EntityUtils.toString(response.getEntity());
-                    } else {
-                        return null;
+                        body = EntityUtils.toString(response.getEntity());
                     }
+                    assertEquals("Expected and actual status codes don't match. Response body: " + body, expectedStatusCode, response.getStatusLine().getStatusCode());
+                    return body;
                 }
             };
 
