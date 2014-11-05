@@ -18,6 +18,8 @@ package com.graphaware.tx.executor.single;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A convenience class that executes work in the context of a {@link org.neo4j.graphdb.Transaction}.
@@ -25,6 +27,8 @@ import org.neo4j.graphdb.Transaction;
  * This class is thread-safe.
  */
 public class SimpleTransactionExecutor implements TransactionExecutor {
+    private static final Logger LOG = LoggerFactory.getLogger(SimpleTransactionExecutor.class);
+
     private final GraphDatabaseService database;
 
     /**
@@ -65,9 +69,11 @@ public class SimpleTransactionExecutor implements TransactionExecutor {
             result = callback.doInTransaction(database); //can throw a business exception
             tx.success();
         } catch (RuntimeException e) {
+            LOG.warn("Runtime exception occurred during transaction execution.", e);
             tx.failure();
             throw e;
         } catch (Exception e) {
+            LOG.warn("Checked exception occurred during transaction execution.", e);
             tx.failure();
             throw new RuntimeException(e);
         } finally {

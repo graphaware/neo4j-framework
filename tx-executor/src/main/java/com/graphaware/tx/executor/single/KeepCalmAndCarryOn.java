@@ -45,7 +45,7 @@ public final class KeepCalmAndCarryOn implements ExceptionHandlingStrategy {
      */
     @Override
     public void handleException(RuntimeException e) {
-        LOG.error("An exception occurred while executing transaction", e);
+        LOG.warn("An exception occurred while executing transaction", e);
     }
 
     /**

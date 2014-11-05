@@ -1,3 +1,7 @@
+2.1.5.25:
+    - more flexibility in extending writers
+    - decreased log level in batch transaction executor
+
 2.1.5.24:
     - no changes (just a bad release because of Nexus)
 
