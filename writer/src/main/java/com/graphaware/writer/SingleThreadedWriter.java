@@ -23,7 +23,7 @@ import static java.util.concurrent.Executors.callable;
 public abstract class SingleThreadedWriter extends AbstractScheduledService implements DatabaseWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SingleThreadedWriter.class);
-    private static final int LOGGING_FREQUENCY_MS = 5000;
+    private static final int LOGGING_INTERVAL_MS = 5000;
     public static final int DEFAULT_QUEUE_CAPACITY = 10000;
 
     private final int queueCapacity;
@@ -106,7 +106,7 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
 
         RunnableFuture<T> futureTask = createTask(task);
 
-        if (!queue.offer(futureTask)) {
+        if (!offer(futureTask)) {
             LOG.warn("Could not write task " + id + " to queue as it is too full. We're losing writes now.");
             return null;
         }
@@ -120,6 +120,17 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
     }
 
     /**
+     * Offer a task to the queue. Intended to be overridden. By default, don't wait and return <code>false</code> in
+     * case the queue is full, otherwise return <code>true</code>.
+     *
+     * @param futureTask to offer to the queue.
+     * @return true iff the task was accepted.
+     */
+    protected boolean offer(RunnableFuture<?> futureTask) {
+        return queue.offer(futureTask);
+    }
+
+    /**
      * Create a runnable future from the given task.
      *
      * @param task task.
@@ -127,7 +138,16 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
      */
     protected abstract <T> RunnableFuture<T> createTask(final Callable<T> task);
 
-    private <T> T block(RunnableFuture<T> futureTask, String id, int waitMillis) {
+    /**
+     * Block until the given task is executed, or until a timeout occurs.
+     *
+     * @param futureTask to wait for.
+     * @param id         of the task for logging.
+     * @param waitMillis how long to wait before giving up.
+     * @param <T>        type of the task's result.
+     * @return result of the task. <code>null</code> if timed out.
+     */
+    protected final <T> T block(RunnableFuture<T> futureTask, String id, int waitMillis) {
         try {
             return futureTask.get(waitMillis, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
@@ -148,10 +168,28 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
 
     protected void logQueueSizeIfNeeded() {
         long now = System.currentTimeMillis();
-        if (now - lastLoggedTime > LOGGING_FREQUENCY_MS && queue.size() > 0) {
+        if (now - lastLoggedTime > loggingFrequencyMs() && (logEmptyQueue() || queue.size() > 0)) {
             LOG.info("Queue size: " + queue.size());
             lastLoggedTime = now;
         }
+    }
+
+    /**
+     * Return <code>true</code> iff empty queue should be logged. Defaults to <code>false</code>, intended to be overridden.
+     *
+     * @return true iff empty queue should be logged.
+     */
+    protected boolean logEmptyQueue() {
+        return false;
+    }
+
+    /**
+     * How often in ms should the queue size be reported to the log.
+     *
+     * @return logging interval in ms. The default is {@link #LOGGING_INTERVAL_MS}, intended to be overridden.
+     */
+    protected long loggingFrequencyMs() {
+        return LOGGING_INTERVAL_MS;
     }
 
     /**
