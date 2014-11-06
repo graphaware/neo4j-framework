@@ -189,6 +189,7 @@ public abstract class PerformanceTestSuite {
         temporaryFolder = new TemporaryFolder();
         try {
             temporaryFolder.create();
+            temporaryFolder.getRoot().deleteOnExit();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

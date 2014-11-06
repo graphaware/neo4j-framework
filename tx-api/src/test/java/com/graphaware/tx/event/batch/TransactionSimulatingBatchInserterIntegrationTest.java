@@ -64,6 +64,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
     @Before
     public void createTemporaryFolder() throws IOException {
         temporaryFolder.create();
+        temporaryFolder.getRoot().deleteOnExit();
     }
 
     @After

@@ -54,6 +54,7 @@ public class NeoTestServer {
 
     public void start() throws IOException, InterruptedException {
         temporaryFolder.create();
+        temporaryFolder.getRoot().deleteOnExit();
 
         String serverConfigContents = IOUtils.toString(new ClassPathResource(neo4jServerConfigFile).getInputStream());
         serverConfigContents = serverConfigContents.replaceAll("=conf/", "=" + temporaryFolder.getRoot().getAbsolutePath() + "/conf/");
