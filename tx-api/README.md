@@ -27,7 +27,7 @@ Add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>tx-api</artifactId>
-    <version>2.1.5.24</version>
+    <version>2.1.5.25</version>
 </dependency>
 ```
 
