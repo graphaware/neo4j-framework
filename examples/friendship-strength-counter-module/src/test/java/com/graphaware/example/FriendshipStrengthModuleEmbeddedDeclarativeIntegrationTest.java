@@ -24,6 +24,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.assertEquals;
 
 
@@ -40,6 +41,7 @@ public class FriendshipStrengthModuleEmbeddedDeclarativeIntegrationTest {
                 .newImpermanentDatabaseBuilder()
                 .loadPropertiesFromFile(this.getClass().getClassLoader().getResource("neo4j-friendship.properties").getPath())
                 .newGraphDatabase();
+        registerShutdownHook(database);
     }
 
     @Test

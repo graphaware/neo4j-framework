@@ -9,7 +9,9 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-    @Configuration
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
+
+@Configuration
     public class Config {
 
         @Bean(destroyMethod = "shutdown")
@@ -19,6 +21,8 @@ import org.springframework.context.annotation.Configuration;
                     .loadPropertiesFromURL(
                             Config.class.getClassLoader().getResource("com/graphaware/runtime/spring/neo4j.properties"))
                     .newGraphDatabase();
+
+            registerShutdownHook(database);
 
             RuntimeRegistry.getRuntime(database).waitUntilStarted();
 

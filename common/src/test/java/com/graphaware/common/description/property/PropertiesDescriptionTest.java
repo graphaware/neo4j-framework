@@ -25,6 +25,8 @@ import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
+
 public abstract class PropertiesDescriptionTest {
 
     private GraphDatabaseService database;
@@ -35,6 +37,7 @@ public abstract class PropertiesDescriptionTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             Node root = database.createNode();

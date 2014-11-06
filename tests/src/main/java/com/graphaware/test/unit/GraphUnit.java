@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static org.junit.Assert.fail;
 import static org.neo4j.graphdb.Direction.OUTGOING;
@@ -64,6 +65,7 @@ public final class GraphUnit {
      */
     public static void assertSameGraph(GraphDatabaseService database, String sameGraphCypher) {
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(otherDatabase);
 
         new ExecutionEngine(otherDatabase).execute(sameGraphCypher);
 
@@ -90,6 +92,7 @@ public final class GraphUnit {
      */
     public static void assertSameGraph(GraphDatabaseService database, String sameGraphCypher, InclusionPolicies inclusionPolicies) {
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(otherDatabase);
 
         new ExecutionEngine(otherDatabase).execute(sameGraphCypher);
 
@@ -122,6 +125,7 @@ public final class GraphUnit {
      */
     public static void assertSubgraph(GraphDatabaseService database, String subgraphCypher) {
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(otherDatabase);
 
         new ExecutionEngine(otherDatabase).execute(subgraphCypher);
 
@@ -155,6 +159,7 @@ public final class GraphUnit {
      */
     public static void assertSubgraph(GraphDatabaseService database, String subgraphCypher, InclusionPolicies inclusionPolicies) {
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(otherDatabase);
 
         new ExecutionEngine(otherDatabase).execute(subgraphCypher);
 

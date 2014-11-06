@@ -12,6 +12,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import java.util.Collections;
 import java.util.Map;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.tx.event.improved.api.Change.changesToMap;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
@@ -26,6 +27,8 @@ public class ChangeTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
+
         new ExecutionEngine(database).execute("CREATE " +
                 "(a), " +
                 "(b {key:'value'})," +

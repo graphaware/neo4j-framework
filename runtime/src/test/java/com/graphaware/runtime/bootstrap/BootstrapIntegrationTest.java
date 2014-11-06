@@ -23,6 +23,7 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.config.InvalidSettingException;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
 import static com.graphaware.runtime.bootstrap.TestRuntimeModule.TEST_RUNTIME_MODULES;
 import static org.junit.Assert.*;
@@ -41,6 +42,8 @@ public class BootstrapIntegrationTest {
     public void moduleShouldNotBeInitializedWhenNoConfigProvided() throws InterruptedException {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
+        registerShutdownHook(database);
+
         assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
         database.shutdown();
@@ -55,6 +58,8 @@ public class BootstrapIntegrationTest {
                 .setConfig(RUNTIME_ENABLED, "false")
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newGraphDatabase();
+
+        registerShutdownHook(database);
 
         assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
@@ -71,6 +76,8 @@ public class BootstrapIntegrationTest {
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newGraphDatabase();
 
+        registerShutdownHook(database);
+
         assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
         database.shutdown();
@@ -85,6 +92,8 @@ public class BootstrapIntegrationTest {
                 .setConfig(RUNTIME_ENABLED, null)
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newGraphDatabase();
+
+        registerShutdownHook(database);
 
         assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
@@ -101,6 +110,8 @@ public class BootstrapIntegrationTest {
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
                 .newGraphDatabase();
+
+        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             database.createNode(); //tx just to kick off Runtime init
@@ -125,6 +136,8 @@ public class BootstrapIntegrationTest {
                 .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
                 .newGraphDatabase();
 
+        registerShutdownHook(database);
+
         Thread.sleep(1000);
 
         assertEquals(1, TEST_RUNTIME_MODULES.size());
@@ -144,6 +157,8 @@ public class BootstrapIntegrationTest {
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, null)
                 .newGraphDatabase();
 
+        registerShutdownHook(database);
+
         assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
         database.shutdown();
@@ -161,6 +176,8 @@ public class BootstrapIntegrationTest {
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
                 .newGraphDatabase();
+
+        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             database.createNode();
@@ -185,6 +202,8 @@ public class BootstrapIntegrationTest {
                 .setConfig("com.graphaware.module.test3.3", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .setConfig("com.graphaware.module.test2.2", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newGraphDatabase();
+
+        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             database.createNode();

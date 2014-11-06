@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -47,6 +48,8 @@ public class PropertyContainerUtilsTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
+
         new ExecutionEngine(database).execute("CREATE " +
                 "(a), " +
                 "(b {key:'value'})," +
@@ -134,6 +137,8 @@ public class PropertyContainerUtilsTest {
     @Test
     public void shouldDeleteNodeWithAllRelationships() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
+
         new ExecutionEngine(database).execute("CREATE " +
                 "(a), " +
                 "(b {name:'node1'})," +
@@ -250,6 +255,7 @@ public class PropertyContainerUtilsTest {
     private void populateDatabaseWithNumberProperties() {
         database.shutdown();
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             database.createNode().setProperty("test", (byte) 123);

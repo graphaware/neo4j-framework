@@ -1,7 +1,9 @@
 package com.graphaware.runtime;
 
+import com.graphaware.common.util.DatabaseUtils;
 import com.graphaware.runtime.bootstrap.RuntimeKernelExtension;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -11,6 +13,8 @@ import org.neo4j.test.RepeatRule;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Random;
+
+import static com.graphaware.common.util.DatabaseUtils.*;
 
 /**
  * Aux runtime tests for bugs found while doing manual testing.
@@ -25,6 +29,11 @@ public class OtherRuntimeTests {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+    @Before
+    public void createTempFolder() {
+        temporaryFolder.getRoot().deleteOnExit();
+    }
+
     @After
     public void deleteTempFolder() {
         temporaryFolder.delete();
@@ -37,6 +46,8 @@ public class OtherRuntimeTests {
                 .newImpermanentDatabaseBuilder()
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
+
+        registerShutdownHook(database);
 
         Thread.sleep(random.nextInt(10));
 
@@ -58,6 +69,8 @@ public class OtherRuntimeTests {
                 .newImpermanentDatabaseBuilder()
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
+
+        registerShutdownHook(database);
 
         Thread.sleep(random.nextInt(10));
 
@@ -83,6 +96,8 @@ public class OtherRuntimeTests {
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
+        registerShutdownHook(database);
+
         try (Transaction tx = database.beginTx()) {
             Node node = database.createNode();
             node.setProperty("test", "test");
@@ -100,6 +115,8 @@ public class OtherRuntimeTests {
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
+        registerShutdownHook(database);
+
         try (Transaction tx = database.beginTx()) {
             database.createNode();
             tx.success();
@@ -115,6 +132,8 @@ public class OtherRuntimeTests {
                 .newImpermanentDatabaseBuilder()
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
+
+        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             database.createNode(DynamicLabel.label("TEST"));
@@ -132,6 +151,8 @@ public class OtherRuntimeTests {
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
+        registerShutdownHook(database);
+
         try (Transaction tx = database.beginTx()) {
             Node node = database.createNode(DynamicLabel.label("TEST"));
             node.setProperty("test", "test");
@@ -148,6 +169,8 @@ public class OtherRuntimeTests {
                 .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot().getPath())
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
+
+        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             Node node = database.createNode(DynamicLabel.label("TEST"));

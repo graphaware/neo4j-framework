@@ -25,6 +25,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Map;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.example.FriendshipStrengthCounter.*;
 import static org.junit.Assert.assertEquals;
 
@@ -39,6 +40,8 @@ public class FriendshipStrengthCounterTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
+
         database.registerTransactionEventHandler(new FriendshipStrengthCounter(database));
     }
 

@@ -34,6 +34,7 @@ import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.*;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.*;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static com.graphaware.tx.event.improved.LazyTransactionDataComprehensiveTest.RelationshipTypes.*;
@@ -1678,6 +1679,7 @@ public class LazyTransactionDataComprehensiveTest {
 
     private void createTestDatabase() {
         db = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(db);
 
         new TestDataBuilder(db)
                 .node(label("TestLabel"))

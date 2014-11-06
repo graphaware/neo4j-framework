@@ -8,6 +8,7 @@ import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.RelationshipUtils.*;
 import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.*;
@@ -23,6 +24,7 @@ public class RelationshipUtilsTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             Node node1 = database.createNode();

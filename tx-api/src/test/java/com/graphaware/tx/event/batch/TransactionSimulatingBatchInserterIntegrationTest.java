@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.common.util.PropertyContainerUtils.propertiesToMap;
 import static com.graphaware.common.util.PropertyContainerUtils.propertyContainersToMap;
@@ -1144,6 +1145,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
     @Test
     public void shouldReturnAllNodesFromTheDatabaseWithGaps() {
         GraphDatabaseService database = new GraphDatabaseFactory().newEmbeddedDatabase(temporaryFolder.getRoot().getAbsolutePath());
+        registerShutdownHook(database);
 
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override

@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
+
 /**
  * Only for documentation. If you need to change this class, change the code in README.md as well please.
  */
@@ -21,6 +23,8 @@ public class JustForDocs {
 
     private void justForDocs() {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //only for demo, use your own persistent one!
+        registerShutdownHook(database);
+
         TransactionExecutor executor = new SimpleTransactionExecutor(database);
 
         executor.executeInTransaction(new VoidReturningCallback() {
@@ -33,6 +37,7 @@ public class JustForDocs {
 
     private void justForDocs2() {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //only for demo, use your own persistent one!
+        registerShutdownHook(database);
 
         List<String> nodeNames = Arrays.asList("Name1", "Name2", "Name3");  //there will be many more
 
@@ -50,6 +55,7 @@ public class JustForDocs {
 
     private void justForDocs5() {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //only for demo, use your own persistent one!
+        registerShutdownHook(database);
 
         BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(
                 database,
