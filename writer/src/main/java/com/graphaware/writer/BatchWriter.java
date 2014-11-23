@@ -63,14 +63,15 @@ public class BatchWriter extends SingleThreadedWriter implements DatabaseWriter 
             return;
         }
 
-        List<Runnable> tasks = new LinkedList<>();
+        List<RunnableFuture<?>> tasks = new LinkedList<>();
         queue.drainTo(tasks);
 
-        new IterableInputBatchTransactionExecutor<>(database, batchSize, tasks, new UnitOfWork<Runnable>() {
+        new IterableInputBatchTransactionExecutor<>(database, batchSize, tasks, new UnitOfWork<RunnableFuture<?>>() {
             @Override
-            public void execute(GraphDatabaseService database, Runnable input, int batchNumber, int stepNumber) {
+            public void execute(GraphDatabaseService database, RunnableFuture<?> input, int batchNumber, int stepNumber) {
                 try {
                     input.run();
+                    input.get();
                 } catch (Exception e) {
                     LOG.warn("Execution threw and exception.", e);
                 }
