@@ -161,7 +161,7 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
             public Boolean call() throws Exception {
                 throw new IOException("Deliberate Testing Exception");
             }
-        }, "test", 10);
+        }, "test", 50);
     }
 
     @Test
