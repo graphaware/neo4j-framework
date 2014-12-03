@@ -9,6 +9,8 @@ import com.graphaware.writer.TxPerTaskWriter;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
@@ -17,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test for {@link com.graphaware.writer.TxPerTaskWriter}.
@@ -88,9 +91,12 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
                 getDatabase().createNode();
                 return true;
             }
-        }, "test", 50);
+        }, "test", 200);
 
         assertTrue(result);
+
+       waitABit();
+
         try (Transaction tx = getDatabase().beginTx()) {
             assertEquals(1, IterableUtils.countNodes(getDatabase()));
             tx.success();

@@ -4,10 +4,14 @@ import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.server.WrappingNeoServerBootstrapper;
 import org.neo4j.server.configuration.Configurator;
 import org.neo4j.server.configuration.ServerConfigurator;
+import org.neo4j.server.configuration.ServerSettings;
 import org.neo4j.server.configuration.ThirdPartyJaxRsPackage;
 
 import java.util.Collections;
 import java.util.Map;
+
+import static org.neo4j.helpers.Settings.FALSE;
+import static org.neo4j.helpers.Settings.TRUE;
 
 /**
  * {@link DatabaseIntegrationTest} that starts the {@link WrappingNeoServerBootstrapper} as well,
@@ -66,7 +70,8 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
             configurator.getThirdpartyJaxRsPackages().add(new ThirdPartyJaxRsPackage(mapping.getKey(), mapping.getValue()));
         }
 
-        configurator.configuration().addProperty(Configurator.WEBSERVER_PORT_PROPERTY_KEY, neoServerPort());
+        configurator.configuration().addProperty(ServerSettings.webserver_port.name(), neoServerPort());
+        configurator.configuration().addProperty(ServerSettings.authorization_enabled.name(), FALSE);
 
         for (Map.Entry<String, String> config : additionalServerConfiguration().entrySet()) {
             configurator.configuration().addProperty(config.getKey(), config.getValue());
