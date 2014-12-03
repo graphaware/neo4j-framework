@@ -146,7 +146,7 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>org.neo4j</groupId>
         <artifactId>neo4j</artifactId>
-        <version>2.2-SNAPSHOT</version>
+        <version>2.2-M01</version>
         <scope>provided</scope>
     </dependency>
 
