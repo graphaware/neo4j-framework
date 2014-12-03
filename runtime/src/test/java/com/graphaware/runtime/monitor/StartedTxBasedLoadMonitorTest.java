@@ -8,6 +8,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.*;
 
 /**
@@ -21,6 +22,8 @@ public class StartedTxBasedLoadMonitorTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
+
         loadMonitor = new StartedTxBasedLoadMonitor(database, new RunningWindowAverage(200, 2000));
     }
 

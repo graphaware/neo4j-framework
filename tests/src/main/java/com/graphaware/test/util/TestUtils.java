@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import static org.junit.Assert.*;
 
@@ -76,7 +77,7 @@ public final class TestUtils {
      * @return JSON as String.
      */
     public static String jsonAsString(Class caller, String fileName) {
-        return jsonAsString(caller.getClass().getPackage().getName().replace(".", "/") + "/", fileName);
+        return jsonAsString(caller.getPackage().getName().replace(".", "/") + "/", fileName);
     }
 
     /**
@@ -89,7 +90,7 @@ public final class TestUtils {
      */
     public static String jsonAsString(String packagePath, String fileName) {
         try {
-            return IOUtils.toString(new ClassPathResource(packagePath + fileName + ".json").getInputStream());
+            return IOUtils.toString(new ClassPathResource(packagePath + fileName + ".json").getInputStream(), Charset.forName("UTF-8"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -185,12 +186,12 @@ public final class TestUtils {
             ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
                 @Override
                 public String handleResponse(final HttpResponse response) throws IOException {
-                    assertEquals(expectedStatusCode, response.getStatusLine().getStatusCode());
+                    String body = null;
                     if (response.getEntity() != null) {
-                        return EntityUtils.toString(response.getEntity());
-                    } else {
-                        return null;
+                        body = EntityUtils.toString(response.getEntity());
                     }
+                    assertEquals("Expected and actual status codes don't match. Response body: " + body, expectedStatusCode, response.getStatusLine().getStatusCode());
+                    return body;
                 }
             };
 
@@ -214,11 +215,13 @@ public final class TestUtils {
      * @return body of the server response.
      */
     public static String executeCypher(String serverUrl, String... cypherStatements) {
-        StringBuilder stringBuilder = new StringBuilder("{\"statements\" : [ {");
+        StringBuilder stringBuilder = new StringBuilder("{\"statements\" : [");
         for (String statement : cypherStatements) {
-            stringBuilder.append("\"statement\" : \"").append(statement).append("\"");
+            stringBuilder.append("{\"statement\" : \"").append(statement).append("\"}").append(",");
         }
-        stringBuilder.append("}]}");
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+
+        stringBuilder.append("]}");
 
         while (serverUrl.endsWith("/")) {
             serverUrl = serverUrl.substring(0, serverUrl.length() - 1);

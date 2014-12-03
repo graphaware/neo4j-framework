@@ -43,7 +43,7 @@ public final class RethrowException implements ExceptionHandlingStrategy {
      */
     @Override
     public void handleException(RuntimeException e) {
-        LOG.error("An exception occurred while executing transaction", e);
+        LOG.warn("An exception occurred while executing transaction", e);
         throw e;
     }
 

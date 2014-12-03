@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.countNodes;
 import static org.junit.Assert.assertEquals;
 
@@ -41,6 +42,7 @@ public class IterableInputBatchTransactionExecutorTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
     }
 
     @After

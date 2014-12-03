@@ -10,6 +10,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.neo4j.graphdb.Direction.*;
@@ -23,6 +24,7 @@ public class IncludeRelationshipsTest {
     @Test
     public void shouldIncludeCorrectRelationships() {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             Node n1 = database.createNode();

@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.neo4j.graphdb.DynamicLabel.label;
@@ -48,6 +49,8 @@ public class LazyTransactionDataSmokeTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
+
         executionEngine = new ExecutionEngine(database);
         eventHandler = new CapturingTransactionEventHandler();
         database.registerTransactionEventHandler(eventHandler);

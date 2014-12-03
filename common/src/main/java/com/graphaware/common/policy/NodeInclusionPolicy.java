@@ -23,4 +23,5 @@ import org.neo4j.graphdb.Node;
  * {@link PropertyContainerInclusionPolicy} for {@link Node}s.
  */
 public interface NodeInclusionPolicy extends PropertyContainerInclusionPolicy<Node> {
+    //todo good toString method on incl policies
 }

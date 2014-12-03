@@ -13,6 +13,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
 import static com.graphaware.common.policy.composite.CompositeNodeInclusionPolicy.*;
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.runtime.config.RuntimeConfiguration.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -26,6 +27,7 @@ public class IncludeBusinessNodesTest {
     @Test
     public void shouldIncludeCorrectRelationships() {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             Node n = database.createNode(label("Test"));

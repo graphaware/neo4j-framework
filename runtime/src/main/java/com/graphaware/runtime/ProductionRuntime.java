@@ -16,16 +16,17 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.TimerDrivenModuleManager;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.writer.DatabaseWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.NotFoundException;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -38,44 +39,35 @@ import java.util.Set;
  */
 public class ProductionRuntime extends DatabaseRuntime {
 
-    private static final Map<GraphDatabaseService, ProductionRuntime> RUNTIMES = new HashMap<>();
-
     private final TimerDrivenModuleManager timerDrivenModuleManager;
 
     /**
      * Construct a new runtime. Protected, please use {@link GraphAwareRuntimeFactory}.
      *
+     * @param configuration            config.
      * @param database                 on which the runtime operates.
      * @param txDrivenModuleManager    manager for transaction-driven modules.
      * @param timerDrivenModuleManager manager for timer-driven modules.
+     * @param databaseWriter           to use when writing to the database.
      */
-    protected ProductionRuntime(GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager) {
-        super(database, txDrivenModuleManager);
+    protected ProductionRuntime(RuntimeConfiguration configuration, GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager, DatabaseWriter databaseWriter) {
+        super(configuration, database, txDrivenModuleManager, databaseWriter);
         this.timerDrivenModuleManager = timerDrivenModuleManager;
 
-        if (getRuntime(database) != null) {
+        if (RuntimeRegistry.getRuntime(database) != null) {
             throw new IllegalStateException("It is not possible to create multiple runtimes for a single database!");
         }
 
-        RUNTIMES.put(database, this);
+        RuntimeRegistry.registerRuntime(database, this);
     }
 
-    /**
-     * Get the {@link ProductionRuntime} registered with the given database.
-     *
-     * @param database for which to get runtime.
-     * @return the runtime, null if none registered.
-     */
-    public static ProductionRuntime getRuntime(GraphDatabaseService database) {
-        return RUNTIMES.get(database);
-    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void doStart(boolean skipLoadingMetadata) {
-        super.doStart(skipLoadingMetadata);
+    protected void startModules(boolean skipLoadingMetadata) {
+        super.startModules(skipLoadingMetadata);
         timerDrivenModuleManager.startModules();
     }
 
@@ -124,6 +116,24 @@ public class ProductionRuntime extends DatabaseRuntime {
      * {@inheritDoc}
      */
     @Override
+    public <M extends RuntimeModule> M getModule(String moduleId, Class<M> clazz) throws NotFoundException {
+        try {
+            return super.getModule(moduleId, clazz);
+        } catch (NotFoundException e) {
+            M module = timerDrivenModuleManager.getModule(moduleId, clazz);
+
+            if (module == null) {
+                throw new NotFoundException("No module of type " + clazz.getName() + " with ID " + moduleId + " has been registered");
+            }
+
+            return module;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void shutdownModules() {
         super.shutdownModules();
 
@@ -136,6 +146,6 @@ public class ProductionRuntime extends DatabaseRuntime {
     @Override
     protected void afterShutdown(GraphDatabaseService database) {
         super.afterShutdown(database);
-        RUNTIMES.remove(database);
+        RuntimeRegistry.removeRuntime(database);
     }
 }

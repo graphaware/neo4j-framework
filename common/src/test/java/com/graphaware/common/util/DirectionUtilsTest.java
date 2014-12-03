@@ -25,6 +25,7 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.DirectionUtils.matches;
 import static com.graphaware.common.util.DirectionUtils.resolveDirection;
 import static junit.framework.Assert.*;
@@ -41,6 +42,7 @@ public class DirectionUtilsTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             Node node1 = database.createNode();

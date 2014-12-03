@@ -23,11 +23,15 @@ import com.graphaware.test.integration.DatabaseIntegrationTest;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.kernel.GraphDatabaseAPI;
+import org.neo4j.kernel.impl.core.NodeManager;
 
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 import static com.graphaware.test.unit.GraphUnit.clearGraph;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 
@@ -41,7 +45,7 @@ public class GraphUnitTest extends DatabaseIntegrationTest {
     }
 
     @Test
-    public void clearGraphWithRuntimeShouldDeleteAllNodesAndRelsExceptRoot() {
+    public void clearGraphWithRuntimeShouldDeleteAllNodesAndRelsButNotGraphProps() {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(getDatabase());
         runtime.start();
 
@@ -60,10 +64,10 @@ public class GraphUnitTest extends DatabaseIntegrationTest {
         }
 
         try (Transaction tx = getDatabase().beginTx()) {
-            assertEquals(1, count(at(getDatabase()).getAllNodes())); //The GA root
+            assertEquals(0, count(at(getDatabase()).getAllNodes()));
+            assertTrue((boolean) ((GraphDatabaseAPI) getDatabase()).getDependencyResolver().resolveDependency(NodeManager.class).getGraphProperties().getProperty("_GA_METADATA"));
             tx.success();
         }
-
     }
 
     @Test

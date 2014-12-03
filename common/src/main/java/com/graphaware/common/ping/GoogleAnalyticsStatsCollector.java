@@ -68,7 +68,7 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
             public void run() {
                 try {
                     //wait to make sure it's not a unit test or something like that
-                    Thread.sleep(30000);
+                    Thread.sleep(60000);
                 } catch (InterruptedException e) {
                     //do nothing
                 }

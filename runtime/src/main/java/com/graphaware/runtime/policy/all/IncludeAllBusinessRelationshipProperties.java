@@ -18,6 +18,8 @@ package com.graphaware.runtime.policy.all;
 
 import com.graphaware.common.policy.RelationshipPropertyInclusionPolicy;
 import com.graphaware.common.policy.all.IncludeAllRelationshipProperties;
+import com.graphaware.common.serialize.Serializer;
+import com.graphaware.common.serialize.SingletonSerializer;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.neo4j.graphdb.Relationship;
 
@@ -27,6 +29,10 @@ import org.neo4j.graphdb.Relationship;
  * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link com.graphaware.runtime.module.TxDrivenModule} internal properties.
  */
 public final class IncludeAllBusinessRelationshipProperties implements RelationshipPropertyInclusionPolicy {
+
+    static {
+        Serializer.register(IncludeAllBusinessRelationshipProperties.class, new SingletonSerializer());
+    }
 
     private static final RelationshipPropertyInclusionPolicy INSTANCE = new IncludeAllBusinessRelationshipProperties();
 

@@ -16,9 +16,11 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.writer.DatabaseWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
@@ -34,16 +36,21 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
 
     private final GraphDatabaseService database;
     private final TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager;
+    private final DatabaseWriter databaseWriter;
 
     /**
      * Construct a new runtime. Protected, please use {@link com.graphaware.runtime.GraphAwareRuntimeFactory}.
      *
+     * @param configuration         config.
      * @param database              on which the runtime operates.
      * @param txDrivenModuleManager manager for transaction-driven modules.
+     * @param databaseWriter        to use when writing to the database.
      */
-    protected DatabaseRuntime(GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager) {
+    protected DatabaseRuntime(RuntimeConfiguration configuration, GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, DatabaseWriter databaseWriter) {
+        super(configuration);
         this.database = database;
         this.txDrivenModuleManager = txDrivenModuleManager;
+        this.databaseWriter = databaseWriter;
         database.registerTransactionEventHandler(this);
         database.registerKernelEventHandler(this);
     }
@@ -90,5 +97,13 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
      */
     protected void afterShutdown(GraphDatabaseService database) {
         //for subclasses
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public DatabaseWriter getDatabaseWriter() {
+        return databaseWriter;
     }
 }

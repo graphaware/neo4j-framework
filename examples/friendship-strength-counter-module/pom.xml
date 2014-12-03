@@ -23,15 +23,15 @@
     <packaging>jar</packaging>
 
     <name>GraphAware Friendship Strength Counter Runtime Module</name>
-    <description>Example of a GraphAware Runtime Module</description>
+    <description>Example of a GraphAware Transaction-Driven Runtime Module</description>
     <url>http://graphaware.com</url>
 
     <properties>
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>2.2-SNAPSHOT</neo4j.version>
+        <neo4j.version>2.2.M01</neo4j.version>
         <graphware.version>2.2.0.19-SNAPSHOT</graphware.version>
-        <spring.version>4.0.0.RELEASE</spring.version>
+        <spring.version>4.1.1.RELEASE</spring.version>
     </properties>
 
     <profiles>
@@ -146,7 +146,7 @@
                 <version>2.9</version>
                 <configuration>
                     <links>
-                        <link>http://api.neo4j.org/2.2-SNAPSHOT/</link>
+                        <link>http://api.neo4j.org/2.2.M01/</link>
                     </links>
                 </configuration>
                 <executions>

@@ -16,10 +16,12 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
+import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 
@@ -35,6 +37,15 @@ import java.util.Set;
  * @param <T> implementation of {@link com.graphaware.runtime.module.TxDrivenModule} that this runtime supports.
  */
 public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGraphAwareRuntime implements TransactionEventHandler<Map<String, Object>> {
+
+    /**
+     * Create a new instance.
+     *
+     * @param configuration config.
+     */
+    protected TxDrivenRuntime(RuntimeConfiguration configuration) {
+        super(configuration);
+    }
 
     /**
      * Get the manager for {@link TxDrivenModule}s.
@@ -61,8 +72,6 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
         if (!isStarted(transactionData)) {
             return null;
         }
-
-        getTxDrivenModuleManager().throwExceptionIfIllegal(data);
 
         return getTxDrivenModuleManager().beforeCommit(transactionData);
     }
@@ -95,6 +104,20 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      * {@inheritDoc}
      */
     @Override
+    public <M extends RuntimeModule> M getModule(String moduleId, Class<M> clazz) throws NotFoundException {
+        M module = getTxDrivenModuleManager().getModule(moduleId, clazz);
+
+        if (module == null) {
+            throw new NotFoundException("No module of type " + clazz.getName() + " with ID " + moduleId + " has been registered");
+        }
+
+        return module;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected Set<String> loadMetadata() {
         return getTxDrivenModuleManager().loadMetadata();
     }
@@ -111,8 +134,8 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      * {@inheritDoc}
      */
     @Override
-    protected void doStart(boolean skipLoadingMetadata) {
-        super.doStart(skipLoadingMetadata);
+    protected void startModules(boolean skipLoadingMetadata) {
+        super.startModules(skipLoadingMetadata);
         getTxDrivenModuleManager().startModules();
     }
 

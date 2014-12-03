@@ -11,7 +11,6 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Integration test for Spring.
  */
-@Ignore("until release of changefeed compatible with this")
 public class SpringIntegrationTest {
 
     @Test

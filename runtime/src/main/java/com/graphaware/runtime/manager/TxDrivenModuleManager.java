@@ -13,19 +13,6 @@ import java.util.Queue;
 public interface TxDrivenModuleManager<T extends TxDrivenModule> extends ModuleManager<T> {
 
     /**
-     * Throw an exception if the transaction that's about to be committed does something illegal from the manager's
-     * point of view.
-     * <p/>
-     * Note that the same thing could be done in the {@link #beforeCommit(com.graphaware.tx.event.improved.data.TransactionDataContainer)}
-     * method. This is a performance optimization to avoid translating {@link TransactionData} into {@link TransactionDataContainer}
-     * when the transaction is illegal anyway.
-     *
-     * @param transactionData about-to-be-committed transaction data.
-     * @throws IllegalStateException if the transaction is illegal.
-     */
-    void throwExceptionIfIllegal(TransactionData transactionData);
-
-    /**
      * Delegate work to modules before a transaction is committed.
      *
      * @param transactionData about-to-be-committed transaction data.

@@ -21,6 +21,10 @@ Add the following snippet to your pom.xml:
 </dependency>
 ```
 
+Note: if your pom.xml inherits from a parent that brings in a Jetty version (e.g. if you're using Spring Boot), please put
+the following in your `<properties>` section:
+`<jetty.version>9.0.5.v20130815</jetty.version>`
+
 <a name="graphunit"/>
 ### GraphUnit
 

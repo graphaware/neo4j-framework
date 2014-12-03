@@ -4,10 +4,14 @@ import static org.neo4j.helpers.Settings.INTEGER;
 import static org.neo4j.helpers.Settings.LONG;
 import static org.neo4j.helpers.Settings.setting;
 
+import com.graphaware.runtime.config.function.StringToDatabaseWriterType;
 import com.graphaware.runtime.config.function.StringToTimingStrategy;
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
+import com.graphaware.runtime.write.DatabaseWriterType;
+import com.graphaware.runtime.write.FluentWritingConfig;
+import com.graphaware.runtime.write.WritingConfig;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.kernel.configuration.Config;
 
@@ -15,9 +19,9 @@ import org.neo4j.kernel.configuration.Config;
  * Implementation of {@link RuntimeConfiguration} that loads bespoke settings from Neo4j's configuration properties, falling
  * back to default values when overrides aren't available. Intended for internal framework use, mainly for server deployments.
  * <p/>
- * So far, the only thing that is configured using this mechanism is the {@link TimingStrategy} for the {@link com.graphaware.runtime.GraphAwareRuntime}.
+ * There are two main things configured using this mechanism: the {@link TimingStrategy} and the {@link DatabaseWriterType}.
  * <p/>
- * There are two choices: {@link AdaptiveTimingStrategy}, configured by using the following settings
+ * For {@link TimingStrategy}, there are two choices. The first one is {@link AdaptiveTimingStrategy}, configured by using the following settings
  * <pre>
  *     com.graphaware.runtime.timing.strategy=adaptive
  *     com.graphaware.runtime.timing.delay=2000
@@ -25,8 +29,7 @@ import org.neo4j.kernel.configuration.Config;
  *     com.graphaware.runtime.timing.minDelay=5
  *     com.graphaware.runtime.timing.busyThreshold=100
  *     com.graphaware.runtime.timing.maxSamples=200
- *     com.graphaware.runtime.timing.maxTime=2000
- *
+ *     com.graphaware.runtime.timing.maxTime=2000*
  * </pre>
  * The above are also the default values, if no configuration is provided. For exact meaning of the values, please refer
  * to the Javadoc of {@link AdaptiveTimingStrategy}.
@@ -37,9 +40,37 @@ import org.neo4j.kernel.configuration.Config;
  *     com.graphaware.runtime.timing.delay=200
  *     com.graphaware.runtime.timing.initialDelay=1000
  * </pre>
+ * <p/>
+ * For {@link WritingConfig}, there are three choices:
+ * <pre>
+ *     com.graphaware.runtime.db.writer=default
+ * </pre>
+ * results in a {@link com.graphaware.writer.DefaultWriter} being constructed.
+ * <p/>
+ * <pre>
+ *     com.graphaware.runtime.db.writer=single
+ *     #optional queue size, defaults to 10,000
+ *     com.graphaware.runtime.db.writer.queueSize=10000
+ * </pre>
+ * results in a {@link com.graphaware.writer.TxPerTaskWriter} being constructed with the configured queue size
+ * <p/>
+ * <pre>
+ *     com.graphaware.runtime.db.writer=batch
+ *     #optional queue size, defaults to 10,000
+ *     com.graphaware.runtime.db.writer.queueSize=10000
+ *     #optional batch size, defaults to 1,000
+ *     com.graphaware.runtime.db.writer.batchSize=1000
+ * </pre>
+ * results in a {@link com.graphaware.writer.BatchWriter} being constructed with the configured queue and batch sizes.
  */
-public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfiguration {
+public final class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfiguration {
 
+    //writer
+    private static final Setting<DatabaseWriterType> DATABASE_WRITER_TYPE_SETTING = setting("com.graphaware.runtime.db.writer", StringToDatabaseWriterType.getInstance(), (String) null);
+    private static final Setting<Integer> WRITER_QUEUE_SIZE = setting("com.graphaware.runtime.db.writer.queueSize", INTEGER, (String) null);
+    private static final Setting<Integer> WRITER_BATCH_SIZE = setting("com.graphaware.runtime.db.writer.batchSize", INTEGER, (String) null);
+
+    //timing
     private static final Setting<TimingStrategy> TIMING_STRATEGY_SETTING = setting("com.graphaware.runtime.timing.strategy", StringToTimingStrategy.getInstance(), (String) null);
 
     //for both policies, this is the main (default, mean, whatever) delay
@@ -55,22 +86,16 @@ public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfigurati
     private static final Setting<Integer> MAX_SAMPLES_SETTING = setting("com.graphaware.runtime.timing.maxSamples", INTEGER, (String) null);
     private static final Setting<Integer> MAX_TIME_SETTING = setting("com.graphaware.runtime.timing.maxTime", INTEGER, (String) null);
 
-    private final Config config;
-
     /**
      * Constructs a new {@link Neo4jConfigBasedRuntimeConfiguration} based on the given Neo4j {@link Config}.
      *
      * @param config The {@link Config} containing the settings used to configure the runtime
      */
     public Neo4jConfigBasedRuntimeConfiguration(Config config) {
-        this.config = config;
+        super(createTimingStrategy(config), createWritingConfig(config));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TimingStrategy getTimingStrategy() {
+    private static TimingStrategy createTimingStrategy(Config config) {
         TimingStrategy timingStrategy = config.get(TIMING_STRATEGY_SETTING);
 
         if (timingStrategy == null) {
@@ -123,4 +148,26 @@ public class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfigurati
 
         throw new IllegalStateException("Unknown timing strategy!");
     }
+
+    private static WritingConfig createWritingConfig(Config config) {
+        DatabaseWriterType databaseWriterType = config.get(DATABASE_WRITER_TYPE_SETTING);
+
+        FluentWritingConfig result = FluentWritingConfig.defaultConfiguration();
+
+        if (databaseWriterType != null) {
+            result = result.withWriterType(databaseWriterType);
+        }
+
+        if (config.get(WRITER_QUEUE_SIZE) != null) {
+            result = result.withQueueSize(config.get(WRITER_QUEUE_SIZE));
+        }
+
+        if (config.get(WRITER_BATCH_SIZE) != null) {
+            result = result.withBatchSize(config.get(WRITER_BATCH_SIZE));
+        }
+
+        return result;
+    }
+
+
 }

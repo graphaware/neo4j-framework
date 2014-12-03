@@ -1,8 +1,8 @@
 package com.graphaware.runtime.manager;
 
-import java.util.Set;
-
 import com.graphaware.runtime.module.RuntimeModule;
+
+import java.util.Set;
 
 /**
  * A manager of {@link RuntimeModule}s, which takes care of their lifecycle.
@@ -26,6 +26,16 @@ public interface ModuleManager<T extends RuntimeModule> {
      * @throws IllegalStateException in case the module is already registered.
      */
     void registerModule(T module);
+
+    /**
+     * Get a module registered with the manager.
+     *
+     * @param moduleId module ID.
+     * @param clazz    expected class of the module.
+     * @param <M>      type of the class above.
+     * @return module, <code>null</code> if no such module exists.
+     */
+    <M extends RuntimeModule> M getModule(String moduleId, Class<M> clazz);
 
     /**
      * Load module metadata from wherever they are stored in between database restarts and do whatever is necessary

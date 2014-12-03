@@ -18,6 +18,8 @@ package com.graphaware.runtime.config;
 
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
+import com.graphaware.runtime.write.FluentWritingConfig;
+import com.graphaware.runtime.write.WritingConfig;
 
 /**
  * {@link RuntimeConfiguration} for {@link com.graphaware.runtime.GraphAwareRuntime} with fluent interface.
@@ -25,19 +27,17 @@ import com.graphaware.runtime.schedule.TimingStrategy;
  */
 public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
 
-    private final TimingStrategy timingStrategy;
-
     /**
      * Creates an instance with default values.
      *
      * @return The {@link FluentRuntimeConfiguration} instance.
      */
     public static FluentRuntimeConfiguration defaultConfiguration() {
-        return new FluentRuntimeConfiguration(AdaptiveTimingStrategy.defaultConfiguration());
+        return new FluentRuntimeConfiguration(AdaptiveTimingStrategy.defaultConfiguration(), FluentWritingConfig.defaultConfiguration());
     }
 
-    private FluentRuntimeConfiguration(TimingStrategy timingStrategy) {
-        this.timingStrategy = timingStrategy;
+    private FluentRuntimeConfiguration(TimingStrategy timingStrategy, WritingConfig writingConfig) {
+        super(timingStrategy, writingConfig);
     }
 
     /**
@@ -47,37 +47,16 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      * @return new instance.
      */
     public FluentRuntimeConfiguration withTimingStrategy(TimingStrategy timingStrategy) {
-        return new FluentRuntimeConfiguration(timingStrategy);
+        return new FluentRuntimeConfiguration(timingStrategy, getWritingConfig());
     }
 
     /**
-     * {@inheritDoc}
+     * Create an instance with different {@link WritingConfig}.
+     *
+     * @param writingConfig of the new instance.
+     * @return new instance.
      */
-    @Override
-    public TimingStrategy getTimingStrategy() {
-        return timingStrategy;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        FluentRuntimeConfiguration that = (FluentRuntimeConfiguration) o;
-
-        if (!timingStrategy.equals(that.timingStrategy)) return false;
-
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return timingStrategy.hashCode();
+    public FluentRuntimeConfiguration withWritingConfig(WritingConfig writingConfig) {
+        return new FluentRuntimeConfiguration(getTimingStrategy(), writingConfig);
     }
 }

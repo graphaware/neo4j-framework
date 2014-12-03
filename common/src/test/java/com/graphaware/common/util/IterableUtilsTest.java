@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.*;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
@@ -45,6 +46,7 @@ public class IterableUtilsTest {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
     }
 
     @After
@@ -108,6 +110,7 @@ public class IterableUtilsTest {
     @Test
     public void testRandom() {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             database.createNode();
@@ -168,6 +171,48 @@ public class IterableUtilsTest {
     public void exceptionShouldBeThrownWhenIterableHasMoreThanOneElement2() {
         getSingle(Arrays.asList("test1", "test2"));
     }
+
+    //
+
+    @Test
+    public void firstElementShouldBeReturnedWhenIterableHasOneElement() {
+        assertEquals("test", getFirstOrNull(Collections.singletonList("test")));
+    }
+
+    @Test
+    public void firstElementShouldBeReturnedWhenIterableHasOneElement2() {
+        assertEquals("test", getFirst(Collections.singletonList("test"), "test"));
+    }
+
+    @Test
+    public void nullShouldBeReturnedWhenIterableHasNoElementsWhenRequestingFirst() {
+        assertNull(getFirstOrNull(Collections.emptyList()));
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void exceptionShouldBeThrownWhenIterableHasNoElementsWhenRequestingFirst() {
+        getFirst(Collections.emptyList(), "test");
+    }
+
+    @Test
+    public void exceptionShouldBeThrownWhenIterableHasNoElements2WhenRequestingFirst() {
+        try {
+            getFirst(Collections.emptyList(), "test");
+        } catch (NotFoundException e) {
+            assertEquals("test", e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldReturnFirstWhenThereIsMoreThanOne() {
+        assertEquals("test1", getFirstOrNull(Arrays.asList("test1", "test2")));
+    }
+
+    @Test
+    public void exceptionShouldBeThrownWhenIterableHasMoreThanOneElement2WhenRequestingFirst() {
+        assertEquals("test1", getFirst(Arrays.asList("test1", "test2"), "test"));
+    }
+
 
     @Test
     public void shouldSampleIterable() {

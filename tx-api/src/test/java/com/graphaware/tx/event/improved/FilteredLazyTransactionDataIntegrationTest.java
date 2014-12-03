@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.common.util.IterableUtils.countNodes;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
@@ -1498,6 +1499,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
     private void createTestDatabase() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
 
         new TestDataBuilder(database)
                 .node() //ID=0
@@ -1560,6 +1562,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
     private void createTestDatabaseForInternalTest() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
 
         new TestDataBuilder(database)
                 .node() //ID=0

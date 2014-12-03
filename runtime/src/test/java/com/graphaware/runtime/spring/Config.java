@@ -2,7 +2,6 @@ package com.graphaware.runtime.spring;
 
 import com.graphaware.module.changefeed.cache.CachingGraphChangeReader;
 import com.graphaware.module.changefeed.io.GraphChangeReader;
-import com.graphaware.runtime.ProductionRuntime;
 import org.junit.rules.TemporaryFolder;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
@@ -11,9 +10,10 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 
-//@Configuration
-public class Config {
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 
+@Configuration
+public class Config {
     @Bean(destroyMethod = "shutdown")
     public GraphDatabaseService graphDatabaseService(TemporaryFolder temporaryFolder) {
         GraphDatabaseService database = new GraphDatabaseFactory()
@@ -21,8 +21,9 @@ public class Config {
                 .loadPropertiesFromURL(
                         Config.class.getClassLoader().getResource("com/graphaware/runtime/spring/neo4j.properties"))
                 .newGraphDatabase();
+        registerShutdownHook(database);
 
-        ProductionRuntime.getRuntime(database).waitUntilStarted();
+        RuntimeRegistry.getRuntime(database).waitUntilStarted();
 
         return database;
     }

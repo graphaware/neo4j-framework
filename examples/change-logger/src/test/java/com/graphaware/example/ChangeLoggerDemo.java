@@ -20,13 +20,14 @@ import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.example.ChangeLogger.*;
-import static org.junit.Assert.assertEquals;
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.graphdb.DynamicLabel.*;
+import static org.neo4j.graphdb.DynamicLabel.label;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 
@@ -40,6 +41,7 @@ public class ChangeLoggerDemo {
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
         database.registerTransactionEventHandler(new ChangeLogger());
     }
 

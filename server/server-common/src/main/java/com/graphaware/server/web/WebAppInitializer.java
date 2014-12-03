@@ -16,6 +16,8 @@
 
 package com.graphaware.server.web;
 
+import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.RuntimeRegistry;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
@@ -37,6 +39,13 @@ public class WebAppInitializer extends AbstractDispatcherServletInitializer {
     protected WebApplicationContext createServletApplicationContext() {
         GenericApplicationContext parent = new GenericApplicationContext();
         parent.getBeanFactory().registerSingleton("database", database);
+
+        GraphAwareRuntime runtime = RuntimeRegistry.getRuntime(database);
+        if (runtime != null) {
+            runtime.waitUntilStarted();
+            parent.getBeanFactory().registerSingleton("databaseWriter", runtime.getDatabaseWriter());
+        }
+
         parent.refresh();
 
         AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();

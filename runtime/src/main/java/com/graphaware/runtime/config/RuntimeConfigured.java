@@ -18,7 +18,10 @@ package com.graphaware.runtime.config;
 
 /**
  * Component configurable by {@link com.graphaware.runtime.GraphAwareRuntime}.
+ *
+ * @deprecated this is a legacy interface and should not need to be used.
  */
+@Deprecated
 public interface RuntimeConfigured {
 
     /**

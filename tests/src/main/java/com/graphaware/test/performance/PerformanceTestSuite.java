@@ -27,6 +27,8 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import java.io.IOException;
 import java.util.*;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
+
 /**
  * Base class for suites of {@link PerformanceTest}s.
  */
@@ -175,6 +177,8 @@ public abstract class PerformanceTestSuite {
 
         database = graphDatabaseBuilder.newGraphDatabase();
 
+        registerShutdownHook(database);
+
         performanceTest.prepareDatabase(database, params);
     }
 
@@ -185,6 +189,7 @@ public abstract class PerformanceTestSuite {
         temporaryFolder = new TemporaryFolder();
         try {
             temporaryFolder.create();
+            temporaryFolder.getRoot().deleteOnExit();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

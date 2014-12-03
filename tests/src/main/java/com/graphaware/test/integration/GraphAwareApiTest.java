@@ -21,8 +21,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.test.TestGraphDatabaseFactory;
 
 import javax.servlet.ServletException;
 
@@ -35,7 +33,7 @@ import javax.servlet.ServletException;
  * <p/>
  * Allows implementing tests to call {@link #getDatabase()} and thus gain low-level access to the database
  * even when running within a server. This is useful, for instance, when using
- * {@link com.graphaware.test.unit.GraphUnit} to assert the database state state. Before tests are run, the database can be populated
+ * {@link com.graphaware.test.unit.GraphUnit} to assert the database state. Before tests are run, the database can be populated
  * by overriding the {@link #populateDatabase(org.neo4j.graphdb.GraphDatabaseService)} method, which is guaranteed to
  * run in a transaction.
  */

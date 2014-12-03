@@ -15,15 +15,16 @@ Features Overview
 
 On a high level, there are two key pieces of functionality:
 * [GraphAware Server](server) is a Neo4j server extension that allows developers to rapidly build (REST) APIs
-on top of Neo4j using Spring MVC, rather than JAX-RS.
+on top of Neo4j using Spring MVC, rather than JAX-RS
 * [GraphAware Runtime](runtime) is a runtime environment for both embedded and server deployments, which
 allows the use of pre-built as well as custom modules called [GraphAware Runtime Modules](runtime). These
 modules typically extend the core functionality of the database by
     * transparently enriching/modifying/preventing ongoing transactions in real-time
     * performing continuous computations on the graph in the background
 
-Whether or not you use the code in this repository as a framework or runtime as described above, you can always add it
-as a dependency and take advantage of its useful features. For Java developers only(1), the following functionality is provided:
+Whether or not you use the code in this repository as a framework or runtime as described above, you can always use it
+ as a software library by adding it as a dependency to your project, and take advantage of its useful features.
+ For Java developers only(1), the following functionality is provided:
 
 * [GraphAware Test](tests)
     * [GraphUnit](tests#graphunit) - simple graph unit-testing
@@ -31,10 +32,13 @@ as a dependency and take advantage of its useful features. For Java developers o
     * [Performance Testing](tests#perftest) - support for performance testing
 * [Improved Neo4j Transaction API](tx-api)
 * [Transaction Executor](tx-executor) and [Batch Transaction Executor](tx-executor#batch-tx)
+* [Database Writer](writer)
 * [Miscellaneous Utilities](common)
 
 (1) i.e., for embedded mode users, managed/unmanaged extensions developers, [GraphAware Runtime Module](#runtime)
  developers and framework-powered Spring MVC controller developers
+
+Please take a look at the provided [examples](examples).
 
 Framework Usage
 ---------------
@@ -89,7 +93,7 @@ The version number has two parts. The first three numbers indicate compatibility
 Data Collection
 ---------------
 
-Note that framework sends a POST request to Google Analytics 30 seconds after start just so we know how many people
+Note that framework sends a POST request to Google Analytics 60 seconds after start just so we know how many people
 actually use it. The only data transmitted are module class names, version and edition of the framework,
 and an anonymous UUID that changes with restart.
 

@@ -24,7 +24,10 @@ import org.neo4j.server.web.WebServer;
 
 /**
  *  {@link org.neo4j.server.WrappingNeoServer} that uses {@link com.graphaware.server.web.GraphAwareJetty9WebServer}.
+ *
+ *  @deprecated because parent class is as well.
  */
+@Deprecated
 public class GraphAwareWrappingNeoServer extends WrappingNeoServer {
 
     public GraphAwareWrappingNeoServer(GraphDatabaseAPI db) {

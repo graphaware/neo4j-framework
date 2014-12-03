@@ -129,7 +129,7 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
             }
         }
 
-        LOG.info("Successfully executed " + successfulSteps + " (out of " + totalSteps.get() + " ) steps in " + batches + " batches");
+        LOG.debug("Successfully executed " + successfulSteps + " (out of " + totalSteps.get() + " ) steps in " + batches + " batches");
         if (successfulSteps.get() != totalSteps.get()) {
             LOG.warn("Failed to execute " + (totalSteps.get() - successfulSteps.get()) + " steps!");
         }

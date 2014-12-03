@@ -5,7 +5,7 @@ This (Maven) module is part of the [GraphAware Neo4j Framework](https://github.c
 
 ### Introduction
 
-This module provides a decorator of the Neo4j Transaction Event API (called [`TransactionData`](http://docs.neo4j.org/chunked/2.2-SNAPSHOT/javadocs/org/neo4j/graphdb/event/TransactionData.html)).
+This module provides a decorator of the Neo4j Transaction Event API (called [`TransactionData`](http://docs.neo4j.org/chunked/2.2.M01/javadocs/org/neo4j/graphdb/event/TransactionData.html)).
 Before a transaction commits, the improved API allows users to traverse the new version of the graph (as it will be
 after the transaction commits), as well as a "snapshot" of the old graph (as it was before the transaction started).
 It provides a clean API to access information about changes performed by the transaction as well as the option to
@@ -16,7 +16,7 @@ been deleted in this tx` when trying to access properties of nodes/relationships
 easily access relationships/nodes that were changed and/or deleted in a transaction, again completely exception-free.
 
 The target audience of this module are advanced Neo4j users, mostly Java developers developing Neo4j
-[`TransactionEventHandler`](http://docs.neo4j.org/chunked/2.2-SNAPSHOT/javadocs/org/neo4j/graphdb/event/TransactionEventHandler.html)s.
+[`TransactionEventHandler`](http://docs.neo4j.org/chunked/2.2.M01/javadocs/org/neo4j/graphdb/event/TransactionEventHandler.html)s.
 The module is also one of the key components of [GraphAware Runtime](../runtime).
 
 ### Getting the Module
@@ -27,7 +27,11 @@ Add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>tx-api</artifactId>
+<<<<<<< HEAD
     <version>2.2.0.19</version>
+=======
+    <version>2.1.6.26</version>
+>>>>>>> master
 </dependency>
 ```
 
@@ -266,16 +270,6 @@ To summarize, this API gives access to two versions of the same graph. Through c
  current versions, one can traverse the current version of the graph as it will be after the transaction commits.
  Through deleted and/or previous versions of `PropertyContainer`s, one can traverse the previous snapshot of the graph,
  as it was before the transaction started.
-
-### Batch Usage
-
-In case you would like to use the Neo4j `BatchInserter` API but still get access to `ImprovedTransactionData` during
-batch insert operations, [`TransactionSimulatingBatchInserterImpl`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/event/batch/api/TransactionSimulatingBatchInserterImpl.html) is the class for you. It is a `BatchInserter` but
-allows `TransactionEventHandler`s to be registered on it. It then simulates a transaction commit every once in a while
-(configurable, please refer to Javadoc).
-
-As a `GraphDatabaseService` equivalent for batch inserts, this project provides [`TransactionSimulatingBatchGraphDatabase`](http://graphaware.com/site/framework/latest/apidocs/org/neo4j/unsafe/batchinsert/TransactionSimulatingBatchGraphDatabase.html)
-for completeness, but its usage is discouraged.
 
 License
 -------

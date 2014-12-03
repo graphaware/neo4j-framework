@@ -25,7 +25,10 @@ import org.neo4j.unsafe.batchinsert.BatchInserter;
  * despite the fact that there are no transactions involved. Therefore, {@link org.neo4j.graphdb.event.TransactionEventHandler}
  * can be registered on it. It is up to the implementations to decide when / how often to simulate a "transaction commit"
  * and call {@link org.neo4j.graphdb.event.TransactionEventHandler} methods.
+ *
+ * @deprecated there is little need for this class, the framework no longer supports batch insertion while its running
  */
+@Deprecated
 public interface TransactionSimulatingBatchInserter extends BatchInserter {
 
     /**

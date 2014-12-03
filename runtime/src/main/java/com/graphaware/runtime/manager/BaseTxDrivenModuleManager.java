@@ -1,18 +1,19 @@
 package com.graphaware.runtime.manager;
 
-import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
-import com.graphaware.runtime.module.NeedsInitializationException;
 import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
+import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
+import com.graphaware.runtime.module.NeedsInitializationException;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
-import org.neo4j.graphdb.event.TransactionData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * {@link BaseModuleManager} for {@link TxDrivenModule}s.
@@ -28,14 +29,6 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      */
     protected BaseTxDrivenModuleManager(ModuleMetadataRepository metadataRepository) {
         super(metadataRepository);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void throwExceptionIfIllegal(TransactionData transactionData) {
-        metadataRepository.throwExceptionIfIllegal(transactionData);
     }
 
     /**
@@ -91,7 +84,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
     @Override
     public void startModules() {
         LOG.info("Starting transaction-driven modules...");
-        for (T module : modules) {
+        for (T module : modules.values()) {
             start(module);
         }
         LOG.info("Transaction-driven modules started.");
@@ -141,7 +134,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
     public Map<String, Object> beforeCommit(TransactionDataContainer transactionData) {
         Map<String, Object> result = new HashMap<>();
 
-        for (T module : modules) {
+        for (T module : modules.values()) {
             FilteredTransactionData filteredTransactionData = new FilteredTransactionData(transactionData, module.getConfiguration().getInclusionPolicies());
 
             if (!filteredTransactionData.mutationsOccurred()) {
@@ -178,7 +171,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      */
     @Override
     public void afterCommit(Map<String, Object> states) {
-        for (T module : modules) {
+        for (T module : modules.values()) {
             if (!states.containsKey(module.getId())) {
                 return; //perhaps module wasn't interested, or threw RuntimeException
             }
@@ -192,7 +185,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      */
     @Override
     public void afterRollback(Map<String, Object> states) {
-        for (T module : modules) {
+        for (T module : modules.values()) {
             if (!states.containsKey(module.getId())) {
                 return; //rollback happened before this module had a go
             }

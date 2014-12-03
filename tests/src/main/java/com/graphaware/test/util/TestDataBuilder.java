@@ -20,7 +20,10 @@ import org.neo4j.graphdb.*;
 
 /**
  * A convenient test data builder with fluent API.
+ *
+ * @deprecated in favour of populating the graph with Cypher.
  */
+@Deprecated
 public class TestDataBuilder {
 
     private final GraphDatabaseService database;

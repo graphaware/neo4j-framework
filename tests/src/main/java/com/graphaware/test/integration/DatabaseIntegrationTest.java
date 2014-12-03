@@ -6,6 +6,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
+
 /**
  * Base class for all kinds of Neo4j integration tests.
  * <p/>
@@ -46,7 +48,9 @@ public abstract class DatabaseIntegrationTest {
      * @return new database.
      */
     protected GraphDatabaseService createDatabase() {
-        return new TestGraphDatabaseFactory().newImpermanentDatabase();
+        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
+        return database;
     }
 
     /**

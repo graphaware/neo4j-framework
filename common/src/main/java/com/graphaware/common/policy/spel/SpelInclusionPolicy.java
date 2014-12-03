@@ -9,10 +9,12 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
  */
 public abstract class SpelInclusionPolicy {
 
-    protected final Expression exp;
+    protected transient final Expression exp;
+    private final String expression;
 
     protected SpelInclusionPolicy(String expression) {
-        exp = new SpelExpressionParser().parseExpression(expression);
+        this.expression = expression;
+        this.exp = new SpelExpressionParser().parseExpression(expression);
     }
 
     /**
@@ -20,7 +22,7 @@ public abstract class SpelInclusionPolicy {
      */
     @Override
     public String toString() {
-        return "SpelInclusionPolicy{exp=" + exp + "}";
+        return expression;
     }
 
     /**
@@ -33,7 +35,7 @@ public abstract class SpelInclusionPolicy {
 
         SpelInclusionPolicy that = (SpelInclusionPolicy) o;
 
-        if (!exp.getExpressionString().equals(that.exp.getExpressionString())) return false;
+        if (!expression.equals(that.expression)) return false;
 
         return true;
     }
@@ -43,6 +45,6 @@ public abstract class SpelInclusionPolicy {
      */
     @Override
     public int hashCode() {
-        return exp.getExpressionString().hashCode();
+        return expression.hashCode();
     }
 }

@@ -26,8 +26,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.helpers.collection.Iterables.count;
@@ -65,6 +65,7 @@ public final class GraphUnit {
      */
     public static void assertSameGraph(GraphDatabaseService database, String sameGraphCypher) {
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(otherDatabase);
 
         new ExecutionEngine(otherDatabase).execute(sameGraphCypher);
 
@@ -91,6 +92,7 @@ public final class GraphUnit {
      */
     public static void assertSameGraph(GraphDatabaseService database, String sameGraphCypher, InclusionPolicies inclusionPolicies) {
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(otherDatabase);
 
         new ExecutionEngine(otherDatabase).execute(sameGraphCypher);
 
@@ -123,6 +125,7 @@ public final class GraphUnit {
      */
     public static void assertSubgraph(GraphDatabaseService database, String subgraphCypher) {
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(otherDatabase);
 
         new ExecutionEngine(otherDatabase).execute(subgraphCypher);
 
@@ -156,6 +159,7 @@ public final class GraphUnit {
      */
     public static void assertSubgraph(GraphDatabaseService database, String subgraphCypher, InclusionPolicies inclusionPolicies) {
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(otherDatabase);
 
         new ExecutionEngine(otherDatabase).execute(subgraphCypher);
 
@@ -199,8 +203,8 @@ public final class GraphUnit {
     private static void assertSameGraph(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies InclusionPolicies) {
         try (Transaction tx = database.beginTx()) {
             try (Transaction tx2 = otherDatabase.beginTx()) {
-                assertSameNumbersOfElements(database, otherDatabase, InclusionPolicies);
-                doAssertSubgraph(database, otherDatabase, InclusionPolicies);
+                doAssertSubgraph(database, otherDatabase, InclusionPolicies, "existing database");
+                doAssertSubgraph(otherDatabase, database, InclusionPolicies, "Cypher-created database");
                 tx2.failure();
             }
             tx.failure();
@@ -210,47 +214,19 @@ public final class GraphUnit {
     private static void assertSubgraph(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies InclusionPolicies) {
         try (Transaction tx = database.beginTx()) {
             try (Transaction tx2 = otherDatabase.beginTx()) {
-                doAssertSubgraph(database, otherDatabase, InclusionPolicies);
+                doAssertSubgraph(database, otherDatabase, InclusionPolicies, "existing database");
                 tx2.failure();
             }
             tx.failure();
         }
     }
 
-    private static void assertSameNumbersOfElements(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies inclusionPolicies) {
-        int nodeCount = 0, otherNodeCount = 0;
-        for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
-            if (isNodeIncluded(node, inclusionPolicies)) {
-                nodeCount++;
-            }
-        }
-        for (Node node : GlobalGraphOperations.at(otherDatabase).getAllNodes()) {
-            if (isNodeIncluded(node, inclusionPolicies)) {
-                otherNodeCount++;
-            }
-        }
-        assertEquals("There are different numbers of nodes in the two graphs", otherNodeCount, nodeCount);
-
-        int relCount = 0, otherRelCount = 0;
-        for (Relationship rel : GlobalGraphOperations.at(database).getAllRelationships()) {
-            if (isRelationshipIncluded(rel, inclusionPolicies)) {
-                relCount++;
-            }
-        }
-        for (Relationship rel : GlobalGraphOperations.at(otherDatabase).getAllRelationships()) {
-            if (isRelationshipIncluded(rel, inclusionPolicies)) {
-                otherRelCount++;
-            }
-        }
-        assertEquals("There are different numbers of relationships in the two graphs", otherRelCount, relCount);
-    }
-
-    private static void doAssertSubgraph(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies inclusionPolicies) {
-        Map<Long, Long[]> sameNodesMap = buildSameNodesMap(database, otherDatabase, inclusionPolicies);
+    private static void doAssertSubgraph(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies inclusionPolicies, String firstDatabaseName) {
+        Map<Long, Long[]> sameNodesMap = buildSameNodesMap(database, otherDatabase, inclusionPolicies, firstDatabaseName);
         Set<Map<Long, Long>> nodeMappings = buildNodeMappingPermutations(sameNodesMap, otherDatabase);
 
         if (nodeMappings.size() == 1) {
-            assertRelationshipsMappingExistsForSingleNodeMapping(database, otherDatabase, nodeMappings.iterator().next(), inclusionPolicies);
+            assertRelationshipsMappingExistsForSingleNodeMapping(database, otherDatabase, nodeMappings.iterator().next(), inclusionPolicies, firstDatabaseName);
             return;
         }
 
@@ -263,7 +239,7 @@ public final class GraphUnit {
         fail("There is no corresponding relationship mapping for any of the possible node mappings");
     }
 
-    private static Map<Long, Long[]> buildSameNodesMap(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies inclusionPolicies) {
+    private static Map<Long, Long[]> buildSameNodesMap(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies inclusionPolicies, String firstDatabaseName) {
         Map<Long, Long[]> sameNodesMap = new HashMap<>();  //map of nodeID and IDs of nodes that match
 
         for (Node node : at(otherDatabase).getAllNodes()) {
@@ -274,7 +250,7 @@ public final class GraphUnit {
 
             //fail fast
             if (!sameNodes.iterator().hasNext()) {
-                fail("There is no corresponding node to " + nodeToString(node));
+                fail("There is no corresponding node to " + nodeToString(node) + " in " + firstDatabaseName);
             }
 
             Set<Long> sameNodeIds = new HashSet<>();
@@ -332,16 +308,20 @@ public final class GraphUnit {
         return true;
     }
 
-    private static void assertRelationshipsMappingExistsForSingleNodeMapping(GraphDatabaseService database, GraphDatabaseService otherDatabase, Map<Long, Long> mapping, InclusionPolicies inclusionPolicies) {
+    private static void assertRelationshipsMappingExistsForSingleNodeMapping(GraphDatabaseService database, GraphDatabaseService otherDatabase, Map<Long, Long> mapping, InclusionPolicies inclusionPolicies, String firstDatabaseName) {
         Set<Long> usedRelationships = new HashSet<>();
         for (Relationship relationship : at(otherDatabase).getAllRelationships()) {
             if (!relationshipMappingExists(database, relationship, mapping, usedRelationships, inclusionPolicies)) {
-                fail("No corresponding relationship found to: " + relationshipToString(relationship));
+                fail("No corresponding relationship found to " + relationshipToString(relationship) + " in " + firstDatabaseName);
             }
         }
     }
 
     private static boolean relationshipMappingExists(GraphDatabaseService database, Relationship relationship, Map<Long, Long> nodeMapping, Set<Long> usedRelationships, InclusionPolicies inclusionPolicies) {
+        if (!isRelationshipIncluded(relationship, inclusionPolicies)) {
+            return true;
+        }
+
         for (Relationship candidate : database.getNodeById(nodeMapping.get(relationship.getStartNode().getId())).getRelationships(OUTGOING)) {
             if (nodeMapping.get(relationship.getEndNode().getId()).equals(candidate.getEndNode().getId())) {
                 if (areSame(candidate, relationship, inclusionPolicies) && !usedRelationships.contains(candidate.getId())) {

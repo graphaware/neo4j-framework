@@ -71,7 +71,7 @@ public class MultiThreadedBatchTransactionExecutor extends DisposableBatchTransa
         executorService.shutdown();
         try {
             executorService.awaitTermination(1, TimeUnit.DAYS);
-            LOG.info("Successfully executed batches using " + numberOfThreads + " threads.");
+            LOG.debug("Successfully executed batches using " + numberOfThreads + " threads.");
         } catch (InterruptedException e) {
             LOG.warn("Did not manage to complete batch execution within 24 hours.");
         }

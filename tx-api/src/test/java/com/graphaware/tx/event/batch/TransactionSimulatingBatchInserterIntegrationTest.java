@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.common.util.PropertyContainerUtils.propertiesToMap;
 import static com.graphaware.common.util.PropertyContainerUtils.propertyContainersToMap;
@@ -53,7 +54,7 @@ import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
- * Integration test for {@link org.neo4j.unsafe.batchinsert.TransactionSimulatingBatchGraphDatabase}.
+ * Integration test for {@link TransactionSimulatingBatchInserter}.
  */
 public class TransactionSimulatingBatchInserterIntegrationTest {
 
@@ -63,6 +64,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
     @Before
     public void createTemporaryFolder() throws IOException {
         temporaryFolder.create();
+        temporaryFolder.getRoot().deleteOnExit();
     }
 
     @After
@@ -1144,6 +1146,7 @@ public class TransactionSimulatingBatchInserterIntegrationTest {
     @Test
     public void shouldReturnAllNodesFromTheDatabaseWithGaps() {
         GraphDatabaseService database = new GraphDatabaseFactory().newEmbeddedDatabase(temporaryFolder.getRoot().getAbsolutePath());
+        registerShutdownHook(database);
 
         new SimpleTransactionExecutor(database).executeInTransaction(new VoidReturningCallback() {
             @Override
