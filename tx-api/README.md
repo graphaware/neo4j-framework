@@ -5,7 +5,7 @@ This (Maven) module is part of the [GraphAware Neo4j Framework](https://github.c
 
 ### Introduction
 
-This module provides a decorator of the Neo4j Transaction Event API (called [`TransactionData`](http://docs.neo4j.org/chunked/2.1.5/javadocs/org/neo4j/graphdb/event/TransactionData.html)).
+This module provides a decorator of the Neo4j Transaction Event API (called [`TransactionData`](http://docs.neo4j.org/chunked/2.1.6/javadocs/org/neo4j/graphdb/event/TransactionData.html)).
 Before a transaction commits, the improved API allows users to traverse the new version of the graph (as it will be
 after the transaction commits), as well as a "snapshot" of the old graph (as it was before the transaction started).
 It provides a clean API to access information about changes performed by the transaction as well as the option to
@@ -16,7 +16,7 @@ been deleted in this tx` when trying to access properties of nodes/relationships
 easily access relationships/nodes that were changed and/or deleted in a transaction, again completely exception-free.
 
 The target audience of this module are advanced Neo4j users, mostly Java developers developing Neo4j
-[`TransactionEventHandler`](http://docs.neo4j.org/chunked/2.1.5/javadocs/org/neo4j/graphdb/event/TransactionEventHandler.html)s.
+[`TransactionEventHandler`](http://docs.neo4j.org/chunked/2.1.6/javadocs/org/neo4j/graphdb/event/TransactionEventHandler.html)s.
 The module is also one of the key components of [GraphAware Runtime](../runtime).
 
 ### Getting the Module
@@ -27,7 +27,7 @@ Add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>tx-api</artifactId>
-    <version>2.1.5.25</version>
+    <version>2.1.6.26</version>
 </dependency>
 ```
 
