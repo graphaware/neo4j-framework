@@ -29,6 +29,6 @@ public class GraphAwareEnterpriseBootstrapper extends EnterpriseBootstrapper {
      */
     @Override
     protected NeoServer createNeoServer() {
-        return new GraphAwareEnterpriseNeoServer(configurator, logging);
+        return new GraphAwareEnterpriseNeoServer(configurator, dependencies);
     }
 }

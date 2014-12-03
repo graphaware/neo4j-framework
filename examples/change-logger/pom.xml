@@ -29,7 +29,7 @@
     <properties>
         <java.version>1.7</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>2.2.M01</neo4j.version>
+        <neo4j.version>2.2.0-M01</neo4j.version>
         <graphware.version>2.2.0.26-SNAPSHOT</graphware.version>
     </properties>
 
@@ -114,7 +114,7 @@
                 <version>2.9</version>
                 <configuration>
                     <links>
-                        <link>http://api.neo4j.org/2.2.M01/</link>
+                        <link>http://api.neo4j.org/2.2.0-M01/</link>
                     </links>
                 </configuration>
                 <executions>

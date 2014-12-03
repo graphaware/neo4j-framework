@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.neo4j.graphdb.DependencyResolver;
 import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.impl.transaction.xaframework.TransactionCounters;
+import org.neo4j.kernel.impl.transaction.TransactionCounters;
 import org.neo4j.management.TransactionManager;
 
 @SuppressWarnings("deprecation")

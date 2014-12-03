@@ -39,7 +39,7 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
     public GraphPropertiesMetadataRepository(GraphDatabaseService database, RuntimeConfiguration configuration, String propertyPrefix) {
         this.propertyPrefix = configuration.createPrefix(propertyPrefix);
         this.database = database;
-        this.metadataPropertyContainer = (((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(NodeManager.class).getGraphProperties());
+        this.metadataPropertyContainer = (((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties());
     }
 
     /**

@@ -65,7 +65,7 @@ public class GraphUnitTest extends DatabaseIntegrationTest {
 
         try (Transaction tx = getDatabase().beginTx()) {
             assertEquals(0, count(at(getDatabase()).getAllNodes()));
-            assertTrue((boolean) ((GraphDatabaseAPI) getDatabase()).getDependencyResolver().resolveDependency(NodeManager.class).getGraphProperties().getProperty("_GA_METADATA"));
+            assertTrue((boolean) ((GraphDatabaseAPI) getDatabase()).getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties().getProperty("_GA_METADATA"));
             tx.success();
         }
     }

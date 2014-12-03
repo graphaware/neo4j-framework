@@ -18,9 +18,12 @@ package com.graphaware.server;
 
 import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
 import com.graphaware.server.web.GraphAwareJetty9WebServer;
+import org.neo4j.kernel.InternalAbstractGraphDatabase;
 import org.neo4j.kernel.logging.Logging;
 import org.neo4j.server.CommunityNeoServer;
+import org.neo4j.server.configuration.ConfigurationBuilder;
 import org.neo4j.server.configuration.Configurator;
+import org.neo4j.server.database.Database;
 import org.neo4j.server.web.WebServer;
 
 /**
@@ -28,8 +31,12 @@ import org.neo4j.server.web.WebServer;
  */
 public class GraphAwareCommunityNeoServer extends CommunityNeoServer {
 
-    public GraphAwareCommunityNeoServer(Configurator configurator, Logging logging) {
-        super(configurator, logging);
+    public GraphAwareCommunityNeoServer(ConfigurationBuilder configurator, InternalAbstractGraphDatabase.Dependencies dependencies) {
+        super(configurator, dependencies);
+    }
+
+    public GraphAwareCommunityNeoServer(ConfigurationBuilder configurator, Database.Factory dbFactory, InternalAbstractGraphDatabase.Dependencies dependencies) {
+        super(configurator, dbFactory, dependencies);
     }
 
     /**
@@ -39,6 +46,6 @@ public class GraphAwareCommunityNeoServer extends CommunityNeoServer {
     protected WebServer createWebServer() {
         GoogleAnalyticsStatsCollector.getInstance().frameworkStart("community");
 
-        return new GraphAwareJetty9WebServer(logging);
+        return new GraphAwareJetty9WebServer(dependencies.logging());
     }
 }

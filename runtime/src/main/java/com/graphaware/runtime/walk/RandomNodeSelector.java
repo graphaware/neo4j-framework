@@ -24,7 +24,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.impl.nioneo.xa.NeoStoreProvider;
+import org.neo4j.kernel.impl.transaction.state.NeoStoreProvider;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 /**

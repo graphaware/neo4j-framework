@@ -610,7 +610,7 @@ public class ProductionRuntimeTest {
 
     @Test
     public void shouldCreateRuntimeMetadataAfterFirstStartup() {
-        PropertyContainer pc = (((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(NodeManager.class).getGraphProperties());
+        PropertyContainer pc = (((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties());
 
         try (Transaction tx = database.beginTx()) {
             assertFalse(pc.hasProperty("_GA_METADATA"));
@@ -1248,7 +1248,7 @@ public class ProductionRuntimeTest {
     }
 
     private PropertyContainer getMetadataContainer() {
-        return (((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(NodeManager.class).getGraphProperties());
+        return (((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties());
     }
 
     private interface RuntimeConfiguredRuntimeModule extends TxDrivenModule, RuntimeConfigured {
