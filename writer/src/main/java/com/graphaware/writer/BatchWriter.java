@@ -54,7 +54,7 @@ public class BatchWriter extends SingleThreadedWriter implements DatabaseWriter 
      * {@inheritDoc}
      */
     @Override
-    protected void runOneIteration() throws Exception {
+    protected final void runOneIteration() throws Exception {
         if (queue.isEmpty()) {
             return;
         }
