@@ -61,8 +61,6 @@ public class TxPerTaskWriter extends SingleThreadedWriter implements DatabaseWri
      */
     @Override
     protected void runOneIteration() throws Exception {
-        logQueueSizeIfNeeded();
-
         try {
             RunnableFuture<?> r = queue.poll();
 
@@ -72,9 +70,6 @@ public class TxPerTaskWriter extends SingleThreadedWriter implements DatabaseWri
 
             while (r != null) {
                 r.run();
-
-                logQueueSizeIfNeeded();
-
                 r = queue.poll();
             }
         } catch (Exception e) {
