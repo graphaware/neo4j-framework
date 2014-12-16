@@ -25,6 +25,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @param <T> type of the stored items.
  * @param <C> type of the quantities associated with the items.
  */
+//todo allow finding values of items
 public class BoundedSortedList<T, C extends Comparable<C>> {
 
     private final List<ComparableItem<T, C>> items = new ArrayList<>();

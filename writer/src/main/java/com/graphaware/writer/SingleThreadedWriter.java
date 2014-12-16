@@ -29,8 +29,7 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
     private final int queueCapacity;
     protected final LinkedBlockingQueue<RunnableFuture<?>> queue;
     protected final GraphDatabaseService database;
-
-    private volatile long lastLoggedTime = System.currentTimeMillis();
+    private final ScheduledExecutorService queueSizeLogger = Executors.newSingleThreadScheduledExecutor();
 
     /**
      * Construct a new writer with a default queue capacity of 10,000.
@@ -60,6 +59,14 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
     public void start() {
         startAsync();
         awaitRunning();
+        queueSizeLogger.scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run() {
+                if (queue.size() > 0 || logEmptyQueue()) {
+                    LOG.info("Queue size: " + queue.size());
+                }
+            }
+        }, 5, loggingFrequencyMs(), TimeUnit.SECONDS);
     }
 
     /**
@@ -67,6 +74,7 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
      */
     @PreDestroy
     public void stop() {
+        queueSizeLogger.shutdownNow();
         stopAsync();
         awaitTerminated();
     }
@@ -164,14 +172,6 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
         }
 
         return null;
-    }
-
-    protected void logQueueSizeIfNeeded() {
-        long now = System.currentTimeMillis();
-        if (now - lastLoggedTime > loggingFrequencyMs() && (logEmptyQueue() || queue.size() > 0)) {
-            LOG.info("Queue size: " + queue.size());
-            lastLoggedTime = now;
-        }
     }
 
     /**

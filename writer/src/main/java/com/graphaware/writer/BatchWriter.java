@@ -8,9 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.*;
 
 /**
  * {@link SingleThreadedWriter} that writes tasks in batches. This is more performant but dangerous,
@@ -57,8 +55,6 @@ public class BatchWriter extends SingleThreadedWriter implements DatabaseWriter 
      */
     @Override
     protected void runOneIteration() throws Exception {
-        logQueueSizeIfNeeded();
-
         if (queue.isEmpty()) {
             return;
         }
@@ -69,13 +65,23 @@ public class BatchWriter extends SingleThreadedWriter implements DatabaseWriter 
         new IterableInputBatchTransactionExecutor<>(database, batchSize, tasks, new UnitOfWork<RunnableFuture<?>>() {
             @Override
             public void execute(GraphDatabaseService database, RunnableFuture<?> input, int batchNumber, int stepNumber) {
-                try {
-                    input.run();
-                    input.get();
-                } catch (Exception e) {
-                    LOG.warn("Execution threw and exception.", e);
-                }
+                processInput(input);
             }
         }).execute();
+    }
+
+    /**
+     * Perform the processing of the given {@link RunnableFuture}.
+     * Can be overridden to add extra logging, timing, etc.
+     *
+     * @param input to process.
+     */
+    protected void processInput(RunnableFuture<?> input) {
+        try {
+            input.run();
+            input.get();
+        } catch (Exception e) {
+            LOG.warn("Execution threw an exception.", e);
+        }
     }
 }
