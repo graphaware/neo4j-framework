@@ -83,13 +83,7 @@ Neo4j server installation. You will then be able to issue a `GET` request to `ht
 and receive the number of nodes in the database in the response body. Note that the `graphaware` part of the URL must be
 there and cannot (yet) be configured.
 
-<<<<<<< HEAD
-To get started quickly, use the provided Maven archetype by typing:
-
-    mvn archetype:generate -DarchetypeGroupId=com.graphaware.neo4j -DarchetypeArtifactId=graphaware-springmvc-maven-archetype -DarchetypeVersion=2.2.0.19
-=======
 To get started quickly, copy the example above and modify to your needs.
->>>>>>> master
 
 To get started manually, you will need the following dependencies:
 
