@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
@@ -48,9 +49,24 @@ public abstract class DatabaseIntegrationTest {
      * @return new database.
      */
     protected GraphDatabaseService createDatabase() {
-        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        GraphDatabaseBuilder graphDatabaseBuilder = new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder();
+
+        if (propertiesFile() != null) {
+            graphDatabaseBuilder = graphDatabaseBuilder.loadPropertiesFromFile(propertiesFile());
+        }
+
+        GraphDatabaseService database = graphDatabaseBuilder.newGraphDatabase();
         registerShutdownHook(database);
         return database;
+    }
+
+    /**
+     * Get the name of properties file used to configure the database.
+     *
+     * @return properties file, <code>null</code> for none.
+     */
+    protected String propertiesFile() {
+        return null;
     }
 
     /**
