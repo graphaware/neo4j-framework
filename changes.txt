@@ -1,4 +1,7 @@
-2.1.6.27:
+2.2.0.27:
+    - updated Framework to Neo4j 2.2.0
+    - completely removed transaction handling and automatic support for @Transactional
+    - removed transaction-simulating batch inserters
     - ability to pass a config file to the database in DatabaseIntegrationTest
 2.1.6.26:
     - logging exceptions that occur when using BatchWriter
