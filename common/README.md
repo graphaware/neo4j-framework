@@ -85,24 +85,24 @@ com.graphaware.module.reco.node=hasLabel('Person')
 
 The following expressions can be used:
 * For all Property Containers (Nodes and Relationships):
-** `hasProperty('propertyName')` - returns boolean. Example: `hasProperty('name')`
-** `getProperty('propertyName','defaultValue')` - returns Object. Example: `getProperty('name','unknown') == 'Michal'`
+    * `hasProperty('propertyName')` - returns boolean. Example: `hasProperty('name')`
+    * `getProperty('propertyName','defaultValue')` - returns Object. Example: `getProperty('name','unknown') == 'Michal'`
 * For Nodes only:
-** `getDegree()` or `degree` - returns int. Examples: `degree > 1`
-** `getDegree('typeOrDirection')` - returns int. Examples: `getDegree('OUTGOING') == 0` or `getDegree('FRIEND_OF') > 1000`
-** `getDegree('type', 'direction')` - returns int. Examples: `getDegree('FRIEND_OF','OUTGOING') > 0`
-** `hasLabel('label')` - returns boolean. Example: `hasLabel('Person')`
+    * `getDegree()` or `degree` - returns int. Examples: `degree > 1`
+    * `getDegree('typeOrDirection')` - returns int. Examples: `getDegree('OUTGOING') == 0` or `getDegree('FRIEND_OF') > 1000`
+    * `getDegree('type', 'direction')` - returns int. Examples: `getDegree('FRIEND_OF','OUTGOING') > 0`
+    * `hasLabel('label')` - returns boolean. Example: `hasLabel('Person')`
 * For Relationships only:
-** `startNode` - returns Node. Example: `startNode.hasProperty('name')`
-** `endNode` - returns Node. Example: `endNode.getDegree() > 0`
-** `type` - returns String. Example: `type == 'WORKS_FOR'`
-** `isType('type')` - returns boolean. Example: `isType('WORKS_FOR')`
+    * `startNode` - returns Node. Example: `startNode.hasProperty('name')`
+    * `endNode` - returns Node. Example: `endNode.getDegree() > 0`
+    * `type` - returns String. Example: `type == 'WORKS_FOR'`
+    * `isType('type')` - returns boolean. Example: `isType('WORKS_FOR')`
 * For Relationships only when one of the participating nodes "looking" at the relationship is provided:
-** `isOutgoing()` - returns boolean. Example: `isOutgoing()`
-** `isIncoming()` - returns boolean. Example: `isIncoming()`
-** `otherNode` - returns Node. Example: `otherNode.hasProperty('name')`
+    * `isOutgoing()` - returns boolean. Example: `isOutgoing()`
+    * `isIncoming()` - returns boolean. Example: `isIncoming()`
+    * `otherNode` - returns Node. Example: `otherNode.hasProperty('name')`
 * For all Property Container Properties:
-** `key` - returns String. Example: `key != 'name'`
+    * `key` - returns String. Example: `key != 'name'`
 
 Of course, the expressions can be combined with logical operators, for instance:
 * `isType('LIVES_IN') && isIncoming()`
