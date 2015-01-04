@@ -18,6 +18,7 @@ public class SpelRelationshipInclusionPolicyTest extends SpelInclusionPolicyTest
     private RelationshipInclusionPolicy policy4 = new SpelRelationshipInclusionPolicy("startNode.hasLabel('Employee')");
     private RelationshipInclusionPolicy policy5 = new SpelRelationshipInclusionPolicy("otherNode.hasLabel('Employee')");
     private RelationshipInclusionPolicy policy6 = new SpelRelationshipInclusionPolicy("hasProperty('until')");
+    private RelationshipInclusionPolicy policy7 = new SpelRelationshipInclusionPolicy("type == 'WORKS_FOR'");
 
     @Test
     public void shouldIncludeCorrectRelationships() {
@@ -31,6 +32,11 @@ public class SpelRelationshipInclusionPolicyTest extends SpelInclusionPolicyTest
             assertTrue(policy2.include(vojtaWorksFor()));
             assertFalse(policy2.include(michalLivesIn()));
             assertFalse(policy2.include(vojtaLivesIn()));
+
+            assertTrue(policy7.include(michalWorksFor()));
+            assertTrue(policy7.include(vojtaWorksFor()));
+            assertFalse(policy7.include(michalLivesIn()));
+            assertFalse(policy7.include(vojtaLivesIn()));
 
             assertTrue(policy3.include(michalLivesIn(), london()));
             assertFalse(policy3.include(michalLivesIn(), michal()));

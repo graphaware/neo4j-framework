@@ -17,6 +17,7 @@ public class SpelNodeInclusionPolicyTest extends SpelInclusionPolicyTest {
         NodeInclusionPolicy policy2 = new SpelNodeInclusionPolicy("getDegree('OUTGOING') > 1");
         NodeInclusionPolicy policy3 = new SpelNodeInclusionPolicy("getDegree('WORKS_FOR', 'BOTH') > 1");
         NodeInclusionPolicy policy4 = new SpelNodeInclusionPolicy("getDegree('WORKS_FOR', 'incoming') > 1");
+        NodeInclusionPolicy policy5 = new SpelNodeInclusionPolicy("degree > 2");
 
         try (Transaction tx = database.beginTx()) {
             assertTrue(policy1.include(michal()));
@@ -38,6 +39,11 @@ public class SpelNodeInclusionPolicyTest extends SpelInclusionPolicyTest {
             assertTrue(policy4.include(graphaware()));
             assertFalse(policy4.include(vojta()));
             assertFalse(policy4.include(london()));
+
+            assertFalse(policy5.include(michal()));
+            assertFalse(policy5.include(graphaware()));
+            assertFalse(policy5.include(vojta()));
+            assertFalse(policy5.include(london()));
 
             tx.success();
         }
