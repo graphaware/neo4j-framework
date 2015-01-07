@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.nio.charset.Charset;
 
 import static org.junit.Assert.*;
@@ -228,6 +229,24 @@ public final class TestUtils {
         }
 
         return post(serverUrl + "/db/data/transaction/commit", stringBuilder.toString(), HttpStatus.SC_OK);
+    }
+
+    /**
+     * Get some available port.
+     *
+     * @return port number.
+     */
+    public static int getAvailablePort() {
+        try {
+            ServerSocket socket = new ServerSocket(0);
+            try {
+                return socket.getLocalPort();
+            } finally {
+                socket.close();
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Cannot find available port: " + e.getMessage(), e);
+        }
     }
 
     /**
