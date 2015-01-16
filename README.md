@@ -78,6 +78,8 @@ Releases are synced to <a href="http://search.maven.org/#search%7Cga%7C1%7Ccom.g
 repository</a>. When using Maven for dependency management, include one or more dependencies in your pom.xml. To find out
  which ones, read further by clicking on one of the sub-modules of this project.
 
+** Attention Windows Users: ** The framework only works when you install Neo4j from the .zip download, not the .exe installer.
+
 ### Snapshots
 
 To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.1.6.27-SNAPSHOT
