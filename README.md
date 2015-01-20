@@ -64,6 +64,8 @@ for their Java project and use it as a library of useful tested code, in additio
 Getting GraphAware Framework
 ----------------------------
 
+**Attention Windows Users:** The framework only works when you install Neo4j from the .zip download, not the .exe installer.
+
 ### Releases
 
 To use the latest release, download the appropriate version and put it
