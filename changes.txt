@@ -1,6 +1,7 @@
 2.1.6.27:
     - input validation in GraphUnit, capability to assert empty database and to print the database contents
     - getAvailablePort() method in TestUtils
+    - float into PropertyContainerUtils for the purposes of the Recommendation Engine Module
 2.1.6.26:
     - logging exceptions that occur when using BatchWriter
 2.1.5.25:
