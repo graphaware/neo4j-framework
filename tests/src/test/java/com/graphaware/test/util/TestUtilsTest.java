@@ -20,7 +20,8 @@ import com.graphaware.test.integration.WrappingServerIntegrationTest;
 import com.graphaware.test.unit.GraphUnit;
 import org.junit.Test;
 
-import static com.graphaware.test.util.TestUtils.*;
+import static com.graphaware.test.util.TestUtils.assertJsonEquals;
+import static com.graphaware.test.util.TestUtils.executeCypher;
 
 /**
  * Test for {@link TestUtils}.

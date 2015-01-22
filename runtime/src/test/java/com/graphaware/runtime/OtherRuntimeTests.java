@@ -16,21 +16,23 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.common.util.DatabaseUtils;
 import com.graphaware.runtime.bootstrap.RuntimeKernelExtension;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.test.RepeatRule;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Random;
 
-import static com.graphaware.common.util.DatabaseUtils.*;
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 
 /**
  * Aux runtime tests for bugs found while doing manual testing.

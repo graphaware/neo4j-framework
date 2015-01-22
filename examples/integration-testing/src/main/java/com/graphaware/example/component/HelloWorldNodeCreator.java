@@ -20,7 +20,6 @@ import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.springframework.stereotype.Component;
 
 /**
  * Very powerful class capable of creating a "Hello World" node. Intended for

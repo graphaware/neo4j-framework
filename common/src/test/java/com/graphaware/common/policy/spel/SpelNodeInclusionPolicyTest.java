@@ -20,7 +20,8 @@ import com.graphaware.common.policy.NodeInclusionPolicy;
 import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit test for {@link com.graphaware.common.policy.spel.SpelNodeInclusionPolicy}.

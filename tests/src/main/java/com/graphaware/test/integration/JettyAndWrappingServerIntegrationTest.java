@@ -17,8 +17,6 @@
 package com.graphaware.test.integration;
 
 import org.eclipse.jetty.server.Server;
-import org.junit.After;
-import org.junit.Before;
 
 /**
  * {@link WrappingServerIntegrationTest} that starts a Jetty server as well on port {@link #jettyServerPort()}, whilst

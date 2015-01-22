@@ -16,21 +16,20 @@
 
 package com.graphaware.runtime;
 
-import static com.graphaware.runtime.config.RuntimeConfiguration.TIMER_MODULES_PROPERTY_PREFIX;
-import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROPERTY_PREFIX;
-
 import com.graphaware.runtime.config.FluentRuntimeConfiguration;
-import com.graphaware.runtime.metadata.GraphPropertiesMetadataRepository;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.GraphDatabaseAPI;
-
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.ProductionTimerDrivenModuleManager;
 import com.graphaware.runtime.manager.ProductionTxDrivenModuleManager;
 import com.graphaware.runtime.manager.TimerDrivenModuleManager;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
+import com.graphaware.runtime.metadata.GraphPropertiesMetadataRepository;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.module.TxDrivenModule;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.GraphDatabaseAPI;
+
+import static com.graphaware.runtime.config.RuntimeConfiguration.TIMER_MODULES_PROPERTY_PREFIX;
+import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROPERTY_PREFIX;
 
 /**
  * Factory producing {@link GraphAwareRuntime}. This should be the only way a runtime is created.

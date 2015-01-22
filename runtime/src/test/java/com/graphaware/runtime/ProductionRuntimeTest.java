@@ -25,7 +25,6 @@ import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.runtime.write.WritingConfig;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-
 import com.graphaware.writer.BaseDatabaseWriter;
 import com.graphaware.writer.DatabaseWriter;
 import org.junit.After;
@@ -43,7 +42,7 @@ import org.neo4j.tooling.GlobalGraphOperations;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.graphaware.runtime.GraphAwareRuntimeFactory.*;
+import static com.graphaware.runtime.GraphAwareRuntimeFactory.createRuntime;
 import static com.graphaware.runtime.config.FluentRuntimeConfiguration.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;

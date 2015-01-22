@@ -21,10 +21,9 @@ import com.graphaware.runtime.policy.all.IncludeAllBusinessNodeProperties;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodes;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessRelationshipProperties;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessRelationships;
-import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class PolicySerializationTest {
 

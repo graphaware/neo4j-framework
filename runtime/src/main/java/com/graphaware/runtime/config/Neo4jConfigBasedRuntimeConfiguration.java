@@ -16,10 +16,6 @@
 
 package com.graphaware.runtime.config;
 
-import static org.neo4j.helpers.Settings.INTEGER;
-import static org.neo4j.helpers.Settings.LONG;
-import static org.neo4j.helpers.Settings.setting;
-
 import com.graphaware.runtime.config.function.StringToDatabaseWriterType;
 import com.graphaware.runtime.config.function.StringToTimingStrategy;
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
@@ -30,6 +26,8 @@ import com.graphaware.runtime.write.FluentWritingConfig;
 import com.graphaware.runtime.write.WritingConfig;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.kernel.configuration.Config;
+
+import static org.neo4j.helpers.Settings.*;
 
 /**
  * Implementation of {@link RuntimeConfiguration} that loads bespoke settings from Neo4j's configuration properties, falling

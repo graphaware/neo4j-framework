@@ -16,9 +16,9 @@
 
 package com.graphaware.runtime.config;
 
+import com.graphaware.common.policy.InclusionPolicies;
 import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.serialize.SingletonSerializer;
-import com.graphaware.common.policy.InclusionPolicies;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
 
 /**
@@ -27,7 +27,7 @@ import com.graphaware.runtime.policy.InclusionPoliciesFactory;
 public final class NullTxDrivenModuleConfiguration implements TxDrivenModuleConfiguration {
 
     static {
-       Serializer.register(NullTxDrivenModuleConfiguration.class, new SingletonSerializer(), 1000);
+        Serializer.register(NullTxDrivenModuleConfiguration.class, new SingletonSerializer(), 1000);
     }
 
     private static final TxDrivenModuleConfiguration INSTANCE = new NullTxDrivenModuleConfiguration();

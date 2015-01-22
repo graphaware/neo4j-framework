@@ -20,7 +20,6 @@ import com.graphaware.common.policy.RelationshipInclusionPolicy;
 import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.serialize.SingletonSerializer;
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 /**

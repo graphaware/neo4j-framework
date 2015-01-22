@@ -17,7 +17,6 @@
 package com.graphaware.runtime.metadata;
 
 import com.graphaware.runtime.module.RuntimeModule;
-import org.neo4j.graphdb.event.TransactionData;
 
 import java.util.Set;
 
@@ -32,7 +31,7 @@ public interface ModuleMetadataRepository {
      * @param module to get metadata for.
      * @param <M>    type of the metadata.
      * @return module metadata, null if no such metadata exists. This happens, for example, when a module has never been
-     *         registered and/or run before.
+     * registered and/or run before.
      */
     <M extends ModuleMetadata> M getModuleMetadata(RuntimeModule module);
 
@@ -42,7 +41,7 @@ public interface ModuleMetadataRepository {
      * @param moduleId to get metadata for.
      * @param <M>      type of the metadata.
      * @return module metadata, null if no such metadata exists. This happens, for example, when a module has never been
-     *         registered and/or run before.
+     * registered and/or run before.
      */
     <M extends ModuleMetadata> M getModuleMetadata(String moduleId);
 

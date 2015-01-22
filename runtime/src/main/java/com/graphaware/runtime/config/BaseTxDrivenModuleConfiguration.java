@@ -17,8 +17,6 @@
 package com.graphaware.runtime.config;
 
 import com.graphaware.common.policy.*;
-import com.graphaware.common.policy.NodePropertyInclusionPolicy;
-import com.graphaware.common.policy.RelationshipPropertyInclusionPolicy;
 
 /**
  * Base-class for {@link TxDrivenModuleConfiguration} implementations.

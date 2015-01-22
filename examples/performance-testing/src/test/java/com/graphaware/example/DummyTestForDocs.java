@@ -20,7 +20,7 @@ import com.graphaware.test.performance.*;
 import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.UnitOfWork;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.GraphDatabaseService;
 
 import java.util.Collections;
 import java.util.LinkedList;

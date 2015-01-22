@@ -21,8 +21,9 @@ import com.graphaware.common.policy.spel.SpelNodeInclusionPolicy;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodes;
 import org.junit.Test;
 
-import static com.graphaware.common.policy.composite.CompositeNodeInclusionPolicy.*;
-import static org.junit.Assert.*;
+import static com.graphaware.common.policy.composite.CompositeNodeInclusionPolicy.of;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Unit test for {@link StringToNodeInclusionPolicy}.

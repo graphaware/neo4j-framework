@@ -16,16 +16,16 @@
 
 package com.graphaware.runtime.config;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
 import org.junit.Test;
 import org.neo4j.kernel.configuration.Config;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 public class Neo4jConfigBasedRuntimeConfigurationTest {
 

@@ -18,10 +18,6 @@ package com.graphaware.writer;
 
 import com.graphaware.common.util.IterableUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
-import com.graphaware.writer.BatchWriter;
-import com.graphaware.writer.DatabaseWriter;
-import com.graphaware.writer.SingleThreadedWriter;
-import com.graphaware.writer.TxPerTaskWriter;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Transaction;

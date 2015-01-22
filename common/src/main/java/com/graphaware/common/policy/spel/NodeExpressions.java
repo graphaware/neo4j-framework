@@ -16,10 +16,11 @@
 
 package com.graphaware.common.policy.spel;
 
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.Node;
 
-import static org.neo4j.graphdb.Direction.*;
-import static org.neo4j.graphdb.DynamicRelationshipType.*;
+import static org.neo4j.graphdb.Direction.valueOf;
+import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
  * {@link PropertyContainerExpressions} for {@link Node}s.

@@ -18,10 +18,8 @@ package com.graphaware.runtime.manager;
 
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
-import org.neo4j.graphdb.event.TransactionData;
 
 import java.util.Map;
-import java.util.Queue;
 
 /**
  * {@link ModuleManager} for {@link TxDrivenModule}s.

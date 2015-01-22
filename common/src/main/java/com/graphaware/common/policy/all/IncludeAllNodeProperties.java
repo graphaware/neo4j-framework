@@ -17,8 +17,6 @@
 package com.graphaware.common.policy.all;
 
 import com.graphaware.common.policy.NodePropertyInclusionPolicy;
-import com.graphaware.common.serialize.Serializer;
-import com.graphaware.common.serialize.SingletonSerializer;
 import org.neo4j.graphdb.Node;
 
 /**

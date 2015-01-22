@@ -26,12 +26,15 @@ import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.graphaware.runtime.schedule.TimingStrategy.*;
+import static com.graphaware.runtime.schedule.TimingStrategy.NEVER_RUN;
+import static com.graphaware.runtime.schedule.TimingStrategy.UNKNOWN;
 
 /**
  * {@link TaskScheduler} that delegates to the registered {@link TimerDrivenModule}s in round-robin fashion, in the order

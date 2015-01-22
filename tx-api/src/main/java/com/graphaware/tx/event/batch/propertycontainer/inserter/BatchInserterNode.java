@@ -16,7 +16,6 @@
 
 package com.graphaware.tx.event.batch.propertycontainer.inserter;
 
-import com.graphaware.common.util.IterableUtils;
 import com.graphaware.common.wrapper.NodeWrapper;
 import org.neo4j.graphdb.*;
 import org.neo4j.unsafe.batchinsert.BatchInserter;
@@ -25,7 +24,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.graphaware.common.util.IterableUtils.*;
+import static com.graphaware.common.util.IterableUtils.count;
+import static com.graphaware.common.util.IterableUtils.toList;
 
 /**
  * {@link org.neo4j.graphdb.Node} proxy to be used in {@link com.graphaware.tx.event.batch.data.BatchTransactionData} when using

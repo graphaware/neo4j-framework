@@ -19,16 +19,16 @@ package com.graphaware.common.policy.spel;
 import org.junit.After;
 import org.junit.Before;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static com.graphaware.common.util.IterableUtils.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.neo4j.graphdb.Direction.*;
-import static org.neo4j.graphdb.DynamicLabel.*;
-import static org.neo4j.graphdb.DynamicRelationshipType.*;
+import static com.graphaware.common.util.IterableUtils.getSingle;
+import static org.neo4j.graphdb.Direction.OUTGOING;
+import static org.neo4j.graphdb.DynamicLabel.label;
+import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
  * Abstract base class for {@link com.graphaware.common.policy.spel.SpelInclusionPolicy} implementation unit tests.

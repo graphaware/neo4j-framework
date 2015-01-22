@@ -16,11 +16,10 @@
 
 package com.graphaware.common.description.predicate;
 
-import static com.graphaware.common.util.ArrayUtils.arrayFriendlyEquals;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.LoggerFactory;
+
+import static com.graphaware.common.util.ArrayUtils.arrayFriendlyEquals;
 
 /**
  * A {@link Predicate} comparing beta (the property value) to the

@@ -21,7 +21,7 @@ import com.graphaware.test.unit.GraphUnit;
 import com.graphaware.test.util.TestUtils;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * {@link com.graphaware.test.integration.DatabaseIntegrationTest} for {@link HelloWorldServerPlugin}.

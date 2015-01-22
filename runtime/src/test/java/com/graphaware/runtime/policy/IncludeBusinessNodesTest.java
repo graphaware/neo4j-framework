@@ -28,9 +28,9 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
-import static com.graphaware.common.policy.composite.CompositeNodeInclusionPolicy.*;
+import static com.graphaware.common.policy.composite.CompositeNodeInclusionPolicy.of;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static com.graphaware.runtime.config.RuntimeConfiguration.*;
+import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.neo4j.graphdb.DynamicLabel.label;

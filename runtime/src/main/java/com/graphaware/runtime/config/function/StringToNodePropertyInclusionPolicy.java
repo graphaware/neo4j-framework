@@ -17,7 +17,6 @@
 package com.graphaware.runtime.config.function;
 
 import com.graphaware.common.policy.NodePropertyInclusionPolicy;
-import com.graphaware.common.policy.all.IncludeAllNodeProperties;
 import com.graphaware.common.policy.composite.CompositeNodePropertyInclusionPolicy;
 import com.graphaware.common.policy.spel.SpelNodePropertyInclusionPolicy;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodeProperties;

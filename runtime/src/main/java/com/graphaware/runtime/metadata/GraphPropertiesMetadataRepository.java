@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime.metadata;
 
+
 import com.graphaware.common.policy.ObjectInclusionPolicy;
 import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.util.PropertyContainerUtils;
@@ -33,7 +34,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static com.graphaware.runtime.config.RuntimeConfiguration.*;
+import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
 
 /**
  * {@link ModuleMetadataRepository} backed by a {@link org.neo4j.kernel.impl.core.GraphProperties}.

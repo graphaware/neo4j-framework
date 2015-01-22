@@ -19,10 +19,10 @@ package com.graphaware.tx.event.improved.data.lazy;
 
 import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.event.PropertyEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;

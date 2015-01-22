@@ -18,10 +18,9 @@ package com.graphaware.example.unmanaged;
 
 import com.graphaware.test.integration.NeoServerIntegrationTest;
 import com.graphaware.test.util.TestUtils;
-import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * {@link com.graphaware.test.integration.DatabaseIntegrationTest} for {@link com.graphaware.example.plugin.HelloWorldServerPlugin}.

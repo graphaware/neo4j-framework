@@ -17,7 +17,6 @@
 package com.graphaware.runtime.metadata;
 
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.NotFoundException;
 
 /**
  * Context of {@link com.graphaware.runtime.module.TimerDrivenModule}s encapsulating the position in the graph and additional

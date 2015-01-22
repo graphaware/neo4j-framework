@@ -16,10 +16,10 @@
 
 package com.graphaware.runtime.policy;
 
-import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.policy.InclusionPolicies;
 import com.graphaware.common.policy.all.IncludeAllNodeProperties;
 import com.graphaware.common.policy.none.IncludeNoNodeProperties;
+import com.graphaware.common.serialize.Serializer;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

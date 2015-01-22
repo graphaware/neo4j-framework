@@ -17,13 +17,11 @@
 package com.graphaware.example.graphaware;
 
 import com.graphaware.test.integration.GraphAwareApiTest;
-import com.graphaware.test.integration.WrappingServerIntegrationTest;
 import com.graphaware.test.unit.GraphUnit;
 import com.graphaware.test.util.TestUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * {@link GraphAwareApiTest} for {@link HelloWorldController}.

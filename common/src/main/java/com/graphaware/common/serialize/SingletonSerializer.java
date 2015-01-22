@@ -16,15 +16,15 @@
 
 package com.graphaware.common.serialize;
 
-import com.esotericsoftware.kryo.*;
+import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
 /**
- *  {@link com.esotericsoftware.kryo.Serializer} for singletons. Singletons must declare a
- *  <code>public static X getInstance</code> method, where <code>X</code> is the singleton class.
+ * {@link com.esotericsoftware.kryo.Serializer} for singletons. Singletons must declare a
+ * <code>public static X getInstance</code> method, where <code>X</code> is the singleton class.
  *
- *  @see {@link com.graphaware.common.policy.none.IncludeNoNodes}, for example.
+ * @see {@link com.graphaware.common.policy.none.IncludeNoNodes}, for example.
  */
 public class SingletonSerializer extends com.esotericsoftware.kryo.Serializer {
 

@@ -16,13 +16,17 @@
 
 package com.graphaware.runtime.manager;
 
-import java.util.*;
-
-import com.graphaware.runtime.metadata.*;
-
+import com.graphaware.runtime.metadata.CorruptMetadataException;
+import com.graphaware.runtime.metadata.ModuleMetadata;
+import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.module.RuntimeModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Base-class for {@link ModuleManager} implementations.

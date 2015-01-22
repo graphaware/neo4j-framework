@@ -17,7 +17,6 @@
 package com.graphaware.runtime.policy.all;
 
 import com.graphaware.common.policy.RelationshipPropertyInclusionPolicy;
-import com.graphaware.common.policy.all.IncludeAllRelationshipProperties;
 import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.serialize.SingletonSerializer;
 import com.graphaware.runtime.config.RuntimeConfiguration;

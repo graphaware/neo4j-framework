@@ -18,7 +18,8 @@ package com.graphaware.tx.event.improved.propertycontainer.snapshot;
 
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.apache.commons.collections4.iterators.EmptyIterator;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.Label;
+import org.neo4j.graphdb.Node;
 import org.neo4j.helpers.collection.PrefetchingIterator;
 
 import java.util.Iterator;

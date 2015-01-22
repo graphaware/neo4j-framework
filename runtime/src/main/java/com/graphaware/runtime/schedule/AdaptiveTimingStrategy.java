@@ -20,8 +20,6 @@ import com.graphaware.runtime.monitor.DatabaseLoadMonitor;
 import com.graphaware.runtime.monitor.RunningWindowAverage;
 import com.graphaware.runtime.monitor.StartedTxBasedLoadMonitor;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link TimingStrategy} that pays attention to the current level of activity in the database, i.e.

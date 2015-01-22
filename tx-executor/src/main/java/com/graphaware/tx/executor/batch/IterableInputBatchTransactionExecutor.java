@@ -21,9 +21,9 @@ import com.graphaware.tx.executor.single.KeepCalmAndCarryOn;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.TransactionCallback;
 import com.graphaware.tx.executor.single.TransactionExecutor;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
