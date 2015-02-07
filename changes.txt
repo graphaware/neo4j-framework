@@ -1,3 +1,5 @@
+2.1.7.28:
+    - update to Neo4j 2.1.7
 2.1.6.27:
     - input validation in GraphUnit, capability to assert empty database and to print the database contents
     - getAvailablePort() method in TestUtils
