@@ -18,6 +18,8 @@ package com.graphaware.runtime.walk;
 
 import com.graphaware.common.policy.fluent.IncludeNodes;
 import com.graphaware.common.policy.none.IncludeNoNodes;
+import com.graphaware.test.data.DatabasePopulator;
+import com.graphaware.test.data.SingleTransactionPopulator;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -32,15 +34,20 @@ import static org.neo4j.graphdb.DynamicLabel.label;
 public class ContinuousNodeSelectorTest extends DatabaseIntegrationTest {
 
     @Override
-    protected void populateDatabase(GraphDatabaseService database) {
-        database.createNode(label("Person")).setProperty("name", "Michal");
-        database.createNode(label("Person")).setProperty("name", "Daniela");
-        database.createNode(label("Person")).setProperty("name", "Vince");
-        database.createNode(label("Company")).setProperty("name", "GraphAware");
-        database.createNode(label("Company")).setProperty("name", "Neo");
-        database.createNode(label("Person")).setProperty("name", "Adam");
+    protected DatabasePopulator databasePopulator() {
+        return new SingleTransactionPopulator() {
+            @Override
+            protected void doPopulate(GraphDatabaseService database) {
+                database.createNode(label("Person")).setProperty("name", "Michal");
+                database.createNode(label("Person")).setProperty("name", "Daniela");
+                database.createNode(label("Person")).setProperty("name", "Vince");
+                database.createNode(label("Company")).setProperty("name", "GraphAware");
+                database.createNode(label("Company")).setProperty("name", "Neo");
+                database.createNode(label("Person")).setProperty("name", "Adam");
 
-        database.getNodeById(2).delete();
+                database.getNodeById(2).delete();
+            }
+        };
     }
 
     @Test

@@ -16,10 +16,10 @@
 
 package com.graphaware.test.integration;
 
+import com.graphaware.test.data.DatabasePopulator;
 import org.junit.After;
 import org.junit.Before;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
@@ -29,7 +29,7 @@ import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
  * <p/>
  * Creates an {@link org.neo4j.test.ImpermanentGraphDatabase} (by default) at the beginning of each test and allows
  * subclasses to populate it by overriding the {@link #populateDatabase(org.neo4j.graphdb.GraphDatabaseService)} method,
- * which is guaranteed to run in a transaction.
+ * or by providing a {@link com.graphaware.test.data.DatabasePopulator} by overriding the {@link #databasePopulator()} method.
  * <p/>
  * Shuts the database down at the end of each test.
  */
@@ -40,22 +40,12 @@ public abstract class DatabaseIntegrationTest {
     @Before
     public void setUp() throws Exception {
         database = createDatabase();
-        populateDatabaseInTransaction();
+        populateDatabase(database);
     }
 
     @After
     public void tearDown() throws Exception {
         database.shutdown();
-    }
-
-    /**
-     * Populate database in a transaction.
-     */
-    private void populateDatabaseInTransaction() {
-        try (Transaction tx = database.beginTx()) {
-            populateDatabase(database);
-            tx.success();
-        }
     }
 
     /**
@@ -70,12 +60,20 @@ public abstract class DatabaseIntegrationTest {
     }
 
     /**
-     * Populate the database that will drive this test. A transaction is running when this method gets called.
-     *
-     * @param database to populate.
+     * Populate the database. Can be overridden. By default, it populates the database using {@link #databasePopulator()}.
      */
     protected void populateDatabase(GraphDatabaseService database) {
-        //for subclasses
+        DatabasePopulator populator = databasePopulator();
+        if (populator != null) {
+            populator.populate(database);
+        }
+    }
+
+    /**
+     * @return {@link com.graphaware.test.data.DatabasePopulator}, <code>null</code> (no population) by default.
+     */
+    protected DatabasePopulator databasePopulator() {
+        return null;
     }
 
     /**

@@ -30,7 +30,7 @@ import java.io.IOException;
  * The primary purpose of tests that extend this class should be to verify that given a certain Neo4j configuration,
  * a (possibly runtime) module is bootstrapped and started correctly when the Neo4j server starts.
  * <p/>
- * The configuration files name are provided by overriding the {@link #neo4jConfigFile()} and {@link #neo4jServerConfigFile()}
+ * The configuration file names are provided by overriding the {@link #neo4jConfigFile()} and {@link #neo4jServerConfigFile()}
  * methods. They default to "neo4j.properties" and "neo4j-server.properties" and if no such files are present
  * on the classpath of the implementing class, the ones that ships with Neo4j are used.
  */
