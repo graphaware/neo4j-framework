@@ -1,8 +1,20 @@
-package com.graphaware.runtime.config;
+/*
+ * Copyright (c) 2015 GraphAware
+ *
+ * This file is part of GraphAware.
+ *
+ * GraphAware is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details. You should have received a copy of
+ * the GNU General Public License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 
-import static org.neo4j.helpers.Settings.INTEGER;
-import static org.neo4j.helpers.Settings.LONG;
-import static org.neo4j.helpers.Settings.setting;
+package com.graphaware.runtime.config;
 
 import com.graphaware.runtime.config.function.StringToDatabaseWriterType;
 import com.graphaware.runtime.config.function.StringToTimingStrategy;
@@ -14,6 +26,8 @@ import com.graphaware.runtime.write.FluentWritingConfig;
 import com.graphaware.runtime.write.WritingConfig;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.kernel.configuration.Config;
+
+import static org.neo4j.helpers.Settings.*;
 
 /**
  * Implementation of {@link RuntimeConfiguration} that loads bespoke settings from Neo4j's configuration properties, falling

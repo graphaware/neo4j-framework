@@ -1,7 +1,22 @@
+/*
+ * Copyright (c) 2015 GraphAware
+ *
+ * This file is part of GraphAware.
+ *
+ * GraphAware is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details. You should have received a copy of
+ * the GNU General Public License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+
 package com.graphaware.runtime.metadata;
 
 import com.graphaware.runtime.module.RuntimeModule;
-import org.neo4j.graphdb.event.TransactionData;
 
 import java.util.Set;
 
@@ -16,7 +31,7 @@ public interface ModuleMetadataRepository {
      * @param module to get metadata for.
      * @param <M>    type of the metadata.
      * @return module metadata, null if no such metadata exists. This happens, for example, when a module has never been
-     *         registered and/or run before.
+     * registered and/or run before.
      */
     <M extends ModuleMetadata> M getModuleMetadata(RuntimeModule module);
 
@@ -26,7 +41,7 @@ public interface ModuleMetadataRepository {
      * @param moduleId to get metadata for.
      * @param <M>      type of the metadata.
      * @return module metadata, null if no such metadata exists. This happens, for example, when a module has never been
-     *         registered and/or run before.
+     * registered and/or run before.
      */
     <M extends ModuleMetadata> M getModuleMetadata(String moduleId);
 

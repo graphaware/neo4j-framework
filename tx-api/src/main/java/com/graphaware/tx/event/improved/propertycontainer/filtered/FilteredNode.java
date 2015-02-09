@@ -16,8 +16,8 @@
 
 package com.graphaware.tx.event.improved.propertycontainer.filtered;
 
-import com.graphaware.common.policy.PropertyInclusionPolicy;
 import com.graphaware.common.policy.InclusionPolicies;
+import com.graphaware.common.policy.PropertyInclusionPolicy;
 import com.graphaware.common.wrapper.NodeWrapper;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;

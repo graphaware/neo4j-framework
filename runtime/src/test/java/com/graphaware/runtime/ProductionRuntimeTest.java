@@ -25,7 +25,6 @@ import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.runtime.write.WritingConfig;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-
 import com.graphaware.writer.BaseDatabaseWriter;
 import com.graphaware.writer.DatabaseWriter;
 import org.junit.After;
@@ -43,7 +42,7 @@ import org.neo4j.tooling.GlobalGraphOperations;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.graphaware.runtime.GraphAwareRuntimeFactory.*;
+import static com.graphaware.runtime.GraphAwareRuntimeFactory.createRuntime;
 import static com.graphaware.runtime.config.FluentRuntimeConfiguration.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -1032,36 +1031,6 @@ public class ProductionRuntimeTest {
     }
 
     @Test
-    public void runtimeConfiguredModulesShouldBeConfigured() {
-        RuntimeConfiguredRuntimeModule mockModule = mock(RuntimeConfiguredRuntimeModule.class);
-        when(mockModule.getId()).thenReturn(MOCK);
-        when(mockModule.getConfiguration()).thenReturn(NullTxDrivenModuleConfiguration.getInstance());
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
-        runtime.registerModule(mockModule);
-
-        verify(mockModule).configurationChanged(defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
-        verify(mockModule, atLeastOnce()).getId();
-        verifyNoMoreInteractions(mockModule);
-    }
-
-    @Test
-    public void realRuntimeConfiguredModulesShouldBeConfigured() {
-        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule();
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
-        runtime.registerModule(module);
-
-        assertEquals(defaultConfiguration().withTimingStrategy(TIMING_STRATEGY), module.getConfig());
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void unConfiguredModuleShouldThrowException() {
-        RealRuntimeConfiguredRuntimeModule module = new RealRuntimeConfiguredRuntimeModule();
-        module.getConfig();
-    }
-
-    @Test
     public void shutdownShouldBeCalledBeforeShutdown() {
         TxDrivenModule mockModule = mockTxModule();
 
@@ -1249,37 +1218,5 @@ public class ProductionRuntimeTest {
 
     private PropertyContainer getMetadataContainer() {
         return (((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties());
-    }
-
-    private interface RuntimeConfiguredRuntimeModule extends TxDrivenModule, RuntimeConfigured {
-
-    }
-
-    private class RealRuntimeConfiguredRuntimeModule extends BaseTxDrivenModule<Void> implements RuntimeConfigured {
-
-        private RuntimeConfiguration configuration;
-
-        public RealRuntimeConfiguredRuntimeModule() {
-            super("TEST");
-        }
-
-        @Override
-        public void configurationChanged(RuntimeConfiguration configuration) {
-            this.configuration = configuration;
-        }
-
-        public RuntimeConfiguration getConfig() {
-            if (configuration == null) {
-                throw new IllegalStateException("Component hasn't been configured. Has it been registered with the " +
-                        "GraphAware runtime?");
-            }
-
-            return configuration;
-        }
-
-        @Override
-        public Void beforeCommit(ImprovedTransactionData transactionData) {
-            return null;
-        }
     }
 }

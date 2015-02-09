@@ -1,7 +1,25 @@
+/*
+ * Copyright (c) 2015 GraphAware
+ *
+ * This file is part of GraphAware.
+ *
+ * GraphAware is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details. You should have received a copy of
+ * the GNU General Public License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+
 package com.graphaware.runtime.walk;
 
 import com.graphaware.common.policy.fluent.IncludeNodes;
 import com.graphaware.common.policy.none.IncludeNoNodes;
+import com.graphaware.test.data.DatabasePopulator;
+import com.graphaware.test.data.SingleTransactionPopulator;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -16,15 +34,20 @@ import static org.neo4j.graphdb.DynamicLabel.label;
 public class ContinuousNodeSelectorTest extends DatabaseIntegrationTest {
 
     @Override
-    protected void populateDatabase(GraphDatabaseService database) {
-        database.createNode(label("Person")).setProperty("name", "Michal");
-        database.createNode(label("Person")).setProperty("name", "Daniela");
-        database.createNode(label("Person")).setProperty("name", "Vince");
-        database.createNode(label("Company")).setProperty("name", "GraphAware");
-        database.createNode(label("Company")).setProperty("name", "Neo");
-        database.createNode(label("Person")).setProperty("name", "Adam");
+    protected DatabasePopulator databasePopulator() {
+        return new SingleTransactionPopulator() {
+            @Override
+            protected void doPopulate(GraphDatabaseService database) {
+                database.createNode(label("Person")).setProperty("name", "Michal");
+                database.createNode(label("Person")).setProperty("name", "Daniela");
+                database.createNode(label("Person")).setProperty("name", "Vince");
+                database.createNode(label("Company")).setProperty("name", "GraphAware");
+                database.createNode(label("Company")).setProperty("name", "Neo");
+                database.createNode(label("Person")).setProperty("name", "Adam");
 
-        database.getNodeById(2).delete();
+                database.getNodeById(2).delete();
+            }
+        };
     }
 
     @Test

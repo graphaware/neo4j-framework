@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2015 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -14,20 +14,19 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.config;
+package com.graphaware.test.data;
+
+import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
- * Component configurable by {@link com.graphaware.runtime.GraphAwareRuntime}.
- *
- * @deprecated this is a legacy interface and should not need to be used.
+ * A component capable of populating Neo4j for testing purposes.
  */
-@Deprecated
-public interface RuntimeConfigured {
+public interface DatabasePopulator {
 
     /**
-     * Acknowledge a configuration change.
+     * Populate the given database.
      *
-     * @param configuration new configuration.
+     * @param database to populate.
      */
-    void configurationChanged(RuntimeConfiguration configuration);
+    void populate(GraphDatabaseService database);
 }

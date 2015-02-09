@@ -24,7 +24,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import java.util.Collections;
 import java.util.Map;
 
-import static com.graphaware.example.RelationshipQualifier.*;
+import static com.graphaware.example.RelationshipQualifier.PROPERTY;
+import static com.graphaware.example.RelationshipQualifier.RELATIONSHIP_TYPE;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 

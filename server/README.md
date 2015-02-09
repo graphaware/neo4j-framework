@@ -94,7 +94,7 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>common</artifactId>
-        <version>2.2.0.19</version>
+        <version>2.2.0.28</version>
         <scope>provided</scope>
     </dependency>
 
@@ -102,7 +102,7 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>api</artifactId>
-        <version>2.2.0.19</version>
+        <version>2.2.0.28</version>
         <scope>provided</scope>
     </dependency>
 
@@ -110,7 +110,7 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-webmvc</artifactId>
-        <version>4.1.1.RELEASE</version>
+        <version>4.1.4.RELEASE</version>
         <scope>provided</scope>
     </dependency>
 
@@ -118,7 +118,7 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-tx</artifactId>
-        <version>4.1.1.RELEASE</version>
+        <version>4.1.4.RELEASE</version>
         <scope>provided</scope>
     </dependency>
 
@@ -126,13 +126,13 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>writer-api</artifactId>
-        <version>2.2.0.19</version>
+        <version>2.2.0.28</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>writer</artifactId>
-        <version>2.2.0.19</version>
+        <version>2.2.0.28</version>
         <scope>provided</scope>
     </dependency>
 
@@ -140,7 +140,7 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>org.neo4j</groupId>
         <artifactId>neo4j</artifactId>
-        <version>2.2-M01</version>
+        <version>2.2.0</version>
         <scope>provided</scope>
     </dependency>
 
@@ -148,13 +148,13 @@ To get started manually, you will need the following dependencies:
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>server-community</artifactId>
-        <version>2.2.0.19</version>
+        <version>2.2.0.28</version>
         <scope>test</scope>
     </dependency>
 
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
-        <version>2.2.0.19</version>
+        <version>2.2.0.28</version>
         <artifactId>tests</artifactId>
         <scope>test</scope>
     </dependency>

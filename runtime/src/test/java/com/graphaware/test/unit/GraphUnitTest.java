@@ -31,7 +31,6 @@ import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 import static com.graphaware.test.unit.GraphUnit.clearGraph;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 

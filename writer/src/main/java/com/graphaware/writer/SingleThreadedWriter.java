@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2015 GraphAware
+ *
+ * This file is part of GraphAware.
+ *
+ * GraphAware is free software: you can redistribute it and/or modify it under the terms of
+ * the GNU General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details. You should have received a copy of
+ * the GNU General Public License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
+
 package com.graphaware.writer;
 
 import com.google.common.util.concurrent.AbstractScheduledService;
@@ -29,8 +45,7 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
     private final int queueCapacity;
     protected final LinkedBlockingQueue<RunnableFuture<?>> queue;
     protected final GraphDatabaseService database;
-
-    private volatile long lastLoggedTime = System.currentTimeMillis();
+    private final ScheduledExecutorService queueSizeLogger = Executors.newSingleThreadScheduledExecutor();
 
     /**
      * Construct a new writer with a default queue capacity of 10,000.
@@ -60,6 +75,14 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
     public void start() {
         startAsync();
         awaitRunning();
+        queueSizeLogger.scheduleWithFixedDelay(new Runnable() {
+            @Override
+            public void run() {
+                if (queue.size() > 0 || logEmptyQueue()) {
+                    LOG.info("Queue size: " + queue.size());
+                }
+            }
+        }, 5, loggingFrequencyMs(), TimeUnit.SECONDS);
     }
 
     /**
@@ -67,6 +90,7 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
      */
     @PreDestroy
     public void stop() {
+        queueSizeLogger.shutdownNow();
         stopAsync();
         awaitTerminated();
     }
@@ -164,14 +188,6 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
         }
 
         return null;
-    }
-
-    protected void logQueueSizeIfNeeded() {
-        long now = System.currentTimeMillis();
-        if (now - lastLoggedTime > loggingFrequencyMs() && (logEmptyQueue() || queue.size() > 0)) {
-            LOG.info("Queue size: " + queue.size());
-            lastLoggedTime = now;
-        }
     }
 
     /**

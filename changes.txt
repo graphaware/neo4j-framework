@@ -3,8 +3,20 @@
     - completely removed transaction handling and automatic support for @Transactional
     - removed transaction-simulating batch inserters
     - ability to pass a config file to the database in DatabaseIntegrationTest
+
+2.1.7.28:
+    - update to Neo4j 2.1.7
+    - different database populators for testing
+    - native Graphgen support for populating databases
+
+2.1.6.27:
+    - input validation in GraphUnit, capability to assert empty database and to print the database contents
+    - getAvailablePort() method in TestUtils
+    - float into PropertyContainerUtils for the purposes of the Recommendation Engine Module
+
 2.1.6.26:
     - logging exceptions that occur when using BatchWriter
+
 2.1.5.25:
     - more flexibility in extending writers
     - decreased log level in batch transaction executor

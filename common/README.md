@@ -16,7 +16,7 @@ Add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>common</artifactId>
-    <version>2.2.0.19</version>
+    <version>2.2.0.28</version>
 </dependency>
 ```
 
@@ -51,6 +51,64 @@ Besides some frameworky internal code, the following functionality is provided b
     * Get a number-valued property without knowing whether it is stored as byte, int, or long
 
 ... and more, please see [Javadoc](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/common/util/package-summary.html).
+
+### Inclusion Policies
+
+Throughout the framework, a class hierarchy stemming from `com.graphaware.common.policy.InclusionPolicy` is used. Its
+subtypes, such as `NodeInclusionPolicy`, `RelationshipInclusionPolicy`, `NodePropertyInclusionPolicy`, etc. are used
+in various places to determine, whether to use certain nodes, relationships, or properties for something.
+
+It is of course possible to create custom implementations of these interfaces in Java. For example, a `NodeInclusionPolicy`
+that tells the framework to only use nodes with label _Person_ for something would look like this:
+
+```java
+public class IncludeAllPeople implements NodeInclusionPolicy {
+
+    @Override
+    public boolean include(Node node) {
+        return node.hasLabel(DynamicLabel.label("Person"));
+    }
+}
+```
+
+Many GraphAware Framework Modules, however, can be used without writing any code, especially when using Neo4j in server mode.
+When these modules need to be configured (usually in _neo4j.properties_), one can use expressions to define `InclusionPolicies`.
+For those familiar with the Spring Framework, the expressions are SPeL expressions and are parsed using GraphAware's
+`InclusionPolicy` implementation, for example `SpelNodeInclusionPolicy`, `SpelRelationshipInclusionPolicy`, etc.
+
+In practice, the configuration could look as follows:
+
+```
+# Example of a Recommendation Engine configuration expressing which nodes recommendations should be computed for:
+com.graphaware.module.reco.node=hasLabel('Person')
+```
+
+The following expressions can be used:
+* For all Property Containers (Nodes and Relationships):
+    * `hasProperty('propertyName')` - returns boolean. Example: `hasProperty('name')`
+    * `getProperty('propertyName','defaultValue')` - returns Object. Example: `getProperty('name','unknown') == 'Michal'`
+* For Nodes only:
+    * `getDegree()` or `degree` - returns int. Examples: `degree > 1`
+    * `getDegree('typeOrDirection')` - returns int. Examples: `getDegree('OUTGOING') == 0` or `getDegree('FRIEND_OF') > 1000`
+    * `getDegree('type', 'direction')` - returns int. Examples: `getDegree('FRIEND_OF','OUTGOING') > 0`
+    * `hasLabel('label')` - returns boolean. Example: `hasLabel('Person')`
+* For Relationships only:
+    * `startNode` - returns Node. Example: `startNode.hasProperty('name')`
+    * `endNode` - returns Node. Example: `endNode.getDegree() > 0`
+    * `type` - returns String. Example: `type == 'WORKS_FOR'`
+    * `isType('type')` - returns boolean. Example: `isType('WORKS_FOR')`
+* For Relationships only when one of the participating nodes "looking" at the relationship is provided:
+    * `isOutgoing()` - returns boolean. Example: `isOutgoing()`
+    * `isIncoming()` - returns boolean. Example: `isIncoming()`
+    * `otherNode` - returns Node. Example: `otherNode.hasProperty('name')`
+* For all Property Container Properties:
+    * `key` - returns String. Example: `key != 'name'`
+
+Of course, the expressions can be combined with logical operators, for instance:
+* `isType('LIVES_IN') && isIncoming()`
+* `hasLabel('Employee') || hasProperty('form') || getProperty('age', 0) > 20`
+* ...
+
 
 License
 -------

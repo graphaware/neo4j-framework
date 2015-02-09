@@ -17,9 +17,6 @@
 package com.graphaware.test.integration;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.neo4j.server.Bootstrapper;
 import org.neo4j.server.configuration.Configurator;

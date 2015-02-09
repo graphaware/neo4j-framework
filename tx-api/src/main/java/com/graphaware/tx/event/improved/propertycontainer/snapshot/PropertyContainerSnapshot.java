@@ -19,10 +19,10 @@ package com.graphaware.tx.event.improved.propertycontainer.snapshot;
 import com.graphaware.common.wrapper.BasePropertyContainerWrapper;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.PropertyContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashSet;

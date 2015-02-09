@@ -19,7 +19,6 @@ package com.graphaware.tx.event.improved.data;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 
-import java.util.Map;
 import java.util.Set;
 
 /**

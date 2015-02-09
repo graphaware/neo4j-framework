@@ -27,10 +27,9 @@ import org.neo4j.tooling.GlobalGraphOperations;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.count;
-import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
-import static com.graphaware.test.unit.GraphUnit.assertSubgraph;
-import static com.graphaware.test.unit.GraphUnit.clearGraph;
+import static com.graphaware.test.unit.GraphUnit.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 
@@ -702,6 +701,166 @@ public class GraphUnitTest {
                 "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
 
         assertSubgraph(database, assertCypher, new InclusionPolicies(new ExcludeChangeSetNodeInclusionPolicy(), new ExcludeCreatedOnPropertyInclusionPolicy(), new ExcludeNextInclusionPolicy(), new ExcludeCountPropertyInclusionPolicy()));
+    }
+
+    @Test
+    public void shouldCorrectlyIdentifyEmptyDatabase() {
+        assertEmpty(database);
+        assertSameGraph(database, null);
+        assertSameGraph(database, "");
+        assertSameGraph(database, " ");
+        assertSameGraph(database, "", InclusionPolicies.all().with(new NodeInclusionPolicy() {
+            @Override
+            public boolean include(Node object) {
+                return true;
+            }
+        }));
+
+        populateDatabase("CREATE (n:Person {name:'Michal'})");
+
+        assertSameGraph(database, " ", InclusionPolicies.all().with(new NodeInclusionPolicy() {
+            @Override
+            public boolean include(Node object) {
+                return false;
+            }
+        }));
+    }
+
+    @Test
+    public void shouldCorrectlyIdentifyEmptyDatabase2() {
+        populateDatabase("CREATE (n:Person {name:'Michal'})-[:FRIEND_OF]->(d:Person {name:'Daniela'})");
+
+        try {
+            assertEmpty(database);
+            fail();
+        } catch (AssertionError e) {
+            //ok
+        }
+
+        try {
+            assertEmpty(database, InclusionPolicies.all());
+            fail();
+        } catch (AssertionError e) {
+            //ok
+        }
+
+        try {
+            assertEmpty(database, InclusionPolicies.all().with(new NodeInclusionPolicy() {
+                @Override
+                public boolean include(Node node) {
+                    return !node.hasLabel(DynamicLabel.label("Person"));
+                }
+            }));
+            fail();
+        } catch (AssertionError e) {
+            //ok
+        }
+
+        assertEmpty(database, InclusionPolicies.all().with(new NodeInclusionPolicy() {
+            @Override
+            public boolean include(Node node) {
+                return !node.hasLabel(DynamicLabel.label("Person"));
+            }
+        }).with(new RelationshipInclusionPolicy.Adapter() {
+            @Override
+            public boolean include(Relationship relationship) {
+                return !relationship.getStartNode().hasLabel(DynamicLabel.label("Person")) && !relationship.getEndNode().hasLabel(DynamicLabel.label("Person"));
+            }
+        }));
+    }
+
+    @Test
+    public void shouldFailWhenWrongArgumentsPassed() {
+        try {
+            assertEmpty(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            //ok
+        }
+
+        try {
+            assertEmpty(null, InclusionPolicies.all());
+            fail();
+        } catch (IllegalArgumentException e) {
+            //ok
+        }
+
+        try {
+            assertSameGraph(null, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            //ok
+        }
+
+        try {
+            assertSameGraph(null, null, InclusionPolicies.all());
+            fail();
+        } catch (IllegalArgumentException e) {
+            //ok
+        }
+
+        try {
+            assertSubgraph(database, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            //ok
+        }
+
+        try {
+            assertSubgraph(null, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            //ok
+        }
+
+        try {
+            assertSubgraph(null, null, InclusionPolicies.all());
+            fail();
+        } catch (IllegalArgumentException e) {
+            //ok
+        }
+
+        try {
+            assertSubgraph(database, "");
+            fail();
+        } catch (IllegalArgumentException e) {
+            //ok
+        }
+
+        try {
+            assertSubgraph(database, " ");
+            fail();
+        } catch (IllegalArgumentException e) {
+            //ok
+        }
+
+        try {
+            assertSubgraph(database, null, InclusionPolicies.all());
+            fail();
+        } catch (IllegalArgumentException e) {
+            //ok
+        }
+
+        try {
+            clearGraph(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            //ok
+        }
+
+        try {
+            clearGraph(null, InclusionPolicies.all());
+            fail();
+        } catch (IllegalArgumentException e) {
+            //ok
+        }
+    }
+
+    @Test
+    public void shouldPrintGraph() {
+        populateDatabase("CREATE (n:Person {name:'Michal'})-[:FRIEND_OF]->(d:Person {name:'Daniela'})");
+        printGraph(database);
+        //not really testing output, just that this is not throwing errors.
     }
 
     /**

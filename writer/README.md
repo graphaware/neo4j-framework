@@ -3,7 +3,7 @@ GraphAware Writer
 
 This (Maven) module is part of the [GraphAware Neo4j Framework](https://github.com/graphaware/neo4j-framework).
 
-The code in this module introduces an abstraction of writing to Neo4j, so that the mechanism can be switched. The main
+The code in this module introduces an abstraction over writing to Neo4j, so that the mechanism can be switched. The main
 purpose of this all is increasing the write throughput of Neo4j. The target audience of this module are advanced Neo4j
 users, mostly Java developers.
 
@@ -15,13 +15,13 @@ Add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>writer-api</artifactId>
-    <version>2.1.6.26</version>
+    <version>2.1.7.28</version>
 </dependency>
 
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>writer</artifactId>
-    <version>2.1.6.26</version>
+    <version>2.1.7.28</version>
 </dependency>
 ```
 
@@ -42,8 +42,8 @@ try (Transaction tx = database.beginTx()) {
 #### Single Threaded Writes - Transaction per Task
 
 In write-heavy applications, where multiple threads write to the same parts of the graph, it is sometimes the case that
-frequent deadlocks occur. One of the transactions participating in the deadlock scenario then has to be failed. There is
-no way around this and Neo4j does it automatically for you.
+frequent deadlocks occur. One of the transactions participating in the deadlock scenario has to be failed, which Neo4j
+does automatically.
 
 One way around this problem is to only use a single thread to write to the database. This guarantees no deadlocks will occur.
 Using the GraphAware Writer module (which comes with the GraphAware Framework), the above example can be re-written as

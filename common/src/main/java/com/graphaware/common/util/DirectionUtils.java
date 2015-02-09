@@ -16,11 +16,11 @@
 
 package com.graphaware.common.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.neo4j.graphdb.Direction.*;
 

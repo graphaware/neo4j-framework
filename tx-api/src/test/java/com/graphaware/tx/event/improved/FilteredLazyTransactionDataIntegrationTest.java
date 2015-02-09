@@ -17,8 +17,6 @@
 package com.graphaware.tx.event.improved;
 
 import com.graphaware.common.policy.*;
-import com.graphaware.common.policy.NodePropertyInclusionPolicy;
-import com.graphaware.common.policy.RelationshipPropertyInclusionPolicy;
 import com.graphaware.test.util.TestDataBuilder;
 import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
@@ -47,7 +45,7 @@ import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.common.util.IterableUtils.countNodes;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
-import static com.graphaware.tx.event.improved.api.Change.*;
+import static com.graphaware.tx.event.improved.api.Change.changesToMap;
 import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;

@@ -17,17 +17,12 @@
 package com.graphaware.runtime.walk;
 
 import com.graphaware.common.policy.NodeInclusionPolicy;
-import com.graphaware.common.util.ReservoirSampler;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodes;
-import org.apache.commons.math3.random.RandomDataGenerator;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.impl.core.NodeManager;
-import org.neo4j.kernel.impl.store.NodeStore;
-import org.neo4j.kernel.impl.transaction.state.NeoStoreProvider;
-import org.neo4j.tooling.GlobalGraphOperations;
+import org.neo4j.kernel.impl.nioneo.xa.NeoStoreProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

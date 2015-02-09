@@ -17,6 +17,7 @@
 package com.graphaware.test.unit;
 
 import com.graphaware.common.policy.InclusionPolicies;
+import com.graphaware.common.util.PropertyContainerUtils;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -64,16 +65,7 @@ public final class GraphUnit {
      * @throws AssertionError in case the graphs are not the same.
      */
     public static void assertSameGraph(GraphDatabaseService database, String sameGraphCypher) {
-        GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(otherDatabase);
-
-        new ExecutionEngine(otherDatabase).execute(sameGraphCypher);
-
-        try {
-            assertSameGraph(database, otherDatabase, InclusionPolicies.all());
-        } finally {
-            otherDatabase.shutdown();
-        }
+        assertSameGraph(database, sameGraphCypher, InclusionPolicies.all());
     }
 
     /**
@@ -91,6 +83,15 @@ public final class GraphUnit {
      * @throws AssertionError in case the graphs are not the same.
      */
     public static void assertSameGraph(GraphDatabaseService database, String sameGraphCypher, InclusionPolicies inclusionPolicies) {
+        if (database == null) {
+            throw new IllegalArgumentException("Database must not be null");
+        }
+
+        if (sameGraphCypher == null || sameGraphCypher.trim().isEmpty()) {
+            assertEmpty(database, inclusionPolicies);
+            return;
+        }
+
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
         registerShutdownHook(otherDatabase);
 
@@ -124,16 +125,7 @@ public final class GraphUnit {
      * @throws AssertionError in case the "cypher" graph is not a subgraph of the "database" graph.
      */
     public static void assertSubgraph(GraphDatabaseService database, String subgraphCypher) {
-        GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(otherDatabase);
-
-        new ExecutionEngine(otherDatabase).execute(subgraphCypher);
-
-        try {
-            assertSubgraph(database, otherDatabase, InclusionPolicies.all());
-        } finally {
-            otherDatabase.shutdown();
-        }
+        assertSubgraph(database, subgraphCypher, InclusionPolicies.all());
     }
 
     /**
@@ -158,6 +150,14 @@ public final class GraphUnit {
      * @throws AssertionError in case the "cypher" graph is not a subgraph of the "database" graph.
      */
     public static void assertSubgraph(GraphDatabaseService database, String subgraphCypher, InclusionPolicies inclusionPolicies) {
+        if (database == null) {
+            throw new IllegalArgumentException("Database must not be null");
+        }
+
+        if (subgraphCypher == null || subgraphCypher.trim().isEmpty()) {
+            throw new IllegalArgumentException("Cypher statement must not be null or empty");
+        }
+
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
         registerShutdownHook(otherDatabase);
 
@@ -167,6 +167,43 @@ public final class GraphUnit {
             assertSubgraph(database, otherDatabase, inclusionPolicies);
         } finally {
             otherDatabase.shutdown();
+        }
+    }
+
+    /**
+     * Assert that the database is empty.
+     *
+     * @param database to run the assertion against.
+     */
+    public static void assertEmpty(GraphDatabaseService database) {
+        assertEmpty(database, InclusionPolicies.all());
+    }
+
+    /**
+     * Assert that the database is empty.
+     *
+     * @param database          to run the assertion against.
+     * @param inclusionPolicies {@link com.graphaware.common.policy.InclusionPolicies} deciding whether to include nodes/relationships/properties or not in the assertion.
+     */
+    public static void assertEmpty(GraphDatabaseService database, InclusionPolicies inclusionPolicies) {
+        if (database == null) {
+            throw new IllegalArgumentException("Database must not be null");
+        }
+
+        try (Transaction tx = database.beginTx()) {
+            for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+                if (inclusionPolicies.getNodeInclusionPolicy().include(node)) {
+                    fail("The database is not empty, there are nodes");
+                }
+            }
+
+            for (Relationship relationship : GlobalGraphOperations.at(database).getAllRelationships()) {
+                if (inclusionPolicies.getRelationshipInclusionPolicy().include(relationship)) {
+                    fail("The database is not empty, there are relationships");
+                }
+            }
+
+            tx.success();
         }
     }
 
@@ -187,6 +224,10 @@ public final class GraphUnit {
      *                          Note that {@link com.graphaware.common.policy.PropertyInclusionPolicy}s are ignored when clearing the graph.
      */
     public static void clearGraph(GraphDatabaseService database, InclusionPolicies inclusionPolicies) {
+        if (database == null) {
+            throw new IllegalArgumentException("Database must not be null");
+        }
+
         for (Relationship rel : GlobalGraphOperations.at(database).getAllRelationships()) {
             if (isRelationshipIncluded(rel, inclusionPolicies)) {
                 rel.delete();
@@ -197,6 +238,45 @@ public final class GraphUnit {
             if (isNodeIncluded(node, inclusionPolicies)) {
                 node.delete();
             }
+        }
+    }
+
+    /**
+     * Prints the contents of the graph.
+     *
+     * @param database to print.
+     */
+    public static void printGraph(GraphDatabaseService database) {
+        printGraph(database, InclusionPolicies.all());
+    }
+
+    /**
+     * Prints the contents of the graph.
+     *
+     * @param database          to print.
+     * @param inclusionPolicies {@link com.graphaware.common.policy.InclusionPolicies} deciding whether to include nodes/relationships or not.
+     *                          Note that {@link com.graphaware.common.policy.PropertyInclusionPolicy}s are ignored when printing the graph.
+     */
+    public static void printGraph(GraphDatabaseService database, InclusionPolicies inclusionPolicies) {
+        if (database == null) {
+            throw new IllegalArgumentException("Database must not be null");
+        }
+
+        try (Transaction tx = database.beginTx()) {
+            System.out.println("Nodes:");
+            for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+                if (isNodeIncluded(node, inclusionPolicies)) {
+                    System.out.println(PropertyContainerUtils.nodeToString(node));
+                }
+            }
+
+            System.out.println("Relationships:");
+            for (Relationship rel : GlobalGraphOperations.at(database).getAllRelationships()) {
+                if (isRelationshipIncluded(rel, inclusionPolicies)) {
+                    System.out.println(PropertyContainerUtils.relationshipToString(rel));
+                }
+            }
+            tx.success();
         }
     }
 

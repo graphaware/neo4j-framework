@@ -293,6 +293,33 @@ public final class PropertyContainerUtils {
         return getLong(propertyContainer.toString(), key, propertyContainer.getProperty(key, defaultValue));
     }
 
+    /**
+     * Get a property from the given property container as float.
+     *
+     * @param propertyContainer to get property from.
+     * @param key               key of the property.
+     * @return value.
+     * @throws ClassCastException if value isn't a number.
+     * @throws org.neo4j.graphdb.NotFoundException
+     *                            if the property doesn't exist.
+     */
+    public static float getFloat(PropertyContainer propertyContainer, String key) {
+        return getFloat(propertyContainer.toString(), key, propertyContainer.getProperty(key));
+    }
+
+    /**
+     * Get a property from the given property container as float.
+     *
+     * @param propertyContainer to get property from.
+     * @param key               key of the property.
+     * @param defaultValue      value returned if property does not exist.
+     * @return value.
+     * @throws ClassCastException if value isn't a number.
+     */
+    public static float getFloat(PropertyContainer propertyContainer, String key, float defaultValue) {
+        return getFloat(propertyContainer.toString(), key, propertyContainer.getProperty(key, defaultValue));
+    }
+
     private static int getInt(String pc, String key, Object value) {
         if (value instanceof Byte) {
             return ((Byte) value).intValue();
@@ -320,6 +347,31 @@ public final class PropertyContainerUtils {
 
         if (value instanceof Long) {
             return (Long) value;
+        }
+
+        throw new ClassCastException(value + " is not a number! (" + pc + ", key=" + key + ")");
+    }
+
+    private static float getFloat(String pc, String key, Object value) {
+        if (value instanceof Byte) {
+            return ((Byte) value).floatValue();
+        }
+
+        if (value instanceof Double) {
+            return ((Double) value).floatValue();
+        }
+
+
+        if (value instanceof Integer) {
+            return ((Integer) value).floatValue();
+        }
+
+        if (value instanceof Long) {
+            return ((Long) value).floatValue();
+        }
+
+        if (value instanceof Float) {
+            return (Float) value;
         }
 
         throw new ClassCastException(value + " is not a number! (" + pc + ", key=" + key + ")");

@@ -19,8 +19,6 @@ package com.graphaware.runtime.config;
 import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.runtime.write.WritingConfig;
 import com.graphaware.writer.DatabaseWriter;
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.Label;
 
 /**
  * {@link com.graphaware.runtime.GraphAwareRuntime} configuration.

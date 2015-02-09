@@ -252,6 +252,58 @@ public class PropertyContainerUtilsTest {
         }
     }
 
+    @Test
+    public void shouldSafelyGetFloat() {
+        populateDatabaseWithNumberProperties();
+        float expected = 123.0f;
+
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(expected, getFloat(database.getNodeById(0), "test"),0);
+            assertEquals(expected, getFloat(database.getNodeById(1), "test"),0);
+            assertEquals(expected, getFloat(database.getNodeById(2), "test"),0);
+            assertEquals(expected, getFloat(database.getNodeById(5), "test"),0);
+
+            try {
+                getFloat(database.getNodeById(3), "test");
+                fail();
+            } catch (ClassCastException e) {
+                //ok
+            }
+
+            try {
+                getFloat(database.getNodeById(4), "test");
+                fail();
+            } catch (NotFoundException e) {
+                //ok
+            }
+
+            tx.success();
+        }
+    }
+
+    @Test
+    public void shouldSafelyGetFloatWithDefaults() {
+        populateDatabaseWithNumberProperties();
+        long expected = 123L;
+
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(expected, getFloat(database.getNodeById(0), "test", 123L),0);
+            assertEquals(expected, getFloat(database.getNodeById(1), "test", 123L),0);
+            assertEquals(expected, getFloat(database.getNodeById(2), "test", 123L),0);
+            assertEquals(expected, getFloat(database.getNodeById(4), "test", 123L),0);
+            assertEquals(expected, getFloat(database.getNodeById(5), "test", 123L),0);
+
+            try {
+                getFloat(database.getNodeById(3), "test", 123L);
+                fail();
+            } catch (ClassCastException e) {
+                //ok
+            }
+
+            tx.success();
+        }
+    }
+
     private void populateDatabaseWithNumberProperties() {
         database.shutdown();
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
@@ -263,6 +315,7 @@ public class PropertyContainerUtilsTest {
             database.createNode().setProperty("test", 123L);
             database.createNode().setProperty("test", "string");
             database.createNode();
+            database.createNode().setProperty("test", 123.0f);
             tx.success();
         }
     }

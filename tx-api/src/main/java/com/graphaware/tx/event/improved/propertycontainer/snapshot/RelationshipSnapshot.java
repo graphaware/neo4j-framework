@@ -19,10 +19,10 @@ package com.graphaware.tx.event.improved.propertycontainer.snapshot;
 import com.graphaware.common.wrapper.RelationshipWrapper;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link PropertyContainerSnapshot} representing a {@link org.neo4j.graphdb.Relationship}.

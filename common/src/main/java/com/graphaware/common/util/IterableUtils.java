@@ -21,7 +21,10 @@ import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.tooling.GlobalGraphOperations;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Utility methods for dealing with {@link Iterable}s.
