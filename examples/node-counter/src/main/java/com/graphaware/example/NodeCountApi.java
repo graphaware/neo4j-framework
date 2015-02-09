@@ -17,6 +17,7 @@
 package com.graphaware.example;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.springframework.beans.factory.annotation.Autowired;
