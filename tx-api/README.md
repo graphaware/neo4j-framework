@@ -5,7 +5,7 @@ This (Maven) module is part of the [GraphAware Neo4j Framework](https://github.c
 
 ### Introduction
 
-This module provides a decorator of the Neo4j Transaction Event API (called [`TransactionData`](http://docs.neo4j.org/chunked/2.2.0-M03/javadocs/org/neo4j/graphdb/event/TransactionData.html)).
+This module provides a decorator of the Neo4j Transaction Event API (called [`TransactionData`](http://docs.neo4j.org/chunked/2.2.0-M04/javadocs/org/neo4j/graphdb/event/TransactionData.html)).
 Before a transaction commits, the improved API allows users to traverse the new version of the graph (as it will be
 after the transaction commits), as well as a "snapshot" of the old graph (as it was before the transaction started).
 It provides a clean API to access information about changes performed by the transaction as well as the option to
@@ -17,7 +17,7 @@ easily access relationships/nodes that were changed and/or deleted in a transact
 
 The target audience of this module are advanced Neo4j users, mostly Java developers developing Neo4j
 [`TransactionEventHandler`](http://docs.neo4j.org/chunked/
-2.2.0-M03/javadocs/org/neo4j/graphdb/event/TransactionEventHandler.html)s.
+2.2.0-M04/javadocs/org/neo4j/graphdb/event/TransactionEventHandler.html)s.
 The module is also one of the key components of [GraphAware Runtime](../runtime).
 
 ### Getting the Module
