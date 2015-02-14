@@ -26,8 +26,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * {@link StatsCollector} that collects stats using Google Analytics.
@@ -36,8 +37,8 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
 
     private static final Logger LOG = LoggerFactory.getLogger(GoogleAnalyticsStatsCollector.class);
     private static final UUID uuid = UUID.randomUUID();
-    private static final String TID = "UA-53671654-1";
-    private static final ExecutorService executor = Executors.newFixedThreadPool(3);
+    private static final String TID = "UA-1428985-8";
+    private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     private static final GoogleAnalyticsStatsCollector INSTANCE = new GoogleAnalyticsStatsCollector();
 
@@ -67,7 +68,7 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
      */
     @Override
     public void runtimeStart() {
-        post(constructBody("com.graphaware.runtime.GraphAwareRuntime"));
+        post(constructBody("runtime"));
     }
 
     /**
@@ -79,16 +80,9 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
     }
 
     private void post(final String body) {
-        executor.submit(new Runnable() {
+        executor.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                try {
-                    //wait to make sure it's not a unit test or something like that
-                    Thread.sleep(60000);
-                } catch (InterruptedException e) {
-                    //do nothing
-                }
-
                 HttpPost httpPost = new HttpPost("http://www.google-analytics.com/collect");
                 httpPost.setEntity(new StringEntity(body, ContentType.TEXT_PLAIN));
 
@@ -98,10 +92,10 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
                     LOG.warn("Unable to collect stats", e1);
                 }
             }
-        });
+        }, 5, 5, TimeUnit.MINUTES);
     }
 
     private String constructBody(String appId) {
-        return "v=1&tid=" + TID + "&cid=" + uuid + "&t=event&ea=start&ec=" + appId + "&el=" + VERSION;
+        return "v=1&tid=" + TID + "&cid=" + uuid + "&t=event&ea=" + appId + "&ec=Run&el=" + VERSION;
     }
 }
