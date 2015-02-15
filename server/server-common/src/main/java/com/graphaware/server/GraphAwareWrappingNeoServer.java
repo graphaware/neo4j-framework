@@ -17,17 +17,15 @@
 package com.graphaware.server;
 
 import com.graphaware.server.web.GraphAwareJetty9WebServer;
+import com.graphaware.server.web.WebAppInitializer;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.server.WrappingNeoServer;
 import org.neo4j.server.configuration.Configurator;
 import org.neo4j.server.web.WebServer;
 
 /**
- *  {@link org.neo4j.server.WrappingNeoServer} that uses {@link com.graphaware.server.web.GraphAwareJetty9WebServer}.
- *
- *  @deprecated because parent class is as well.
+ *  {@link org.neo4j.server.WrappingNeoServer} that bootstraps the GraphAware Framework.
  */
-@Deprecated
 public class GraphAwareWrappingNeoServer extends WrappingNeoServer {
 
     public GraphAwareWrappingNeoServer(GraphDatabaseAPI db) {
@@ -43,6 +41,6 @@ public class GraphAwareWrappingNeoServer extends WrappingNeoServer {
      */
     @Override
     protected WebServer createWebServer() {
-        return new GraphAwareJetty9WebServer(getLogging());
+        return new GraphAwareJetty9WebServer(getLogging(), new WebAppInitializer(getDatabase(), this));
     }
 }

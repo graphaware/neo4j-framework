@@ -23,24 +23,22 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ArrayUtil;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.logging.Logging;
-import org.neo4j.server.database.InjectableProvider;
 import org.neo4j.server.web.Jetty9WebServer;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import java.util.Collection;
 
 /**
  * GraphAware extension to {@link org.neo4j.server.web.Jetty9WebServer} that mounts the framework APIs under "/graphaware".
  */
 public class GraphAwareJetty9WebServer extends Jetty9WebServer {
 
-    private GraphDatabaseService database;
+    private final WebAppInitializer initializer;
 
-    public GraphAwareJetty9WebServer(Logging logging) {
+    public GraphAwareJetty9WebServer(Logging logging, WebAppInitializer initializer) {
         super(logging);
+        this.initializer = initializer;
     }
 
     @Override
@@ -52,25 +50,14 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
 
         //If http logging is turned on, the jetty handler is a RequestLogHandler with a different type hierarchy than
         //the HandlerList returned when http logging is off
-        if(getJetty().getHandler().getClass().equals(RequestLogHandler.class)) {
-            handlerList = (HandlerList)((RequestLogHandler)getJetty().getHandler()).getHandler();
-        }
-        else {
+        if (getJetty().getHandler().getClass().equals(RequestLogHandler.class)) {
+            handlerList = (HandlerList) ((RequestLogHandler) getJetty().getHandler()).getHandler();
+        } else {
             handlerList = (HandlerList) getJetty().getHandler();
         }
         handlerList.setHandlers(ArrayUtil.prependToArray(context, handlerList.getHandlers(), Handler.class));
 
         super.startJetty();
-    }
-
-    @Override
-    public void setDefaultInjectables(Collection<InjectableProvider<?>> defaultInjectables) {
-        for (InjectableProvider<?> provider : defaultInjectables) {
-            if (GraphDatabaseService.class.isAssignableFrom(provider.t)) {
-                database = (GraphDatabaseService) provider.getValue(null);
-            }
-        }
-        super.setDefaultInjectables(defaultInjectables);
     }
 
     public class JettyStartingListener extends AbstractLifeCycle.AbstractLifeCycleListener {
@@ -84,7 +71,7 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
         @Override
         public void lifeCycleStarting(LifeCycle event) {
             try {
-                new WebAppInitializer(database).onStartup(sc);
+                initializer.onStartup(sc);
             } catch (ServletException e) {
                 throw new RuntimeException(e);
             }

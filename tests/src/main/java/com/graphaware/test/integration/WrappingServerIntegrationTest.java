@@ -18,7 +18,6 @@ package com.graphaware.test.integration;
 
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.server.WrappingNeoServerBootstrapper;
-import org.neo4j.server.configuration.Configurator;
 import org.neo4j.server.configuration.ServerConfigurator;
 import org.neo4j.server.configuration.ServerSettings;
 import org.neo4j.server.configuration.ThirdPartyJaxRsPackage;
@@ -27,10 +26,9 @@ import java.util.Collections;
 import java.util.Map;
 
 import static org.neo4j.helpers.Settings.FALSE;
-import static org.neo4j.helpers.Settings.TRUE;
 
 /**
- * {@link DatabaseIntegrationTest} that starts the {@link WrappingNeoServerBootstrapper} as well,
+ * {@link DatabaseIntegrationTest} that starts the {@link WrappingNeoServerBootstrapper},
  * in order to make the Neo4j browser and potentially custom managed and unmanaged extensions available for testing.
  * <p/>
  * This is generally useful for developers who use Neo4j in server mode and want to test their extensions, whilst
@@ -44,6 +42,8 @@ import static org.neo4j.helpers.Settings.TRUE;
  * <p/>
  * By overriding {@link #additionalServerConfiguration()}, you can provide additional server configuration (which would
  * normally live in neo4j-server.properties).
+ * <p/>
+ * For testing pure Spring MVC code that uses the GraphAware Framework, please use {@link com.graphaware.test.integration.GraphAwareApiTest}.
  */
 public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationTest {
 
@@ -70,8 +70,12 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
     private void startServerWrapper() {
         ServerConfigurator configurator = new ServerConfigurator((GraphDatabaseAPI) getDatabase());
         populateConfigurator(configurator);
-        bootstrapper = new WrappingNeoServerBootstrapper((GraphDatabaseAPI) getDatabase(), configurator);
+        bootstrapper = createBootstrapper(configurator);
         bootstrapper.start();
+    }
+
+    protected WrappingNeoServerBootstrapper createBootstrapper(ServerConfigurator configurator) {
+        return new WrappingNeoServerBootstrapper((GraphDatabaseAPI) getDatabase(), configurator);
     }
 
     /**
@@ -98,8 +102,8 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
      * Provide information for registering unmanaged extensions.
      *
      * @return map where the key is the package in which a set of extensions live and value is the mount point of those
-     *         extensions, i.e., a URL under which they will be exposed relative to the server address
-     *         (typically http://localhost:7575 for tests).
+     * extensions, i.e., a URL under which they will be exposed relative to the server address
+     * (typically http://localhost:7575 for tests).
      */
     protected Map<String, String> thirdPartyJaxRsPackageMappings() {
         return Collections.emptyMap();

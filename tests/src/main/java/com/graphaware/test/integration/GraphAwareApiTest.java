@@ -16,19 +16,16 @@
 
 package com.graphaware.test.integration;
 
-import com.graphaware.server.web.WebAppInitializer;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.util.component.AbstractLifeCycle;
-import org.eclipse.jetty.util.component.LifeCycle;
-
-import javax.servlet.ServletException;
+import com.graphaware.server.GraphAwareWrappingNeoServerBootstrapper;
+import org.neo4j.kernel.GraphDatabaseAPI;
+import org.neo4j.server.WrappingNeoServerBootstrapper;
+import org.neo4j.server.configuration.ServerConfigurator;
 
 /**
  * Base-class for tests of APIs that are written as Spring MVC {@link org.springframework.stereotype.Controller}s
  * and deployed using the GraphAware Framework.
  * <p/>
- * Starts a Neo4j server on the port specified using {@link #jettyServerPort()} (or 8082 by default) and deploys all
+ * Starts a Neo4j server on the port specified using {@link #neoServerPort()} (or 7575 by default) and deploys all
  * {@link org.springframework.stereotype.Controller} annotated controllers.
  * <p/>
  * Allows implementing tests to call {@link #getDatabase()} and thus gain low-level access to the database
@@ -37,35 +34,14 @@ import javax.servlet.ServletException;
  * by overriding the {@link #populateDatabase(org.neo4j.graphdb.GraphDatabaseService)} method, or by providing a
  * {@link com.graphaware.test.data.DatabasePopulator} in {@link #databasePopulator()}.
  */
-public abstract class GraphAwareApiTest extends JettyAndWrappingServerIntegrationTest {
+public abstract class GraphAwareApiTest extends WrappingServerIntegrationTest {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void modifyServer(Server server) {
-        final ServletContextHandler handler = new ServletContextHandler(null, "/graphaware", ServletContextHandler.SESSIONS);
-
-        handler.addLifeCycleListener(new AbstractLifeCycle.AbstractLifeCycleListener() {
-            @Override
-            public void lifeCycleStarting(LifeCycle event) {
-                try {
-                    new WebAppInitializer(getDatabase()).onStartup(handler.getServletContext());
-                } catch (ServletException e) {
-                    throw new RuntimeException();
-                }
-            }
-        });
-
-        server.setHandler(handler);
+    protected WrappingNeoServerBootstrapper createBootstrapper(ServerConfigurator configurator) {
+        return new GraphAwareWrappingNeoServerBootstrapper((GraphDatabaseAPI) getDatabase(), configurator);
     }
 
-    /**
-     * Get the URL against which tests would typically be executed.
-     *
-     * @return base URL.
-     */
-    protected String baseUrl() {
-        return baseJettyUrl() + "/graphaware";
+    public String baseUrl() {
+        return baseNeoUrl() + "/graphaware";
     }
 }
