@@ -3,6 +3,7 @@
     - completely removed transaction handling and automatic support for @Transactional
     - removed transaction-simulating batch inserters
     - ability to pass a config file to the database in DatabaseIntegrationTest
+    - internals improvements and bugfixes
 
 2.1.7.28:
     - update to Neo4j 2.1.7
