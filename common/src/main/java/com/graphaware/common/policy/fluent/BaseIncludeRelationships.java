@@ -191,6 +191,25 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
     }
 
     /**
+     * Convert relationship types represented as  {@link RelationshipType} objects to strings.
+     *
+     * @param relationshipTypes to convert.
+     * @return converted.
+     */
+    private String[] typesToStrings(RelationshipType[] relationshipTypes) {
+        List<String> strings = new LinkedList<>();
+
+        for (RelationshipType type : relationshipTypes) {
+            if (type == null) {
+                throw new IllegalArgumentException("Null relationships types are not supported");
+            }
+            strings.add(type.name());
+        }
+
+        return strings.toArray(new String[strings.size()]);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -202,7 +221,7 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
         BaseIncludeRelationships that = (BaseIncludeRelationships) o;
 
         if (direction != that.direction) return false;
-        if (!Arrays.equals(relationshipTypes, that.relationshipTypes)) return false;
+        if (!Arrays.equals(typesToStrings(relationshipTypes), typesToStrings(that.relationshipTypes))) return false;
 
         return true;
     }
@@ -214,7 +233,7 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + direction.hashCode();
-        result = 31 * result + Arrays.hashCode(relationshipTypes);
+        result = 31 * result + Arrays.hashCode(typesToStrings(relationshipTypes));
         return result;
     }
 }
