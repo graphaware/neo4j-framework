@@ -16,10 +16,17 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.common.kv.GraphKeyValueStore;
+import com.graphaware.common.kv.KeyValueStore;
 import com.graphaware.common.policy.InclusionPolicies;
-import com.graphaware.runtime.config.*;
+import com.graphaware.runtime.config.FluentTxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.metadata.*;
-import com.graphaware.runtime.module.*;
+import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
+import com.graphaware.runtime.module.NeedsInitializationException;
+import com.graphaware.runtime.module.TimerDrivenModule;
+import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
@@ -34,8 +41,6 @@ import org.mockito.Mockito;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.helpers.collection.Iterables;
-import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.impl.core.NodeManager;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
@@ -66,12 +71,14 @@ public class ProductionRuntimeTest {
     private ModuleMetadataRepository timerRepo;
     private GraphDatabaseService database;
     private ModuleMetadataRepository txRepo;
+    private KeyValueStore keyValueStore;
 
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         txRepo = new GraphPropertiesMetadataRepository(database, defaultConfiguration(), TX_MODULES_PROPERTY_PREFIX);
         timerRepo = new GraphPropertiesMetadataRepository(database, defaultConfiguration(), TIMER_MODULES_PROPERTY_PREFIX);
+        keyValueStore = new GraphKeyValueStore(database);
     }
 
     @After
@@ -224,8 +231,7 @@ public class ProductionRuntimeTest {
         final TimerDrivenModule mockModule = mockTimerModule();
 
         try (Transaction tx = database.beginTx()) {
-            PropertyContainer root = getMetadataContainer();
-            root.setProperty(GA_PREFIX + TX_MODULES_PROPERTY_PREFIX + "_" + MOCK, "CORRUPT");
+            keyValueStore.set(GA_PREFIX + TX_MODULES_PROPERTY_PREFIX + "_" + MOCK, "CORRUPT");
             tx.success();
         }
 
@@ -608,31 +614,6 @@ public class ProductionRuntimeTest {
     }
 
     @Test
-    public void shouldCreateRuntimeMetadataAfterFirstStartup() {
-        PropertyContainer pc = (((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties());
-
-        try (Transaction tx = database.beginTx()) {
-            assertFalse(pc.hasProperty("_GA_METADATA"));
-            tx.success();
-        }
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
-
-        try (Transaction tx = database.beginTx()) {
-            assertFalse(pc.hasProperty("_GA_METADATA"));
-            tx.success();
-        }
-
-        runtime.start();
-
-        try (Transaction tx = database.beginTx()) {
-            assertTrue(pc.hasProperty("_GA_METADATA"));
-            assertTrue((boolean) pc.getProperty("_GA_METADATA"));
-            tx.success();
-        }
-    }
-
-    @Test
     public void moduleRegisteredForTheFirstTimeShouldBeInitialized() {
         final TxDrivenModule mockModule = mockTxModule();
 
@@ -816,8 +797,7 @@ public class ProductionRuntimeTest {
         final TxDrivenModule mockModule = mockTxModule();
 
         try (Transaction tx = database.beginTx()) {
-            PropertyContainer root = getMetadataContainer();
-            root.setProperty(GA_PREFIX + TX_MODULES_PROPERTY_PREFIX + "_" + MOCK, "CORRUPT");
+            keyValueStore.set(GA_PREFIX + TX_MODULES_PROPERTY_PREFIX + "_" + MOCK, "CORRUPT");
             tx.success();
         }
 
@@ -845,8 +825,7 @@ public class ProductionRuntimeTest {
         final TxDrivenModule mockModule = mockTxModule();
 
         try (Transaction tx = database.beginTx()) {
-            PropertyContainer root = getMetadataContainer();
-            root.setProperty(GA_PREFIX + TX_MODULES_PROPERTY_PREFIX + "_" + MOCK, new byte[]{2, 3, 4});
+            keyValueStore.set(GA_PREFIX + TX_MODULES_PROPERTY_PREFIX + "_" + MOCK, new byte[]{2, 3, 4});
             tx.success();
         }
 
@@ -874,10 +853,9 @@ public class ProductionRuntimeTest {
         final TxDrivenModule mockModule = mockTxModule();
 
         try (Transaction tx = database.beginTx()) {
-            PropertyContainer root = getMetadataContainer();
             txRepo.persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()));
-            root.setProperty(GA_PREFIX + TX_MODULES_PROPERTY_PREFIX + "_UNUSED", "CORRUPT");
-            root.setProperty(GA_PREFIX + TX_MODULES_PROPERTY_PREFIX + "_UNUSED2", new byte[]{1, 2, 3});
+            keyValueStore.set(GA_PREFIX + TX_MODULES_PROPERTY_PREFIX + "_UNUSED", "CORRUPT");
+            keyValueStore.set(GA_PREFIX + TX_MODULES_PROPERTY_PREFIX + "_UNUSED2", new byte[]{1, 2, 3});
             tx.success();
         }
 
@@ -1214,9 +1192,5 @@ public class ProductionRuntimeTest {
 
     private interface TxAndTimerDrivenModule extends TxDrivenModule, TimerDrivenModule {
 
-    }
-
-    private PropertyContainer getMetadataContainer() {
-        return (((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties());
     }
 }

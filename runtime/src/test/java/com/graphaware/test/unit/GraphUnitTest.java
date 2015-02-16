@@ -16,15 +16,17 @@
 
 package com.graphaware.test.unit;
 
+import com.graphaware.common.kv.GraphKeyValueStore;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
+import com.graphaware.runtime.bootstrap.TestRuntimeModule;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.impl.core.NodeManager;
+
+import java.util.Collections;
 
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
@@ -46,6 +48,7 @@ public class GraphUnitTest extends DatabaseIntegrationTest {
     @Test
     public void clearGraphWithRuntimeShouldDeleteAllNodesAndRelsButNotGraphProps() {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(getDatabase());
+        runtime.registerModule(new TestRuntimeModule("test", Collections.singletonMap("test", "test")));
         runtime.start();
 
         try (Transaction tx = getDatabase().beginTx()) {
@@ -64,7 +67,7 @@ public class GraphUnitTest extends DatabaseIntegrationTest {
 
         try (Transaction tx = getDatabase().beginTx()) {
             assertEquals(0, count(at(getDatabase()).getAllNodes()));
-            assertTrue((boolean) ((GraphDatabaseAPI) getDatabase()).getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties().getProperty("_GA_METADATA"));
+            assertTrue(new GraphKeyValueStore(getDatabase()).hasKey("_GA_TX_MODULE_test"));
             tx.success();
         }
     }

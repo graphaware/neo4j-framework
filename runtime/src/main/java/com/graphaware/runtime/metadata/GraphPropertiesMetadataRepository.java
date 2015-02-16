@@ -17,24 +17,19 @@
 package com.graphaware.runtime.metadata;
 
 
-import com.graphaware.common.policy.ObjectInclusionPolicy;
+import com.graphaware.common.kv.GraphKeyValueStore;
+import com.graphaware.common.kv.KeyValueStore;
 import com.graphaware.common.serialize.Serializer;
-import com.graphaware.common.util.PropertyContainerUtils;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModule;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.PropertyContainer;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.kernel.impl.core.NodeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
 
 /**
  * {@link ModuleMetadataRepository} backed by a {@link org.neo4j.kernel.impl.core.GraphProperties}.
@@ -42,8 +37,7 @@ import static com.graphaware.runtime.config.RuntimeConfiguration.GA_METADATA;
 public class GraphPropertiesMetadataRepository implements ModuleMetadataRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphPropertiesMetadataRepository.class);
-    private final GraphDatabaseService database;
-    private final PropertyContainer metadataPropertyContainer;
+    private final KeyValueStore keyValueStore;
     private final String propertyPrefix;
 
     /**
@@ -55,23 +49,7 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
      */
     public GraphPropertiesMetadataRepository(GraphDatabaseService database, RuntimeConfiguration configuration, String propertyPrefix) {
         this.propertyPrefix = configuration.createPrefix(propertyPrefix);
-        this.database = database;
-        this.metadataPropertyContainer = (((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties());
-    }
-
-    /**
-     * Get the {@link PropertyContainer} against which to store all metadata.
-     *
-     * @return {@link PropertyContainer} on which metadata is stored, null if one doesn't exist.
-     */
-    protected PropertyContainer getOrCreateMetadataContainer() {
-        if (!metadataPropertyContainer.hasProperty(GA_METADATA)) {
-            try (Transaction tx = database.beginTx()) {
-                metadataPropertyContainer.setProperty(GA_METADATA, true);
-                tx.success();
-            }
-        }
-        return metadataPropertyContainer;
+        this.keyValueStore = new GraphKeyValueStore(database);
     }
 
     /**
@@ -88,9 +66,8 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
     @Override
     public <M extends ModuleMetadata> M getModuleMetadata(String moduleId) {
         final String key = moduleKey(moduleId);
-        PropertyContainer container = getOrCreateMetadataContainer();
 
-        Map<String, Object> internalProperties = getInternalProperties(container);
+        Map<String, Object> internalProperties = getInternalProperties(keyValueStore);
 
         try {
             byte[] serializedMetadata = (byte[]) internalProperties.get(key);
@@ -120,7 +97,7 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
      */
     @Override
     public <M extends ModuleMetadata> void persistModuleMetadata(String moduleId, M metadata) {
-        getOrCreateMetadataContainer().setProperty(moduleKey(moduleId), Serializer.toByteArray(metadata));
+        keyValueStore.set(moduleKey(moduleId), Serializer.toByteArray(metadata));
     }
 
     /**
@@ -129,7 +106,7 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
     @Override
     public Set<String> getAllModuleIds() {
         Set<String> result = new HashSet<>();
-        for (String key : getInternalProperties(getOrCreateMetadataContainer()).keySet()) {
+        for (String key : getInternalProperties(keyValueStore).keySet()) {
             result.add(key.replace(propertyPrefix, ""));
         }
         return result;
@@ -140,22 +117,23 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
      */
     @Override
     public void removeModuleMetadata(String moduleId) {
-        getOrCreateMetadataContainer().removeProperty(moduleKey(moduleId));
+        keyValueStore.remove(moduleKey(moduleId));
     }
 
     /**
-     * Get properties starting with {@link #propertyPrefix} from a {@link PropertyContainer}.
+     * Get properties starting with {@link #propertyPrefix} from a {@link com.graphaware.common.kv.KeyValueStore}.
      *
-     * @param pc {@link PropertyContainer} to get properties from.
+     * @param keyValueStore {@link KeyValueStore} to get properties from.
      * @return map of properties (key-value).
      */
-    private Map<String, Object> getInternalProperties(PropertyContainer pc) {
-        return PropertyContainerUtils.propertiesToMap(pc, new ObjectInclusionPolicy<String>() {
-            @Override
-            public boolean include(String s) {
-                return s.startsWith(propertyPrefix);
+    private Map<String, Object> getInternalProperties(KeyValueStore keyValueStore) {
+        Map<String, Object> result = new HashMap<>();
+        for (String key : keyValueStore.getKeys()) {
+            if (key.startsWith(propertyPrefix)) {
+                result.put(key, keyValueStore.get(key));
             }
-        });
+        }
+        return result;
     }
 
     /**

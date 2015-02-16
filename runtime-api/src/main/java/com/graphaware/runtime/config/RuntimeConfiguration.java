@@ -32,11 +32,6 @@ public interface RuntimeConfiguration {
     public static final String GA_PREFIX = "_GA_";
 
     /**
-     * Identifier of Framework Metadata in metadata repositories.
-     */
-    public static final String GA_METADATA = GA_PREFIX + "METADATA";
-
-    /**
      * Prefix for property keys of properties storing {@link com.graphaware.runtime.metadata.TxDrivenModuleMetadata}.
      */
     public static final String TX_MODULES_PROPERTY_PREFIX = "TX_MODULE";
