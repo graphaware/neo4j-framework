@@ -18,10 +18,12 @@ package com.graphaware.perf.writes;
 
 import com.graphaware.test.performance.PerformanceTest;
 import com.graphaware.test.performance.PerformanceTestSuite;
+import org.junit.Ignore;
 
 /**
  * Performance test suite for write throughput perf tests.
  */
+@Ignore
 public class WritePerformanceTestSuite extends PerformanceTestSuite {
 
     @Override
