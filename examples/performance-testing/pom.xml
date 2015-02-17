@@ -40,7 +40,24 @@
             <groupId>com.graphaware.neo4j</groupId>
             <version>${graphware.version}</version>
             <artifactId>tx-executor</artifactId>
-            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <version>${graphware.version}.5</version>
+            <artifactId>algorithms</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <version>${graphware.version}</version>
+            <artifactId>writer</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <version>${graphware.version}</version>
+            <artifactId>writer-api</artifactId>
         </dependency>
 
         <!-- Neo4j -->
@@ -56,13 +73,18 @@
             <groupId>com.graphaware.neo4j</groupId>
             <version>${graphware.version}</version>
             <artifactId>tests</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>1.7.7</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
             <version>1.7.7</version>
         </dependency>
 
