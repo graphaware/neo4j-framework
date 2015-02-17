@@ -50,6 +50,8 @@ Besides some frameworky internal code, the following functionality is provided b
     * Convert Nodes and Relationships to a human-readable String representation
     * Get a number-valued property without knowing whether it is stored as byte, int, or long
 
+* In-graph key-value store (see [`KeyValueStore`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/common/kv/KeyValueStore.html))
+
 ... and more, please see [Javadoc](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/common/util/package-summary.html).
 
 ### Inclusion Policies

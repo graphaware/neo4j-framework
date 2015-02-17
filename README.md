@@ -95,7 +95,7 @@ The version number has two parts. The first three numbers indicate compatibility
 Data Collection
 ---------------
 
-Note that framework sends a POST request to Google Analytics 5 minutes after start just so we know how many people
+Note that framework sends a POST request to Google Analytics every 5 minutes after start just so we know how many people
 actually use it. The only data transmitted are module class names, version and edition of the framework,
 and an anonymous UUID that changes with restart.
 

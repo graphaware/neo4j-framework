@@ -10,6 +10,7 @@ GraphAware Runtime is a runtime component of the GraphAware Framework.
 GraphAware Runtime is useful when you:
 * require functionality that transparently alters transactions or prevents them from happening at all. For example, you might want to:
     * Enforce specific constraints on the graph schema
+    * Maintain an in-graph index (like the [GraphAware TimeTree](https://github.com/graphaware/neo4j-timetree))
     * Use optimistic locking to prevent updates of out-of-date data
     * Improve performance by building (and keeping in sync) in-graph indices
     * Improve performance of supernodes
@@ -37,6 +38,7 @@ The following Runtime Modules are developed and provided by GraphAware. They are
 * [Change Feed Module](https://github.com/graphaware/neo4j-changefeed)
 * [Node Rank Module](https://github.com/graphaware/neo4j-noderank)
 * [UUID Module](https://github.com/graphaware/neo4j-uuid)
+* [TimeTree Module](https://github.com/graphaware/neo4j-timetree) (the Runtime part is optional for the TimeTree)
 
 
 ### Getting the Runtime
@@ -259,8 +261,25 @@ public class FriendshipStrengthModuleBootstrapper implements RuntimeModuleBootst
     }
 }
 ```
+### Configuration
+
+`RuntimeModuleBootstrapper` gets its configuration passed into the `bootstrapModule` method as `Map` of String-String
+key-value pairs. It is up to the developer to make sense of this, because it is specific to the module being bootstrapped.
+
+There is, however, built-in support for parsing configuration the is meant to become an `InclusionPolicy`. For example,
+let's we're building some indexing module that should only index *some* nodes. The user can provide the specification
+in the property file in the form of a `NodeInclusionPolicy`. To convert a String, such as `hasLabel('MyLabel')` to
+ a policy, use `com.graphaware.runtime.config.function.StringTo*InclusionPolicy` classes.
+
+For instance,
+` NodeInclusionPolicy policy = StringToNodeInclusionPolicy.getInstance().apply(config.get("nodes"));`
+where config had an entry `com.graphaware.module.MY_MODULE.nodes=hasLabel('MyLabel')` will produce a `NodeInclusionPolicy`
+that only includes nodes labelled `MyLabel`.
+
+For more information on how to express `InclusionPolicies` using String, see [InclusionPolicies](https://github.com/graphaware/neo4j-framework/tree/master/common#inclusion-policies)
 
 ### Logging
+
 To enable logging from your GraphAware Runtime Modules, set up a dependency on `slf4j-api` like this:
 
 ```xml

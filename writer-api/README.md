@@ -3,7 +3,7 @@ GraphAware Runtime API
 
 This (Maven) module is part of the [GraphAware Neo4j Framework](https://github.com/graphaware/neo4j-framework).
 
-It contains essential APIs for GraphAware Writer and only exists for dependency management reasons.
+It contains essential APIs for [GraphAware Writer](../writer) and only exists for dependency management reasons.
 
 License
 -------

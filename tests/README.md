@@ -23,13 +23,13 @@ Add the following snippet to your pom.xml:
 
 Note: if your pom.xml inherits from a parent that brings in a Jetty version (e.g. if you're using Spring Boot), please put
 the following in your `<properties>` section:
-`<jetty.version>9.0.5.v20130815</jetty.version>`
+`<jetty.version>9.2.1.v20140609</jetty.version>`
 
 <a name="graphunit"/>
 ### GraphUnit
 
 [`GraphUnit`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/test/unit/GraphUnit.html) is a single
-class with two `public static` methods intended for easy unit-testing of code that somehow manipulates
+class with a few `public static` methods intended for easy unit-testing of code that somehow manipulates
 data in the Neo4j graph database. It allows to assert the correct state of the database after the code has been run, using Cypher `CREATE` statements.
 
 The first method `public static void assertSameGraph(GraphDatabaseService database, String sameGraphCypher)` is used to verify
@@ -397,7 +397,7 @@ public class HelloWorldControllerTest extends DatabaseIntegrationTest {
 
 In order to test the API (end-to-end) test of a Spring MVC Controller deployed to Neo4j/GraphAware, one can extend the
 `GraphAwareApiTest`, which deploys the wrapping Neo4j server as before (on port 7575) and additionally exposes the MVC
-Controllers on port 8082 by default. A test would then looks like this:
+Controllers. A test would then looks like this:
 
 ```java
 /**

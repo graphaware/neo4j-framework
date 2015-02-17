@@ -16,8 +16,7 @@ been deleted in this tx` when trying to access properties of nodes/relationships
 easily access relationships/nodes that were changed and/or deleted in a transaction, again completely exception-free.
 
 The target audience of this module are advanced Neo4j users, mostly Java developers developing Neo4j
-[`TransactionEventHandler`](http://docs.neo4j.org/chunked/
-2.2.0-M04/javadocs/org/neo4j/graphdb/event/TransactionEventHandler.html)s.
+[`TransactionEventHandler`](http://docs.neo4j.org/chunked/2.2.0-M04/javadocs/org/neo4j/graphdb/event/TransactionEventHandler.html)s.
 The module is also one of the key components of [GraphAware Runtime](../runtime).
 
 ### Getting the Module
