@@ -14,7 +14,20 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.example;
+package com.graphaware.perf.writes;
 
-public class DummyClassThatKeepsMavenHappy {
+import com.graphaware.test.performance.PerformanceTest;
+import com.graphaware.test.performance.PerformanceTestSuite;
+
+/**
+ * Performance test suite for write throughput perf tests.
+ */
+public class WritePerformanceTestSuite extends PerformanceTestSuite {
+
+    @Override
+    protected PerformanceTest[] getPerfTests() {
+        return new PerformanceTest[]{
+                new WritePerformanceTest()
+        };
+    }
 }
