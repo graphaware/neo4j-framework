@@ -105,6 +105,24 @@ public class RelationshipUtilsTest {
             assertEquals(1, r.getId());
             assertEquals(2, IterableUtils.count(GlobalGraphOperations.at(database).getAllRelationships()));
 
+            assertTrue(relationshipExists(node2, node1, withName("TEST"), OUTGOING));
+
+            tx.success();
+        }
+    }
+
+    @Test
+    public void nonExistingRelationshipShouldBeCreated2() {
+        try (Transaction tx = database.beginTx()) {
+            Node node1 = database.getNodeById(0);
+            Node node2 = database.getNodeById(1);
+
+            Relationship r = createRelationshipIfNotExists(node1, node2, withName("TEST"), INCOMING);
+            assertEquals(1, r.getId());
+            assertEquals(2, IterableUtils.count(GlobalGraphOperations.at(database).getAllRelationships()));
+
+            assertTrue(relationshipExists(node1, node2, withName("TEST"), INCOMING));
+
             tx.success();
         }
     }
