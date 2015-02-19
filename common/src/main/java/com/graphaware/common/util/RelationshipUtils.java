@@ -122,6 +122,9 @@ public final class RelationshipUtils {
         Relationship existing = getSingleRelationshipOrNull(node1, node2, type, direction);
 
         if (existing == null) {
+            if (Direction.INCOMING.equals(direction)) {
+                return node2.createRelationshipTo(node1, type);
+            }
             return node1.createRelationshipTo(node2, type);
         }
 

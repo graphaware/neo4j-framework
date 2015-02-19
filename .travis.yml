@@ -1,7 +1,5 @@
 language: java
 
 branches:
-  except:
-    - flow
-    - db_experiment
-    - 2.2
+  only:
+    - master
