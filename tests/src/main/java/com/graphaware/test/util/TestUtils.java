@@ -34,6 +34,8 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -105,7 +107,23 @@ public final class TestUtils {
      * @return the body of the response.
      */
     public static String get(String url, final int expectedStatusCode) {
-        return method(new HttpGet(url), expectedStatusCode);
+        return get(url, Collections.<String, String>emptyMap(), expectedStatusCode);
+    }
+
+    /**
+     * Issue an HTTP GET and assert the response status code.
+     *
+     * @param url                to GET.
+     * @param headers            request headers as map.
+     * @param expectedStatusCode expected status code.
+     * @return the body of the response.
+     */
+    public static String get(String url, Map<String, String> headers, final int expectedStatusCode) {
+        HttpGet method = new HttpGet(url);
+
+        setHeaders(method, headers);
+
+        return method(method, expectedStatusCode);
     }
 
     /**
@@ -128,10 +146,25 @@ public final class TestUtils {
      * @return the body of the response.
      */
     public static String post(String url, String json, final int expectedStatusCode) {
+        return post(url, json, Collections.<String, String>emptyMap(), expectedStatusCode);
+    }
+
+    /**
+     * Issue an HTTP POST and assert the response status code.
+     *
+     * @param url                to POST to.
+     * @param json               request body.
+     * @param headers            request headers as map.
+     * @param expectedStatusCode expected status code.
+     * @return the body of the response.
+     */
+    public static String post(String url, String json, Map<String, String> headers, final int expectedStatusCode) {
         HttpPost post = new HttpPost(url);
         if (json != null) {
             post.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
         }
+
+        setHeaders(post, headers);
 
         return method(post, expectedStatusCode);
     }
@@ -156,10 +189,25 @@ public final class TestUtils {
      * @return the body of the response.
      */
     public static String put(String url, String json, final int expectedStatusCode) {
+        return put(url, json, Collections.<String, String>emptyMap(), expectedStatusCode);
+    }
+
+    /**
+     * Issue an HTTP PUT and assert the response status code.
+     *
+     * @param url                to POST to.
+     * @param json               request body.
+     * @param headers            request headers as map.
+     * @param expectedStatusCode expected status code.
+     * @return the body of the response.
+     */
+    public static String put(String url, String json, Map<String, String> headers, final int expectedStatusCode) {
         HttpPut put = new HttpPut(url);
         if (json != null) {
             put.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
         }
+
+        setHeaders(put, headers);
 
         return method(put, expectedStatusCode);
     }
@@ -172,7 +220,23 @@ public final class TestUtils {
      * @return the body of the response.
      */
     public static String delete(String url, final int expectedStatusCode) {
-        return method(new HttpDelete(url), expectedStatusCode);
+        return delete(url, Collections.<String, String>emptyMap(), expectedStatusCode);
+    }
+
+    /**
+     * Issue an HTTP DELETE and assert the response status code.
+     *
+     * @param url                to DELETE.
+     * @param headers            request headers as map.
+     * @param expectedStatusCode expected status code.
+     * @return the body of the response.
+     */
+    public static String delete(String url, Map<String, String> headers, final int expectedStatusCode) {
+        HttpDelete method = new HttpDelete(url);
+
+        setHeaders(method, headers);
+
+        return method(method, expectedStatusCode);
     }
 
     /**
@@ -229,6 +293,12 @@ public final class TestUtils {
         }
 
         return post(serverUrl + "/db/data/transaction/commit", stringBuilder.toString(), HttpStatus.SC_OK);
+    }
+
+    private static void setHeaders(HttpRequestBase method, Map<String, String> headers) {
+        for (Map.Entry<String, String> headerEntry : headers.entrySet()) {
+            method.setHeader(headerEntry.getKey(), headerEntry.getValue());
+        }
     }
 
     /**
