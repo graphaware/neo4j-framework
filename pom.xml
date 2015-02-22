@@ -513,7 +513,7 @@
                     <links>
                         <link>http://api.neo4j.org/2.2-M04/</link>
                     </links>
-                    <additionalparam>-Xdoclint:none</additionalparam>
+                    <!--<additionalparam>-Xdoclint:none</additionalparam>-->
                 </configuration>
                 <executions>
                     <execution>
@@ -522,14 +522,6 @@
                             <goal>jar</goal>
                         </goals>
                     </execution>
-                    <!-- http://jira.codehaus.org/browse/MNG-4618 still seems to be an active bug -->
-                    <!--<execution>-->
-                    <!--<id>aggregate</id>-->
-                    <!--<goals>-->
-                    <!--<goal>aggregate</goal>-->
-                    <!--</goals>-->
-                    <!--<phase>package</phase>-->
-                    <!--</execution>-->
                 </executions>
             </plugin>
         </plugins>

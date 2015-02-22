@@ -16,18 +16,25 @@
 
 package com.graphaware.server.web;
 
+import com.graphaware.server.tx.LongRunningTransactionFilter;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ArrayUtil;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.neo4j.kernel.logging.Logging;
+import org.neo4j.server.database.InjectableProvider;
+import org.neo4j.server.rest.transactional.TransactionFacade;
 import org.neo4j.server.web.Jetty9WebServer;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import java.util.Collection;
+import java.util.EnumSet;
 
 /**
  * GraphAware extension to {@link org.neo4j.server.web.Jetty9WebServer} that mounts the framework APIs under "/graphaware".
@@ -35,6 +42,7 @@ import javax.servlet.ServletException;
 public class GraphAwareJetty9WebServer extends Jetty9WebServer {
 
     private final WebAppInitializer initializer;
+    private LongRunningTransactionFilter txFilter;
 
     public GraphAwareJetty9WebServer(Logging logging, WebAppInitializer initializer) {
         super(logging);
@@ -47,6 +55,7 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/graphaware");
         context.addLifeCycleListener(new JettyStartingListener(context.getServletContext()));
+        context.addFilter(new FilterHolder(txFilter), "/*", EnumSet.allOf(DispatcherType.class));
 
         //If http logging is turned on, the jetty handler is a RequestLogHandler with a different type hierarchy than
         //the HandlerList returned when http logging is off
@@ -58,6 +67,17 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
         handlerList.setHandlers(ArrayUtil.prependToArray(context, handlerList.getHandlers(), Handler.class));
 
         super.startJetty();
+    }
+
+    @Override
+    public void setDefaultInjectables(Collection<InjectableProvider<?>> defaultInjectables) {
+        for (InjectableProvider<?> injecteble : defaultInjectables) {
+            if (TransactionFacade.class.isAssignableFrom(injecteble.t)) {
+                txFilter = new LongRunningTransactionFilter((TransactionFacade) injecteble.getValue(null));
+            }
+        }
+
+        super.setDefaultInjectables(defaultInjectables);
     }
 
     public class JettyStartingListener extends AbstractLifeCycle.AbstractLifeCycleListener {

@@ -4,6 +4,7 @@
     - removed transaction-simulating batch inserters
     - ability to pass a config file to the database in DatabaseIntegrationTest
     - internals improvements and bugfixes
+    - ability for GraphAware modules to participate in transactional-endpoint-managed long-running transactions
 
 2.1.7.28:
     - update to Neo4j 2.1.7
