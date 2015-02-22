@@ -41,6 +41,6 @@ public class GraphAwareWrappingNeoServer extends WrappingNeoServer {
      */
     @Override
     protected WebServer createWebServer() {
-        return new GraphAwareJetty9WebServer(getLogging(), new WebAppInitializer(getDatabase(), this));
+        return new GraphAwareJetty9WebServer(getLogging(), new WebAppInitializer(getDatabase()), getConfig());
     }
 }
