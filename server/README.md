@@ -190,6 +190,13 @@ ones that aren't listed above:
 </build>
 ```
 
+### Long-Running Transactions
+
+It is possible for extensions to participate in long-running transactions that are created using the [Transactional Cypher HTTP Endpoint](http://neo4j.com/docs/stable/rest-api-transactional.html).
+
+In order for an extension (MVC controller etc) to participate in long-running transactions, the client needs to set an HTTP request header
+called `_GA_TX_ID` with value equal to the transaction ID, which you have received from the endpoint when creating the transaction.
+
 License
 -------
 
