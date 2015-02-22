@@ -45,6 +45,6 @@ public class GraphAwareEnterpriseNeoServer extends EnterpriseNeoServer {
     protected WebServer createWebServer() {
         GoogleAnalyticsStatsCollector.getInstance().frameworkStart("enterprise");
 
-        return new GraphAwareJetty9WebServer(getLogging(), new WebAppInitializer(getDatabase(), this));
+        return new GraphAwareJetty9WebServer(getLogging(), new WebAppInitializer(getDatabase()));
     }
 }

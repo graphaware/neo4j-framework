@@ -18,7 +18,6 @@ package com.graphaware.server.web;
 
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.RuntimeRegistry;
-import org.neo4j.server.NeoServer;
 import org.neo4j.server.database.Database;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
@@ -31,11 +30,9 @@ import org.springframework.web.servlet.support.AbstractDispatcherServletInitiali
 public class WebAppInitializer extends AbstractDispatcherServletInitializer {
 
     private Database database;
-    private NeoServer neoServer;
 
-    public WebAppInitializer(Database database, NeoServer neoServer) {
+    public WebAppInitializer(Database database) {
         this.database = database;
-        this.neoServer = neoServer;
     }
 
     @Override
@@ -48,28 +45,6 @@ public class WebAppInitializer extends AbstractDispatcherServletInitializer {
             runtime.waitUntilStarted();
             parent.getBeanFactory().registerSingleton("databaseWriter", runtime.getDatabaseWriter());
         }
-
-        //ready for being able to wire transaction registry into Spring beans, not sure if this is the way we will go
-        //the intention is for extensions / APIs to be able to participate in long-running transactions started using
-        //the Cypher transactional endpoint.
-
-//        parent.getBeanFactory().registerSingleton("transactionRegistry", new FactoryBean<TransactionRegistry>() {
-//            @Override
-//            public TransactionRegistry getObject() throws Exception {
-//                return neoServer.getTransactionRegistry();
-//            }
-//
-//            @Override
-//            public Class<?> getObjectType() {
-//                return TransactionRegistry.class;
-//            }
-//
-//            @Override
-//            public boolean isSingleton() {
-//                return true;
-//            }
-//        });
-
 
         parent.refresh();
 
