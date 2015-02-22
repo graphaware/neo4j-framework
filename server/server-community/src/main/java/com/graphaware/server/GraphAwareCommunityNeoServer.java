@@ -45,6 +45,6 @@ public class GraphAwareCommunityNeoServer extends CommunityNeoServer {
     protected WebServer createWebServer() {
         GoogleAnalyticsStatsCollector.getInstance().frameworkStart("community");
 
-        return new GraphAwareJetty9WebServer(getLogging(), new WebAppInitializer(getDatabase()));
+        return new GraphAwareJetty9WebServer(getLogging(), new WebAppInitializer(getDatabase()), getConfig());
     }
 }

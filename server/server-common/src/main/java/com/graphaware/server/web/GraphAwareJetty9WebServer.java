@@ -17,6 +17,7 @@
 package com.graphaware.server.web;
 
 import com.graphaware.server.tx.LongRunningTransactionFilter;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
@@ -25,10 +26,13 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ArrayUtil;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle;
+import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.logging.Logging;
 import org.neo4j.server.database.InjectableProvider;
 import org.neo4j.server.rest.transactional.TransactionFacade;
 import org.neo4j.server.web.Jetty9WebServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
@@ -41,19 +45,26 @@ import java.util.EnumSet;
  */
 public class GraphAwareJetty9WebServer extends Jetty9WebServer {
 
+    private static final Logger LOG = LoggerFactory.getLogger(GraphAwareJetty9WebServer.class);
+
+    private static final String GA_CONTEXT_PATH_SETTING = "com.graphaware.server.uri";
+    private static final String GA_CONTEXT_PATH_DEFAULT = "graphaware";
+
     private final WebAppInitializer initializer;
+    private final Config config;
     private LongRunningTransactionFilter txFilter;
 
-    public GraphAwareJetty9WebServer(Logging logging, WebAppInitializer initializer) {
+    public GraphAwareJetty9WebServer(Logging logging, WebAppInitializer initializer, Config config) {
         super(logging);
         this.initializer = initializer;
+        this.config = config;
     }
 
     @Override
     protected void startJetty() {
         HandlerList handlerList;
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/graphaware");
+        context.setContextPath(getContextPath(config));
         context.addLifeCycleListener(new JettyStartingListener(context.getServletContext()));
         context.addFilter(new FilterHolder(txFilter), "/*", EnumSet.allOf(DispatcherType.class));
 
@@ -67,6 +78,21 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
         handlerList.setHandlers(ArrayUtil.prependToArray(context, handlerList.getHandlers(), Handler.class));
 
         super.startJetty();
+    }
+
+    private String getContextPath(Config config) {
+        if (config.getParams().containsKey(GA_CONTEXT_PATH_SETTING)) {
+            String path = config.getParams().get(GA_CONTEXT_PATH_SETTING);
+            if (StringUtils.isNotBlank(path)) {
+                LOG.info("Mounting GraphAware Framework under /" + path);
+                return "/" + path;
+            } else {
+                LOG.warn("Invalid URI for GraphAware Framework, will use default...");
+            }
+        }
+
+        LOG.info("Mounting GraphAware Framework under /" + GA_CONTEXT_PATH_DEFAULT);
+        return "/" + GA_CONTEXT_PATH_DEFAULT;
     }
 
     @Override
