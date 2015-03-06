@@ -25,8 +25,6 @@ import org.neo4j.server.configuration.ThirdPartyJaxRsPackage;
 import java.util.Collections;
 import java.util.Map;
 
-import static org.neo4j.helpers.Settings.FALSE;
-
 /**
  * {@link DatabaseIntegrationTest} that starts the {@link WrappingNeoServerBootstrapper},
  * in order to make the Neo4j browser and potentially custom managed and unmanaged extensions available for testing.
@@ -91,7 +89,7 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
         }
 
         configurator.configuration().addProperty(ServerSettings.webserver_port.name(), neoServerPort());
-        configurator.configuration().addProperty(ServerSettings.authorization_enabled.name(), FALSE);
+        configurator.configuration().addProperty(ServerSettings.auth_enabled.name(), authEnabled());
 
         for (Map.Entry<String, String> config : additionalServerConfiguration().entrySet()) {
             configurator.configuration().addProperty(config.getKey(), config.getValue());
@@ -125,6 +123,13 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
      */
     protected int neoServerPort() {
         return DEFAULT_NEO_PORT;
+    }
+
+    /**
+     * @return <code>true</code> iff Neo4j's native auth functionality should be enable, <code>false</code> (default) for disabled.
+     */
+    protected boolean authEnabled() {
+        return false;
     }
 
     /**
