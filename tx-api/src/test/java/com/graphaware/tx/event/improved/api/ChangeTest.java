@@ -19,7 +19,6 @@ package com.graphaware.tx.event.improved.api;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -45,7 +44,7 @@ public class ChangeTest {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         registerShutdownHook(database);
 
-        new ExecutionEngine(database).execute("CREATE " +
+        database.execute("CREATE " +
                 "(a), " +
                 "(b {key:'value'})," +
                 "(b)-[:test]->(a)," +

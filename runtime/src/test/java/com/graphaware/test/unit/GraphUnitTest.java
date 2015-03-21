@@ -23,7 +23,6 @@ import com.graphaware.runtime.bootstrap.TestRuntimeModule;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
 import org.junit.Test;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.Transaction;
 
 import java.util.Collections;
@@ -42,7 +41,7 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
 public class GraphUnitTest extends DatabaseIntegrationTest {
 
     private void populateDatabase(String cypher) {
-        new ExecutionEngine(getDatabase()).execute(cypher);
+        getDatabase().execute(cypher);
     }
 
     @Test

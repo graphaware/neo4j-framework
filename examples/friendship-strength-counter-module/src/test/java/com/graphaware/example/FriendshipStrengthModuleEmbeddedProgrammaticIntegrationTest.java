@@ -23,7 +23,6 @@ import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
@@ -63,7 +62,7 @@ public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
 
     @Test
     public void totalFriendshipStrengthShouldBeCorrectlyCalculated() {
-        new ExecutionEngine(database).execute("CREATE " +
+        database.execute("CREATE " +
                 "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
                 "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
 

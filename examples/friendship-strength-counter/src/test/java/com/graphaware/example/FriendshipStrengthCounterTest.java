@@ -19,10 +19,10 @@ package com.graphaware.example;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
@@ -95,9 +95,7 @@ public class FriendshipStrengthCounterTest {
 
     @Test
     public void totalFriendshipStrengthShouldBeCountedUsingCypher() {
-        ExecutionEngine executionEngine = new ExecutionEngine(database);
-
-        executionEngine.execute("CREATE " +
+        database.execute("CREATE " +
                 "(p1:Person), (p2:Person), (p3:Person)," +
                 "(p1)-[:FRIEND_OF {strength:3}]->(p2)," +
                 "(p2)-[:FRIEND_OF {strength:1}]->(p1)," +
@@ -105,13 +103,19 @@ public class FriendshipStrengthCounterTest {
 
         String query = "MATCH (c:FriendshipCounter) RETURN c.totalFriendshipStrength as result";
 
-        for (Map<String, Object> result : executionEngine.execute(query)) {
+        Iterator<Map<String, Object>> execute = database.execute(query);
+
+        while (execute.hasNext()) {
+            Map<String, Object> result = execute.next();
             assertEquals(6L, result.get("result"));
         }
 
-        executionEngine.execute("MATCH (p1:Person)-[f:FRIEND_OF {strength:3}]->(p2) DELETE f");
+        database.execute("MATCH (p1:Person)-[f:FRIEND_OF {strength:3}]->(p2) DELETE f");
 
-        for (Map<String, Object> result : executionEngine.execute(query)) {
+        execute = database.execute(query);
+
+        while (execute.hasNext()) {
+            Map<String, Object> result = execute.next();
             assertEquals(3L, result.get("result"));
         }
     }

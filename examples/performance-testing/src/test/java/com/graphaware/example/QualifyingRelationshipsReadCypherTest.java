@@ -17,7 +17,6 @@
 package com.graphaware.example;
 
 import com.graphaware.test.util.TestUtils;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -33,8 +32,6 @@ import static org.neo4j.graphdb.Direction.OUTGOING;
  * {@link QualifyingRelationshipsReadTest} for Cypher.
  */
 public class QualifyingRelationshipsReadCypherTest extends QualifyingRelationshipsReadTest {
-
-    private ExecutionEngine executionEngine;
 
     /**
      * {@inheritDoc}
@@ -58,15 +55,13 @@ public class QualifyingRelationshipsReadCypherTest extends QualifyingRelationshi
     @Override
     public void prepareDatabase(GraphDatabaseService database, final Map<String, Object> params) {
         super.prepareDatabase(database, params);
-
-        executionEngine = new ExecutionEngine(database);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public long run(GraphDatabaseService database, final Map<String, Object> params) {
+    public long run(final GraphDatabaseService database, final Map<String, Object> params) {
         long time = 0;
 
         final String query = buildQuery(params);
@@ -75,7 +70,7 @@ public class QualifyingRelationshipsReadCypherTest extends QualifyingRelationshi
             time += TestUtils.time(new TestUtils.Timed() {
                 @Override
                 public void time() {
-                    executionEngine.execute(query, Collections.<String, Object>singletonMap("id", RANDOM.nextInt(NO_NODES)));
+                    database.execute(query, Collections.<String, Object>singletonMap("id", RANDOM.nextInt(NO_NODES)));
                 }
             });
         }

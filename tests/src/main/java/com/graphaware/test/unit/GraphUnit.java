@@ -18,7 +18,6 @@ package com.graphaware.test.unit;
 
 import com.graphaware.common.policy.InclusionPolicies;
 import com.graphaware.common.util.PropertyContainerUtils;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
@@ -95,7 +94,7 @@ public final class GraphUnit {
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
         registerShutdownHook(otherDatabase);
 
-        new ExecutionEngine(otherDatabase).execute(sameGraphCypher);
+        otherDatabase.execute(sameGraphCypher);
 
         try {
             assertSameGraph(database, otherDatabase, inclusionPolicies);
@@ -161,7 +160,7 @@ public final class GraphUnit {
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory().newImpermanentDatabase();
         registerShutdownHook(otherDatabase);
 
-        new ExecutionEngine(otherDatabase).execute(subgraphCypher);
+        otherDatabase.execute(subgraphCypher);
 
         try {
             assertSubgraph(database, otherDatabase, inclusionPolicies);

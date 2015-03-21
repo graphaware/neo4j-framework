@@ -21,7 +21,6 @@ import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.TransactionData;
@@ -43,7 +42,6 @@ import static org.neo4j.graphdb.DynamicLabel.label;
 public class LazyTransactionDataSmokeTest {
 
     private GraphDatabaseService database;
-    private ExecutionEngine executionEngine;
     private CapturingTransactionEventHandler eventHandler;
 
     @Before
@@ -51,7 +49,6 @@ public class LazyTransactionDataSmokeTest {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         registerShutdownHook(database);
 
-        executionEngine = new ExecutionEngine(database);
         eventHandler = new CapturingTransactionEventHandler();
         database.registerTransactionEventHandler(eventHandler);
     }
@@ -204,7 +201,7 @@ public class LazyTransactionDataSmokeTest {
 
 
     private void execute(String cypher) {
-        executionEngine.execute(cypher);
+        database.execute(cypher);
     }
 
     private void startCapturing() {

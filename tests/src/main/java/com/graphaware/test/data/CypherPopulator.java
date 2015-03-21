@@ -16,7 +16,6 @@
 
 package com.graphaware.test.data;
 
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
@@ -29,7 +28,6 @@ public abstract class CypherPopulator implements DatabasePopulator {
 
     @Override
     public void populate(GraphDatabaseService database) {
-        ExecutionEngine engine = new ExecutionEngine(database);
         String separator = separator();
 
         String[] statementGroups = statementGroups();
@@ -40,7 +38,7 @@ public abstract class CypherPopulator implements DatabasePopulator {
         for (String statementGroup : statementGroups) {
             try (Transaction tx = database.beginTx()) {
                 for (String statement : statementGroup.split(separator)) {
-                    engine.execute(statement);
+                    database.execute(statement);
                 }
                 tx.success();
             }

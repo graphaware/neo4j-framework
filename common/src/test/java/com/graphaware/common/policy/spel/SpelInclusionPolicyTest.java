@@ -18,7 +18,6 @@ package com.graphaware.common.policy.spel;
 
 import org.junit.After;
 import org.junit.Before;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -42,7 +41,7 @@ public abstract class SpelInclusionPolicyTest {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         registerShutdownHook(database);
 
-        new ExecutionEngine(database).execute("CREATE " +
+        database.execute("CREATE " +
                 "(m:Employee {name:'Michal'})-[:WORKS_FOR {role:'Director', since:2013}]->(ga:Company {name:'GraphAware', form:'Ltd'})," +
                 "(v:Intern {name:'Vojta', age:25})-[:WORKS_FOR {since:2014, until:2014}]->(ga)," +
                 "(m)-[:LIVES_IN]->(l:Place {name:'London'})<-[:LIVES_IN]-(v)"

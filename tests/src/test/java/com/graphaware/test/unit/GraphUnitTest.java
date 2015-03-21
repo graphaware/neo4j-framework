@@ -20,7 +20,6 @@ import com.graphaware.common.policy.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
@@ -39,14 +38,11 @@ import static org.neo4j.tooling.GlobalGraphOperations.at;
 public class GraphUnitTest {
 
     private GraphDatabaseService database;
-    private ExecutionEngine executionEngine;
 
     @Before
     public void setUp() {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         registerShutdownHook(database);
-
-        executionEngine = new ExecutionEngine(database);
     }
 
     @After
@@ -55,7 +51,7 @@ public class GraphUnitTest {
     }
 
     private void populateDatabase(String cypher) {
-        executionEngine.execute(cypher);
+        database.execute(cypher);
     }
 
     @Test

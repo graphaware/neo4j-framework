@@ -21,7 +21,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -50,7 +49,7 @@ public class PropertyContainerUtilsTest {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         registerShutdownHook(database);
 
-        new ExecutionEngine(database).execute("CREATE " +
+        database.execute("CREATE " +
                 "(a), " +
                 "(b {key:'value'})," +
                 "(b)-[:test]->(a)," +
@@ -139,7 +138,7 @@ public class PropertyContainerUtilsTest {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         registerShutdownHook(database);
 
-        new ExecutionEngine(database).execute("CREATE " +
+        database.execute("CREATE " +
                 "(a), " +
                 "(b {name:'node1'})," +
                 "(c {name:'node2'})," +

@@ -19,7 +19,6 @@ package com.graphaware.example;
 import com.graphaware.example.module.FriendshipStrengthCounter;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -54,7 +53,7 @@ public class FriendshipStrengthModuleEmbeddedDeclarativeIntegrationTest {
 
     @Test
     public void totalFriendshipStrengthShouldBeCorrectlyCalculated() {
-        new ExecutionEngine(database).execute("CREATE " +
+        database.execute("CREATE " +
                 "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
                 "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
 
