@@ -18,6 +18,7 @@ package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
+import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.runtime.module.BaseTxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.DynamicLabel;
@@ -74,7 +75,7 @@ public class TestRuntimeModule extends BaseTxDrivenModule<Void> {
     }
 
     @Override
-    public void reinitialize(GraphDatabaseService database) {
+    public void reinitialize(GraphDatabaseService database, TxDrivenModuleMetadata oldMetadata) {
         throw new UnsupportedOperationException();
     }
 

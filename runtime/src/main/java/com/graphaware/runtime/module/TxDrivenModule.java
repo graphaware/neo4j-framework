@@ -17,6 +17,7 @@
 package com.graphaware.runtime.module;
 
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
+import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -42,11 +43,10 @@ public interface TxDrivenModule<T> extends RuntimeModule {
      *
      * @param transactionData data about the soon-to-be-committed transaction. It is already filtered based on {@link #getConfiguration()}.
      * @return a state object (or <code>null</code>) that will be passed on to {@link #afterCommit(Object)} of this object. Only return <code>null</code> if you do nothing in {@link #afterCommit(Object)}.
-     * @throws NeedsInitializationException if it detects data is out of sync. {@link #initialize(org.neo4j.graphdb.GraphDatabaseService)}  will be called next
-     *                                      time the {@link com.graphaware.runtime.GraphAwareRuntime} is started. Until then, the module
-     *                                      should perform on best-effort basis.
-     * @throws DeliberateTransactionRollbackException
-     *                                      if the module wants to prevent the transaction from committing.
+     * @throws NeedsInitializationException           if it detects data is out of sync. {@link #initialize(org.neo4j.graphdb.GraphDatabaseService)}  will be called next
+     *                                                time the {@link com.graphaware.runtime.GraphAwareRuntime} is started. Until then, the module
+     *                                                should perform on best-effort basis.
+     * @throws DeliberateTransactionRollbackException if the module wants to prevent the transaction from committing.
      */
     T beforeCommit(ImprovedTransactionData transactionData) throws DeliberateTransactionRollbackException;
 
@@ -107,8 +107,10 @@ public interface TxDrivenModule<T> extends RuntimeModule {
      * module to a state equivalent to a state of the same module that has been registered at all times since the
      * database was empty. It can perform global-graph operations to achieve this.
      *
-     * @param database to initialize this module for.
+     * @param database    to re-initialize this module for.
+     * @param oldMetadata metadata stored for this module from its previous run. Can be <code>null</code> in case metadata
+     *                    was corrupt or there was no metadata.
      */
-    void reinitialize(GraphDatabaseService database);
+    void reinitialize(GraphDatabaseService database, TxDrivenModuleMetadata oldMetadata);
 
 }

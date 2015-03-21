@@ -76,4 +76,27 @@ public class DefaultTxDrivenModuleMetadata implements TxDrivenModuleMetadata {
 
         return new DefaultTxDrivenModuleMetadata(configuration, true, System.currentTimeMillis());
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DefaultTxDrivenModuleMetadata that = (DefaultTxDrivenModuleMetadata) o;
+
+        if (!configuration.equals(that.configuration)) return false;
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return configuration.hashCode();
+    }
 }

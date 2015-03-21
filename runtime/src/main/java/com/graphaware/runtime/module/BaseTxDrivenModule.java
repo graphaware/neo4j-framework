@@ -18,6 +18,7 @@ package com.graphaware.runtime.module;
 
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
+import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
@@ -69,7 +70,7 @@ public abstract class BaseTxDrivenModule<T> extends BaseRuntimeModule implements
      * {@inheritDoc}
      */
     @Override
-    public void reinitialize(GraphDatabaseService database) {
+    public void reinitialize(GraphDatabaseService database, TxDrivenModuleMetadata oldMetadata) {
         //to be overridden if re-initialisation differs from initialisation
         initialize(database);
     }

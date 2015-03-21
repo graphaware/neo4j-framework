@@ -53,7 +53,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
     @Override
     protected void handleCorruptMetadata(T module) {
         LOG.info("Module " + module.getId() + " seems to have corrupted metadata, will re-initialize...");
-        reinitialize(module);
+        reinitialize(module, null);
     }
 
     /**
@@ -80,13 +80,13 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
     protected TxDrivenModuleMetadata acknowledgeMetadata(T module, TxDrivenModuleMetadata metadata) {
         if (metadata.needsInitialization()) {
             LOG.info("Module " + module.getId() + " has been marked for re-initialization on " + new Date(metadata.problemTimestamp()).toString() + ". Will re-initialize...");
-            reinitialize(module);
+            reinitialize(module, metadata);
             return createFreshMetadata(module);
         }
 
         if (!metadata.getConfig().equals(module.getConfiguration())) {
             LOG.info("Module " + module.getId() + " seems to have changed configuration since last run, will re-initialize...");
-            reinitialize(module);
+            reinitialize(module, metadata);
             return createFreshMetadata(module);
         }
 
@@ -139,9 +139,11 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      * <p/>
      * Note that for many modules, it might not be necessary to do anything.
      *
-     * @param module to initialize.
+     * @param module      to initialize.
+     * @param oldMetadata metadata stored for this module from its previous run. Can be <code>null</code> in case metadata
+     *                    was corrupt or there was no metadata.
      */
-    protected abstract void reinitialize(T module);
+    protected abstract void reinitialize(T module, TxDrivenModuleMetadata oldMetadata);
 
     /**
      * {@inheritDoc}

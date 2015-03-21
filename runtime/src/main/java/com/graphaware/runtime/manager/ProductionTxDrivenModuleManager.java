@@ -17,6 +17,7 @@
 package com.graphaware.runtime.manager;
 
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
+import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.runtime.module.TxDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -58,7 +59,7 @@ public class ProductionTxDrivenModuleManager extends BaseTxDrivenModuleManager<T
      * {@inheritDoc}
      */
     @Override
-    protected void reinitialize(TxDrivenModule module) {
-        module.reinitialize(database);
+    protected void reinitialize(TxDrivenModule module, TxDrivenModuleMetadata oldMetadata) {
+        module.reinitialize(database, oldMetadata);
     }
 }

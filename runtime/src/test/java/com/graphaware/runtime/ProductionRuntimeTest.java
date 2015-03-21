@@ -85,7 +85,7 @@ public class ProductionRuntimeTest {
     public void tearDown() {
         database.shutdown();
     }
- 
+
     @Test(expected = IllegalStateException.class)
     public void shouldNotBeAllowedToCreateTwoRuntimes() {
         createRuntime(database);
@@ -290,10 +290,10 @@ public class ProductionRuntimeTest {
 
         GraphAwareRuntime runtime = createRuntime(database,
                 defaultConfiguration()
-                .withTimingStrategy(
-                        AdaptiveTimingStrategy
-                                .defaultConfiguration()
-                                .withDefaultDelayMillis(50)));
+                        .withTimingStrategy(
+                                AdaptiveTimingStrategy
+                                        .defaultConfiguration()
+                                        .withDefaultDelayMillis(50)));
 
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
@@ -667,8 +667,10 @@ public class ProductionRuntimeTest {
     public void changedModuleShouldBeReInitialized() {
         final TxDrivenModule mockModule = mockTxModule();
 
+        DefaultTxDrivenModuleMetadata oldMetadata = new DefaultTxDrivenModuleMetadata(FluentTxDrivenModuleConfiguration.defaultConfiguration().with(InclusionPolicies.none()));
+
         try (Transaction tx = database.beginTx()) {
-            txRepo.persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(FluentTxDrivenModuleConfiguration.defaultConfiguration().with(InclusionPolicies.none())));
+            txRepo.persistModuleMetadata(mockModule, oldMetadata);
             tx.success();
         }
 
@@ -677,7 +679,7 @@ public class ProductionRuntimeTest {
 
         runtime.start();
 
-        verify(mockModule).reinitialize(database);
+        verify(mockModule).reinitialize(database, oldMetadata);
         verify(mockModule).start(database);
         verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule, atLeastOnce()).getId();
@@ -695,8 +697,10 @@ public class ProductionRuntimeTest {
     public void forcedModuleShouldBeReInitialized() {
         final TxDrivenModule mockModule = mockTxModule();
 
+        DefaultTxDrivenModuleMetadata metadata = new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()).markedNeedingInitialization();
+
         try (Transaction tx = database.beginTx()) {
-            txRepo.persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()).markedNeedingInitialization());
+            txRepo.persistModuleMetadata(mockModule, metadata);
             tx.success();
         }
 
@@ -705,7 +709,7 @@ public class ProductionRuntimeTest {
 
         runtime.start();
 
-        verify(mockModule).reinitialize(database);
+        verify(mockModule).reinitialize(database, metadata);
         verify(mockModule).start(database);
         verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule, atLeastOnce()).getId();
@@ -809,7 +813,7 @@ public class ProductionRuntimeTest {
         verify(mockModule).start(database);
         verify(mockModule, atLeastOnce()).getId();
         verify(mockModule, atLeastOnce()).getConfiguration();
-        verify(mockModule).reinitialize(database);
+        verify(mockModule).reinitialize(database, null);
         verifyNoMoreInteractions(mockModule);
 
         try (Transaction tx = database.beginTx()) {
@@ -837,7 +841,7 @@ public class ProductionRuntimeTest {
         verify(mockModule).start(database);
         verify(mockModule, atLeastOnce()).getId();
         verify(mockModule, atLeastOnce()).getConfiguration();
-        verify(mockModule).reinitialize(database);
+        verify(mockModule).reinitialize(database, null);
         verifyNoMoreInteractions(mockModule);
 
         try (Transaction tx = database.beginTx()) {
