@@ -1,4 +1,4 @@
-2.2.0.27:
+2.2.0.28:
     - updated Framework to Neo4j 2.2.0
     - completely removed transaction handling and automatic support for @Transactional
     - removed transaction-simulating batch inserters
