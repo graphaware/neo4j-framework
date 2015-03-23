@@ -47,7 +47,7 @@
         <module>examples/friendship-strength-counter</module>
         <module>examples/change-logger</module>
         <module>examples/friendship-strength-counter-module</module>
-        <module>examples/performance-testing</module>
+        <!--<module>examples/performance-testing</module>-->
         <module>examples/integration-testing</module>
     </modules>
 
