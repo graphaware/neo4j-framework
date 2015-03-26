@@ -18,7 +18,6 @@ package com.graphaware.server;
 
 import com.graphaware.test.integration.NeoServerIntegrationTest;
 import org.apache.http.HttpStatus;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.graphaware.test.util.TestUtils.get;
@@ -34,7 +33,6 @@ public class EnterpriseNeoServerIntegrationTest extends NeoServerIntegrationTest
     }
 
     @Test
-    @Ignore //todo fix!!
     public void jarFilesShouldBeWired() {
         get(baseUrl() + "/graphaware/timetree/now", HttpStatus.SC_OK);
     }

@@ -46,7 +46,7 @@
         <module>examples/friendship-strength-counter</module>
         <module>examples/change-logger</module>
         <module>examples/friendship-strength-counter-module</module>
-        <!--<module>examples/performance-testing</module>-->
+        <module>examples/performance-testing</module>
         <module>examples/integration-testing</module>
     </modules>
 
@@ -189,14 +189,14 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>timetree</artifactId>
-                <version>2.1.7.28.20</version>
+                <version>2.2.0.28.20</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>resttest</artifactId>
-                <version>2.1.7.28.12</version>
+                <version>2.2.0.28.12</version>
                 <scope>test</scope>
             </dependency>
 
