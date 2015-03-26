@@ -309,10 +309,6 @@ Modify conf/custom-logback.xml in your Neo4j install path and add at the end
 
 In the example above, logging is set to `debug` level and log statements are written to an extensions.log file in the Neo4j data/log directory.
 
-### Inclusion Policies
-
-todo document Spel inclusion policies
-
 License
 -------
 
