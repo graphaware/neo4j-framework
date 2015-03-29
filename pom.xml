@@ -14,7 +14,8 @@
   ~ <http://www.gnu.org/licenses />.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.graphaware.neo4j</groupId>
@@ -121,6 +122,24 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>doclint-java8-disable</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <properties>
@@ -128,7 +147,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <neo4j.version>2.2.0</neo4j.version>
         <spring.version>4.1.6.RELEASE</spring.version>
-        <graphaware.version>2.2.0.28</graphaware.version>
+        <graphaware.version>2.2.0.29-SNAPSHOT</graphaware.version>
     </properties>
 
     <dependencyManagement>
@@ -512,7 +531,6 @@
                     <links>
                         <link>http://api.neo4j.org/2.2.0/</link>
                     </links>
-                    <!--<additionalparam>-Xdoclint:none</additionalparam>-->
                 </configuration>
                 <executions>
                     <execution>

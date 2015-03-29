@@ -99,12 +99,6 @@
             <artifactId>neo4j-server</artifactId>
             <scope>compile</scope>
         </dependency>
-        <!-- this is needed when testing with the enterprise server -->
-        <dependency>
-            <groupId>org.neo4j.app</groupId>
-            <artifactId>neo4j-server-enterprise</artifactId>
-            <scope>compile</scope>
-        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
