@@ -40,11 +40,7 @@ public class LowLevelCache implements CacheConfiguration {
         Map<String, String> result = new HashMap<>(existingConfig);
 
         //low level cache
-        result.put("neostore.nodestore.db.mapped_memory", "25M");
-        result.put("neostore.relationshipstore.db.mapped_memory", "50M");
-        result.put("neostore.propertystore.db.mapped_memory", "90M");
-        result.put("neostore.propertystore.db.strings.mapped_memory", "130M");
-        result.put("neostore.propertystore.db.arrays.mapped_memory", "130M");
+        result.put("dbms.pagecache.memory", "500M");
 
         //high level cache
         result.put("cache_type", "none");
