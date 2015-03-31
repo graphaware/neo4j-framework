@@ -125,25 +125,25 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime-api</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer-api</artifactId>
-                <version>${project.version}</version>
+                <version>${graphaware.version}</version>
             </dependency>
 
             <dependency>

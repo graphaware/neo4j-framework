@@ -150,6 +150,25 @@
                     <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <links>
+                        <link>http://api.neo4j.org/2.2.0/</link>
+                        <link>http://graphaware.com/site/framework/latest/apidocs/</link>
+                    </links>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
