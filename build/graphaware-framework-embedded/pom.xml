@@ -42,11 +42,11 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>graphaware-embedded-all-${project.version}</finalName>
+                    <finalName>graphaware-framework-${project.version}</finalName>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <appendAssemblyId>true</appendAssemblyId>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
         </plugins>

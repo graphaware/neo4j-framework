@@ -49,7 +49,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>graphaware-server-enterprise-all-${project.version}</finalName>
+                    <finalName>graphaware-framework-enterprise-${project.version}</finalName>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>

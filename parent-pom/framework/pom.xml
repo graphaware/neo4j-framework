@@ -1,0 +1,144 @@
+<!--
+  ~ Copyright (c) 2015 GraphAware
+  ~
+  ~ This file is part of GraphAware.
+  ~
+  ~ GraphAware is free software: you can redistribute it and/or modify it under the terms of
+  ~ the GNU General Public License as published by the Free Software Foundation, either
+  ~ version 3 of the License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  ~  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  ~ See the GNU General Public License for more details. You should have received a copy of
+  ~ the GNU General Public License along with this program.  If not, see
+  ~ <http://www.gnu.org/licenses/>.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>framework-parent</artifactId>
+    <version>2.2.0.29-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <parent>
+        <groupId>com.graphaware.neo4j</groupId>
+        <artifactId>graphaware-parent</artifactId>
+        <version>2.2.0.29-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <modules>
+        <module>../../api</module>
+        <module>../../common</module>
+        <module>../../runtime-api</module>
+        <module>../../runtime</module>
+        <module>../../server</module>
+        <module>../../tests</module>
+        <module>../../tx-api</module>
+        <module>../../tx-executor</module>
+        <module>../../writer</module>
+        <module>../../writer-api</module>
+        <module>../../build</module>
+
+        <!--examples-->
+        <module>../../examples/node-counter</module>
+        <module>../../examples/friendship-strength-counter</module>
+        <module>../../examples/change-logger</module>
+        <module>../../examples/friendship-strength-counter-module</module>
+        <module>../../examples/performance-testing</module>
+        <module>../../examples/integration-testing</module>
+    </modules>
+
+    <name>GraphAware Neo4j Framework</name>
+    <description>Parent POM for GraphAware Neo4j Framework</description>
+    <url>https://github.com/graphaware/neo4j-framework</url>
+
+    <licenses>
+        <license>
+            <name>GNU General Public License, version 3</name>
+            <url>http://www.gnu.org/licenses/gpl-3.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:graphaware/neo4j-framework.git</connection>
+        <developerConnection>scm:git:git@github.com:graphaware/neo4j-framework.git</developerConnection>
+        <url>git@github.com:graphaware/neo4j-framework.git</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>bachmanm</id>
+            <name>Michal Bachman</name>
+            <email>neo4j-framework@graphaware.org</email>
+        </developer>
+    </developers>
+
+    <ciManagement>
+        <url>https://travis-ci.org/graphaware/neo4j-framework</url>
+        <system>Travis CI</system>
+    </ciManagement>
+
+    <inceptionYear>2013</inceptionYear>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/graphaware/neo4j-framework/issues</url>
+    </issueManagement>
+
+    <dependencyManagement>
+
+        <dependencies>
+
+            <!-- for integration testing -->
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>timetree</artifactId>
+                <version>2.2.0.28.20</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>resttest</artifactId>
+                <version>2.2.0.28.12</version>
+                <scope>test</scope>
+            </dependency>
+
+        </dependencies>
+
+    </dependencyManagement>
+
+    <dependencies>
+
+        <!-- Neo4j -->
+
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-primitive-collections</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-kernel</artifactId>
+            <type>test-jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-io</artifactId>
+            <type>test-jar</type>
+        </dependency>
+
+    </dependencies>
+
+</project>

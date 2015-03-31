@@ -22,101 +22,24 @@
     <version>2.2.0.29-SNAPSHOT</version>
     <packaging>jar</packaging>
 
+    <parent>
+        <groupId>com.graphaware.neo4j</groupId>
+        <artifactId>module-parent</artifactId>
+        <version>2.2.0.29-SNAPSHOT</version>
+        <relativePath>../../parent-pom/module/pom.xml</relativePath>
+    </parent>
+
     <name>GraphAware Friendship Strength Counter</name>
     <description>Example of a Neo4j Transaction Event Handler with GraphAware Improved Transaction API</description>
     <url>http://graphaware.com</url>
 
-    <properties>
-        <java.version>1.7</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>2.2.0</neo4j.version>
-        <graphware.version>2.2.0.29-SNAPSHOT</graphware.version>
-    </properties>
-
     <dependencies>
-        <!-- GraphAware Framework -->
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>common</artifactId>
-            <version>${graphware.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>tx-api</artifactId>
-            <version>${graphware.version}</version>
-        </dependency>
-
-        <!-- Neo4j -->
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j</artifactId>
-            <version>${neo4j.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Testing -->
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <version>${graphware.version}</version>
-            <artifactId>tests</artifactId>
-            <scope>test</scope>
         </dependency>
 
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
-                <configuration>
-                    <links>
-                        <link>http://api.neo4j.org/2.2.0/</link>
-                    </links>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.7</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>
