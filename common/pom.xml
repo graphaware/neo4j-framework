@@ -21,10 +21,10 @@
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>framework-parent</artifactId>
         <version>2.2.0.29-SNAPSHOT</version>
+        <relativePath>../parent-pom/framework/pom.xml</relativePath>
     </parent>
 
     <artifactId>common</artifactId>
-    <packaging>jar</packaging>
 
     <name>GraphAware Common</name>
     <description>General-Purpose Library of Neo4j-Related Code</description>
