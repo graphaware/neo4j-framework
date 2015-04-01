@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2015 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -14,21 +14,25 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server;
+package com.ga;
 
-import org.neo4j.server.NeoServer;
-import org.neo4j.server.enterprise.EnterpriseBootstrapper;
+import com.graphaware.common.util.IterableUtils;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.tooling.GlobalGraphOperations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-/**
- * {@link org.neo4j.server.enterprise.EnterpriseBootstrapper} that uses {@link GraphAwareEnterpriseNeoServer}.
- */
-public class GraphAwareEnterpriseBootstrapper extends EnterpriseBootstrapper {
+@Service
+public class HelloWorldService implements GreetingService {
 
-    /**
-     * {@inheritDoc}
-     */
+    @Autowired
+    private GraphDatabaseService database;
+
     @Override
-    protected NeoServer createNeoServer() {
-        return new GraphAwareEnterpriseNeoServer(configurator, dependencies);
+    public String greet() {
+        try (Transaction tx = database.beginTx()) {
+            return "Hello World! There are " + IterableUtils.count(GlobalGraphOperations.at(database).getAllNodes()) + " nodes in the database.";
+        }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2015 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -16,19 +16,24 @@
 
 package com.graphaware.server;
 
-import org.neo4j.server.NeoServer;
-import org.neo4j.server.enterprise.EnterpriseBootstrapper;
+import com.graphaware.test.integration.NeoServerIntegrationTest;
+import org.apache.http.HttpStatus;
+import org.junit.Test;
+
+import static com.graphaware.test.util.TestUtils.get;
 
 /**
- * {@link org.neo4j.server.enterprise.EnterpriseBootstrapper} that uses {@link GraphAwareEnterpriseNeoServer}.
+ * Integration test for custom server that wires Spring components.
  */
-public class GraphAwareEnterpriseBootstrapper extends EnterpriseBootstrapper {
+public class CustomPackageNeoServerIntegrationTest extends NeoServerIntegrationTest {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected NeoServer createNeoServer() {
-        return new GraphAwareEnterpriseNeoServer(configurator, dependencies);
+    protected String neo4jServerConfigFile() {
+        return "neo4j-server-custom-package.properties";
+    }
+
+    @Test
+    public void componentsShouldBeWired() {
+        get(baseUrl() + "/graphaware/greet", HttpStatus.SC_OK);
     }
 }

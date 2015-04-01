@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2015 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -14,21 +14,9 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server;
+package com.ga;
 
-import org.neo4j.server.NeoServer;
-import org.neo4j.server.enterprise.EnterpriseBootstrapper;
+public interface GreetingService {
 
-/**
- * {@link org.neo4j.server.enterprise.EnterpriseBootstrapper} that uses {@link GraphAwareEnterpriseNeoServer}.
- */
-public class GraphAwareEnterpriseBootstrapper extends EnterpriseBootstrapper {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected NeoServer createNeoServer() {
-        return new GraphAwareEnterpriseNeoServer(configurator, dependencies);
-    }
+    String greet();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2015 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -14,21 +14,28 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server;
+package com.ga2;
 
-import org.neo4j.server.NeoServer;
-import org.neo4j.server.enterprise.EnterpriseBootstrapper;
+import com.ga.GreetingService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * {@link org.neo4j.server.enterprise.EnterpriseBootstrapper} that uses {@link GraphAwareEnterpriseNeoServer}.
+ * GraphAware Controller.
  */
-public class GraphAwareEnterpriseBootstrapper extends EnterpriseBootstrapper {
+@Controller
+@RequestMapping(value = "/greet")
+public class GreetingController {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected NeoServer createNeoServer() {
-        return new GraphAwareEnterpriseNeoServer(configurator, dependencies);
+    @Autowired
+    private GreetingService greetingService;
+
+    @RequestMapping(method = RequestMethod.GET)
+    @ResponseBody
+    public String handleRequest() {
+        return greetingService.greet();
     }
 }

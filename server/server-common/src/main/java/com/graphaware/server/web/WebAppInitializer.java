@@ -16,10 +16,7 @@
 
 package com.graphaware.server.web;
 
-import com.graphaware.runtime.GraphAwareRuntime;
-import com.graphaware.runtime.RuntimeRegistry;
-import org.neo4j.server.database.Database;
-import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.support.AbstractDispatcherServletInitializer;
@@ -29,28 +26,19 @@ import org.springframework.web.servlet.support.AbstractDispatcherServletInitiali
  */
 public class WebAppInitializer extends AbstractDispatcherServletInitializer {
 
-    private Database database;
+    private final ApplicationContext root;
+    private final String[] packagesToScan;
 
-    public WebAppInitializer(Database database) {
-        this.database = database;
+    public WebAppInitializer(ApplicationContext root, String[] packagesToScan) {
+        this.root = root;
+        this.packagesToScan = packagesToScan;
     }
 
     @Override
     protected WebApplicationContext createServletApplicationContext() {
-        GenericApplicationContext parent = new GenericApplicationContext();
-        parent.getBeanFactory().registerSingleton("database", database.getGraph());
-
-        GraphAwareRuntime runtime = RuntimeRegistry.getRuntime(database.getGraph());
-        if (runtime != null) {
-            runtime.waitUntilStarted();
-            parent.getBeanFactory().registerSingleton("databaseWriter", runtime.getDatabaseWriter());
-        }
-
-        parent.refresh();
-
         AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
-        appContext.setParent(parent);
-        appContext.scan("com.**.graphaware.**", "org.**.graphaware.**", "net.**.graphaware.**");
+        appContext.setParent(root);
+        appContext.scan(packagesToScan);
 
         return appContext;
     }
