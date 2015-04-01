@@ -55,10 +55,10 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphAwareJetty9WebServer.class);
 
-    private static final String GA_CONTEXT_PATH_SETTING = "com.graphaware.server.uri";
-    private static final String GA_CONTEXT_PATH_DEFAULT = "graphaware";
-    private static final String GA_PACKAGE_SCAN_SETTING = "com.graphaware.server.scan";
-    private static final String[] GA_PACKAGE_SCAN_DEFAULT = new String[]{"com.**.graphaware.**", "org.**.graphaware.**", "net.**.graphaware.**"};
+    private static final String GA_API_CONTEXT_PATH_SETTING = "com.graphaware.server.api.uri";
+    private static final String GA_API_CONTEXT_PATH_DEFAULT = "graphaware";
+    private static final String GA_API_PACKAGE_SCAN_SETTING = "com.graphaware.server.api.scan";
+    private static final String[] GA_API_PACKAGE_SCAN_DEFAULT = new String[]{"com.**.graphaware.**", "org.**.graphaware.**", "net.**.graphaware.**"};
 
     private final Config config;
     private LongRunningTransactionFilter txFilter;
@@ -79,6 +79,8 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
         SessionManager sessionManager = findSessionManager(handlerList);
 
         addHandlers(handlerList, sessionManager, rootContext);
+
+        addFilters();
 
         super.startJetty();
     }
@@ -102,6 +104,14 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
         ServletContextHandler graphAwareHandler = createGraphAwareHandler(sessionManager, rootContext);
 
         prependHandler(handlerList, graphAwareHandler);
+    }
+
+    protected void addFilters() {
+
+    }
+
+    protected void addFilterToAllHandlers(FilterHolder filterHolder) {
+        addFilter(findHandlerList(), filterHolder);
     }
 
     protected ServletContextHandler createGraphAwareHandler(SessionManager sessionManager, ApplicationContext rootContext) {
@@ -137,9 +147,17 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
         throw new IllegalStateException("Could not find SessionManager");
     }
 
+    private void addFilter(HandlerList handlerList, FilterHolder filterHolder) {
+        for (Handler h :  handlerList.getHandlers()) {
+            if (h instanceof ServletContextHandler) {
+                ((ServletContextHandler) h).addFilter(filterHolder, "/*", EnumSet.allOf(DispatcherType.class));
+            }
+        }
+    }
+
     private String getContextPath(Config config) {
-        if (config.getParams().containsKey(GA_CONTEXT_PATH_SETTING)) {
-            String path = config.getParams().get(GA_CONTEXT_PATH_SETTING);
+        if (config.getParams().containsKey(GA_API_CONTEXT_PATH_SETTING)) {
+            String path = config.getParams().get(GA_API_CONTEXT_PATH_SETTING);
             if (StringUtils.isNotBlank(path)) {
                 LOG.info("Mounting GraphAware Framework under /" + path);
                 return "/" + path;
@@ -148,13 +166,13 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
             }
         }
 
-        LOG.info("Mounting GraphAware Framework under /" + GA_CONTEXT_PATH_DEFAULT);
-        return "/" + GA_CONTEXT_PATH_DEFAULT;
+        LOG.info("Mounting GraphAware Framework under /" + GA_API_CONTEXT_PATH_DEFAULT);
+        return "/" + GA_API_CONTEXT_PATH_DEFAULT;
     }
 
     private String[] getPackagesToScan(Config config) {
-        if (config.getParams().containsKey(GA_PACKAGE_SCAN_SETTING)) {
-            String packageExpression = config.getParams().get(GA_PACKAGE_SCAN_SETTING);
+        if (config.getParams().containsKey(GA_API_PACKAGE_SCAN_SETTING)) {
+            String packageExpression = config.getParams().get(GA_API_PACKAGE_SCAN_SETTING);
             if (StringUtils.isNotBlank(packageExpression)) {
                 LOG.info("Will try to scan the following packages: " + packageExpression);
                 return packageExpression.split(",");
@@ -163,8 +181,8 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
             }
         }
 
-        LOG.info("Will try to scan the following packages: " + ArrayUtils.toString(GA_PACKAGE_SCAN_DEFAULT));
-        return GA_PACKAGE_SCAN_DEFAULT;
+        LOG.info("Will try to scan the following packages: " + ArrayUtils.toString(GA_API_PACKAGE_SCAN_DEFAULT));
+        return GA_API_PACKAGE_SCAN_DEFAULT;
     }
 
     @Override
@@ -196,5 +214,9 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public Config getConfig() {
+        return config;
     }
 }
