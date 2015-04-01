@@ -19,6 +19,7 @@ package com.graphaware.server.web;
 import com.graphaware.server.tx.LongRunningTransactionFilter;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.SessionManager;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.servlet.FilterHolder;
@@ -62,22 +63,51 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
 
     @Override
     protected void startJetty() {
-        HandlerList handlerList;
+        HandlerList handlerList = findHandlerList();
+
+        SessionManager sessionManager = findSessionManager(handlerList);
+
+        addHandlers(handlerList, sessionManager);
+
+        super.startJetty();
+    }
+
+    protected void addHandlers(HandlerList handlerList, SessionManager sessionManager) {
+        ServletContextHandler graphAwareHandler = createGraphAwareHandler(sessionManager);
+
+        prependHandler(handlerList, graphAwareHandler);
+    }
+
+    protected ServletContextHandler createGraphAwareHandler(SessionManager sessionManager) {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath(getContextPath(config));
+        context.getSessionHandler().setSessionManager(sessionManager);
         context.addLifeCycleListener(new JettyStartingListener(context.getServletContext()));
         context.addFilter(new FilterHolder(txFilter), "/*", EnumSet.allOf(DispatcherType.class));
+        return context;
+    }
 
+    protected final void prependHandler(HandlerList handlerList, ServletContextHandler handler) {
+        handlerList.setHandlers(ArrayUtil.prependToArray(handler, handlerList.getHandlers(), Handler.class));
+    }
+
+    private HandlerList findHandlerList() {
         //If http logging is turned on, the jetty handler is a RequestLogHandler with a different type hierarchy than
         //the HandlerList returned when http logging is off
         if (getJetty().getHandler().getClass().equals(RequestLogHandler.class)) {
-            handlerList = (HandlerList) ((RequestLogHandler) getJetty().getHandler()).getHandler();
-        } else {
-            handlerList = (HandlerList) getJetty().getHandler();
+            return  (HandlerList) ((RequestLogHandler) getJetty().getHandler()).getHandler();
         }
-        handlerList.setHandlers(ArrayUtil.prependToArray(context, handlerList.getHandlers(), Handler.class));
+        return  (HandlerList) getJetty().getHandler();
+    }
 
-        super.startJetty();
+    private SessionManager findSessionManager(HandlerList handlerList) {
+        for (Handler h :  handlerList.getHandlers()) {
+            if (h instanceof ServletContextHandler) {
+                return  ((ServletContextHandler) h).getSessionHandler().getSessionManager();
+            }
+        }
+
+        throw new IllegalStateException("Could not find SessionManager");
     }
 
     private String getContextPath(Config config) {
@@ -117,10 +147,14 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
         @Override
         public void lifeCycleStarting(LifeCycle event) {
             try {
-                initializer.onStartup(sc);
+                onJettyStartup(sc);
             } catch (ServletException e) {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    protected void onJettyStartup(ServletContext sc) throws ServletException {
+        initializer.onStartup(sc);
     }
 }
