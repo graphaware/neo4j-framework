@@ -43,6 +43,15 @@
 
         <dependencies>
 
+            <!-- GraphAware -->
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>api</artifactId>
+                <version>2.2.0.30-SNAPSHOT</version>
+                <scope>provided</scope>
+            </dependency>
+
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <version>2.2.0.30-SNAPSHOT</version>
@@ -58,22 +67,98 @@
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>runtime</artifactId>
+                <version>2.2.0.30-SNAPSHOT</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>runtime-api</artifactId>
+                <version>2.2.0.30-SNAPSHOT</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>writer</artifactId>
+                <version>2.2.0.30-SNAPSHOT</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>writer-api</artifactId>
+                <version>2.2.0.30-SNAPSHOT</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>server-common</artifactId>
+                <version>2.2.0.30-SNAPSHOT</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>tx-api</artifactId>
+                <version>2.2.0.30-SNAPSHOT</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>tx-executor</artifactId>
+                <version>2.2.0.30-SNAPSHOT</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>server-community</artifactId>
                 <version>2.2.0.30-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
 
+            <!-- Logging -->
+
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-webmvc</artifactId>
-                <version>${spring.version}</version>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.7</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Commons -->
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>4.0</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
-                <groupId>org.neo4j</groupId>
-                <artifactId>server-api</artifactId>
-                <version>${neo4j.version}</version>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.4</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>3.3</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Serialization -->
+
+            <dependency>
+                <groupId>com.esotericsoftware.kryo</groupId>
+                <artifactId>kryo</artifactId>
+                <version>2.16</version>
                 <scope>provided</scope>
             </dependency>
 
@@ -95,6 +180,66 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>2.2.3</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Spring -->
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>${spring.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>${spring.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-webmvc</artifactId>
+                <version>${spring.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-expression</artifactId>
+                <version>${spring.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Guava -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>17.0</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- UUID -->
+            <dependency>
+                <groupId>com.eaio.uuid</groupId>
+                <artifactId>uuid</artifactId>
+                <version>3.4</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.neo4j</groupId>
+                <artifactId>server-api</artifactId>
+                <version>${neo4j.version}</version>
                 <scope>provided</scope>
             </dependency>
 
