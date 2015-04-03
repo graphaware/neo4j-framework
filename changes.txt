@@ -1,5 +1,7 @@
 2.2.0.29:
     - POM reorganisation
+    - UUID generation part of the framework
+    - ability to better extend web server to support GraphAware Enterprise
 
 2.2.0.28:
     - updated Framework to Neo4j 2.2.0
