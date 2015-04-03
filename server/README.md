@@ -13,8 +13,12 @@ of the GraphAware Framework and place it into the _plugins_ directory of Neo4j.
 
 The following APIs are developed and provided by GraphAware:
 * [Algorithms](https://github.com/graphaware/neo4j-algorithms)
-* [TimeTree](https://github.com/graphaware/neo4j-timetree)
+* [ChangeFeed](https://github.com/graphaware/neo4j-changefeed) (primarily a [runtime module](../runtime))
+* [NodeRank](https://github.com/graphaware/neo4j-noderank) (primarily a [runtime module](../runtime))
+* [RestTest](https://github.com/graphaware/neo4j-resttest)
+* [TimeTree](https://github.com/graphaware/neo4j-timetree) (optionally also a [runtime module](../runtime))
 * [WarmUp](https://github.com/graphaware/neo4j-warmup)
+
 
 ### Usage
 
@@ -51,144 +55,40 @@ public class NodeCountApi {
 }
 ```
 
-**WARNING** Your class must reside in a `com`, `net`, or `org` top-level
+**WARNING** By default Your class must reside in a `com`, `net`, or `org` top-level
 package and one of the package levels must be called `graphaware`. For example, `com.mycompany.graphaware.NodeCountApi`
- will do. Alternatively, if you do not want the class to reside in the specified package, you need to put the following
- class in a package that follows the specification, for instance `com.mycompany.graphaware`:
+will do.
+
+Alternatively, if you do not want the class to reside in the specified package, you need to put the following
+class in a package that follows the specification, for instance `com.mycompany.graphaware`:
 
 ```java
 @Configuration
-@ComponentScan(basePackages = {"com.yourdomain.**"})
+@ComponentScan(basePackages = {"com.your_domain_here.**"})
 public class GraphAwareIntegration {
 }
 ```
 
 Then your controllers can reside in any subpackage of `com.yourdomain`.
 
-If you want to use `@Transactional` instead of explicitly starting and committing transactions, the above snippet can
-be changed to
-
-```java
-@Configuration
-@ComponentScan(basePackages = {"com.yourdomain.**"})
-@EnableTransactionManagement
-public class GraphAwareIntegration {
-}
+Yet another alternative is to add the following line to `neo4j.properties`:
 ```
+com.graphaware.server.api.scan=com.your_domain_here.**
+```
+
+The value part of the property is a Spring expression for which packages to scan, typically provided to the `base-package` XML attribute of `<context:component-scan />`. Please refer to the [Spring Documentation](http://docs.spring.io/spring/docs/current/spring-framework-reference/htmlsingle/#beans-java-instantiating-container-scan) for more details.
 
 **WARNING END**
 
 Compile this code into a .jar file (with dependencies, see below) and place it into the _plugins_ directory of your
 Neo4j server installation. You will then be able to issue a `GET` request to `http://your-neo4j-url:7474/graphaware/count`
-and receive the number of nodes in the database in the response body. Note that the `graphaware` part of the URL must be
-there and cannot (yet) be configured.
-
-To get started quickly, copy the example above and modify to your needs.
-
-To get started manually, you will need the following dependencies:
-
-```xml
-<dependencies>
-
-    <!-- GraphAware Framework -->
-    <dependency>
-        <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>common</artifactId>
-        <version>2.2.0.28</version>
-        <scope>provided</scope>
-    </dependency>
-
-    <!-- optional -->
-    <dependency>
-        <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>api</artifactId>
-        <version>2.2.0.28</version>
-        <scope>provided</scope>
-    </dependency>
-
-    <!-- Spring Framework -->
-    <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-webmvc</artifactId>
-        <version>4.1.4.RELEASE</version>
-        <scope>provided</scope>
-    </dependency>
-
-    <!-- optional if you want to use @Transactional -->
-    <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-tx</artifactId>
-        <version>4.1.4.RELEASE</version>
-        <scope>provided</scope>
-    </dependency>
-
-    <!-- optional if you want to use GraphAware DatabaseWriter -->
-    <dependency>
-        <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>writer-api</artifactId>
-        <version>2.2.0.28</version>
-        <scope>provided</scope>
-    </dependency>
-    <dependency>
-        <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>writer</artifactId>
-        <version>2.2.0.28</version>
-        <scope>provided</scope>
-    </dependency>
-
-    <!-- Neo4j -->
-    <dependency>
-        <groupId>org.neo4j</groupId>
-        <artifactId>neo4j</artifactId>
-        <version>2.2.0</version>
-        <scope>provided</scope>
-    </dependency>
-
-    <!-- Testing -->
-    <dependency>
-        <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>server-community</artifactId>
-        <version>2.2.0.28</version>
-        <scope>test</scope>
-    </dependency>
-
-    <dependency>
-        <groupId>com.graphaware.neo4j</groupId>
-        <version>2.2.0.28</version>
-        <artifactId>tests</artifactId>
-        <scope>test</scope>
-    </dependency>
-
-</dependencies>
+and receive the number of nodes in the database in the response body. Note that the `graphaware` part of the URL is a default
+and can be changed by adding the following line  to `neo4j.properties`:
+```
+com.graphaware.server.api.uri=your_uri_here
 ```
 
-It is also a good idea to use make sure the resulting .jar file includes all the dependencies, if you use any external
-ones that aren't listed above:
-<a name="alldependencies"/>
-```xml
-<build>
-    <plugins>
-        <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>attached</goal>
-                    </goals>
-                </execution>
-            </executions>
-            <configuration>
-                <finalName>${project.name}-all-${project.version}</finalName>
-                <descriptorRefs>
-                    <descriptorRef>jar-with-dependencies</descriptorRef>
-                </descriptorRefs>
-                <appendAssemblyId>false</appendAssemblyId>
-            </configuration>
-        </plugin>
-    </plugins>
-</build>
-```
+To get started quickly, start with the [pom file from the example above](https://github.com/graphaware/neo4j-framework/blob/master/examples/node-counter/pom.xml) and modify to your needs (notably change the framework version to 2.2.0.28).
 
 ### Long-Running Transactions
 
