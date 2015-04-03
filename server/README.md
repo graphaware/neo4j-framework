@@ -88,7 +88,7 @@ and can be changed by adding the following line  to `neo4j.properties`:
 com.graphaware.server.api.uri=your_uri_here
 ```
 
-To get started quickly, start with the [pom file from the example above](https://github.com/graphaware/neo4j-framework/blob/master/examples/node-counter/pom.xml) and modify to your needs (notably change the framework version to 2.2.0.28).
+To get started quickly, start with the [pom file from the example above](https://github.com/graphaware/neo4j-framework/blob/master/examples/node-counter/pom.xml) and modify to your needs (notably change the framework version to 2.2.0.29).
 
 ### Long-Running Transactions
 

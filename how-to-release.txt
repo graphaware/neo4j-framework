@@ -5,8 +5,8 @@ mvn clean install -DskipTests=true
 mvn javadoc:aggregate, copy the javadoc from top-level target dir to graphaware website
 git reset --hard HEAD
 
-search and replace the last release version with the new one
 search and replace the last snapshot version with the new one
+search and replace the last release version with the new one
 
 mvn clean install
 
