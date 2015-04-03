@@ -374,6 +374,13 @@
                 <version>17.0</version>
             </dependency>
 
+            <!-- UUID -->
+            <dependency>
+                <groupId>com.eaio.uuid</groupId>
+                <artifactId>uuid</artifactId>
+                <version>3.4</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -411,6 +418,13 @@
         </dependency>
 
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>eaio.com</id>
+            <url>http://eaio.com/maven2</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
