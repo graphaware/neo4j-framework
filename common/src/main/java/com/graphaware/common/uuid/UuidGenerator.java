@@ -19,7 +19,7 @@ package com.graphaware.common.uuid;
 /**
  * A UUID generator.
  */
-interface UuidGenerator {
+public interface UuidGenerator {
 
     /**
      * Generate a UUID.
