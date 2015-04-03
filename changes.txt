@@ -1,3 +1,6 @@
+2.2.0.30:
+    - Module POM cleanup
+
 2.2.0.29:
     - POM reorganisation
     - UUID generation part of the framework
