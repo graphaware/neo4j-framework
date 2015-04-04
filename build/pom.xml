@@ -32,7 +32,7 @@
     <url>http://graphaware.com</url>
 
     <modules>
-        <module>graphaware-framework-embedded</module>
+        <module>graphaware-framework</module>
         <module>graphaware-framework-server-community</module>
         <module>graphaware-framework-server-enterprise</module>
     </modules>

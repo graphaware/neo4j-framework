@@ -21,10 +21,10 @@
         <artifactId>build</artifactId>
         <version>2.2.0.31-SNAPSHOT</version>
     </parent>
-    <artifactId>graphaware-framework-embedded</artifactId>
+    <artifactId>graphaware-framework</artifactId>
     <packaging>pom</packaging>
 
-    <name>GraphAware Framework Embedded Build</name>
+    <name>GraphAware Framework Build</name>
     <description>Technical Maven Module for Building the Framework for Embedded Use</description>
     <url>http://graphaware.com</url>
 
