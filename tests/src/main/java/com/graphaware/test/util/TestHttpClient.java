@@ -224,7 +224,7 @@ public class TestHttpClient {
      * @param expectedStatusCode expected status code.
      * @return the body of the response.
      */
-    protected String method(HttpRequestBase method, final int expectedStatusCode) {
+    public String method(HttpRequestBase method, final int expectedStatusCode) {
         try {
             String result = client.execute(method, responseHandler(expectedStatusCode));
 
