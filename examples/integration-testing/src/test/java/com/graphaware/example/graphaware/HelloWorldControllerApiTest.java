@@ -18,7 +18,6 @@ package com.graphaware.example.graphaware;
 
 import com.graphaware.test.integration.GraphAwareApiTest;
 import com.graphaware.test.unit.GraphUnit;
-import com.graphaware.test.util.TestUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -32,7 +31,7 @@ public class HelloWorldControllerApiTest extends GraphAwareApiTest {
 
     @Test
     public void shouldCreateAndReturnNode() {
-        assertEquals("0", TestUtils.post(baseUrl() + "/helloworld/create", 200));
+        assertEquals("0", httpClient.post(baseUrl() + "/helloworld/create", 200));
 
         GraphUnit.assertSameGraph(getDatabase(), "CREATE (:HelloWorld {hello:'world'})");
     }

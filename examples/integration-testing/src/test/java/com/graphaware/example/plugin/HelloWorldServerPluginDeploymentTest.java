@@ -29,7 +29,7 @@ public class HelloWorldServerPluginDeploymentTest extends NeoServerIntegrationTe
 
     @Test
     public void shouldCreateAndReturnNode() {
-        TestUtils.get(baseUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
-        TestUtils.post(baseUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
+        httpClient.get(baseUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
+        httpClient.post(baseUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
     }
 }

@@ -20,8 +20,6 @@ import com.graphaware.test.integration.NeoServerIntegrationTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
-import static com.graphaware.test.util.TestUtils.get;
-
 /**
  * Integration test for custom server that wires Spring components.
  */
@@ -34,6 +32,6 @@ public class CustomUriCommunityNeoServerIntegrationTest extends NeoServerIntegra
 
     @Test
     public void componentsShouldBeWired() {
-        get(baseUrl() + "/mycompany/greeting", HttpStatus.SC_OK);
+        httpClient.get(baseUrl() + "/mycompany/greeting", HttpStatus.SC_OK);
     }
 }

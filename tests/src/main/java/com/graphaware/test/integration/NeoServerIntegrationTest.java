@@ -16,6 +16,7 @@
 
 package com.graphaware.test.integration;
 
+import com.graphaware.test.util.TestHttpClient;
 import org.junit.After;
 import org.junit.Before;
 
@@ -38,15 +39,23 @@ public abstract class NeoServerIntegrationTest {
 
     private NeoTestServer neoTestServer;
 
+    protected TestHttpClient httpClient;
+
     @Before
     public void setUp() throws IOException, InterruptedException {
         neoTestServer = new NeoTestServer(neo4jConfigFile(), neo4jServerConfigFile());
         neoTestServer.start();
+        httpClient = createHttpClient();
     }
 
     @After
     public void tearDown() throws IOException, InterruptedException {
+        httpClient.close();
         neoTestServer.stop();
+    }
+
+    protected TestHttpClient createHttpClient() {
+        return new TestHttpClient();
     }
 
     protected String baseUrl() {

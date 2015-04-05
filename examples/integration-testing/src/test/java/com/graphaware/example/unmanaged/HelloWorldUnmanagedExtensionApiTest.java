@@ -18,7 +18,6 @@ package com.graphaware.example.unmanaged;
 
 import com.graphaware.test.integration.WrappingServerIntegrationTest;
 import com.graphaware.test.unit.GraphUnit;
-import com.graphaware.test.util.TestUtils;
 import org.junit.Test;
 
 import java.util.Collections;
@@ -43,7 +42,7 @@ public class HelloWorldUnmanagedExtensionApiTest extends WrappingServerIntegrati
 
     @Test
     public void shouldCreateAndReturnNode() {
-        String result = TestUtils.post(baseNeoUrl() + "/ext/helloworld/create", 200);
+        String result = httpClient.post(baseNeoUrl() + "/ext/helloworld/create", 200);
         assertEquals("0", result);
 
         GraphUnit.assertSameGraph(getDatabase(), "CREATE (:HelloWorld {hello:'world'})");

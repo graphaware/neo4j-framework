@@ -17,7 +17,6 @@
 package com.graphaware.example.graphaware;
 
 import com.graphaware.test.integration.NeoServerIntegrationTest;
-import com.graphaware.test.util.TestUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -31,6 +30,6 @@ public class HelloWorldControllerDeploymentTest extends NeoServerIntegrationTest
 
     @Test
     public void shouldCreateAndReturnNode() {
-        assertEquals("0", TestUtils.post(baseUrl() + "/graphaware/helloworld/create", 200));
+        assertEquals("0", httpClient.post(baseUrl() + "/graphaware/helloworld/create", 200));
     }
 }

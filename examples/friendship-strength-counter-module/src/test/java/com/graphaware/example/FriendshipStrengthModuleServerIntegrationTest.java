@@ -20,8 +20,6 @@ import com.graphaware.test.integration.NeoServerIntegrationTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
-import static com.graphaware.test.util.TestUtils.executeCypher;
-import static com.graphaware.test.util.TestUtils.get;
 import static org.junit.Assert.assertEquals;
 
 
@@ -40,16 +38,16 @@ public class FriendshipStrengthModuleServerIntegrationTest extends NeoServerInte
 
     @Test
     public void totalFriendshipStrengthOnEmptyDatabaseShouldBeZero() {
-         assertEquals("0", get(baseUrl()+"/graphaware/friendship/strength", HttpStatus.SC_OK));
+         assertEquals("0", httpClient.get(baseUrl() + "/graphaware/friendship/strength", HttpStatus.SC_OK));
     }
 
     @Test
     public void totalFriendshipStrengthShouldBeCorrectlyCalculated() {
-        executeCypher(baseUrl(),
+        httpClient.executeCypher(baseUrl(),
                 "CREATE " +
-                "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
-                "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
+                        "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
+                        "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
 
-        assertEquals("3", get(baseUrl()+"/graphaware/friendship/strength", HttpStatus.SC_OK));
+        assertEquals("3", httpClient.get(baseUrl()+"/graphaware/friendship/strength", HttpStatus.SC_OK));
     }
 }

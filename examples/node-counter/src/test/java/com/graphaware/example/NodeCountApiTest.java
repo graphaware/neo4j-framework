@@ -21,7 +21,6 @@ import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
 
-import static com.graphaware.test.util.TestUtils.get;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -31,7 +30,7 @@ public class NodeCountApiTest extends GraphAwareApiTest {
 
     @Test
     public void emptyDatabaseShouldHaveZeroNodes() {
-        assertEquals("0", get(baseUrl() + "/count", HttpStatus.SC_OK));
+        assertEquals("0", httpClient.get(baseUrl() + "/count", HttpStatus.SC_OK));
     }
 
     @Test
@@ -43,6 +42,6 @@ public class NodeCountApiTest extends GraphAwareApiTest {
             tx.success();
         }
 
-        assertEquals("2", get(baseUrl() + "/count", HttpStatus.SC_OK));
+        assertEquals("2", httpClient.get(baseUrl() + "/count", HttpStatus.SC_OK));
     }
 }

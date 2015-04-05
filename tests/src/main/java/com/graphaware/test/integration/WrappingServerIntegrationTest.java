@@ -16,6 +16,7 @@
 
 package com.graphaware.test.integration;
 
+import com.graphaware.test.util.TestHttpClient;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.server.WrappingNeoServerBootstrapper;
 import org.neo4j.server.configuration.ServerConfigurator;
@@ -49,16 +50,24 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
 
     private WrappingNeoServerBootstrapper bootstrapper;
 
+    protected TestHttpClient httpClient;
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
         startServerWrapper();
+        httpClient = createHttpClient();
     }
 
     @Override
     public void tearDown() throws Exception {
+        httpClient.close();
         bootstrapper.stop();
         super.tearDown();
+    }
+
+    protected TestHttpClient createHttpClient() {
+        return new TestHttpClient();
     }
 
     /**

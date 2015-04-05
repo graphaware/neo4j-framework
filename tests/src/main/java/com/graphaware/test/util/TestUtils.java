@@ -18,15 +18,6 @@ package com.graphaware.test.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.*;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -34,10 +25,9 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Utilities mainly intended for testing.
@@ -96,208 +86,6 @@ public final class TestUtils {
             return IOUtils.toString(new ClassPathResource(packagePath + fileName + ".json").getInputStream(), Charset.forName("UTF-8"));
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Issue an HTTP GET and assert the response status code.
-     *
-     * @param url                to GET.
-     * @param expectedStatusCode expected status code.
-     * @return the body of the response.
-     */
-    public static String get(String url, final int expectedStatusCode) {
-        return get(url, Collections.<String, String>emptyMap(), expectedStatusCode);
-    }
-
-    /**
-     * Issue an HTTP GET and assert the response status code.
-     *
-     * @param url                to GET.
-     * @param headers            request headers as map.
-     * @param expectedStatusCode expected status code.
-     * @return the body of the response.
-     */
-    public static String get(String url, Map<String, String> headers, final int expectedStatusCode) {
-        HttpGet method = new HttpGet(url);
-
-        setHeaders(method, headers);
-
-        return method(method, expectedStatusCode);
-    }
-
-    /**
-     * Issue an HTTP POST with empty body and assert the response status code.
-     *
-     * @param url                to POST to.
-     * @param expectedStatusCode expected status code.
-     * @return the body of the response.
-     */
-    public static String post(String url, final int expectedStatusCode) {
-        return post(url, null, expectedStatusCode);
-    }
-
-    /**
-     * Issue an HTTP POST and assert the response status code.
-     *
-     * @param url                to POST to.
-     * @param json               request body.
-     * @param expectedStatusCode expected status code.
-     * @return the body of the response.
-     */
-    public static String post(String url, String json, final int expectedStatusCode) {
-        return post(url, json, Collections.<String, String>emptyMap(), expectedStatusCode);
-    }
-
-    /**
-     * Issue an HTTP POST and assert the response status code.
-     *
-     * @param url                to POST to.
-     * @param json               request body.
-     * @param headers            request headers as map.
-     * @param expectedStatusCode expected status code.
-     * @return the body of the response.
-     */
-    public static String post(String url, String json, Map<String, String> headers, final int expectedStatusCode) {
-        HttpPost post = new HttpPost(url);
-        if (json != null) {
-            post.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
-        }
-
-        setHeaders(post, headers);
-
-        return method(post, expectedStatusCode);
-    }
-
-    /**
-     * Issue an HTTP PUT with empty body and assert the response status code.
-     *
-     * @param url                to PUT to.
-     * @param expectedStatusCode expected status code.
-     * @return the body of the response.
-     */
-    public static String put(String url, final int expectedStatusCode) {
-        return put(url, null, expectedStatusCode);
-    }
-
-    /**
-     * Issue an HTTP PUT and assert the response status code.
-     *
-     * @param url                to POST to.
-     * @param json               request body.
-     * @param expectedStatusCode expected status code.
-     * @return the body of the response.
-     */
-    public static String put(String url, String json, final int expectedStatusCode) {
-        return put(url, json, Collections.<String, String>emptyMap(), expectedStatusCode);
-    }
-
-    /**
-     * Issue an HTTP PUT and assert the response status code.
-     *
-     * @param url                to POST to.
-     * @param json               request body.
-     * @param headers            request headers as map.
-     * @param expectedStatusCode expected status code.
-     * @return the body of the response.
-     */
-    public static String put(String url, String json, Map<String, String> headers, final int expectedStatusCode) {
-        HttpPut put = new HttpPut(url);
-        if (json != null) {
-            put.setEntity(new StringEntity(json, ContentType.APPLICATION_JSON));
-        }
-
-        setHeaders(put, headers);
-
-        return method(put, expectedStatusCode);
-    }
-
-    /**
-     * Issue an HTTP DELETE and assert the response status code.
-     *
-     * @param url                to DELETE.
-     * @param expectedStatusCode expected status code.
-     * @return the body of the response.
-     */
-    public static String delete(String url, final int expectedStatusCode) {
-        return delete(url, Collections.<String, String>emptyMap(), expectedStatusCode);
-    }
-
-    /**
-     * Issue an HTTP DELETE and assert the response status code.
-     *
-     * @param url                to DELETE.
-     * @param headers            request headers as map.
-     * @param expectedStatusCode expected status code.
-     * @return the body of the response.
-     */
-    public static String delete(String url, Map<String, String> headers, final int expectedStatusCode) {
-        HttpDelete method = new HttpDelete(url);
-
-        setHeaders(method, headers);
-
-        return method(method, expectedStatusCode);
-    }
-
-    /**
-     * Issue a HTTP call and assert the response status code.
-     *
-     * @param method             HTTP method.
-     * @param expectedStatusCode expected status code.
-     * @return the body of the response.
-     */
-    protected static String method(HttpRequestBase method, final int expectedStatusCode) {
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
-                @Override
-                public String handleResponse(final HttpResponse response) throws IOException {
-                    String body = null;
-                    if (response.getEntity() != null) {
-                        body = EntityUtils.toString(response.getEntity());
-                    }
-                    assertEquals("Expected and actual status codes don't match. Response body: " + body, expectedStatusCode, response.getStatusLine().getStatusCode());
-                    return body;
-                }
-            };
-
-            String result = httpClient.execute(method, responseHandler);
-
-            LOG.debug("HTTP " + method.getMethod() + " returned: " + result);
-
-            return result;
-
-        } catch (IOException e) {
-            fail(e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Execute a set of cypher statements against a database in a single transaction.
-     *
-     * @param serverUrl        URL of the database server.
-     * @param cypherStatements to execute.
-     * @return body of the server response.
-     */
-    public static String executeCypher(String serverUrl, String... cypherStatements) {
-        StringBuilder stringBuilder = new StringBuilder("{\"statements\" : [");
-        for (String statement : cypherStatements) {
-            stringBuilder.append("{\"statement\" : \"").append(statement).append("\"}").append(",");
-        }
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-
-        stringBuilder.append("]}");
-
-        while (serverUrl.endsWith("/")) {
-            serverUrl = serverUrl.substring(0, serverUrl.length() - 1);
-        }
-
-        return post(serverUrl + "/db/data/transaction/commit", stringBuilder.toString(), HttpStatus.SC_OK);
-    }
-
-    private static void setHeaders(HttpRequestBase method, Map<String, String> headers) {
-        for (Map.Entry<String, String> headerEntry : headers.entrySet()) {
-            method.setHeader(headerEntry.getKey(), headerEntry.getValue());
         }
     }
 

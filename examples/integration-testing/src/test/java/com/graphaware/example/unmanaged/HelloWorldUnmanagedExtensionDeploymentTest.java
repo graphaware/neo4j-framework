@@ -17,7 +17,6 @@
 package com.graphaware.example.unmanaged;
 
 import com.graphaware.test.integration.NeoServerIntegrationTest;
-import com.graphaware.test.util.TestUtils;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -39,6 +38,6 @@ public class HelloWorldUnmanagedExtensionDeploymentTest extends NeoServerIntegra
 
     @Test
     public void shouldCreateAndReturnNode() {
-        assertEquals("0", TestUtils.post(baseUrl() + "/ext/helloworld/create", 200));
+        assertEquals("0", httpClient.post(baseUrl() + "/ext/helloworld/create", 200));
     }
 }

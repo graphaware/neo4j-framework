@@ -24,8 +24,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Collections;
 
-import static com.graphaware.test.util.TestUtils.get;
-import static com.graphaware.test.util.TestUtils.post;
 
 /**
  * Integration test for custom server that wires Spring components.
@@ -34,18 +32,18 @@ public class TxParticipationIntegrationTest extends NeoServerIntegrationTest {
 
     @Test
     public void invalidTransactionShouldResultInException() {
-        System.out.println(get(baseUrl() + "/graphaware/greeting", Collections.singletonMap("_GA_TX_ID", "invalid"), HttpStatus.SC_BAD_REQUEST));
+        System.out.println(httpClient.get(baseUrl() + "/graphaware/greeting", Collections.singletonMap("_GA_TX_ID", "invalid"), HttpStatus.SC_BAD_REQUEST));
     }
 
     @Test
     public void nonExistingTransactionShouldResultInException() {
-        System.out.println(get(baseUrl() + "/graphaware/greeting", Collections.singletonMap("_GA_TX_ID", "1"), HttpStatus.SC_BAD_REQUEST));
+        System.out.println(httpClient.get(baseUrl() + "/graphaware/greeting", Collections.singletonMap("_GA_TX_ID", "1"), HttpStatus.SC_BAD_REQUEST));
     }
 
     @Test
     public void moduleApiShouldParticipateInOpenTransaction() throws IOException {
         //First transaction over Cypher transactional rest endpoint, keep open:
-        String response = post(baseUrl() + "/db/data/transaction", "{\n" +
+        String response = httpClient.post(baseUrl() + "/db/data/transaction", "{\n" +
                 "  \"statements\" : [ {\n" +
                 "    \"statement\" : \"CREATE (p:Person {props}) RETURN id(p)\",\n" +
                 "    \"parameters\" : {\n" +
@@ -60,7 +58,7 @@ public class TxParticipationIntegrationTest extends NeoServerIntegrationTest {
         String txUrl = commitUrl.substring(0, commitUrl.length() - "commit".length());
 
         //Second transaction over Cypher transactional rest endpoint, keep open:
-        post(txUrl, "{\n" +
+        httpClient.post(txUrl, "{\n" +
                 "  \"statements\" : [ {\n" +
                 "    \"statement\" : \"CREATE (p:Person {props}) RETURN id(p)\",\n" +
                 "    \"parameters\" : {\n" +
@@ -72,11 +70,11 @@ public class TxParticipationIntegrationTest extends NeoServerIntegrationTest {
                 "}", HttpStatus.SC_OK);
 
         //Third transaction over REST to an extension
-        post(baseUrl() + "/graphaware/link/0/1", null, Collections.singletonMap("_GA_TX_ID", "1"), HttpStatus.SC_CREATED);
+        httpClient.post(baseUrl() + "/graphaware/link/0/1", null, Collections.singletonMap("_GA_TX_ID", "1"), HttpStatus.SC_CREATED);
 
         //Commit transaction over transactional endpoint
-        post(commitUrl, HttpStatus.SC_OK);
+        httpClient.post(commitUrl, HttpStatus.SC_OK);
 
-        post(baseUrl() + "/graphaware/resttest/assertSameGraph","{\"cypher\": \"CREATE (m:Person {name:'Michal'})-[:TEST]->(d:Person {name:'Daniela'})\"}" , HttpStatus.SC_OK);
+        httpClient.post(baseUrl() + "/graphaware/resttest/assertSameGraph", "{\"cypher\": \"CREATE (m:Person {name:'Michal'})-[:TEST]->(d:Person {name:'Daniela'})\"}", HttpStatus.SC_OK);
     }
 }

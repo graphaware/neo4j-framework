@@ -14,27 +14,30 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.example.plugin;
+package com.graphaware.test.util;
 
 import com.graphaware.test.integration.WrappingServerIntegrationTest;
 import com.graphaware.test.unit.GraphUnit;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-
 /**
- * {@link com.graphaware.test.integration.DatabaseIntegrationTest} for {@link HelloWorldServerPlugin}.
- *
- * Tests the logic as well as the API.
+ * Test for {@link com.graphaware.test.util.TestUtils}.
  */
-public class HelloWorldServerPluginApiTest extends WrappingServerIntegrationTest {
+public class TestHttpClientTest extends WrappingServerIntegrationTest {
 
     @Test
-    public void shouldCreateAndReturnNode() {
-        httpClient.get(baseNeoUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
-        String result = httpClient.post(baseNeoUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
+    public void shouldBeAbleToExecuteCypherStatement() throws InterruptedException {
+        httpClient.executeCypher(baseNeoUrl(), "CREATE (:Person {name:'Michal'})");
 
-        assertTrue(result.contains(" \"hello\" : \"world\""));
-        GraphUnit.assertSameGraph(getDatabase(), "CREATE (:HelloWorld {hello:'world'})");
+        Thread.sleep(100);
+
+        GraphUnit.assertSameGraph(getDatabase(), "CREATE (:Person {name:'Michal'})");
+    }
+
+    @Test
+    public void shouldBeAbleToExecuteCypherStatements() {
+        httpClient.executeCypher(baseNeoUrl(), "CREATE (:Person {name:'Michal'})", "CREATE (:Person {name:'Vince'})");
+
+        GraphUnit.assertSameGraph(getDatabase(), "CREATE (:Person {name:'Michal'}), (:Person {name:'Vince'})");
     }
 }
