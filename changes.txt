@@ -1,3 +1,9 @@
+2.2.1.30:
+    - Update to Neo4j 2.2.1
+    - TestUtils refactoring
+    - Webadmin bootstrapped in integration tests
+    - Iron out minor Maven glitches caused by last release
+
 2.2.0.30:
     - Module POM cleanup
 
