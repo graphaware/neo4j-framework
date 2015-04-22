@@ -49,6 +49,7 @@ import static com.graphaware.tx.event.improved.api.Change.changesToMap;
 import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
+import static org.neo4j.graphdb.DynamicLabel.label;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
@@ -107,6 +108,30 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         }
                     }
         );
+
+        assertTrue(mutationsOccurred.get());
+    }
+
+    @Test //bug test
+    public void changeOfLabelShouldBePickedUp() {
+        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+
+        try (Transaction tx = database.beginTx()) {
+            Node node = database.createNode(label("Person"));
+            node.setProperty("name", "Michal");
+            tx.success();
+        }
+
+        final AtomicBoolean mutationsOccurred = new AtomicBoolean(false);
+
+        mutateGraph(new LabelChange(), new BeforeCommitCallback() {
+            @Override
+            public void doBeforeCommit(ImprovedTransactionData transactionData) {
+                if (transactionData.mutationsOccurred()) {
+                    mutationsOccurred.set(true);
+                }
+            }
+        });
 
         assertTrue(mutationsOccurred.get());
     }
@@ -1618,6 +1643,16 @@ public class FilteredLazyTransactionDataIntegrationTest {
             Node four = database.getNodeById(4);
             four.setProperty("name", "Three");
             four.setProperty("name", "Four");
+        }
+    }
+
+    private class LabelChange extends VoidReturningCallback {
+
+        @Override
+        public void doInTx(GraphDatabaseService database) {
+            Node michal = (database.findNode(label("Person"), "name", "Michal"));
+            michal.removeLabel(label("Person"));
+            michal.addLabel(label("Human"));
         }
     }
 

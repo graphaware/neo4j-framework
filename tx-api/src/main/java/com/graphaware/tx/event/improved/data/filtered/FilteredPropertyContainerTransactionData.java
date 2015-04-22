@@ -125,8 +125,8 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      *
      * @param container to get.
      * @return snapshot of the property container before the transaction started. Filtering not applied on retrieving
-     *         the object, but the result is decorated by a
-     *         {@link com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredPropertyContainer}.
+     * the object, but the result is decorated by a
+     * {@link com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredPropertyContainer}.
      * @throws IllegalArgumentException in case the given property container has not been deleted in the transaction.
      */
     public T getDeleted(T container) {
@@ -137,7 +137,7 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      * Get all property containers deleted in the transaction as they were before the transaction started.
      *
      * @return read-only collection of all deleted property containers as they were before the transaction started
-     *         (snapshots). Filtered according to provided policies.
+     * (snapshots). Filtered according to provided policies.
      */
     public Collection<T> getAllDeleted() {
         if (getPropertyContainerInclusionPolicy() instanceof IncludeNone) {
@@ -161,8 +161,8 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      *
      * @param container to get.
      * @return snapshot of the property container before the transaction started and the current state of the property
-     *         container. Filtering not applied on retrieving the object, but the result is decorated by a
-     *         {@link com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredPropertyContainer}.
+     * container. Filtering not applied on retrieving the object, but the result is decorated by a
+     * {@link com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredPropertyContainer}.
      * @throws IllegalArgumentException in case the given property container has not been changed in the transaction.
      */
     public Change<T> getChanged(T container) {
@@ -173,7 +173,7 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      * Get all property containers changed in the transaction.
      *
      * @return a read-only collection of all changed property containers as they were before the transaction started and
-     *         as they are now. Filtered according to provided policies.
+     * as they are now. Filtered according to provided policies.
      */
     public Collection<Change<T>> getAllChanged() {
         if (getPropertyContainerInclusionPolicy() instanceof IncludeNone) {
@@ -198,8 +198,8 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      *
      * @param container for which to get created properties.
      * @return read-only properties created for the given container. Filtered according to provided
-     *         {@link com.graphaware.common.policy.PropertyInclusionPolicy}. Compliance with the {@link com.graphaware.common.policy.PropertyContainerInclusionPolicy} is not
-     *         verified.
+     * {@link com.graphaware.common.policy.PropertyInclusionPolicy}. Compliance with the {@link com.graphaware.common.policy.PropertyContainerInclusionPolicy} is not
+     * verified.
      */
     public Map<String, Object> createdProperties(T container) {
         if (getPropertyInclusionPolicy() instanceof IncludeNoProperties) {
@@ -225,9 +225,9 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      *
      * @param container for which to get deleted properties.
      * @return read-only properties deleted for the given container, where the value is the property value before the
-     *         transaction started. Filtered according to provided
-     *         {@link com.graphaware.common.policy.PropertyInclusionPolicy}. Compliance with the {@link com.graphaware.common.policy.PropertyContainerInclusionPolicy} is not
-     *         verified.
+     * transaction started. Filtered according to provided
+     * {@link com.graphaware.common.policy.PropertyInclusionPolicy}. Compliance with the {@link com.graphaware.common.policy.PropertyContainerInclusionPolicy} is not
+     * verified.
      */
     public Map<String, Object> deletedProperties(T container) {
         if (getPropertyInclusionPolicy() instanceof IncludeNoProperties) {
@@ -241,7 +241,7 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      *
      * @param container deleted container.
      * @return read-only properties of the deleted container, where the value is the property value before the
-     *         transaction started. Full truth, no filtering performed (because this is a Neo4j API workaround, not available through the public API (api package)).
+     * transaction started. Full truth, no filtering performed (because this is a Neo4j API workaround, not available through the public API (api package)).
      */
     public Map<String, Object> propertiesOfDeletedContainer(T container) {
         if (getPropertyInclusionPolicy() instanceof IncludeNoProperties) {
@@ -266,9 +266,9 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      *
      * @param container for which to get changed properties.
      * @return read-only properties changed for the given container, where the value is the property value before and
-     *         after the transaction started, respectively. Filtered according to provided
-     *         {@link com.graphaware.common.policy.PropertyInclusionPolicy}. Compliance with the {@link com.graphaware.common.policy.PropertyContainerInclusionPolicy} is not
-     *         verified.
+     * after the transaction started, respectively. Filtered according to provided
+     * {@link com.graphaware.common.policy.PropertyInclusionPolicy}. Compliance with the {@link com.graphaware.common.policy.PropertyContainerInclusionPolicy} is not
+     * verified.
      */
     public Map<String, Change<Object>> changedProperties(T container) {
         if (getPropertyInclusionPolicy() instanceof IncludeNoProperties) {
@@ -304,16 +304,21 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
     protected final Collection<Change<T>> filterChangedPropertyContainers(Collection<Change<T>> toFilter) {
         Collection<Change<T>> result = new HashSet<>();
         for (Change<T> candidate : toFilter) {
-            if (getPropertyContainerInclusionPolicy().include(candidate.getPrevious()) || getPropertyContainerInclusionPolicy().include(candidate.getCurrent())) {
-                if (!createdProperties(candidate.getPrevious()).isEmpty()
-                        || !deletedProperties(candidate.getPrevious()).isEmpty()
-                        || !changedProperties(candidate.getPrevious()).isEmpty()) {
-
-                    result.add(filteredChange(candidate));
-                }
+            if (include(candidate) && hasChanged(candidate)) {
+                result.add(filteredChange(candidate));
             }
         }
         return result;
+    }
+
+    private boolean include(Change<T> candidate) {
+        return getPropertyContainerInclusionPolicy().include(candidate.getPrevious()) || getPropertyContainerInclusionPolicy().include(candidate.getCurrent());
+    }
+
+    protected boolean hasChanged(Change<T> candidate) {
+        return !createdProperties(candidate.getPrevious()).isEmpty()
+                || !deletedProperties(candidate.getPrevious()).isEmpty()
+                || !changedProperties(candidate.getPrevious()).isEmpty();
     }
 
     /**

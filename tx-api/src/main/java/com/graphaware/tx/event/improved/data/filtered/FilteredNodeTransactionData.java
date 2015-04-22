@@ -19,6 +19,7 @@ package com.graphaware.tx.event.improved.data.filtered;
 import com.graphaware.common.policy.InclusionPolicies;
 import com.graphaware.common.policy.PropertyContainerInclusionPolicy;
 import com.graphaware.common.policy.PropertyInclusionPolicy;
+import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.data.NodeTransactionData;
 import com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode;
 import org.neo4j.graphdb.Label;
@@ -114,5 +115,13 @@ public class FilteredNodeTransactionData extends FilteredPropertyContainerTransa
     @Override
     public Set<Label> labelsOfDeletedNode(Node node) {
         return getWrapped().labelsOfDeletedNode(node);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasChanged(Change<Node> candidate) {
+        return super.hasChanged(candidate) || !assignedLabels(candidate.getPrevious()).isEmpty() || !removedLabels(candidate.getPrevious()).isEmpty();
     }
 }

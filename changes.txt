@@ -1,3 +1,6 @@
+2.2.1.31:
+    - Fixed a bug where nodes with changed labels and no changed properties were not reported as changed
+
 2.2.1.30:
     - Update to Neo4j 2.2.1
     - TestUtils refactoring
