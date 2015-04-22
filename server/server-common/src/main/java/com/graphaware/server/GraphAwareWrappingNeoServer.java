@@ -19,7 +19,7 @@ package com.graphaware.server;
 import com.graphaware.server.web.GraphAwareJetty9WebServer;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.server.WrappingNeoServer;
-import org.neo4j.server.configuration.Configurator;
+import org.neo4j.server.configuration.ConfigurationBuilder;
 import org.neo4j.server.web.WebServer;
 
 /**
@@ -31,7 +31,7 @@ public class GraphAwareWrappingNeoServer extends WrappingNeoServer {
         super(db);
     }
 
-    public GraphAwareWrappingNeoServer(GraphDatabaseAPI db, Configurator configurator) {
+    public GraphAwareWrappingNeoServer(GraphDatabaseAPI db, ConfigurationBuilder configurator) {
         super(db, configurator);
     }
 
@@ -40,6 +40,6 @@ public class GraphAwareWrappingNeoServer extends WrappingNeoServer {
      */
     @Override
     protected WebServer createWebServer() {
-        return new GraphAwareJetty9WebServer(getLogging(), getDatabase(), getConfig());
+        return new GraphAwareJetty9WebServer(logProvider, getDatabase(), getConfig());
     }
 }

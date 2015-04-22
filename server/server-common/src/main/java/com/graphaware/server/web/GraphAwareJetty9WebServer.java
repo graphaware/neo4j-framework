@@ -31,7 +31,7 @@ import org.eclipse.jetty.util.ArrayUtil;
 import org.eclipse.jetty.util.component.AbstractLifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.neo4j.kernel.configuration.Config;
-import org.neo4j.kernel.logging.Logging;
+import org.neo4j.logging.LogProvider;
 import org.neo4j.server.database.Database;
 import org.neo4j.server.database.InjectableProvider;
 import org.neo4j.server.rest.transactional.TransactionFacade;
@@ -68,8 +68,8 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
     private Database database;
     private AbstractApplicationContext rootContext;
 
-    public GraphAwareJetty9WebServer(Logging logging, Database database, Config config) {
-        super(logging);
+    public GraphAwareJetty9WebServer(LogProvider logProvider, Database database, Config config) {
+        super(logProvider, config);
         this.database = database;
         this.config = config;
     }
