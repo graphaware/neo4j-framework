@@ -45,6 +45,8 @@ import org.springframework.web.WebApplicationInitializer;
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.EnumSet;
 
@@ -121,7 +123,20 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
         context.addLifeCycleListener(new JettyStartingListener(new WebAppInitializer(rootContext, getPackagesToScan(config)), context.getServletContext()));
         context.addFilter(new FilterHolder(txFilter), "/*", EnumSet.allOf(DispatcherType.class));
 
+        addDefaultFilters(context);
+
         return context;
+    }
+
+    protected final void addDefaultFilters(ServletContextHandler context) {
+        //dirty dirty stuff
+        try {
+            Method m = this.getClass().getSuperclass().getDeclaredMethod("addFiltersTo", ServletContextHandler.class);
+            m.setAccessible(true);
+            m.invoke(this, context);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected final void prependHandler(HandlerList handlerList, ServletContextHandler handler) {

@@ -24,7 +24,7 @@ import java.io.IOException;
 
 /**
  * Base class for server mode integration tests that are as close to real Neo4j server deployment as possible. As a consequence,
- * low-level access to {@link org.neo4j.graphdb.GraphDatabaseService} is not provided. Instead, use {@link com.graphaware.test.util.TestUtils#executeCypher(String, String...)}
+ * low-level access to {@link org.neo4j.graphdb.GraphDatabaseService} is not provided. Instead, use {@link com.graphaware.test.util.TestHttpClient#executeCypher(String, String...)}
  * to populate/query the database.
  * <p/>
  * The target audience of this class are developers of GraphAware Framework (Runtime) Modules.
