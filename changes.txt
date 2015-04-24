@@ -1,6 +1,6 @@
 2.2.1.31:
     - Fixed a bug where nodes with changed labels and no changed properties were not reported as changed
-    - Fixed a critical issue where APIs deployed as GraphAware plugins were not secured using the default Neo4j auth mechanism
+    - Fixed a critical issue (#16) where APIs deployed as GraphAware plugins were not secured using the default Neo4j auth mechanism
 
 2.2.1.30:
     - Update to Neo4j 2.2.1
