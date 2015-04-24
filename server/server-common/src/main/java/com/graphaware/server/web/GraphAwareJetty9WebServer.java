@@ -131,7 +131,7 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
     protected final void addDefaultFilters(ServletContextHandler context) {
         //dirty dirty stuff
         try {
-            Method m = this.getClass().getSuperclass().getDeclaredMethod("addFiltersTo", ServletContextHandler.class);
+            Method m = Jetty9WebServer.class.getDeclaredMethod("addFiltersTo", ServletContextHandler.class);
             m.setAccessible(true);
             m.invoke(this, context);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
