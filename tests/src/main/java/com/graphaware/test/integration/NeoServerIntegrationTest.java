@@ -37,8 +37,7 @@ import java.io.IOException;
  */
 public abstract class NeoServerIntegrationTest {
 
-    private NeoTestServer neoTestServer;
-
+    protected NeoTestServer neoTestServer;
     protected TestHttpClient httpClient;
 
     @Before
