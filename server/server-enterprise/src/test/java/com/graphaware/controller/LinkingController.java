@@ -14,27 +14,27 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server;
+package com.graphaware.controller;
 
+import com.graphaware.service.LinkingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-/**
- * GraphAware Controller.
- */
 @Controller
-@RequestMapping(value = "/greeting")
-public class GreetingController {
+@RequestMapping(value = "/link")
+public class LinkingController {
 
     @Autowired
-    private GreetingService greetingService;
+    private LinkingService linkingService;
 
-    @RequestMapping(method = RequestMethod.GET)
-    @ResponseBody
-    public String handleRequest() {
-        return greetingService.greet();
+    @RequestMapping(value = "/{start}/{end}", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public void link(@PathVariable long start, @PathVariable long end) {
+        linkingService.link(start, end);
     }
 }

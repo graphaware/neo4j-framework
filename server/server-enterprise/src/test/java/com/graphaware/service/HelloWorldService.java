@@ -14,30 +14,25 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server;
+package com.graphaware.service;
 
-import org.neo4j.graphdb.DynamicRelationshipType;
+import com.graphaware.common.util.IterableUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.tooling.GlobalGraphOperations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class LinkingServiceImpl implements LinkingService {
-
-    private final GraphDatabaseService database;
+public class HelloWorldService implements GreetingService {
 
     @Autowired
-    public LinkingServiceImpl(GraphDatabaseService database) {
-        this.database = database;
-    }
+    private GraphDatabaseService database;
 
     @Override
-    public void link(long startNodeId, long endNodeId) {
+    public String greet() {
         try (Transaction tx = database.beginTx()) {
-            database.getNodeById(startNodeId).createRelationshipTo(database.getNodeById(endNodeId),
-                    DynamicRelationshipType.withName("TEST"));
-            tx.success();
+            return "Hello World! There are " + IterableUtils.count(GlobalGraphOperations.at(database).getAllNodes()) + " nodes in the database.";
         }
     }
 }

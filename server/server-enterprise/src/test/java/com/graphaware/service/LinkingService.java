@@ -14,25 +14,12 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server;
+package com.graphaware.service;
 
-import com.graphaware.common.util.IterableUtils;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.tooling.GlobalGraphOperations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+/**
+ * A service for testing.
+ */
+public interface LinkingService {
 
-@Service
-public class HelloWorldService implements GreetingService {
-
-    @Autowired
-    private GraphDatabaseService database;
-
-    @Override
-    public String greet() {
-        try (Transaction tx = database.beginTx()) {
-            return "Hello World! There are " + IterableUtils.count(GlobalGraphOperations.at(database).getAllNodes()) + " nodes in the database.";
-        }
-    }
+    void link(long startNodeId, long endNodeId);
 }

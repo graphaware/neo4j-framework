@@ -14,12 +14,26 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server;
+package com.graphaware.service;
 
-/**
- * A service for testing.
- */
-public interface LinkingService {
+import org.springframework.stereotype.Service;
 
-    void link(long startNodeId, long endNodeId);
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+@Service
+public class DummyService {
+
+    public static boolean initCalled = false;
+    public static boolean destroyCalled = false;
+
+    @PostConstruct
+    public void init() {
+        initCalled = true;
+    }
+
+    @PreDestroy
+    public void destroy() {
+        destroyCalled = true;
+    }
 }

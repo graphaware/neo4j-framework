@@ -14,26 +14,30 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server;
+package com.graphaware.service;
 
+import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.stereotype.Service;
 
-@Controller
-@RequestMapping(value = "/link")
-public class LinkingController {
+@Service
+public class LinkingServiceImpl implements LinkingService {
+
+    private final GraphDatabaseService database;
 
     @Autowired
-    private LinkingService linkingService;
+    public LinkingServiceImpl(GraphDatabaseService database) {
+        this.database = database;
+    }
 
-    @RequestMapping(value = "/{start}/{end}", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.CREATED)
-    public void link(@PathVariable long start, @PathVariable long end) {
-        linkingService.link(start, end);
+    @Override
+    public void link(long startNodeId, long endNodeId) {
+        try (Transaction tx = database.beginTx()) {
+            database.getNodeById(startNodeId).createRelationshipTo(database.getNodeById(endNodeId),
+                    DynamicRelationshipType.withName("TEST"));
+            tx.success();
+        }
     }
 }
