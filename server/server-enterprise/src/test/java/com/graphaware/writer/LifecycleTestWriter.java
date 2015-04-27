@@ -14,26 +14,32 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.service;
+package com.graphaware.writer;
 
-import org.springframework.stereotype.Service;
+import org.neo4j.graphdb.GraphDatabaseService;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
-@Service
-public class DummyService {
+public class LifecycleTestWriter extends TxPerTaskWriter {
 
     public static boolean initCalled = false;
     public static boolean destroyCalled = false;
 
-    @PostConstruct
-    public void init() {
-        initCalled = true;
+    public LifecycleTestWriter(GraphDatabaseService database) {
+        super(database);
     }
 
-    @PreDestroy
-    public void destroy() {
+    public LifecycleTestWriter(GraphDatabaseService database, int queueCapacity) {
+        super(database, queueCapacity);
+    }
+
+    @Override
+    public void start() {
+        initCalled = true;
+        super.start();
+    }
+
+    @Override
+    public void stop() {
         destroyCalled = true;
+        super.stop();
     }
 }

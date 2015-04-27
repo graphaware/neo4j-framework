@@ -39,6 +39,7 @@ import org.neo4j.server.web.Jetty9WebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.web.WebApplicationInitializer;
 
@@ -65,6 +66,7 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
     private final Config config;
     private LongRunningTransactionFilter txFilter;
     private Database database;
+    private AbstractApplicationContext rootContext;
 
     public GraphAwareJetty9WebServer(Logging logging, Database database, Config config) {
         super(logging);
@@ -74,7 +76,7 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
 
     @Override
     protected void startJetty() {
-        ApplicationContext rootContext = createRootApplicationContext();
+        rootContext = createRootApplicationContext();
 
         HandlerList handlerList = findHandlerList();
 
@@ -87,8 +89,18 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
         super.startJetty();
     }
 
-    protected ApplicationContext createRootApplicationContext() {
+    @Override
+    public void stop() {
+        if (rootContext != null) {
+            rootContext.close();
+        }
+
+        super.stop();
+    }
+
+    protected AbstractApplicationContext createRootApplicationContext() {
         GenericApplicationContext parent = new GenericApplicationContext();
+        parent.registerShutdownHook();
         parent.getBeanFactory().registerSingleton("database", database.getGraph());
 
         GraphAwareRuntime runtime = RuntimeRegistry.getRuntime(database.getGraph());

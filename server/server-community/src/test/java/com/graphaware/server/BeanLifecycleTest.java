@@ -16,9 +16,18 @@
 
 package com.graphaware.server;
 
-import com.graphaware.service.DummyService;
+import com.graphaware.runtime.GraphAwareRuntimeFactory;
+import com.graphaware.runtime.config.FluentRuntimeConfiguration;
+import com.graphaware.runtime.write.WritingConfig;
+import com.graphaware.service.LifecycleTestService;
 import com.graphaware.test.integration.NeoTestServer;
+import com.graphaware.writer.DatabaseWriter;
+import com.graphaware.writer.LifecycleTestWriter;
+import org.junit.Before;
 import org.junit.Test;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.GraphDatabaseAPI;
+import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.io.IOException;
 
@@ -27,20 +36,54 @@ import static org.junit.Assert.assertTrue;
 
 public class BeanLifecycleTest {
 
+    @Before
+    public void setUp() {
+        LifecycleTestService.initCalled = false;
+        LifecycleTestWriter.initCalled = false;
+        LifecycleTestService.destroyCalled = false;
+        LifecycleTestWriter.destroyCalled = false;
+    }
+
     @Test
-    public void lifecycleAnnotationsShouldBeHonoured() throws IOException, InterruptedException {
-        assertFalse(DummyService.initCalled);
-        assertFalse(DummyService.destroyCalled);
+    public void lifecycleAnnotationsShouldBeHonouredInWebContext() throws IOException, InterruptedException {
+        assertFalse(LifecycleTestService.initCalled);
+        assertFalse(LifecycleTestService.destroyCalled);
 
         NeoTestServer testServer = new NeoTestServer();
         testServer.start();
 
-        assertTrue(DummyService.initCalled);
-        assertFalse(DummyService.destroyCalled);
+        assertTrue(LifecycleTestService.initCalled);
+        assertFalse(LifecycleTestService.destroyCalled);
 
         testServer.stop();
 
-        assertTrue(DummyService.initCalled);
-        assertTrue(DummyService.destroyCalled);
+        assertTrue(LifecycleTestService.initCalled);
+        assertTrue(LifecycleTestService.destroyCalled);
+    }
+
+    @Test
+    public void lifecycleAnnotationsShouldBeHonouredInRootContext() throws IOException, InterruptedException {
+        assertFalse(LifecycleTestWriter.initCalled);
+        assertFalse(LifecycleTestWriter.destroyCalled);
+
+        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        GraphAwareRuntimeFactory.createRuntime(database, FluentRuntimeConfiguration.defaultConfiguration().withWritingConfig(new WritingConfig() {
+            @Override
+            public DatabaseWriter produceWriter(GraphDatabaseService database) {
+                return new LifecycleTestWriter(database);
+            }
+        })).start();
+
+        GraphAwareWrappingNeoServer server = new GraphAwareWrappingNeoServer((GraphDatabaseAPI) database);
+        server.start();
+
+        assertTrue(LifecycleTestWriter.initCalled);
+        assertFalse(LifecycleTestWriter.destroyCalled);
+
+        server.stop();
+        database.shutdown();
+
+        assertTrue(LifecycleTestWriter.initCalled);
+        assertTrue(LifecycleTestWriter.destroyCalled);
     }
 }
