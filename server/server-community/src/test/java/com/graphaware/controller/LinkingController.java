@@ -14,9 +14,24 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server;
+package com.graphaware.controller;
 
-public interface GreetingService {
+import com.graphaware.service.LinkingService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
-    String greet();
+@Controller
+@RequestMapping(value = "/link")
+public class LinkingController {
+
+    @Autowired
+    private LinkingService linkingService;
+
+    @RequestMapping(value = "/{start}/{end}", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public void link(@PathVariable long start, @PathVariable long end) {
+        linkingService.link(start, end);
+    }
 }

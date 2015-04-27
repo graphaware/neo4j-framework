@@ -14,25 +14,28 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server;
+package com.graphaware.controller;
 
-import com.graphaware.common.util.IterableUtils;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.tooling.GlobalGraphOperations;
+import com.graphaware.service.GreetingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-@Service
-public class HelloWorldService implements GreetingService {
+/**
+ * GraphAware Controller.
+ */
+@Controller
+@RequestMapping(value = "/greeting")
+public class GreetingController {
 
     @Autowired
-    private GraphDatabaseService database;
+    private GreetingService greetingService;
 
-    @Override
-    public String greet() {
-        try (Transaction tx = database.beginTx()) {
-            return "Hello World! There are " + IterableUtils.count(GlobalGraphOperations.at(database).getAllNodes()) + " nodes in the database.";
-        }
+    @RequestMapping(method = RequestMethod.GET)
+    @ResponseBody
+    public String handleRequest() {
+        return greetingService.greet();
     }
 }
