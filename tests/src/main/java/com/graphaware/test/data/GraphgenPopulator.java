@@ -44,7 +44,7 @@ public abstract class GraphgenPopulator extends CypherPopulator {
             BufferedReader in = new BufferedReader(new FileReader(file));
             while (in.ready()) {
                 String line = in.readLine();
-                if (line.startsWith("CREATE CONSTRAINT ON")) {
+                if (line.startsWith("CREATE CONSTRAINT") || line.startsWith("CREATE INDEX")) {
                     schema.append(line);
                 } else {
                     data.append(line);
