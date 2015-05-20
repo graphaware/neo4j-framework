@@ -33,6 +33,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.*;
@@ -1560,6 +1561,34 @@ public class LazyTransactionDataComprehensiveTest {
                         }
                     }
         );
+    }
+
+    @Test
+    public void shouldReportLabelRemovalAsAChange() {
+        createTestDatabase();
+
+        final AtomicInteger changedNodes = new AtomicInteger(0);
+
+        BeforeCommitCallback beforeCommitCallback = new BeforeCommitCallback.RememberingAdapter() {
+            @Override
+            protected void doBeforeCommit(ImprovedTransactionData transactionData) {
+                for (Change<Node> change : transactionData.getAllChangedNodes()) {
+                    changedNodes.incrementAndGet();
+                }
+            }
+        };
+
+        mutateGraph(new VoidReturningCallback() {
+                        @Override
+                        protected void doInTx(GraphDatabaseService database) {
+                            //change that should not be picked up as a change
+                            Node five = database.findNodes(label("ToBeRemoved")).next();
+                            five.removeLabel(label("ToBeRemoved"));
+                        }
+                    }, beforeCommitCallback
+        );
+
+        assertEquals(1, changedNodes.get());
     }
 
     @Test
