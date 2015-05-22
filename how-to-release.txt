@@ -27,3 +27,4 @@ List of modules to upgrade:
         algorithms
         reco
         reco-meetup
+        ga-enterprise
