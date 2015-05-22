@@ -8,12 +8,8 @@ git reset --hard HEAD
 search and replace the last snapshot version with the new one
 search and replace the last release version with the new one
 
-mvn clean install
-
-mvn release:prepare
+mvn release:clean release:prepare
 mvn release:perform
-
-go to https://oss.sonatype.org/, login as graphaware, promote released library
 
 notes:
     removing a git tag:
