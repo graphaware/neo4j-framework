@@ -19,7 +19,7 @@
 
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>graphaware-parent</artifactId>
-    <version>2.2.2.32-SNAPSHOT</version>
+    <version>2.2.2.31-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>GraphAware Neo4j Framework Parent POM</name>
@@ -175,69 +175,69 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>api</artifactId>
-                <version>2.2.2.32-SNAPSHOT</version>
+                <version>2.2.2.31-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>common</artifactId>
-                <version>2.2.2.32-SNAPSHOT</version>
+                <version>2.2.2.31-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime</artifactId>
-                <version>2.2.2.32-SNAPSHOT</version>
+                <version>2.2.2.31-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime-api</artifactId>
-                <version>2.2.2.32-SNAPSHOT</version>
+                <version>2.2.2.31-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer</artifactId>
-                <version>2.2.2.32-SNAPSHOT</version>
+                <version>2.2.2.31-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer-api</artifactId>
-                <version>2.2.2.32-SNAPSHOT</version>
+                <version>2.2.2.31-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>server-common</artifactId>
-                <version>2.2.2.32-SNAPSHOT</version>
+                <version>2.2.2.31-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>server-community</artifactId>
-                <version>2.2.2.32-SNAPSHOT</version>
+                <version>2.2.2.31-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tests</artifactId>
-                <version>2.2.2.32-SNAPSHOT</version>
+                <version>2.2.2.31-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-api</artifactId>
-                <version>2.2.2.32-SNAPSHOT</version>
+                <version>2.2.2.31-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-executor</artifactId>
-                <version>2.2.2.32-SNAPSHOT</version>
+                <version>2.2.2.31-SNAPSHOT</version>
             </dependency>
 
             <!-- Neo4j -->
