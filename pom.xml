@@ -24,6 +24,7 @@
 
     <name>GraphAware Neo4j Framework Parent POM</name>
     <description>Parent POM for GraphAware Neo4j Framework and Modules</description>
+    <url>http://graphaware.com/products</url>
 
     <modules>
         <module>parent-pom/framework</module>
