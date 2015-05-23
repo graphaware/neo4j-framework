@@ -17,6 +17,7 @@
 package com.graphaware.tx.event.improved;
 
 import com.graphaware.common.policy.*;
+import com.graphaware.common.policy.fluent.IncludeNodes;
 import com.graphaware.test.util.TestDataBuilder;
 import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
@@ -132,6 +133,34 @@ public class FilteredLazyTransactionDataIntegrationTest {
                 }
             }
         });
+
+        assertTrue(mutationsOccurred.get());
+    }
+
+    @Test
+    public void removedLabelShouldBePickedUp() {
+        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+
+        try (Transaction tx = database.beginTx()) {
+            Node node = database.createNode(label("Person"));
+            node.setProperty("name", "Michal");
+            tx.success();
+        }
+
+        final AtomicBoolean mutationsOccurred = new AtomicBoolean(false);
+        database.registerTransactionEventHandler(new TransactionEventHandler.Adapter<Object>() {
+            @Override
+            public Object beforeCommit(TransactionData data) throws Exception {
+                mutationsOccurred.set(new FilteredTransactionData(new LazyTransactionData(data), InclusionPolicies.all().with(IncludeNodes.all().with(label("Person")))).mutationsOccurred());
+                return null;
+            }
+        });
+
+
+        try (Transaction tx = database.beginTx()) {
+            database.findNodes(label("Person")).next().removeLabel(label("Person"));
+            tx.success();
+        }
 
         assertTrue(mutationsOccurred.get());
     }
