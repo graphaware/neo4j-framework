@@ -67,6 +67,21 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
      *
      * @param database   against which to execute batched queries.
      * @param batchSize  how many {@link UnitOfWork} are in a single batch.
+     * @param input      to the execution. These are provided to each unit of work, one by one.
+     * @param unitOfWork to be executed for each input item. Must be thread-safe.
+     */
+    public IterableInputBatchTransactionExecutor(GraphDatabaseService database, int batchSize, Iterator<T> input, UnitOfWork<T> unitOfWork) {
+        this.batchSize = batchSize;
+        this.unitOfWork = unitOfWork;
+        this.iterator = new SynchronizedIterator<>(input);
+        this.executor = new SimpleTransactionExecutor(database);
+    }
+
+    /**
+     * Create an instance of IterableInputBatchExecutor.
+     *
+     * @param database   against which to execute batched queries.
+     * @param batchSize  how many {@link UnitOfWork} are in a single batch.
      * @param callback   that will produce the input to the execution but needs to run in a transaction. Items of the input are provided to each unit of work, one by one.
      * @param unitOfWork to be executed for each input item. Must be thread-safe.
      */
@@ -78,6 +93,26 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
             @Override
             public Iterator<T> doInTransaction(GraphDatabaseService database) throws Exception {
                 return new SynchronizedIterator<>(callback.doInTransaction(database).iterator());
+            }
+        });
+    }
+
+    /**
+     * Create an instance of IterableInputBatchExecutor.
+     *
+     * @param database   against which to execute batched queries.
+     * @param batchSize  how many {@link UnitOfWork} are in a single batch.
+     * @param unitOfWork to be executed for each input item. Must be thread-safe.
+     * @param callback   that will produce the input to the execution but needs to run in a transaction. Items of the input are provided to each unit of work, one by one.
+     */
+    public IterableInputBatchTransactionExecutor(GraphDatabaseService database, int batchSize, UnitOfWork<T> unitOfWork, final TransactionCallback<Iterator<T>> callback) {
+        this.batchSize = batchSize;
+        this.unitOfWork = unitOfWork;
+        this.executor = new SimpleTransactionExecutor(database);
+        this.iterator = executor.executeInTransaction(new TransactionCallback<Iterator<T>>() {
+            @Override
+            public Iterator<T> doInTransaction(GraphDatabaseService database) throws Exception {
+                return new SynchronizedIterator<>(callback.doInTransaction(database));
             }
         });
     }

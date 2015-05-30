@@ -25,6 +25,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -92,6 +93,42 @@ public class IterableInputBatchTransactionExecutorTest {
                     @Override
                     public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
                         node.setProperty("name", "Name" + batchNumber + stepNumber);
+                    }
+                }
+        );
+
+        executor.execute();
+
+        try (Transaction tx = database.beginTx()) {
+            assertEquals("Name11", database.getNodeById(0).getProperty("name"));
+            assertEquals("Name12", database.getNodeById(1).getProperty("name"));
+            assertEquals("Name13", database.getNodeById(2).getProperty("name"));
+            assertEquals("Name108", database.getNodeById(97).getProperty("name"));
+            assertEquals("Name109", database.getNodeById(98).getProperty("name"));
+            assertEquals("Name1010", database.getNodeById(99).getProperty("name"));
+        }
+    }
+
+    @Test
+    public void iterorAcquiredInTransactionShouldBeProcessed() {
+        try (Transaction tx = database.beginTx()) {
+            for (int i = 0; i < 100; i++) {
+                database.createNode(DynamicLabel.label("Test"));
+            }
+            tx.success();
+        }
+
+        BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, 10,
+                new UnitOfWork<Node>() {
+                    @Override
+                    public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
+                        node.setProperty("name", "Name" + batchNumber + stepNumber);
+                    }
+                },
+                new TransactionCallback<Iterator<Node>>() {
+                    @Override
+                    public Iterator<Node> doInTransaction(GraphDatabaseService database) throws Exception {
+                        return database.findNodes(DynamicLabel.label("Test"));
                     }
                 }
         );
