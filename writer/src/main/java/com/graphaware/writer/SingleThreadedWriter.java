@@ -82,7 +82,7 @@ public abstract class SingleThreadedWriter extends AbstractScheduledService impl
                     LOG.info("Queue size: " + queue.size());
                 }
             }
-        }, 5, loggingFrequencyMs(), TimeUnit.SECONDS);
+        }, 5, loggingFrequencyMs(), TimeUnit.MILLISECONDS);
     }
 
     /**
