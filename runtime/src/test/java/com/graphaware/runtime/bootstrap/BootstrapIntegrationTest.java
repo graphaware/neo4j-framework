@@ -23,6 +23,10 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.config.InvalidSettingException;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
 import static com.graphaware.runtime.bootstrap.TestRuntimeModule.TEST_RUNTIME_MODULES;
@@ -214,5 +218,30 @@ public class BootstrapIntegrationTest {
         assertEquals("test1", TEST_RUNTIME_MODULES.get(0).getId());
         assertEquals("test2", TEST_RUNTIME_MODULES.get(1).getId());
         assertEquals("test3", TEST_RUNTIME_MODULES.get(2).getId());
+    }
+
+    @Test
+    public void modulesShouldBeDelegatedToInRandomOrderWhenOrderClashes() throws InterruptedException {
+        GraphDatabaseService database = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig(RUNTIME_ENABLED, "true")
+                .setConfig("com.graphaware.module.test1.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .setConfig("com.graphaware.module.test3.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .setConfig("com.graphaware.module.test2.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .newGraphDatabase();
+
+        registerShutdownHook(database);
+
+        try (Transaction tx = database.beginTx()) {
+            database.createNode();
+            tx.success();
+        }
+
+        assertEquals(3, TEST_RUNTIME_MODULES.size());
+        Set<String> remaining = new HashSet<>(Arrays.asList("test1", "test2", "test3"));
+        assertTrue(remaining.remove(TEST_RUNTIME_MODULES.get(0).getId()));
+        assertTrue(remaining.remove(TEST_RUNTIME_MODULES.get(1).getId()));
+        assertTrue(remaining.remove(TEST_RUNTIME_MODULES.get(2).getId()));
+        assertTrue(remaining.isEmpty());
     }
 }

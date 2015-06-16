@@ -27,9 +27,7 @@ import org.neo4j.kernel.lifecycle.Lifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -130,22 +128,30 @@ public class RuntimeKernelExtension implements Lifecycle {
     }
 
     private void registerModules(GraphAwareRuntime runtime) {
-        Map<Integer, Pair<String, String>> orderedBootstrappers = findOrderedBootstrappers();
+        List<Pair<Integer, Pair<String, String>>> orderedBootstrappers = findOrderedBootstrappers();
 
-        for (Pair<String, String> bootstrapperPair : orderedBootstrappers.values()) {
-            LOG.info("Bootstrapping module with ID " + bootstrapperPair.first() + ", using " + bootstrapperPair.other());
+        int lastOrder = -1;
+        for (Pair<Integer, Pair<String, String>> bootstrapperPair : orderedBootstrappers) {
+            int order = bootstrapperPair.first();
+            LOG.info("Bootstrapping module with order " + order + ", ID " + bootstrapperPair.other().first() + ", using " + bootstrapperPair.other().other());
+
+            if (lastOrder == order) {
+                LOG.warn("There is more than one module with order " + order + "! Will order clashing modules randomly");
+            }
+
+            lastOrder = order;
 
             try {
-                RuntimeModuleBootstrapper bootstrapper = (RuntimeModuleBootstrapper) Class.forName(bootstrapperPair.other()).newInstance();
-                runtime.registerModule(bootstrapper.bootstrapModule(bootstrapperPair.first(), findModuleConfig(bootstrapperPair.first()), database));
+                RuntimeModuleBootstrapper bootstrapper = (RuntimeModuleBootstrapper) Class.forName(bootstrapperPair.other().other()).newInstance();
+                runtime.registerModule(bootstrapper.bootstrapModule(bootstrapperPair.other().first(), findModuleConfig(bootstrapperPair.other().first()), database));
             } catch (Exception e) {
                 LOG.error("Unable to bootstrap module " + bootstrapperPair.first(), e);
             }
         }
     }
 
-    private Map<Integer, Pair<String, String>> findOrderedBootstrappers() {
-        Map<Integer, Pair<String, String>> orderedBootstrappers = new TreeMap<>();
+    private List<Pair<Integer, Pair<String, String>>> findOrderedBootstrappers() {
+        List<Pair<Integer, Pair<String, String>>> orderedBootstrappers = new ArrayList<>();
 
         for (String paramKey : config.getParams().keySet()) {
             Matcher matcher = MODULE_ENABLED_KEY.matcher(paramKey);
@@ -154,9 +160,16 @@ public class RuntimeKernelExtension implements Lifecycle {
                 String moduleId = matcher.group(1);
                 Integer moduleOrder = Integer.valueOf(matcher.group(2));
                 String bootstrapperClass = config.get(setting(paramKey, STRING, MANDATORY));
-                orderedBootstrappers.put(moduleOrder, Pair.of(moduleId, bootstrapperClass));
+                orderedBootstrappers.add(Pair.of(moduleOrder, Pair.of(moduleId, bootstrapperClass)));
             }
         }
+
+        Collections.sort(orderedBootstrappers, new Comparator<Pair<Integer, Pair<String, String>>>() {
+            @Override
+            public int compare(Pair<Integer, Pair<String, String>> o1, Pair<Integer, Pair<String, String>> o2) {
+                return Integer.compare(o1.first(), o2.first());
+            }
+        });
 
         return orderedBootstrappers;
     }
