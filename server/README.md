@@ -83,7 +83,7 @@ The value part of the property is a Spring expression for which packages to scan
 Compile this code into a .jar file (with dependencies, see below) and place it into the _plugins_ directory of your
 Neo4j server installation. You will then be able to issue a `GET` request to `http://your-neo4j-url:7474/graphaware/count`
 and receive the number of nodes in the database in the response body. Note that the `graphaware` part of the URL is a default
-and can be changed by adding the following line  to `neo4j.properties`:
+and can be changed by adding the following line  to `neo4j-server.properties`:
 ```
 com.graphaware.server.api.uri=your_uri_here
 ```
