@@ -1,20 +1,10 @@
 package com.graphaware.test.integration;
 
 import org.neo4j.cluster.ClusterSettings;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.config.Setting;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.graphdb.factory.HighlyAvailableGraphDatabaseFactory;
 import org.neo4j.helpers.Settings;
 import org.neo4j.kernel.ha.HaSettings;
-import org.neo4j.server.configuration.Configurator;
-import org.neo4j.server.web.ServerInternalSettings;
-import org.neo4j.test.TestGraphDatabaseFactory;
-
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static org.neo4j.helpers.Settings.setting;
-import static org.neo4j.helpers.Settings.STRING;
 
 public class HighAvailabilityDatabaseIntegrationTest extends DatabaseIntegrationTest {
 
@@ -26,26 +16,42 @@ public class HighAvailabilityDatabaseIntegrationTest extends DatabaseIntegration
     private static final String PATH = "target/graph-master";
 
     @Override
-    protected GraphDatabaseService createDatabase() {
-        //This is deprecated, but I didn't find another way how to do it properly.
-        GraphDatabaseBuilder graphDatabaseBuilder = new HighlyAvailableGraphDatabaseFactory().newHighlyAvailableDatabaseBuilder(PATH);
-
-        if (propertiesFile() != null) {
-            graphDatabaseBuilder = graphDatabaseBuilder.loadPropertiesFromFile(propertiesFile());
-        } else {
-            setConfig(graphDatabaseBuilder);
-        }
-
-        GraphDatabaseService database = graphDatabaseBuilder.newGraphDatabase();
-        registerShutdownHook(database);
-        return database;
+    protected GraphDatabaseBuilder createGraphDatabaseBuilder() {
+        return new HighlyAvailableGraphDatabaseFactory().newHighlyAvailableDatabaseBuilder(getPath());
     }
 
-    protected void setConfig(GraphDatabaseBuilder graphDatabaseBuilder) {
-        graphDatabaseBuilder.setConfig(ClusterSettings.server_id, SERVER_ID);
-        graphDatabaseBuilder.setConfig(HaSettings.ha_server, HA_SERVER);
-        graphDatabaseBuilder.setConfig(HaSettings.slave_only, SLAVE_ONLY);
-        graphDatabaseBuilder.setConfig(ClusterSettings.cluster_server, CLUSTER_SERVER);
-        graphDatabaseBuilder.setConfig(ClusterSettings.initial_hosts, INITIAL_HOSTS);
+    @Override
+    protected void populateConfig(GraphDatabaseBuilder builder) {
+        super.populateConfig(builder);
+
+        builder.setConfig(ClusterSettings.server_id, getServerId());
+        builder.setConfig(HaSettings.ha_server, getHaServer());
+        builder.setConfig(HaSettings.slave_only, getSlaveOnly());
+        builder.setConfig(ClusterSettings.cluster_server, getClusterServer());
+        builder.setConfig(ClusterSettings.initial_hosts, getInitialHosts());
+    }
+
+    protected String getServerId() {
+        return SERVER_ID;
+    }
+
+    protected String getHaServer() {
+        return HA_SERVER;
+    }
+
+    protected String getSlaveOnly() {
+        return SLAVE_ONLY;
+    }
+
+    protected String getClusterServer() {
+        return CLUSTER_SERVER;
+    }
+
+    protected String getInitialHosts() {
+        return INITIAL_HOSTS;
+    }
+
+    protected String getPath() {
+        return PATH;
     }
 }
