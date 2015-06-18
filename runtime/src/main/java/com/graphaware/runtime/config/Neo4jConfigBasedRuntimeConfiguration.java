@@ -113,7 +113,7 @@ public final class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfi
         TimingStrategy timingStrategy = config.get(TIMING_STRATEGY_SETTING);
 
         if (timingStrategy == null) {
-            return AdaptiveTimingStrategy.defaultConfiguration();
+            timingStrategy = AdaptiveTimingStrategy.defaultConfiguration();
         }
 
         if (timingStrategy instanceof FixedDelayTimingStrategy) {
