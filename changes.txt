@@ -1,4 +1,4 @@
-2.2.3.32:
+2.2.3.32 (not yet released):
     - Update to Neo4j 2.2.3
     - Minor bugfixes and improvements
 
