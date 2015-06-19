@@ -1,3 +1,7 @@
+2.2.3.32:
+    - Update to Neo4j 2.2.3
+    - Minor bugfixes and improvements
+
 2.2.2.31:
     - Update to Neo4j 2.2.2
     - Fixed a bug where nodes with changed labels and no changed properties were not reported as changed
