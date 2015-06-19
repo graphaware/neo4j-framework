@@ -90,6 +90,25 @@ public final class DirectionUtils {
         return BOTH.equals(direction1) || BOTH.equals(direction2) || direction1.equals(direction2);
     }
 
+    /**
+     * Reverse direction.
+     *
+     * @param direction to reverse.
+     * @return reversed direction.
+     */
+    public static Direction reverse(Direction direction) {
+        switch (direction) {
+            case BOTH:
+                return BOTH;
+            case OUTGOING:
+                return INCOMING;
+            case INCOMING:
+                return OUTGOING;
+            default:
+                throw new IllegalArgumentException("Unknown direction " + direction);
+        }
+    }
+
     private DirectionUtils() {
     }
 }

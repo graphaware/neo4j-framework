@@ -17,6 +17,7 @@
 package com.graphaware.common.util;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -28,7 +29,8 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.DirectionUtils.matches;
 import static com.graphaware.common.util.DirectionUtils.resolveDirection;
-import static junit.framework.Assert.*;
+import static com.graphaware.common.util.DirectionUtils.reverse;
+import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
@@ -143,5 +145,12 @@ public class DirectionUtilsTest {
 
             matches(relationship, database.getNodeById(2), OUTGOING);
         }
+    }
+
+    @Test
+    public void shouldCorrectlyReverseDirection() {
+        assertEquals(OUTGOING, reverse(INCOMING));
+        assertEquals(INCOMING, reverse(OUTGOING));
+        assertEquals(BOTH, reverse(BOTH));
     }
 }
