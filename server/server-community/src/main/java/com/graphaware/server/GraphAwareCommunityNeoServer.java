@@ -18,7 +18,7 @@ package com.graphaware.server;
 
 import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
 import com.graphaware.server.web.GraphAwareJetty9WebServer;
-import org.neo4j.kernel.InternalAbstractGraphDatabase;
+import org.neo4j.kernel.impl.factory.GraphDatabaseFacadeFactory;
 import org.neo4j.logging.LogProvider;
 import org.neo4j.server.CommunityNeoServer;
 import org.neo4j.server.configuration.ConfigurationBuilder;
@@ -30,11 +30,11 @@ import org.neo4j.server.web.WebServer;
  */
 public class GraphAwareCommunityNeoServer extends CommunityNeoServer {
 
-    public GraphAwareCommunityNeoServer(ConfigurationBuilder configurator, InternalAbstractGraphDatabase.Dependencies dependencies, LogProvider logProvider) {
+    public GraphAwareCommunityNeoServer(ConfigurationBuilder configurator, GraphDatabaseFacadeFactory.Dependencies dependencies, LogProvider logProvider) {
         super(configurator, dependencies, logProvider);
     }
 
-    public GraphAwareCommunityNeoServer(ConfigurationBuilder configurator, Database.Factory dbFactory, InternalAbstractGraphDatabase.Dependencies dependencies, LogProvider logProvider) {
+    public GraphAwareCommunityNeoServer(ConfigurationBuilder configurator, Database.Factory dbFactory, GraphDatabaseFacadeFactory.Dependencies dependencies, LogProvider logProvider) {
         super(configurator, dbFactory, dependencies, logProvider);
     }
 

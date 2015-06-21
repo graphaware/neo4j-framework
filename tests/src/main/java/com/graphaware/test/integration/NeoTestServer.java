@@ -19,6 +19,7 @@ package com.graphaware.test.integration;
 import org.apache.commons.io.IOUtils;
 import org.junit.rules.TemporaryFolder;
 import org.neo4j.server.Bootstrapper;
+import org.neo4j.server.CommunityBootstrapper;
 import org.neo4j.server.configuration.Configurator;
 import org.springframework.core.io.ClassPathResource;
 
@@ -64,8 +65,12 @@ public class NeoTestServer {
 
         System.setProperty(Configurator.NEO_SERVER_CONFIG_FILE_KEY, serverConfig.getAbsolutePath());
 
-        bootstrapper = Bootstrapper.loadMostDerivedBootstrapper();
-        bootstrapper.start(new String[0]);
+        bootstrapper = createBootstrapper();
+        bootstrapper.start();
+    }
+
+    protected Bootstrapper createBootstrapper() {
+        return new CommunityBootstrapper();
     }
 
     public void stop() throws IOException, InterruptedException {
