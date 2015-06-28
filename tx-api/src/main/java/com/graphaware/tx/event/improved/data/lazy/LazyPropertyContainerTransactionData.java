@@ -230,13 +230,17 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
 
     protected void registerChange(T candidate) {
         if (!changedContainsKey(candidate)) {
-            Change<T> change = new Change<>(oldSnapshot(candidate), newSnapshot(candidate));
+            Change<T> change = createChangeObject(candidate);
             changed.put(id(candidate), change);
         }
     }
 
     protected boolean changedContainsKey(T candidate) {
         return changed.containsKey(id(candidate));
+    }
+
+    protected Change<T> createChangeObject(T candidate) {
+        return new Change<>(oldSnapshot(candidate), newSnapshot(candidate));
     }
 
     /**

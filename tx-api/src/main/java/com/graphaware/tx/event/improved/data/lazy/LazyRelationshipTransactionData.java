@@ -16,6 +16,7 @@
 
 package com.graphaware.tx.event.improved.data.lazy;
 
+import com.graphaware.tx.event.improved.api.Change;
 import com.graphaware.tx.event.improved.data.RelationshipTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import com.graphaware.tx.event.improved.propertycontainer.snapshot.RelationshipSnapshot;
@@ -156,5 +157,14 @@ public class LazyRelationshipTransactionData extends LazyPropertyContainerTransa
         }
 
         return result;
+    }
+
+    @Override
+    protected Change<Relationship> createChangeObject(Relationship candidate) {
+        return new Change<>(oldSnapshot(bugWorkaround(candidate)), newSnapshot(bugWorkaround(candidate)));
+    }
+
+    private Relationship bugWorkaround(Relationship relationship) {
+        return relationship.getGraphDatabase().getRelationshipById(relationship.getId());
     }
 }
