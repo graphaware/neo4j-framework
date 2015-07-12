@@ -4,5 +4,3 @@ branches:
   only:
     - master
     - 2.3
-
-sudo: false
