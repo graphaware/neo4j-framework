@@ -22,7 +22,7 @@ import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.UnitOfWork;
-import com.graphaware.tx.executor.callback.AllNodes;
+import com.graphaware.tx.executor.input.AllNodes;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -70,7 +70,7 @@ public class RandomNodeSelectorTest {
             }
         }).execute();
 
-        new IterableInputBatchTransactionExecutor<>(database, 1000, AllNodes.getInstance(), new UnitOfWork<Node>() {
+        new IterableInputBatchTransactionExecutor<>(database, 1000, new AllNodes(database, 1000), new UnitOfWork<Node>() {
             @Override
             public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
                 node.delete();
@@ -147,7 +147,7 @@ public class RandomNodeSelectorTest {
             }
         }).execute();
 
-        new IterableInputBatchTransactionExecutor<>(database, 1000, AllNodes.getInstance(), new UnitOfWork<Node>() {
+        new IterableInputBatchTransactionExecutor<>(database, 1000, new AllNodes(database, 1000), new UnitOfWork<Node>() {
             @Override
             public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
                 if (stepNumber != 1000) {

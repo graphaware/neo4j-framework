@@ -17,14 +17,13 @@
 package com.graphaware.tx.executor;
 
 import com.graphaware.tx.executor.batch.*;
+import com.graphaware.tx.executor.input.AllNodes;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
-import com.graphaware.tx.executor.single.TransactionCallback;
 import com.graphaware.tx.executor.single.TransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Arrays;
 import java.util.List;
@@ -76,12 +75,7 @@ public class JustForDocs {
         BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(
                 database,
                 1000,
-                new TransactionCallback<Iterable<Node>>() {
-                    @Override
-                    public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
-                        return GlobalGraphOperations.at(database).getAllNodes();
-                    }
-                },
+                new AllNodes(database, 1000),
                 new UnitOfWork<Node>() {
                     @Override
                     public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
@@ -108,7 +102,7 @@ public class JustForDocs {
 
         int batchSize = 1000;
         int noNodes = 100000;
-        BatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, batchSize, noNodes, CreateRandomNode.getInstance());
+        IterableInputBatchTransactionExecutor batchExecutor = new NoInputBatchTransactionExecutor(database, batchSize, noNodes, CreateRandomNode.getInstance());
         BatchTransactionExecutor multiThreadedExecutor = new MultiThreadedBatchTransactionExecutor(batchExecutor, 4);
         multiThreadedExecutor.execute();
     }

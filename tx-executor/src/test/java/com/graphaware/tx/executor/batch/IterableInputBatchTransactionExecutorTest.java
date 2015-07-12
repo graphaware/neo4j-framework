@@ -16,16 +16,15 @@
 
 package com.graphaware.tx.executor.batch;
 
-import com.graphaware.tx.executor.single.TransactionCallback;
+import com.graphaware.tx.executor.input.AllNodes;
+import com.graphaware.tx.executor.input.AllNodesWithLabel;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -83,12 +82,7 @@ public class IterableInputBatchTransactionExecutorTest {
         }
 
         BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, 10,
-                new TransactionCallback<Iterable<Node>>() {
-                    @Override
-                    public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
-                        return GlobalGraphOperations.at(database).getAllNodes();
-                    }
-                },
+                new AllNodes(database, 10),
                 new UnitOfWork<Node>() {
                     @Override
                     public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
@@ -119,16 +113,11 @@ public class IterableInputBatchTransactionExecutorTest {
         }
 
         BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, 10,
+                new AllNodesWithLabel(database, 10, DynamicLabel.label("Test")),
                 new UnitOfWork<Node>() {
                     @Override
                     public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
                         node.setProperty("name", "Name" + batchNumber + stepNumber);
-                    }
-                },
-                new TransactionCallback<Iterator<Node>>() {
-                    @Override
-                    public Iterator<Node> doInTransaction(GraphDatabaseService database) throws Exception {
-                        return database.findNodes(DynamicLabel.label("Test"));
                     }
                 }
         );
@@ -157,17 +146,13 @@ public class IterableInputBatchTransactionExecutorTest {
 
         final AtomicInteger count = new AtomicInteger(0);
 
-        new IterableInputBatchTransactionExecutor<>(database, 100, new TransactionCallback<Iterable<Node>>() {
-            @Override
-            public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
-                return GlobalGraphOperations.at(database).getAllNodesWithLabel(label);
-            }
-        }, new UnitOfWork<Node>() {
-            @Override
-            public void execute(GraphDatabaseService database, Node input, int batchNumber, int stepNumber) {
-                count.incrementAndGet();
-            }
-        }
+        new IterableInputBatchTransactionExecutor<>(database, 100, new AllNodesWithLabel(database, 100, label),
+                new UnitOfWork<Node>() {
+                    @Override
+                    public void execute(GraphDatabaseService database, Node input, int batchNumber, int stepNumber) {
+                        count.incrementAndGet();
+                    }
+                }
         ).execute();
 
         assertEquals(2, count.get());

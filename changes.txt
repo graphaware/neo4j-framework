@@ -1,6 +1,6 @@
-2.2.3.32 (not yet released):
-    - Update to Neo4j 2.2.3
-    - Minor bugfixes and improvements
+2.2.2.32 (not yet released):
+    - Bugfix in batch transaction executor
+    - Other minor bugfixes and improvements
 
 2.2.2.31:
     - Update to Neo4j 2.2.2

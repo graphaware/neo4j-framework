@@ -17,6 +17,7 @@
 package com.graphaware.tx.executor.batch;
 
 import com.graphaware.tx.executor.NullItem;
+import com.graphaware.tx.executor.input.NoInput;
 import org.junit.Test;
 
 import java.util.NoSuchElementException;
@@ -24,7 +25,7 @@ import java.util.NoSuchElementException;
 import static org.junit.Assert.*;
 
 /**
- * Unit test for {@link com.graphaware.tx.executor.batch.NoInput}.
+ * Unit test for {@link NoInput}.
  */
 public class NoInputTest {
 

@@ -24,12 +24,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Decorator for a {@link BatchTransactionExecutor}, which allows it to be executed using multiple threads.
+ * Decorator for a {@link IterableInputBatchTransactionExecutor}, which allows it to be executed using multiple threads.
  */
 public class MultiThreadedBatchTransactionExecutor extends DisposableBatchTransactionExecutor {
     private static final Logger LOG = LoggerFactory.getLogger(MultiThreadedBatchTransactionExecutor.class);
 
-    private final BatchTransactionExecutor wrappedExecutor;
+    private final IterableInputBatchTransactionExecutor<?> wrappedExecutor;
     private final int numberOfThreads;
 
     /**
@@ -37,7 +37,7 @@ public class MultiThreadedBatchTransactionExecutor extends DisposableBatchTransa
      *
      * @param wrappedExecutor the executor to which each thread will delegate work.
      */
-    public MultiThreadedBatchTransactionExecutor(BatchTransactionExecutor wrappedExecutor) {
+    public MultiThreadedBatchTransactionExecutor(IterableInputBatchTransactionExecutor<?> wrappedExecutor) {
         this(wrappedExecutor, Runtime.getRuntime().availableProcessors());
     }
 
@@ -47,7 +47,7 @@ public class MultiThreadedBatchTransactionExecutor extends DisposableBatchTransa
      * @param wrappedExecutor the executor to which each thread will delegate work.
      * @param numberOfThreads the total number of threads used for the execution.
      */
-    public MultiThreadedBatchTransactionExecutor(BatchTransactionExecutor wrappedExecutor, int numberOfThreads) {
+    public MultiThreadedBatchTransactionExecutor(IterableInputBatchTransactionExecutor<?> wrappedExecutor, int numberOfThreads) {
         this.wrappedExecutor = wrappedExecutor;
         this.numberOfThreads = numberOfThreads;
     }
@@ -59,11 +59,13 @@ public class MultiThreadedBatchTransactionExecutor extends DisposableBatchTransa
     public void doExecute() {
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
 
+        wrappedExecutor.populateQueue();
+
         for (int i = 0; i < numberOfThreads; i++) {
             executorService.submit(new Runnable() {
                 @Override
                 public void run() {
-                    wrappedExecutor.execute();
+                    wrappedExecutor.processQueue();
                 }
             });
         }

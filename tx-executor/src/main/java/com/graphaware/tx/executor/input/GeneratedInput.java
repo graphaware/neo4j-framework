@@ -14,7 +14,9 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.executor.batch;
+package com.graphaware.tx.executor.input;
+
+import com.graphaware.tx.executor.batch.BatchTransactionExecutor;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

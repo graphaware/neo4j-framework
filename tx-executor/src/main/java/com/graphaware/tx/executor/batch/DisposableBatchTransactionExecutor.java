@@ -30,7 +30,7 @@ public abstract class DisposableBatchTransactionExecutor implements BatchTransac
      * {@inheritDoc}
      */
     @Override
-    public void execute() {
+    public final void execute() {
         if (alreadyExecuted.compareAndSet(false, true)) {
             doExecute();
         } else {

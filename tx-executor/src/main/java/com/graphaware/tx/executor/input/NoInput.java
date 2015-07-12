@@ -14,9 +14,11 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.executor.batch;
+package com.graphaware.tx.executor.input;
 
 import com.graphaware.tx.executor.NullItem;
+import com.graphaware.tx.executor.batch.BatchTransactionExecutor;
+import com.graphaware.tx.executor.batch.UnitOfWork;
 
 /**
  * Dummy generated input that is intended for {@link BatchTransactionExecutor}s that use {@link UnitOfWork} but generate

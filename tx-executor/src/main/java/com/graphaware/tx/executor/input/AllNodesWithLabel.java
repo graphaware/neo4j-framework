@@ -14,37 +14,32 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.executor.callback;
+package com.graphaware.tx.executor.input;
 
 import com.graphaware.tx.executor.single.TransactionCallback;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.neo4j.tooling.GlobalGraphOperations;
+import org.neo4j.helpers.collection.Iterables;
 
 /**
- * {@link TransactionCallback} returning all nodes in the database. Singleton.
+ * {@link TransactionalInput} returning all nodes with a specific label.
  */
-public final class AllNodes implements TransactionCallback<Iterable<Node>> {
-
-    private static final AllNodes INSTANCE = new AllNodes();
+public final class AllNodesWithLabel  extends TransactionalInput<Node> {
 
     /**
-     * Get an instance of this callback.
+     * Create a new input.
      *
-     * @return instance.
+     * @param database  to take all nodes from.
+     * @param batchSize how many nodes in a batch.
+     * @param label which all returned nodes have.
      */
-    public static AllNodes getInstance() {
-        return INSTANCE;
-    }
-
-    private AllNodes() {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
-        return GlobalGraphOperations.at(database).getAllNodes();
+    public AllNodesWithLabel(GraphDatabaseService database, int batchSize, final Label label) {
+        super(database, batchSize, new TransactionCallback<Iterable<Node>>() {
+            @Override
+            public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
+                return Iterables.asResourceIterable(database.findNodes(label));
+            }
+        });
     }
 }

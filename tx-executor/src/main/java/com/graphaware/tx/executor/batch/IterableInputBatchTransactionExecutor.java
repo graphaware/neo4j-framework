@@ -16,7 +16,9 @@
 
 package com.graphaware.tx.executor.batch;
 
+import com.graphaware.common.util.BlockingArrayBlockingQueue;
 import com.graphaware.tx.executor.NullItem;
+import com.graphaware.tx.executor.input.TransactionalInput;
 import com.graphaware.tx.executor.single.KeepCalmAndCarryOn;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.TransactionCallback;
@@ -25,8 +27,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -35,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @param <T> type of the input item, on which steps are executed.
  */
-public class IterableInputBatchTransactionExecutor<T> implements BatchTransactionExecutor {
+public class IterableInputBatchTransactionExecutor<T> extends DisposableBatchTransactionExecutor {
     private static final Logger LOG = LoggerFactory.getLogger(IterableInputBatchTransactionExecutor.class);
 
     private final int batchSize;
@@ -44,85 +46,56 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
     protected final AtomicInteger totalSteps = new AtomicInteger(0);
     protected final AtomicInteger batches = new AtomicInteger(0);
     protected final AtomicInteger successfulSteps = new AtomicInteger(0);
-    protected final Iterator<T> iterator;
+    protected final Iterable<T> input;
     protected final TransactionExecutor executor;
+
+    protected final AtomicBoolean finished = new AtomicBoolean(false);
+    protected final BlockingArrayBlockingQueue<T> queue = new BlockingArrayBlockingQueue<>(10_000);
 
     /**
      * Create an instance of IterableInputBatchExecutor.
      *
      * @param database   against which to execute batched queries.
      * @param batchSize  how many {@link UnitOfWork} are in a single batch.
-     * @param input      to the execution. These are provided to each unit of work, one by one.
+     * @param input      to the execution. These items are provided to each unit of work, one by one.
+     *                   Please use {@link TransactionalInput} if the input is fetched from the database.
      * @param unitOfWork to be executed for each input item. Must be thread-safe.
      */
     public IterableInputBatchTransactionExecutor(GraphDatabaseService database, int batchSize, Iterable<T> input, UnitOfWork<T> unitOfWork) {
         this.batchSize = batchSize;
         this.unitOfWork = unitOfWork;
-        this.iterator = new SynchronizedIterator<>(input.iterator());
+        this.input = input;
         this.executor = new SimpleTransactionExecutor(database);
-    }
-
-    /**
-     * Create an instance of IterableInputBatchExecutor.
-     *
-     * @param database   against which to execute batched queries.
-     * @param batchSize  how many {@link UnitOfWork} are in a single batch.
-     * @param unitOfWork to be executed for each input item. Must be thread-safe.
-     * @param input      to the execution. These are provided to each unit of work, one by one.
-     */
-    public IterableInputBatchTransactionExecutor(GraphDatabaseService database, int batchSize, UnitOfWork<T> unitOfWork, Iterator<T> input) {
-        this.batchSize = batchSize;
-        this.unitOfWork = unitOfWork;
-        this.iterator = new SynchronizedIterator<>(input);
-        this.executor = new SimpleTransactionExecutor(database);
-    }
-
-    /**
-     * Create an instance of IterableInputBatchExecutor.
-     *
-     * @param database   against which to execute batched queries.
-     * @param batchSize  how many {@link UnitOfWork} are in a single batch.
-     * @param callback   that will produce the input to the execution but needs to run in a transaction. Items of the input are provided to each unit of work, one by one.
-     * @param unitOfWork to be executed for each input item. Must be thread-safe.
-     */
-    public IterableInputBatchTransactionExecutor(GraphDatabaseService database, int batchSize, final TransactionCallback<Iterable<T>> callback, UnitOfWork<T> unitOfWork) {
-        this.batchSize = batchSize;
-        this.unitOfWork = unitOfWork;
-        this.executor = new SimpleTransactionExecutor(database);
-        this.iterator = executor.executeInTransaction(new TransactionCallback<Iterator<T>>() {
-            @Override
-            public Iterator<T> doInTransaction(GraphDatabaseService database) throws Exception {
-                return new SynchronizedIterator<>(callback.doInTransaction(database).iterator());
-            }
-        });
-    }
-
-    /**
-     * Create an instance of IterableInputBatchExecutor.
-     *
-     * @param database   against which to execute batched queries.
-     * @param batchSize  how many {@link UnitOfWork} are in a single batch.
-     * @param unitOfWork to be executed for each input item. Must be thread-safe.
-     * @param callback   that will produce the input to the execution but needs to run in a transaction. Items of the input are provided to each unit of work, one by one.
-     */
-    public IterableInputBatchTransactionExecutor(GraphDatabaseService database, int batchSize, UnitOfWork<T> unitOfWork, final TransactionCallback<Iterator<T>> callback) {
-        this.batchSize = batchSize;
-        this.unitOfWork = unitOfWork;
-        this.executor = new SimpleTransactionExecutor(database);
-        this.iterator = executor.executeInTransaction(new TransactionCallback<Iterator<T>>() {
-            @Override
-            public Iterator<T> doInTransaction(GraphDatabaseService database) throws Exception {
-                return new SynchronizedIterator<>(callback.doInTransaction(database));
-            }
-        });
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void execute() {
-        while (true) {
+    protected void doExecute() {
+        populateQueue();
+        processQueue();
+    }
+
+    protected final void populateQueue() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    for (T input : IterableInputBatchTransactionExecutor.this.input) {
+                        queue.offer(input);
+                    }
+                } catch (Exception e) {
+                    LOG.warn("Exception while producing input!", e);
+                } finally {
+                    finished.set(true);
+                }
+            }
+        }).start();
+    }
+
+    protected final void processQueue() {
+        while (notFinished()) {
             final int batchNo = batches.incrementAndGet();
 
             if (LOG.isTraceEnabled()) {
@@ -130,37 +103,47 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
             }
 
             final AtomicInteger currentBatchSteps = new AtomicInteger(0);
+            final AtomicBoolean polled = new AtomicBoolean(false);
             NullItem result = executor.executeInTransaction(new TransactionCallback<NullItem>() {
                 @Override
                 public NullItem doInTransaction(GraphDatabaseService database) {
-                    try {
-                        while (iterator.hasNext() && currentBatchSteps.get() < batchSize) {
-                            T next = iterator.next();
+                    while ((notFinished()) && currentBatchSteps.get() < batchSize) {
+                        T next;
+                        try {
+                            next = queue.poll(100, TimeUnit.MILLISECONDS);
+                        } catch (InterruptedException e) {
+                            continue;
+                        }
+
+                        if (next != null) {
+                            polled.set(true);
                             totalSteps.incrementAndGet();
                             unitOfWork.execute(database, next, batchNo, currentBatchSteps.incrementAndGet());
+                        } else {
+                            if (!finished.get()) {
+                                LOG.warn("Waited for over 100ms but no input arrived. Still expecting more input. ");
+                            } else {
+                                break;
+                            }
                         }
-                    } catch (NoSuchElementException | NullPointerException e) {
-                        //this is OK, simply means there's no more items to process. The NPE comes from
-                        //org.neo4j.collection.primitive.PrimitiveLongCollections$PrimitiveLongConcatingIterator.fetchNext(PrimitiveLongCollections.java:195)
                     }
                     return NullItem.getInstance();
 
                 }
             }, KeepCalmAndCarryOn.getInstance());
 
-            int attemptedSteps = currentBatchSteps.get();
-            if (attemptedSteps == 0) {
-                batches.decrementAndGet();
-                break;
-            }
-
             if (result != null) {
-                successfulSteps.addAndGet(attemptedSteps);
+                successfulSteps.addAndGet(currentBatchSteps.get());
                 if (LOG.isTraceEnabled()) {
                     LOG.trace("Committed transaction for batch number " + batchNo);
                 }
             } else {
                 LOG.warn("Rolled back transaction for batch number " + batchNo);
+
+                if (!polled.get()) {
+                    LOG.warn("Throwing away the head of the queue as the transaction seems to have failed before polling...");
+                    queue.poll();
+                }
             }
         }
 
@@ -168,5 +151,9 @@ public class IterableInputBatchTransactionExecutor<T> implements BatchTransactio
         if (successfulSteps.get() != totalSteps.get()) {
             LOG.warn("Failed to execute " + (totalSteps.get() - successfulSteps.get()) + " steps!");
         }
+    }
+
+    private boolean notFinished() {
+        return !finished.get() || !queue.isEmpty();
     }
 }

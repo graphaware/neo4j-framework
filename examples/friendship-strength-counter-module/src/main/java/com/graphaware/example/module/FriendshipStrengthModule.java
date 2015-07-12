@@ -22,6 +22,7 @@ import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.module.BaseTxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
+import com.graphaware.tx.executor.input.TransactionalInput;
 import com.graphaware.tx.executor.batch.UnitOfWork;
 import com.graphaware.tx.executor.single.TransactionCallback;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -83,12 +84,12 @@ public class FriendshipStrengthModule extends BaseTxDrivenModule<Void> {
 
         new IterableInputBatchTransactionExecutor<>(
                 database, 10000,
-                new TransactionCallback<Iterable<Relationship>>() {
+                new TransactionalInput<>(database, 10000, new TransactionCallback<Iterable<Relationship>>() {
                     @Override
                     public Iterable<Relationship> doInTransaction(GraphDatabaseService database) throws Exception {
                         return at(database).getAllRelationships();
                     }
-                },
+                }),
                 new UnitOfWork<Relationship>() {
                     @Override
                     public void execute(GraphDatabaseService database, Relationship relationship, int batchNumber, int stepNumber) {
