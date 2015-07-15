@@ -1,3 +1,6 @@
+2.2.2.33:
+    - Make perf tests more extensible
+
 2.2.2.32:
     - Bugfix in batch transaction executor
     - Other minor bugfixes and improvements

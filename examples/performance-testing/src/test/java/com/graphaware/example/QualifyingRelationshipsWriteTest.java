@@ -111,7 +111,7 @@ public class QualifyingRelationshipsWriteTest implements PerformanceTest {
      * {@inheritDoc}
      */
     @Override
-    public void prepareDatabase(GraphDatabaseService database, Map<String, Object> params) {
+    public void prepare(GraphDatabaseService database, Map<String, Object> params) {
         new NoInputBatchTransactionExecutor(database, 1000, NO_NODES, new UnitOfWork<NullItem>() {
             @Override
             public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {

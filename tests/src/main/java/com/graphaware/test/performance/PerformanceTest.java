@@ -30,7 +30,7 @@ import java.util.Random;
  */
 public interface PerformanceTest {
 
-    static final Random RANDOM = new Random(System.currentTimeMillis());
+    Random RANDOM = new Random(System.currentTimeMillis());
 
     /**
      * Get the name of this test. Will be used in the name of the results file.
@@ -79,11 +79,12 @@ public interface PerformanceTest {
 
     /**
      * Prepare the database for performance test, for instance, register the runtime, pre-populate with data, etc.
+     * Prepare other things that last as long as the database.
      *
      * @param database to prepare.
      * @param params   test parameters.
      */
-    void prepareDatabase(GraphDatabaseService database, Map<String, Object> params);
+    void prepare(GraphDatabaseService database, Map<String, Object> params);
 
     /**
      * Run the performance test.

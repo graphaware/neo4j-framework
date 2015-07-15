@@ -92,7 +92,7 @@ public class DummyTestForDocs implements PerformanceTest {
      * {@inheritDoc}
      */
     @Override
-    public void prepareDatabase(GraphDatabaseService database, final Map<String, Object> params) {
+    public void prepare(GraphDatabaseService database, final Map<String, Object> params) {
         //create 100 nodes in batches of 100
         new NoInputBatchTransactionExecutor(database, 100, 100, new UnitOfWork<NullItem>() {
             @Override

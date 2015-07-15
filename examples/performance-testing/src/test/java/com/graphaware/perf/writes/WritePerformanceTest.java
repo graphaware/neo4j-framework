@@ -100,7 +100,7 @@ public class WritePerformanceTest implements PerformanceTest {
     }
 
     @Override
-    public void prepareDatabase(GraphDatabaseService database, final Map<String, Object> params) {
+    public void prepare(GraphDatabaseService database, final Map<String, Object> params) {
         generatorConfiguration = new BasicGeneratorConfig(
                 new BarabasiAlbertRelationshipGenerator(new BarabasiAlbertConfig((Integer) params.get(NETWORK_SIZE), 3)),
                 SocialNetworkNodeCreator.getInstance(),

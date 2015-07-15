@@ -53,8 +53,8 @@ public class QualifyingRelationshipsReadCypherTest extends QualifyingRelationshi
      * {@inheritDoc}
      */
     @Override
-    public void prepareDatabase(GraphDatabaseService database, final Map<String, Object> params) {
-        super.prepareDatabase(database, params);
+    public void prepare(GraphDatabaseService database, final Map<String, Object> params) {
+        super.prepare(database, params);
     }
 
     /**

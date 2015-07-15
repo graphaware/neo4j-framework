@@ -33,10 +33,11 @@ import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
  * Base class for suites of {@link PerformanceTest}s.
  */
 public abstract class PerformanceTestSuite {
+
     private static final Logger LOG = LoggerFactory.getLogger(PerformanceTestSuite.class);
 
-    private TemporaryFolder temporaryFolder;
-    private GraphDatabaseService database;
+    protected TemporaryFolder temporaryFolder;
+    protected GraphDatabaseService database;
 
     /**
      * Get the performance tests run as a part of this test suite.
@@ -56,12 +57,22 @@ public abstract class PerformanceTestSuite {
             LOG.info("Started performance test: " + performanceTest.longName());
 
             TestResults testResults = run(performanceTest);
-            testResults.printToFile(performanceTest.longName(),  performanceTest.shortName() + "-" + System.currentTimeMillis() + ".txt");
+            testResults.printToFile(performanceTest.longName(), getFileName(performanceTest));
 
             LOG.info("Finished performance test: " + performanceTest.longName());
         }
 
         LOG.info("Performance test suite finished.");
+    }
+
+    /**
+     * Get the name of the file into which the results of this test will be written.
+     *
+     * @param performanceTest test.
+     * @return file name.
+     */
+    protected String getFileName(PerformanceTest performanceTest) {
+        return performanceTest.shortName() + "-" + System.currentTimeMillis() + ".txt";
     }
 
     /**
@@ -168,7 +179,7 @@ public abstract class PerformanceTestSuite {
      * @param params          with which the test will be run.
      */
     private void createDatabase(PerformanceTest performanceTest, Map<String, Object> params) {
-        GraphDatabaseBuilder graphDatabaseBuilder = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(temporaryFolder.getRoot().getPath());
+        GraphDatabaseBuilder graphDatabaseBuilder = createGraphDatabaseBuilder();
 
         Map<String, String> dbConfig = performanceTest.databaseParameters(params);
         if (dbConfig != null) {
@@ -179,7 +190,17 @@ public abstract class PerformanceTestSuite {
 
         registerShutdownHook(database);
 
-        performanceTest.prepareDatabase(database, params);
+        performanceTest.prepare(database, params);
+    }
+
+    /**
+     * Create a builder for the database. By default, creates an embedded database builder set up to create an empty
+     * database in a temporary folder.
+     *
+     * @return builder.
+     */
+    protected GraphDatabaseBuilder createGraphDatabaseBuilder() {
+        return new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(temporaryFolder.getRoot().getPath());
     }
 
     /**
