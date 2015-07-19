@@ -1,5 +1,6 @@
 2.2.2.33:
     - Make perf tests more extensible
+    - Runtime modules (re)initialisation memory optimisations
 
 2.2.2.32:
     - Bugfix in batch transaction executor
