@@ -20,7 +20,6 @@ import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.ErrorState;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.slf4j.Logger;
@@ -168,11 +167,8 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
             LOG.info("Metadata loading skipped.");
         } else {
             LOG.info("Loading module metadata...");
-            try (Transaction tx = startTransaction()) {
-                Set<String> moduleIds = loadMetadata();
-                cleanupMetadata(moduleIds);
-                tx.success();
-            }
+            Set<String> moduleIds = loadMetadata();
+            cleanupMetadata(moduleIds);
             LOG.info("Module metadata loaded.");
         }
     }
@@ -185,17 +181,10 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
     }
 
     /**
-     * Start a database transaction.
-     *
-     * @return tx.
-     */
-    protected abstract Transaction startTransaction();
-
-    /**
      * Load module metadata.
      *
      * @return IDs of all modules registered with the runtime, no matter whether they previously had some metadata in
-     *         the graph or not.
+     * the graph or not.
      */
     protected abstract Set<String> loadMetadata();
 

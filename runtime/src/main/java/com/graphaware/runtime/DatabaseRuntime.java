@@ -22,7 +22,6 @@ import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.writer.DatabaseWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
 
 
 /**
@@ -71,14 +70,6 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
         if (module instanceof TxDrivenModule) {
             txDrivenModuleManager.registerModule((TxDrivenModule) module);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Transaction startTransaction() {
-        return database.beginTx();
     }
 
     /**

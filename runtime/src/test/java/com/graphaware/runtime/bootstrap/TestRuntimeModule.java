@@ -21,10 +21,7 @@ import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.runtime.module.BaseTxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,14 +59,15 @@ public class TestRuntimeModule extends BaseTxDrivenModule<Void> {
 
     @Override
     public void initialize(GraphDatabaseService database) {
-        try {
+        try (Transaction tx = database.beginTx()){
             Node n1 = database.createNode(DynamicLabel.label("test"));
             Node n2 = database.createNode();
             n1.createRelationshipTo(n2, DynamicRelationshipType.withName("TEST"));
             n1.getRelationships().iterator().next().getType();
             Thread.sleep(200); //takes some time to initialize
+            tx.success();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         initialized = true;
     }

@@ -23,6 +23,7 @@ import com.graphaware.common.serialize.Serializer;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModule;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +38,7 @@ import java.util.Set;
 public class GraphPropertiesMetadataRepository implements ModuleMetadataRepository {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphPropertiesMetadataRepository.class);
+    private final GraphDatabaseService database;
     private final KeyValueStore keyValueStore;
     private final String propertyPrefix;
 
@@ -48,6 +50,7 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
      * @param propertyPrefix String with which the property keys of properties written by this repository will be prefixed.
      */
     public GraphPropertiesMetadataRepository(GraphDatabaseService database, RuntimeConfiguration configuration, String propertyPrefix) {
+        this.database = database;
         this.propertyPrefix = configuration.createPrefix(propertyPrefix);
         this.keyValueStore = new GraphKeyValueStore(database);
     }
@@ -67,7 +70,7 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
     public <M extends ModuleMetadata> M getModuleMetadata(String moduleId) {
         final String key = moduleKey(moduleId);
 
-        Map<String, Object> internalProperties = getInternalProperties(keyValueStore);
+        Map<String, Object> internalProperties = getInternalProperties();
 
         try {
             byte[] serializedMetadata = (byte[]) internalProperties.get(key);
@@ -97,7 +100,10 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
      */
     @Override
     public <M extends ModuleMetadata> void persistModuleMetadata(String moduleId, M metadata) {
-        keyValueStore.set(moduleKey(moduleId), Serializer.toByteArray(metadata));
+        try (Transaction tx = database.beginTx()) {
+            keyValueStore.set(moduleKey(moduleId), Serializer.toByteArray(metadata));
+            tx.success();
+        }
     }
 
     /**
@@ -106,7 +112,7 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
     @Override
     public Set<String> getAllModuleIds() {
         Set<String> result = new HashSet<>();
-        for (String key : getInternalProperties(keyValueStore).keySet()) {
+        for (String key : getInternalProperties().keySet()) {
             result.add(key.replace(propertyPrefix, ""));
         }
         return result;
@@ -117,22 +123,29 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
      */
     @Override
     public void removeModuleMetadata(String moduleId) {
-        keyValueStore.remove(moduleKey(moduleId));
+        try (Transaction tx = database.beginTx()) {
+            keyValueStore.remove(moduleKey(moduleId));
+            tx.success();
+        }
     }
 
     /**
      * Get properties starting with {@link #propertyPrefix} from a {@link com.graphaware.common.kv.KeyValueStore}.
      *
-     * @param keyValueStore {@link KeyValueStore} to get properties from.
      * @return map of properties (key-value).
      */
-    private Map<String, Object> getInternalProperties(KeyValueStore keyValueStore) {
+    private Map<String, Object> getInternalProperties() {
         Map<String, Object> result = new HashMap<>();
-        for (String key : keyValueStore.getKeys()) {
-            if (key.startsWith(propertyPrefix)) {
-                result.put(key, keyValueStore.get(key));
+
+        try (Transaction tx = database.beginTx()) {
+            for (String key : keyValueStore.getKeys()) {
+                if (key.startsWith(propertyPrefix)) {
+                    result.put(key, keyValueStore.get(key));
+                }
             }
+            tx.success();
         }
+
         return result;
     }
 

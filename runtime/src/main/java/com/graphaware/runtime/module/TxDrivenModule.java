@@ -91,7 +91,7 @@ public interface TxDrivenModule<T> extends RuntimeModule {
     /**
      * Initialize this module. This method must bring the module to a state equivalent to a state of the same module that
      * has been registered at all times since the database was empty. It can perform global-graph operations to achieve
-     * this.
+     * this. It must manage its own transactions.
      * <p/>
      * For example, a module that performs some in-graph caching needs to write information into the graph so that when
      * the method returns, the graph is in the same state as it would be if the module has been running all the time
@@ -105,7 +105,7 @@ public interface TxDrivenModule<T> extends RuntimeModule {
     /**
      * Re-initialize this module. This method must remove all metadata written to the graph by this module and bring the
      * module to a state equivalent to a state of the same module that has been registered at all times since the
-     * database was empty. It can perform global-graph operations to achieve this.
+     * database was empty. It can perform global-graph operations to achieve this. It must manage its own transactions.
      *
      * @param database    to re-initialize this module for.
      * @param oldMetadata metadata stored for this module from its previous run. Can be <code>null</code> in case metadata
