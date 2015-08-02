@@ -16,7 +16,6 @@
 
 package com.graphaware.api;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.HashMap;
@@ -28,14 +27,20 @@ import java.util.Map;
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public abstract class JsonPropertyContainer {
 
-    private long id;
-    private Map<String, Object> properties = new HashMap<>();
+    private long id = -1;
+    private Map<String, Object> properties;
+
+    protected JsonPropertyContainer() {
+    }
 
     protected JsonPropertyContainer(long id) {
         this.id = id;
     }
 
     public void putProperty(String key, Object value) {
+        if (properties == null) {
+            properties = new HashMap<>();
+        }
         properties.put(key, value);
     }
 
@@ -47,7 +52,6 @@ public abstract class JsonPropertyContainer {
         this.id = id;
     }
 
-    @JsonAnyGetter
     public Map<String, Object> getProperties() {
         return properties;
     }
