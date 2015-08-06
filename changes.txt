@@ -1,6 +1,7 @@
 2.2.2.33:
     - Make perf tests more extensible
     - Runtime modules (re)initialisation memory optimisations
+    - API overhaul for nodes and relationships returned by modules
 
 2.2.2.32:
     - Bugfix in batch transaction executor
