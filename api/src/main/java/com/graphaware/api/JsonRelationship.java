@@ -16,41 +16,122 @@
 
 package com.graphaware.api;
 
-import com.graphaware.common.util.DirectionUtils;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
+
+import java.util.Map;
 
 /**
  * JSON-serializable representation of a Neo4j relationship.
  */
-public class JsonRelationship extends JsonPropertyContainer {
+public class JsonRelationship extends JsonPropertyContainer<Relationship> {
 
+    private long startNodeId = NEW;
+    private long endNodeId = NEW;
     private String type;
-    private Direction direction = Direction.BOTH;
 
-    public JsonRelationship(Relationship relationship, Node pointOfView) {
-        this(relationship, new JsonInput(), pointOfView);
+    /**
+     * Public no-arg constructor (for Jackson)
+     */
+    public JsonRelationship() {
     }
 
-    public JsonRelationship(Relationship relationship, JsonInput jsonInput, Node pointOfView) {
-        super(relationship.getId());
+    /**
+     * Create a JSON-serializable representation from a Neo4j relationship.
+     *
+     * @param relationship to create JSON from.
+     */
+    public JsonRelationship(Relationship relationship) {
+        this(relationship, new JsonInput());
+    }
 
-        if (jsonInput.getRelationshipProperties() != null) {
-            for (String property : jsonInput.getRelationshipProperties()) {
-                if (relationship.hasProperty(property)) {
-                    putProperty(property, relationship.getProperty(property));
-                }
-            }
-        } else {
-            for (String property : relationship.getPropertyKeys()) {
-                putProperty(property, relationship.getProperty(property));
-            }
+    /**
+     * Create a JSON-serializable representation from a Neo4j node.
+     *
+     * @param relationship to create JSON from.
+     * @param jsonInput    specifying what to include in the produced JSON.
+     */
+    public JsonRelationship(Relationship relationship, JsonInput jsonInput) {
+        super(relationship, jsonInput.getRelationshipProperties());
+        startNodeId = relationship.getStartNode().getId();
+        endNodeId = relationship.getEndNode().getId();
+        setType(relationship.getType().name());
+    }
+
+    /**
+     * Construct a representation of a relationship from its internal Neo4j ID.
+     *
+     * @param id ID.
+     */
+    public JsonRelationship(long id) {
+        super(id);
+    }
+
+    /**
+     * Construct a new relationship representation.
+     *
+     * @param startNodeId start node ID.
+     * @param endNodeId   end node ID.
+     * @param type        relationship type.
+     * @param properties  relationship properties.
+     */
+    public JsonRelationship(long startNodeId, long endNodeId, String type, Map<String, Object> properties) {
+        super(properties);
+        this.startNodeId = startNodeId;
+        this.endNodeId = endNodeId;
+        this.type = type;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Relationship create(GraphDatabaseService database) {
+        return database.getNodeById(startNodeId).createRelationshipTo(database.getNodeById(endNodeId), DynamicRelationshipType.withName(type));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Relationship fetch(GraphDatabaseService database) {
+        return database.getRelationshipById(getId());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void checkCanCreate() {
+        super.checkCanCreate();
+
+        if (type == null || type.length() == 0) {
+            throw new IllegalStateException("Relationship type must not be null or empty");
         }
 
-        setType(relationship.getType().name());
-        setDirection(DirectionUtils.resolveDirection(relationship, pointOfView));
+        if (startNodeId == NEW || endNodeId == NEW) {
+            throw new IllegalStateException("Start and End node IDs must be specified");
+        }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void checkCanFetch() {
+        super.checkCanFetch();
+
+        if (startNodeId != NEW || endNodeId != NEW) {
+            throw new IllegalStateException("Must not specify start/end node for existing relationship!");
+        }
+
+        if (type != null) {
+            throw new IllegalStateException("Must not specify type for existing relationship!");
+        }
+    }
+
+    //Getters and setters
 
     public String getType() {
         return type;
@@ -60,11 +141,20 @@ public class JsonRelationship extends JsonPropertyContainer {
         this.type = type;
     }
 
-    public Direction getDirection() {
-        return direction;
+    public long getStartNodeId() {
+        return startNodeId;
     }
 
-    public void setDirection(Direction direction) {
-        this.direction = direction;
+    public void setStartNodeId(long startNodeId) {
+        this.startNodeId = startNodeId;
+    }
+
+    public long getEndNodeId() {
+        return endNodeId;
+    }
+
+    public void setEndNodeId(long endNodeId) {
+        this.endNodeId = endNodeId;
     }
 }
+

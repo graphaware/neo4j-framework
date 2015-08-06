@@ -16,50 +16,108 @@
 
 package com.graphaware.api;
 
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.*;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * JSON-serializable representation of a Neo4j node.
  */
-public class JsonNode extends JsonPropertyContainer {
+public class JsonNode extends JsonPropertyContainer<Node> {
 
     private String[] labels;
 
+    /**
+     * Public no-arg constructor (for Jackson)
+     */
+    public JsonNode() {
+    }
+
+    /**
+     * Create a JSON-serializable representation from a Neo4j node.
+     *
+     * @param node node to create JSON from.
+     */
     public JsonNode(Node node) {
         this(node, new JsonInput());
     }
 
+    /**
+     * Create a JSON-serializable representation from a Neo4j node.
+     *
+     * @param node      node to create JSON from.
+     * @param jsonInput specifying what to include in the produced JSON.
+     */
     public JsonNode(Node node, JsonInput jsonInput) {
-        super(node.getId());
+        super(node, jsonInput.getNodeProperties());
+        setLabels(labelsToStringArray(node.getLabels()));
+    }
 
-        if (jsonInput.getNodeProperties() != null) {
-            for (String property : jsonInput.getNodeProperties()) {
-                if (node.hasProperty(property)) {
-                    putProperty(property, node.getProperty(property));
-                }
-            }
-        } else {
-            for (String property : node.getPropertyKeys()) {
-                putProperty(property, node.getProperty(property));
-            }
-        }
+    /**
+     * Create a JSON-serializable representation from a Neo4j node ID.
+     *
+     * @param id of a node to create JSON from.
+     */
+    public JsonNode(long id) {
+        super(id);
+    }
 
-        if (!Boolean.FALSE.equals(jsonInput.getIncludeNodeLabels())) {
-            setLabels(labelsToStringArray(node.getLabels()));
+    /**
+     * Construct a new representation of a node.
+     *
+     * @param labels of the new node.
+     * @param properties of the new node.
+     */
+    public JsonNode(String[] labels, Map<String, Object> properties) {
+        super(properties);
+        this.labels = labels;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Node create(GraphDatabaseService database) {
+        return database.createNode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Node fetch(GraphDatabaseService database) {
+        return database.getNodeById(getId());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void populate(Node node) {
+        super.populate(node);
+
+        if (labels != null) {
+            for (String label : labels) {
+                node.addLabel(DynamicLabel.label(label));
+            }
         }
     }
 
-    private String[] labelsToStringArray(Iterable<Label> labels) {
-        List<String> labelsAsList = new LinkedList<>();
-        for (Label label : labels) {
-            labelsAsList.add(label.name());
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void checkCanFetch() {
+        super.checkCanFetch();
+
+        if (labels != null && labels.length != 0) {
+            throw new IllegalStateException("Must not specify labels for existing node!");
         }
-        return labelsAsList.toArray(new String[labelsAsList.size()]);
     }
+
+    //getters and setters
 
     public String[] getLabels() {
         return labels;
@@ -67,5 +125,15 @@ public class JsonNode extends JsonPropertyContainer {
 
     public void setLabels(String[] labels) {
         this.labels = labels;
+    }
+
+    //helpers
+
+    private String[] labelsToStringArray(Iterable<Label> labels) {
+        List<String> labelsAsList = new LinkedList<>();
+        for (Label label : labels) {
+            labelsAsList.add(label.name());
+        }
+        return labelsAsList.toArray(new String[labelsAsList.size()]);
     }
 }

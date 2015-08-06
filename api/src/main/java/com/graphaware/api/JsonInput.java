@@ -22,7 +22,6 @@ package com.graphaware.api;
 public class JsonInput {
 
     private String[] nodeProperties;
-    private Boolean includeNodeLabels;
     private String[] relationshipProperties;
 
     /**
@@ -43,24 +42,6 @@ public class JsonInput {
      */
     public void setNodeProperties(String[] nodeProperties) {
         this.nodeProperties = nodeProperties;
-    }
-
-    /**
-     * Find out whether node labels should be included in the output.
-     *
-     * @return true iff node labels should be included.
-     */
-    public Boolean getIncludeNodeLabels() {
-        return includeNodeLabels;
-    }
-
-    /**
-     * Specify whether node labels should be included in the output.
-     *
-     * @param includeNodeLabels true iff node labels should be included, false or null otherwise.
-     */
-    public void setIncludeNodeLabels(Boolean includeNodeLabels) {
-        this.includeNodeLabels = includeNodeLabels;
     }
 
     /**
