@@ -1,5 +1,6 @@
-2.2.2.34:
-    - todo upgrade Spring
+2.2.4.34:
+    - upgraded Neo4j to 2.2.4
+    - upgraded Spring to 4.2.0.RELEASE
     - improved inclusion policies to address https://github.com/graphaware/neo4j-timetree/issues/35
 
 2.2.2.33:
