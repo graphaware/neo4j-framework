@@ -16,6 +16,7 @@
 
 package com.graphaware.common.policy.composite;
 
+import com.graphaware.common.policy.BasePropertyContainerInclusionPolicy;
 import com.graphaware.common.policy.PropertyContainerInclusionPolicy;
 import org.neo4j.graphdb.PropertyContainer;
 
@@ -26,7 +27,7 @@ import java.util.Arrays;
  * All contained policies must "vote" <code>true</code> to {@link #include(org.neo4j.graphdb.PropertyContainer)} in
  * order for this policy to return <code>true</code>.
  */
-public abstract class CompositePropertyContainerInclusionPolicy<P extends PropertyContainer, T extends PropertyContainerInclusionPolicy<P>> implements PropertyContainerInclusionPolicy<P> {
+public abstract class CompositePropertyContainerInclusionPolicy<P extends PropertyContainer, T extends PropertyContainerInclusionPolicy<P>> extends BasePropertyContainerInclusionPolicy<P> implements PropertyContainerInclusionPolicy<P> {
 
     protected final T[] policies;
 

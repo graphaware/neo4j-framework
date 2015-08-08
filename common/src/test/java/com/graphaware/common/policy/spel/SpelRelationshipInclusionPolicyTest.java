@@ -19,7 +19,9 @@ package com.graphaware.common.policy.spel;
 import com.graphaware.common.policy.RelationshipInclusionPolicy;
 import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.helpers.collection.Iterables;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -108,6 +110,15 @@ public class SpelRelationshipInclusionPolicyTest extends SpelInclusionPolicyTest
     public void shouldComplainAboutIncorrectUsage3() {
         try (Transaction tx = database.beginTx()) {
             policy5.include(michalLivesIn());
+            tx.success();
+        }
+    }
+
+    @Test
+    public void shouldIncludeAllCorrectRels() {
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(1, Iterables.count(policy6.getAll(database)));
+            assertEquals(vojtaWorksFor(), policy6.getAll(database).iterator().next());
             tx.success();
         }
     }

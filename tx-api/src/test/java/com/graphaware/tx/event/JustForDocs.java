@@ -16,8 +16,8 @@
 
 package com.graphaware.tx.event;
 
+import com.graphaware.common.policy.BaseNodeInclusionPolicy;
 import com.graphaware.common.policy.InclusionPolicies;
-import com.graphaware.common.policy.NodeInclusionPolicy;
 import com.graphaware.common.policy.none.IncludeNoRelationships;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -69,7 +69,7 @@ public class JustForDocs {
             @Override
             public Object beforeCommit(TransactionData data) throws Exception {
                 InclusionPolicies inclusionPolicies = InclusionPolicies.all()
-                        .with(new NodeInclusionPolicy() {
+                        .with(new BaseNodeInclusionPolicy() {
                             @Override
                             public boolean include(Node node) {
                                 return node.getProperty("name", "default").equals("Two");

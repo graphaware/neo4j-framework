@@ -19,7 +19,9 @@ package com.graphaware.common.policy.spel;
 import com.graphaware.common.policy.NodeInclusionPolicy;
 import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.helpers.collection.Iterables;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -28,14 +30,25 @@ import static org.junit.Assert.assertTrue;
  */
 public class SpelNodeInclusionPolicyTest extends SpelInclusionPolicyTest {
 
+    private NodeInclusionPolicy policy1;
+    private NodeInclusionPolicy policy2;
+    private NodeInclusionPolicy policy3;
+    private NodeInclusionPolicy policy4;
+    private NodeInclusionPolicy policy5;
+
+    @Override
+    public void setUp() {
+        super.setUp();
+
+        policy1 = new SpelNodeInclusionPolicy("hasLabel('Employee') || hasProperty('form') || getProperty('age', 0) > 20");
+        policy2 = new SpelNodeInclusionPolicy("getDegree('OUTGOING') > 1");
+        policy3 = new SpelNodeInclusionPolicy("getDegree('WORKS_FOR', 'BOTH') > 1");
+        policy4 = new SpelNodeInclusionPolicy("getDegree('WORKS_FOR', 'incoming') > 1");
+        policy5 = new SpelNodeInclusionPolicy("degree > 2");
+    }
+
     @Test
     public void shouldIncludeCorrectNodes() {
-        NodeInclusionPolicy policy1 = new SpelNodeInclusionPolicy("hasLabel('Employee') || hasProperty('form') || getProperty('age', 0) > 20");
-        NodeInclusionPolicy policy2 = new SpelNodeInclusionPolicy("getDegree('OUTGOING') > 1");
-        NodeInclusionPolicy policy3 = new SpelNodeInclusionPolicy("getDegree('WORKS_FOR', 'BOTH') > 1");
-        NodeInclusionPolicy policy4 = new SpelNodeInclusionPolicy("getDegree('WORKS_FOR', 'incoming') > 1");
-        NodeInclusionPolicy policy5 = new SpelNodeInclusionPolicy("degree > 2");
-
         try (Transaction tx = database.beginTx()) {
             assertTrue(policy1.include(michal()));
             assertTrue(policy1.include(graphaware()));
@@ -62,6 +75,15 @@ public class SpelNodeInclusionPolicyTest extends SpelInclusionPolicyTest {
             assertFalse(policy5.include(vojta()));
             assertFalse(policy5.include(london()));
 
+            tx.success();
+        }
+    }
+
+    @Test
+    public void shouldCorrectlyGetAllNodes() {
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(1, Iterables.count(policy3.getAll(database)));
+            assertEquals(graphaware(), policy3.getAll(database).iterator().next());
             tx.success();
         }
     }

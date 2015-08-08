@@ -17,8 +17,10 @@
 package com.graphaware.common.policy.composite;
 
 import com.graphaware.common.policy.RelationshipInclusionPolicy;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * {@link CompositePropertyContainerInclusionPolicy} for {@link Relationship}s.
@@ -42,5 +44,13 @@ public final class CompositeRelationshipInclusionPolicy extends CompositePropert
         }
 
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Iterable<Relationship> doGetAll(GraphDatabaseService database) {
+        return GlobalGraphOperations.at(database).getAllRelationships();
     }
 }

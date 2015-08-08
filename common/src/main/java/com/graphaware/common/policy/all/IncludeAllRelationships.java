@@ -16,15 +16,13 @@
 
 package com.graphaware.common.policy.all;
 
-
 import com.graphaware.common.policy.RelationshipInclusionPolicy;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 /**
  * {@link RelationshipInclusionPolicy} that includes all relationships. Singleton.
  */
-public final class IncludeAllRelationships extends IncludeAll<Relationship> implements RelationshipInclusionPolicy {
+public final class IncludeAllRelationships extends RelationshipInclusionPolicy.Adapter {
 
     private static final RelationshipInclusionPolicy INSTANCE = new IncludeAllRelationships();
 
@@ -39,7 +37,7 @@ public final class IncludeAllRelationships extends IncludeAll<Relationship> impl
      * {@inheritDoc}
      */
     @Override
-    public boolean include(Relationship relationship, Node pointOfView) {
-        return include(relationship);
+    public boolean include(Relationship object) {
+        return true;
     }
 }

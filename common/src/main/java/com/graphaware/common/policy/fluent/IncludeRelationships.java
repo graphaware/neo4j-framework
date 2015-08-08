@@ -20,7 +20,10 @@ import com.graphaware.common.description.predicate.Predicate;
 import com.graphaware.common.description.property.DetachedPropertiesDescription;
 import com.graphaware.common.description.property.WildcardPropertiesDescription;
 import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Collections;
 
@@ -65,5 +68,13 @@ public class IncludeRelationships extends BaseIncludeRelationships<IncludeRelati
     @Override
     protected IncludeRelationships newInstance(DetachedPropertiesDescription propertiesDescription) {
         return new IncludeRelationships(getDirection(), getRelationshipTypes(), propertiesDescription);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Iterable<Relationship> doGetAll(GraphDatabaseService database) {
+        return GlobalGraphOperations.at(database).getAllRelationships();
     }
 }

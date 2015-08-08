@@ -16,18 +16,21 @@
 
 package com.graphaware.runtime.policy.all;
 
+import com.graphaware.common.policy.BasePropertyContainerInclusionPolicy;
 import com.graphaware.common.policy.NodeInclusionPolicy;
 import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.serialize.SingletonSerializer;
 import com.graphaware.runtime.config.RuntimeConfiguration;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * Policy that includes all business / application level nodes, but exclude any
  * {@link com.graphaware.runtime.GraphAwareRuntime} internal nodes. Singleton.
  */
-public final class IncludeAllBusinessNodes implements NodeInclusionPolicy {
+public final class IncludeAllBusinessNodes extends BasePropertyContainerInclusionPolicy<Node> implements NodeInclusionPolicy {
 
     static {
         Serializer.register(IncludeAllBusinessNodes.class, new SingletonSerializer());
@@ -54,5 +57,13 @@ public final class IncludeAllBusinessNodes implements NodeInclusionPolicy {
         }
 
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Iterable<Node> doGetAll(GraphDatabaseService database) {
+        return GlobalGraphOperations.at(database).getAllNodes();
     }
 }

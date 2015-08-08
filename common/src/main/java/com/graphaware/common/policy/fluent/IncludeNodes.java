@@ -19,7 +19,10 @@ package com.graphaware.common.policy.fluent;
 import com.graphaware.common.description.predicate.Predicate;
 import com.graphaware.common.description.property.DetachedPropertiesDescription;
 import com.graphaware.common.description.property.WildcardPropertiesDescription;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
+import org.neo4j.graphdb.Node;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Collections;
 
@@ -63,5 +66,13 @@ public class IncludeNodes extends BaseIncludeNodes<IncludeNodes> {
     @Override
     protected IncludeNodes newInstance(DetachedPropertiesDescription propertiesDescription) {
         return new IncludeNodes(getLabel(), propertiesDescription);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Iterable<Node> doGetAll(GraphDatabaseService database) {
+        return GlobalGraphOperations.at(database).getAllNodes();
     }
 }

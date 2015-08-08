@@ -37,7 +37,7 @@ public interface RelationshipInclusionPolicy extends PropertyContainerInclusionP
     /**
      * Adapter for implementations that don't care about which node is looking at the relationship.
      */
-    public abstract class Adapter implements RelationshipInclusionPolicy {
+    abstract class Adapter extends BaseRelationshipInclusionPolicy implements RelationshipInclusionPolicy {
 
         /**
          * {@inheritDoc}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2015 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -14,24 +14,24 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.common.policy.none;
+package com.graphaware.common.policy;
 
-import com.graphaware.common.policy.NodeInclusionPolicy;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
- * {@link NodeInclusionPolicy} that ignores all nodes. Singleton.
+ * Base class for {@link RelationshipInclusionPolicy} implementations. Implements the {@link #getAll(GraphDatabaseService)} method
+ * in the most naive way possible.
  */
-public final class IncludeNoNodes extends IncludeNoPropertyContainers<Node> implements NodeInclusionPolicy {
+public abstract class BaseRelationshipInclusionPolicy extends BasePropertyContainerInclusionPolicy<Relationship> implements RelationshipInclusionPolicy {
 
-    private static final NodeInclusionPolicy INSTANCE = new IncludeNoNodes();
-
-    public static NodeInclusionPolicy getInstance() {
-        return INSTANCE;
-    }
-
-    private IncludeNoNodes() {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Iterable<Relationship> doGetAll(GraphDatabaseService database) {
+        return GlobalGraphOperations.at(database).getAllRelationships();
     }
 }

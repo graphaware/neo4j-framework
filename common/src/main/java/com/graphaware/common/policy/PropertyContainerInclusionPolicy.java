@@ -17,10 +17,22 @@
 package com.graphaware.common.policy;
 
 
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
  * {@link ObjectInclusionPolicy} for {@link PropertyContainer}s.
  */
 public interface PropertyContainerInclusionPolicy<T extends PropertyContainer> extends ObjectInclusionPolicy<T> {
+
+    /**
+     * Get all {@link PropertyContainer}s matching the policy from the database. This can be a naive implementation
+     * retrieving all {@link PropertyContainer}s and calling the {@link #include(Object)} method for each one of them,
+     * but it could also be more clever than that and directly retrieve the included {@link PropertyContainer}s from an
+     * index, by label, etc.
+     *
+     * @param database to retrieve the {@link PropertyContainer}s from.
+     * @return all {@link PropertyContainer}s matching the policy.
+     */
+    Iterable<T> getAll(GraphDatabaseService database);
 }

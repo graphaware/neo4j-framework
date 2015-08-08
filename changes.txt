@@ -1,3 +1,7 @@
+2.2.2.34:
+    - todo upgrade Spring
+    - improved inclusion policies to address https://github.com/graphaware/neo4j-timetree/issues/35
+
 2.2.2.33:
     - Make perf tests more extensible
     - Runtime modules (re)initialisation memory optimisations

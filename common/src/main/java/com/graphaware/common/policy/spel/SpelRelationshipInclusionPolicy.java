@@ -17,8 +17,12 @@
 package com.graphaware.common.policy.spel;
 
 import com.graphaware.common.policy.RelationshipInclusionPolicy;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.helpers.Predicate;
+import org.neo4j.helpers.collection.FilteringIterable;
+import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * {@link RelationshipInclusionPolicy} based on a SPEL expression. The expression can use methods defined in
@@ -49,5 +53,18 @@ public class SpelRelationshipInclusionPolicy extends SpelInclusionPolicy impleme
     @Override
     public boolean include(Relationship relationship, Node pointOfView) {
         return (Boolean) exp.getValue(new RelationshipExpressions(relationship, pointOfView));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterable<Relationship> getAll(GraphDatabaseService database) {
+        return new FilteringIterable<>(GlobalGraphOperations.at(database).getAllRelationships(), new Predicate<Relationship>() {
+            @Override
+            public boolean accept(Relationship item) {
+                return include(item);
+            }
+        });
     }
 }

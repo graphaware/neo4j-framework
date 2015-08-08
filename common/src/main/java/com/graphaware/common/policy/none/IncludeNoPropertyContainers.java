@@ -16,13 +16,16 @@
 
 package com.graphaware.common.policy.none;
 
+import com.graphaware.common.policy.BasePropertyContainerInclusionPolicy;
 import com.graphaware.common.policy.PropertyContainerInclusionPolicy;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.helpers.collection.Iterables;
 
 /**
  * {@link PropertyContainerInclusionPolicy} that ignores all property containers.
  */
-public abstract class IncludeNoPropertyContainers<T extends PropertyContainer> implements PropertyContainerInclusionPolicy<T> {
+public abstract class IncludeNoPropertyContainers<T extends PropertyContainer> extends BasePropertyContainerInclusionPolicy<T> {
 
     protected IncludeNoPropertyContainers() {
     }
@@ -33,5 +36,13 @@ public abstract class IncludeNoPropertyContainers<T extends PropertyContainer> i
     @Override
     public final boolean include(T propertyContainer) {
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Iterable<T> doGetAll(GraphDatabaseService database) {
+        return Iterables.empty();
     }
 }

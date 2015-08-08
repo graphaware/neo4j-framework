@@ -1495,7 +1495,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
             LazyTransactionData lazyTransactionData = new LazyTransactionData(data);
 
             beforeCommitCallback.doBeforeCommit(new FilteredTransactionData(lazyTransactionData, new InclusionPolicies(
-                    new NodeInclusionPolicy() {
+                    new BaseNodeInclusionPolicy() {
                         @Override
                         public boolean include(Node node) {
                             return !node.getProperty("name", "").equals("Four") && !node.hasProperty(INTERNAL_NODE_PROPERTY);

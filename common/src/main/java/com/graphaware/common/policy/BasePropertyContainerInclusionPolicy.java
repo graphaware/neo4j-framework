@@ -14,42 +14,40 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.common.policy.spel;
+package com.graphaware.common.policy;
 
-import com.graphaware.common.policy.NodeInclusionPolicy;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.helpers.Predicate;
 import org.neo4j.helpers.collection.FilteringIterable;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
- * {@link NodeInclusionPolicy} based on a SPEL expression. The expression can use methods defined in {@link NodeExpressions}.
+ * Base class for {@link PropertyContainerInclusionPolicy} implementations that implement the {@link #getAll(GraphDatabaseService)}
+ * method in a naive way.
+ *
+ * @param <T>
  */
-public class SpelNodeInclusionPolicy extends SpelInclusionPolicy implements NodeInclusionPolicy {
-
-    public SpelNodeInclusionPolicy(String expression) {
-        super(expression);
-    }
+public abstract class BasePropertyContainerInclusionPolicy<T extends PropertyContainer> implements PropertyContainerInclusionPolicy<T> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean include(Node node) {
-        return (Boolean) exp.getValue(new NodeExpressions(node));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<Node> getAll(GraphDatabaseService database) {
-        return new FilteringIterable<>(GlobalGraphOperations.at(database).getAllNodes(), new Predicate<Node>() {
+    public Iterable<T> getAll(GraphDatabaseService database) {
+        return new FilteringIterable<>(doGetAll(database), new Predicate<T>() {
             @Override
-            public boolean accept(Node item) {
+            public boolean accept(T item) {
                 return include(item);
             }
         });
     }
+
+    /**
+     * Simply get all possible {@link PropertyContainer}s from the database, not worrying whether they are included by
+     * this policy or not.
+     *
+     * @param database to get property contrainers from.
+     * @return all property containers.
+     */
+    protected abstract Iterable<T> doGetAll(GraphDatabaseService database);
 }

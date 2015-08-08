@@ -16,10 +16,10 @@
 
 package com.graphaware.runtime.config.function;
 
-import com.graphaware.common.policy.NodeInclusionPolicy;
+import com.graphaware.common.policy.BaseNodeInclusionPolicy;
 import org.neo4j.graphdb.Node;
 
-public class TestNodeInclusionPolicy implements NodeInclusionPolicy {
+public class TestNodeInclusionPolicy extends BaseNodeInclusionPolicy {
 
     private final String someField = "test";
 

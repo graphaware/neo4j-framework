@@ -17,6 +17,7 @@
 package com.graphaware.test.unit;
 
 import com.graphaware.common.policy.*;
+import com.graphaware.common.policy.none.IncludeNoNodes;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -705,21 +706,11 @@ public class GraphUnitTest {
         assertSameGraph(database, null);
         assertSameGraph(database, "");
         assertSameGraph(database, " ");
-        assertSameGraph(database, "", InclusionPolicies.all().with(new NodeInclusionPolicy() {
-            @Override
-            public boolean include(Node object) {
-                return true;
-            }
-        }));
+        assertSameGraph(database, "", InclusionPolicies.all());
 
         populateDatabase("CREATE (n:Person {name:'Michal'})");
 
-        assertSameGraph(database, " ", InclusionPolicies.all().with(new NodeInclusionPolicy() {
-            @Override
-            public boolean include(Node object) {
-                return false;
-            }
-        }));
+        assertSameGraph(database, " ", InclusionPolicies.all().with(IncludeNoNodes.getInstance()));
     }
 
     @Test
@@ -741,7 +732,7 @@ public class GraphUnitTest {
         }
 
         try {
-            assertEmpty(database, InclusionPolicies.all().with(new NodeInclusionPolicy() {
+            assertEmpty(database, InclusionPolicies.all().with(new BaseNodeInclusionPolicy() {
                 @Override
                 public boolean include(Node node) {
                     return !node.hasLabel(DynamicLabel.label("Person"));
@@ -752,7 +743,7 @@ public class GraphUnitTest {
             //ok
         }
 
-        assertEmpty(database, InclusionPolicies.all().with(new NodeInclusionPolicy() {
+        assertEmpty(database, InclusionPolicies.all().with(new BaseNodeInclusionPolicy() {
             @Override
             public boolean include(Node node) {
                 return !node.hasLabel(DynamicLabel.label("Person"));
@@ -862,7 +853,7 @@ public class GraphUnitTest {
     /**
      * Include only nodes with label 'Blue'
      */
-    class BlueNodeInclusionPolicy implements NodeInclusionPolicy {
+    class BlueNodeInclusionPolicy extends BaseNodeInclusionPolicy {
 
         @Override
         public boolean include(Node node) {
@@ -873,7 +864,7 @@ public class GraphUnitTest {
     /**
      * Include everything except nodes labelled 'ChangeSet'
      */
-    class ExcludeChangeSetNodeInclusionPolicy implements NodeInclusionPolicy {
+    class ExcludeChangeSetNodeInclusionPolicy extends BaseNodeInclusionPolicy {
 
         @Override
         public boolean include(Node node) {

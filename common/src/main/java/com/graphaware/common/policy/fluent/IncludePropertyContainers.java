@@ -19,6 +19,7 @@ package com.graphaware.common.policy.fluent;
 import com.graphaware.common.description.predicate.Predicate;
 import com.graphaware.common.description.property.DetachedPropertiesDescription;
 import com.graphaware.common.description.property.LiteralPropertiesDescription;
+import com.graphaware.common.policy.BasePropertyContainerInclusionPolicy;
 import com.graphaware.common.policy.PropertyContainerInclusionPolicy;
 import org.neo4j.graphdb.PropertyContainer;
 
@@ -27,7 +28,7 @@ import org.neo4j.graphdb.PropertyContainer;
  * value {@link Predicate}s. In other words, the implementations can be used to specify, which {@link PropertyContainer}s
  * to include based on the presence and/or value of their properties.
  */
-public abstract class IncludePropertyContainers<C extends IncludePropertyContainers<?, T>, T extends PropertyContainer> implements PropertyContainerInclusionPolicy<T> {
+public abstract class IncludePropertyContainers<C extends IncludePropertyContainers<?, T>, T extends PropertyContainer> extends BasePropertyContainerInclusionPolicy<T> implements PropertyContainerInclusionPolicy<T> {
 
     private final DetachedPropertiesDescription propertiesDescription;
 
