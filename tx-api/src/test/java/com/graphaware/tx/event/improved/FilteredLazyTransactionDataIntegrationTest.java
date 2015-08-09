@@ -56,7 +56,7 @@ import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 /**
  * Integration test for {@link com.graphaware.tx.event.improved.api.FilteredTransactionData}.
  */
-@SuppressWarnings("deprecation")
+//@SuppressWarnings("deprecation")
 public class FilteredLazyTransactionDataIntegrationTest {
 
     private static final String INTERNAL_PREFIX = "_GA_";
@@ -1249,12 +1249,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
                         Node deleted = deletedNodes.get(2L);
 
-                        try {
-                            database.getNodeById(3).createRelationshipTo(deleted, withName("illegal"));
-                            fail();
-                        } catch (IllegalStateException e) {
-                            //OK
-                        }
+                        database.getNodeById(3).createRelationshipTo(deleted, withName("illegal"));
                     }
                 }
         );
