@@ -111,7 +111,7 @@
                         <configuration>
                             <aggregate>true</aggregate>
                             <links>
-                                <link>http://api.neo4j.org/${neo4j.version}/</link>
+                                <link>http://neo4j.com/docs/${neo4j.version}/javadocs/</link>
                             </links>
                         </configuration>
                         <executions>

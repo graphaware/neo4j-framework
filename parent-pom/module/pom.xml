@@ -300,7 +300,7 @@
                 <version>2.9</version>
                 <configuration>
                     <links>
-                        <link>http://api.neo4j.org/2.2.4/</link>
+                        <link>http://neo4j.com/docs/${neo4j.version}/javadocs/</link>
                         <link>http://graphaware.com/site/framework/latest/apidocs/</link>
                     </links>
                 </configuration>
