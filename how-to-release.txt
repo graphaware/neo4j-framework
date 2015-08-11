@@ -21,10 +21,11 @@ List of modules to upgrade:
         warmup
         changefeed
         uuid
-        timetree
         resttest
-        noderank
         algorithms
+        noderank
+        timetree
         reco
         reco-meetup
+        importer
         ga-enterprise
