@@ -278,6 +278,37 @@ public final class GraphUnit {
             tx.success();
         }
     }
+    
+    /**
+     * Compare two {@link org.neo4j.graphdb.Node} to verify they contain the same labels and properties.
+     * 
+     * @param node1             first node to compare.
+     * @param node2             second node to compare.
+     * @param inclusionPolicies {@link com.graphaware.common.policy.InclusionPolicies} deciding whether to include nodes/relationships or not.
+     *                          Note that {@link com.graphaware.common.policy.PropertyInclusionPolicy}s are ignored when printing the graph.
+     * @return boolean are the nodes the same.
+     */
+    public static boolean areSame(Node node1, Node node2, InclusionPolicies inclusionPolicies) {
+ 	
+        return haveSameLabels(node1, node2) && haveSameProperties(node1, node2, inclusionPolicies);
+
+    }
+
+    /**
+     * Compare two {@link org.neo4j.graphdb.Relationship} to verify they contain the same labels and properties.
+     * 
+     * @param relationship1     first relationship to compare.
+     * @param relationship2     second relationship to compare.
+     * @param inclusionPolicies {@link com.graphaware.common.policy.InclusionPolicies} deciding whether to include nodes/relationships or not.
+     *                          Note that {@link com.graphaware.common.policy.PropertyInclusionPolicy}s are ignored when printing the graph.
+     * @return boolean are the relationships the same.
+     */
+    public static boolean areSame(Relationship relationship1, Relationship relationship2, InclusionPolicies inclusionPolicies) {
+ 	
+        return haveSameType(relationship1, relationship2) && haveSameProperties(relationship1, relationship2, inclusionPolicies);
+
+    }
+
 
     private static void assertSameGraph(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies InclusionPolicies) {
         try (Transaction tx = database.beginTx()) {
@@ -448,16 +479,6 @@ public final class GraphUnit {
         }
 
         return result;
-    }
-
-    private static boolean areSame(Node node1, Node node2, InclusionPolicies inclusionPolicies) {
-        return haveSameLabels(node1, node2) && haveSameProperties(node1, node2, inclusionPolicies);
-
-    }
-
-    private static boolean areSame(Relationship relationship1, Relationship relationship2, InclusionPolicies inclusionPolicies) {
-        return haveSameType(relationship1, relationship2) && haveSameProperties(relationship1, relationship2, inclusionPolicies);
-
     }
 
     private static boolean haveSameLabels(Node node1, Node node2) {
