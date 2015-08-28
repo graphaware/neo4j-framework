@@ -1,3 +1,7 @@
+2.2.5.34:
+    - upgraded Neo4j to 2.2.5
+    - exposed some (previously private) methods in GraphUnit
+
 2.2.4.34:
     - upgraded Neo4j to 2.2.4
     - upgraded Spring to 4.2.0.RELEASE
