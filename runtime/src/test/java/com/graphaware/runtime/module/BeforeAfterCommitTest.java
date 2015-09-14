@@ -28,7 +28,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class BeforeAfterCommitTest1 {
+public class BeforeAfterCommitTest {
 
     @Test
     public void afterCommitShouldBeCalled() throws InterruptedException {
