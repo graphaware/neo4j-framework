@@ -18,20 +18,17 @@ package org.neo4j.server;
 
 import com.graphaware.server.GraphAwareCommunityNeoServer;
 import org.neo4j.kernel.GraphDatabaseDependencies;
+import org.neo4j.kernel.configuration.Config;
 import org.neo4j.logging.LogProvider;
-import org.neo4j.server.configuration.ConfigurationBuilder;
 
 public class CommunityBootstrapper extends Bootstrapper {
 
     public static void main(String[] args) {
-        Integer exit = new CommunityBootstrapper().start();
-        if (exit != 0) {
-            System.exit(exit);
-        }
+        throw new UnsupportedOperationException("Invoking Bootstrapper#main() is no longer supported. If you see this error, please contact GraphAware support (support@graphaware.com).");
     }
 
     @Override
-    protected NeoServer createNeoServer(ConfigurationBuilder configurator, GraphDatabaseDependencies dependencies, LogProvider logProvider) {
-        return new GraphAwareCommunityNeoServer(configurator, dependencies, logProvider);
+    protected NeoServer createNeoServer(Config config, GraphDatabaseDependencies graphDatabaseDependencies, LogProvider logProvider) {
+        return new GraphAwareCommunityNeoServer(config, dependencies, logProvider);
     }
 }

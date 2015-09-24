@@ -39,8 +39,9 @@ import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.*;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static com.graphaware.tx.event.improved.LazyTransactionDataComprehensiveTest.RelationshipTypes.*;
+import static com.graphaware.tx.event.improved.PropertiesAssert.assertProperties;
 import static com.graphaware.tx.event.improved.api.Change.changesToMap;
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.DynamicLabel.label;
@@ -120,19 +121,18 @@ public class LazyTransactionDataComprehensiveTest {
 
                         long r1Id = db.getNodeById(7).getSingleRelationship(R2, OUTGOING).getId();
                         Relationship r1 = created.get(r1Id);
-                        assertEquals(4, r1.getProperty(TIME));
-                        assertEquals(1, count(r1.getPropertyKeys()));
+                        assertProperties(r1, TIME, 4);
 
                         long r2Id = db.getNodeById(1).getSingleRelationship(R1, OUTGOING).getId();
                         Relationship r2 = created.get(r2Id);
-                        assertEquals(0, count(r2.getPropertyKeys()));
+                        assertProperties(r2);
 
                         assertTrue(td.hasBeenCreated(r1));
                         assertTrue(td.hasBeenCreated(r2));
                         assertFalse(td.hasBeenCreated(db.getNodeById(3).getSingleRelationship(R1, OUTGOING)));
 
                         //in contrast to filtered version:
-                        assertTrue(r2.getEndNode().hasProperty(PLACE));
+                        assertProperties(r2.getEndNode(), NAME, "Three", PLACE, "London", TAGS, "one");
                         assertNotNull(r2.getEndNode().getSingleRelationship(R3, OUTGOING));
                     }
                 }
@@ -152,9 +152,8 @@ public class LazyTransactionDataComprehensiveTest {
                         Relationship r2 = created.get(r2Id);
 
                         Node one = r2.getStartNode();
-                        assertEquals("NewOne", one.getProperty(NAME));
-                        assertFalse(one.hasProperty(COUNT));
-                        assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) one.getProperty(TAGS)));
+                        assertProperties(one, NAME, "NewOne", TAGS,  new String[]{"one", "three"});
+
                         assertEquals(1, count(one.getLabels()));
                         assertTrue(contains(one.getLabels(), label("NewOne")));
                         assertTrue(one.hasLabel(label("NewOne")));
@@ -179,14 +178,10 @@ public class LazyTransactionDataComprehensiveTest {
                         assertEquals(1, changed.size());
 
                         Relationship previous = getSingleValue(changed).getPrevious();
-                        assertEquals(2, count(previous.getPropertyKeys()));
-                        assertEquals(3, previous.getProperty(TIME));
-                        assertEquals("cool", previous.getProperty(TAG));
+                        assertProperties(previous, TIME, 3, TAG, "cool");
 
                         Relationship current = getSingleValue(changed).getCurrent();
-                        assertEquals(2, count(current.getPropertyKeys()));
-                        assertEquals(4, current.getProperty(TIME));
-                        assertEquals("cool", current.getProperty(TAGS));
+                        assertProperties(current, TIME, 4, TAGS, "cool");
 
                         assertTrue(td.hasBeenChanged(previous));
                         assertTrue(td.hasBeenChanged(current));
@@ -207,19 +202,15 @@ public class LazyTransactionDataComprehensiveTest {
                         Relationship previous = getSingleValue(changed).getPrevious();
 
                         Node one = previous.getEndNode();
-                        assertEquals("One", one.getProperty(NAME));
-                        assertEquals(1, one.getProperty(COUNT, 2));
-                        assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) one.getProperty(TAGS)));
-                        assertEquals(3, count(one.getPropertyKeys()));
+                        assertProperties(one, NAME, "One", COUNT, 1, TAGS, new String[]{"one", "two"});
+
                         assertEquals(1, count(one.getLabels()));
                         assertTrue(contains(one.getLabels(), label("One")));
                         assertTrue(one.hasLabel(label("One")));
                         assertFalse(one.hasLabel(label("NewOne")));
 
                         Node three = previous.getStartNode();
-                        assertEquals("Three", three.getProperty(NAME));
-                        assertEquals("London", three.getProperty(PLACE));
-                        assertEquals("nothing", three.getProperty(TAGS, "nothing"));
+                        assertProperties(three, NAME, "Three", PLACE, "London");
 
                         Relationship r1 = one.getSingleRelationship(R1, OUTGOING);
                         assertEquals("Two", r1.getEndNode().getProperty(NAME));
@@ -264,18 +255,13 @@ public class LazyTransactionDataComprehensiveTest {
                         current = td.getChanged(current).getCurrent();
 
                         Node one = current.getEndNode();
-                        assertEquals("NewOne", one.getProperty(NAME));
-                        assertEquals(2, one.getProperty(COUNT, 2));
-                        assertFalse(one.hasProperty(COUNT));
-                        assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) one.getProperty(TAGS)));
-                        assertEquals(2, count(one.getPropertyKeys()));
+                        assertProperties(one, NAME, "NewOne", TAGS, new String[]{"one", "three"});
+
                         assertEquals(1, count(one.getLabels()));
                         assertTrue(contains(one.getLabels(), label("NewOne")));
 
                         Node three = current.getStartNode();
-                        assertEquals("Three", three.getProperty(NAME));
-                        assertEquals("London", three.getProperty(PLACE));
-                        assertEquals("one", three.getProperty(TAGS));
+                        assertProperties(three, NAME, "Three", PLACE, "London", TAGS, "one");
 
                         assertEquals("Three", one.getSingleRelationship(R1, OUTGOING).getEndNode().getProperty(NAME));
                     }
@@ -325,12 +311,11 @@ public class LazyTransactionDataComprehensiveTest {
 
                         long r1Id = toMap(td.getAllDeletedNodes()).get(2L).getSingleRelationship(R1, INCOMING).getId();
                         Relationship r1 = deleted.get(r1Id);
-                        assertEquals(1, r1.getProperty(TIME));
-                        assertEquals(1, count(r1.getPropertyKeys()));
+                        assertProperties(r1, TIME, 1);
 
                         long r2Id = toMap(td.getAllDeletedNodes()).get(2L).getSingleRelationship(R2, INCOMING).getId();
                         Relationship r2 = deleted.get(r2Id);
-                        assertEquals(0, count(r2.getPropertyKeys()));
+                        assertProperties(r2);
 
                         Iterator<Relationship> relationships = toMap(td.getAllDeletedNodes()).get(2L).getRelationships(R2, OUTGOING).iterator();
                         long r3Id = relationships.next().getId();
@@ -338,12 +323,11 @@ public class LazyTransactionDataComprehensiveTest {
                             r3Id = relationships.next().getId();
                         }
                         Relationship r3 = deleted.get(r3Id);
-                        assertEquals(2, r3.getProperty(TIME));
-                        assertEquals(1, count(r3.getPropertyKeys()));
+                        assertProperties(r3, TIME, 2);
 
                         long r4Id = changesToMap(td.getAllChangedNodes()).get(3L).getPrevious().getSingleRelationship(R3, INCOMING).getId();
                         Relationship r4 = deleted.get(r4Id);
-                        assertEquals(0, count(r4.getPropertyKeys()));
+                        assertProperties(r4);
 
                         assertTrue(td.hasBeenDeleted(r1));
                         assertTrue(td.hasBeenDeleted(r2));
@@ -377,17 +361,13 @@ public class LazyTransactionDataComprehensiveTest {
                         Relationship deletedRel = td.getDeleted(r4);
 
                         Node one = deletedRel.getStartNode();
-                        assertEquals("One", one.getProperty(NAME));
-                        assertEquals(1, one.getProperty(COUNT, 2));
-                        assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) one.getProperty(TAGS)));
-                        assertEquals(3, count(one.getPropertyKeys()));
+                        assertProperties(one, NAME, "One", COUNT, 1, TAGS, new String[]{"one", "two"});
+
                         assertEquals(1, count(one.getLabels()));
                         assertTrue(contains(one.getLabels(), label("One")));
 
                         Node three = deletedRel.getEndNode();
-                        assertEquals("Three", three.getProperty(NAME));
-                        assertEquals("London", three.getProperty(PLACE));
-                        assertEquals("nothing", three.getProperty(TAGS, "nothing"));
+                        assertProperties(three, NAME, "Three", PLACE, "London");
 
                         Relationship r5 = one.getSingleRelationship(R1, OUTGOING);
                         assertEquals("Two", r5.getEndNode().getProperty(NAME));
@@ -525,11 +505,8 @@ public class LazyTransactionDataComprehensiveTest {
                         assertEquals(1, createdNodes.size());
 
                         Node createdNode = createdNodes.get(7L);
-                        assertEquals("Seven", createdNode.getProperty(NAME));
-                        assertEquals(1, count(createdNode.getLabels()));
+                        assertProperties(createdNode, NAME, "Seven", "size", 4L);
                         assertTrue(contains(createdNode.getLabels(), label("SomeLabel")));
-                        assertEquals(4L, createdNode.getProperty("size"));
-                        assertEquals(2, count(createdNode.getPropertyKeys()));
 
                         assertTrue(td.hasBeenCreated(createdNode));
                         assertFalse(td.hasBeenCreated(db.getNodeById(3)));
@@ -576,45 +553,35 @@ public class LazyTransactionDataComprehensiveTest {
                         assertEquals(4, changed.size());
 
                         Node previous1 = changed.get(1L).getPrevious();
-                        assertEquals(3, count(previous1.getPropertyKeys()));
-                        assertEquals("One", previous1.getProperty(NAME));
-                        assertEquals(1, previous1.getProperty(COUNT));
-                        assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) previous1.getProperty(TAGS)));
+                        assertProperties(previous1, NAME, "One", COUNT, 1, TAGS, new String[]{"one", "two"});
 
                         Node current1 = changed.get(1L).getCurrent();
-                        assertEquals(2, count(current1.getPropertyKeys()));
-                        assertEquals("NewOne", current1.getProperty(NAME));
-                        assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) current1.getProperty(TAGS)));
+                        assertProperties(current1, NAME, "NewOne", TAGS, new String[]{"one", "three"});
 
                         Node previous2 = changed.get(3L).getPrevious();
-                        assertEquals(2, count(previous2.getPropertyKeys()));
-                        assertEquals("Three", previous2.getProperty(NAME));
-                        assertEquals("London", previous2.getProperty(PLACE));
+                        assertProperties(previous2, NAME, "Three", PLACE, "London");
 
                         Node current2 = changed.get(3L).getCurrent();
-                        assertEquals(3, count(current2.getPropertyKeys()));
-                        assertEquals("Three", current2.getProperty(NAME));
-                        assertEquals("London", current2.getProperty(PLACE));
-                        assertEquals("one", current2.getProperty(TAGS));
+                        assertProperties(current2, NAME, "Three", PLACE, "London", TAGS, "one");
 
                         Node previous3 = changed.get(5L).getPrevious();
-                        assertEquals("Five", previous3.getProperty(NAME));
+                        assertProperties(previous3, NAME, "Five");
                         assertEquals(1, count(previous3.getLabels()));
                         assertEquals("SomeLabel", previous3.getLabels().iterator().next().name());
 
                         Node current3 = changed.get(5L).getCurrent();
-                        assertEquals("Five", current3.getProperty(NAME));
+                        assertProperties(current3, NAME, "Five");
                         assertEquals(2, count(current3.getLabels()));
                         assertTrue(contains(current3.getLabels(), label("SomeLabel")));
                         assertTrue(contains(current3.getLabels(), label("NewLabel")));
 
                         Node previous4 = changed.get(6L).getPrevious();
-                        assertEquals("Six", previous4.getProperty(NAME));
+                        assertProperties(previous4, NAME, "Six");
                         assertEquals(1, count(previous4.getLabels()));
                         assertEquals("ToBeRemoved", previous4.getLabels().iterator().next().name());
 
                         Node current4 = changed.get(6L).getCurrent();
-                        assertEquals("Six", current4.getProperty(NAME));
+                        assertProperties(current4, NAME, "Six");
                         assertEquals(0, count(current4.getLabels()));
 
                         assertTrue(td.hasBeenChanged(previous1));
@@ -731,6 +698,8 @@ public class LazyTransactionDataComprehensiveTest {
                         assertEquals("Three", current.getSingleRelationship(R1, OUTGOING).getEndNode().getProperty(NAME));
                         assertEquals("London", current.getRelationships(R1, OUTGOING).iterator().next().getEndNode().getProperty(PLACE));
                         assertEquals("one", current.getRelationships(OUTGOING, R1).iterator().next().getEndNode().getProperty(TAGS));
+
+                        assertProperties(current.getRelationships(R1, OUTGOING).iterator().next().getEndNode(), NAME, "Three", PLACE, "London", TAGS, "one");
                     }
                 }
         );
@@ -772,9 +741,7 @@ public class LazyTransactionDataComprehensiveTest {
                         Node deleted = deletedNodes.get(2L);
                         Node one = td.getDeleted(deleted).getSingleRelationship(R1, INCOMING).getStartNode();
 
-                        assertEquals("Two", deleted.getProperty(NAME));
-                        assertEquals(2L, deleted.getProperty("size"));
-                        assertEquals(2, count(deleted.getPropertyKeys()));
+                        assertProperties(deleted, NAME, "Two", "size", 2L);
 
                         assertTrue(td.hasBeenDeleted(deleted));
                         assertFalse(td.hasBeenDeleted(one));
@@ -1370,16 +1337,11 @@ public class LazyTransactionDataComprehensiveTest {
             Relationship r4 = db.getRelationshipById(r4Id);
 
             Node one = r4.getStartNode();
-            assertEquals("One", one.getProperty(NAME));
-            assertEquals(1, one.getProperty(COUNT, 2));
-            assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) one.getProperty(TAGS)));
-            assertEquals(3, count(one.getPropertyKeys()));
+            assertProperties(one, NAME, "One", COUNT,1, TAGS, new String[]{"one", "two"});
             assertEquals(1, count(one.getLabels()));
             assertTrue(contains(one.getLabels(), label("One")));
 
-            assertEquals("Three", r4.getEndNode().getProperty(NAME));
-            assertEquals("London", r4.getEndNode().getProperty(PLACE));
-            assertEquals("nothing", r4.getEndNode().getProperty(TAGS, "nothing"));
+            assertProperties(r4.getEndNode(), NAME, "Three", PLACE, "London");
 
             Relationship r5 = one.getSingleRelationship(R1, OUTGOING);
             assertEquals("Two", r5.getEndNode().getProperty(NAME));

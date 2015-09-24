@@ -18,6 +18,7 @@ package com.graphaware.test.integration;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.rules.TemporaryFolder;
+import org.neo4j.helpers.Service;
 import org.neo4j.server.Bootstrapper;
 import org.neo4j.server.CommunityBootstrapper;
 import org.neo4j.server.configuration.Configurator;
@@ -66,11 +67,25 @@ public class NeoTestServer {
         System.setProperty(Configurator.NEO_SERVER_CONFIG_FILE_KEY, serverConfig.getAbsolutePath());
 
         bootstrapper = createBootstrapper();
-        bootstrapper.start();
+        bootstrapper.start(serverConfig.getAbsoluteFile());
     }
 
     protected Bootstrapper createBootstrapper() {
-        return new CommunityBootstrapper();
+        return loadMostDerivedBootstrapper();
+    }
+
+    private static Bootstrapper loadMostDerivedBootstrapper() {
+        Bootstrapper winner = new CommunityBootstrapper();
+        for (Bootstrapper candidate : Service.load(Bootstrapper.class)) {
+            if (isMoreDerivedThan(candidate, winner)) {
+                winner = candidate;
+            }
+        }
+        return winner;
+    }
+
+    protected static boolean isMoreDerivedThan(Bootstrapper one, Bootstrapper other) {
+        return other.getClass().isAssignableFrom(one.getClass());
     }
 
     public void stop() throws IOException, InterruptedException {

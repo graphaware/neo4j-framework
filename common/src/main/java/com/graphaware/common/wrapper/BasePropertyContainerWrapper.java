@@ -297,12 +297,18 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         BasePropertyContainerWrapper that = (BasePropertyContainerWrapper) o;
 
-        if (!getWrapped().equals(that.getWrapped())) return false;
+        if (!getWrapped().equals(that.getWrapped())) {
+            return false;
+        }
 
         return true;
     }

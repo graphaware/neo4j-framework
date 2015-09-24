@@ -17,9 +17,9 @@
 package com.graphaware.server;
 
 import org.neo4j.kernel.GraphDatabaseDependencies;
+import org.neo4j.kernel.configuration.Config;
 import org.neo4j.logging.LogProvider;
 import org.neo4j.server.NeoServer;
-import org.neo4j.server.configuration.ConfigurationBuilder;
 import org.neo4j.server.enterprise.EnterpriseBootstrapper;
 
 /**
@@ -31,7 +31,7 @@ public class GraphAwareEnterpriseBootstrapper extends EnterpriseBootstrapper {
      * {@inheritDoc}
      */
     @Override
-    protected NeoServer createNeoServer(ConfigurationBuilder configurator, GraphDatabaseDependencies dependencies, LogProvider userLogProvider) {
+    protected NeoServer createNeoServer(Config configurator, GraphDatabaseDependencies dependencies, LogProvider userLogProvider) {
         return new GraphAwareEnterpriseNeoServer(configurator, dependencies, userLogProvider);
     }
 }

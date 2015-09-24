@@ -19,10 +19,10 @@ package com.graphaware.server;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.GraphDatabaseDependencies;
+import org.neo4j.kernel.configuration.Config;
 import org.neo4j.logging.LogProvider;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.WrappingNeoServerBootstrapper;
-import org.neo4j.server.configuration.ConfigurationBuilder;
 import org.neo4j.server.configuration.Configurator;
 import org.neo4j.server.configuration.ServerConfigurator;
 
@@ -47,7 +47,7 @@ public class GraphAwareWrappingNeoServerBootstrapper extends WrappingNeoServerBo
     }
 
     @Override
-    protected NeoServer createNeoServer(ConfigurationBuilder configurator, GraphDatabaseDependencies dependencies, LogProvider userLogProvider) {
+    protected NeoServer createNeoServer(Config config, GraphDatabaseDependencies dependencies, LogProvider userLogProvider) {
         return new GraphAwareWrappingNeoServer((GraphDatabaseAPI) database, configurator);
     }
 }

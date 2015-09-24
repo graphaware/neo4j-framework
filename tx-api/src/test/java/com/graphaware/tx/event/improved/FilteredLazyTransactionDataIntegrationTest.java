@@ -46,6 +46,8 @@ import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.common.util.IterableUtils.countNodes;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
+import static com.graphaware.tx.event.improved.LazyTransactionDataComprehensiveTest.*;
+import static com.graphaware.tx.event.improved.PropertiesAssert.assertProperties;
 import static com.graphaware.tx.event.improved.api.Change.changesToMap;
 import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
@@ -56,7 +58,6 @@ import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 /**
  * Integration test for {@link com.graphaware.tx.event.improved.api.FilteredTransactionData}.
  */
-//@SuppressWarnings("deprecation")
 public class FilteredLazyTransactionDataIntegrationTest {
 
     private static final String INTERNAL_PREFIX = "_GA_";
@@ -197,12 +198,11 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
                         long r1Id = database.getNodeById(5).getSingleRelationship(withName("R2"), OUTGOING).getId();
                         Relationship r1 = created.get(r1Id);
-                        assertEquals("not there", r1.getProperty("time", "not there")); //filtered out
-                        assertEquals(0, count(r1.getPropertyKeys())); //time filtered out
+                        assertProperties(r1);
 
                         long r2Id = database.getNodeById(1).getSingleRelationship(withName("R1"), OUTGOING).getId();
                         Relationship r2 = created.get(r2Id);
-                        assertEquals(0, count(r2.getPropertyKeys()));
+                        assertProperties(r2);
 
                         assertTrue(transactionData.hasBeenCreated(r1));
                         assertTrue(transactionData.hasBeenCreated(r2));
@@ -229,10 +229,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
                         long r2Id = database.getNodeById(1).getSingleRelationship(withName("R1"), OUTGOING).getId();
                         Relationship r2 = created.get(r2Id);
-
-                        assertEquals("NewOne", r2.getStartNode().getProperty("name"));
-                        assertFalse(r2.getStartNode().hasProperty("count"));
-                        assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) r2.getStartNode().getProperty("tags")));
+                        assertProperties(r2.getStartNode(), NAME, "NewOne", TAGS, new String[]{"one", "three"});
 
                         assertNull(r2.getEndNode().getSingleRelationship(withName("R3"), INCOMING));
                         assertEquals(5, r2.getEndNode().getSingleRelationship(withName("R2"), INCOMING).getStartNode().getId());
@@ -284,11 +281,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         assertTrue(transactionData.mutationsOccurred());
 
                         Relationship previous = transactionData.getChanged(database.getRelationshipById(changedRelId.get())).getPrevious();
-
-                        assertEquals("One", previous.getEndNode().getProperty("name"));
-                        assertEquals(1, previous.getEndNode().getProperty("count", 2));
-                        assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) previous.getEndNode().getProperty("tags")));
-                        assertEquals(3, count(previous.getEndNode().getPropertyKeys()));
+                        assertProperties(previous.getEndNode(), NAME, "One", COUNT, 1, TAGS, new String[]{"one", "two"});
 
                         assertEquals("Three", previous.getStartNode().getProperty("name"));
                         assertEquals("nothing", previous.getStartNode().getProperty("tags", "nothing"));
@@ -351,12 +344,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         Relationship current = transactionData.getChanged(database.getRelationshipById(changedRelId.get())).getCurrent();
 
                         current = transactionData.getChanged(current).getCurrent();
-
-                        assertEquals("NewOne", current.getEndNode().getProperty("name"));
-                        assertEquals(2, current.getEndNode().getProperty("count", 2));
-                        assertFalse(current.getEndNode().hasProperty("count"));
-                        assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) current.getEndNode().getProperty("tags")));
-                        assertEquals(2, count(current.getEndNode().getPropertyKeys()));
+                        assertProperties(current.getEndNode(), NAME, "NewOne", TAGS, new String[]{"one", "three"});
 
                         assertEquals("Three", current.getStartNode().getProperty("name"));
                         assertEquals("none", current.getStartNode().getProperty("place", "none")); //filtered
@@ -426,11 +414,11 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         } catch (NotFoundException e) {
                             //ok
                         }
-                        assertEquals(0, count(r1.getPropertyKeys()));
+                        assertProperties(r1);
 
                         long r2Id = propertyContainersToMap(transactionData.getAllDeletedNodes()).get(2L).getSingleRelationship(withName("R2"), INCOMING).getId();
                         Relationship r2 = deleted.get(r2Id);
-                        assertEquals(0, count(r2.getPropertyKeys()));
+                        assertProperties(r2);
 
                         Iterator<Relationship> relationships = propertyContainersToMap(transactionData.getAllDeletedNodes()).get(2L).getRelationships(withName("R2"), OUTGOING).iterator();
                         long r3Id = relationships.next().getId();
@@ -439,10 +427,10 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         }
                         Relationship r3 = deleted.get(r3Id);
                         assertEquals("nothing", r3.getProperty("time", "nothing"));
-                        assertEquals(0, count(r3.getPropertyKeys()));
+                        assertProperties(r3);
 
                         Relationship r4 = transactionData.getDeleted(deletedRelationship.get());
-                        assertEquals(0, count(r4.getPropertyKeys()));
+                        assertProperties(r4);
 
                         assertTrue(transactionData.hasBeenDeleted(r1));
                         assertTrue(transactionData.hasBeenDeleted(r2));
@@ -480,11 +468,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         Relationship r4 = transactionData.getDeleted(deletedRel.get());
 
                         Relationship deletedRel = transactionData.getDeleted(r4);
-
-                        assertEquals("One", deletedRel.getStartNode().getProperty("name"));
-                        assertEquals(1, deletedRel.getStartNode().getProperty("count", 2));
-                        assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) deletedRel.getStartNode().getProperty("tags")));
-                        assertEquals(3, count(deletedRel.getStartNode().getPropertyKeys()));
+                        assertProperties(deletedRel.getStartNode(), NAME, "One", COUNT, 1, TAGS, new String[]{"one", "two"});
 
                         assertEquals("Three", deletedRel.getEndNode().getProperty("name"));
                         assertEquals("nothing", deletedRel.getEndNode().getProperty("tags", "nothing"));
@@ -643,9 +627,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         assertEquals(1, createdNodes.size());
 
                         Node createdNode = createdNodes.get(5L);
-                        assertEquals("Five", createdNode.getProperty("name"));
-                        assertEquals(4L, createdNode.getProperty("size"));
-                        assertEquals(2, count(createdNode.getPropertyKeys()));
+                        assertProperties(createdNode, NAME, "Five", "size", 4L);
 
                         assertTrue(transactionData.hasBeenCreated(createdNode));
                         assertFalse(transactionData.hasBeenCreated(database.getNodeById(3)));
@@ -687,24 +669,16 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         assertEquals(2, changed.size());
 
                         Node previous1 = changed.get(1L).getPrevious();
-                        assertEquals(3, count(previous1.getPropertyKeys()));
-                        assertEquals("One", previous1.getProperty("name"));
-                        assertEquals(1, previous1.getProperty("count"));
-                        assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) previous1.getProperty("tags")));
+                        assertProperties(previous1, NAME, "One", COUNT, 1, TAGS, new String[]{"one", "two"});
 
                         Node current1 = changed.get(1L).getCurrent();
-                        assertEquals(2, count(current1.getPropertyKeys()));
-                        assertEquals("NewOne", current1.getProperty("name"));
-                        assertTrue(Arrays.equals(new String[]{"one", "three"}, (String[]) current1.getProperty("tags")));
+                        assertProperties(current1, NAME, "NewOne", TAGS, new String[]{"one", "three"});
 
                         Node previous2 = changed.get(3L).getPrevious();
-                        assertEquals(1, count(previous2.getPropertyKeys()));
-                        assertEquals("Three", previous2.getProperty("name"));
+                        assertProperties(previous2, NAME, "Three");
 
                         Node current2 = changed.get(3L).getCurrent();
-                        assertEquals(2, count(current2.getPropertyKeys()));
-                        assertEquals("Three", current2.getProperty("name"));
-                        assertEquals("one", current2.getProperty("tags"));
+                        assertProperties(current2, NAME, "Three", TAGS, "one");
 
                         assertTrue(transactionData.hasBeenChanged(previous1));
                         assertTrue(transactionData.hasBeenChanged(previous2));
@@ -849,11 +823,10 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         assertEquals(1, deletedNodes.size());
 
                         Node deleted = deletedNodes.get(2L);
-                        Node one = transactionData.getDeleted(deleted).getSingleRelationship(withName("R1"), INCOMING).getStartNode();
+                        Node deleted1 = transactionData.getDeleted(deleted);
+                        Node one = deleted1.getSingleRelationship(withName("R1"), INCOMING).getStartNode();
 
-                        assertEquals("Two", deleted.getProperty("name"));
-                        assertEquals(2L, deleted.getProperty("size"));
-                        assertEquals(2, count(deleted.getPropertyKeys()));
+                        assertProperties(deleted, NAME, "Two", "size", 2L);
 
                         assertTrue(transactionData.hasBeenDeleted(deleted));
                         assertFalse(transactionData.hasBeenDeleted(one));
@@ -1098,10 +1071,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
         try (Transaction tx = database.beginTx()) {
 
             Node createdNode = database.getNodeById(5L);
-
-            assertEquals("NewFive", createdNode.getProperty("name"));
-            assertEquals("something", createdNode.getProperty("additional"));
-            assertEquals(2, count(createdNode.getPropertyKeys()));
+            assertProperties(createdNode, NAME, "NewFive", "additional", "something");
             assertFalse(createdNode.hasProperty("size"));
         }
     }
@@ -1131,10 +1101,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
         try (Transaction tx = database.beginTx()) {
 
             Node node = database.getNodeById(1L);
-
-            assertEquals(2, count(node.getPropertyKeys()));
-            assertEquals("YetAnotherOne", node.getProperty("name"));
-            assertEquals("something", node.getProperty("additional"));
+            assertProperties(node, NAME, "YetAnotherOne", "additional", "something");
             assertFalse(node.hasProperty("tags"));
         }
     }

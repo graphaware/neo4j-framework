@@ -75,7 +75,7 @@ public class GraphAwareJetty9WebServer extends Jetty9WebServer {
     }
 
     @Override
-    protected void startJetty() {
+    protected void startJetty() throws Exception {
         rootContext = createRootApplicationContext();
 
         HandlerList handlerList = findHandlerList();

@@ -17,10 +17,10 @@
 package com.graphaware.server;
 
 import org.neo4j.kernel.GraphDatabaseDependencies;
+import org.neo4j.kernel.configuration.Config;
 import org.neo4j.logging.LogProvider;
 import org.neo4j.server.CommunityBootstrapper;
 import org.neo4j.server.NeoServer;
-import org.neo4j.server.configuration.ConfigurationBuilder;
 
 /**
  * {@link org.neo4j.server.CommunityBootstrapper} that uses {@link com.graphaware.server.GraphAwareCommunityNeoServer}.
@@ -28,7 +28,7 @@ import org.neo4j.server.configuration.ConfigurationBuilder;
 public class GraphAwareCommunityBootstrapper extends CommunityBootstrapper {
 
     @Override
-    protected NeoServer createNeoServer(ConfigurationBuilder configurator, GraphDatabaseDependencies dependencies, LogProvider logProvider) {
-        return new GraphAwareCommunityNeoServer(configurator, dependencies, logProvider);
+    protected NeoServer createNeoServer(Config config, GraphDatabaseDependencies graphDatabaseDependencies, LogProvider logProvider) {
+        return new GraphAwareCommunityNeoServer(config, dependencies, logProvider);
     }
 }

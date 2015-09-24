@@ -36,15 +36,13 @@ public class RelationshipSnapshotIterator extends PrefetchingIterator<Relationsh
     private final Iterator<Relationship> deletedRelationshipIterator;
 
     public RelationshipSnapshotIterator(Node node, Iterable<Relationship> wrappedIterable, TransactionDataContainer transactionDataContainer, Direction direction, RelationshipType... relationshipTypes) {
-        this.wrappedIterator = wrappedIterable.iterator();
         this.transactionDataContainer = transactionDataContainer;
+        this.deletedRelationshipIterator = transactionDataContainer.getRelationshipTransactionData().getDeleted(node, direction, relationshipTypes).iterator();
 
         if (transactionDataContainer.getNodeTransactionData().hasBeenDeleted(node)) {
-            //change in Neo4j 2.1! Deleted relationships of a deleted node are exposed via the node's API!
-            //Therefore, we don't want to add them again.
-            this.deletedRelationshipIterator = IteratorUtil.emptyIterator();
+            this.wrappedIterator = IteratorUtil.emptyIterator();
         } else {
-            this.deletedRelationshipIterator = transactionDataContainer.getRelationshipTransactionData().getDeleted(node, direction, relationshipTypes).iterator();
+            this.wrappedIterator = wrappedIterable.iterator();
         }
     }
 

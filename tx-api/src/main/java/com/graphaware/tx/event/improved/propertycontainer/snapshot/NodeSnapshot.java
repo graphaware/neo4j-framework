@@ -21,6 +21,7 @@ import com.graphaware.common.wrapper.NodeWrapper;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.neo4j.graphdb.*;
+import org.neo4j.helpers.collection.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,6 +107,9 @@ public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Nod
      */
     @Override
     public Iterable<Label> getLabels() {
+        if (transactionDataContainer.getNodeTransactionData().hasBeenDeleted(this)) {
+            return new LabelSnapshotIterator(this, Iterables.<Label>empty(), transactionDataContainer);
+        }
         return new LabelSnapshotIterator(this, super.getLabels(), transactionDataContainer);
     }
 
@@ -132,7 +136,10 @@ public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Nod
      */
     @Override
     public int getDegree() {
-        int degree = super.getDegree();
+        int degree = 0;
+        if (!transactionDataContainer.getNodeTransactionData().hasBeenDeleted(this)) {
+            degree = super.getDegree();
+        }
         long removed = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getDeleted(this));
         long added = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getCreated(this));
 
@@ -144,7 +151,10 @@ public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Nod
      */
     @Override
     public int getDegree(RelationshipType type) {
-        int degree = super.getDegree(type);
+        int degree = 0;
+        if (!transactionDataContainer.getNodeTransactionData().hasBeenDeleted(this)) {
+            degree = super.getDegree(type);
+        }
         long removed = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getDeleted(this, type));
         long added = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getCreated(this, type));
 
@@ -156,7 +166,10 @@ public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Nod
      */
     @Override
     public int getDegree(Direction direction) {
-        int degree = super.getDegree(direction);
+        int degree = 0;
+        if (!transactionDataContainer.getNodeTransactionData().hasBeenDeleted(this)) {
+            degree = super.getDegree(direction);
+        }
         long removed = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getDeleted(this, direction));
         long added = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getCreated(this, direction));
 
@@ -168,7 +181,10 @@ public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Nod
      */
     @Override
     public int getDegree(RelationshipType type, Direction direction) {
-        int degree = super.getDegree(type, direction);
+        int degree = 0;
+        if (!transactionDataContainer.getNodeTransactionData().hasBeenDeleted(this)) {
+            degree = super.getDegree(type, direction);
+        }
         long removed = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getDeleted(this, direction, type));
         long added = IterableUtils.count(transactionDataContainer.getRelationshipTransactionData().getCreated(this, direction, type));
 

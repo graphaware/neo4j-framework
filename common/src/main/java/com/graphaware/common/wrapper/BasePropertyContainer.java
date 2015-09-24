@@ -18,7 +18,9 @@ package com.graphaware.common.wrapper;
 
 import org.neo4j.graphdb.*;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Base class for custom {@link org.neo4j.graphdb.PropertyContainer} implementations.
@@ -36,6 +38,37 @@ public abstract class BasePropertyContainer implements PropertyContainer {
             return defaultValue;
         }
         return getProperty(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, Object> getAllProperties() {
+        Map<String, Object> result = new HashMap<>();
+
+        for (String key : getPropertyKeys()) {
+            result.put(key, getProperty(key));
+        }
+
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, Object> getProperties(String... keys) {
+        Map<String, Object> result = new HashMap<>();
+
+        for (String key : keys) {
+            if (!hasProperty(key)) {
+                continue;
+            }
+            result.put(key, getProperty(key));
+        }
+
+        return result;
     }
 
     /**
