@@ -14,34 +14,25 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.module;
+package com.graphaware.runtime.module.thirdparty;
 
-import static org.springframework.util.Assert.notNull;
+import com.graphaware.common.representation.PropertyContainerRepresentation;
+import org.neo4j.graphdb.PropertyContainer;
 
 /**
- * Base class for {@link com.graphaware.runtime.module.RuntimeModule} implementations.
+ * {@link BaseWriteOperation} representing a create or delete operation.
  *
+ * @param <R> type of the details object.
+ * @param <T> type of the {@link PropertyContainer} that the operation was performed on.
  */
-public abstract class BaseRuntimeModule implements RuntimeModule {
-
-    private final String moduleId;
+public abstract class CreateOrDelete<R extends PropertyContainerRepresentation<T>, T extends PropertyContainer> extends BaseWriteOperation<R> {
 
     /**
-     * Construct a new module.
+     * Create the operation.
      *
-     * @param moduleId ID of this module. Must not be <code>null</code>.
+     * @param details details about the operation. Must not be <code>null</code>.
      */
-    protected BaseRuntimeModule(String moduleId) {
-        notNull(moduleId);
-
-        this.moduleId = moduleId;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getId() {
-        return moduleId;
+    protected CreateOrDelete(R details) {
+        super(details);
     }
 }

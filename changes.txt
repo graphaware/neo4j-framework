@@ -1,3 +1,6 @@
+2.2.5.35:
+    - third-party system integration support
+
 2.2.5.34:
     - upgraded Neo4j to 2.2.5
     - exposed some (previously private) methods in GraphUnit

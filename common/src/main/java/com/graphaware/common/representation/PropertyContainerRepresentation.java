@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2015 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -14,39 +14,42 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.api;
+package com.graphaware.common.representation;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.graphaware.common.util.PropertyContainerUtils;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Transaction;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * JSON-serializable representation of a Neo4j property container.
+ * {@link Serializable} representation of a Neo4j property container.
+ *
+ * @param <T> type of the {@link PropertyContainer} this class represents.
  */
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public abstract class JsonPropertyContainer<T extends PropertyContainer> {
+public abstract class PropertyContainerRepresentation<T extends PropertyContainer> implements Serializable {
     static final long NEW = -1;
 
     private long id = NEW;
     private Map<String, Object> properties;
 
     /**
-     * No-arg constructor for Jackson.
+     * No-arg constructor (for Jackson et al).
      */
-    protected JsonPropertyContainer() {
+    protected PropertyContainerRepresentation() {
     }
 
     /**
      * Construct a new representation from a property container.
      *
-     * @param pc         to construct a representation from.
+     * @param pc         to construct a representation from. Must not be <code>null</code>.
      * @param properties keys of properties to be included in the representation.
      *                   Can be <code>null</code>, which represents all. Empty array represents none.
      */
-    protected JsonPropertyContainer(T pc, String[] properties) {
+    protected PropertyContainerRepresentation(T pc, String[] properties) {
         this(PropertyContainerUtils.id(pc));
 
         if (properties != null) {
@@ -67,24 +70,37 @@ public abstract class JsonPropertyContainer<T extends PropertyContainer> {
      *
      * @param id ID.
      */
-    protected JsonPropertyContainer(long id) {
+    protected PropertyContainerRepresentation(long id) {
         this.id = id;
     }
 
     /**
      * Construct a new representation of a property container from a map of properties.
      *
-     * @param properties of the new container.
+     * @param properties of the new container. Can be <code>null</code>, which is equivalent to an empty map.
      */
-    protected JsonPropertyContainer(Map<String, Object> properties) {
+    protected PropertyContainerRepresentation(Map<String, Object> properties) {
+        setProperties(properties);
+    }
+
+    /**
+     * Construct a new representation of a property container from its internal Neo4j ID and a map of properties.
+     * <p/>
+     * Note that this constructor is only intended for testing.
+     *
+     * @param id         ID.
+     * @param properties of the new container. Can be <code>null</code>, which is equivalent to an empty map.
+     */
+    protected PropertyContainerRepresentation(long id, Map<String, Object> properties) {
+        this.id = id;
         setProperties(properties);
     }
 
     /**
      * Add a property.
      *
-     * @param key   key
-     * @param value value.
+     * @param key   key. Must not be <code>null</code>.
+     * @param value value. Must not be <code>null</code>.
      */
     public void putProperty(String key, Object value) {
         initPropsIfNeeded();
@@ -184,12 +200,55 @@ public abstract class JsonPropertyContainer<T extends PropertyContainer> {
         this.id = id;
     }
 
+    /**
+     * @return properties. Can be <code>null</code>.
+     */
     public Map<String, Object> getProperties() {
         return properties;
     }
 
+    /**
+     * Set properties.
+     *
+     * @param properties Can be <code>null</code>, which is equivalent to an empty map.
+     */
     public void setProperties(Map<String, Object> properties) {
-        initPropsIfNeeded();
-        this.properties.putAll(properties);
+        if (properties == null) {
+            this.properties = null;
+        } else {
+            initPropsIfNeeded();
+            this.properties.putAll(properties);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        PropertyContainerRepresentation<?> that = (PropertyContainerRepresentation<?>) o;
+
+        if (id != that.id) {
+            return false;
+        }
+        return !(properties != null ? !properties.equals(that.properties) : that.properties != null);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (properties != null ? properties.hashCode() : 0);
+        return result;
     }
 }

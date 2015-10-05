@@ -18,6 +18,7 @@ package com.graphaware.api;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
@@ -346,7 +347,7 @@ public class JsonSerialisationTest {
 
             tx.success();
             fail();
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | IllegalArgumentException | JsonMappingException e) {
             //ok
         }
 
@@ -356,7 +357,7 @@ public class JsonSerialisationTest {
 
             tx.success();
             fail();
-        } catch (IllegalStateException e) {
+        } catch (IllegalStateException | IllegalArgumentException | JsonMappingException e) {
             //ok
         }
 

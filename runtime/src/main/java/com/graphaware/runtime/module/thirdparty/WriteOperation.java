@@ -14,34 +14,33 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.module;
+package com.graphaware.runtime.module.thirdparty;
 
-import static org.springframework.util.Assert.notNull;
+import java.io.Serializable;
 
 /**
- * Base class for {@link com.graphaware.runtime.module.RuntimeModule} implementations.
+ * Representation of a database write operation.
  *
+ * @param <T> type of the object that provides details about the operation.
  */
-public abstract class BaseRuntimeModule implements RuntimeModule {
+public interface WriteOperation<T> extends Serializable {
 
-    private final String moduleId;
-
-    /**
-     * Construct a new module.
-     *
-     * @param moduleId ID of this module. Must not be <code>null</code>.
-     */
-    protected BaseRuntimeModule(String moduleId) {
-        notNull(moduleId);
-
-        this.moduleId = moduleId;
+    enum OperationType {
+        NODE_CREATED,
+        NODE_UPDATED,
+        NODE_DELETED,
+        RELATIONSHIP_CREATED,
+        RELATIONSHIP_UPDATED,
+        RELATIONSHIP_DELETED
     }
 
     /**
-     * {@inheritDoc}
+     * @return type of the operation. Never <code>null</code>.
      */
-    @Override
-    public String getId() {
-        return moduleId;
-    }
+    OperationType getType();
+
+    /**
+     * @return details about the object the operation was performed on.
+     */
+    T getDetails();
 }

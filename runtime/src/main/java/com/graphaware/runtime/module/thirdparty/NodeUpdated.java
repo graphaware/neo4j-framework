@@ -14,34 +14,31 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.module;
+package com.graphaware.runtime.module.thirdparty;
 
-import static org.springframework.util.Assert.notNull;
+import com.graphaware.common.representation.NodeRepresentation;
+import org.neo4j.graphdb.Node;
 
 /**
- * Base class for {@link com.graphaware.runtime.module.RuntimeModule} implementations.
- *
+ * {@link WriteOperation} representing a {@link Node} being updated.
  */
-public abstract class BaseRuntimeModule implements RuntimeModule {
-
-    private final String moduleId;
+public class NodeUpdated extends Update<NodeRepresentation, Node> {
 
     /**
-     * Construct a new module.
+     * Create the operation.
      *
-     * @param moduleId ID of this module. Must not be <code>null</code>.
+     * @param previous representation of the previous state of the updated {@link Node}. Must not be <code>null</code>.
+     * @param current representation of the current state of the updated {@link Node}. Must not be <code>null</code>.
      */
-    protected BaseRuntimeModule(String moduleId) {
-        notNull(moduleId);
-
-        this.moduleId = moduleId;
+    public NodeUpdated(NodeRepresentation previous, NodeRepresentation current) {
+        super(previous, current);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getId() {
-        return moduleId;
+    public OperationType getType() {
+        return OperationType.NODE_UPDATED;
     }
 }

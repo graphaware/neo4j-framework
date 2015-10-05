@@ -14,34 +14,28 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.module;
+package com.graphaware.runtime.module.thirdparty;
 
-import static org.springframework.util.Assert.notNull;
+import java.util.Collection;
 
 /**
- * Base class for {@link com.graphaware.runtime.module.RuntimeModule} implementations.
- *
+ * A {@link ThirdPartyIntegrationModule} for testing.
  */
-public abstract class BaseRuntimeModule implements RuntimeModule {
+public class TestThirdPartyModule extends ThirdPartyIntegrationModule {
 
-    private final String moduleId;
+    private Collection<WriteOperation<?>> writeOperations;
 
-    /**
-     * Construct a new module.
-     *
-     * @param moduleId ID of this module. Must not be <code>null</code>.
-     */
-    protected BaseRuntimeModule(String moduleId) {
-        notNull(moduleId);
-
-        this.moduleId = moduleId;
+    public TestThirdPartyModule(String moduleId) {
+        super(moduleId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public String getId() {
-        return moduleId;
+    public void afterCommit(Collection<WriteOperation<?>> state) {
+        super.afterCommit(state);
+        writeOperations = state;
+    }
+
+    public Collection<WriteOperation<?>> getWriteOperations() {
+        return writeOperations;
     }
 }

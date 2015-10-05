@@ -14,34 +14,30 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.module;
+package com.graphaware.runtime.module.thirdparty;
 
-import static org.springframework.util.Assert.notNull;
+import com.graphaware.common.representation.NodeRepresentation;
+import org.neo4j.graphdb.Node;
 
 /**
- * Base class for {@link com.graphaware.runtime.module.RuntimeModule} implementations.
- *
+ * {@link WriteOperation} representing a {@link Node} being created.
  */
-public abstract class BaseRuntimeModule implements RuntimeModule {
-
-    private final String moduleId;
+public class NodeCreated extends CreateOrDelete<NodeRepresentation, Node> {
 
     /**
-     * Construct a new module.
+     * Create the operation.
      *
-     * @param moduleId ID of this module. Must not be <code>null</code>.
+     * @param createdNode representation of the created node. Must not be <code>null</code>.
      */
-    protected BaseRuntimeModule(String moduleId) {
-        notNull(moduleId);
-
-        this.moduleId = moduleId;
+    public NodeCreated(NodeRepresentation createdNode) {
+        super(createdNode);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getId() {
-        return moduleId;
+    public OperationType getType() {
+        return OperationType.NODE_CREATED;
     }
 }
