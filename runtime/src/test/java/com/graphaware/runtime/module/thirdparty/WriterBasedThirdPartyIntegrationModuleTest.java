@@ -20,6 +20,7 @@ import com.graphaware.common.representation.NodeRepresentation;
 import com.graphaware.common.representation.RelationshipRepresentation;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
+import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.writer.thirdparty.*;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -28,16 +29,22 @@ import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Collection;
+import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class ThirdPartyModuleTest {
+/**
+ * Integration test for {@link WriterBasedThirdPartyIntegrationModule}
+ */
+public class WriterBasedThirdPartyIntegrationModuleTest {
 
     @Test
-    public void modificationsShouldBeCorrectlyBuilt() {
+    public void modificationsShouldBeCorrectlyBuilt() throws InterruptedException {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
-        TestThirdPartyModule module = new TestThirdPartyModule("test");
+        RememberingWriter writer = new RememberingWriter();
+        TxDrivenModule module = new WriterBasedThirdPartyIntegrationModule("test", writer);
 
         database.execute("CREATE (p:Person {name:'Michal', age:30})-[:WORKS_FOR {since:2013, role:'MD'}]->(c:Company {name:'GraphAware', est: 2013})");
         database.execute("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Adam'})-[:WORKS_FOR {since:2014}]->(ga)");
@@ -50,33 +57,42 @@ public class ThirdPartyModuleTest {
         try (Transaction tx = database.beginTx()) {
             database.execute("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Daniela'})-[:WORKS_FOR]->(ga)");
             database.execute("MATCH (p:Person {name:'Michal'}) SET p.age=31");
+            tx.success();
+        }
+
+        try (Transaction tx = database.beginTx()) {
             database.execute("MATCH (p:Person {name:'Adam'})-[r]-() DELETE p,r");
             database.execute("MATCH (p:Person {name:'Michal'})-[r:WORKS_FOR]->() REMOVE r.role");
             tx.success();
         }
 
-        Collection<WriteOperation<?>> writeOperations = module.getWriteOperations();
-        assertEquals(6, writeOperations.size());
+        Thread.sleep(1000);
 
-        assertTrue(writeOperations.contains(new NodeCreated(
+        List<Collection<WriteOperation<?>>> writeOperations = writer.getRemembered();
+        assertEquals(2, writeOperations.size());
+        assertEquals(3, writeOperations.get(0).size());
+        assertEquals(3, writeOperations.get(1).size());
+
+        assertTrue(writeOperations.get(0).contains(new NodeCreated(
                 new NodeRepresentation(3L, new String[]{"Person"}, MapUtil.map("name", "Daniela")))));
 
-        assertTrue(writeOperations.contains(new NodeUpdated(
+        assertTrue(writeOperations.get(0).contains(new NodeUpdated(
                 new NodeRepresentation(0L, new String[]{"Person"}, MapUtil.map("name", "Michal", "age", 30L)),
                 new NodeRepresentation(0L, new String[]{"Person"}, MapUtil.map("name", "Michal", "age", 31L)))));
 
-        assertTrue(writeOperations.contains(new NodeDeleted(
-                new NodeRepresentation(2L, new String[]{"Person"}, MapUtil.map("name", "Adam")))));
-
-        assertTrue(writeOperations.contains(new RelationshipCreated(
+        assertTrue(writeOperations.get(0).contains(new RelationshipCreated(
                 new RelationshipRepresentation(2L, 3L, 1L, "WORKS_FOR", null)
         )));
 
-        assertTrue(writeOperations.contains(new RelationshipUpdated(
+        assertTrue(writeOperations.get(1).contains(new NodeDeleted(
+                new NodeRepresentation(2L, new String[]{"Person"}, MapUtil.map("name", "Adam")))));
+
+
+        assertTrue(writeOperations.get(1).contains(new RelationshipUpdated(
                 new RelationshipRepresentation(0L, 0L, 1L, "WORKS_FOR", MapUtil.map("since", 2013L, "role", "MD")),
                 new RelationshipRepresentation(0L, 0L, 1L, "WORKS_FOR", MapUtil.map("since", 2013L)))));
 
-        assertTrue(writeOperations.contains(new RelationshipDeleted(
+        assertTrue(writeOperations.get(1).contains(new RelationshipDeleted(
                 new RelationshipRepresentation(1L, 2L, 1L, "WORKS_FOR", MapUtil.map("since", 2014L))
         )));
 
