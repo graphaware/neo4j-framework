@@ -29,3 +29,4 @@ List of modules to upgrade:
         reco-meetup
         importer
         ga-enterprise
+        neo4j-es

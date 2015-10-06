@@ -44,7 +44,7 @@ public final class ConfigUtils {
      * @param <T>                               type of the class being instantiated.
      * @return instantiated class.
      */
-    public <T> T instantiate(Map<String, String> config, String configKey, String tryingToInstantiateWhat, String whatHappensWhenInstantiationFails) {
+    public static <T> T instantiate(Map<String, String> config, String configKey, String tryingToInstantiateWhat, String whatHappensWhenInstantiationFails) {
         if (config.get(configKey) != null) {
             String className = config.get(configKey);
 
