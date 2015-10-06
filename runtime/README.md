@@ -18,6 +18,7 @@ GraphAware Runtime is useful when you:
     * Timestamp modifications
     * Find out what the latest graph modifications that took place were
     * Write trigger-like functionality (which can actually be unit-tested!)
+    * Integrate with third-party systems (see [`WriterBasedThirdPartyIntegrationModule`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/runtime/module/thirdparty/WriterBasedThirdPartyIntegrationModule.html)
     * ... and much more
 * need to compute something continuously in the background, writing the results back to the graph. For example, you might want to:
     * delete expired data
@@ -54,12 +55,12 @@ add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>runtime-api</artifactId>
-    <version>2.2.5.34</version>
+    <version>2.2.5.35</version>
 </dependency>
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>runtime</artifactId>
-    <version>2.2.5.34</version>
+    <version>2.2.5.35</version>
 </dependency>
 ```
 
@@ -134,56 +135,56 @@ To start from scratch, you will need the following dependencies in your pom.xml
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>api</artifactId>
-        <version>2.2.5.34</version>
+        <version>2.2.5.35</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>common</artifactId>
-        <version>2.2.5.34</version>
+        <version>2.2.5.35</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>runtime-api</artifactId>
-        <version>2.2.5.34</version>
+        <version>2.2.5.35</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>runtime</artifactId>
-        <version>2.2.5.34</version>
+        <version>2.2.5.35</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tests</artifactId>
-        <version>2.2.5.34</version>
+        <version>2.2.5.35</version>
         <scope>test</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tx-api</artifactId>
-        <version>2.2.5.34</version>
+        <version>2.2.5.35</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tx-executor</artifactId>
-        <version>2.2.5.34</version>
+        <version>2.2.5.35</version>
         <scope>provided</scope>
     </dependency>
      <!-- needed if the module wants to use the Writer API -->
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>writer-api</artifactId>
-        <version>2.2.5.34</version>
+        <version>2.2.5.35</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>writer</artifactId>
-        <version>2.2.5.34</version>
+        <version>2.2.5.35</version>
         <scope>provided</scope>
     </dependency>
     ...

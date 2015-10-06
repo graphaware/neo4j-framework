@@ -15,13 +15,13 @@ Add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>writer-api</artifactId>
-    <version>2.1.7.28</version>
+    <version>2.2.5.35</version>
 </dependency>
 
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>writer</artifactId>
-    <version>2.1.7.28</version>
+    <version>2.2.5.35</version>
 </dependency>
 ```
 
@@ -52,7 +52,7 @@ follows:
 ```java
 final GraphDatabaseService database = ... //get or create a database
 int queueSize = 1000; //optional, default is 10,000
-DatabaseWriter writer = new TxPerTaskWriter(database, queueSize); //only one of these per application!
+Neo4jWriter writer = new TxPerTaskWriter(database, queueSize); //only one of these per application!
 
 writer.write(new Runnable() {
     @Override
@@ -100,7 +100,7 @@ causes the entire batch to be rolled back.
 final GraphDatabaseService database = ... //get or create a database
 int queueSize = 1000; //optional, default is 10,000
 int batchSize = 1000; //optional, default is 1,000
-DatabaseWriter writer = new BatchWriter(database, queueSize, batchSize); //only one of these per application!
+Neo4jWriter writer = new BatchWriter(database, queueSize, batchSize); //only one of these per application!
 
 Long nodeId = writer.write(new Callable<Long>() {
     @Override
@@ -117,7 +117,7 @@ that simply executes every task synchronously, in a separate transaction:
 
 ```java
 final GraphDatabaseService database = ... //get or create a database
-DatabaseWriter writer = new DefaultWriter(database); //only one of these per application!
+Neo4jWriter writer = new DefaultWriter(database); //only one of these per application!
 
 Long nodeId = writer.write(new Callable<Long>() {
     @Override
