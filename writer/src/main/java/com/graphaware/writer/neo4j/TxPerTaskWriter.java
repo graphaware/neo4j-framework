@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.writer;
+package com.graphaware.writer.neo4j;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
@@ -28,7 +28,7 @@ import java.util.concurrent.RunnableFuture;
 /**
  * {@link SingleThreadedWriter} that writes each task in a separate transaction.
  */
-public class TxPerTaskWriter extends SingleThreadedWriter implements DatabaseWriter {
+public class TxPerTaskWriter extends SingleThreadedWriter implements Neo4jWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(TxPerTaskWriter.class);
 

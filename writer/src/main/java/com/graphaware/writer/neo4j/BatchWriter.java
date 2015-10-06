@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.writer;
+package com.graphaware.writer.neo4j;
 
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.UnitOfWork;
@@ -32,7 +32,7 @@ import java.util.concurrent.RunnableFuture;
  * {@link SingleThreadedWriter} that writes tasks in batches. This is more performant but dangerous,
  * since a single task's failure can roll back the whole batch. This is here for experiments, not for production.
  */
-public class BatchWriter extends SingleThreadedWriter implements DatabaseWriter {
+public class BatchWriter extends SingleThreadedWriter implements Neo4jWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(BatchWriter.class);
     public static final int DEFAULT_BATCH_SIZE = 1000;

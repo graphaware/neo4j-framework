@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 GraphAware
+ * Copyright (c) 2014 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -14,30 +14,23 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.module.thirdparty;
-
-import com.graphaware.common.representation.NodeRepresentation;
-import org.neo4j.graphdb.Node;
+package com.graphaware.writer;
 
 /**
- * {@link WriteOperation} representing a {@link Node} being created.
+ * A writer that writes to a system, which can be a third-party application, or Neo4j itself.
+ * <p/>
+ * Implementations can choose how they write to the system, but must make sure that tasks that are submitted to it
+ * run within the context of a transaction.
  */
-public class NodeCreated extends CreateOrDelete<NodeRepresentation, Node> {
+public interface Writer {
 
     /**
-     * Create the operation.
-     *
-     * @param createdNode representation of the created node. Must not be <code>null</code>.
+     * Start the writer.
      */
-    public NodeCreated(NodeRepresentation createdNode) {
-        super(createdNode);
-    }
+    void start();
 
     /**
-     * {@inheritDoc}
+     * Stop the writer.
      */
-    @Override
-    public OperationType getType() {
-        return OperationType.NODE_CREATED;
-    }
+    void stop();
 }

@@ -16,6 +16,8 @@
 
 package com.graphaware.runtime.module.thirdparty;
 
+import com.graphaware.writer.thirdparty.WriteOperation;
+
 import java.util.Collection;
 
 /**

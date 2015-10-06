@@ -20,6 +20,7 @@ import com.graphaware.common.representation.NodeRepresentation;
 import com.graphaware.common.representation.RelationshipRepresentation;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
+import com.graphaware.writer.thirdparty.*;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;

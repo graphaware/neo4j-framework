@@ -14,21 +14,31 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.write;
+package com.graphaware.writer.thirdparty;
 
-import com.graphaware.writer.neo4j.Neo4jWriter;
-import org.neo4j.graphdb.GraphDatabaseService;
+import com.graphaware.writer.Writer;
+
+import java.util.Collection;
 
 /**
- * A configuration of {@link Neo4jWriter}s for the purposes of the framework.
+ * A {@link Writer} to a third-party system.
  */
-public interface WritingConfig {
+public interface ThirdPartyWriter extends Writer {
 
     /**
-     * Produce a database writer configured by this configuration, setup to write to the given database.
+     * Write an operation.
      *
-     * @param database that the writer will write to.
-     * @return writer.
+     * @param operation to write. Must not be <code>null</code>.
+     * @param id        for logging purposes. Must not be <code>null</code>.
      */
-    Neo4jWriter produceWriter(GraphDatabaseService database);
+    void write(WriteOperation<?> operation, String id);
+
+    /**
+     * Write a collection of operations.
+     *
+     * @param operations to write. Must not be <code>null</code>.
+     * @param id         for logging purposes. Must not be <code>null</code>.
+     */
+    void write(Collection<WriteOperation<?>> operations, String id);
+
 }

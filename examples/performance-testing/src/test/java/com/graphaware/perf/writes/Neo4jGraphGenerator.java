@@ -26,7 +26,7 @@ import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.MultiThreadedBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.UnitOfWork;
-import com.graphaware.writer.DatabaseWriter;
+import com.graphaware.writer.neo4j.Neo4jWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.kernel.DeadlockDetectedException;
@@ -48,14 +48,14 @@ public class Neo4jGraphGenerator extends BaseGraphGenerator {
     private final int noThreads;
     private final AtomicInteger deadlocks = new AtomicInteger(0);
     private long time = 0;
-    private DatabaseWriter writer;
+    private Neo4jWriter writer;
 
     public Neo4jGraphGenerator(GraphDatabaseService database, int noThreads) {
         this.database = database;
         this.noThreads = noThreads;
     }
 
-    public Neo4jGraphGenerator(GraphDatabaseService database, int noThreads, DatabaseWriter writer) {
+    public Neo4jGraphGenerator(GraphDatabaseService database, int noThreads, Neo4jWriter writer) {
         this.database = database;
         this.noThreads = noThreads;
         this.writer = writer;

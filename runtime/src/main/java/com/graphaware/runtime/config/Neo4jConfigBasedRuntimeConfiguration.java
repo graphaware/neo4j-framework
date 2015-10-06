@@ -24,6 +24,9 @@ import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.runtime.write.DatabaseWriterType;
 import com.graphaware.runtime.write.FluentWritingConfig;
 import com.graphaware.runtime.write.WritingConfig;
+import com.graphaware.writer.neo4j.BatchWriter;
+import com.graphaware.writer.neo4j.DefaultWriter;
+import com.graphaware.writer.neo4j.TxPerTaskWriter;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.kernel.configuration.Config;
 
@@ -59,14 +62,14 @@ import static org.neo4j.helpers.Settings.*;
  * <pre>
  *     com.graphaware.runtime.db.writer=default
  * </pre>
- * results in a {@link com.graphaware.writer.DefaultWriter} being constructed.
+ * results in a {@link DefaultWriter} being constructed.
  * <p/>
  * <pre>
  *     com.graphaware.runtime.db.writer=single
  *     #optional queue size, defaults to 10,000
  *     com.graphaware.runtime.db.writer.queueSize=10000
  * </pre>
- * results in a {@link com.graphaware.writer.TxPerTaskWriter} being constructed with the configured queue size
+ * results in a {@link TxPerTaskWriter} being constructed with the configured queue size
  * <p/>
  * <pre>
  *     com.graphaware.runtime.db.writer=batch
@@ -75,7 +78,7 @@ import static org.neo4j.helpers.Settings.*;
  *     #optional batch size, defaults to 1,000
  *     com.graphaware.runtime.db.writer.batchSize=1000
  * </pre>
- * results in a {@link com.graphaware.writer.BatchWriter} being constructed with the configured queue and batch sizes.
+ * results in a {@link BatchWriter} being constructed with the configured queue and batch sizes.
  */
 public final class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfiguration {
 

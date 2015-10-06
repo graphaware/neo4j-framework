@@ -20,8 +20,9 @@ import com.graphaware.common.representation.NodeRepresentation;
 import com.graphaware.common.representation.RelationshipRepresentation;
 import com.graphaware.runtime.module.BaseTxDrivenModule;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
-import com.graphaware.tx.event.improved.api.Change;
+import com.graphaware.common.util.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
+import com.graphaware.writer.thirdparty.*;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 

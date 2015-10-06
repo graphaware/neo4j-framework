@@ -14,16 +14,18 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.writer;
+package com.graphaware.writer.neo4j;
+
+import com.graphaware.writer.Writer;
 
 import java.util.concurrent.Callable;
 
 /**
- * A {@link DatabaseWriter} that throws an {@link UnsupportedOperationException} any time it is used for writing. Its
- * purpose is to serve as a placeholder for places where the use of {@link DatabaseWriter} does not make sense, e.g.
+ * A {@link Neo4jWriter} that throws an {@link UnsupportedOperationException} any time it is used for writing. Its
+ * purpose is to serve as a placeholder for places where the use of {@link Neo4jWriter} does not make sense, e.g.
  * when using {@link org.neo4j.unsafe.batchinsert.BatchInserter}s. Singleton.
  */
-public final class NullWriter implements DatabaseWriter {
+public final class NullWriter implements Neo4jWriter {
 
     private static final NullWriter INSTANCE = new NullWriter();
 

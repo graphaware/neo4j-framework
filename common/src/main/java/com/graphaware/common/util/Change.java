@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.api;
+package com.graphaware.common.util;
 
 import org.neo4j.graphdb.PropertyContainer;
 

@@ -32,8 +32,8 @@ import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.runtime.write.WritingConfig;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import com.graphaware.writer.BaseDatabaseWriter;
-import com.graphaware.writer.DatabaseWriter;
+import com.graphaware.writer.neo4j.BaseNeo4jWriter;
+import com.graphaware.writer.neo4j.Neo4jWriter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -1134,8 +1134,8 @@ public class ProductionRuntimeTest {
 
         GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withWritingConfig(new WritingConfig() {
             @Override
-            public DatabaseWriter produceWriter(GraphDatabaseService database) {
-                return new BaseDatabaseWriter(database) {
+            public Neo4jWriter produceWriter(GraphDatabaseService database) {
+                return new BaseNeo4jWriter(database) {
                     @Override
                     public void start() {
                         started.set(true);

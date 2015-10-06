@@ -14,10 +14,9 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.module.thirdparty;
+package com.graphaware.writer.thirdparty;
 
 import com.graphaware.common.representation.RelationshipRepresentation;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 /**

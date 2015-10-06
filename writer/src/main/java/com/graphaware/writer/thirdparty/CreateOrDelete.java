@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.module.thirdparty;
+package com.graphaware.writer.thirdparty;
 
 import com.graphaware.common.representation.PropertyContainerRepresentation;
 import org.neo4j.graphdb.PropertyContainer;

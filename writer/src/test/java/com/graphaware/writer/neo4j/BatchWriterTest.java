@@ -14,14 +14,15 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.writer;
+package com.graphaware.writer.neo4j;
 
 import com.graphaware.common.util.IterableUtils;
-import com.graphaware.common.util.PropertyContainerUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
+import com.graphaware.writer.neo4j.BatchWriter;
+import com.graphaware.writer.neo4j.Neo4jWriter;
+import com.graphaware.writer.neo4j.TxPerTaskWriter;
 import org.junit.Test;
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Transaction;
 
 import java.io.IOException;
@@ -31,18 +32,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
- * Test for {@link com.graphaware.writer.TxPerTaskWriter}.
+ * Test for {@link TxPerTaskWriter}.
  */
-public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
+public class BatchWriterTest extends DatabaseIntegrationTest {
 
-    private DatabaseWriter writer;
+    private Neo4jWriter writer;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        writer = new TxPerTaskWriter(getDatabase());
+        writer = new BatchWriter(getDatabase());
         writer.start();
     }
 
@@ -102,9 +104,12 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
                 getDatabase().createNode();
                 return true;
             }
-        }, "test", 50);
+        }, "test", 200);
 
         assertTrue(result);
+
+       waitABit();
+
         try (Transaction tx = getDatabase().beginTx()) {
             assertEquals(1, IterableUtils.countNodes(getDatabase()));
             tx.success();
@@ -138,7 +143,7 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void whenQueueIsFullTasksGetDropped() {
-        writer = new TxPerTaskWriter(getDatabase(), 2);
+        writer = new BatchWriter(getDatabase(), 2, 100);
         writer.start();
 
         Runnable task = new Runnable() {
@@ -177,7 +182,7 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
             public Boolean call() throws Exception {
                 throw new IOException("Deliberate Testing Exception");
             }
-        }, "test", 50);
+        }, "test", 10);
     }
 
     @Test
@@ -198,8 +203,95 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
     }
 
     @Test
+    public void oneFailingTransactionDoesntRollbackTheWholeBatch() {
+        writer.write(new Runnable() {
+            @Override
+            public void run() {
+                getDatabase().createNode();
+            }
+        });
+        writer.write(new Runnable() {
+            @Override
+            public void run() {
+                getDatabase().createNode();
+            }
+        });
+        writer.write(new Runnable() {
+            @Override
+            public void run() {
+                throw new RuntimeException("Deliberate Testing Exception");
+            }
+        });
+        writer.write(new Runnable() {
+            @Override
+            public void run() {
+                getDatabase().createNode();
+            }
+        });
+        writer.write(new Runnable() {
+            @Override
+            public void run() {
+                getDatabase().createNode();
+            }
+        });
+        writer.write(new Runnable() {
+            @Override
+            public void run() {
+                getDatabase().createNode();
+            }
+        });
+
+        waitABit();
+
+        try (Transaction tx = getDatabase().beginTx()) {
+            assertEquals(5, IterableUtils.countNodes(getDatabase()));
+            tx.success();
+        }
+    }
+
+    @Test
+    public void constraintViolationRollsBackTheWholeBatch() {
+        try (Transaction tx = getDatabase().beginTx()) {
+            getDatabase().createNode().createRelationshipTo(getDatabase().createNode(), DynamicRelationshipType.withName("test"));
+            tx.success();
+        }
+
+        for (int i = 0; i < 5; i++) {
+            writer.write(new Runnable() {
+                @Override
+                public void run() {
+                    getDatabase().createNode();
+                }
+            });
+        }
+
+        writer.write(new Runnable() {
+            @Override
+            public void run() {
+                getDatabase().getNodeById(0).delete();
+            }
+        });
+
+        for (int i = 0; i < 5; i++) {
+            writer.write(new Runnable() {
+                @Override
+                public void run() {
+                    getDatabase().createNode();
+                }
+            });
+        }
+
+        waitABit();
+
+        try (Transaction tx = getDatabase().beginTx()) {
+            assertTrue(10 > IterableUtils.countNodes(getDatabase()));
+            tx.success();
+        }
+    }
+
+    @Test
     public void multipleThreadsCanSubmitTasks() {
-        writer = new TxPerTaskWriter(getDatabase());
+        writer = new BatchWriter(getDatabase());
         writer.start();
 
         final Runnable task = new Runnable() {
@@ -232,7 +324,7 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
 
     @Test
     public void tasksAreFinishedBeforeShutdown() throws InterruptedException {
-        writer = new TxPerTaskWriter(getDatabase());
+        writer = new BatchWriter(getDatabase());
         writer.start();
 
         final Runnable task = new Runnable() {
@@ -248,43 +340,6 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
                 @Override
                 public void run() {
                     writer.write(task);
-                }
-            });
-        }
-        executorService.shutdown();
-        executorService.awaitTermination(1, TimeUnit.SECONDS);
-
-        writer.stop();
-
-        try (Transaction tx = getDatabase().beginTx()) {
-            assertEquals(100, IterableUtils.countNodes(getDatabase()));
-            tx.success();
-        }
-    }
-
-    @Test
-    public void callablesWork() throws InterruptedException {
-        writer = new TxPerTaskWriter(getDatabase());
-        writer.start();
-
-        final Callable<Long> task = new Callable<Long>() {
-            @Override
-            public Long call() throws Exception {
-                for (Node node : getDatabase().findNodesByLabelAndProperty(DynamicLabel.label("test"), "test", "test")) {
-                    System.out.println(PropertyContainerUtils.nodeToString(node));
-                }
-                Node test = getDatabase().createNode(DynamicLabel.label("test"));
-                test.setProperty("test", "test");
-                return test.getId();
-            }
-        };
-
-        ExecutorService executorService = Executors.newFixedThreadPool(20);
-        for (int i = 0; i < 100; i++) {
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    writer.write(task, "test", 0);
                 }
             });
         }

@@ -14,22 +14,33 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.module.thirdparty;
+package com.graphaware.writer.thirdparty;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.io.Serializable;
 
 /**
- * Created by bachmanm on 05/10/2015.
+ * Representation of a database write operation.
+ *
+ * @param <T> type of the object that provides details about the operation.
  */
-public abstract class AsyncThirdPartyIntegrationModule extends ThirdPartyIntegrationModule {
+public interface WriteOperation<T> extends Serializable {
 
-    private final Queue<WriteOperation<?>> queue = new ConcurrentLinkedDeque<>();
-
-    public AsyncThirdPartyIntegrationModule(String moduleId) {
-        super(moduleId);
+    enum OperationType {
+        NODE_CREATED,
+        NODE_UPDATED,
+        NODE_DELETED,
+        RELATIONSHIP_CREATED,
+        RELATIONSHIP_UPDATED,
+        RELATIONSHIP_DELETED
     }
 
+    /**
+     * @return type of the operation. Never <code>null</code>.
+     */
+    OperationType getType();
 
+    /**
+     * @return details about the object the operation was performed on.
+     */
+    T getDetails();
 }

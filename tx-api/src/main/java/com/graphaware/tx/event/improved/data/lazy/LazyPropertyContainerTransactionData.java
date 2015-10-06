@@ -17,7 +17,7 @@
 package com.graphaware.tx.event.improved.data.lazy;
 
 
-import com.graphaware.tx.event.improved.api.Change;
+import com.graphaware.common.util.Change;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.event.PropertyEntry;

@@ -14,16 +14,20 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.writer;
+package com.graphaware.writer.neo4j;
 
+import com.graphaware.writer.Writer;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import static java.util.concurrent.Executors.callable;
 
 /**
- * Abstract base class for {@link DatabaseWriter} implementations.
+ * A Neo4j database {@link Writer}.
+ * <p/>
+ * Extending classes can choose how they write to the database, but must make sure that tasks that are submitted to it
+ * run within the context of a transaction.
  */
-public abstract class BaseDatabaseWriter implements DatabaseWriter {
+public abstract class BaseNeo4jWriter implements Neo4jWriter {
 
     protected final GraphDatabaseService database;
 
@@ -32,7 +36,7 @@ public abstract class BaseDatabaseWriter implements DatabaseWriter {
      *
      * @param database to write to.
      */
-    protected BaseDatabaseWriter(GraphDatabaseService database) {
+    protected BaseNeo4jWriter(GraphDatabaseService database) {
         this.database = database;
     }
 

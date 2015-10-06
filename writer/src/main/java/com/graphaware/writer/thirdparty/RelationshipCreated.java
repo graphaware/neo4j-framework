@@ -14,33 +14,30 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.module.thirdparty;
+package com.graphaware.writer.thirdparty;
 
-import java.io.Serializable;
+import com.graphaware.common.representation.RelationshipRepresentation;
+import org.neo4j.graphdb.Relationship;
 
 /**
- * Representation of a database write operation.
- *
- * @param <T> type of the object that provides details about the operation.
+ * {@link WriteOperation} representing a {@link Relationship} being created.
  */
-public interface WriteOperation<T> extends Serializable {
+public class RelationshipCreated extends CreateOrDelete<RelationshipRepresentation, Relationship> {
 
-    enum OperationType {
-        NODE_CREATED,
-        NODE_UPDATED,
-        NODE_DELETED,
-        RELATIONSHIP_CREATED,
-        RELATIONSHIP_UPDATED,
-        RELATIONSHIP_DELETED
+    /**
+     * Create the operation.
+     *
+     * @param createdRelationship representation of the created relationship. Must not be <code>null</code>.
+     */
+    public RelationshipCreated(RelationshipRepresentation createdRelationship) {
+        super(createdRelationship);
     }
 
     /**
-     * @return type of the operation. Never <code>null</code>.
+     * {@inheritDoc}
      */
-    OperationType getType();
-
-    /**
-     * @return details about the object the operation was performed on.
-     */
-    T getDetails();
+    @Override
+    public OperationType getType() {
+        return OperationType.RELATIONSHIP_CREATED;
+    }
 }

@@ -14,25 +14,23 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.module.thirdparty;
+package com.graphaware.writer.thirdparty;
 
-import com.graphaware.common.representation.RelationshipRepresentation;
+import com.graphaware.common.representation.NodeRepresentation;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 
 /**
- * {@link WriteOperation} representing a {@link Relationship} being updated.
+ * {@link WriteOperation} representing a {@link Node} being created.
  */
-public class RelationshipUpdated extends Update<RelationshipRepresentation, Relationship> {
+public class NodeCreated extends CreateOrDelete<NodeRepresentation, Node> {
 
     /**
      * Create the operation.
      *
-     * @param previous representation of the previous state of the updated {@link Relationship}. Must not be <code>null</code>.
-     * @param current representation of the current state of the updated {@link Relationship}. Must not be <code>null</code>.
+     * @param createdNode representation of the created node. Must not be <code>null</code>.
      */
-    public RelationshipUpdated(RelationshipRepresentation previous, RelationshipRepresentation current) {
-        super(previous, current);
+    public NodeCreated(NodeRepresentation createdNode) {
+        super(createdNode);
     }
 
     /**
@@ -40,6 +38,6 @@ public class RelationshipUpdated extends Update<RelationshipRepresentation, Rela
      */
     @Override
     public OperationType getType() {
-        return OperationType.RELATIONSHIP_UPDATED;
+        return OperationType.NODE_CREATED;
     }
 }

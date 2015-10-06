@@ -14,12 +14,11 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.module.thirdparty;
+package com.graphaware.writer.thirdparty;
 
 import com.graphaware.common.representation.PropertyContainerRepresentation;
-import com.graphaware.tx.event.improved.api.Change;
+import com.graphaware.common.util.Change;
 import org.neo4j.graphdb.PropertyContainer;
-import org.springframework.util.Assert;
 
 import static org.springframework.util.Assert.*;
 

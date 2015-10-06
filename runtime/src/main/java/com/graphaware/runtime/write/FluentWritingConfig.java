@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime.write;
 
-import com.graphaware.writer.*;
+import com.graphaware.writer.neo4j.*;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
@@ -79,7 +79,7 @@ public class FluentWritingConfig implements WritingConfig {
      * {@inheritDoc}
      */
     @Override
-    public DatabaseWriter produceWriter(GraphDatabaseService database) {
+    public Neo4jWriter produceWriter(GraphDatabaseService database) {
         switch (writerType) {
             case DEFAULT:
                 return new DefaultWriter(database);

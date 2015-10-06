@@ -17,7 +17,7 @@
 package com.graphaware.runtime.write;
 
 /**
- * Type of {@link com.graphaware.writer.DatabaseWriter}.
+ * Type of {@link com.graphaware.writer.neo4j.Neo4jWriter}.
  */
 public enum DatabaseWriterType {
 

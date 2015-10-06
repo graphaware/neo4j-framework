@@ -14,10 +14,13 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.writer;
+package com.graphaware.writer.neo4j;
 
 import com.graphaware.common.util.IterableUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
+import com.graphaware.writer.neo4j.DefaultWriter;
+import com.graphaware.writer.neo4j.Neo4jWriter;
+import com.graphaware.writer.neo4j.TxPerTaskWriter;
 import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
 
@@ -28,11 +31,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Test for {@link com.graphaware.writer.TxPerTaskWriter}.
+ * Test for {@link TxPerTaskWriter}.
  */
 public class DefaultWriterTest extends DatabaseIntegrationTest {
 
-    private DatabaseWriter writer;
+    private Neo4jWriter writer;
 
     @Override
     public void setUp() throws Exception {
