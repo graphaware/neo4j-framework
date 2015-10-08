@@ -49,11 +49,11 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>graphaware-framework-enterprise-${project.version}</finalName>
+                    <finalName>graphaware-server-enterprise-all-${project.version}</finalName>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <appendAssemblyId>true</appendAssemblyId>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
         </plugins>

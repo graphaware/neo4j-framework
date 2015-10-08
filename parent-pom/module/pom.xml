@@ -286,11 +286,11 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>${project.artifactId}-${project.version}</finalName>
+                    <finalName>graphaware-${project.artifactId}-${project.version}</finalName>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <appendAssemblyId>true</appendAssemblyId>
+                    <appendAssemblyId>false</appendAssemblyId>
                     <runOnlyAtExecutionRoot>true</runOnlyAtExecutionRoot>
                 </configuration>
             </plugin>
