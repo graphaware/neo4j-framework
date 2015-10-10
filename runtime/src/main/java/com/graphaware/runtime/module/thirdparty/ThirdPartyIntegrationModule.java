@@ -43,7 +43,7 @@ public abstract class ThirdPartyIntegrationModule extends BaseTxDrivenModule<Col
     /**
      * Construct a new module.
      *
-     * @param moduleId ID of this module. Must not be <code>null</code>.
+     * @param moduleId ID of this module. Must not be <code>null</code> or empty.
      */
     protected ThirdPartyIntegrationModule(String moduleId) {
         super(moduleId);

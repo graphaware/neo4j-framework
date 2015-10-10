@@ -34,7 +34,7 @@ public class WriterBasedThirdPartyIntegrationModule extends ThirdPartyIntegratio
     /**
      * Construct a new module.
      *
-     * @param moduleId ID of this module. Must not be <code>null</code>.
+     * @param moduleId ID of this module. Must not be <code>null</code> or empty.
      * @param writer to use for integrating with third-party system. Must not be <code>null</code>.
      */
     public WriterBasedThirdPartyIntegrationModule(String moduleId, ThirdPartyWriter writer) {
