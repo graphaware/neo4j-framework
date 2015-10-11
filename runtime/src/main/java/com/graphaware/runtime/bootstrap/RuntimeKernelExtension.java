@@ -122,7 +122,7 @@ public class RuntimeKernelExtension implements Lifecycle {
                     LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within 5 minutes.");
                 }
             }
-        }).start();
+        }, "GraphAware Starter").start();
 
         LOG.info("GraphAware Runtime bootstrapped, starting the Runtime...");
     }
