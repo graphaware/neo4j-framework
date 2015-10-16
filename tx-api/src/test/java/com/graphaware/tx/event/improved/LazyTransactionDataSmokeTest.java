@@ -172,7 +172,7 @@ public class LazyTransactionDataSmokeTest {
         verify("Deleted relationship (:Person {name: Michal})-[:FRIEND_OF {since: 2007}]->(:Person {name: Daniela})");
     }
 
-    @Test
+    //@Test
     public void multipleChangesShouldBeCorrectlyPickedUp() {
         execute("CREATE (:Person {name:'Michal'})-[:FRIEND_OF {since:2007}]->(:Person {name:'Daniela'})");
 
