@@ -78,7 +78,6 @@ public class RandomNodeSelector implements NodeSelector {
      */
     private Node randomNodeO1(GraphDatabaseService database) {
         long highestId = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(NeoStores.class).getNodeStore().getHighestPossibleIdInUse();
-
         if (highestId <= 0) {
             return null;
         }
