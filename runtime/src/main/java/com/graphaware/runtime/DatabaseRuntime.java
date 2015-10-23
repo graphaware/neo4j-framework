@@ -20,7 +20,7 @@ import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TxDrivenModule;
-import com.graphaware.writer.DatabaseWriter;
+import com.graphaware.writer.neo4j.Neo4jWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 
@@ -35,7 +35,7 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
 
     private final GraphDatabaseService database;
     private final TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager;
-    private final DatabaseWriter databaseWriter;
+    private final Neo4jWriter writer;
 
     /**
      * Construct a new runtime. Protected, please use {@link com.graphaware.runtime.GraphAwareRuntimeFactory}.
@@ -43,13 +43,13 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
      * @param configuration         config.
      * @param database              on which the runtime operates.
      * @param txDrivenModuleManager manager for transaction-driven modules.
-     * @param databaseWriter        to use when writing to the database.
+     * @param writer        to use when writing to the database.
      */
-    protected DatabaseRuntime(RuntimeConfiguration configuration, GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, DatabaseWriter databaseWriter) {
+    protected DatabaseRuntime(RuntimeConfiguration configuration, GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, Neo4jWriter writer) {
         super(configuration);
         this.database = database;
         this.txDrivenModuleManager = txDrivenModuleManager;
-        this.databaseWriter = databaseWriter;
+        this.writer = writer;
         database.registerTransactionEventHandler(this);
         database.registerKernelEventHandler(this);
     }
@@ -94,7 +94,7 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
      * {@inheritDoc}
      */
     @Override
-    public DatabaseWriter getDatabaseWriter() {
-        return databaseWriter;
+    public Neo4jWriter getDatabaseWriter() {
+        return writer;
     }
 }

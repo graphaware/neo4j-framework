@@ -21,8 +21,8 @@ import com.graphaware.runtime.config.FluentRuntimeConfiguration;
 import com.graphaware.runtime.write.WritingConfig;
 import com.graphaware.service.LifecycleTestService;
 import com.graphaware.test.integration.NeoTestServer;
-import com.graphaware.writer.DatabaseWriter;
 import com.graphaware.writer.LifecycleTestWriter;
+import com.graphaware.writer.neo4j.Neo4jWriter;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -69,7 +69,7 @@ public class BeanLifecycleTest {
         GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         GraphAwareRuntimeFactory.createRuntime(database, FluentRuntimeConfiguration.defaultConfiguration().withWritingConfig(new WritingConfig() {
             @Override
-            public DatabaseWriter produceWriter(GraphDatabaseService database) {
+            public Neo4jWriter produceWriter(GraphDatabaseService database) {
                 return new LifecycleTestWriter(database);
             }
         })).start();

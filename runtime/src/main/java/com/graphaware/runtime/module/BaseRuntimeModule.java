@@ -16,6 +16,8 @@
 
 package com.graphaware.runtime.module;
 
+import static org.springframework.util.Assert.hasLength;
+
 /**
  * Base class for {@link com.graphaware.runtime.module.RuntimeModule} implementations.
  *
@@ -27,9 +29,11 @@ public abstract class BaseRuntimeModule implements RuntimeModule {
     /**
      * Construct a new module.
      *
-     * @param moduleId ID of this module.
+     * @param moduleId ID of this module. Must not be <code>null</code> or empty.
      */
     protected BaseRuntimeModule(String moduleId) {
+        hasLength(moduleId);
+
         this.moduleId = moduleId;
     }
 

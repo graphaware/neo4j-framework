@@ -14,8 +14,9 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.api;
+package com.graphaware.common.util;
 
+import com.graphaware.common.util.Change;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +29,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static com.graphaware.tx.event.improved.api.Change.changesToMap;
+import static com.graphaware.common.util.Change.changesToMap;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 

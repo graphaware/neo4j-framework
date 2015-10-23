@@ -33,7 +33,7 @@ public abstract class BaseTxDrivenModule<T> extends BaseRuntimeModule implements
     /**
      * Construct a new module.
      *
-     * @param moduleId ID of this module.
+     * @param moduleId ID of this module. Must not be <code>null</code>.
      */
     protected BaseTxDrivenModule(String moduleId) {
         super(moduleId);

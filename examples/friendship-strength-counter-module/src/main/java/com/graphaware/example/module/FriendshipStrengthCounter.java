@@ -16,7 +16,7 @@
 
 package com.graphaware.example.module;
 
-import com.graphaware.tx.event.improved.api.Change;
+import com.graphaware.common.util.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;

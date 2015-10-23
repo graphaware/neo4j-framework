@@ -16,20 +16,17 @@
 
 package com.graphaware.api;
 
-import org.neo4j.graphdb.DynamicRelationshipType;
-import org.neo4j.graphdb.GraphDatabaseService;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.graphaware.common.representation.RelationshipRepresentation;
 import org.neo4j.graphdb.Relationship;
 
 import java.util.Map;
 
 /**
- * JSON-serializable representation of a Neo4j relationship.
+ * JSON-serializable {@link RelationshipRepresentation}.
  */
-public class JsonRelationship extends JsonPropertyContainer<Relationship> {
-
-    private long startNodeId = NEW;
-    private long endNodeId = NEW;
-    private String type;
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+public class JsonRelationship extends RelationshipRepresentation {
 
     /**
      * Public no-arg constructor (for Jackson)
@@ -54,9 +51,6 @@ public class JsonRelationship extends JsonPropertyContainer<Relationship> {
      */
     public JsonRelationship(Relationship relationship, JsonInput jsonInput) {
         super(relationship, jsonInput.getRelationshipProperties());
-        startNodeId = relationship.getStartNode().getId();
-        endNodeId = relationship.getEndNode().getId();
-        setType(relationship.getType().name());
     }
 
     /**
@@ -77,84 +71,7 @@ public class JsonRelationship extends JsonPropertyContainer<Relationship> {
      * @param properties  relationship properties.
      */
     public JsonRelationship(long startNodeId, long endNodeId, String type, Map<String, Object> properties) {
-        super(properties);
-        this.startNodeId = startNodeId;
-        this.endNodeId = endNodeId;
-        this.type = type;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Relationship create(GraphDatabaseService database) {
-        return database.getNodeById(startNodeId).createRelationshipTo(database.getNodeById(endNodeId), DynamicRelationshipType.withName(type));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Relationship fetch(GraphDatabaseService database) {
-        return database.getRelationshipById(getId());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void checkCanCreate() {
-        super.checkCanCreate();
-
-        if (type == null || type.length() == 0) {
-            throw new IllegalStateException("Relationship type must not be null or empty");
-        }
-
-        if (startNodeId == NEW || endNodeId == NEW) {
-            throw new IllegalStateException("Start and End node IDs must be specified");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void checkCanFetch() {
-        super.checkCanFetch();
-
-        if (startNodeId != NEW || endNodeId != NEW) {
-            throw new IllegalStateException("Must not specify start/end node for existing relationship!");
-        }
-
-        if (type != null) {
-            throw new IllegalStateException("Must not specify type for existing relationship!");
-        }
-    }
-
-    //Getters and setters
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public long getStartNodeId() {
-        return startNodeId;
-    }
-
-    public void setStartNodeId(long startNodeId) {
-        this.startNodeId = startNodeId;
-    }
-
-    public long getEndNodeId() {
-        return endNodeId;
-    }
-
-    public void setEndNodeId(long endNodeId) {
-        this.endNodeId = endNodeId;
+        super(startNodeId, endNodeId, type, properties);
     }
 }
 

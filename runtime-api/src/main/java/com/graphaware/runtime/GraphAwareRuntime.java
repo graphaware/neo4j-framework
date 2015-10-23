@@ -18,7 +18,7 @@ package com.graphaware.runtime;
 
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModule;
-import com.graphaware.writer.DatabaseWriter;
+import com.graphaware.writer.neo4j.Neo4jWriter;
 import org.neo4j.graphdb.NotFoundException;
 
 /**
@@ -94,5 +94,5 @@ public interface GraphAwareRuntime {
      *
      * @return writer associated with this runtime.
      */
-    DatabaseWriter getDatabaseWriter();
+    Neo4jWriter getDatabaseWriter();
 }

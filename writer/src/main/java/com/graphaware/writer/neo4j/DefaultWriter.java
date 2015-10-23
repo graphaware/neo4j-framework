@@ -14,8 +14,9 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.writer;
+package com.graphaware.writer.neo4j;
 
+import com.graphaware.writer.Writer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
@@ -24,10 +25,10 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.Callable;
 
 /**
- * A {@link DatabaseWriter} that writes to the database using the same thread that is submitting the task and blocks
+ * A {@link Neo4jWriter} that writes to the database using the same thread that is submitting the task and blocks
  * until the write is finished. In other words, this is no different from writing directly to the database.
  */
-public class DefaultWriter extends BaseDatabaseWriter {
+public class DefaultWriter extends BaseNeo4jWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultWriter.class);
 

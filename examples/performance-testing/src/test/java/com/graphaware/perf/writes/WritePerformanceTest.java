@@ -27,10 +27,10 @@ import com.graphaware.test.performance.ExponentialParameter;
 import com.graphaware.test.performance.Parameter;
 import com.graphaware.test.performance.PerformanceTest;
 import com.graphaware.test.util.TestUtils;
-import com.graphaware.writer.BatchWriter;
-import com.graphaware.writer.DatabaseWriter;
-import com.graphaware.writer.DefaultWriter;
-import com.graphaware.writer.TxPerTaskWriter;
+import com.graphaware.writer.neo4j.BatchWriter;
+import com.graphaware.writer.neo4j.DefaultWriter;
+import com.graphaware.writer.neo4j.Neo4jWriter;
+import com.graphaware.writer.neo4j.TxPerTaskWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +115,7 @@ public class WritePerformanceTest implements PerformanceTest {
 
     @Override
     public long run(final GraphDatabaseService database, final Map<String, Object> params) {
-        final DatabaseWriter writer = resolveWriter((Writer) params.get(WRITER), database);
+        final Neo4jWriter writer = resolveWriter((Writer) params.get(WRITER), database);
         if (writer != null) {
             writer.start();
         }
@@ -149,7 +149,7 @@ public class WritePerformanceTest implements PerformanceTest {
         return false;
     }
 
-    private DatabaseWriter resolveWriter(Writer writer, GraphDatabaseService database) {
+    private Neo4jWriter resolveWriter(Writer writer, GraphDatabaseService database) {
         switch (writer) {
             case NONE:
                 return null;

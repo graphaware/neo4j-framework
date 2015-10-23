@@ -120,6 +120,19 @@ public final class TestUtils {
     }
 
     /**
+     * Wait for a specified number of ms.
+     *
+     * @param ms how long to wait.
+     */
+    public static void waitFor(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Timed operation.
      */
     public interface Timed {

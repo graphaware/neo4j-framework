@@ -16,7 +16,7 @@
 
 package com.graphaware.tx.event.improved.data;
 
-import com.graphaware.tx.event.improved.api.Change;
+import com.graphaware.common.util.Change;
 import org.neo4j.graphdb.*;
 
 import java.util.Collection;

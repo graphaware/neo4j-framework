@@ -19,7 +19,7 @@ package com.graphaware.tx.event.improved.data.filtered;
 import com.graphaware.common.policy.InclusionPolicies;
 import com.graphaware.common.policy.PropertyContainerInclusionPolicy;
 import com.graphaware.common.policy.PropertyInclusionPolicy;
-import com.graphaware.tx.event.improved.api.Change;
+import com.graphaware.common.util.Change;
 import com.graphaware.tx.event.improved.data.NodeTransactionData;
 import com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode;
 import org.neo4j.graphdb.Label;

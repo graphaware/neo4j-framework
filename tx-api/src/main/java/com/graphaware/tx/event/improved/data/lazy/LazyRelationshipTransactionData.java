@@ -16,7 +16,7 @@
 
 package com.graphaware.tx.event.improved.data.lazy;
 
-import com.graphaware.tx.event.improved.api.Change;
+import com.graphaware.common.util.Change;
 import com.graphaware.tx.event.improved.data.RelationshipTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import com.graphaware.tx.event.improved.propertycontainer.snapshot.RelationshipSnapshot;

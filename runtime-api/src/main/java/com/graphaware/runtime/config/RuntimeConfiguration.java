@@ -18,7 +18,6 @@ package com.graphaware.runtime.config;
 
 import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.runtime.write.WritingConfig;
-import com.graphaware.writer.DatabaseWriter;
 
 /**
  * {@link com.graphaware.runtime.GraphAwareRuntime} configuration.
@@ -58,7 +57,7 @@ public interface RuntimeConfiguration {
     TimingStrategy getTimingStrategy();
 
     /**
-     * Retrieves the {@link WritingConfig} used for configuring a {@link DatabaseWriter}.
+     * Retrieves the {@link WritingConfig} used for configuring a {@link com.graphaware.writer.neo4j.Neo4jWriter}.
      *
      * @return The {@link WritingConfig}, may not be null.
      */

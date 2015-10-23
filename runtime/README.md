@@ -18,6 +18,7 @@ GraphAware Runtime is useful when you:
     * Timestamp modifications
     * Find out what the latest graph modifications that took place were
     * Write trigger-like functionality (which can actually be unit-tested!)
+    * Integrate with third-party systems (see [`WriterBasedThirdPartyIntegrationModule`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/runtime/module/thirdparty/WriterBasedThirdPartyIntegrationModule.html)
     * ... and much more
 * need to compute something continuously in the background, writing the results back to the graph. For example, you might want to:
     * delete expired data

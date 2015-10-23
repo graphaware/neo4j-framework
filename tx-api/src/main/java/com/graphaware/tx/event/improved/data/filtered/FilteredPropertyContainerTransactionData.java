@@ -21,7 +21,7 @@ import com.graphaware.common.policy.PropertyContainerInclusionPolicy;
 import com.graphaware.common.policy.PropertyInclusionPolicy;
 import com.graphaware.common.policy.none.IncludeNoProperties;
 import com.graphaware.common.policy.none.IncludeNone;
-import com.graphaware.tx.event.improved.api.Change;
+import com.graphaware.common.util.Change;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import org.neo4j.graphdb.PropertyContainer;
 

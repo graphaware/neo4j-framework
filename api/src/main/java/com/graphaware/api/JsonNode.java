@@ -16,18 +16,17 @@
 
 package com.graphaware.api;
 
-import org.neo4j.graphdb.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.graphaware.common.representation.NodeRepresentation;
+import org.neo4j.graphdb.Node;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 /**
- * JSON-serializable representation of a Neo4j node.
+ * JSON-serializable {@link NodeRepresentation}.
  */
-public class JsonNode extends JsonPropertyContainer<Node> {
-
-    private String[] labels;
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+public class JsonNode extends NodeRepresentation {
 
     /**
      * Public no-arg constructor (for Jackson)
@@ -52,7 +51,6 @@ public class JsonNode extends JsonPropertyContainer<Node> {
      */
     public JsonNode(Node node, JsonInput jsonInput) {
         super(node, jsonInput.getNodeProperties());
-        setLabels(labelsToStringArray(node.getLabels()));
     }
 
     /**
@@ -71,69 +69,6 @@ public class JsonNode extends JsonPropertyContainer<Node> {
      * @param properties of the new node.
      */
     public JsonNode(String[] labels, Map<String, Object> properties) {
-        super(properties);
-        this.labels = labels;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Node create(GraphDatabaseService database) {
-        return database.createNode();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Node fetch(GraphDatabaseService database) {
-        return database.getNodeById(getId());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void populate(Node node) {
-        super.populate(node);
-
-        if (labels != null) {
-            for (String label : labels) {
-                node.addLabel(DynamicLabel.label(label));
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void checkCanFetch() {
-        super.checkCanFetch();
-
-        if (labels != null && labels.length != 0) {
-            throw new IllegalStateException("Must not specify labels for existing node!");
-        }
-    }
-
-    //getters and setters
-
-    public String[] getLabels() {
-        return labels;
-    }
-
-    public void setLabels(String[] labels) {
-        this.labels = labels;
-    }
-
-    //helpers
-
-    private String[] labelsToStringArray(Iterable<Label> labels) {
-        List<String> labelsAsList = new LinkedList<>();
-        for (Label label : labels) {
-            labelsAsList.add(label.name());
-        }
-        return labelsAsList.toArray(new String[labelsAsList.size()]);
+        super(labels, properties);
     }
 }

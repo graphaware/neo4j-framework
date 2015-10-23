@@ -16,6 +16,7 @@
 
 package com.graphaware.writer;
 
+import com.graphaware.writer.neo4j.TxPerTaskWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 public class LifecycleTestWriter extends TxPerTaskWriter {

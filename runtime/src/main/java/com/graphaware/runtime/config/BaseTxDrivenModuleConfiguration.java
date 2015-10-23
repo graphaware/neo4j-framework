@@ -18,6 +18,8 @@ package com.graphaware.runtime.config;
 
 import com.graphaware.common.policy.*;
 
+import static org.springframework.util.Assert.notNull;
+
 /**
  * Base-class for {@link TxDrivenModuleConfiguration} implementations.
  */
@@ -25,7 +27,13 @@ public abstract class BaseTxDrivenModuleConfiguration<T extends BaseTxDrivenModu
 
     private final InclusionPolicies inclusionPolicies;
 
+    /**
+     * Construct a new configuration.
+     *
+     * @param inclusionPolicies policies for inclusion of nodes, relationships, and properties for processing by the module. Must not be <code>null</code>.
+     */
     protected BaseTxDrivenModuleConfiguration(InclusionPolicies inclusionPolicies) {
+        notNull(inclusionPolicies);
         this.inclusionPolicies = inclusionPolicies;
     }
 
@@ -101,12 +109,18 @@ public abstract class BaseTxDrivenModuleConfiguration<T extends BaseTxDrivenModu
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         BaseTxDrivenModuleConfiguration that = (BaseTxDrivenModuleConfiguration) o;
 
-        if (!inclusionPolicies.equals(that.inclusionPolicies)) return false;
+        if (!inclusionPolicies.equals(that.inclusionPolicies)) {
+            return false;
+        }
 
         return true;
     }

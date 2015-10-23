@@ -16,11 +16,11 @@
 
 package com.graphaware.runtime.write;
 
-import com.graphaware.writer.DatabaseWriter;
+import com.graphaware.writer.neo4j.Neo4jWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
- * A configuration of {@link DatabaseWriter}s for the purposes of the framework.
+ * A configuration of {@link Neo4jWriter}s for the purposes of the framework.
  */
 public interface WritingConfig {
 
@@ -30,5 +30,5 @@ public interface WritingConfig {
      * @param database that the writer will write to.
      * @return writer.
      */
-    DatabaseWriter produceWriter(GraphDatabaseService database);
+    Neo4jWriter produceWriter(GraphDatabaseService database);
 }
