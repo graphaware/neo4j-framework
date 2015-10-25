@@ -19,37 +19,63 @@
 
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>framework-parent</artifactId>
+        <artifactId>server</artifactId>
         <version>2.3.0.35-SNAPSHOT</version>
-        <relativePath>../parent-pom/framework/pom.xml</relativePath>
     </parent>
 
-    <artifactId>server-parent</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>server-common</artifactId>
+    <packaging>jar</packaging>
 
     <name>GraphAware Server</name>
-    <description>Parent Project for GraphAware Neo4j Server Extensions</description>
+    <description>Neo4j Server - Spring Framework Integration</description>
     <url>http://graphaware.com</url>
-
-    <modules>
-        <module>server-common</module>
-        <module>server-community</module>
-        <module>server-enterprise</module>
-    </modules>
 
     <dependencies>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
             <artifactId>runtime-api</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>common</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.neo4j.app</groupId>
             <artifactId>neo4j-server</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>tests</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>resttest</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
