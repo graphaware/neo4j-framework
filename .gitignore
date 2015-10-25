@@ -10,5 +10,4 @@ target/
 *.db
 .DS_Store
 .classpath
-server/server-community/data/
-server/server-enterprise/data/
+server/data/

@@ -19,12 +19,12 @@
 
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>server</artifactId>
+        <artifactId>framework-parent</artifactId>
         <version>2.3.0.35-SNAPSHOT</version>
+        <relativePath>../parent-pom/framework/pom.xml</relativePath>
     </parent>
 
-    <artifactId>server-common</artifactId>
-    <packaging>jar</packaging>
+    <artifactId>server</artifactId>
 
     <name>GraphAware Server</name>
     <description>Neo4j Server - Spring Framework Integration</description>
@@ -74,6 +74,12 @@
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>resttest</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>writer</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

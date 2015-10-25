@@ -17,6 +17,7 @@
 package com.graphaware.example;
 
 import com.graphaware.example.module.FriendshipStrengthCounter;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -41,6 +42,11 @@ public class FriendshipStrengthModuleEmbeddedDeclarativeIntegrationTest {
                 .loadPropertiesFromFile(this.getClass().getClassLoader().getResource("neo4j-friendship.properties").getPath())
                 .newGraphDatabase();
         registerShutdownHook(database);
+    }
+
+    @After
+    public void tearDown() {
+        database.shutdown();
     }
 
     @Test

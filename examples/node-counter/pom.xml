@@ -47,7 +47,7 @@
 
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>server-community</artifactId>
+            <artifactId>server</artifactId>
         </dependency>
 
     </dependencies>

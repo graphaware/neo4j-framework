@@ -66,26 +66,8 @@ public class NeoTestServer {
 
         System.setProperty(Configurator.NEO_SERVER_CONFIG_FILE_KEY, serverConfig.getAbsolutePath());
 
-        bootstrapper = createBootstrapper();
+        bootstrapper = new CommunityBootstrapper();
         bootstrapper.start(serverConfig.getAbsoluteFile());
-    }
-
-    protected Bootstrapper createBootstrapper() {
-        return loadMostDerivedBootstrapper();
-    }
-
-    private static Bootstrapper loadMostDerivedBootstrapper() {
-        Bootstrapper winner = new CommunityBootstrapper();
-        for (Bootstrapper candidate : Service.load(Bootstrapper.class)) {
-            if (isMoreDerivedThan(candidate, winner)) {
-                winner = candidate;
-            }
-        }
-        return winner;
-    }
-
-    protected static boolean isMoreDerivedThan(Bootstrapper one, Bootstrapper other) {
-        return other.getClass().isAssignableFrom(one.getClass());
     }
 
     public void stop() throws IOException, InterruptedException {

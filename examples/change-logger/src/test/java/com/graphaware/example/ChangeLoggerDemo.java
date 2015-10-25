@@ -18,6 +18,7 @@ package com.graphaware.example;
 
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -43,6 +44,11 @@ public class ChangeLoggerDemo {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         registerShutdownHook(database);
         database.registerTransactionEventHandler(new ChangeLogger());
+    }
+
+    @After
+    public void tearDown() {
+        database.shutdown();
     }
 
     @Test

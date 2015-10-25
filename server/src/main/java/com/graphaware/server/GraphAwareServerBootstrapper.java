@@ -40,34 +40,23 @@ public class GraphAwareServerBootstrapper implements SPIPluginLifecycle {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphAwareServerBootstrapper.class);
 
-//    @GET
-//    @Produces( MediaType.TEXT_PLAIN )
-//    @Path( "/hello" )
-//    public Response hello()
-//    {
-//        // Do stuff with the database
-//        return Response.status(Response.Status.OK).entity(
-//                ("OK").getBytes(Charset.forName("UTF-8"))).build();
-//    }
-
     @Override
     public Collection<Injectable<?>> start(NeoServer neoServer) {
         Jetty9WebServer oldServer = (Jetty9WebServer) ((AbstractNeoServer) neoServer).getWebServer();
 
         try {
-            Field logProvider1 = AbstractNeoServer.class.getDeclaredField("logProvider");
-            logProvider1.setAccessible(true);
-            LogProvider logProvider = (LogProvider) logProvider1.get(neoServer);
-            GraphAwareJetty9WebServer newWebServer = new GraphAwareJetty9WebServer(logProvider, neoServer.getDatabase(), neoServer.getConfig());
+            Field logProvider = AbstractNeoServer.class.getDeclaredField("logProvider");
+            logProvider.setAccessible(true);
+            GraphAwareJetty9WebServer newWebServer = new GraphAwareJetty9WebServer((LogProvider) logProvider.get(neoServer), neoServer.getDatabase(), neoServer.getConfig());
 
-            Field field =  AbstractNeoServer.class.getDeclaredField("webServer");
+            Field field = AbstractNeoServer.class.getDeclaredField("webServer");
             field.setAccessible(true);
             field.set(neoServer, newWebServer);
 
-            copyField(Jetty9WebServer.class, oldServer, newWebServer, "staticContent");
-            copyField(Jetty9WebServer.class, oldServer, newWebServer, "jaxRSPackages");
-            copyField(Jetty9WebServer.class, oldServer, newWebServer, "jaxRSClasses");
-            copyField(Jetty9WebServer.class, oldServer, newWebServer, "filters");
+            copyField(oldServer, newWebServer, "staticContent");
+            copyField(oldServer, newWebServer, "jaxRSPackages");
+            copyField(oldServer, newWebServer, "jaxRSClasses");
+            copyField(oldServer, newWebServer, "filters");
 
             Method method = AbstractNeoServer.class.getDeclaredMethod("configureWebServer");
             method.setAccessible(true);
@@ -77,13 +66,19 @@ public class GraphAwareServerBootstrapper implements SPIPluginLifecycle {
             throw new RuntimeException(e);
         }
 
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
-    private static <T,U> void copyField(Class<T> cls, T from, T to, String fieldName) throws NoSuchFieldException, IllegalAccessException {
-        Field field = Jetty9WebServer.class.getDeclaredField(fieldName);
+    private static <T, F> void copyField(T from, T to, String fieldName) throws NoSuchFieldException, IllegalAccessException {
+        Field field = from.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
-        field.set(to, field.get(from));
+        field.set(to, getField(from, fieldName));
+    }
+
+    private static <T, F> F getField(T object, String fieldName) throws NoSuchFieldException, IllegalAccessException {
+        Field field = object.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return (F) field.get(object);
     }
 
     @Override

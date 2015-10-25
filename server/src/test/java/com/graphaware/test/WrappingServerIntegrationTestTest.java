@@ -30,7 +30,6 @@ public class WrappingServerIntegrationTestTest extends WrappingServerIntegration
 
     @Test
     public void shouldLoadWebAdmin() {
-        //Skip test until RC2
-        //httpClient.get(baseNeoUrl() + "/webadmin", SC_OK);
+        httpClient.get(baseNeoUrl() + "/webadmin", SC_OK);
     }
 }

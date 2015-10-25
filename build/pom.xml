@@ -32,9 +32,8 @@
     <url>http://graphaware.com</url>
 
     <modules>
-        <module>graphaware-framework</module>
-        <module>graphaware-framework-server-community</module>
-        <module>graphaware-framework-server-enterprise</module>
+        <module>graphaware-framework-embedded</module>
+        <module>graphaware-framework-server</module>
     </modules>
 
     <dependencyManagement>
@@ -47,13 +46,7 @@
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
-                <artifactId>server-community</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.graphaware.neo4j</groupId>
-                <artifactId>server-enterprise</artifactId>
+                <artifactId>server</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
