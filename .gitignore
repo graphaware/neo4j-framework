@@ -11,3 +11,5 @@ target/
 .DS_Store
 .classpath
 server/data/
+.cert
+.key
