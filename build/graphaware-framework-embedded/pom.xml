@@ -16,40 +16,40 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.graphaware.neo4j.example</groupId>
-    <artifactId>node-counter</artifactId>
-    <version>2.3.0.35-SNAPSHOT</version>
-    <packaging>jar</packaging>
-
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>module-parent</artifactId>
+        <artifactId>build</artifactId>
         <version>2.3.0.35-SNAPSHOT</version>
-        <relativePath>../../parent-pom/module/pom.xml</relativePath>
     </parent>
+    <artifactId>graphaware-framework-embedded</artifactId>
+    <packaging>pom</packaging>
 
-    <name>GraphAware Node Counter</name>
-    <description>Example of a Spring MVC controller built and deployed using the GraphAware Framework</description>
+    <name>GraphAware Framework Build</name>
+    <description>Technical Maven Module for Building the Framework for Embedded Use</description>
     <url>http://graphaware.com</url>
 
-    <dependencies>
-
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>server</artifactId>
-        </dependency>
-
-    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <finalName>graphaware-embedded-all-${project.version}</finalName>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

@@ -113,7 +113,7 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
      * (typically http://localhost:7575 for tests).
      */
     protected Map<String, String> thirdPartyJaxRsPackageMappings() {
-        return Collections.emptyMap();
+        return Collections.singletonMap("com.graphaware.server", "/graphaware");
     }
 
     /**

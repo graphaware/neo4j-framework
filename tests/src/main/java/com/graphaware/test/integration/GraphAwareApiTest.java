@@ -16,10 +16,8 @@
 
 package com.graphaware.test.integration;
 
-import com.graphaware.server.GraphAwareWrappingNeoServerBootstrapper;
-import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.server.WrappingNeoServerBootstrapper;
-import org.neo4j.server.configuration.ServerConfigurator;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * Base-class for tests of APIs that are written as Spring MVC {@link org.springframework.stereotype.Controller}s
@@ -37,8 +35,8 @@ import org.neo4j.server.configuration.ServerConfigurator;
 public abstract class GraphAwareApiTest extends WrappingServerIntegrationTest {
 
     @Override
-    protected WrappingNeoServerBootstrapper createBootstrapper(ServerConfigurator configurator) {
-        return new GraphAwareWrappingNeoServerBootstrapper((GraphDatabaseAPI) getDatabase(), configurator);
+    protected Map<String, String> thirdPartyJaxRsPackageMappings() {
+        return Collections.singletonMap("com.graphaware.server", "/graphaware");
     }
 
     public String baseUrl() {
