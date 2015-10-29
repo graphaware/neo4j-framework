@@ -25,7 +25,7 @@ The following APIs are developed and provided by GraphAware:
 **Example:** An example is provided in [examples/node-counter](../examples/node-counter).
 
 With GraphAware Framework in the _plugins_ directory of your Neo4j server installation and
- `org.neo4j.server.thirdparty_jaxrs_classes=com.graphaware.server=/graphaware` in `neo4j.properties`, it is possible to develop Spring
+ `org.neo4j.server.thirdparty_jaxrs_classes=com.graphaware.server=/graphaware` in `neo4j-server.properties`, it is possible to develop Spring
 MVC controllers that have the Neo4j database wired in as `GraphDatabaseService`.
 
 For example, to develop an API endpoint that counts all the nodes in the database using Spring MVC, create the following
