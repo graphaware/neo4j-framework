@@ -10,6 +10,13 @@ etc.
 
 See the <a href="http://graphaware.com/neo4j/2014/05/28/graph-aware-neo4j-framework.html" target="_blank">announcement on our blog</a>.
 
+Upgrading to Neo4j 2.3
+----------------------
+
+Please note that a number of things have changed in Neo4j 2.3 and consequently in the GraphAware Framework. Notably:
+* There is now only one .jar file for both enterprise and community deployments.
+* You need to add `org.neo4j.server.thirdparty_jaxrs_classes=com.graphaware.server=/graphaware` to `neo4j.properties` to make the Framework work.
+
 Features Overview
 -----------------
 
@@ -47,9 +54,13 @@ Framework Usage
 ### Server Mode
 
 When using Neo4j in the <a href="http://docs.neo4j.org/chunked/stable/server-installation.html" target="_blank">standalone server</a> mode,
-deploying the GraphAware Framework (and any code using it) is a matter of [downloading](#download) the appropriate .jar files,
-copying them into the _plugins_ directory in your Neo4j installation, and restarting the server. The framework and modules
-are then used via calls to their REST APIs, if they provide any.
+deploying the GraphAware Framework (and any code using it) is a matter of :
+* [downloading](#download) the appropriate .jar files
+* copying them into the _plugins_ directory in your Neo4j installation
+* adding `org.neo4j.server.thirdparty_jaxrs_classes=com.graphaware.server=/graphaware` to `neo4j.properties`
+* restarting the server
+
+The framework and modules are then used via calls to their REST APIs, if they provide any.
 
 ### Embedded Mode / Java Development
 
@@ -63,8 +74,6 @@ for their Java project and use it as a library of useful tested code, in additio
 <a name="download"/>
 Getting GraphAware Framework
 ----------------------------
-
-**Attention Windows Users:** The framework only works when you install Neo4j from the .zip download, not the .exe installer.
 
 ### Releases
 
