@@ -85,7 +85,7 @@ Neo4j server installation. You will then be able to issue a `GET` request to `ht
 and receive the number of nodes in the database in the response body. Note that the `graphaware` part of the URL is a default
 and can be changed by adding the following line  to `neo4j-server.properties`:
 ```
-com.graphaware.server.api.uri=your_uri_here
+com.graphaware.server.api.uri=your_uri_here //todo no longer true
 ```
 
 To get started quickly, start with the [pom file from the example above](https://github.com/graphaware/neo4j-framework/blob/master/examples/node-counter/pom.xml) and modify to your needs (notably change the framework version to 2.3.0.35).

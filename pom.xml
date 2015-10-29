@@ -252,6 +252,13 @@
 
             <dependency>
                 <groupId>org.neo4j</groupId>
+                <artifactId>neo4j-enterprise</artifactId>
+                <version>${neo4j.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.neo4j</groupId>
                 <artifactId>neo4j-primitive-collections</artifactId>
                 <version>${neo4j.version}</version>
                 <scope>provided</scope>
@@ -282,6 +289,13 @@
 
             <dependency>
                 <groupId>org.neo4j.app</groupId>
+                <artifactId>neo4j-server-enterprise</artifactId>
+                <version>${neo4j.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.neo4j.app</groupId>
                 <artifactId>neo4j-server</artifactId>
                 <version>${neo4j.version}</version>
                 <type>test-jar</type>
@@ -300,21 +314,8 @@
                 <groupId>org.neo4j.app</groupId>
                 <artifactId>neo4j-server-enterprise</artifactId>
                 <version>${neo4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.neo4j</groupId>
-                <artifactId>neo4j-ha</artifactId>
-                <version>${neo4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.neo4j</groupId>
-                <artifactId>neo4j-management</artifactId>
-                <version>${neo4j.version}</version>
-                <scope>provided</scope>
+                <type>test-jar</type>
+                <scope>test</scope>
             </dependency>
 
             <dependency>

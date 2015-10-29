@@ -42,10 +42,19 @@ public abstract class NeoServerIntegrationTest {
 
     @Before
     public void setUp() throws IOException, InterruptedException {
-        neoTestServer = new NeoTestServer(neo4jConfigFile(), neo4jServerConfigFile());
+        neoTestServer = neoTestServer(neo4jConfigFile(), neo4jServerConfigFile());
         neoTestServer.start();
         httpClient = createHttpClient();
     }
+
+    /**
+     * Construct a {@link NeoTestServer}. Should either be {@link CommunityNeoTestServer} or {@link EnterpriseNeoTestServer}/
+     *
+     * @param neo4jConfigFile       neo4j.properties or equivalent.
+     * @param neo4jServerConfigFile neo4j-server.properties or equivalent.
+     * @return test server.
+     */
+    protected abstract NeoTestServer neoTestServer(String neo4jConfigFile, String neo4jServerConfigFile);
 
     @After
     public void tearDown() throws IOException, InterruptedException {

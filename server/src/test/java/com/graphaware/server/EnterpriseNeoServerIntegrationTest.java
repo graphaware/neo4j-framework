@@ -14,29 +14,27 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.test;
+package com.graphaware.server;
 
+import com.graphaware.test.integration.CommunityNeoTestServer;
+import com.graphaware.test.integration.EnterpriseNeoTestServer;
 import com.graphaware.test.integration.NeoServerIntegrationTest;
-import org.junit.Ignore;
+import com.graphaware.test.integration.NeoTestServer;
+import org.apache.http.HttpStatus;
 import org.junit.Test;
 
-import static org.apache.http.HttpStatus.SC_OK;
+/**
+ * Integration test for custom server that wires Spring components.
+ */
+public class EnterpriseNeoServerIntegrationTest extends NeoServerIntegrationTest {
 
-public abstract class NeoServerIntegrationTestTest extends NeoServerIntegrationTest {
-
-    @Test
-    public void shouldLoadBrowser() {
-        httpClient.get(baseUrl() + "/browser", SC_OK);
+    @Override
+    protected NeoTestServer neoTestServer(String neo4jConfigFile, String neo4jServerConfigFile) {
+        return new EnterpriseNeoTestServer(neo4jConfigFile, neo4jServerConfigFile);
     }
 
     @Test
-    public void shouldLoadWebAdmin() {
-        httpClient.get(baseUrl() + "/webadmin", SC_OK);
-    }
-
-    @Test
-    @Ignore //this will not work - would have to have graphaware server as a dependency, but that would introduce a cycle
-    public void shouldLoadAPIs() {
-        httpClient.get(baseUrl() + "/graphaware/greeting", SC_OK);
+    public void componentsShouldBeWired() {
+        httpClient.get(baseUrl() + "/graphaware/greeting", HttpStatus.SC_OK);
     }
 }

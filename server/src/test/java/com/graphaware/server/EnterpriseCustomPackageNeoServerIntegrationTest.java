@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 GraphAware
+ * Copyright (c) 2015 GraphAware
  *
  * This file is part of GraphAware.
  *
@@ -14,47 +14,32 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.example;
+package com.graphaware.server;
 
 import com.graphaware.test.integration.CommunityNeoTestServer;
+import com.graphaware.test.integration.EnterpriseNeoTestServer;
 import com.graphaware.test.integration.NeoServerIntegrationTest;
 import com.graphaware.test.integration.NeoTestServer;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
-
 /**
- * Test for {@link com.graphaware.example.module.FriendshipStrengthCounter}.
+ * Integration test for custom server that wires Spring components.
  */
-public class FriendshipStrengthModuleServerIntegrationTest extends NeoServerIntegrationTest {
+public class EnterpriseCustomPackageNeoServerIntegrationTest extends NeoServerIntegrationTest {
 
     @Override
     protected NeoTestServer neoTestServer(String neo4jConfigFile, String neo4jServerConfigFile) {
-        return new CommunityNeoTestServer(neo4jConfigFile, neo4jServerConfigFile);
+        return new EnterpriseNeoTestServer(neo4jConfigFile, neo4jServerConfigFile);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected String neo4jConfigFile() {
-        return "neo4j-friendship.properties";
+    protected String neo4jServerConfigFile() {
+        return "neo4j-server-custom-package.properties";
     }
 
     @Test
-    public void totalFriendshipStrengthOnEmptyDatabaseShouldBeZero() {
-         assertEquals("0", httpClient.get(baseUrl() + "/graphaware/friendship/strength", HttpStatus.SC_OK));
-    }
-
-    @Test
-    public void totalFriendshipStrengthShouldBeCorrectlyCalculated() {
-        httpClient.executeCypher(baseUrl(),
-                "CREATE " +
-                        "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
-                        "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
-
-        assertEquals("3", httpClient.get(baseUrl()+"/graphaware/friendship/strength", HttpStatus.SC_OK));
+    public void componentsShouldBeWired() {
+        httpClient.get(baseUrl() + "/graphaware/greet", HttpStatus.SC_OK);
     }
 }

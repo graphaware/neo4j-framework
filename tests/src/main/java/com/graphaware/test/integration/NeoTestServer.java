@@ -35,7 +35,7 @@ import java.io.IOException;
  * The Neo4j and server configuration file names are provided using a constructor. They defaults to "neo4j.properties"
  * and "neo4j-server.properties" and if no such files are present on the classpath, the ones that ships with Neo4j are used.
  */
-public class NeoTestServer {
+public abstract class NeoTestServer {
 
     private Bootstrapper bootstrapper;
     private TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -51,7 +51,7 @@ public class NeoTestServer {
         this.neo4jServerConfigFile = neo4jServerConfigFile;
     }
 
-    public void start() throws IOException, InterruptedException {
+    public final void start() throws IOException, InterruptedException {
         temporaryFolder.create();
         temporaryFolder.getRoot().deleteOnExit();
 
@@ -66,9 +66,11 @@ public class NeoTestServer {
 
         System.setProperty(Configurator.NEO_SERVER_CONFIG_FILE_KEY, serverConfig.getAbsolutePath());
 
-        bootstrapper = new CommunityBootstrapper();
+        bootstrapper = createBootstrapper();
         bootstrapper.start(serverConfig.getAbsoluteFile());
     }
+
+    protected abstract Bootstrapper createBootstrapper();
 
     public void stop() throws IOException, InterruptedException {
         bootstrapper.stop();

@@ -17,6 +17,8 @@
 package com.graphaware.server;
 
 import com.graphaware.service.LifecycleTestService;
+import com.graphaware.test.integration.CommunityNeoTestServer;
+import com.graphaware.test.integration.EnterpriseNeoTestServer;
 import com.graphaware.test.integration.NeoTestServer;
 import com.graphaware.writer.LifecycleTestWriter;
 import org.junit.Before;
@@ -38,11 +40,11 @@ public class BeanLifecycleTest {
     }
 
     @Test
-    public void lifecycleAnnotationsShouldBeHonouredInWebContext() throws IOException, InterruptedException {
+    public void lifecycleAnnotationsShouldBeHonouredInWebContextCommunity() throws IOException, InterruptedException {
         assertFalse(LifecycleTestService.initCalled);
         assertFalse(LifecycleTestService.destroyCalled);
 
-        NeoTestServer testServer = new NeoTestServer();
+        NeoTestServer testServer = new CommunityNeoTestServer();
         testServer.start();
 
         assertTrue(LifecycleTestService.initCalled);
@@ -54,29 +56,20 @@ public class BeanLifecycleTest {
         assertTrue(LifecycleTestService.destroyCalled);
     }
 
-//    @Test
-//    public void lifecycleAnnotationsShouldBeHonouredInRootContext() throws IOException, InterruptedException {
-//        assertFalse(LifecycleTestWriter.initCalled);
-//        assertFalse(LifecycleTestWriter.destroyCalled);
-//
-//        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-//        GraphAwareRuntimeFactory.createRuntime(database, FluentRuntimeConfiguration.defaultConfiguration().withWritingConfig(new WritingConfig() {
-//            @Override
-//            public Neo4jWriter produceWriter(GraphDatabaseService database) {
-//                return new LifecycleTestWriter(database);
-//            }
-//        })).start();
-//
-//        GraphAwareWrappingNeoServer server = new GraphAwareWrappingNeoServer((GraphDatabaseAPI) database);
-//        server.start();
-//
-//        assertTrue(LifecycleTestWriter.initCalled);
-//        assertFalse(LifecycleTestWriter.destroyCalled);
-//
-//        server.stop();
-//        database.shutdown();
-//
-//        assertTrue(LifecycleTestWriter.initCalled);
-//        assertTrue(LifecycleTestWriter.destroyCalled);
-//    }
+    @Test
+    public void lifecycleAnnotationsShouldBeHonouredInWebContextEnterprise() throws IOException, InterruptedException {
+        assertFalse(LifecycleTestService.initCalled);
+        assertFalse(LifecycleTestService.destroyCalled);
+
+        NeoTestServer testServer = new EnterpriseNeoTestServer();
+        testServer.start();
+
+        assertTrue(LifecycleTestService.initCalled);
+        assertFalse(LifecycleTestService.destroyCalled);
+
+        testServer.stop();
+
+        assertTrue(LifecycleTestService.initCalled);
+        assertTrue(LifecycleTestService.destroyCalled);
+    }
 }
