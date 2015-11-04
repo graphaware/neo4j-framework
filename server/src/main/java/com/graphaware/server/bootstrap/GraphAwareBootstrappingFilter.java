@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
 /**
  * {@link Filter} that only exists to bootstrap the Framework.
  */
-class GraphAwareBootstrappingFilter implements Filter {
+public class GraphAwareBootstrappingFilter implements Filter {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphAwareBootstrappingFilter.class);
 
@@ -149,7 +149,7 @@ class GraphAwareBootstrappingFilter implements Filter {
 
     private String getContextPath(Config config) {
         for (ThirdPartyJaxRsPackage rsPackage : config.get(ServerSettings.third_party_packages)) {
-            if (rsPackage.getPackageName().equals(GA_PACKAGE)) {
+            if (rsPackage.getPackageName().equals(getPackage())) {
                 String path = rsPackage.getMountPoint();
                 if (StringUtils.isNotBlank(path)) {
                     LOG.info("Mounting GraphAware Framework under " + path);
@@ -161,6 +161,10 @@ class GraphAwareBootstrappingFilter implements Filter {
         }
 
         throw new IllegalStateException("No mount point for GraphAware");
+    }
+
+    protected String getPackage() {
+        return GA_PACKAGE;
     }
 
     private String[] getPackagesToScan(Config config) {

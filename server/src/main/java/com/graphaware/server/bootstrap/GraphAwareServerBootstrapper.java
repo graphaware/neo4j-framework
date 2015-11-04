@@ -68,7 +68,7 @@ public class GraphAwareServerBootstrapper implements SPIPluginLifecycle {
     }
 
     protected void addFilters(NeoServer neoServer, Config config, Database database, Jetty9WebServer webServer) {
-        webServer.addFilter(createBootstrappingFilter(database, config, webServer), "/*");
+        webServer.addFilter(createBootstrappingFilter(neoServer, database, config, webServer), "/*");
         webServer.addFilter(createTransactionFilter(neoServer), "/*");
     }
 
@@ -83,7 +83,7 @@ public class GraphAwareServerBootstrapper implements SPIPluginLifecycle {
         throw new IllegalStateException("Server is not an AbstractNeoServer");
     }
 
-    protected GraphAwareBootstrappingFilter createBootstrappingFilter(Database database, Config config, Jetty9WebServer webServer) {
+    protected GraphAwareBootstrappingFilter createBootstrappingFilter(NeoServer neoServer, Database database, Config config, Jetty9WebServer webServer) {
         return new GraphAwareBootstrappingFilter(database, config, webServer);
     }
 
