@@ -246,6 +246,18 @@ public class TestHttpClient {
      * @return body of the server response.
      */
     public String executeCypher(String serverUrl, String... cypherStatements) {
+        return executeCypher(serverUrl, Collections.<String, String>emptyMap(), cypherStatements);
+    }
+
+    /**
+     * Execute a set of cypher statements against a database in a single transaction.
+     *
+     * @param serverUrl        URL of the database server.
+     * @param headers          request headers as map.
+     * @param cypherStatements to execute.
+     * @return body of the server response.
+     */
+    public String executeCypher(String serverUrl, Map<String, String> headers, String... cypherStatements) {
         StringBuilder stringBuilder = new StringBuilder("{\"statements\" : [");
         for (String statement : cypherStatements) {
             stringBuilder.append("{\"statement\" : \"").append(statement).append("\"}").append(",");
@@ -258,7 +270,7 @@ public class TestHttpClient {
             serverUrl = serverUrl.substring(0, serverUrl.length() - 1);
         }
 
-        return post(serverUrl + "/db/data/transaction/commit", stringBuilder.toString(), HttpStatus.SC_OK);
+        return post(serverUrl + "/db/data/transaction/commit", stringBuilder.toString(), headers, HttpStatus.SC_OK);
     }
 
     protected void setHeaders(HttpRequestBase method, Map<String, String> headers) {
