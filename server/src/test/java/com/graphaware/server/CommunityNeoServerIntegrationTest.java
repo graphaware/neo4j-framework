@@ -33,7 +33,9 @@ public class CommunityNeoServerIntegrationTest extends NeoServerIntegrationTest 
     }
 
     @Test
-    public void componentsShouldBeWired() {
+    public void componentsShouldBeWired() throws InterruptedException {
         httpClient.get(baseUrl() + "/graphaware/greeting", HttpStatus.SC_OK);
+
+//        Thread.sleep(1000000);
     }
 }

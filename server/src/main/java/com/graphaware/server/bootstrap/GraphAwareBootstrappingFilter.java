@@ -3,6 +3,7 @@ package com.graphaware.server.bootstrap;
 import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.RuntimeRegistry;
+import com.graphaware.server.web.OtherMvcConfig;
 import com.graphaware.server.web.WebAppInitializer;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -18,12 +19,13 @@ import org.neo4j.server.configuration.ServerSettings;
 import org.neo4j.server.configuration.ThirdPartyJaxRsPackage;
 import org.neo4j.server.database.Database;
 import org.neo4j.server.web.Jetty9WebServer;
-import org.neo4j.server.web.WebServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 import javax.servlet.*;
 import java.io.IOException;
@@ -31,7 +33,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * {@link Filter} that only exists to bootstrap the Framework.
+ * {@link Filter} that only exists to bootstrap the GraphAware Framework in Neo4j server.
  */
 public class GraphAwareBootstrappingFilter implements Filter {
 
@@ -82,7 +84,9 @@ public class GraphAwareBootstrappingFilter implements Filter {
 
         rootContext = createRootApplicationContext();
 
-        addHandlers(handlerList, sessionManager, rootContext);
+        addSpringToExistingHandlers(handlerList, sessionManager, rootContext);
+
+        addCustomHandlers(handlerList, sessionManager, rootContext);
     }
 
     private HandlerList findHandlerList(FilterConfig filterConfig) {
@@ -105,7 +109,30 @@ public class GraphAwareBootstrappingFilter implements Filter {
         return parent;
     }
 
-    protected void addHandlers(HandlerCollection handlerList, SessionManager sessionManager, ApplicationContext rootContext) {
+    protected void addSpringToExistingHandlers(HandlerCollection handlerList, SessionManager sessionManager, ApplicationContext rootContext) {
+        for (Handler handler1 : handlerList.getHandlers()) {
+            if (!(handler1 instanceof ServletContextHandler)) {
+                System.out.println(handler1 + " not a SCH");
+                continue;
+            }
+            ServletContextHandler handler = (ServletContextHandler) handler1;
+            WebApplicationContext appContext = createAppContext(rootContext, handler);
+
+            handler.addEventListener(new JettyStartingListener(new WebAppInitializer(appContext), handler.getServletContext()));
+        }
+    }
+
+    protected WebApplicationContext createAppContext(ApplicationContext rootContext, ServletContextHandler handler) {
+        AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
+        appContext.setParent(rootContext);
+        appContext.setServletContext(handler.getServletContext());
+        appContext.register(OtherMvcConfig.class);
+        appContext.refresh();
+
+        return appContext;
+    }
+
+    protected void addCustomHandlers(HandlerCollection handlerList, SessionManager sessionManager, ApplicationContext rootContext) {
         ServletContextHandler graphAwareHandler = createGraphAwareHandler(sessionManager, rootContext);
 
         prependHandler(handlerList, graphAwareHandler);
@@ -115,11 +142,24 @@ public class GraphAwareBootstrappingFilter implements Filter {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath(getContextPath(config));
         context.getSessionHandler().setSessionManager(sessionManager);
-        context.addLifeCycleListener(new JettyStartingListener(new WebAppInitializer(rootContext, getPackagesToScan(config)), context.getServletContext()));
+
+        WebApplicationContext appContext = createGaAppContext(rootContext, context);
+
+//        context.addEventListener(new ContextLoaderListener(appContext ));
+        context.addEventListener(new JettyStartingListener(new WebAppInitializer(appContext), context.getServletContext()));
 
         addDefaultFilters(context);
 
         return context;
+    }
+
+    protected WebApplicationContext createGaAppContext(ApplicationContext rootContext, ServletContextHandler context) {
+        AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
+        appContext.setParent(rootContext);
+        appContext.scan(getPackagesToScan(config));
+        appContext.setServletContext(context.getServletContext());
+        appContext.refresh();
+        return appContext;
     }
 
     protected final void addDefaultFilters(ServletContextHandler context) {

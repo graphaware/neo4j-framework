@@ -26,21 +26,15 @@ import org.springframework.web.servlet.support.AbstractDispatcherServletInitiali
  */
 public class WebAppInitializer extends AbstractDispatcherServletInitializer {
 
-    private final ApplicationContext root;
-    private final String[] packagesToScan;
+    private final WebApplicationContext root;
 
-    public WebAppInitializer(ApplicationContext root, String[] packagesToScan) {
+    public WebAppInitializer(WebApplicationContext root) {
         this.root = root;
-        this.packagesToScan = packagesToScan;
     }
 
     @Override
     protected WebApplicationContext createServletApplicationContext() {
-        AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
-        appContext.setParent(root);
-        appContext.scan(packagesToScan);
-
-        return appContext;
+        return root;
     }
 
     @Override

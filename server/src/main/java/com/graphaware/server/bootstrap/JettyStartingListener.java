@@ -5,12 +5,14 @@ import org.eclipse.jetty.util.component.LifeCycle;
 import org.springframework.web.WebApplicationInitializer;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 
 /**
  * A Jetty listener that initializes Spring when the server starts.
  */
-class JettyStartingListener extends AbstractLifeCycle.AbstractLifeCycleListener {
+class JettyStartingListener implements ServletContextListener {
 
     private final WebApplicationInitializer initializer;
 
@@ -22,11 +24,16 @@ class JettyStartingListener extends AbstractLifeCycle.AbstractLifeCycleListener 
     }
 
     @Override
-    public void lifeCycleStarting(LifeCycle event) {
+    public void contextInitialized(ServletContextEvent sce) {
         try {
             initializer.onStartup(sc);
         } catch (ServletException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+
     }
 }
