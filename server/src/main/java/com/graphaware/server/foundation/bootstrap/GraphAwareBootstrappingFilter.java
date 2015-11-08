@@ -76,7 +76,7 @@ public class GraphAwareBootstrappingFilter implements Filter {
 
         //addSpringToNeoHandlers(handlerList, sessionManager, rootContext);
 
-        addGraphAwareHandlers(handlerList, sessionManager, rootContext);
+        addGraphAwareHandlers(handlerList, sessionManager, rootContext, neoServer.getConfig());
     }
 
     private HandlerList findHandlerList(FilterConfig filterConfig) {
@@ -113,20 +113,29 @@ public class GraphAwareBootstrappingFilter implements Filter {
 //        return new NeoWebContextCreator();
 //    }
 
-    protected void addGraphAwareHandlers(HandlerCollection handlerList, SessionManager sessionManager, ApplicationContext rootContext) {
+    protected void addGraphAwareHandlers(HandlerCollection handlerList, SessionManager sessionManager, ApplicationContext rootContext, Config config) {
         prependHandler(handlerList, createGraphAwareHandler(sessionManager, rootContext));
     }
 
     private ServletContextHandler createGraphAwareHandler(SessionManager sessionManager, ApplicationContext rootContext) {
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath(getContextPath(neoServer.getConfig()));
-        context.getSessionHandler().setSessionManager(sessionManager);
-        context.setServer(webServer.getJetty());
+        ServletContextHandler handler = createNewHandler(sessionManager, getContextPath(neoServer.getConfig()));
 
-        addSpringToHandler(context, getGraphAwareContextCreator(), rootContext, neoServer.getConfig());
-        addDefaultFilters(context);
+        addSpringToHandler(handler, getGraphAwareContextCreator(), rootContext, neoServer.getConfig());
+        addDefaultFilters(handler);
 
-        return context;
+        return handler;
+    }
+
+    protected final ServletContextHandler createNewHandler(SessionManager sessionManager, String contextPath) {
+        ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        configureNewHandler(sessionManager, contextPath, handler);
+        return handler;
+    }
+
+    protected final void configureNewHandler(SessionManager sessionManager, String contextPath, ServletContextHandler handler) {
+        handler.setContextPath(contextPath);
+        handler.getSessionHandler().setSessionManager(sessionManager);
+        handler.setServer(webServer.getJetty());
     }
 
     protected WebContextCreator getGraphAwareContextCreator() {
@@ -134,7 +143,10 @@ public class GraphAwareBootstrappingFilter implements Filter {
     }
 
     protected final void addSpringToHandler(ServletContextHandler handler, WebContextCreator contextCreator, ApplicationContext rootContext, Config config) {
-        WebApplicationContext context = contextCreator.createWebContext(rootContext, handler, config);
+        addSpringToHandler(handler, contextCreator.createWebContext(rootContext, handler, config));
+    }
+
+    protected final void addSpringToHandler(ServletContextHandler handler, WebApplicationContext context) {
         handler.addEventListener(new SpringInitializingServletContextListener(new WebAppInitializer(context, "graphaware" + handler.getContextPath()), handler.getServletContext()));
     }
 
