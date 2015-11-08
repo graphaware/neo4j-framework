@@ -14,11 +14,9 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server.web;
+package com.graphaware.server.foundation.bootstrap;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.support.AbstractDispatcherServletInitializer;
 
 /**
@@ -27,9 +25,11 @@ import org.springframework.web.servlet.support.AbstractDispatcherServletInitiali
 public class WebAppInitializer extends AbstractDispatcherServletInitializer {
 
     private final WebApplicationContext root;
+    private final String name;
 
-    public WebAppInitializer(WebApplicationContext root) {
+    public WebAppInitializer(WebApplicationContext root, String name) {
         this.root = root;
+        this.name = name;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class WebAppInitializer extends AbstractDispatcherServletInitializer {
 
     @Override
     protected String getServletName() {
-        return "graphaware";
+        return name;
     }
 
     @Override

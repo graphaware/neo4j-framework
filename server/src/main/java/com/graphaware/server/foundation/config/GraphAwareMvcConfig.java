@@ -14,15 +14,16 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server.web;
+package com.graphaware.server.foundation.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
  * Spring MVC application config.
  */
 @Configuration
 @EnableWebMvc
-public class MvcConfig {
+public class GraphAwareMvcConfig extends WebMvcConfigurerAdapter {
 }

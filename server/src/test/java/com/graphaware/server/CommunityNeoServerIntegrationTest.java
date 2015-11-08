@@ -20,7 +20,10 @@ import com.graphaware.test.integration.CommunityNeoTestServer;
 import com.graphaware.test.integration.NeoServerIntegrationTest;
 import com.graphaware.test.integration.NeoTestServer;
 import org.apache.http.HttpStatus;
+import org.junit.Assert;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * Integration test for custom server that wires Spring components.
@@ -34,8 +37,6 @@ public class CommunityNeoServerIntegrationTest extends NeoServerIntegrationTest 
 
     @Test
     public void componentsShouldBeWired() throws InterruptedException {
-        httpClient.get(baseUrl() + "/graphaware/greeting", HttpStatus.SC_OK);
-
-//        Thread.sleep(1000000);
+        assertTrue(httpClient.get(baseUrl() + "/graphaware/greeting", HttpStatus.SC_OK).startsWith("Hello"));
     }
 }

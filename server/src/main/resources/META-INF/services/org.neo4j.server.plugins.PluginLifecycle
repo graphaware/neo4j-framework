@@ -1,1 +1,1 @@
-com.graphaware.server.bootstrap.GraphAwareServerBootstrapper
+com.graphaware.server.foundation.bootstrap.GraphAwareServerBootstrapper

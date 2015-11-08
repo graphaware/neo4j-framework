@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server.bootstrap;
+package com.graphaware.server.foundation.bootstrap;
 
 import com.graphaware.server.tx.LongRunningTransactionFilter;
 import org.apache.commons.configuration.Configuration;
@@ -60,15 +60,11 @@ public class GraphAwareServerBootstrapper implements SPIPluginLifecycle {
     }
 
     private void addFilters(NeoServer neoServer) {
-        Config config = neoServer.getConfig();
-        Database database = neoServer.getDatabase();
-        Jetty9WebServer webServer = getWebServer(neoServer);
-
-        addFilters(neoServer, config, database, webServer);
+        addFilters(neoServer, getWebServer(neoServer));
     }
 
-    protected void addFilters(NeoServer neoServer, Config config, Database database, Jetty9WebServer webServer) {
-        webServer.addFilter(createBootstrappingFilter(neoServer, database, config, webServer), "/*");
+    protected void addFilters(NeoServer neoServer, Jetty9WebServer webServer) {
+        webServer.addFilter(createBootstrappingFilter(neoServer, webServer), "/*");
         webServer.addFilter(createTransactionFilter(neoServer), "/*");
     }
 
@@ -83,8 +79,8 @@ public class GraphAwareServerBootstrapper implements SPIPluginLifecycle {
         throw new IllegalStateException("Server is not an AbstractNeoServer");
     }
 
-    protected GraphAwareBootstrappingFilter createBootstrappingFilter(NeoServer neoServer, Database database, Config config, Jetty9WebServer webServer) {
-        return new GraphAwareBootstrappingFilter(database, config, webServer);
+    protected GraphAwareBootstrappingFilter createBootstrappingFilter(NeoServer neoServer, Jetty9WebServer webServer) {
+        return new GraphAwareBootstrappingFilter(neoServer, webServer);
     }
 
     private LongRunningTransactionFilter createTransactionFilter(NeoServer neoServer) {
