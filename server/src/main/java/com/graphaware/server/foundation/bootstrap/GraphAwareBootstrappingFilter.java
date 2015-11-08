@@ -74,7 +74,7 @@ public class GraphAwareBootstrappingFilter implements Filter {
 
         rootContext = getRootContextCreator().createContext(neoServer);
 
-        addSpringToNeoHandlers(handlerList, sessionManager, rootContext);
+        //addSpringToNeoHandlers(handlerList, sessionManager, rootContext);
 
         addGraphAwareHandlers(handlerList, sessionManager, rootContext);
     }
@@ -97,21 +97,21 @@ public class GraphAwareBootstrappingFilter implements Filter {
         return new FoundationRootContextCreator();
     }
 
-    private void addSpringToNeoHandlers(HandlerCollection handlerList, SessionManager sessionManager, ApplicationContext rootContext) {
-        for (Handler neoHandler : handlerList.getHandlers()) {
-            if (!(neoHandler instanceof ServletContextHandler)) {
-                LOG.info(neoHandler + " is not a ServletContextHandler. Not adding Spring.");
-                continue;
-            }
-            LOG.info("Adding Spring to " + neoHandler);
+//    private void addSpringToNeoHandlers(HandlerCollection handlerList, SessionManager sessionManager, ApplicationContext rootContext) {
+//        for (Handler neoHandler : handlerList.getHandlers()) {
+//            if (!(neoHandler instanceof ServletContextHandler)) {
+//                LOG.info(neoHandler + " is not a ServletContextHandler. Not adding Spring.");
+//                continue;
+//            }
+//            LOG.info("Adding Spring to " + neoHandler);
+//
+//            addSpringToHandler((ServletContextHandler) neoHandler, getNeoContextCreator(), rootContext, neoServer.getConfig());
+//        }
+//    }
 
-            addSpringToHandler((ServletContextHandler) neoHandler, getNeoContextCreator(), rootContext, neoServer.getConfig());
-        }
-    }
-
-    protected WebContextCreator getNeoContextCreator() {
-        return new NeoWebContextCreator();
-    }
+//    protected WebContextCreator getNeoContextCreator() {
+//        return new NeoWebContextCreator();
+//    }
 
     protected void addGraphAwareHandlers(HandlerCollection handlerList, SessionManager sessionManager, ApplicationContext rootContext) {
         prependHandler(handlerList, createGraphAwareHandler(sessionManager, rootContext));
