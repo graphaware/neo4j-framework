@@ -24,17 +24,17 @@ import org.springframework.web.servlet.support.AbstractDispatcherServletInitiali
  */
 public class WebAppInitializer extends AbstractDispatcherServletInitializer {
 
-    private final WebApplicationContext root;
+    private final WebApplicationContext context;
     private final String name;
 
-    public WebAppInitializer(WebApplicationContext root, String name) {
-        this.root = root;
+    public WebAppInitializer(WebApplicationContext context, String name) {
+        this.context = context;
         this.name = name;
     }
 
     @Override
     protected WebApplicationContext createServletApplicationContext() {
-        return root;
+        return context;
     }
 
     @Override

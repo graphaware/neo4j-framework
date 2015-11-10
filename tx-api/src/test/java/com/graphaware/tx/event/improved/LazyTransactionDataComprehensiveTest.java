@@ -16,8 +16,9 @@
 
 package com.graphaware.tx.event.improved;
 
-import com.graphaware.test.util.TestDataBuilder;
 import com.graphaware.common.util.Change;
+import com.graphaware.test.unit.GraphUnit;
+import com.graphaware.test.util.TestDataBuilder;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import com.graphaware.tx.executor.single.*;
@@ -35,12 +36,12 @@ import org.neo4j.tooling.GlobalGraphOperations;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.graphaware.common.util.Change.changesToMap;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.*;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static com.graphaware.tx.event.improved.LazyTransactionDataComprehensiveTest.RelationshipTypes.*;
 import static com.graphaware.tx.event.improved.PropertiesAssert.assertProperties;
-import static com.graphaware.common.util.Change.changesToMap;
 import static junit.framework.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
@@ -152,7 +153,7 @@ public class LazyTransactionDataComprehensiveTest {
                         Relationship r2 = created.get(r2Id);
 
                         Node one = r2.getStartNode();
-                        assertProperties(one, NAME, "NewOne", TAGS,  new String[]{"one", "three"});
+                        assertProperties(one, NAME, "NewOne", TAGS, new String[]{"one", "three"});
 
                         assertEquals(1, count(one.getLabels()));
                         assertTrue(contains(one.getLabels(), label("NewOne")));
@@ -345,6 +346,8 @@ public class LazyTransactionDataComprehensiveTest {
                     }
                 }
         );
+
+        GraphUnit.printGraph(db);
     }
 
     @Test
@@ -1337,7 +1340,7 @@ public class LazyTransactionDataComprehensiveTest {
             Relationship r4 = db.getRelationshipById(r4Id);
 
             Node one = r4.getStartNode();
-            assertProperties(one, NAME, "One", COUNT,1, TAGS, new String[]{"one", "two"});
+            assertProperties(one, NAME, "One", COUNT, 1, TAGS, new String[]{"one", "two"});
             assertEquals(1, count(one.getLabels()));
             assertTrue(contains(one.getLabels(), label("One")));
 
