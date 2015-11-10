@@ -17,7 +17,11 @@
 package com.graphaware.common.policy.spel;
 
 import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.neo4j.graphdb.Direction.valueOf;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
@@ -49,5 +53,13 @@ class NodeExpressions extends PropertyContainerExpressions<Node> {
 
     public boolean hasLabel(String label) {
         return propertyContainer.hasLabel(DynamicLabel.label(label));
+    }
+
+    public String[] getLabels() {
+        List<String> labels = new LinkedList<>();
+        for (Label label : propertyContainer.getLabels()) {
+            labels.add(label.name());
+        }
+        return labels.toArray(new String[labels.size()]);
     }
 }
