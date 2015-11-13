@@ -1,3 +1,6 @@
+2.3.1.35:
+    - upgraded Neo4j to 2.3.1
+
 2.3.0.35:
     - upgraded Neo4j to 2.3.0
 

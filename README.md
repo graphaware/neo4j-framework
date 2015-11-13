@@ -2,7 +2,7 @@
 GraphAware Neo4j Framework
 ==========================
 
-[![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework) | <a href="http://graphaware.com/downloads/" target="_blank">Downloads</a> | <a href="http://graphaware.com/site/framework/latest/apidocs/" target="_blank">Javadoc</a> | Latest Release: 2.3.0.35
+[![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework) | <a href="http://graphaware.com/downloads/" target="_blank">Downloads</a> | <a href="http://graphaware.com/site/framework/latest/apidocs/" target="_blank">Javadoc</a> | Latest Release: 2.3.1.35
 
 GraphAware Framework speeds up development with <a href="http://neo4j.org" target="_blank">Neo4j</a> by providing a
 platform for building useful generic as well as domain-specific functionality, analytical capabilities, (iterative) graph algorithms,
@@ -81,8 +81,8 @@ To use the latest release, download the appropriate version and put it
 the _plugins_ directory in your Neo4j server installation and restart the server (server mode), or on the classpath (embedded mode).
 
 The following downloads are available:
-* [GraphAware Framework for Embedded Mode, version 2.3.0.35](http://graphaware.com/downloads/graphaware-embedded-all-2.3.0.35.jar)
-* [GraphAware Framework for Server Mode, version 2.3.0.35](http://graphaware.com/downloads/graphaware-server-all-2.3.0.35.jar)
+* [GraphAware Framework for Embedded Mode, version 2.3.1.35](http://graphaware.com/downloads/graphaware-embedded-all-2.3.1.35.jar)
+* [GraphAware Framework for Server Mode, version 2.3.1.35](http://graphaware.com/downloads/graphaware-server-all-2.3.1.35.jar)
 
 Releases are synced to <a href="http://search.maven.org/#search%7Cga%7C1%7Ccom.graphaware.neo4j" target="_blank">Maven Central
 repository</a>. When using Maven for dependency management, include one or more dependencies in your pom.xml. To find out
@@ -90,7 +90,7 @@ repository</a>. When using Maven for dependency management, include one or more 
 
 ### Snapshots
 
-To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.3.0.36-SNAPSHOT
+To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.3.1.36-SNAPSHOT
 jar files. If you need standalone .jar files with all dependencies, look into the `target` folders in the `build` directory.
 
 ### Note on Versioning Scheme
