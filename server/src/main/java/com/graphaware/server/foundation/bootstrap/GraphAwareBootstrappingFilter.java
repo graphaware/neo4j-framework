@@ -1,13 +1,18 @@
 package com.graphaware.server.foundation.bootstrap;
 
 import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
-import com.graphaware.server.foundation.context.*;
+import com.graphaware.server.foundation.context.FoundationRootContextCreator;
+import com.graphaware.server.foundation.context.GraphAwareWebContextCreator;
+import com.graphaware.server.foundation.context.RootContextCreator;
+import com.graphaware.server.foundation.context.WebContextCreator;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.SessionManager;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ArrayUtil;
 import org.neo4j.kernel.configuration.Config;
@@ -80,7 +85,13 @@ public class GraphAwareBootstrappingFilter implements Filter {
     }
 
     private HandlerList findHandlerList(FilterConfig filterConfig) {
-        return (HandlerList) ((ContextHandler.Context) filterConfig.getServletContext()).getContextHandler().getServer().getHandler();
+        Server server = ((ContextHandler.Context) filterConfig.getServletContext()).getContextHandler().getServer();
+
+        if (server.getHandler().getClass().equals(RequestLogHandler.class)) {
+            return (HandlerList) ((RequestLogHandler) server.getHandler()).getHandler();
+        }
+
+        return (HandlerList) server.getHandler();
     }
 
     private SessionManager findSessionManager(HandlerCollection handlerList) {
