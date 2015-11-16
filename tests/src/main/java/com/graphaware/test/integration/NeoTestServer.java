@@ -57,10 +57,10 @@ public abstract class NeoTestServer {
 
         File serverConfig = serverConfigToConfDir();
 
-        copyToConfDir(neo4jConfigFile);
+        copyToConfDir(neo4jConfigFile, "neo4j.properties");
 
         for (String otherConfig : otherConfResources()) {
-            copyToConfDir(otherConfig);
+            copyToConfDir(otherConfig, otherConfig);
         }
 
         bootstrapper = createBootstrapper();
@@ -84,8 +84,8 @@ public abstract class NeoTestServer {
         return new String[0];
     }
 
-    protected File copyToConfDir(String classPathResource) throws IOException {
-        File result = temporaryFolder.newFile("conf/" + classPathResource);
+    protected File copyToConfDir(String classPathResource, String newName) throws IOException {
+        File result = temporaryFolder.newFile("conf/" + newName);
         IOUtils.copy(new ClassPathResource(classPathResource).getInputStream(), new FileOutputStream(result));
         return result;
     }
