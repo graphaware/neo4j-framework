@@ -1,7 +1,5 @@
 language: java
 
-sudo: false
-
 branches:
   only:
     - master
