@@ -115,7 +115,7 @@ executor.execute();
 ```
 
 In case the input itself is an `Iterable` read from the database, it will need to be read inside a transaction, so an
-`Iterable`-returning [`TransactionCallback`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/executor/single/TransactionCallback.html) should be passed in instead of a pure `Iterable`. For example, to assign a
+`Iterable`-returning [`TransactionalInput`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/executor/input/TransactionalInput.html) should be passed in instead of a pure `Iterable`. For example, to assign a
  UUID to all existing nodes in the database, you would execute the following:
 
 ```java
@@ -124,12 +124,32 @@ GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDat
 BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(
         database,
         1000,
-        new TransactionCallback<Iterable<Node>>() {
+        new TransactionalInput<>(database, 1000, new TransactionCallback<Iterable<Node>>() {
             @Override
             public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
                 return GlobalGraphOperations.at(database).getAllNodes();
             }
-        },
+        }),
+        new UnitOfWork<Node>() {
+            @Override
+            public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
+                node.setProperty("uuid", UUID.randomUUID());
+            }
+        }
+);
+
+executor.execute();
+```
+
+which could be simplified by the provided `AllNodes` class to:
+
+```java
+GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //only for demo, use your own persistent one!
+
+BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(
+        database,
+        1000,
+        new AllNodes(database, 1000),
         new UnitOfWork<Node>() {
             @Override
             public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
