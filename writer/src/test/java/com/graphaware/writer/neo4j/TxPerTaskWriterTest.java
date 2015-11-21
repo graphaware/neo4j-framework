@@ -272,9 +272,6 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
         final Callable<Long> task = new Callable<Long>() {
             @Override
             public Long call() throws Exception {
-                for (Node node : getDatabase().findNodesByLabelAndProperty(DynamicLabel.label("test"), "test", "test")) {
-                    System.out.println(PropertyContainerUtils.nodeToString(node));
-                }
                 Node test = getDatabase().createNode(DynamicLabel.label("test"));
                 test.setProperty("test", "test");
                 return test.getId();

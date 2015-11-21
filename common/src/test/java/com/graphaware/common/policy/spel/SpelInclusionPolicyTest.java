@@ -54,19 +54,19 @@ public abstract class SpelInclusionPolicyTest {
     }
 
     protected Node michal() {
-        return getSingle(database.findNodesByLabelAndProperty(label("Employee"), "name", "Michal"));
+        return getSingle(database.findNodes(label("Employee"), "name", "Michal"));
     }
 
     protected Node vojta() {
-        return getSingle(database.findNodesByLabelAndProperty(label("Intern"), "name", "Vojta"));
+        return getSingle(database.findNodes(label("Intern"), "name", "Vojta"));
     }
 
     protected Node graphaware() {
-        return getSingle(database.findNodesByLabelAndProperty(label("Company"), "name", "GraphAware"));
+        return getSingle(database.findNodes(label("Company"), "name", "GraphAware"));
     }
 
     protected Node london() {
-        return getSingle(database.findNodesByLabelAndProperty(label("Place"), "name", "London"));
+        return getSingle(database.findNodes(label("Place"), "name", "London"));
     }
 
     protected Relationship michalWorksFor() {

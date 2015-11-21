@@ -19,6 +19,7 @@ package com.graphaware.test.unit;
 import com.graphaware.common.policy.InclusionPolicies;
 import com.graphaware.common.util.PropertyContainerUtils;
 import org.neo4j.graphdb.*;
+import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.slf4j.Logger;
@@ -473,7 +474,7 @@ public final class GraphUnit {
     private static Iterable<Node> findSameNodesByLabel(GraphDatabaseService database, Node node, Label label, InclusionPolicies inclusionPolicies) {
         Set<Node> result = new HashSet<>();
 
-        for (Node candidate : GlobalGraphOperations.at(database).getAllNodesWithLabel(label)) {
+        for (Node candidate : Iterables.asResourceIterable(database.findNodes(label))) {
             if (isNodeIncluded(candidate, inclusionPolicies)) {
                 if (areSame(node, candidate, inclusionPolicies)) {
                     result.add(candidate);

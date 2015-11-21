@@ -117,8 +117,6 @@ public class QualifyingRelationshipsReadCypherTest extends QualifyingRelationshi
 
         query.append(" RETURN count (m)");
 
-        System.out.println(query.toString());
-
         return query.toString();
     }
 }

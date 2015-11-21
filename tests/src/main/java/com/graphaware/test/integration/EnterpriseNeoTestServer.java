@@ -1,7 +1,6 @@
 package com.graphaware.test.integration;
 
 import org.neo4j.server.Bootstrapper;
-import org.neo4j.server.CommunityBootstrapper;
 import org.neo4j.server.enterprise.EnterpriseBootstrapper;
 
 /**

@@ -35,12 +35,12 @@ public class CommunityTxParticipationIntegrationTest extends NeoServerIntegratio
 
     @Test
     public void invalidTransactionShouldResultInException() {
-        System.out.println(httpClient.get(baseUrl() + "/graphaware/greeting", Collections.singletonMap("_GA_TX_ID", "invalid"), HttpStatus.SC_BAD_REQUEST));
+        httpClient.get(baseUrl() + "/graphaware/greeting", Collections.singletonMap("_GA_TX_ID", "invalid"), HttpStatus.SC_BAD_REQUEST);
     }
 
     @Test
     public void nonExistingTransactionShouldResultInException() {
-        System.out.println(httpClient.get(baseUrl() + "/graphaware/greeting", Collections.singletonMap("_GA_TX_ID", "1"), HttpStatus.SC_BAD_REQUEST));
+        httpClient.get(baseUrl() + "/graphaware/greeting", Collections.singletonMap("_GA_TX_ID", "1"), HttpStatus.SC_BAD_REQUEST);
     }
 
     @Test

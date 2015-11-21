@@ -16,6 +16,7 @@
 
 package com.graphaware.common.policy.composite;
 
+import com.graphaware.common.policy.NodeInclusionPolicy;
 import com.graphaware.common.policy.RelationshipInclusionPolicy;
 import com.graphaware.common.policy.all.IncludeAllNodes;
 import com.graphaware.common.policy.all.IncludeAllRelationships;
@@ -33,7 +34,7 @@ public class CompositePropertyContainerInclusionPolicyTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotConstructEmptyCompositePolicy() {
-        CompositeNodeInclusionPolicy.of(null);
+        CompositeNodeInclusionPolicy.of((NodeInclusionPolicy) null);
     }
 
     @Test(expected = IllegalArgumentException.class)

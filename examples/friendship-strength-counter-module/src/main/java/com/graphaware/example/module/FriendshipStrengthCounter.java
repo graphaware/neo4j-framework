@@ -93,7 +93,7 @@ public class FriendshipStrengthCounter {
      * @return counter node.
      */
     private static Node getCounterNode(GraphDatabaseService database) {
-        Node result = getSingleOrNull(at(database).getAllNodesWithLabel(FriendshipCounter));
+        Node result = getSingleOrNull(database.findNodes(FriendshipCounter));
 
         if (result != null) {
             return result;

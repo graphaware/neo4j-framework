@@ -29,6 +29,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.helpers.collection.Iterables;
 
 import java.util.Collections;
 
@@ -76,7 +77,7 @@ public class FriendshipStrengthModule extends BaseTxDrivenModule<Void> {
     @Override
     public void initialize(GraphDatabaseService database) {
         try (Transaction tx = database.beginTx()) {
-            for (Node counter : at(database).getAllNodesWithLabel(FriendshipCounter)) {
+            for (Node counter : Iterables.asResourceIterable(database.findNodes(FriendshipCounter))) {
                 counter.delete();
             }
             tx.success();

@@ -98,7 +98,7 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
      * @return counter node.
      */
     private static Node getCounterNode(GraphDatabaseService database) {
-        Node result = IterableUtils.getSingleOrNull(GlobalGraphOperations.at(database).getAllNodesWithLabel(COUNTER_NODE_LABEL));
+        Node result = IterableUtils.getSingleOrNull(database.findNodes(COUNTER_NODE_LABEL));
 
         if (result != null) {
             return result;

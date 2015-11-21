@@ -23,6 +23,8 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -36,6 +38,8 @@ import static com.graphaware.common.util.PropertyContainerUtils.relationshipToSt
  * node created for that purpose.
  */
 public class ChangeLogger extends TransactionEventHandler.Adapter<Void> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ChangeLogger.class);
 
     /**
      * {@inheritDoc}
@@ -75,7 +79,7 @@ public class ChangeLogger extends TransactionEventHandler.Adapter<Void> {
         }
 
         for (String change : changes) {
-            System.out.println(change);
+            LOG.info(change);
         }
     }
 }

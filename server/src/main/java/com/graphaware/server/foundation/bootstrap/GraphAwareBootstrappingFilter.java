@@ -181,7 +181,7 @@ public class GraphAwareBootstrappingFilter implements Filter {
             if (rsPackage.getPackageName().equals(getPackage())) {
                 String path = rsPackage.getMountPoint();
                 if (StringUtils.isNotBlank(path)) {
-                    LOG.info("Mounting GraphAware Framework under " + path);
+                    LOG.info("Mounting GraphAware Framework at {}", path);
                     return path;
                 } else {
                     throw new IllegalArgumentException("Illegal GraphAware mount point: " + path);
