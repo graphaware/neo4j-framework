@@ -18,7 +18,6 @@ package com.graphaware.common.policy.all;
 
 import com.graphaware.common.util.IterableUtils;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -28,7 +27,8 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit test for {@link IncludeAllNodes}.

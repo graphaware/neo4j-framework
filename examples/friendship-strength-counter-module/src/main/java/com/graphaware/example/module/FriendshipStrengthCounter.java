@@ -27,7 +27,6 @@ import static com.graphaware.example.module.Labels.FriendshipCounter;
 import static com.graphaware.example.module.PropertyKeys.STRENGTH;
 import static com.graphaware.example.module.PropertyKeys.TOTAL_FRIENDSHIP_STRENGTH;
 import static com.graphaware.example.module.Relationships.FRIEND_OF;
-import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
  * Example of a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler} that uses GraphAware {@link ImprovedTransactionData}

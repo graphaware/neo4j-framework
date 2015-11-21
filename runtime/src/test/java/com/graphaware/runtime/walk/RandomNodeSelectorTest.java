@@ -17,7 +17,6 @@
 package com.graphaware.runtime.walk;
 
 import com.graphaware.common.policy.BaseNodeInclusionPolicy;
-import com.graphaware.common.policy.NodeInclusionPolicy;
 import com.graphaware.common.policy.none.IncludeNoNodes;
 import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;

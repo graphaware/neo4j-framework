@@ -17,9 +17,7 @@
 package com.graphaware.common.policy.none;
 
 import com.graphaware.common.policy.NodeInclusionPolicy;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.helpers.collection.Iterables;
 
 /**
  * {@link NodeInclusionPolicy} that ignores all nodes. Singleton.

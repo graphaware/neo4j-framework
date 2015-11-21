@@ -17,10 +17,7 @@
 package com.graphaware.writer.neo4j;
 
 import com.graphaware.common.util.IterableUtils;
-import com.graphaware.common.util.PropertyContainerUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
-import com.graphaware.writer.neo4j.Neo4jWriter;
-import com.graphaware.writer.neo4j.TxPerTaskWriter;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.Node;

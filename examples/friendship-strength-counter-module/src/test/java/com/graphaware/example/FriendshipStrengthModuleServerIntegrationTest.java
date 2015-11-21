@@ -16,9 +16,7 @@
 
 package com.graphaware.example;
 
-import com.graphaware.test.integration.CommunityNeoTestServer;
 import com.graphaware.test.integration.NeoServerIntegrationTest;
-import com.graphaware.test.integration.NeoTestServer;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 

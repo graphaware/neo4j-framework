@@ -17,7 +17,6 @@
 package com.graphaware.writer.neo4j;
 
 import com.graphaware.writer.service.QueueBackedScheduledService;
-import com.graphaware.writer.Writer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

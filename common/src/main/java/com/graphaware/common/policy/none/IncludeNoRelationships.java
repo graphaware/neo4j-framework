@@ -18,10 +18,8 @@ package com.graphaware.common.policy.none;
 
 
 import com.graphaware.common.policy.RelationshipInclusionPolicy;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.helpers.collection.Iterables;
 
 /**
  * {@link RelationshipInclusionPolicy} that ignores all relationships. Singleton.

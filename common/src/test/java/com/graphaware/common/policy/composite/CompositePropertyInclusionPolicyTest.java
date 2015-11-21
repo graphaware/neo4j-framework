@@ -16,7 +16,6 @@
 
 package com.graphaware.common.policy.composite;
 
-import com.graphaware.common.policy.NodeInclusionPolicy;
 import com.graphaware.common.policy.NodePropertyInclusionPolicy;
 import com.graphaware.common.policy.RelationshipPropertyInclusionPolicy;
 import com.graphaware.common.policy.all.IncludeAllNodeProperties;

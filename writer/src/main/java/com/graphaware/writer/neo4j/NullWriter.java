@@ -16,8 +16,6 @@
 
 package com.graphaware.writer.neo4j;
 
-import com.graphaware.writer.Writer;
-
 import java.util.concurrent.Callable;
 
 /**

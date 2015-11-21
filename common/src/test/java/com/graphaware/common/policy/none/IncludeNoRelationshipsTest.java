@@ -16,8 +16,6 @@
 
 package com.graphaware.common.policy.none;
 
-import com.graphaware.common.policy.all.IncludeAllRelationships;
-import com.graphaware.common.policy.fluent.IncludeRelationships;
 import com.graphaware.common.util.IterableUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -31,7 +29,6 @@ import org.neo4j.tooling.GlobalGraphOperations;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Unit test for {@link IncludeNoRelationships}.

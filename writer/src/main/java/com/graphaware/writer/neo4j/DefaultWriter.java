@@ -16,7 +16,6 @@
 
 package com.graphaware.writer.neo4j;
 
-import com.graphaware.writer.Writer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;

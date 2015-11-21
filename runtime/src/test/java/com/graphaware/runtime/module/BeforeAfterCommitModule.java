@@ -18,13 +18,8 @@ package com.graphaware.runtime.module;
 
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
-import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
-import com.graphaware.runtime.module.BaseTxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import org.neo4j.graphdb.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**

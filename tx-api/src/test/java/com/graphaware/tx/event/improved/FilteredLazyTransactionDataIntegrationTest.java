@@ -18,8 +18,8 @@ package com.graphaware.tx.event.improved;
 
 import com.graphaware.common.policy.*;
 import com.graphaware.common.policy.fluent.IncludeNodes;
-import com.graphaware.test.util.TestDataBuilder;
 import com.graphaware.common.util.Change;
+import com.graphaware.test.util.TestDataBuilder;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.graphaware.common.util.Change.*;
+import static com.graphaware.common.util.Change.changesToMap;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.common.util.IterableUtils.countNodes;

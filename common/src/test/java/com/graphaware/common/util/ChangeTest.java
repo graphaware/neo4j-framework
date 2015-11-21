@@ -16,7 +16,6 @@
 
 package com.graphaware.common.util;
 
-import com.graphaware.common.util.Change;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,8 +27,8 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import java.util.Collections;
 import java.util.Map;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.Change.changesToMap;
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 

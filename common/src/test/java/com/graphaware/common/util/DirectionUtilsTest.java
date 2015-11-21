@@ -17,7 +17,6 @@
 package com.graphaware.common.util;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -27,9 +26,7 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static com.graphaware.common.util.DirectionUtils.matches;
-import static com.graphaware.common.util.DirectionUtils.resolveDirection;
-import static com.graphaware.common.util.DirectionUtils.reverse;
+import static com.graphaware.common.util.DirectionUtils.*;
 import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;

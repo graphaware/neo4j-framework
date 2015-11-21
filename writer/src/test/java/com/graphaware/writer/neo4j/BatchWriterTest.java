@@ -18,9 +18,6 @@ package com.graphaware.writer.neo4j;
 
 import com.graphaware.common.util.IterableUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
-import com.graphaware.writer.neo4j.BatchWriter;
-import com.graphaware.writer.neo4j.Neo4jWriter;
-import com.graphaware.writer.neo4j.TxPerTaskWriter;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Transaction;
@@ -32,7 +29,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Test for {@link TxPerTaskWriter}.

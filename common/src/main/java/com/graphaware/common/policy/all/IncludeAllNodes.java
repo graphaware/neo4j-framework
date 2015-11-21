@@ -19,9 +19,7 @@ package com.graphaware.common.policy.all;
 
 import com.graphaware.common.policy.BaseNodeInclusionPolicy;
 import com.graphaware.common.policy.NodeInclusionPolicy;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * {@link NodeInclusionPolicy} that includes all nodes. Singleton.

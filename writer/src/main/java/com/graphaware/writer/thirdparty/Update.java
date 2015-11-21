@@ -20,7 +20,7 @@ import com.graphaware.common.representation.PropertyContainerRepresentation;
 import com.graphaware.common.util.Change;
 import org.neo4j.graphdb.PropertyContainer;
 
-import static org.springframework.util.Assert.*;
+import static org.springframework.util.Assert.notNull;
 
 /**
  * {@link BaseWriteOperation} representing an update operation.

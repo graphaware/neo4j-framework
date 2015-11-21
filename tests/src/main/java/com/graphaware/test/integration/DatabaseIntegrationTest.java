@@ -20,7 +20,6 @@ import com.graphaware.test.data.DatabasePopulator;
 import org.junit.After;
 import org.junit.Before;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
