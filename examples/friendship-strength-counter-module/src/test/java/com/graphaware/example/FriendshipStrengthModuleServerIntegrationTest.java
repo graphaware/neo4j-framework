@@ -30,11 +30,6 @@ import static org.junit.Assert.assertEquals;
  */
 public class FriendshipStrengthModuleServerIntegrationTest extends NeoServerIntegrationTest {
 
-    @Override
-    protected NeoTestServer neoTestServer(String neo4jConfigFile, String neo4jServerConfigFile) {
-        return new CommunityNeoTestServer(neo4jConfigFile, neo4jServerConfigFile);
-    }
-
     /**
      * {@inheritDoc}
      */

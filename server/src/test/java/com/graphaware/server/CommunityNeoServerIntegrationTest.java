@@ -16,24 +16,16 @@
 
 package com.graphaware.server;
 
-import com.graphaware.test.integration.CommunityNeoTestServer;
 import com.graphaware.test.integration.NeoServerIntegrationTest;
-import com.graphaware.test.integration.NeoTestServer;
 import org.apache.http.HttpStatus;
-import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Integration test for custom server that wires Spring components.
  */
 public class CommunityNeoServerIntegrationTest extends NeoServerIntegrationTest {
-
-    @Override
-    protected NeoTestServer neoTestServer(String neo4jConfigFile, String neo4jServerConfigFile) {
-        return new CommunityNeoTestServer(neo4jConfigFile, neo4jServerConfigFile);
-    }
 
     @Test
     public void componentsShouldBeWired() throws InterruptedException {

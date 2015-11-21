@@ -16,10 +16,7 @@
 
 package com.graphaware.example.plugin;
 
-import com.graphaware.test.integration.CommunityNeoTestServer;
 import com.graphaware.test.integration.NeoServerIntegrationTest;
-import com.graphaware.test.integration.NeoTestServer;
-import com.graphaware.test.util.TestUtils;
 import org.junit.Test;
 
 /**
@@ -28,11 +25,6 @@ import org.junit.Test;
  * Only tests the actual deployment of the extension, not so much the logic.
  */
 public class HelloWorldServerPluginDeploymentTest extends NeoServerIntegrationTest {
-
-    @Override
-    protected NeoTestServer neoTestServer(String neo4jConfigFile, String neo4jServerConfigFile) {
-        return new CommunityNeoTestServer(neo4jConfigFile, neo4jServerConfigFile);
-    }
 
     @Test
     public void shouldCreateAndReturnNode() {

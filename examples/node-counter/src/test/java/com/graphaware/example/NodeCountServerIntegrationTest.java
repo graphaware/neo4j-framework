@@ -16,9 +16,7 @@
 
 package com.graphaware.example;
 
-import com.graphaware.test.integration.CommunityNeoTestServer;
 import com.graphaware.test.integration.NeoServerIntegrationTest;
-import com.graphaware.test.integration.NeoTestServer;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -28,11 +26,6 @@ import static org.junit.Assert.assertEquals;
  * {@link com.graphaware.test.integration.NeoServerIntegrationTest} for {@link NodeCountApi}.
  */
 public class NodeCountServerIntegrationTest extends NeoServerIntegrationTest {
-
-    @Override
-    protected NeoTestServer neoTestServer(String neo4jConfigFile, String neo4jServerConfigFile) {
-        return new CommunityNeoTestServer(neo4jConfigFile, neo4jServerConfigFile);
-    }
 
     @Test
     public void apiShouldBeMounted() {

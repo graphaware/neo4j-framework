@@ -1,6 +1,5 @@
 package com.graphaware.test;
 
-import com.graphaware.test.integration.CommunityNeoTestServer;
 import com.graphaware.test.integration.EnterpriseNeoTestServer;
 import com.graphaware.test.integration.NeoTestServer;
 

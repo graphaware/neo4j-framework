@@ -34,7 +34,7 @@ public class CompositePropertyContainerInclusionPolicyTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotConstructEmptyCompositePolicy() {
-        CompositeNodeInclusionPolicy.of((NodeInclusionPolicy) null);
+        CompositeNodeInclusionPolicy.of((NodeInclusionPolicy[]) null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -44,7 +44,7 @@ public class CompositePropertyContainerInclusionPolicyTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotConstructEmptyCompositePolicy3() {
-        CompositeRelationshipInclusionPolicy.of(new RelationshipInclusionPolicy[0]);
+        CompositeRelationshipInclusionPolicy.of((RelationshipInclusionPolicy[]) new RelationshipInclusionPolicy[0]);
     }
 
     @Test

@@ -16,9 +16,7 @@
 
 package com.graphaware.example.unmanaged;
 
-import com.graphaware.test.integration.CommunityNeoTestServer;
 import com.graphaware.test.integration.NeoServerIntegrationTest;
-import com.graphaware.test.integration.NeoTestServer;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -29,11 +27,6 @@ import static org.junit.Assert.assertEquals;
  * Tests the logic as well as the API.
  */
 public class HelloWorldUnmanagedExtensionDeploymentTest extends NeoServerIntegrationTest {
-
-    @Override
-    protected NeoTestServer neoTestServer(String neo4jConfigFile, String neo4jServerConfigFile) {
-        return new CommunityNeoTestServer(neo4jConfigFile, neo4jServerConfigFile);
-    }
 
     /**
      * {@inheritDoc}

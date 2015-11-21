@@ -16,9 +16,7 @@
 
 package com.graphaware.example.graphaware;
 
-import com.graphaware.test.integration.CommunityNeoTestServer;
 import com.graphaware.test.integration.NeoServerIntegrationTest;
-import com.graphaware.test.integration.NeoTestServer;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -29,11 +27,6 @@ import static org.junit.Assert.assertEquals;
  * Only tests the actual deployment of the extension, not so much the logic.
  */
 public class HelloWorldControllerDeploymentTest extends NeoServerIntegrationTest {
-
-    @Override
-    protected NeoTestServer neoTestServer(String neo4jConfigFile, String neo4jServerConfigFile) {
-        return new CommunityNeoTestServer(neo4jConfigFile, neo4jServerConfigFile);
-    }
 
     @Test
     public void shouldCreateAndReturnNode() {

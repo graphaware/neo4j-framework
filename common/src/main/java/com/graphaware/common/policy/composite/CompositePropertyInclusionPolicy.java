@@ -34,6 +34,11 @@ public abstract class CompositePropertyInclusionPolicy<T extends PropertyContain
         if (policies == null || policies.length < 1) {
             throw new IllegalArgumentException("There must be at least one wrapped policy in composite policy");
         }
+        for (PropertyInclusionPolicy<T> p : policies) {
+            if (p == null) {
+                throw new IllegalArgumentException("Policy must not be null");
+            }
+        }
         this.policies = policies;
     }
 
@@ -56,12 +61,18 @@ public abstract class CompositePropertyInclusionPolicy<T extends PropertyContain
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         CompositePropertyInclusionPolicy that = (CompositePropertyInclusionPolicy) o;
 
-        if (!Arrays.equals(policies, that.policies)) return false;
+        if (!Arrays.equals(policies, that.policies)) {
+            return false;
+        }
 
         return true;
     }

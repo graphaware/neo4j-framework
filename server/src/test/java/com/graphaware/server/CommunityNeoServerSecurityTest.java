@@ -16,9 +16,7 @@
 
 package com.graphaware.server;
 
-import com.graphaware.test.integration.CommunityNeoTestServer;
 import com.graphaware.test.integration.NeoServerIntegrationTest;
-import com.graphaware.test.integration.NeoTestServer;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -26,11 +24,6 @@ import org.junit.Test;
  * Integration test for GraphAware API security.
  */
 public class CommunityNeoServerSecurityTest extends NeoServerIntegrationTest {
-
-    @Override
-    protected NeoTestServer neoTestServer(String neo4jConfigFile, String neo4jServerConfigFile) {
-        return new CommunityNeoTestServer(neo4jConfigFile, neo4jServerConfigFile);
-    }
 
     @Override
     protected String neo4jServerConfigFile() {

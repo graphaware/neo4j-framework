@@ -35,7 +35,7 @@ import java.io.IOException;
  * methods. They default to "neo4j.properties" and "neo4j-server.properties" and if no such files are present
  * on the classpath of the implementing class, the ones that ships with Neo4j are used.
  */
-public abstract class NeoServerIntegrationTest {
+public class NeoServerIntegrationTest {
 
     protected NeoTestServer neoTestServer;
     protected TestHttpClient httpClient;
@@ -54,7 +54,9 @@ public abstract class NeoServerIntegrationTest {
      * @param neo4jServerConfigFile neo4j-server.properties or equivalent.
      * @return test server.
      */
-    protected abstract NeoTestServer neoTestServer(String neo4jConfigFile, String neo4jServerConfigFile);
+    protected NeoTestServer neoTestServer(String neo4jConfigFile, String neo4jServerConfigFile) {
+        return new CommunityNeoTestServer(neo4jConfigFile, neo4jServerConfigFile);
+    }
 
     @After
     public void tearDown() throws IOException, InterruptedException {

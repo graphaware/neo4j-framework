@@ -30,7 +30,7 @@ import com.graphaware.common.policy.none.IncludeNoNodeProperties;
 import com.graphaware.common.policy.none.IncludeNoNodes;
 import com.graphaware.common.policy.none.IncludeNoRelationshipProperties;
 import com.graphaware.common.policy.none.IncludeNoRelationships;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+import org.apache.commons.codec.binary.Base64;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.objenesis.strategy.StdInstantiatorStrategy;
@@ -123,7 +123,7 @@ public final class Serializer {
      * @return object as String.
      */
     public static String toString(Object object, String prefix) {
-        return prefix + Base64.encode(toByteArray(object));
+        return prefix + new String(Base64.encodeBase64(toByteArray(object)));
     }
 
     /**
@@ -143,6 +143,6 @@ public final class Serializer {
      * @return de-serialized object.
      */
     public static <T> T fromString(String string, String prefix) {
-        return fromByteArray(Base64.decode(string.substring(prefix.length())));
+        return fromByteArray(Base64.decodeBase64(string.substring(prefix.length())));
     }
 }
