@@ -89,7 +89,7 @@ and can be change, e.g.:
 `org.neo4j.server.thirdparty_jaxrs_classes=com.graphaware.server=/your_uri_here`
 ```
 
-To get started quickly, start with the [pom file from the example above](https://github.com/graphaware/neo4j-framework/blob/master/examples/node-counter/pom.xml) and modify to your needs (notably change the framework version to 2.3.1.35).
+To get started quickly, start with the [pom file from the example above](https://github.com/graphaware/neo4j-framework/blob/master/examples/node-counter/pom.xml) and modify to your needs.
 
 ### Long-Running Transactions
 
