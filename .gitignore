@@ -13,3 +13,4 @@ target/
 server/data/
 .cert
 .key
+neo4j-home/
