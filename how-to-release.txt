@@ -7,6 +7,10 @@ mvn release:clean release:prepare
 mvn release:perform
 
 notes:
+    framework javadoc
+
+    git checkout tags/graphaware-parent-${version} && mvn clean package -DskipTests && mvn javadoc:aggregate && git checkout master
+
     removing a git tag:
         git tag -d graphaware-parent-2.1.7.28
         git push origin :refs/tags/graphaware-parent-2.1.7.28
