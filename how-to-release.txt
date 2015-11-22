@@ -30,3 +30,4 @@ List of modules to upgrade:
         importer
         ga-enterprise
         neo4j-to-elasticsearch
+        schema
