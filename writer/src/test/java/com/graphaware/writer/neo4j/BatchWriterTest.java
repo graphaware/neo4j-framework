@@ -178,7 +178,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
             public Boolean call() throws Exception {
                 throw new IOException("Deliberate Testing Exception");
             }
-        }, "test", 10);
+        }, "test", 20);
     }
 
     @Test
