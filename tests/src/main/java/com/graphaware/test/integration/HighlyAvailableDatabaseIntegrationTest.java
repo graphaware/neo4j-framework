@@ -22,7 +22,9 @@ import org.neo4j.graphdb.factory.HighlyAvailableGraphDatabaseFactory;
 import org.neo4j.helpers.Settings;
 import org.neo4j.kernel.ha.HaSettings;
 
-public class HighAvailabilityDatabaseIntegrationTest extends DatabaseIntegrationTest {
+import java.io.File;
+
+public class HighlyAvailableDatabaseIntegrationTest extends DatabaseIntegrationTest {
 
     private static final String SERVER_ID = "1";
     private static final String HA_SERVER = "localhost:6001";
@@ -33,7 +35,7 @@ public class HighAvailabilityDatabaseIntegrationTest extends DatabaseIntegration
 
     @Override
     protected GraphDatabaseBuilder createGraphDatabaseBuilder() {
-        return new HighlyAvailableGraphDatabaseFactory().newHighlyAvailableDatabaseBuilder(getPath());
+        return new HighlyAvailableGraphDatabaseFactory().newEmbeddedDatabaseBuilder(new File(getPath()));
     }
 
     @Override

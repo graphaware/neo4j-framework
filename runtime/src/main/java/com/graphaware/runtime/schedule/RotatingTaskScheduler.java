@@ -17,24 +17,33 @@
 package com.graphaware.runtime.schedule;
 
 import com.graphaware.common.util.Pair;
+import com.graphaware.runtime.config.TimerDrivenModuleConfiguration;
 import com.graphaware.runtime.metadata.DefaultTimerDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TimerDrivenModuleContext;
 import com.graphaware.runtime.module.TimerDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.kernel.GraphDatabaseAPI;
+import org.neo4j.kernel.KernelData;
+import org.neo4j.management.HighAvailability;
+import org.neo4j.management.Neo4jManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.*;
 import static com.graphaware.runtime.schedule.TimingStrategy.NEVER_RUN;
 import static com.graphaware.runtime.schedule.TimingStrategy.UNKNOWN;
+import static org.neo4j.kernel.ha.cluster.HighAvailabilityModeSwitcher.MASTER;
+import static org.neo4j.kernel.ha.cluster.HighAvailabilityModeSwitcher.SLAVE;
 
 /**
  * {@link TaskScheduler} that delegates to the registered {@link TimerDrivenModule}s in round-robin fashion, in the order
@@ -52,6 +61,7 @@ public class RotatingTaskScheduler implements TaskScheduler {
     private Iterator<Map.Entry<TimerDrivenModule, TimerDrivenModuleContext>> moduleContextIterator;
 
     private final ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor();
+    private final HighAvailability haBean;
 
     /**
      * Construct a new task scheduler.
@@ -64,6 +74,21 @@ public class RotatingTaskScheduler implements TaskScheduler {
         this.database = database;
         this.repository = repository;
         this.timingStrategy = timingStrategy;
+        this.haBean = getHaBean();
+    }
+
+    private HighAvailability getHaBean() {
+        try {
+            HighAvailability bean = Neo4jManager.get(((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(KernelData.class).instanceId()).getHighAvailabilityBean();
+            LOG.info("Running in a clustered architecture, obtained HA bean.");
+            return bean;
+        } catch (NoSuchElementException e) {
+            LOG.info("Running in a single-node architecture.");
+            return null;
+        } catch (Exception e) {
+            LOG.warn("Failed to obtain Neo4j Manager, assuming a single-node architecture.", e);
+            return null;
+        }
     }
 
     /**
@@ -164,7 +189,7 @@ public class RotatingTaskScheduler implements TaskScheduler {
         Pair<T, C> moduleAndContext = findNextModuleAndContext();
 
         if (moduleAndContext == null) {
-            return; //no module withes to run
+            return; //no module wishes to run
         }
 
         T module = moduleAndContext.first();
@@ -191,12 +216,35 @@ public class RotatingTaskScheduler implements TaskScheduler {
 
         for (int i = 0; i < totalModules; i++) {
             Pair<T, C> candidate = nextModuleAndContext();
-            if (candidate.second() == null || candidate.second().earliestNextCall() <= now) {
+
+            if (hasCorrectRole(candidate.first()) && (candidate.second() == null || candidate.second().earliestNextCall() <= now)) {
                 return candidate;
             }
         }
 
         return null;
+    }
+
+    /**
+     * Check if the given module has the correct role (e.g. master or slave) to run.
+     *
+     * @param module to check for.
+     * @return <code>true</code> iff can run.
+     */
+    private boolean hasCorrectRole(TimerDrivenModule<?> module) {
+        if (haBean == null) {
+            return true; //no HA
+        }
+
+        TimerDrivenModuleConfiguration.InstanceRolePolicy policy = module.getConfiguration().getInstanceRolePolicy();
+
+        if (policy.equals(ANY)) {
+            return true;
+        }
+
+        String currentRole = haBean.getRole();
+
+        return MASTER.equals(currentRole) && policy.equals(MASTER_ONLY) || SLAVE.equals(currentRole) && policy.equals(SLAVES_ONLY);
     }
 
     /**

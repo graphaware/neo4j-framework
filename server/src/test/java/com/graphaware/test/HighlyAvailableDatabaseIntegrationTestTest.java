@@ -16,21 +16,22 @@
 
 package com.graphaware.test;
 
-import com.graphaware.test.integration.HighAvailabilityDatabaseIntegrationTest;
+import com.graphaware.test.integration.HighlyAvailableDatabaseIntegrationTest;
 import org.junit.Test;
 import org.neo4j.management.ClusterMemberInfo;
+import org.neo4j.management.HighAvailability;
 import org.neo4j.management.Neo4jManager;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
-public class HighAvailabilityDatabaseIntegrationTestTest extends HighAvailabilityDatabaseIntegrationTest {
+public class HighlyAvailableDatabaseIntegrationTestTest extends HighlyAvailableDatabaseIntegrationTest {
 
     @Test
-    public void shouldStartHighAvailabilityDatabase() {
+    public void shouldStartHighlyAvailableDatabase() {
         Neo4jManager manager = Neo4jManager.get();
 
-        org.neo4j.management.HighAvailability highAvailabilityBean = manager.getHighAvailabilityBean();
+        HighAvailability highAvailabilityBean = manager.getHighAvailabilityBean();
 
         assertNotNull(highAvailabilityBean);
 

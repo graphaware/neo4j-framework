@@ -19,14 +19,9 @@ package com.graphaware.runtime;
 import com.graphaware.common.kv.GraphKeyValueStore;
 import com.graphaware.common.kv.KeyValueStore;
 import com.graphaware.common.policy.InclusionPolicies;
-import com.graphaware.runtime.config.FluentTxDrivenModuleConfiguration;
-import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
-import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.*;
 import com.graphaware.runtime.metadata.*;
-import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
-import com.graphaware.runtime.module.NeedsInitializationException;
-import com.graphaware.runtime.module.TimerDrivenModule;
-import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.runtime.module.*;
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
@@ -483,7 +478,7 @@ public class ProductionRuntimeTest {
         TxAndTimerDrivenModule mockModule = mock(TxAndTimerDrivenModule.class);
         when(mockModule.getId()).thenReturn(MOCK);
         when(mockModule.createInitialContext(database)).thenReturn(null);
-        when(mockModule.getConfiguration()).thenReturn(NullTxDrivenModuleConfiguration.getInstance());
+        when(mockModule.getConfiguration()).thenReturn(NullTxAndTimerDrivenModuleConfiguration.getInstance());
 
         GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
@@ -1192,9 +1187,5 @@ public class ProductionRuntimeTest {
         when(mockModule.createInitialContext(database)).thenReturn(null);
 
         return mockModule;
-    }
-
-    private interface TxAndTimerDrivenModule extends TxDrivenModule, TimerDrivenModule {
-
     }
 }
