@@ -24,7 +24,7 @@ import com.graphaware.common.serialize.SingletonSerializer;
 /**
  * {@link TxAndTimerDrivenModuleConfiguration} for {@link com.graphaware.runtime.module.TxAndTimerDrivenModule}s with no configuration. Singleton.
  */
-public class NullTxAndTimerDrivenModuleConfiguration implements TxAndTimerDrivenModuleConfiguration {
+public final class NullTxAndTimerDrivenModuleConfiguration implements TxAndTimerDrivenModuleConfiguration {
 
     static {
         Serializer.register(NullTxAndTimerDrivenModuleConfiguration.class, new SingletonSerializer(), 1020);
