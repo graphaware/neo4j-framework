@@ -16,7 +16,7 @@ Add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>common</artifactId>
-    <version>2.3.1.36</version>
+    <version>3.0.0.36</version>
 </dependency>
 ```
 
