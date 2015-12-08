@@ -88,15 +88,15 @@ public final class Serializer {
     private Serializer() {
     }
 
-    public static void register(Class type) {
+    public synchronized static void register(Class type) {
         kryo.register(type);
     }
 
-    public static void register(Class type, com.esotericsoftware.kryo.Serializer serializer) {
+    public synchronized static void register(Class type, com.esotericsoftware.kryo.Serializer serializer) {
         kryo.register(type, serializer);
     }
 
-    public static void register(Class type, com.esotericsoftware.kryo.Serializer serializer, int id) {
+    public synchronized static void register(Class type, com.esotericsoftware.kryo.Serializer serializer, int id) {
         kryo.register(type, serializer, id);
     }
 
@@ -106,7 +106,7 @@ public final class Serializer {
      * @param object to serialize.
      * @return byte array.
      */
-    public static byte[] toByteArray(Object object) {
+    public synchronized static byte[] toByteArray(Object object) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         Output output = new Output(stream);
         kryo.writeClassAndObject(output, object);
@@ -122,7 +122,7 @@ public final class Serializer {
      * @param object to serialize.
      * @return object as String.
      */
-    public static String toString(Object object, String prefix) {
+    public synchronized static String toString(Object object, String prefix) {
         return prefix + new String(Base64.encodeBase64(toByteArray(object)));
     }
 
@@ -132,7 +132,7 @@ public final class Serializer {
      * @param array to read from.
      * @return de-serialized object.
      */
-    public static <T> T fromByteArray(byte[] array) {
+    public synchronized static <T> T fromByteArray(byte[] array) {
         return (T) kryo.readClassAndObject(new Input(array));
     }
 
@@ -142,7 +142,7 @@ public final class Serializer {
      * @param string to read from.
      * @return de-serialized object.
      */
-    public static <T> T fromString(String string, String prefix) {
+    public synchronized static <T> T fromString(String string, String prefix) {
         return fromByteArray(Base64.decodeBase64(string.substring(prefix.length())));
     }
 }
