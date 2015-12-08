@@ -27,7 +27,7 @@ public abstract class BasePartiallyComparable<T extends PartiallyComparable<T>> 
     protected abstract T self();
 
     /**
-     * @see {@link PartiallyComparable#isMoreSpecificThan(Object)}.
+     * @see PartiallyComparable#isMoreSpecificThan(Object).
      */
     public boolean isMoreSpecificThan(T other) {
         return other.isMoreGeneralThan(self());

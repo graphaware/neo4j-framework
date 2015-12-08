@@ -98,7 +98,7 @@ public abstract class BasePropertyContainer implements PropertyContainer {
     //the following methods intentionally break object-orientation a bit to keep the rest of the codebase DRY
 
     /**
-     * @see {@link org.neo4j.graphdb.Relationship#getOtherNode(org.neo4j.graphdb.Node)}.
+     * @see org.neo4j.graphdb.Relationship#getOtherNode(org.neo4j.graphdb.Node).
      */
     public Node getOtherNode(Node node) {
         Relationship self = relationship();
@@ -118,7 +118,7 @@ public abstract class BasePropertyContainer implements PropertyContainer {
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Relationship#getNodes()}.
+     * @see org.neo4j.graphdb.Relationship#getNodes().
      */
     public Node[] getNodes() {
         Relationship self = relationship();
@@ -126,7 +126,7 @@ public abstract class BasePropertyContainer implements PropertyContainer {
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#getSingleRelationship(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction)}.
+     * @see org.neo4j.graphdb.Node#getSingleRelationship(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction).
      */
     public Relationship getSingleRelationship(RelationshipType type, Direction dir) {
         Node self = node();
@@ -146,42 +146,42 @@ public abstract class BasePropertyContainer implements PropertyContainer {
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#hasRelationship()}
+     * @see org.neo4j.graphdb.Node#hasRelationship()
      */
     public boolean hasRelationship() {
         return node().getRelationships().iterator().hasNext();
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#hasRelationship(org.neo4j.graphdb.RelationshipType...)}
+     * @see org.neo4j.graphdb.Node#hasRelationship(org.neo4j.graphdb.RelationshipType...)
      */
     public boolean hasRelationship(RelationshipType... types) {
         return node().getRelationships(types).iterator().hasNext();
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#hasRelationship(org.neo4j.graphdb.Direction, org.neo4j.graphdb.RelationshipType...)}
+     * @see org.neo4j.graphdb.Node#hasRelationship(org.neo4j.graphdb.Direction, org.neo4j.graphdb.RelationshipType...)
      */
     public boolean hasRelationship(Direction direction, RelationshipType... types) {
         return node().getRelationships(direction, types).iterator().hasNext();
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#hasRelationship(org.neo4j.graphdb.Direction)}
+     * @see org.neo4j.graphdb.Node#hasRelationship(org.neo4j.graphdb.Direction)
      */
     public boolean hasRelationship(Direction dir) {
         return node().getRelationships(dir).iterator().hasNext();
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#hasRelationship(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction)}
+     * @see org.neo4j.graphdb.Node#hasRelationship(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction)
      */
     public boolean hasRelationship(RelationshipType type, Direction dir) {
         return node().getRelationships(type, dir).iterator().hasNext();
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Relationship#isType(org.neo4j.graphdb.RelationshipType)}.
+     * @see org.neo4j.graphdb.Relationship#isType(org.neo4j.graphdb.RelationshipType).
      */
     public boolean isType(RelationshipType type) {
         return relationship().getType().name().equals(type.name());
