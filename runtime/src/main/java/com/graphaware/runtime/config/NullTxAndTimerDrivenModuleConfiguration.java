@@ -59,4 +59,12 @@ public final class NullTxAndTimerDrivenModuleConfiguration implements TxAndTimer
     public InclusionPolicies getInclusionPolicies() {
         return NullTxDrivenModuleConfiguration.getInstance().getInclusionPolicies();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long initializeUntil() {
+        return NullTxDrivenModuleConfiguration.getInstance().initializeUntil();
+    }
 }

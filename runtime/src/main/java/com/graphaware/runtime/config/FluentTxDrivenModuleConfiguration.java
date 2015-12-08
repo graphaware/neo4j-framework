@@ -38,23 +38,24 @@ public final class FluentTxDrivenModuleConfiguration extends BaseTxDrivenModuleC
      * Create a new configuration with {@link com.graphaware.runtime.policy.InclusionPoliciesFactory#allBusiness()}.
      */
     private FluentTxDrivenModuleConfiguration() {
-        super(InclusionPoliciesFactory.allBusiness());
+        super(InclusionPoliciesFactory.allBusiness(), ALWAYS);
     }
 
     /**
      * Create a new configuration.
      *
      * @param inclusionPolicies of the configuration.
+     * @param initializeUntil   of the new configuration.
      */
-    private FluentTxDrivenModuleConfiguration(InclusionPolicies inclusionPolicies) {
-        super(inclusionPolicies);
+    private FluentTxDrivenModuleConfiguration(InclusionPolicies inclusionPolicies, long initializeUntil) {
+        super(inclusionPolicies, initializeUntil);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected FluentTxDrivenModuleConfiguration newInstance(InclusionPolicies inclusionPolicies) {
-        return new FluentTxDrivenModuleConfiguration(inclusionPolicies);
+    protected FluentTxDrivenModuleConfiguration newInstance(InclusionPolicies inclusionPolicies, long initializeUntil) {
+        return new FluentTxDrivenModuleConfiguration(inclusionPolicies, initializeUntil);
     }
 }

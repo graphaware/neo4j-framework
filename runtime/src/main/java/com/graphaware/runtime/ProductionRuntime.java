@@ -66,8 +66,8 @@ public class ProductionRuntime extends DatabaseRuntime {
      * {@inheritDoc}
      */
     @Override
-    protected void startModules(boolean skipLoadingMetadata) {
-        super.startModules(skipLoadingMetadata);
+    protected void startModules() {
+        super.startModules();
         timerDrivenModuleManager.startModules();
     }
 

@@ -32,6 +32,7 @@ public final class NullTxDrivenModuleConfiguration implements TxDrivenModuleConf
 
     private static final TxDrivenModuleConfiguration INSTANCE = new NullTxDrivenModuleConfiguration();
     private final InclusionPolicies inclusionPolicies;
+    private final long initializeUntil;
 
     /**
      * Get instance of this singleton configuration.
@@ -44,6 +45,7 @@ public final class NullTxDrivenModuleConfiguration implements TxDrivenModuleConf
 
     private NullTxDrivenModuleConfiguration() {
         inclusionPolicies = InclusionPoliciesFactory.allBusiness();
+        initializeUntil = ALWAYS;
     }
 
     /**
@@ -52,5 +54,13 @@ public final class NullTxDrivenModuleConfiguration implements TxDrivenModuleConf
     @Override
     public InclusionPolicies getInclusionPolicies() {
         return inclusionPolicies;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long initializeUntil() {
+        return initializeUntil;
     }
 }

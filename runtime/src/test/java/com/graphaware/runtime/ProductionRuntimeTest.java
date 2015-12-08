@@ -645,6 +645,55 @@ public class ProductionRuntimeTest {
     }
 
     @Test
+    public void moduleRegisteredForTheFirstTimeShouldBeInitializedWhenAllowed() {
+        FluentTxDrivenModuleConfiguration configuration = FluentTxDrivenModuleConfiguration.defaultConfiguration().withInitializeUntil(System.currentTimeMillis() + 2000);
+
+        final TxDrivenModule mockModule = mockTxModule(configuration);
+
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        runtime.registerModule(mockModule);
+
+        runtime.start();
+
+        verify(mockModule).initialize(database);
+        verify(mockModule).start(database);
+        verify(mockModule, atLeastOnce()).getConfiguration();
+        verify(mockModule, atLeastOnce()).getId();
+        verifyNoMoreInteractions(mockModule);
+
+        try (Transaction tx = database.beginTx()) {
+            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
+            assertEquals(configuration, moduleMetadata.getConfig());
+            assertFalse(moduleMetadata.needsInitialization());
+            assertEquals(-1, moduleMetadata.problemTimestamp());
+        }
+    }
+
+    @Test
+    public void moduleRegisteredForTheFirstTimeShouldNotBeInitializedWhenNotAllowed() {
+        FluentTxDrivenModuleConfiguration configuration = FluentTxDrivenModuleConfiguration.defaultConfiguration().withInitializeUntil(System.currentTimeMillis() - 1);
+
+        final TxDrivenModule mockModule = mockTxModule(configuration);
+
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        runtime.registerModule(mockModule);
+
+        runtime.start();
+
+        verify(mockModule).start(database);
+        verify(mockModule, atLeastOnce()).getConfiguration();
+        verify(mockModule, atLeastOnce()).getId();
+        verifyNoMoreInteractions(mockModule);
+
+        try (Transaction tx = database.beginTx()) {
+            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
+            assertEquals(configuration, moduleMetadata.getConfig());
+            assertFalse(moduleMetadata.needsInitialization());
+            assertEquals(-1, moduleMetadata.problemTimestamp());
+        }
+    }
+
+    @Test
     public void moduleAlreadyRegisteredShouldNotBeInitialized() {
         final TxDrivenModule mockModule = mockTxModule();
 
@@ -702,6 +751,37 @@ public class ProductionRuntimeTest {
     }
 
     @Test
+    public void changedModuleShouldNotBeReInitializedWhenNotAllowed() {
+        FluentTxDrivenModuleConfiguration configuration = FluentTxDrivenModuleConfiguration.defaultConfiguration().withInitializeUntil(System.currentTimeMillis() - 1);
+
+        final TxDrivenModule mockModule = mockTxModule(configuration);
+
+        DefaultTxDrivenModuleMetadata oldMetadata = new DefaultTxDrivenModuleMetadata(FluentTxDrivenModuleConfiguration.defaultConfiguration().with(InclusionPolicies.none()));
+
+        try (Transaction tx = database.beginTx()) {
+            txRepo.persistModuleMetadata(mockModule, oldMetadata);
+            tx.success();
+        }
+
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        runtime.registerModule(mockModule);
+
+        runtime.start();
+
+        verify(mockModule).start(database);
+        verify(mockModule, atLeastOnce()).getConfiguration();
+        verify(mockModule, atLeastOnce()).getId();
+        verifyNoMoreInteractions(mockModule);
+
+        try (Transaction tx = database.beginTx()) {
+            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
+            assertEquals(configuration, moduleMetadata.getConfig());
+            assertFalse(moduleMetadata.needsInitialization());
+            assertEquals(-1, moduleMetadata.problemTimestamp());
+        }
+    }
+
+    @Test
     public void forcedModuleShouldBeReInitialized() {
         final TxDrivenModule mockModule = mockTxModule();
 
@@ -732,26 +812,31 @@ public class ProductionRuntimeTest {
     }
 
     @Test
-    public void changedModuleShouldNotBeReInitializedWhenInitializationSkipped() {
-        final TxDrivenModule mockModule = mockTxModule();
+    public void forcedModuleShouldNotBeReInitializedWhenNotAllowed() {
+        FluentTxDrivenModuleConfiguration configuration = FluentTxDrivenModuleConfiguration.defaultConfiguration().withInitializeUntil(System.currentTimeMillis() - 1);
+
+        final TxDrivenModule mockModule = mockTxModule(configuration);
+
+        DefaultTxDrivenModuleMetadata metadata = new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()).markedNeedingInitialization();
 
         try (Transaction tx = database.beginTx()) {
-            txRepo.persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(FluentTxDrivenModuleConfiguration.defaultConfiguration().with(InclusionPolicies.none())));
+            txRepo.persistModuleMetadata(mockModule, metadata);
             tx.success();
         }
 
         GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
-        runtime.start(true);
+        runtime.start();
 
         verify(mockModule).start(database);
+        verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule);
 
         try (Transaction tx = database.beginTx()) {
             TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
-            assertEquals(FluentTxDrivenModuleConfiguration.defaultConfiguration().with(InclusionPolicies.none()), moduleMetadata.getConfig());
+            assertEquals(configuration, moduleMetadata.getConfig());
             assertFalse(moduleMetadata.needsInitialization());
             assertEquals(-1, moduleMetadata.problemTimestamp());
         }
@@ -1007,7 +1092,7 @@ public class ProductionRuntimeTest {
         final TxDrivenModule mockModule = mockTxModule();
 
         GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
-        runtime.start(true);
+        runtime.start();
         runtime.registerModule(mockModule);
     }
 
@@ -1180,6 +1265,10 @@ public class ProductionRuntimeTest {
 
     private TxDrivenModule mockTxModule(String id) {
         return mockTxModule(id, NullTxDrivenModuleConfiguration.getInstance());
+    }
+
+    private TxDrivenModule mockTxModule(TxDrivenModuleConfiguration configuration) {
+        return mockTxModule(MOCK, configuration);
     }
 
     private TxDrivenModule mockTxModule(String id, TxDrivenModuleConfiguration configuration) {

@@ -17,7 +17,7 @@
 package com.graphaware.runtime.module;
 
 /**
- * {@link RuntimeException} indicating a {@link com.graphaware.runtime.module.TxDrivenModule} needs to be (re-)initialized.
+ * {@link RuntimeException} indicating a {@link RuntimeModule} needs to be (re-)initialized.
  */
 public class NeedsInitializationException extends RuntimeException {
 

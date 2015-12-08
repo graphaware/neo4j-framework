@@ -52,8 +52,8 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      */
     @Override
     protected void handleCorruptMetadata(T module) {
-        LOG.info("Module " + module.getId() + " seems to have corrupted metadata, will re-initialize...");
-        reinitialize(module, null);
+        LOG.info("Module " + module.getId() + " seems to have corrupted metadata, will try to re-initialize...");
+        reinitializeIfAllowed(module, null);
     }
 
     /**
@@ -61,8 +61,8 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      */
     @Override
     protected void handleNoMetadata(T module) {
-        LOG.info("Module " + module.getId() + " seems to have been registered for the first time, will initialize...");
-        initialize(module);
+        LOG.info("Module " + module.getId() + " seems to have been registered for the first time, will try to initialize...");
+        initializeIfAllowed(module);
     }
 
     /**
@@ -79,14 +79,14 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
     @Override
     protected TxDrivenModuleMetadata acknowledgeMetadata(T module, TxDrivenModuleMetadata metadata) {
         if (metadata.needsInitialization()) {
-            LOG.info("Module " + module.getId() + " has been marked for re-initialization on " + new Date(metadata.problemTimestamp()).toString() + ". Will re-initialize...");
-            reinitialize(module, metadata);
+            LOG.info("Module " + module.getId() + " has been marked for re-initialization on " + new Date(metadata.problemTimestamp()).toString() + ". Will try to re-initialize...");
+            reinitializeIfAllowed(module, metadata);
             return createFreshMetadata(module);
         }
 
         if (!metadata.getConfig().equals(module.getConfiguration())) {
-            LOG.info("Module " + module.getId() + " seems to have changed configuration since last run, will re-initialize...");
-            reinitialize(module, metadata);
+            LOG.info("Module " + module.getId() + " seems to have changed configuration since last run, will try to re-initialize...");
+            reinitializeIfAllowed(module, metadata);
             return createFreshMetadata(module);
         }
 
@@ -113,6 +113,31 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      * @param module to be started.
      */
     protected abstract void start(T module);
+
+    private void initializeIfAllowed(T module) {
+        if (allowedToInitialize(module, "initialize")) {
+            initialize(module);
+        }
+    }
+
+    private void reinitializeIfAllowed(T module, TxDrivenModuleMetadata metadata) {
+        if (allowedToInitialize(module, "re-initialize")) {
+            reinitialize(module, metadata);
+        }
+    }
+
+    private boolean allowedToInitialize(T module, String logMessage) {
+        long initUntil = module.getConfiguration().initializeUntil();
+        long now = System.currentTimeMillis();
+
+        if (initUntil > now) {
+            LOG.info("InitializeUntil set to " + initUntil + " and it is " + now + ". Will " + logMessage + ".");
+            return true;
+        } else {
+            LOG.info("InitializeUntil set to " + initUntil + " and it is " + now + ". Will NOT " + logMessage + ".");
+            return false;
+        }
+    }
 
     /**
      * Initialize module. This means doing any work necessary for a module that has been registered for the first time

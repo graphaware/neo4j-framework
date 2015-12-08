@@ -81,14 +81,6 @@ public interface GraphAwareRuntime {
     RuntimeConfiguration getConfiguration();
 
     /**
-     * Start the runtime, optionally skipping the metadata loading phase. It is not recommended to skip metadata loading;
-     * modules without metadata might not behave correctly.
-     *
-     * @param skipLoadingMetadata true for skipping the metadata loading phase.
-     */
-    void start(boolean skipLoadingMetadata);
-
-    /**
      * Get an instance of database writer associated with this runtime. Modules should use this writer to execute database
      * modifications. This allows the framework (and its configuration) to optimize write throughput.
      *

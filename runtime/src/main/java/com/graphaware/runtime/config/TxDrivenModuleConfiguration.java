@@ -31,4 +31,14 @@ public interface TxDrivenModuleConfiguration {
      * @return policies.
      */
     InclusionPolicies getInclusionPolicies();
+
+    long NEVER = 0;
+    long ALWAYS = Long.MAX_VALUE;
+
+    /**
+     * @return until what time in ms since epoch it is ok to re(initialize) the entire module in case the configuration
+     * has changed since the last time the module was started, or if it is the first time the module was registered.
+     * {@link #NEVER} for never, {@link #ALWAYS} for always.
+     */
+    long initializeUntil();
 }
