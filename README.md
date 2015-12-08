@@ -90,7 +90,7 @@ repository</a>. When using Maven for dependency management, include one or more 
 
 ### Snapshots
 
-To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.3.1.36-SNAPSHOT
+To use the latest development version, just clone this repository and run `mvn clean install`. This will produce 2.3.1.37-SNAPSHOT
 jar files. If you need standalone .jar files with all dependencies, look into the `target` folders in the `build` directory.
 
 ### Note on Versioning Scheme
