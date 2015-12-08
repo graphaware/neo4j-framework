@@ -24,19 +24,24 @@ import com.graphaware.runtime.config.NullTimerDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TimerDrivenModuleConfiguration;
 import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import org.junit.Test;
+import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.cluster.ClusterSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.graphdb.factory.HighlyAvailableGraphDatabaseFactory;
+import org.neo4j.helpers.Settings;
 import org.neo4j.kernel.ha.HaSettings;
+import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.io.File;
 import java.util.concurrent.*;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.*;
 import static com.graphaware.test.util.TestUtils.waitFor;
 import static org.junit.Assert.assertTrue;
+import static org.neo4j.helpers.Settings.FALSE;
 
 public class TimerDrivenModuleHaTest {
 
@@ -64,7 +69,13 @@ public class TimerDrivenModuleHaTest {
 
     @Test
     public void shouldInSingleMode() {
-        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        GraphDatabaseService database = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+                .newGraphDatabase();
+
+        registerShutdownHook(database);
 
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database,
                 FluentRuntimeConfiguration
@@ -134,13 +145,19 @@ public class TimerDrivenModuleHaTest {
     }
 
     private GraphDatabaseService haDb(String id, boolean slave) throws InterruptedException {
-        GraphDatabaseBuilder builder = new HighlyAvailableGraphDatabaseFactory().newEmbeddedDatabaseBuilder(new File("target/data/" + id + "/" + System.currentTimeMillis()));
-        builder.setConfig(ClusterSettings.server_id, id);
-        builder.setConfig(HaSettings.ha_server, "localhost:600" + id);
-        builder.setConfig(HaSettings.slave_only, Boolean.toString(slave));
-        builder.setConfig(ClusterSettings.cluster_server, "localhost:500" + id);
-        builder.setConfig(ClusterSettings.initial_hosts, "localhost:5001,localhost:5002,localhost:5003");
+        GraphDatabaseService database = new HighlyAvailableGraphDatabaseFactory()
+                .newEmbeddedDatabaseBuilder(new File("target/data/" + id + "/" + System.currentTimeMillis()))
+                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+                .setConfig(ClusterSettings.server_id, id)
+                .setConfig(HaSettings.ha_server, "localhost:600" + id)
+                .setConfig(HaSettings.slave_only, Boolean.toString(slave))
+                .setConfig(ClusterSettings.cluster_server, "localhost:500" + id)
+                .setConfig(ClusterSettings.initial_hosts, "localhost:5001,localhost:5002,localhost:5003")
+                .newGraphDatabase();
 
-        return builder.newGraphDatabase();
+        registerShutdownHook(database);
+
+        return database;
     }
 }

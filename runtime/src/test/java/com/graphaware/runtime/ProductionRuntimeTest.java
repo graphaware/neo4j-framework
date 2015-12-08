@@ -19,6 +19,7 @@ package com.graphaware.runtime;
 import com.graphaware.common.kv.GraphKeyValueStore;
 import com.graphaware.common.kv.KeyValueStore;
 import com.graphaware.common.policy.InclusionPolicies;
+import com.graphaware.common.util.DatabaseUtils;
 import com.graphaware.runtime.config.*;
 import com.graphaware.runtime.metadata.*;
 import com.graphaware.runtime.module.*;
@@ -33,20 +34,25 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.KernelEventHandler;
+import org.neo4j.helpers.Settings;
 import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.graphaware.common.util.DatabaseUtils.*;
 import static com.graphaware.runtime.GraphAwareRuntimeFactory.createRuntime;
 import static com.graphaware.runtime.config.FluentRuntimeConfiguration.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
+import static org.neo4j.helpers.Settings.FALSE;
 
 /**
  * Unit test for {@link ProductionRuntime}.
@@ -70,7 +76,14 @@ public class ProductionRuntimeTest {
 
     @Before
     public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        database = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+                .newGraphDatabase();
+
+        registerShutdownHook(database);
+
         txRepo = new GraphPropertiesMetadataRepository(database, defaultConfiguration(), TX_MODULES_PROPERTY_PREFIX);
         timerRepo = new GraphPropertiesMetadataRepository(database, defaultConfiguration(), TIMER_MODULES_PROPERTY_PREFIX);
         keyValueStore = new GraphKeyValueStore(database);

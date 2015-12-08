@@ -19,19 +19,23 @@ package com.graphaware.test.integration;
 import com.graphaware.test.data.DatabasePopulator;
 import org.junit.After;
 import org.junit.Before;
+import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
+import org.neo4j.helpers.Settings;
+import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
+import static org.neo4j.helpers.Settings.FALSE;
 
 /**
  * Base class for all kinds of Neo4j integration tests.
- * <p/>
+ * <p>
  * Creates an {@link org.neo4j.test.ImpermanentGraphDatabase} (by default) at the beginning of each test and allows
  * subclasses to populate it by overriding the {@link #populateDatabase(org.neo4j.graphdb.GraphDatabaseService)} method,
  * or by providing a {@link com.graphaware.test.data.DatabasePopulator} by overriding the {@link #databasePopulator()} method.
- * <p/>
+ * <p>
  * Shuts the database down at the end of each test.
  */
 public abstract class DatabaseIntegrationTest {
@@ -55,7 +59,10 @@ public abstract class DatabaseIntegrationTest {
      * @return builder.
      */
     protected GraphDatabaseBuilder createGraphDatabaseBuilder() {
-        return new TestGraphDatabaseFactory().newImpermanentDatabaseBuilder();
+        return new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE);
     }
 
     /**
@@ -68,8 +75,7 @@ public abstract class DatabaseIntegrationTest {
 
         if (propertiesFile() != null) {
             builder = builder.loadPropertiesFromFile(propertiesFile());
-        }
-        else {
+        } else {
             populateConfig(builder);
         }
 

@@ -18,9 +18,13 @@ package com.graphaware.runtime.bootstrap;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.config.InvalidSettingException;
+import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
+import org.neo4j.helpers.Settings;
+import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Arrays;
@@ -31,6 +35,7 @@ import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
 import static com.graphaware.runtime.bootstrap.TestRuntimeModule.TEST_RUNTIME_MODULES;
 import static org.junit.Assert.*;
+import static org.neo4j.helpers.Settings.FALSE;
 
 /**
  * Integration test for runtime and module bootstrapping.
@@ -44,7 +49,7 @@ public class BootstrapIntegrationTest {
 
     @Test
     public void moduleShouldNotBeInitializedWhenNoConfigProvided() throws InterruptedException {
-        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        GraphDatabaseService database = builder().newGraphDatabase();
 
         registerShutdownHook(database);
 
@@ -57,8 +62,7 @@ public class BootstrapIntegrationTest {
 
     @Test
     public void moduleShouldNotBeInitializedWhenRuntimeIsDisabled() throws InterruptedException {
-        GraphDatabaseService database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
+        GraphDatabaseService database = builder()
                 .setConfig(RUNTIME_ENABLED, "false")
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newGraphDatabase();
@@ -74,8 +78,7 @@ public class BootstrapIntegrationTest {
 
     @Test(expected = InvalidSettingException.class)
     public void misconfiguredRuntimeShouldFailStartup() throws InterruptedException {
-        GraphDatabaseService database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
+        GraphDatabaseService database = builder()
                 .setConfig(RUNTIME_ENABLED, "whatever")
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newGraphDatabase();
@@ -91,8 +94,7 @@ public class BootstrapIntegrationTest {
 
     @Test
     public void moduleShouldNotBeInitializedWhenRuntimeIsDisabled3() throws InterruptedException {
-        GraphDatabaseService database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
+        GraphDatabaseService database = builder()
                 .setConfig(RUNTIME_ENABLED, null)
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newGraphDatabase();
@@ -108,9 +110,7 @@ public class BootstrapIntegrationTest {
 
     @Test
     public void moduleShouldBeInitializedWhenRuntimeIsEnabled() throws InterruptedException {
-        GraphDatabaseService database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig(RUNTIME_ENABLED, "true")
+        GraphDatabaseService database = builder()
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
                 .newGraphDatabase();
@@ -133,9 +133,7 @@ public class BootstrapIntegrationTest {
 
     @Test
     public void moduleShouldBeInitializedWhenRuntimeIsEnabledWithoutAnyTransactions() throws InterruptedException {
-        GraphDatabaseService database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig(RUNTIME_ENABLED, "true")
+        GraphDatabaseService database = builder()
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
                 .newGraphDatabase();
@@ -155,9 +153,7 @@ public class BootstrapIntegrationTest {
 
     @Test
     public void moduleShouldBeInitializedWhenModuleIsDisabled() throws InterruptedException {
-        GraphDatabaseService database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig(RUNTIME_ENABLED, "true")
+        GraphDatabaseService database = builder()
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, null)
                 .newGraphDatabase();
 
@@ -172,9 +168,7 @@ public class BootstrapIntegrationTest {
 
     @Test
     public void moduleShouldBeInitializedWhenAnotherModuleIsMisConfigured() throws InterruptedException {
-        GraphDatabaseService database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig(RUNTIME_ENABLED, "true")
+        GraphDatabaseService database = builder()
                 .setConfig("com.graphaware.module.wrong1.enabled", "com.not.existent.Bootstrapper")
                 .setConfig("com.graphaware.module.wrong2.2", "com.not.existent.Bootstrapper")
                 .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
@@ -199,9 +193,7 @@ public class BootstrapIntegrationTest {
 
     @Test
     public void modulesShouldBeDelegatedToInCorrectOrder() throws InterruptedException {
-        GraphDatabaseService database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig(RUNTIME_ENABLED, "true")
+        GraphDatabaseService database = builder()
                 .setConfig("com.graphaware.module.test1.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .setConfig("com.graphaware.module.test3.3", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .setConfig("com.graphaware.module.test2.2", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
@@ -222,9 +214,7 @@ public class BootstrapIntegrationTest {
 
     @Test
     public void modulesShouldBeDelegatedToInRandomOrderWhenOrderClashes() throws InterruptedException {
-        GraphDatabaseService database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig(RUNTIME_ENABLED, "true")
+        GraphDatabaseService database = builder()
                 .setConfig("com.graphaware.module.test1.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .setConfig("com.graphaware.module.test3.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .setConfig("com.graphaware.module.test2.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
@@ -243,5 +233,13 @@ public class BootstrapIntegrationTest {
         assertTrue(remaining.remove(TEST_RUNTIME_MODULES.get(1).getId()));
         assertTrue(remaining.remove(TEST_RUNTIME_MODULES.get(2).getId()));
         assertTrue(remaining.isEmpty());
+    }
+
+    private GraphDatabaseBuilder builder() {
+        return new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+                .setConfig(RUNTIME_ENABLED, "true");
     }
 }

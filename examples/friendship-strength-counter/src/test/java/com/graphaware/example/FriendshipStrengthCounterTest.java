@@ -19,7 +19,10 @@ package com.graphaware.example;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.*;
+import org.neo4j.helpers.Settings;
+import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Iterator;
@@ -28,6 +31,7 @@ import java.util.Map;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.example.FriendshipStrengthCounter.*;
 import static org.junit.Assert.assertEquals;
+import static org.neo4j.helpers.Settings.FALSE;
 
 
 /**
@@ -39,7 +43,12 @@ public class FriendshipStrengthCounterTest {
 
     @Before
     public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        database = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+                .newGraphDatabase();
+
         registerShutdownHook(database);
 
         database.registerTransactionEventHandler(new FriendshipStrengthCounter(database));
