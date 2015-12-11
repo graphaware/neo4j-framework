@@ -19,8 +19,10 @@ package com.graphaware.runtime;
 import com.graphaware.common.kv.GraphKeyValueStore;
 import com.graphaware.common.kv.KeyValueStore;
 import com.graphaware.common.policy.InclusionPolicies;
-import com.graphaware.common.util.DatabaseUtils;
-import com.graphaware.runtime.config.*;
+import com.graphaware.runtime.config.FluentTxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.NullTxAndTimerDrivenModuleConfiguration;
+import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.metadata.*;
 import com.graphaware.runtime.module.*;
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
@@ -46,7 +48,7 @@ import org.neo4j.tooling.GlobalGraphOperations;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.graphaware.common.util.DatabaseUtils.*;
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.runtime.GraphAwareRuntimeFactory.createRuntime;
 import static com.graphaware.runtime.config.FluentRuntimeConfiguration.*;
 import static org.junit.Assert.*;
@@ -177,6 +179,29 @@ public class ProductionRuntimeTest {
     public void moduleThrowingExceptionShouldRollbackTransaction() {
         TxDrivenModule mockModule = mockTxModule(MOCK);
         doThrow(new DeliberateTransactionRollbackException("Deliberate testing exception")).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
+
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        runtime.registerModule(mockModule);
+        runtime.start();
+
+        try (Transaction tx = database.beginTx()) {
+            Node node = database.createNode(new Label[]{});
+            node.setProperty("test", "test");
+            tx.success();
+        } catch (Exception e) {
+            //ok
+        }
+
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(0, Iterables.count(GlobalGraphOperations.at(database).getAllNodes()));
+            tx.success();
+        }
+    }
+
+    @Test
+    public void moduleThrowingRuntimeExceptionShouldRollbackTransaction() {
+        TxDrivenModule mockModule = mockTxModule(MOCK);
+        doThrow(new RuntimeException("Deliberate testing exception")).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
         GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
@@ -1119,7 +1144,7 @@ public class ProductionRuntimeTest {
     }
 
     @Test
-    public void whenOneModuleThrowsAnExceptionThenOtherModulesShouldStillBeDelegatedTo() {
+    public void whenOneModuleThrowsAnExceptionThenOtherModulesShouldNotBeDelegatedTo() {
         TxDrivenModule mockModule1 = mockTxModule(MOCK + "1");
         doThrow(new RuntimeException()).when(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
 
@@ -1145,12 +1170,12 @@ public class ProductionRuntimeTest {
         try (Transaction tx = database.beginTx()) {
             database.createNode(new Label[]{});
             tx.success();
+        } catch (RuntimeException e) {
+            //ok
         }
 
         verify(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
-        verify(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
-        verify(mockModule1).afterCommit(null); //threw exception
-        verify(mockModule2).afterCommit("TEST_" + MOCK + "2");
+        verify(mockModule1).afterRollback(null);
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule1, atLeastOnce()).getConfiguration();

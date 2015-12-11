@@ -142,11 +142,11 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
     /**
      * Initialize module. This means doing any work necessary for a module that has been registered for the first time
      * on an existing database, or that has been previously registered with different configuration.
-     * <p/>
+     * <p>
      * For example, a module that performs some in-graph caching needs to write information into the graph so that when
      * the method returns, the graph is in the same state as it would be if the module has been running all the time
      * since the graph was empty.
-     * <p/>
+     * <p>
      * Note that for many modules, it might not be necessary to do anything.
      *
      * @param module to initialize.
@@ -157,11 +157,11 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      * Re-initialize module. This means cleaning up all data this module might have ever written to the graph and
      * doing any work necessary for a module that has been registered for the first time
      * on an existing database, or that has been previously registered with different configuration.
-     * <p/>
+     * <p>
      * For example, a module that performs some in-graph caching needs to write information into the graph so that when
      * the method returns, the graph is in the same state as it would be if the module has been running all the time
      * since the graph was empty.
-     * <p/>
+     * <p>
      * Note that for many modules, it might not be necessary to do anything.
      *
      * @param module      to initialize.
@@ -194,19 +194,22 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
                 metadataRepository.persistModuleMetadata(module, moduleMetadata.markedNeedingInitialization());
             } catch (DeliberateTransactionRollbackException e) {
                 LOG.debug("Module " + module.getId() + " threw an exception indicating that the transaction should be rolled back.", e);
-
-                result.put(module.getId(), state);      //just so the module gets afterRollback called as well
-                afterRollback(result); //remove this when https://github.com/neo4j/neo4j/issues/2660 is resolved
-
-                throw e;               //will cause rollback
+                return handleException(result, module, state, e);
             } catch (RuntimeException e) {
                 LOG.warn("Module " + module.getId() + " threw an exception", e);
+                return handleException(result, module, state, e);
             }
 
             result.put(module.getId(), state);
         }
 
         return result;
+    }
+
+    private Map<String, Object> handleException(Map<String, Object> result, T module, Object state, RuntimeException e) {
+        result.put(module.getId(), state);      //just so the module gets afterRollback called as well
+        afterRollback(result); //remove this when https://github.com/neo4j/neo4j/issues/2660 is resolved
+        throw e;               //will cause rollback
     }
 
     /**
