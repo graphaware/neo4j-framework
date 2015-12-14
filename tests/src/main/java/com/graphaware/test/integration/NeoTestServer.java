@@ -29,7 +29,7 @@ import java.io.IOException;
 /**
  * Real Neo4j server, started from an instance of this class using the {@link #start()} method and stopped using the
  * {@link #stop()} method.
- * <p/>
+ * <p>
  * The Neo4j and server configuration file names are provided using a constructor. They defaults to "neo4j.properties"
  * and "neo4j-server.properties" and if no such files are present on the classpath, the ones that ships with Neo4j are used.
  */
@@ -69,10 +69,10 @@ public abstract class NeoTestServer {
 
     private File serverConfigToConfDir() throws IOException {
         String serverConfigContents = IOUtils.toString(new ClassPathResource(neo4jServerConfigFile).getInputStream());
-        serverConfigContents = serverConfigContents.replaceAll("=conf/", "=" + temporaryFolder.getRoot().getAbsolutePath() + "/conf/");
-        serverConfigContents = serverConfigContents.replaceAll("=data/", "=" + temporaryFolder.getRoot().getAbsolutePath() + "/data/");
+        serverConfigContents = serverConfigContents.replaceAll("=conf" + File.separator, "=" + temporaryFolder.getRoot().getAbsolutePath() + File.separator + "conf" + File.separator);
+        serverConfigContents = serverConfigContents.replaceAll("=data" + File.separator, "=" + temporaryFolder.getRoot().getAbsolutePath() + File.separator + "data" + File.separator);
 
-        File serverConfig = temporaryFolder.newFile("conf/neo4j-server.properties");
+        File serverConfig = temporaryFolder.newFile("conf" + File.separator + "neo4j-server.properties");
         IOUtils.copy(IOUtils.toInputStream(serverConfigContents), new FileOutputStream(serverConfig));
         System.setProperty(Configurator.NEO_SERVER_CONFIG_FILE_KEY, serverConfig.getAbsolutePath());
         return serverConfig;
@@ -85,7 +85,7 @@ public abstract class NeoTestServer {
     }
 
     protected File copyToConfDir(String classPathResource, String newName) throws IOException {
-        File result = temporaryFolder.newFile("conf/" + newName);
+        File result = temporaryFolder.newFile("conf" + File.separator + newName);
         IOUtils.copy(new ClassPathResource(classPathResource).getInputStream(), new FileOutputStream(result));
         return result;
     }
