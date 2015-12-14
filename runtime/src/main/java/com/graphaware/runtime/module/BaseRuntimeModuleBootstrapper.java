@@ -40,10 +40,10 @@ public abstract class BaseRuntimeModuleBootstrapper<C extends BaseTxDrivenModule
 
     protected static final String INITIALIZE_UNTIL = "initializeUntil";
 
-    protected static final String NODES = "nodes";
-    protected static final String NODE_PROPERTIES = "node.properties";
-    protected static final String RELATIONSHIPS = "relationships";
-    protected static final String RELATIONSHIP_PROPERTIES = "relationship.properties";
+    protected static final String NODE = "node";
+    protected static final String NODE_PROPERTY = "node.property";
+    protected static final String RELATIONSHIP = "relationship";
+    protected static final String RELATIONSHIP_PROPERTY = "relationship.property";
 
     /**
      * Produce default configuration for the module.
@@ -64,27 +64,27 @@ public abstract class BaseRuntimeModuleBootstrapper<C extends BaseTxDrivenModule
             logInitUntil(moduleId, configuration);
         }
 
-        if (configExists(config, NODES)) {
-            NodeInclusionPolicy policy = StringToNodeInclusionPolicy.getInstance().apply(config.get(NODES));
-            LOG.info("Nodes Inclusion Policy set to {}", policy);
+        if (configExists(config, NODE)) {
+            NodeInclusionPolicy policy = StringToNodeInclusionPolicy.getInstance().apply(config.get(NODE));
+            LOG.info("Node Inclusion Policy set to {}", policy);
             configuration = configuration.with(policy);
         }
 
-        if (configExists(config, NODE_PROPERTIES)) {
-            NodePropertyInclusionPolicy policy = StringToNodePropertyInclusionPolicy.getInstance().apply(config.get(NODE_PROPERTIES));
-            LOG.info("Node Properties Inclusion Policy set to {}", policy);
+        if (configExists(config, NODE_PROPERTY)) {
+            NodePropertyInclusionPolicy policy = StringToNodePropertyInclusionPolicy.getInstance().apply(config.get(NODE_PROPERTY));
+            LOG.info("Node Property Inclusion Policy set to {}", policy);
             configuration = configuration.with(policy);
         }
 
-        if (configExists(config, RELATIONSHIPS)) {
-            RelationshipInclusionPolicy policy = StringToRelationshipInclusionPolicy.getInstance().apply(config.get(RELATIONSHIPS));
-            LOG.info("Relationships Inclusion Policy set to {}", policy);
+        if (configExists(config, RELATIONSHIP)) {
+            RelationshipInclusionPolicy policy = StringToRelationshipInclusionPolicy.getInstance().apply(config.get(RELATIONSHIP));
+            LOG.info("Relationship Inclusion Policy set to {}", policy);
             configuration = configuration.with(policy);
         }
 
-        if (configExists(config, RELATIONSHIP_PROPERTIES)) {
-            RelationshipPropertyInclusionPolicy policy = StringToRelationshipPropertyInclusionPolicy.getInstance().apply(config.get(RELATIONSHIP_PROPERTIES));
-            LOG.info("Relationship Properties Inclusion Policy set to {}", policy);
+        if (configExists(config, RELATIONSHIP_PROPERTY)) {
+            RelationshipPropertyInclusionPolicy policy = StringToRelationshipPropertyInclusionPolicy.getInstance().apply(config.get(RELATIONSHIP_PROPERTY));
+            LOG.info("Relationship Property Inclusion Policy set to {}", policy);
             configuration = configuration.with(policy);
         }
 
