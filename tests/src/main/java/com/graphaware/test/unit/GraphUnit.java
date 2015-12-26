@@ -18,7 +18,6 @@ package com.graphaware.test.unit;
 
 import com.graphaware.common.policy.InclusionPolicies;
 import com.graphaware.common.util.PropertyContainerUtils;
-import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.Settings;
 import org.neo4j.helpers.collection.Iterables;
@@ -98,7 +97,7 @@ public final class GraphUnit {
 
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig("online_backup_enabled", Settings.FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 
@@ -169,7 +168,7 @@ public final class GraphUnit {
 
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig("online_backup_enabled", Settings.FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 

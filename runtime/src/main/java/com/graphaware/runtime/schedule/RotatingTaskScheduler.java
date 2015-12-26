@@ -42,8 +42,6 @@ import java.util.concurrent.TimeUnit;
 import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.*;
 import static com.graphaware.runtime.schedule.TimingStrategy.NEVER_RUN;
 import static com.graphaware.runtime.schedule.TimingStrategy.UNKNOWN;
-import static org.neo4j.kernel.ha.cluster.HighAvailabilityModeSwitcher.MASTER;
-import static org.neo4j.kernel.ha.cluster.HighAvailabilityModeSwitcher.SLAVE;
 
 /**
  * {@link TaskScheduler} that delegates to the registered {@link TimerDrivenModule}s in round-robin fashion, in the order
@@ -244,7 +242,7 @@ public class RotatingTaskScheduler implements TaskScheduler {
 
         String currentRole = haBean.getRole();
 
-        return MASTER.equals(currentRole) && policy.equals(MASTER_ONLY) || SLAVE.equals(currentRole) && policy.equals(SLAVES_ONLY);
+        return "master".equals(currentRole) && policy.equals(MASTER_ONLY) || "slave".equals(currentRole) && policy.equals(SLAVES_ONLY);
     }
 
     /**

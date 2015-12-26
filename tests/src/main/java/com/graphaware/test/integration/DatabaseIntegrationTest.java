@@ -19,7 +19,6 @@ package com.graphaware.test.integration;
 import com.graphaware.test.data.DatabasePopulator;
 import org.junit.After;
 import org.junit.Before;
-import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.helpers.Settings;
@@ -61,7 +60,7 @@ public abstract class DatabaseIntegrationTest {
     protected GraphDatabaseBuilder createGraphDatabaseBuilder() {
         return new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig("online_backup_enabled", Settings.FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE);
     }
 
