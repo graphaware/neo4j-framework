@@ -86,6 +86,9 @@ public class RotatingTaskScheduler implements TaskScheduler {
         } catch (Exception e) {
             LOG.warn("Failed to obtain Neo4j Manager, assuming a single-node architecture.", e);
             return null;
+        } catch (NoClassDefFoundError error) {
+            LOG.info("Running in a single-node architecture (Neo4j Community)");
+            return null;
         }
     }
 
