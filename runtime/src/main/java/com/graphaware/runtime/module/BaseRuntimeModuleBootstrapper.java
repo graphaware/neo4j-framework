@@ -59,11 +59,23 @@ public abstract class BaseRuntimeModuleBootstrapper<C extends BaseTxDrivenModule
     public RuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
         C configuration = defaultConfiguration();
 
+        configuration = configureInitialization(moduleId, config, configuration);
+
+        configuration = configureInclusionPolicies(config, configuration);
+
+        return doBootstrapModule(moduleId, config, database, configuration);
+    }
+
+    protected C configureInitialization(String moduleId, Map<String, String> config, C configuration) {
         if (configExists(config, INITIALIZE_UNTIL)) {
             configuration = configuration.withInitializeUntil(Long.valueOf(config.get(INITIALIZE_UNTIL)));
             logInitUntil(moduleId, configuration);
         }
 
+        return configuration;
+    }
+
+    protected C configureInclusionPolicies(Map<String, String> config, C configuration) {
         if (configExists(config, NODE)) {
             NodeInclusionPolicy policy = StringToNodeInclusionPolicy.getInstance().apply(config.get(NODE));
             LOG.info("Node Inclusion Policy set to {}", policy);
@@ -88,7 +100,7 @@ public abstract class BaseRuntimeModuleBootstrapper<C extends BaseTxDrivenModule
             configuration = configuration.with(policy);
         }
 
-        return doBootstrapModule(moduleId, config, database, configuration);
+        return configuration;
     }
 
     /**
