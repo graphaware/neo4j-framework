@@ -16,40 +16,17 @@
 
 package com.graphaware.test.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.charset.Charset;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 /**
  * Utilities mainly intended for testing.
  */
 public final class TestUtils {
-
-    private static final Logger LOG = LoggerFactory.getLogger(TestUtils.class);
-
-    /**
-     * Assert that two JSON objects represented as Strings are semantically equal.
-     *
-     * @param one one.
-     * @param two two.
-     */
-    public static void assertJsonEquals(String one, String two) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            assertTrue(mapper.readTree(one).equals(mapper.readTree(two)));
-        } catch (IOException e) {
-            fail();
-        }
-    }
 
     /**
      * Convert a JSON file to String.
