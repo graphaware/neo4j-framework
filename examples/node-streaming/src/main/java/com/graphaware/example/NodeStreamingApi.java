@@ -19,7 +19,7 @@ package com.graphaware.example;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.graphaware.api.JsonNode;
+import com.graphaware.api.json.LongIdJsonNode;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -71,7 +71,7 @@ public class NodeStreamingApi {
                         } else {
                             first = false;
                         }
-                        emitter.send(new JsonNode(node));
+                        emitter.send(new LongIdJsonNode(node));
                     }
 
                     emitter.send("]");
@@ -99,7 +99,7 @@ public class NodeStreamingApi {
 
                 try (Transaction tx = database.beginTx()) {
                     for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
-                        jsonGenerator.writeObject(new JsonNode(node));
+                        jsonGenerator.writeObject(new LongIdJsonNode(node));
                     }
                     tx.success();
                 }

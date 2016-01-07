@@ -17,12 +17,33 @@
 package com.graphaware.api;
 
 /**
- * Base-class for JSON-serializable API inputs. Specifies what to include in the output.
+ * Specification of what to include an API output.
  */
-public class JsonInput {
+public class SerializationSpecification {
 
     private String[] nodeProperties;
     private String[] relationshipProperties;
+
+    /**
+     * Construct a new spec: Return all node and relationship properties.
+     */
+    public SerializationSpecification() {
+    }
+
+    /**
+     * Construct a new spec.
+     *
+     * @param nodeProperties         keys of node properties to be included in the output. If the property doesn't exist for a node, nothing
+     *                               happens (i.e. it will not appear in the output in any form). <code>null</code> means all,
+     *                               empty array means none.
+     * @param relationshipProperties keys of relationship properties to be included in the output. If the property doesn't exist for
+     *                               a relationship, nothing happens (i.e. it will not appear in the output in any form).
+     *                               <code>null</code> means all, empty array means none.
+     */
+    public SerializationSpecification(String[] nodeProperties, String[] relationshipProperties) {
+        this.nodeProperties = nodeProperties;
+        this.relationshipProperties = relationshipProperties;
+    }
 
     /**
      * Get the node properties to be included in the output.
@@ -38,7 +59,8 @@ public class JsonInput {
      * Set the node properties to be included in the output.
      *
      * @param nodeProperties keys of node properties to be included. If the property doesn't exist for a node, nothing
-     *                       happens (i.e. it will not appear in the output in any form).
+     *                       happens (i.e. it will not appear in the output in any form). <code>null</code> means all,
+     *                       empty array means none.
      */
     public void setNodeProperties(String[] nodeProperties) {
         this.nodeProperties = nodeProperties;
@@ -59,6 +81,7 @@ public class JsonInput {
      *
      * @param relationshipProperties keys of relationship properties to be included. If the property doesn't exist for
      *                               a relationship, nothing happens (i.e. it will not appear in the output in any form).
+     *                               <code>null</code> means all, empty array means none.
      */
     public void setRelationshipProperties(String[] relationshipProperties) {
         this.relationshipProperties = relationshipProperties;

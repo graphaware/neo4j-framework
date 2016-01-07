@@ -31,6 +31,7 @@ import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.assertEquals;
@@ -81,7 +82,7 @@ public class ThirdPartyIntegrationModuleTest {
                 new NodeRepresentation(2L, new String[]{"Person"}, MapUtil.map("name", "Adam")))));
 
         assertTrue(writeOperations.contains(new RelationshipCreated(
-                new RelationshipRepresentation(2L, 3L, 1L, "WORKS_FOR", null)
+                new RelationshipRepresentation(2L, 3L, 1L, "WORKS_FOR", Collections.<String, Object>emptyMap())
         )));
 
         assertTrue(writeOperations.contains(new RelationshipUpdated(

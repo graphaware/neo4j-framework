@@ -32,6 +32,7 @@ import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
@@ -92,7 +93,7 @@ public class WriterBasedThirdPartyIntegrationModuleTest {
                 new NodeRepresentation(0L, new String[]{"Person"}, MapUtil.map("name", "Michal", "age", 31L)))));
 
         assertTrue(writeOperations.get(0).contains(new RelationshipCreated(
-                new RelationshipRepresentation(2L, 3L, 1L, "WORKS_FOR", null)
+                new RelationshipRepresentation(2L, 3L, 1L, "WORKS_FOR", Collections.<String, Object>emptyMap())
         )));
 
         assertTrue(writeOperations.get(1).contains(new NodeDeleted(

@@ -47,8 +47,7 @@ public class NodeRepresentation extends PropertyContainerRepresentation<Node> {
      * @param node node to create the representation from. Must not be <code>null</code>.
      */
     public NodeRepresentation(Node node) {
-        super(node, null);
-        setLabels(labelsToStringArray(node.getLabels()));
+        this(node, null);
     }
 
     /**
@@ -66,10 +65,10 @@ public class NodeRepresentation extends PropertyContainerRepresentation<Node> {
     /**
      * Construct a representation from a Neo4j node ID.
      *
-     * @param id of a node to create the representation from.
+     * @param graphId of a node to create the representation from.
      */
-    public NodeRepresentation(long id) {
-        super(id);
+    public NodeRepresentation(long graphId) {
+        super(graphId);
     }
 
     /**
@@ -87,15 +86,15 @@ public class NodeRepresentation extends PropertyContainerRepresentation<Node> {
 
     /**
      * Construct a representation from a Neo4j node ID, an array of labels, and a map of properties.
-     * <p/>
+     * <p>
      * Note that this constructor is only intended for testing.
      *
-     * @param id         ID.
+     * @param graphId    ID.
      * @param labels     of the new node. Must not be <code>null</code>, but can be empty.
      * @param properties of the new node. Can be <code>null</code>, which is equivalent to an empty map.
      */
-    public NodeRepresentation(long id, String[] labels, Map<String, Object> properties) {
-        super(id, properties);
+    public NodeRepresentation(long graphId, String[] labels, Map<String, Object> properties) {
+        super(graphId, properties);
 
         notNull(labels);
         this.labels = labels;
@@ -114,7 +113,7 @@ public class NodeRepresentation extends PropertyContainerRepresentation<Node> {
      */
     @Override
     protected Node fetch(GraphDatabaseService database) {
-        return database.getNodeById(getId());
+        return database.getNodeById(getGraphId());
     }
 
     /**

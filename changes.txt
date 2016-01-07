@@ -6,6 +6,7 @@
     - fixed issue #30: module throwing an exception now always causes transaction rollback
     - fixed issue #35: provided examples of streaming controllers
     - make it easier and more consistent for runtime module developers to bootstrap modules
+    - overhaul of JSON API support, so that it is much more flexible
 
 2.3.1.36:
     - removed log4j in favour of logback

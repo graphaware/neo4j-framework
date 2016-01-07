@@ -14,32 +14,22 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.api;
+package com.graphaware.api.transform;
 
-import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.Relationship;
 
 /**
- * JSON-serializable representation of a Neo4j relationship type and direction. Direction defaults to BOTH, type must
- * be specified.
+ * Trivial {@link RelationshipIdTransformer} that performs no transformation of the ID. Singleton.
  */
-public class JsonRelationshipTypeAndDirection {
+public class TrivialRelationshipIdTransformer extends BaseTrivialIdTransformer<Relationship> implements RelationshipIdTransformer<Long> {
 
-    private String type;
-    private Direction direction = Direction.BOTH;
+    private static final TrivialRelationshipIdTransformer INSTANCE = new TrivialRelationshipIdTransformer();
 
-    public String getType() {
-        return type;
+    public static TrivialRelationshipIdTransformer getInstance() {
+        return INSTANCE;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Direction getDirection() {
-        return direction;
-    }
-
-    public void setDirection(Direction direction) {
-        this.direction = direction;
+    private TrivialRelationshipIdTransformer() {
     }
 }
+
