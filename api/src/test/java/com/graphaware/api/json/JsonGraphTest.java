@@ -76,7 +76,9 @@ public class JsonGraphTest {
                 "{\"properties\":{},\"labels\":[],\"id\":1}]," +
                 "\"relationships\":" +
                 "[{\"properties\":{\"k1\":\"v1\",\"k2\":2},\"type\":\"R\",\"id\":0,\"startNodeId\":0,\"endNodeId\":1}," +
-                "{\"properties\":{\"k1\":\"v2\",\"k2\":4},\"type\":\"R2\",\"id\":1,\"startNodeId\":0,\"endNodeId\":1}]}", mapper.writeValueAsString(g), true);
+                "{\"properties\":{\"k1\":\"v2\",\"k2\":4},\"type\":\"R2\",\"id\":1,\"startNodeId\":0,\"endNodeId\":1}]}", mapper.writeValueAsString(g), false);
+
+        System.out.println(mapper.writeValueAsString(g));
     }
 
     @Test
@@ -96,7 +98,7 @@ public class JsonGraphTest {
                 "{\"properties\":{},\"labels\":[],\"id\":1}]," +
                 "\"relationships\":" +
                 "[{\"properties\":{\"k1\":\"v1\",\"k2\":2},\"type\":\"R\",\"id\":0,\"startNodeId\":0,\"endNodeId\":1}," +
-                "{\"properties\":{\"k1\":\"v2\",\"k2\":4},\"type\":\"R2\",\"id\":1,\"startNodeId\":0,\"endNodeId\":1}]}", mapper.writeValueAsString(g), true);
+                "{\"properties\":{\"k1\":\"v2\",\"k2\":4},\"type\":\"R2\",\"id\":1,\"startNodeId\":0,\"endNodeId\":1}]}", mapper.writeValueAsString(g), false);
     }
 
     private class Graph extends JsonGraph<Graph> {
