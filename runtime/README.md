@@ -44,7 +44,7 @@ The following Runtime Modules are developed and provided by GraphAware. They are
 
 ### Getting the Runtime
 
-GraphAware Runtime ships with the Framework. By [downloading](http://graphaware.com/downloads) the appropriate release
+GraphAware Runtime ships with the Framework. By [downloading](http://products.graphaware.com) the appropriate release
 of the GraphAware Framework and placing it into the _plugins_ directory of your Neo4 server, you have the Runtime as well.
 However, it is disabled by default and needs to be explicitly enabled (read on).
 

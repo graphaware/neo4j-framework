@@ -8,7 +8,7 @@ This (Maven) module is part of the [GraphAware Neo4j Framework](https://github.c
 This module allows building APIs by deploying Spring MVC Controllers into the _plugins_ directory of the Neo4j server and thus provide
 and alternative to server plugins and unmanaged server extensions.
 
-There is no need to use this module directly. Just [download](http://graphaware.com/downloads) the appropriate release
+There is no need to use this module directly. Just [download](http://products.graphaware.com) the appropriate release
 of the GraphAware Framework and place it into the _plugins_ directory of Neo4j.
 
 The following APIs are developed and provided by GraphAware:
