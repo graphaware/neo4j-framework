@@ -118,6 +118,14 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      * {@inheritDoc}
      */
     @Override
+    public <M extends RuntimeModule> M getModule(Class<M> clazz) throws NotFoundException {
+        return getTxDrivenModuleManager().getModule(clazz);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected Set<String> loadMetadata() {
         return getTxDrivenModuleManager().loadMetadata();
     }

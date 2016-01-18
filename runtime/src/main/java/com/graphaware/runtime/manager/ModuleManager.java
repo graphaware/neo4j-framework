@@ -54,6 +54,16 @@ public interface ModuleManager<T extends RuntimeModule> {
     <M extends RuntimeModule> M getModule(String moduleId, Class<M> clazz);
 
     /**
+     * Get a module registered with the manager.
+     *
+     * @param clazz class of the module.
+     * @param <M>   type of the class above.
+     * @return module. <code>null</code> if no such module exists.
+     * @throws IllegalStateException if more than one module of the same type has been registered.
+     */
+    <M extends RuntimeModule> M getModule(Class<M> clazz);
+
+    /**
      * Load module metadata from wherever they are stored in between database restarts and do whatever is necessary
      * to do with this metadata before the modules can be used.
      *

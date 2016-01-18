@@ -74,6 +74,24 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <M extends RuntimeModule> M getModule(Class<M> clazz) {
+        M result = null;
+        for (T module : modules.values()) {
+            if (clazz.isAssignableFrom(module.getClass())) {
+                if (result != null) {
+                    throw new IllegalStateException("More than one module of type " + clazz + " has been registered");
+                }
+                result = (M) module;
+            }
+        }
+
+        return result;
+    }
+
+    /**
      * Check that the given module isn't already registered with the manager.
      *
      * @param module to check.

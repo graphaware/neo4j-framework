@@ -19,10 +19,7 @@ package com.graphaware.runtime;
 import com.graphaware.common.kv.GraphKeyValueStore;
 import com.graphaware.common.kv.KeyValueStore;
 import com.graphaware.common.policy.InclusionPolicies;
-import com.graphaware.runtime.config.FluentTxDrivenModuleConfiguration;
-import com.graphaware.runtime.config.NullTxAndTimerDrivenModuleConfiguration;
-import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
-import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.*;
 import com.graphaware.runtime.metadata.*;
 import com.graphaware.runtime.module.*;
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
@@ -608,6 +605,65 @@ public class ProductionRuntimeTest {
         assertEquals(mockModule1, runtime.getModule(MOCK + "1", TimerDrivenModule.class));
         assertEquals(mockModule2, runtime.getModule(MOCK + "2", TxDrivenModule.class));
         assertEquals(mockModule3, runtime.getModule(MOCK + "3", TimerDrivenModule.class));
+    }
+
+    @Test
+    public void shouldObtainModulesOfCorrectTypesWhenIdNotSpecified() {
+        M1 mockM1 = mockTxModule("M1", M1.class);
+        M2 mockM2a = mockTxModule("M2a", M2.class);
+        M2 mockM2b = mockTxModule("M2b", M2.class);
+        M3 mockM3 = mockTimerModule("M3", M3.class);
+        M4 mockM4a = mockTimerModule("M4a", M4.class);
+        M4 mockM4b = mockTimerModule("M4b", M4.class);
+        M5 mockM5 = mockTimerModule("M5", M5.class);
+        M6 mockM6a = mockTimerModule("M6a", M6.class);
+        M6 mockM6b = mockTimerModule("M6b", M6.class);
+
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        runtime.registerModule(mockM1);
+        runtime.registerModule(mockM2a);
+        runtime.registerModule(mockM2b);
+        runtime.registerModule(mockM3);
+        runtime.registerModule(mockM4a);
+        runtime.registerModule(mockM4b);
+        runtime.registerModule(mockM5);
+        runtime.registerModule(mockM6a);
+        runtime.registerModule(mockM6b);
+
+        assertEquals(mockM1, runtime.getModule(M1.class));
+        assertEquals(mockM3, runtime.getModule(M3.class));
+        assertEquals(mockM5, runtime.getModule(M5.class));
+
+        try {
+            runtime.getModule(M2.class);
+        } catch (IllegalStateException e) {
+            //ok
+        }
+        try {
+            runtime.getModule(M4.class);
+        } catch (IllegalStateException e) {
+            //ok
+        }
+        try {
+            runtime.getModule(M6.class);
+        } catch (IllegalStateException e) {
+            //ok
+        }
+        try {
+            runtime.getModule(M7.class);
+        } catch (NotFoundException e) {
+            //ok
+        }
+        try {
+            runtime.getModule(M8.class);
+        } catch (NotFoundException e) {
+            //ok
+        }
+        try {
+            runtime.getModule(M9.class);
+        } catch (NotFoundException e) {
+            //ok
+        }
     }
 
     @Test(expected = NotFoundException.class)
@@ -1304,6 +1360,14 @@ public class ProductionRuntimeTest {
         return mockModule;
     }
 
+    private <T extends TxDrivenModule> T mockTxModule(String id, Class<T> cls) {
+        T mockModule = mock(cls);
+        when(mockModule.getId()).thenReturn(id);
+        when(mockModule.getConfiguration()).thenReturn( NullTxDrivenModuleConfiguration.getInstance());
+        when(mockModule.beforeCommit(any(ImprovedTransactionData.class))).thenReturn("TEST_" + id);
+        return mockModule;
+    }
+
     private TimerDrivenModule mockTimerModule() {
         return mockTimerModule(MOCK);
     }
@@ -1315,4 +1379,62 @@ public class ProductionRuntimeTest {
 
         return mockModule;
     }
+
+    private <T extends TimerDrivenModule> T mockTimerModule(String id, Class<T> cls) {
+        T mockModule = mock(cls);
+        when(mockModule.getId()).thenReturn(id);
+        when(mockModule.createInitialContext(database)).thenReturn(null);
+
+        return mockModule;
+    }
+
+    interface M1 extends TxDrivenModule {
+
+    }
+
+    interface M2 extends TxDrivenModule {
+
+    }
+
+    interface M3 extends TimerDrivenModule {
+
+    }
+
+    interface M4 extends TimerDrivenModule {
+
+    }
+
+    interface M5 extends TxAndTimerDrivenModule {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        TxAndTimerDrivenModuleConfiguration getConfiguration();
+    }
+
+    interface M6 extends TxAndTimerDrivenModule {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        TxAndTimerDrivenModuleConfiguration getConfiguration();
+    }
+
+    interface M7 extends TxDrivenModule {
+
+    }
+
+    interface M8 extends TimerDrivenModule {
+
+    }
+
+    interface M9 extends TxAndTimerDrivenModule {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        TxAndTimerDrivenModuleConfiguration getConfiguration();
+    }
+
+
 }
