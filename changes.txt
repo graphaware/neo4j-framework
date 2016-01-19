@@ -1,3 +1,6 @@
+2.3.2.37:
+    - upgraded Neo4j to 2.3.2change
+
 2.3.1.37:
     - removed security vulnerability (http://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability/)
     - timer-driven modules are cluster-aware (know if running in master or slave)
