@@ -18,9 +18,7 @@ package com.graphaware.test;
 
 import com.graphaware.test.integration.EnterpriseNeoTestServer;
 import com.graphaware.test.integration.NeoTestServer;
-import org.junit.Ignore;
 
-@Ignore
 public class EnterpriseNeoServerIntegrationTestTest extends NeoServerIntegrationTestTest {
 
     @Override

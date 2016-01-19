@@ -19,13 +19,11 @@ package com.graphaware.server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.graphaware.test.integration.NeoServerIntegrationTest;
 import org.apache.http.HttpStatus;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Collections;
 
-@Ignore
 public class CommunityTxParticipationIntegrationTest extends NeoServerIntegrationTest {
 
     @Test

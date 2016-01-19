@@ -21,13 +21,11 @@ import com.graphaware.test.integration.EnterpriseNeoTestServer;
 import com.graphaware.test.integration.NeoServerIntegrationTest;
 import com.graphaware.test.integration.NeoTestServer;
 import org.apache.http.HttpStatus;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Collections;
 
-@Ignore
 public class EnterpriseTxParticipationIntegrationTest extends NeoServerIntegrationTest {
 
     @Override
