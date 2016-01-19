@@ -22,6 +22,7 @@ import com.graphaware.test.integration.EnterpriseNeoTestServer;
 import com.graphaware.test.integration.NeoTestServer;
 import com.graphaware.writer.LifecycleTestWriter;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+@Ignore
 public class BeanLifecycleTest {
 
     @Before

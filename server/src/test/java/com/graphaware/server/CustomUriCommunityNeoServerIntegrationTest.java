@@ -18,11 +18,13 @@ package com.graphaware.server;
 
 import com.graphaware.test.integration.NeoServerIntegrationTest;
 import org.apache.http.HttpStatus;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Integration test for custom server that wires Spring components.
  */
+@Ignore
 public class CustomUriCommunityNeoServerIntegrationTest extends NeoServerIntegrationTest {
 
     @Override

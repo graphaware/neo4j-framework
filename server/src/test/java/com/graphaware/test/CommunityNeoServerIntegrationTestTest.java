@@ -16,5 +16,8 @@
 
 package com.graphaware.test;
 
+import org.junit.Ignore;
+
+@Ignore
 public class CommunityNeoServerIntegrationTestTest extends NeoServerIntegrationTestTest {
 }

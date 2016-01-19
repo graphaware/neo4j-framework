@@ -18,11 +18,13 @@ package com.graphaware.server;
 
 import com.graphaware.test.integration.NeoServerIntegrationTest;
 import org.apache.http.HttpStatus;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Integration test for GraphAware API security.
  */
+@Ignore
 public class CommunityNeoServerSecurityTest extends NeoServerIntegrationTest {
 
     @Override
