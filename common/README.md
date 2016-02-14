@@ -68,7 +68,7 @@ public class IncludeAllPeople implements NodeInclusionPolicy {
 
     @Override
     public boolean include(Node node) {
-        return node.hasLabel(DynamicLabel.label("Person"));
+        return node.hasLabel(Label.label("Person"));
     }
 }
 ```

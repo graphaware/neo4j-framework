@@ -19,7 +19,7 @@ package com.graphaware.test.integration;
 import org.apache.commons.io.IOUtils;
 import org.junit.rules.TemporaryFolder;
 import org.neo4j.server.Bootstrapper;
-import org.neo4j.server.configuration.Configurator;
+import org.neo4j.server.configuration.ServerSettings;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
@@ -53,7 +53,7 @@ public abstract class NeoTestServer {
         temporaryFolder.create();
         temporaryFolder.getRoot().deleteOnExit();
 
-        temporaryFolder.newFolder("conf");
+        temporaryFolder.newFolder("config");
 
         File serverConfig = serverConfigToConfDir();
 
@@ -69,12 +69,12 @@ public abstract class NeoTestServer {
 
     private File serverConfigToConfDir() throws IOException {
         String serverConfigContents = IOUtils.toString(new ClassPathResource(neo4jServerConfigFile).getInputStream());
-        serverConfigContents = serverConfigContents.replaceAll("=conf/", "=" + temporaryFolder.getRoot().getAbsolutePath() + "/conf/");
+        serverConfigContents = serverConfigContents.replaceAll("=config/", "=" + temporaryFolder.getRoot().getAbsolutePath() + "/config/");
         serverConfigContents = serverConfigContents.replaceAll("=data/", "=" + temporaryFolder.getRoot().getAbsolutePath() + "/data/");
 
-        File serverConfig = temporaryFolder.newFile("conf/neo4j-server.properties");
+        File serverConfig = temporaryFolder.newFile("config/neo4j-server.properties");
         IOUtils.copy(IOUtils.toInputStream(serverConfigContents), new FileOutputStream(serverConfig));
-        System.setProperty(Configurator.NEO_SERVER_CONFIG_FILE_KEY, serverConfig.getAbsolutePath());
+        System.setProperty(ServerSettings.SERVER_CONFIG_FILE_KEY, serverConfig.getAbsolutePath());
         return serverConfig;
     }
 
@@ -85,7 +85,7 @@ public abstract class NeoTestServer {
     }
 
     protected File copyToConfDir(String classPathResource, String newName) throws IOException {
-        File result = temporaryFolder.newFile("conf/" + newName);
+        File result = temporaryFolder.newFile("config/" + newName);
         IOUtils.copy(new ClassPathResource(classPathResource).getInputStream(), new FileOutputStream(result));
         return result;
     }

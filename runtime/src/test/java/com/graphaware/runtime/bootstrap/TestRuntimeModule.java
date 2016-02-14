@@ -60,7 +60,7 @@ public class TestRuntimeModule extends BaseTxDrivenModule<Void> {
     @Override
     public void initialize(GraphDatabaseService database) {
         try (Transaction tx = database.beginTx()){
-            Node n1 = database.createNode(DynamicLabel.label("test"));
+            Node n1 = database.createNode(Label.label("test"));
             Node n2 = database.createNode();
             n1.createRelationshipTo(n2, DynamicRelationshipType.withName("TEST"));
             n1.getRelationships().iterator().next().getType();

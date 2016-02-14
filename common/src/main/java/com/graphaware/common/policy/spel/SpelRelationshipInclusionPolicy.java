@@ -20,14 +20,13 @@ import com.graphaware.common.policy.RelationshipInclusionPolicy;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.helpers.Predicate;
 import org.neo4j.helpers.collection.FilteringIterable;
 import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * {@link RelationshipInclusionPolicy} based on a SPEL expression. The expression can use methods defined in
  * {@link RelationshipExpressions}.
- * <p/>
+ * <p>
  * Note that there are certain methods (like {@link RelationshipExpressions#getOtherNode()}
  * or {@link RelationshipExpressions#isOutgoing()}) that rely on providing
  * a node whose point of view the call is being made. These methods only work when calling {@link #include(org.neo4j.graphdb.Relationship, org.neo4j.graphdb.Node)}.
@@ -60,11 +59,6 @@ public class SpelRelationshipInclusionPolicy extends SpelInclusionPolicy impleme
      */
     @Override
     public Iterable<Relationship> getAll(GraphDatabaseService database) {
-        return new FilteringIterable<>(GlobalGraphOperations.at(database).getAllRelationships(), new Predicate<Relationship>() {
-            @Override
-            public boolean accept(Relationship item) {
-                return include(item);
-            }
-        });
+        return new FilteringIterable<>(GlobalGraphOperations.at(database).getAllRelationships(), this::include);
     }
 }

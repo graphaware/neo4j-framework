@@ -22,7 +22,7 @@ import com.graphaware.test.integration.DatabaseIntegrationTest;
 import com.graphaware.tx.executor.input.TransactionalInput;
 import com.graphaware.tx.executor.single.TransactionCallback;
 import org.junit.Test;
-import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.helpers.collection.Iterables;
@@ -62,7 +62,7 @@ public class TransactionalInputTest extends DatabaseIntegrationTest {
         TransactionalInput<Node> input = new TransactionalInput<>(getDatabase(), 2, new TransactionCallback<Iterable<Node>>() {
             @Override
             public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
-                return Iterables.asResourceIterable(database.findNodes(DynamicLabel.label("Person")));
+                return Iterables.asResourceIterable(database.findNodes(Label.label("Person")));
             }
         });
 
@@ -85,7 +85,7 @@ public class TransactionalInputTest extends DatabaseIntegrationTest {
         TransactionalInput<Node> input = new TransactionalInput<>(getDatabase(), 1, new TransactionCallback<Iterable<Node>>() {
             @Override
             public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
-                return Iterables.asResourceIterable(database.findNodes(DynamicLabel.label("Person")));
+                return Iterables.asResourceIterable(database.findNodes(Label.label("Person")));
             }
         });
 
@@ -107,7 +107,7 @@ public class TransactionalInputTest extends DatabaseIntegrationTest {
         TransactionalInput<Node> input = new TransactionalInput<>(getDatabase(), 3, new TransactionCallback<Iterable<Node>>() {
             @Override
             public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
-                return Iterables.asResourceIterable(database.findNodes(DynamicLabel.label("Person")));
+                return Iterables.asResourceIterable(database.findNodes(Label.label("Person")));
             }
         });
 
@@ -129,7 +129,7 @@ public class TransactionalInputTest extends DatabaseIntegrationTest {
         TransactionalInput<Node> input = new TransactionalInput<>(getDatabase(), 100, new TransactionCallback<Iterable<Node>>() {
             @Override
             public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
-                return Iterables.asResourceIterable(database.findNodes(DynamicLabel.label("Person")));
+                return Iterables.asResourceIterable(database.findNodes(Label.label("Person")));
             }
         });
 

@@ -17,9 +17,9 @@
 package com.graphaware.runtime.config.function;
 
 import com.graphaware.common.policy.InclusionPolicy;
-import org.neo4j.function.Function;
 
 import java.lang.reflect.Method;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 /**

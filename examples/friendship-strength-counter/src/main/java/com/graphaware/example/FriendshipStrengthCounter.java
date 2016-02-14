@@ -34,7 +34,7 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
     public static final RelationshipType FRIEND_OF = DynamicRelationshipType.withName("FRIEND_OF");
     public static final String STRENGTH = "strength";
     public static final String TOTAL_FRIENDSHIP_STRENGTH = "totalFriendshipStrength";
-    public static final Label COUNTER_NODE_LABEL = DynamicLabel.label("FriendshipCounter");
+    public static final Label COUNTER_NODE_LABEL = Label.label("FriendshipCounter");
 
     private final GraphDatabaseService database;
 

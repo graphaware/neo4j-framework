@@ -22,8 +22,8 @@ import com.graphaware.test.integration.DatabaseIntegrationTest;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.junit.Test;
-import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
@@ -60,7 +60,7 @@ public class AdditionalModificationsIntegrationTest extends DatabaseIntegrationT
                 assertEquals(1, transactionData.getAllCreatedNodes().size());
 
                 for (Node node : transactionData.getAllCreatedNodes()) {
-                    Node unknownCity = node.getGraphDatabase().createNode(DynamicLabel.label("City"));
+                    Node unknownCity = node.getGraphDatabase().createNode(Label.label("City"));
                     node.createRelationshipTo(unknownCity, DynamicRelationshipType.withName("LIVES_IN"));
                 }
 

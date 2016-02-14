@@ -21,8 +21,9 @@ import com.graphaware.runtime.config.Neo4jConfigBasedRuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
-import org.neo4j.helpers.Pair;
+import org.neo4j.helpers.collection.Pair;
 import org.neo4j.kernel.configuration.Config;
+import org.neo4j.kernel.configuration.Settings;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.graphaware.runtime.GraphAwareRuntimeFactory.createRuntime;
-import static org.neo4j.helpers.Settings.*;
+import static org.neo4j.kernel.configuration.Settings.*;
 
 /**
  * Neo4j kernel extension that automatically creates a {@link GraphAwareRuntime} and registers

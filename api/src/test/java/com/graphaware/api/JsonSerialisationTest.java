@@ -45,7 +45,7 @@ public class JsonSerialisationTest {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
         try (Transaction tx = database.beginTx()) {
-            Node node1 = database.createNode(DynamicLabel.label("L1"), DynamicLabel.label("L2"));
+            Node node1 = database.createNode(Label.label("L1"), Label.label("L2"));
             Node node2 = database.createNode();
 
             node1.setProperty("k1", "v1");
@@ -375,7 +375,7 @@ public class JsonSerialisationTest {
     @Test
     public void shouldCorrectlySerialiseArrayProps() throws JsonProcessingException {
         try (Transaction tx = database.beginTx()) {
-            Node node = database.createNode(DynamicLabel.label("L1"), DynamicLabel.label("L2"));
+            Node node = database.createNode(Label.label("L1"), Label.label("L2"));
             node.setProperty("k1", new String[]{"v1", "v2"});
             node.setProperty("k2", new int[]{2, 3});
 

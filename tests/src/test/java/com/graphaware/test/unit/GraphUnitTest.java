@@ -537,8 +537,8 @@ public class GraphUnitTest {
     @Test
     public void deletedNewLabelShouldNotInfluenceEquality() { //bug test
         try (Transaction tx = database.beginTx()) {
-            database.createNode(DynamicLabel.label("Accident"));
-            database.createNode(DynamicLabel.label("RealLabel"));
+            database.createNode(Label.label("Accident"));
+            database.createNode(Label.label("RealLabel"));
             tx.success();
         }
 
@@ -735,7 +735,7 @@ public class GraphUnitTest {
             assertEmpty(database, InclusionPolicies.all().with(new BaseNodeInclusionPolicy() {
                 @Override
                 public boolean include(Node node) {
-                    return !node.hasLabel(DynamicLabel.label("Person"));
+                    return !node.hasLabel(Label.label("Person"));
                 }
             }));
             fail();
@@ -746,12 +746,12 @@ public class GraphUnitTest {
         assertEmpty(database, InclusionPolicies.all().with(new BaseNodeInclusionPolicy() {
             @Override
             public boolean include(Node node) {
-                return !node.hasLabel(DynamicLabel.label("Person"));
+                return !node.hasLabel(Label.label("Person"));
             }
         }).with(new RelationshipInclusionPolicy.Adapter() {
             @Override
             public boolean include(Relationship relationship) {
-                return !relationship.getStartNode().hasLabel(DynamicLabel.label("Person")) && !relationship.getEndNode().hasLabel(DynamicLabel.label("Person"));
+                return !relationship.getStartNode().hasLabel(Label.label("Person")) && !relationship.getEndNode().hasLabel(Label.label("Person"));
             }
         }));
     }
@@ -857,7 +857,7 @@ public class GraphUnitTest {
 
         @Override
         public boolean include(Node node) {
-            return node.hasLabel(DynamicLabel.label("Blue"));
+            return node.hasLabel(Label.label("Blue"));
         }
     }
 
@@ -868,7 +868,7 @@ public class GraphUnitTest {
 
         @Override
         public boolean include(Node node) {
-            return !(node.hasLabel(DynamicLabel.label("ChangeSet")));
+            return !(node.hasLabel(Label.label("ChangeSet")));
         }
     }
 

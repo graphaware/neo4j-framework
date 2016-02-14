@@ -17,6 +17,7 @@
 package com.graphaware.common.wrapper;
 
 import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.traversal.Traverser;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -69,30 +70,6 @@ public abstract class BasePropertyContainer implements PropertyContainer {
         }
 
         return result;
-    }
-
-    /**
-     * @throws UnsupportedOperationException always.
-     */
-    @SuppressWarnings("deprecation")
-    public Traverser traverse(Traverser.Order traversalOrder, StopEvaluator stopEvaluator, ReturnableEvaluator returnableEvaluator, RelationshipType relationshipType, Direction direction) {
-        throw new UnsupportedOperationException("Deprecated method not supported by GraphAware");
-    }
-
-    /**
-     * @throws UnsupportedOperationException always.
-     */
-    @SuppressWarnings("deprecation")
-    public Traverser traverse(Traverser.Order traversalOrder, StopEvaluator stopEvaluator, ReturnableEvaluator returnableEvaluator, RelationshipType firstRelationshipType, Direction firstDirection, RelationshipType secondRelationshipType, Direction secondDirection) {
-        throw new UnsupportedOperationException("Deprecated method not supported by GraphAware");
-    }
-
-    /**
-     * @throws UnsupportedOperationException always.
-     */
-    @SuppressWarnings("deprecation")
-    public Traverser traverse(Traverser.Order traversalOrder, StopEvaluator stopEvaluator, ReturnableEvaluator returnableEvaluator, Object... relationshipTypesAndDirections) {
-        throw new UnsupportedOperationException("Deprecated method not supported by GraphAware");
     }
 
     //the following methods intentionally break object-orientation a bit to keep the rest of the codebase DRY

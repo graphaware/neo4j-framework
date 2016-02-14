@@ -18,16 +18,14 @@ package com.graphaware.runtime.walk;
 
 import com.graphaware.common.policy.BaseNodeInclusionPolicy;
 import com.graphaware.common.policy.none.IncludeNoNodes;
-import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor;
-import com.graphaware.tx.executor.batch.UnitOfWork;
 import com.graphaware.tx.executor.input.AllNodes;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -63,19 +61,9 @@ public class RandomNodeSelectorTest {
 
     @Test
     public void shouldReturnNullOnDatabaseWithAllNodesDeleted() {
-        new NoInputBatchTransactionExecutor(database, 1000, 1000, new UnitOfWork<NullItem>() {
-            @Override
-            public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
-                database.createNode();
-            }
-        }).execute();
+        new NoInputBatchTransactionExecutor(database, 1000, 1000, (db, input, batchNumber, stepNumber) -> db.createNode()).execute();
 
-        new IterableInputBatchTransactionExecutor<>(database, 1000, new AllNodes(database, 1000), new UnitOfWork<Node>() {
-            @Override
-            public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
-                node.delete();
-            }
-        }).execute();
+        new IterableInputBatchTransactionExecutor<>(database, 1000, new AllNodes(database, 1000), (db, node, batchNumber, stepNumber) -> node.delete()).execute();
 
         try (Transaction tx = database.beginTx()) {
             assertNull(new RandomNodeSelector().selectNode(database));
@@ -85,12 +73,7 @@ public class RandomNodeSelectorTest {
 
     @Test
     public void shouldReturnNullWhenNoNodeMatchesTheSpec() {
-        new NoInputBatchTransactionExecutor(database, 1000, 1000, new UnitOfWork<NullItem>() {
-            @Override
-            public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
-                database.createNode();
-            }
-        }).execute();
+        new NoInputBatchTransactionExecutor(database, 1000, 1000, (db, input, batchNumber, stepNumber) -> db.createNode()).execute();
 
         try (Transaction tx = database.beginTx()) {
             assertNull(new RandomNodeSelector(IncludeNoNodes.getInstance()).selectNode(database));
@@ -100,12 +83,7 @@ public class RandomNodeSelectorTest {
 
     @Test
     public void shouldReturnCorrectNode() {
-        new NoInputBatchTransactionExecutor(database, 1000, 1000, new UnitOfWork<NullItem>() {
-            @Override
-            public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
-                database.createNode(DynamicLabel.label("Label" + (stepNumber % 10)));
-            }
-        }).execute();
+        new NoInputBatchTransactionExecutor(database, 1000, 1000, (db, input, batchNumber, stepNumber) -> db.createNode(Label.label("Label" + (stepNumber % 10)))).execute();
 
         try (Transaction tx = database.beginTx()) {
             assertNotNull(new RandomNodeSelector().selectNode(database));
@@ -113,12 +91,12 @@ public class RandomNodeSelectorTest {
             Node node = new RandomNodeSelector(new BaseNodeInclusionPolicy() {
                 @Override
                 public boolean include(Node object) {
-                    return object.hasLabel(DynamicLabel.label("Label4"));
+                    return object.hasLabel(Label.label("Label4"));
                 }
             }).selectNode(database);
 
             assertNotNull(node);
-            assertTrue(node.hasLabel(DynamicLabel.label("Label4")));
+            assertTrue(node.hasLabel(Label.label("Label4")));
 
             tx.success();
         }
@@ -140,19 +118,11 @@ public class RandomNodeSelectorTest {
 
     @Test
     public void shouldReturnTheOnlyRemainingNodeAfterTheRestHasBeenDeleted() {
-        new NoInputBatchTransactionExecutor(database, 1000, 1000, new UnitOfWork<NullItem>() {
-            @Override
-            public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
-                database.createNode();
-            }
-        }).execute();
+        new NoInputBatchTransactionExecutor(database, 1000, 1000, (db, input, batchNumber, stepNumber) -> db.createNode()).execute();
 
-        new IterableInputBatchTransactionExecutor<>(database, 1000, new AllNodes(database, 1000), new UnitOfWork<Node>() {
-            @Override
-            public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
-                if (stepNumber != 1000) {
-                    node.delete();
-                }
+        new IterableInputBatchTransactionExecutor<>(database, 1000, new AllNodes(database, 1000), (db, node, batchNumber, stepNumber) -> {
+            if (stepNumber != 1000) {
+                node.delete();
             }
         }).execute();
 

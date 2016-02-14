@@ -80,16 +80,13 @@ public class SimpleTransactionExecutorTest {
         }
     }
 
-    @Test(expected = TransactionFailureException.class)
+    @Test(expected = ConstraintViolationException.class)
     public void deletingNodeWithRelationshipsShouldThrowException() {
         createNodeAndRelationship();
 
-        executor.executeInTransaction(new TransactionCallback<Void>() {
-            @Override
-            public Void doInTransaction(GraphDatabaseService database) {
-                database.getNodeById(0).delete();
-                return null;
-            }
+        executor.executeInTransaction(database -> {
+            database.getNodeById(0).delete();
+            return null;
         });
     }
 
@@ -101,12 +98,9 @@ public class SimpleTransactionExecutorTest {
             assertEquals(2, countNodes(database));
         }
 
-        executor.executeInTransaction(new TransactionCallback<Void>() {
-            @Override
-            public Void doInTransaction(GraphDatabaseService database) {
-                database.getNodeById(0).delete();
-                return null;
-            }
+        executor.executeInTransaction(db -> {
+            db.getNodeById(0).delete();
+            return null;
         }, KeepCalmAndCarryOn.getInstance());
 
         try (Transaction tx = database.beginTx()) {
@@ -115,13 +109,10 @@ public class SimpleTransactionExecutorTest {
     }
 
     private void createNodeAndRelationship() {
-        executor.executeInTransaction(new TransactionCallback<Void>() {
-            @Override
-            public Void doInTransaction(GraphDatabaseService database) {
-                Node node = database.createNode();
-                node.createRelationshipTo(database.getNodeById(0), DynamicRelationshipType.withName("TEST_REL_TYPE"));
-                return null;
-            }
+        executor.executeInTransaction(db -> {
+            Node node = db.createNode();
+            node.createRelationshipTo(db.getNodeById(0), DynamicRelationshipType.withName("TEST_REL_TYPE"));
+            return null;
         });
     }
 }

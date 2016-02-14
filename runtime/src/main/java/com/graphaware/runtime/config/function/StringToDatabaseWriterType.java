@@ -17,10 +17,11 @@
 package com.graphaware.runtime.config.function;
 
 import com.graphaware.runtime.write.DatabaseWriterType;
-import org.neo4j.helpers.Function;
+
+import java.util.function.Function;
 
 /**
- * A {@link org.neo4j.helpers.Function} that converts String to {@link DatabaseWriterType}. Singleton.
+ * A {@link Function} that converts String to {@link DatabaseWriterType}. Singleton.
  */
 public final class StringToDatabaseWriterType implements Function<String, DatabaseWriterType> {
 

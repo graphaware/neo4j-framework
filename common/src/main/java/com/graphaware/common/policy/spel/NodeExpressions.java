@@ -16,7 +16,7 @@
 
 package com.graphaware.common.policy.spel;
 
-import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 
@@ -52,7 +52,7 @@ class NodeExpressions extends PropertyContainerExpressions<Node> {
     }
 
     public boolean hasLabel(String label) {
-        return propertyContainer.hasLabel(DynamicLabel.label(label));
+        return propertyContainer.hasLabel(Label.label(label));
     }
 
     public String[] getLabels() {

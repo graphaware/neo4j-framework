@@ -18,7 +18,6 @@ package com.graphaware.common.policy;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.PropertyContainer;
-import org.neo4j.helpers.Predicate;
 import org.neo4j.helpers.collection.FilteringIterable;
 
 /**
@@ -35,12 +34,7 @@ public abstract class BasePropertyContainerInclusionPolicy<T extends PropertyCon
     @Override
     public Iterable<T> getAll(GraphDatabaseService database) {
         //Neo suggests replacing this deprecated stuff with another deprecated class - not much we can do
-        return new FilteringIterable<>(doGetAll(database), new Predicate<T>() {
-            @Override
-            public boolean accept(T item) {
-                return include(item);
-            }
-        });
+        return new FilteringIterable<>(doGetAll(database), this::include);
     }
 
     /**

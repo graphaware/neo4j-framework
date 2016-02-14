@@ -43,9 +43,9 @@ public class WritePerfTest {
                     @Override
                     public void run() {
                         try (Transaction tx = database.beginTx()) {
-                            Node node1 = database.createNode(DynamicLabel.label("Person"));
+                            Node node1 = database.createNode(Label.label("Person"));
                             node1.setProperty("name", "Person1");
-                            Node node2 = database.createNode(DynamicLabel.label("Person"));
+                            Node node2 = database.createNode(Label.label("Person"));
                             node2.setProperty("name", "Person2");
                             node1.createRelationshipTo(node2, DynamicRelationshipType.withName("FRIEND"));
                             tx.success();

@@ -19,7 +19,8 @@ package com.graphaware.runtime.config.function;
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
 import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import com.graphaware.runtime.schedule.TimingStrategy;
-import org.neo4j.helpers.Function;
+
+import java.util.function.Function;
 
 /**
  * A {@link Function} that converts String to {@link TimingStrategy}. Singleton.

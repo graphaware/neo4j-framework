@@ -19,7 +19,6 @@ package com.graphaware.common.policy.spel;
 import com.graphaware.common.policy.NodeInclusionPolicy;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.helpers.Predicate;
 import org.neo4j.helpers.collection.FilteringIterable;
 import org.neo4j.tooling.GlobalGraphOperations;
 
@@ -45,11 +44,6 @@ public class SpelNodeInclusionPolicy extends SpelInclusionPolicy implements Node
      */
     @Override
     public Iterable<Node> getAll(GraphDatabaseService database) {
-        return new FilteringIterable<>(GlobalGraphOperations.at(database).getAllNodes(), new Predicate<Node>() {
-            @Override
-            public boolean accept(Node item) {
-                return include(item);
-            }
-        });
+        return new FilteringIterable<>(GlobalGraphOperations.at(database).getAllNodes(), this::include);
     }
 }

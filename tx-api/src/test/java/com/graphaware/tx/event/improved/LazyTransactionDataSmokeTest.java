@@ -34,7 +34,7 @@ import java.util.Set;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.neo4j.graphdb.DynamicLabel.label;
+import static org.neo4j.graphdb.Label.label;
 
 /**
  * Unit test for {@link com.graphaware.tx.event.improved.api.LazyTransactionData}.

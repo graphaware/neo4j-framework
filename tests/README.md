@@ -82,7 +82,7 @@ public class HelloWorldNodeCreator {
         Node node;
 
         try (Transaction tx = database.beginTx()) {
-            node = database.createNode(DynamicLabel.label("HelloWorld"));
+            node = database.createNode(Label.label("HelloWorld"));
             node.setProperty("hello", "world");
             tx.success();
         }

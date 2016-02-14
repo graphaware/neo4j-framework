@@ -29,8 +29,9 @@ import com.graphaware.writer.neo4j.DefaultWriter;
 import com.graphaware.writer.neo4j.TxPerTaskWriter;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.kernel.configuration.Config;
+import org.neo4j.kernel.configuration.Settings;
 
-import static org.neo4j.helpers.Settings.*;
+import static org.neo4j.kernel.configuration.Settings.*;
 
 /**
  * Implementation of {@link RuntimeConfiguration} that loads bespoke settings from Neo4j's configuration properties, falling

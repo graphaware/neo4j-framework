@@ -107,13 +107,13 @@ public class IterableInputBatchTransactionExecutorTest {
     public void iterorAcquiredInTransactionShouldBeProcessed() {
         try (Transaction tx = database.beginTx()) {
             for (int i = 0; i < 100; i++) {
-                database.createNode(DynamicLabel.label("Test"));
+                database.createNode(Label.label("Test"));
             }
             tx.success();
         }
 
         BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, 10,
-                new AllNodesWithLabel(database, 10, DynamicLabel.label("Test")),
+                new AllNodesWithLabel(database, 10, Label.label("Test")),
                 new UnitOfWork<Node>() {
                     @Override
                     public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
@@ -136,7 +136,7 @@ public class IterableInputBatchTransactionExecutorTest {
 
     @Test
     public void bugTest() {
-        final Label label = DynamicLabel.label("TEST");
+        final Label label = Label.label("TEST");
 
         try (Transaction tx = database.beginTx()) {
             database.createNode(label);

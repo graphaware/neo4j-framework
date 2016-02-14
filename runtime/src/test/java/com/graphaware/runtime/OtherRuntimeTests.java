@@ -22,7 +22,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -70,7 +70,7 @@ public class OtherRuntimeTests {
         Thread.sleep(random.nextInt(10));
 
         try (Transaction tx = database.beginTx()) {
-            Node node = database.createNode(DynamicLabel.label("TEST"));
+            Node node = database.createNode(Label.label("TEST"));
             node.setProperty("test", "test");
             tx.success();
         }
@@ -96,7 +96,7 @@ public class OtherRuntimeTests {
         try (Transaction tx = database.beginTx()) {
             Node node1 = database.createNode();
             node1.setProperty("name", "MB");
-            node1.addLabel(DynamicLabel.label("Person"));
+            node1.addLabel(Label.label("Person"));
 
             tx.success();
         }
@@ -154,7 +154,7 @@ public class OtherRuntimeTests {
         registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
-            database.createNode(DynamicLabel.label("TEST"));
+            database.createNode(Label.label("TEST"));
             tx.success();
         }
 
@@ -172,7 +172,7 @@ public class OtherRuntimeTests {
         registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
-            Node node = database.createNode(DynamicLabel.label("TEST"));
+            Node node = database.createNode(Label.label("TEST"));
             node.setProperty("test", "test");
             tx.success();
         }
@@ -191,7 +191,7 @@ public class OtherRuntimeTests {
         registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
-            Node node = database.createNode(DynamicLabel.label("TEST"));
+            Node node = database.createNode(Label.label("TEST"));
             node.setProperty("test", "test");
             tx.success();
         }

@@ -16,7 +16,7 @@
 
 package com.graphaware.common.representation;
 
-import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
@@ -126,7 +126,7 @@ public class NodeRepresentation extends PropertyContainerRepresentation<Node> {
 
         if (labels != null) {
             for (String label : labels) {
-                node.addLabel(DynamicLabel.label(label));
+                node.addLabel(Label.label(label));
             }
         }
     }

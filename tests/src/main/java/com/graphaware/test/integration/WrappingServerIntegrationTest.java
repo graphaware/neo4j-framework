@@ -17,53 +17,58 @@
 package com.graphaware.test.integration;
 
 import com.graphaware.test.util.TestHttpClient;
-import org.neo4j.kernel.GraphDatabaseAPI;
-import org.neo4j.server.WrappingNeoServerBootstrapper;
-import org.neo4j.server.configuration.ServerConfigurator;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.server.CommunityNeoServer;
 import org.neo4j.server.configuration.ServerSettings;
-import org.neo4j.server.configuration.ThirdPartyJaxRsPackage;
+import org.neo4j.server.helpers.CommunityServerBuilder;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
 /**
  * {@link DatabaseIntegrationTest} that starts the {@link WrappingNeoServerBootstrapper},
  * in order to make the Neo4j browser and potentially custom managed and unmanaged extensions available for testing.
- * <p/>
+ * <p>
  * This is generally useful for developers who use Neo4j in server mode and want to test their extensions, whilst
  * being able to access the {@link org.neo4j.graphdb.GraphDatabaseService} object using {@link #getDatabase()},
  * for example to run {@link com.graphaware.test.unit.GraphUnit} test cases on it.
- * <p/>
+ * <p>
  * Unmanaged extensions are registered by overriding the {@link #thirdPartyJaxRsPackageMappings()} and providing
  * key-value pairs, where key is the package in which extensions live and value is the URI of the mount point.
- * <p/>
+ * <p>
  * By overriding {@link #neoServerPort()}, you can change the port number of which the server runs (7575 by default).
- * <p/>
+ * <p>
  * By overriding {@link #additionalServerConfiguration()}, you can provide additional server configuration (which would
  * normally live in neo4j-server.properties).
- * <p/>
+ * <p>
  * For testing pure Spring MVC code that uses the GraphAware Framework, please use {@link com.graphaware.test.integration.GraphAwareApiTest}.
  */
 public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationTest {
 
     private static final int DEFAULT_NEO_PORT = 7575;
 
-    private WrappingNeoServerBootstrapper bootstrapper;
+    private CommunityNeoServer server;
 
     protected TestHttpClient httpClient;
 
     @Override
     public void setUp() throws Exception {
-        super.setUp();
         startServerWrapper();
+        super.setUp();
         httpClient = createHttpClient();
     }
 
     @Override
     public void tearDown() throws Exception {
         httpClient.close();
-        bootstrapper.stop();
+        server.stop();
         super.tearDown();
+    }
+
+    @Override
+    protected GraphDatabaseService createDatabase() {
+        return server.getDatabase().getGraph();
     }
 
     protected TestHttpClient createHttpClient() {
@@ -72,17 +77,12 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
 
     /**
      * Start the server wrapper.
-     * //todo change to CommunityServerBuilder
      */
-    private void startServerWrapper() {
-        ServerConfigurator configurator = new ServerConfigurator((GraphDatabaseAPI) getDatabase());
-        populateConfigurator(configurator);
-        bootstrapper = createBootstrapper(configurator);
-        bootstrapper.start();
-    }
-
-    protected WrappingNeoServerBootstrapper createBootstrapper(ServerConfigurator configurator) {
-        return new WrappingNeoServerBootstrapper((GraphDatabaseAPI) getDatabase(), configurator);
+    private void startServerWrapper() throws IOException {
+        CommunityServerBuilder builder = CommunityServerBuilder.server().onPort(neoServerPort());
+        builder = populateConfigurator(builder);
+        server = builder.build();
+        server.start();
     }
 
     /**
@@ -90,19 +90,20 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
      * register extensions, provide additional server config (including changing the port on which the server runs),
      * please override one of the methods below.
      *
-     * @param configurator to populate.
+     * @param builder to populate.
      */
-    protected void populateConfigurator(ServerConfigurator configurator) {
+    protected CommunityServerBuilder populateConfigurator(CommunityServerBuilder builder) {
         for (Map.Entry<String, String> mapping : thirdPartyJaxRsPackageMappings().entrySet()) {
-            configurator.getThirdpartyJaxRsPackages().add(new ThirdPartyJaxRsPackage(mapping.getKey(), mapping.getValue()));
+            builder = builder.withThirdPartyJaxRsPackage(mapping.getKey(), mapping.getValue());
         }
 
-        configurator.configuration().addProperty(ServerSettings.webserver_port.name(), neoServerPort());
-        configurator.configuration().addProperty(ServerSettings.auth_enabled.name(), authEnabled());
+        builder = builder.withProperty(ServerSettings.auth_enabled.name(), Boolean.toString(authEnabled()));
 
         for (Map.Entry<String, String> config : additionalServerConfiguration().entrySet()) {
-            configurator.configuration().addProperty(config.getKey(), config.getValue());
+            builder = builder.withProperty(config.getKey(), config.getValue());
         }
+
+        return builder;
     }
 
     /**

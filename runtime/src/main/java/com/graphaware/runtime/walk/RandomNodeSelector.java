@@ -24,6 +24,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.kernel.GraphDatabaseAPI;
+import org.neo4j.kernel.impl.storageengine.impl.recordstorage.RecordStorageEngine;
 import org.neo4j.kernel.impl.store.NeoStores;
 import org.neo4j.tooling.GlobalGraphOperations;
 
@@ -77,7 +78,7 @@ public class RandomNodeSelector implements NodeSelector {
      * @return random node, null if not successful.
      */
     private Node randomNodeO1(GraphDatabaseService database) {
-        long highestId = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(NeoStores.class).getNodeStore().getHighestPossibleIdInUse();
+        long highestId = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(RecordStorageEngine.class).testAccessNeoStores().getNodeStore().getHighestPossibleIdInUse();
         if (highestId <= 0) {
             return null;
         }

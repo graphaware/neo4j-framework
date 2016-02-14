@@ -293,7 +293,7 @@ To enable logging from your GraphAware Runtime Modules, set up a dependency on `
 ```
 Make sure you do not include any other slf4j implementations.
 
-Modify conf/custom-logback.xml in your Neo4j install path and add at the end
+Modify config/custom-logback.xml in your Neo4j install path and add at the end
 
 ```xml
 <appender name="EXTENSIONLOG"  class="ch.qos.logback.core.FileAppender">

@@ -23,8 +23,7 @@ import org.neo4j.graphdb.config.Setting;
 
 import java.util.Map;
 
-import static org.neo4j.helpers.Settings.STRING;
-import static org.neo4j.helpers.Settings.setting;
+import static org.neo4j.kernel.configuration.Settings.*;
 
 /**
  * {@link com.graphaware.runtime.module.RuntimeModuleBootstrapper} for {@link TestRuntimeModule}.

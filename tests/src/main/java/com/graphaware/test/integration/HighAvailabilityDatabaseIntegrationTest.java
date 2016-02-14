@@ -19,7 +19,7 @@ package com.graphaware.test.integration;
 import org.neo4j.cluster.ClusterSettings;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.graphdb.factory.HighlyAvailableGraphDatabaseFactory;
-import org.neo4j.helpers.Settings;
+import org.neo4j.kernel.configuration.Settings;
 import org.neo4j.kernel.ha.HaSettings;
 
 public class HighAvailabilityDatabaseIntegrationTest extends DatabaseIntegrationTest {

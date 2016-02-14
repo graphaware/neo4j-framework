@@ -29,7 +29,7 @@ import static com.graphaware.common.description.predicate.Predicates.undefined;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.neo4j.graphdb.DynamicLabel.label;
+import static org.neo4j.graphdb.Label.label;
 
 /**
  * Unit test for  {@link com.graphaware.common.policy.fluent.IncludeNodes}.

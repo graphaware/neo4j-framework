@@ -19,7 +19,7 @@ package com.graphaware.writer.neo4j;
 import com.graphaware.common.util.IterableUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
 import org.junit.Test;
-import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
@@ -269,7 +269,7 @@ public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
         final Callable<Long> task = new Callable<Long>() {
             @Override
             public Long call() throws Exception {
-                Node test = getDatabase().createNode(DynamicLabel.label("test"));
+                Node test = getDatabase().createNode(Label.label("test"));
                 test.setProperty("test", "test");
                 return test.getId();
             }

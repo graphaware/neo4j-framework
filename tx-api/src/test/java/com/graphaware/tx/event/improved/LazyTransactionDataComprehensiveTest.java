@@ -45,7 +45,7 @@ import static com.graphaware.tx.event.improved.PropertiesAssert.assertProperties
 import static junit.framework.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.graphdb.DynamicLabel.label;
+import static org.neo4j.graphdb.Label.label;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
 
 /**
