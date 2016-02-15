@@ -25,7 +25,6 @@ import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.helpers.Settings;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
@@ -34,9 +33,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.graphdb.Label.label;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
-import static org.neo4j.helpers.Settings.FALSE;
+import static org.neo4j.graphdb.Label.label;
+import static org.neo4j.kernel.configuration.Settings.FALSE;
 
 /**
  * Unit test for {@link RandomRelationshipSelector}.
@@ -49,7 +48,7 @@ public class RandomRelationshipSelectorTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 

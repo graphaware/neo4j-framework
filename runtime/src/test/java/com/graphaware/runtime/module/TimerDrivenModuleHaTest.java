@@ -27,9 +27,7 @@ import org.junit.Test;
 import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.cluster.ClusterSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.graphdb.factory.HighlyAvailableGraphDatabaseFactory;
-import org.neo4j.helpers.Settings;
 import org.neo4j.kernel.ha.HaSettings;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -38,10 +36,12 @@ import java.io.File;
 import java.util.concurrent.*;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.*;
+import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.ANY;
+import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.MASTER_ONLY;
+import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.SLAVES_ONLY;
 import static com.graphaware.test.util.TestUtils.waitFor;
 import static org.junit.Assert.assertTrue;
-import static org.neo4j.helpers.Settings.FALSE;
+import static org.neo4j.kernel.configuration.Settings.FALSE;
 
 public class TimerDrivenModuleHaTest {
 
@@ -71,7 +71,7 @@ public class TimerDrivenModuleHaTest {
     public void shouldInSingleMode() {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 
@@ -147,7 +147,7 @@ public class TimerDrivenModuleHaTest {
     private GraphDatabaseService haDb(String id, boolean slave) throws InterruptedException {
         GraphDatabaseService database = new HighlyAvailableGraphDatabaseFactory()
                 .newEmbeddedDatabaseBuilder(new File("target/data/" + id + "/" + System.currentTimeMillis()))
-                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .setConfig(ClusterSettings.server_id, id)
                 .setConfig(HaSettings.ha_server, "localhost:600" + id)

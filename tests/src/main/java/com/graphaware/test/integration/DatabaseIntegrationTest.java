@@ -21,12 +21,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
-import org.neo4j.helpers.Settings;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static org.neo4j.helpers.Settings.FALSE;
+import static org.neo4j.kernel.configuration.Settings.*;
 
 /**
  * Base class for all kinds of Neo4j integration tests.
@@ -60,7 +59,7 @@ public abstract class DatabaseIntegrationTest {
     protected GraphDatabaseBuilder createGraphDatabaseBuilder() {
         return new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig("online_backup_enabled", Settings.FALSE)
+                .setConfig("online_backup_enabled", FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE);
     }
 

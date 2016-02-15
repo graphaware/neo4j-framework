@@ -23,7 +23,6 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.config.InvalidSettingException;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
-import org.neo4j.helpers.Settings;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
@@ -35,7 +34,7 @@ import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
 import static com.graphaware.runtime.bootstrap.TestRuntimeModule.TEST_RUNTIME_MODULES;
 import static org.junit.Assert.*;
-import static org.neo4j.helpers.Settings.FALSE;
+import static org.neo4j.kernel.configuration.Settings.FALSE;
 
 /**
  * Integration test for runtime and module bootstrapping.
@@ -238,7 +237,7 @@ public class BootstrapIntegrationTest {
     private GraphDatabaseBuilder builder() {
         return new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .setConfig(RUNTIME_ENABLED, "true");
     }

@@ -33,7 +33,7 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Uniqueness;
-import org.neo4j.helpers.Settings;
+import org.neo4j.kernel.configuration.Settings;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
@@ -57,7 +57,7 @@ import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.Label.label;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
-import static org.neo4j.helpers.Settings.FALSE;
+import static org.neo4j.kernel.configuration.Settings.*;
 
 /**
  * Integration test for {@link com.graphaware.tx.event.improved.api.FilteredTransactionData}.
@@ -122,7 +122,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
     public void changeOfLabelShouldBePickedUp() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 
@@ -150,7 +150,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
     public void removedLabelShouldBePickedUp() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 
@@ -1526,7 +1526,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
     private void createTestDatabase() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 
@@ -1594,7 +1594,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
     private void createTestDatabaseForInternalTest() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 

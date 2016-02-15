@@ -19,7 +19,6 @@ package com.graphaware.test.unit;
 import com.graphaware.common.policy.InclusionPolicies;
 import com.graphaware.common.util.PropertyContainerUtils;
 import org.neo4j.graphdb.*;
-import org.neo4j.helpers.Settings;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -33,8 +32,8 @@ import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static org.junit.Assert.fail;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.helpers.Settings.FALSE;
 import static org.neo4j.helpers.collection.Iterables.count;
+import static org.neo4j.kernel.configuration.Settings.*;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
@@ -97,7 +96,7 @@ public final class GraphUnit {
 
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig("online_backup_enabled", Settings.FALSE)
+                .setConfig("online_backup_enabled", FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 
@@ -168,7 +167,7 @@ public final class GraphUnit {
 
         GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig("online_backup_enabled", Settings.FALSE)
+                .setConfig("online_backup_enabled", FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 

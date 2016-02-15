@@ -23,14 +23,13 @@ import org.junit.Test;
 import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.helpers.Settings;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.countNodes;
 import static org.junit.Assert.assertEquals;
-import static org.neo4j.helpers.Settings.FALSE;
+import static org.neo4j.kernel.configuration.Settings.FALSE;
 
 /**
  * Unit test for {@link com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor}.
@@ -43,7 +42,7 @@ public class NoInputBatchTransactionExecutorTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 

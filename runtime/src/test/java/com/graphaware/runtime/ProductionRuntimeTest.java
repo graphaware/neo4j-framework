@@ -36,7 +36,6 @@ import org.mockito.Mockito;
 import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.KernelEventHandler;
-import org.neo4j.helpers.Settings;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -51,7 +50,7 @@ import static com.graphaware.runtime.config.FluentRuntimeConfiguration.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
-import static org.neo4j.helpers.Settings.FALSE;
+import static org.neo4j.kernel.configuration.Settings.FALSE;
 
 /**
  * Unit test for {@link ProductionRuntime}.
@@ -77,7 +76,7 @@ public class ProductionRuntimeTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 

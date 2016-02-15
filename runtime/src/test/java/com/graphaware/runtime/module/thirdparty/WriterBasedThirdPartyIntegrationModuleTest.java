@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.helpers.Settings;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -38,7 +37,7 @@ import java.util.List;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.neo4j.helpers.Settings.FALSE;
+import static org.neo4j.kernel.configuration.Settings.FALSE;
 
 /**
  * Integration test for {@link WriterBasedThirdPartyIntegrationModule}
@@ -49,7 +48,7 @@ public class WriterBasedThirdPartyIntegrationModuleTest {
     public void modificationsShouldBeCorrectlyBuilt() throws InterruptedException {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 
