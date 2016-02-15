@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -30,7 +30,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
  */
 public interface TimerDrivenModuleContext<T> {
 
-    public static final long ASAP = -1;
+    long ASAP = -1;
 
     /**
      * Get the earliest time the {@link com.graphaware.runtime.module.TimerDrivenModule} wishes to be called again.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -32,9 +32,9 @@ import java.util.Set;
 
 /**
  * {@link DatabaseRuntime} intended for production use.
- * <p/>
+ * <p>
  * Supports both {@link TimerDrivenModule} and {@link TxDrivenModule} {@link RuntimeModule}s.
- * <p/>
+ * <p>
  * To use this {@link GraphAwareRuntime}, please construct it using {@link GraphAwareRuntimeFactory}.
  */
 public class ProductionRuntime extends DatabaseRuntime {
@@ -48,7 +48,7 @@ public class ProductionRuntime extends DatabaseRuntime {
      * @param database                 on which the runtime operates.
      * @param txDrivenModuleManager    manager for transaction-driven modules.
      * @param timerDrivenModuleManager manager for timer-driven modules.
-     * @param writer           to use when writing to the database.
+     * @param writer                   to use when writing to the database.
      */
     protected ProductionRuntime(RuntimeConfiguration configuration, GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager, Neo4jWriter writer) {
         super(configuration, database, txDrivenModuleManager, writer);
@@ -66,8 +66,8 @@ public class ProductionRuntime extends DatabaseRuntime {
      * {@inheritDoc}
      */
     @Override
-    protected void startModules(boolean skipLoadingMetadata) {
-        super.startModules(skipLoadingMetadata);
+    protected void startModules() {
+        super.startModules();
         timerDrivenModuleManager.startModules();
     }
 
@@ -128,6 +128,37 @@ public class ProductionRuntime extends DatabaseRuntime {
 
             return module;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <M extends RuntimeModule> M getModule(Class<M> clazz) throws NotFoundException {
+        M result = null;
+        try {
+            result = super.getModule(clazz);
+        } catch (NotFoundException e) {
+            //ok
+        }
+
+        try {
+            M potentialResult = timerDrivenModuleManager.getModule(clazz);
+            if (potentialResult != null) {
+                if (result != null && potentialResult != result) {
+                    throw new IllegalStateException("More than one module of type " + clazz + " has been registered");
+                }
+                result = potentialResult;
+            }
+        } catch (NotFoundException e) {
+            //ok
+        }
+
+        if (result == null) {
+            throw new NotFoundException("No module of type " + clazz.getName() + " has been registered");
+        }
+
+        return result;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -29,8 +29,8 @@ import static org.springframework.util.Assert.hasLength;
  */
 public class RelationshipRepresentation extends PropertyContainerRepresentation<Relationship> {
 
-    private long startNodeId = NEW;
-    private long endNodeId = NEW;
+    private long startNodeGraphId = NEW;
+    private long endNodeGraphId = NEW;
     private String type;
 
     /**
@@ -45,10 +45,7 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
      * @param relationship to create the representation from. Must not be <code>null</code>.
      */
     public RelationshipRepresentation(Relationship relationship) {
-        super(relationship, null);
-        startNodeId = relationship.getStartNode().getId();
-        endNodeId = relationship.getEndNode().getId();
-        setType(relationship.getType().name());
+        this(relationship, null);
     }
 
     /**
@@ -60,52 +57,52 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
      */
     public RelationshipRepresentation(Relationship relationship, String[] properties) {
         super(relationship, properties);
-        startNodeId = relationship.getStartNode().getId();
-        endNodeId = relationship.getEndNode().getId();
+        startNodeGraphId = relationship.getStartNode().getId();
+        endNodeGraphId = relationship.getEndNode().getId();
         setType(relationship.getType().name());
     }
 
     /**
      * Construct a representation of a relationship from its internal Neo4j ID.
      *
-     * @param id ID.
+     * @param graphId ID.
      */
-    public RelationshipRepresentation(long id) {
-        super(id);
+    public RelationshipRepresentation(long graphId) {
+        super(graphId);
     }
 
     /**
      * Construct a new relationship representation.
      *
-     * @param startNodeId start node ID.
-     * @param endNodeId   end node ID.
-     * @param type        relationship type. Must not be <code>null</code> or empty.
-     * @param properties  relationship properties. Can be <code>null</code>, which is equivalent to an empty map.
+     * @param startNodeGraphId start node ID.
+     * @param endNodeGraphId   end node ID.
+     * @param type             relationship type. Must not be <code>null</code> or empty.
+     * @param properties       relationship properties. Can be <code>null</code>, which is equivalent to an empty map.
      */
-    public RelationshipRepresentation(long startNodeId, long endNodeId, String type, Map<String, Object> properties) {
+    public RelationshipRepresentation(long startNodeGraphId, long endNodeGraphId, String type, Map<String, Object> properties) {
         super(properties);
         hasLength(type);
-        this.startNodeId = startNodeId;
-        this.endNodeId = endNodeId;
+        this.startNodeGraphId = startNodeGraphId;
+        this.endNodeGraphId = endNodeGraphId;
         this.type = type;
     }
 
     /**
      * Construct a new relationship representation.
-     * <p/>
+     * <p>
      * Note that this constructor is only intended for testing.
      *
-     * @param id          Neo4j relationship ID.
-     * @param startNodeId start node ID.
-     * @param endNodeId   end node ID.
-     * @param type        relationship type. Must not be <code>null</code> or empty.
-     * @param properties  relationship properties. Can be <code>null</code>, which is equivalent to an empty map.
+     * @param graphId          Neo4j relationship ID.
+     * @param startNodeGraphId start node ID.
+     * @param endNodeGraphId   end node ID.
+     * @param type             relationship type. Must not be <code>null</code> or empty.
+     * @param properties       relationship properties. Can be <code>null</code>, which is equivalent to an empty map.
      */
-    public RelationshipRepresentation(long id, long startNodeId, long endNodeId, String type, Map<String, Object> properties) {
-        super(id, properties);
+    public RelationshipRepresentation(long graphId, long startNodeGraphId, long endNodeGraphId, String type, Map<String, Object> properties) {
+        super(graphId, properties);
         hasLength(type);
-        this.startNodeId = startNodeId;
-        this.endNodeId = endNodeId;
+        this.startNodeGraphId = startNodeGraphId;
+        this.endNodeGraphId = endNodeGraphId;
         this.type = type;
     }
 
@@ -114,7 +111,7 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
      */
     @Override
     protected Relationship create(GraphDatabaseService database) {
-        return database.getNodeById(startNodeId).createRelationshipTo(database.getNodeById(endNodeId), DynamicRelationshipType.withName(type));
+        return database.getNodeById(startNodeGraphId).createRelationshipTo(database.getNodeById(endNodeGraphId), DynamicRelationshipType.withName(type));
     }
 
     /**
@@ -122,7 +119,7 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
      */
     @Override
     protected Relationship fetch(GraphDatabaseService database) {
-        return database.getRelationshipById(getId());
+        return database.getRelationshipById(getGraphId());
     }
 
     /**
@@ -136,7 +133,7 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
             throw new IllegalStateException("Relationship type must not be null or empty");
         }
 
-        if (startNodeId == NEW || endNodeId == NEW) {
+        if (startNodeGraphId == NEW || endNodeGraphId == NEW) {
             throw new IllegalStateException("Start and End node IDs must be specified");
         }
     }
@@ -148,7 +145,7 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
     protected void checkCanFetch() {
         super.checkCanFetch();
 
-        if (startNodeId != NEW || endNodeId != NEW) {
+        if (startNodeGraphId != NEW || endNodeGraphId != NEW) {
             throw new IllegalStateException("Must not specify start/end node for existing relationship!");
         }
 
@@ -168,20 +165,20 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
         this.type = type;
     }
 
-    public long getStartNodeId() {
-        return startNodeId;
+    public long getStartNodeGraphId() {
+        return startNodeGraphId;
     }
 
-    public void setStartNodeId(long startNodeId) {
-        this.startNodeId = startNodeId;
+    public void setStartNodeGraphId(long startNodeGraphId) {
+        this.startNodeGraphId = startNodeGraphId;
     }
 
-    public long getEndNodeId() {
-        return endNodeId;
+    public long getEndNodeGraphId() {
+        return endNodeGraphId;
     }
 
-    public void setEndNodeId(long endNodeId) {
-        this.endNodeId = endNodeId;
+    public void setEndNodeGraphId(long endNodeGraphId) {
+        this.endNodeGraphId = endNodeGraphId;
     }
 
     /**
@@ -201,10 +198,10 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
 
         RelationshipRepresentation that = (RelationshipRepresentation) o;
 
-        if (startNodeId != that.startNodeId) {
+        if (startNodeGraphId != that.startNodeGraphId) {
             return false;
         }
-        if (endNodeId != that.endNodeId) {
+        if (endNodeGraphId != that.endNodeGraphId) {
             return false;
         }
         return type.equals(that.type);
@@ -217,8 +214,8 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + (int) (startNodeId ^ (startNodeId >>> 32));
-        result = 31 * result + (int) (endNodeId ^ (endNodeId >>> 32));
+        result = 31 * result + (int) (startNodeGraphId ^ (startNodeGraphId >>> 32));
+        result = 31 * result + (int) (endNodeGraphId ^ (endNodeGraphId >>> 32));
         result = 31 * result + type.hashCode();
         return result;
     }

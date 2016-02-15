@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -21,15 +21,19 @@ import com.graphaware.tx.executor.single.VoidReturningCallback;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.helpers.Settings;
+import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.Label.label;
 import static org.neo4j.graphdb.DynamicRelationshipType.withName;
+import static org.neo4j.helpers.Settings.FALSE;
 
 
 /**
@@ -41,7 +45,12 @@ public class ChangeLoggerDemo {
 
     @Before
     public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        database = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+                .newGraphDatabase();
+
         registerShutdownHook(database);
         database.registerTransactionEventHandler(new ChangeLogger());
     }

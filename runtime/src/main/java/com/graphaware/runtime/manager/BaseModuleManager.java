@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -71,6 +71,24 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
         }
 
         return (M) module;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <M extends RuntimeModule> M getModule(Class<M> clazz) {
+        M result = null;
+        for (T module : modules.values()) {
+            if (clazz.isAssignableFrom(module.getClass())) {
+                if (result != null) {
+                    throw new IllegalStateException("More than one module of type " + clazz + " has been registered");
+                }
+                result = (M) module;
+            }
+        }
+
+        return result;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -116,14 +116,6 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
      */
     @Override
     public final synchronized void start() {
-        start(false);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final synchronized void start(boolean skipLoadingMetadata) {
         if (State.STARTED.equals(state)) {
             LOG.debug("GraphAware already started");
             return;
@@ -142,7 +134,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
         state = State.STARTING;
 
         startStatsCollector();
-        startModules(skipLoadingMetadata);
+        startModules();
         startWriter();
 
         state = State.STARTED;
@@ -159,18 +151,12 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
 
     /**
      * Perform the actual start of the runtime, being certain that it is the right time to do so.
-     *
-     * @param skipLoadingMetadata true for skipping the metadata loading phase.
      */
-    protected void startModules(boolean skipLoadingMetadata) {
-        if (skipLoadingMetadata) {
-            LOG.info("Metadata loading skipped.");
-        } else {
-            LOG.info("Loading module metadata...");
-            Set<String> moduleIds = loadMetadata();
-            cleanupMetadata(moduleIds);
-            LOG.info("Module metadata loaded.");
-        }
+    protected void startModules() {
+        LOG.info("Loading module metadata...");
+        Set<String> moduleIds = loadMetadata();
+        cleanupMetadata(moduleIds);
+        LOG.info("Module metadata loaded.");
     }
 
     /**
@@ -216,7 +202,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
      * </ul>
      *
      * @return <code>true</code> iff the runtime is started.
-     *         <code>false</code> iff the runtime isn't started but it is safe to proceed.
+     * <code>false</code> iff the runtime isn't started but it is safe to proceed.
      * @throws IllegalStateException in case the runtime hasn't been started at all.
      */
     protected final boolean isStarted(ImprovedTransactionData transactionData) {

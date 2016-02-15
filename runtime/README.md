@@ -44,7 +44,7 @@ The following Runtime Modules are developed and provided by GraphAware. They are
 
 ### Getting the Runtime
 
-GraphAware Runtime ships with the Framework. By [downloading](http://graphaware.com/downloads) the appropriate release
+GraphAware Runtime ships with the Framework. By [downloading](http://products.graphaware.com) the appropriate release
 of the GraphAware Framework and placing it into the _plugins_ directory of your Neo4 server, you have the Runtime as well.
 However, it is disabled by default and needs to be explicitly enabled (read on).
 
@@ -293,19 +293,31 @@ To enable logging from your GraphAware Runtime Modules, set up a dependency on `
 ```
 Make sure you do not include any other slf4j implementations.
 
-Modify config/custom-logback.xml in your Neo4j install path and add at the end
+Create config/custom-logback.xml in your Neo4j install path and add
 
 ```xml
-<appender name="EXTENSIONLOG"  class="ch.qos.logback.core.FileAppender">
-    <file>data/log/extensions.log</file>
-    <encoder>
-        <pattern>%date{yyyy-MM-dd HH:mm:ss.SSSZ} %-5level [%logger{15}]: %message%n</pattern>
-    </encoder>
-</appender>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSSZ} %-5level %msg%n</pattern>
+        </encoder>
+    </appender>
 
-<logger name="com.mycompany" level="debug">
-    <appender-ref ref="EXTENSIONLOG"/>
-</logger>
+    <appender name="EXTENSIONLOG"  class="ch.qos.logback.core.FileAppender">
+        <file>data/log/extensions.log</file>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSSZ} %-5level [%logger{15}]: %message%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.graphaware" level="debug">
+        <appender-ref ref="EXTENSIONLOG"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
 ```
 
 In the example above, logging is set to `debug` level and log statements are written to an extensions.log file in the Neo4j data/log directory.
@@ -313,7 +325,7 @@ In the example above, logging is set to `debug` level and log statements are wri
 License
 -------
 
-Copyright (c) 2014 GraphAware
+Copyright (c) 2013-2016 GraphAware
 
 GraphAware is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

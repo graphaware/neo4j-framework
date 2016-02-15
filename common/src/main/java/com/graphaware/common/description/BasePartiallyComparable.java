@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -27,7 +27,7 @@ public abstract class BasePartiallyComparable<T extends PartiallyComparable<T>> 
     protected abstract T self();
 
     /**
-     * @see {@link PartiallyComparable#isMoreSpecificThan(Object)}.
+     * @see PartiallyComparable#isMoreSpecificThan(Object).
      */
     public boolean isMoreSpecificThan(T other) {
         return other.isMoreGeneralThan(self());

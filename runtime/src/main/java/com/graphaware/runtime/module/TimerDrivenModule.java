@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -16,12 +16,15 @@
 
 package com.graphaware.runtime.module;
 
+import com.graphaware.runtime.config.TimerDrivenModuleConfiguration;
 import com.graphaware.runtime.metadata.TimerDrivenModuleContext;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  * Specialisation of {@link RuntimeModule} that can be driven by a timing strategy as opposed to a response to transaction
  * events.
+ *
+ * @param <C> the type of context that the module persists in Neo4j between runs.
  */
 public interface TimerDrivenModule<C extends TimerDrivenModuleContext> extends RuntimeModule {
 
@@ -42,4 +45,13 @@ public interface TimerDrivenModule<C extends TimerDrivenModuleContext> extends R
      * @return context that will be presented next time the module is run.
      */
     C doSomeWork(C lastContext, GraphDatabaseService database);
+
+    /**
+     * Return the configuration of this module. Each module must encapsulate its entire configuration in an instance of
+     * a {@link com.graphaware.runtime.config.TimerDrivenModuleConfiguration} implementation. Use {@link com.graphaware.runtime.config.NullTimerDrivenModuleConfiguration}
+     * if this module needs no configuration.
+     *
+     * @return module configuration.
+     */
+    TimerDrivenModuleConfiguration getConfiguration();
 }

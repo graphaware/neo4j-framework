@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -118,6 +118,14 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      * {@inheritDoc}
      */
     @Override
+    public <M extends RuntimeModule> M getModule(Class<M> clazz) throws NotFoundException {
+        return getTxDrivenModuleManager().getModule(clazz);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected Set<String> loadMetadata() {
         return getTxDrivenModuleManager().loadMetadata();
     }
@@ -134,8 +142,8 @@ public abstract class TxDrivenRuntime<T extends TxDrivenModule> extends BaseGrap
      * {@inheritDoc}
      */
     @Override
-    protected void startModules(boolean skipLoadingMetadata) {
-        super.startModules(skipLoadingMetadata);
+    protected void startModules() {
+        super.startModules();
         getTxDrivenModuleManager().startModules();
     }
 

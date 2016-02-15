@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2013-2015 GraphAware
+  ~ Copyright (c) 2013-2016 GraphAware
   ~
   ~ This file is part of the GraphAware Framework.
   ~
@@ -42,10 +42,6 @@
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>tests</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
         </dependency>
     </dependencies>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -41,6 +41,7 @@ public class FriendshipStrengthModuleEmbeddedDeclarativeIntegrationTest {
                 .newImpermanentDatabaseBuilder()
                 .loadPropertiesFromFile(this.getClass().getClassLoader().getResource("neo4j-friendship.properties").getPath())
                 .newGraphDatabase();
+
         registerShutdownHook(database);
     }
 

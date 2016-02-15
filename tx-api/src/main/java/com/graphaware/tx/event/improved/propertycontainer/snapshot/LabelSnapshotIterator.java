@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -17,9 +17,9 @@
 package com.graphaware.tx.event.improved.propertycontainer.snapshot;
 
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
-import org.apache.commons.collections4.iterators.EmptyIterator;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+import org.neo4j.helpers.collection.IteratorUtil;
 import org.neo4j.helpers.collection.PrefetchingIterator;
 
 import java.util.Iterator;
@@ -45,7 +45,7 @@ public class LabelSnapshotIterator extends PrefetchingIterator<Label> implements
             this.removedLabelsIterator = transactionDataContainer.getNodeTransactionData().labelsOfDeletedNode(node).iterator();
         }
         else {
-            this.removedLabelsIterator = EmptyIterator.emptyIterator();
+            this.removedLabelsIterator = IteratorUtil.emptyIterator();
         }
     }
 

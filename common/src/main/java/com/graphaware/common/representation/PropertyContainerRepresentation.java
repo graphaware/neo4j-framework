@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -25,15 +25,18 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.springframework.util.Assert.notNull;
+
 /**
- * {@link Serializable} representation of a Neo4j property container.
+ * Representation of a Neo4j property container.
  *
  * @param <T> type of the {@link PropertyContainer} this class represents.
  */
 public abstract class PropertyContainerRepresentation<T extends PropertyContainer> implements Serializable {
-    static final long NEW = -1;
+    public static final long NEW = -1;
 
-    private long id = NEW;
+    private long graphId = NEW;
+    //perhaps not the right thing from software design perspective, but: null properties means not hydrated, empty means no properties
     private Map<String, Object> properties;
 
     /**
@@ -52,6 +55,7 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
     protected PropertyContainerRepresentation(T pc, String[] properties) {
         this(PropertyContainerUtils.id(pc));
 
+        initPropsIfNeeded();
         if (properties != null) {
             for (String property : properties) {
                 if (pc.hasProperty(property)) {
@@ -68,31 +72,33 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
     /**
      * Construct a representation of a property container from its internal Neo4j ID.
      *
-     * @param id ID.
+     * @param graphId ID.
      */
-    protected PropertyContainerRepresentation(long id) {
-        this.id = id;
+    protected PropertyContainerRepresentation(long graphId) {
+        this.graphId = graphId;
     }
 
     /**
      * Construct a new representation of a property container from a map of properties.
      *
-     * @param properties of the new container. Can be <code>null</code>, which is equivalent to an empty map.
+     * @param properties of the new container. Must not be <code>null</code>, but can be empty.
      */
     protected PropertyContainerRepresentation(Map<String, Object> properties) {
+        notNull(properties);
         setProperties(properties);
     }
 
     /**
      * Construct a new representation of a property container from its internal Neo4j ID and a map of properties.
-     * <p/>
+     * <p>
      * Note that this constructor is only intended for testing.
      *
-     * @param id         ID.
-     * @param properties of the new container. Can be <code>null</code>, which is equivalent to an empty map.
+     * @param graphId    ID.
+     * @param properties of the new container. Must not be <code>null</code>, but can be empty.
      */
-    protected PropertyContainerRepresentation(long id, Map<String, Object> properties) {
-        this.id = id;
+    protected PropertyContainerRepresentation(long graphId, Map<String, Object> properties) {
+        notNull(properties);
+        this.graphId = graphId;
         setProperties(properties);
     }
 
@@ -120,12 +126,12 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
      * @param database to create/fetch container in.
      * @return container.
      */
-    public final T producePropertyContainer(GraphDatabaseService database) {
+    public T producePropertyContainer(GraphDatabaseService database) {
         T result;
 
         try (Transaction tx = database.beginTx()) {
 
-            if (getId() == NEW) {
+            if (getGraphId() == NEW) {
                 checkCanCreate();
                 result = create(database);
                 populate(result);
@@ -162,7 +168,7 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
      * @param t to populate from.
      */
     protected void populate(T t) {
-        setId(PropertyContainerUtils.id(t));
+        setGraphId(PropertyContainerUtils.id(t));
         if (properties != null) {
             for (Map.Entry<String, Object> entry : properties.entrySet()) {
                 t.setProperty(entry.getKey(), entry.getValue());
@@ -185,19 +191,19 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
      * @throws IllegalStateException if not possible to fetch.
      */
     protected void checkCanFetch() {
-        if (getProperties() != null && !getProperties().isEmpty()) {
-            throw new IllegalStateException("Must not specify properties for existing node!");
+        if (getProperties() != null) {
+            throw new IllegalStateException("Must not specify properties for existing property container!");
         }
     }
 
     //getters & setters
 
-    public long getId() {
-        return id;
+    public long getGraphId() {
+        return graphId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setGraphId(long graphId) {
+        this.graphId = graphId;
     }
 
     /**
@@ -210,15 +216,12 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
     /**
      * Set properties.
      *
-     * @param properties Can be <code>null</code>, which is equivalent to an empty map.
+     * @param properties Must not be <code>null</code>, but can be empty.
      */
     public void setProperties(Map<String, Object> properties) {
-        if (properties == null) {
-            this.properties = null;
-        } else {
-            initPropsIfNeeded();
-            this.properties.putAll(properties);
-        }
+        notNull(properties);
+        initPropsIfNeeded();
+        this.properties.putAll(properties);
     }
 
     /**
@@ -235,7 +238,7 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
 
         PropertyContainerRepresentation<?> that = (PropertyContainerRepresentation<?>) o;
 
-        if (id != that.id) {
+        if (graphId != that.graphId) {
             return false;
         }
         return !(properties != null ? !properties.equals(that.properties) : that.properties != null);
@@ -247,7 +250,7 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
      */
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
+        int result = (int) (graphId ^ (graphId >>> 32));
         result = 31 * result + (properties != null ? properties.hashCode() : 0);
         return result;
     }

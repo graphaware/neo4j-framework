@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -24,6 +24,7 @@ import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.helpers.Settings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
@@ -31,6 +32,7 @@ import static com.graphaware.common.description.relationship.RelationshipDescrip
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.*;
+import static org.neo4j.helpers.Settings.FALSE;
 
 /**
  * Test for {@link com.graphaware.common.description.relationship.DetachedRelationshipDescriptionImpl}.
@@ -41,7 +43,10 @@ public class DetachedRelationshipDescriptionImplTest {
 
     @Before
     public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        database = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .newGraphDatabase();
+
         registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {

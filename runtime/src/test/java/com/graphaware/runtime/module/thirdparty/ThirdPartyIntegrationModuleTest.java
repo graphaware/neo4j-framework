@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -22,21 +22,33 @@ import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.writer.thirdparty.*;
 import org.junit.Test;
+import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.helpers.Settings;
 import org.neo4j.helpers.collection.MapUtil;
+import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Collection;
+import java.util.Collections;
 
+import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.neo4j.helpers.Settings.FALSE;
 
 public class ThirdPartyIntegrationModuleTest {
 
     @Test
     public void modificationsShouldBeCorrectlyBuilt() {
-        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        GraphDatabaseService database = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+                .newGraphDatabase();
+
+        registerShutdownHook(database);
 
         TestThirdPartyModule module = new TestThirdPartyModule("test");
 
@@ -70,7 +82,7 @@ public class ThirdPartyIntegrationModuleTest {
                 new NodeRepresentation(2L, new String[]{"Person"}, MapUtil.map("name", "Adam")))));
 
         assertTrue(writeOperations.contains(new RelationshipCreated(
-                new RelationshipRepresentation(2L, 3L, 1L, "WORKS_FOR", null)
+                new RelationshipRepresentation(2L, 3L, 1L, "WORKS_FOR", Collections.<String, Object>emptyMap())
         )));
 
         assertTrue(writeOperations.contains(new RelationshipUpdated(

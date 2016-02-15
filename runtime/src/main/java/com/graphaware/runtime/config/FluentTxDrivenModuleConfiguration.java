@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -20,15 +20,15 @@ import com.graphaware.common.policy.InclusionPolicies;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
 
 /**
- * {@link TxDrivenModuleConfiguration} with fluent interface.
- * Intended for users of Neo4j in embedded mode to programatically configure the runtime.
+ * {@link TimerDrivenModuleConfiguration} with fluent interface.
+ * Intended for users of Neo4j in embedded mode for programmatic configuration.
  */
 public final class FluentTxDrivenModuleConfiguration extends BaseTxDrivenModuleConfiguration<FluentTxDrivenModuleConfiguration> {
 
     /**
      * Creates an instance with default values, i.e., with {@link com.graphaware.runtime.policy.InclusionPoliciesFactory#allBusiness()}.
      *
-     * @return The {@link FluentRuntimeConfiguration} instance.
+     * @return The {@link FluentTxDrivenModuleConfiguration} instance.
      */
     public static FluentTxDrivenModuleConfiguration defaultConfiguration() {
         return new FluentTxDrivenModuleConfiguration();
@@ -38,23 +38,24 @@ public final class FluentTxDrivenModuleConfiguration extends BaseTxDrivenModuleC
      * Create a new configuration with {@link com.graphaware.runtime.policy.InclusionPoliciesFactory#allBusiness()}.
      */
     private FluentTxDrivenModuleConfiguration() {
-        super(InclusionPoliciesFactory.allBusiness());
+        super(InclusionPoliciesFactory.allBusiness(), ALWAYS);
     }
 
     /**
      * Create a new configuration.
      *
      * @param inclusionPolicies of the configuration.
+     * @param initializeUntil   of the new configuration.
      */
-    private FluentTxDrivenModuleConfiguration(InclusionPolicies inclusionPolicies) {
-        super(inclusionPolicies);
+    private FluentTxDrivenModuleConfiguration(InclusionPolicies inclusionPolicies, long initializeUntil) {
+        super(inclusionPolicies, initializeUntil);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected FluentTxDrivenModuleConfiguration newInstance(InclusionPolicies inclusionPolicies) {
-        return new FluentTxDrivenModuleConfiguration(inclusionPolicies);
+    protected FluentTxDrivenModuleConfiguration newInstance(InclusionPolicies inclusionPolicies, long initializeUntil) {
+        return new FluentTxDrivenModuleConfiguration(inclusionPolicies, initializeUntil);
     }
 }

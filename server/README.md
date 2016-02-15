@@ -8,7 +8,7 @@ This (Maven) module is part of the [GraphAware Neo4j Framework](https://github.c
 This module allows building APIs by deploying Spring MVC Controllers into the _plugins_ directory of the Neo4j server and thus provide
 and alternative to server plugins and unmanaged server extensions.
 
-There is no need to use this module directly. Just [download](http://graphaware.com/downloads) the appropriate release
+There is no need to use this module directly. Just [download](http://products.graphaware.com) the appropriate release
 of the GraphAware Framework and place it into the _plugins_ directory of Neo4j.
 
 The following APIs are developed and provided by GraphAware:
@@ -101,7 +101,7 @@ called `_GA_TX_ID` with value equal to the transaction ID, which you have receiv
 License
 -------
 
-Copyright (c) 2014 GraphAware
+Copyright (c) 2013-2016 GraphAware
 
 GraphAware is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

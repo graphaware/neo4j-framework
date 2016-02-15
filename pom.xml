@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2013-2015 GraphAware
+  ~ Copyright (c) 2013-2016 GraphAware
   ~
   ~ This file is part of the GraphAware Framework.
   ~
@@ -20,6 +20,7 @@
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>graphaware-parent</artifactId>
     <version>3.0.0.37-SNAPSHOT</version>
+    <version>2.3.2.38-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>GraphAware Neo4j Framework Parent POM</name>
@@ -126,13 +127,27 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>intellij-javadoc-fix</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.9</version>
+                        <configuration>
+                            <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <neo4j.version>3.0.0-M03</neo4j.version>
-        <spring.version>4.2.0.RELEASE</spring.version>
+        <spring.version>4.2.3.RELEASE</spring.version>
         <logback.version>1.1.2</logback.version>
     </properties>
 
@@ -327,7 +342,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>1.7.7</version>
+                <version>1.7.13</version>
             </dependency>
 
             <dependency>
@@ -342,21 +357,21 @@
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.11</version>
+                <version>4.12</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-all</artifactId>
-                <version>1.9.5</version>
+                <version>1.10.19</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.skyscreamer</groupId>
                 <artifactId>jsonassert</artifactId>
-                <version>1.2.3</version>
+                <version>1.3.0</version>
                 <scope>test</scope>
             </dependency>
 
@@ -365,13 +380,7 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.5</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-collections4</artifactId>
-                <version>4.0</version>
+                <version>4.5.1</version>
             </dependency>
 
             <dependency>
@@ -383,7 +392,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-math3</artifactId>
-                <version>3.3</version>
+                <version>3.5</version>
             </dependency>
 
             <dependency>
@@ -460,7 +469,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>17.0</version>
+                <version>18.0</version>
             </dependency>
 
             <!-- UUID -->
@@ -506,7 +515,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.3</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -516,7 +525,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.1</version>
+                <version>2.8.2</version>
                 <configuration>
                     <retryFailedDeploymentCount>10</retryFailedDeploymentCount>
                 </configuration>
@@ -524,7 +533,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.3</version>
+                <version>1.6.6</version>
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>
@@ -535,7 +544,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5</version>
+                <version>2.5.3</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <useReleaseProfile>false</useReleaseProfile>
@@ -546,7 +555,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
+                <version>2.4</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -559,7 +568,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
+                <version>2.10.3</version>
                 <configuration>
                     <aggregate>true</aggregate>
                     <links>

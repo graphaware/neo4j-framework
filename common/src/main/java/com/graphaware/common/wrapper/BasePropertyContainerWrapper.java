@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -77,28 +77,28 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#getRelationships()}.
+     * @see org.neo4j.graphdb.Node#getRelationships().
      */
     public Iterable<Relationship> getRelationships() {
         return getRelationships(BOTH);
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.RelationshipType...)}.
+     * @see org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.RelationshipType...).
      */
     public Iterable<Relationship> getRelationships(RelationshipType... types) {
         return getRelationships(BOTH, types);
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.Direction)}.
+     * @see org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.Direction).
      */
     public Iterable<Relationship> getRelationships(Direction dir) {
         return getRelationships(dir, new RelationshipType[0]);
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction)}.
+     * @see org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction).
      */
     public Iterable<Relationship> getRelationships(RelationshipType type, Direction dir) {
         return getRelationships(dir, type);
@@ -107,35 +107,35 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
     //The following methods intentionally break object-orientation a bit to keep the rest of the codebase DRY:
 
     /**
-     * @see {@link Node#hasLabel(org.neo4j.graphdb.Label)}.
+     * @see Node#hasLabel(org.neo4j.graphdb.Label).
      */
     public boolean hasLabel(Label label) {
         return getWrappedNode().hasLabel(label);
     }
 
     /**
-     * @see {@link Node#hasLabel(org.neo4j.graphdb.Label)}.
+     * @see Node#hasLabel(org.neo4j.graphdb.Label).
      */
     public Iterable<Label> getLabels() {
         return getWrappedNode().getLabels();
     }
 
     /**
-     * @see {@link Node#addLabel(org.neo4j.graphdb.Label)}.
+     * @see Node#addLabel(org.neo4j.graphdb.Label).
      */
     public void addLabel(Label label) {
         getWrappedNode().addLabel(label);
     }
 
     /**
-     * @see {@link Node#removeLabel(org.neo4j.graphdb.Label)}.
+     * @see Node#removeLabel(org.neo4j.graphdb.Label).
      */
     public void removeLabel(Label label) {
         getWrappedNode().removeLabel(label);
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.Direction, org.neo4j.graphdb.RelationshipType...)}.
+     * @see org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.Direction, org.neo4j.graphdb.RelationshipType...).
      */
     public Iterable<Relationship> getRelationships(Direction direction, RelationshipType... types) {
         if (types == null || types.length == 0) {
@@ -146,63 +146,63 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#createRelationshipTo(org.neo4j.graphdb.Node, org.neo4j.graphdb.RelationshipType)}.
+     * @see org.neo4j.graphdb.Node#createRelationshipTo(org.neo4j.graphdb.Node, org.neo4j.graphdb.RelationshipType).
      */
     public Relationship createRelationshipTo(Node otherNode, RelationshipType type) {
         return wrapRelationship(getWrappedNode().createRelationshipTo(otherNode, type));
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#getRelationshipTypes()}.
+     * @see org.neo4j.graphdb.Node#getRelationshipTypes().
      */
     public Iterable<RelationshipType> getRelationshipTypes() {
         return getWrappedNode().getRelationshipTypes();
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#getDegree()}.
+     * @see org.neo4j.graphdb.Node#getDegree().
      */
     public int getDegree() {
         return getWrappedNode().getDegree();
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#getDegree(org.neo4j.graphdb.RelationshipType)}.
+     * @see org.neo4j.graphdb.Node#getDegree(org.neo4j.graphdb.RelationshipType).
      */
     public int getDegree(RelationshipType type) {
         return getWrappedNode().getDegree(type);
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#getDegree(org.neo4j.graphdb.Direction)}.
+     * @see org.neo4j.graphdb.Node#getDegree(org.neo4j.graphdb.Direction).
      */
     public int getDegree(Direction direction) {
         return getWrappedNode().getDegree(direction);
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#getDegree(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction)}.
+     * @see org.neo4j.graphdb.Node#getDegree(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction).
      */
     public int getDegree(RelationshipType type, Direction direction) {
         return getWrappedNode().getDegree(type, direction);
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Relationship#getType()}.
+     * @see org.neo4j.graphdb.Relationship#getType().
      */
     public RelationshipType getType() {
         return getWrappedRelationship().getType();
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Relationship#getStartNode()}.
+     * @see org.neo4j.graphdb.Relationship#getStartNode().
      */
     public Node getStartNode() {
         return wrapNode(getWrappedRelationship().getStartNode());
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Relationship#getEndNode()}.
+     * @see org.neo4j.graphdb.Relationship#getEndNode().
      */
     public Node getEndNode() {
         return wrapNode(getWrappedRelationship().getEndNode());
@@ -253,7 +253,7 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
     //Typically no need to override:
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#getId()}  and {@link org.neo4j.graphdb.Relationship#getId()}.
+     * @see org.neo4j.graphdb.Node#getId()}  and {@link org.neo4j.graphdb.Relationship#getId().
      */
     public long getId() {
         if (getWrapped() instanceof Node) {
@@ -268,7 +268,7 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
     }
 
     /**
-     * @see {@link org.neo4j.graphdb.Node#delete()}  and {@link org.neo4j.graphdb.Relationship#delete()}.
+     * @see org.neo4j.graphdb.Node#delete()}  and {@link org.neo4j.graphdb.Relationship#delete().
      */
     public void delete() {
         if (getWrapped() instanceof Node) {

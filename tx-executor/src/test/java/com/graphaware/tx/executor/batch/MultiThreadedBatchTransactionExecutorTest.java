@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -20,8 +20,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.helpers.Settings;
+import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
@@ -30,6 +33,7 @@ import static com.graphaware.test.util.TestUtils.Timed;
 import static com.graphaware.test.util.TestUtils.time;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.neo4j.helpers.Settings.FALSE;
 
 /**
  * Unit test for {@link com.graphaware.tx.executor.batch.MultiThreadedBatchTransactionExecutor}.
@@ -40,7 +44,12 @@ public class MultiThreadedBatchTransactionExecutorTest {
 
     @Before
     public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        database = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+                .newGraphDatabase();
+
         registerShutdownHook(database);
     }
 

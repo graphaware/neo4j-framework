@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -52,6 +52,16 @@ public interface ModuleManager<T extends RuntimeModule> {
      * @return module, <code>null</code> if no such module exists.
      */
     <M extends RuntimeModule> M getModule(String moduleId, Class<M> clazz);
+
+    /**
+     * Get a module registered with the manager.
+     *
+     * @param clazz class of the module.
+     * @param <M>   type of the class above.
+     * @return module. <code>null</code> if no such module exists.
+     * @throws IllegalStateException if more than one module of the same type has been registered.
+     */
+    <M extends RuntimeModule> M getModule(Class<M> clazz);
 
     /**
      * Load module metadata from wherever they are stored in between database restarts and do whatever is necessary

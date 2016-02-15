@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -22,17 +22,21 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.neo4j.graphdb.Label;
+import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.kernel.configuration.Settings;
+import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.RepeatRule;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Random;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
+import static org.neo4j.kernel.configuration.Settings.*;
 
 /**
  * Aux runtime tests for bugs found while doing manual testing.
@@ -62,6 +66,8 @@ public class OtherRuntimeTests {
     public void makeSureDeadlockDoesNotOccur() throws InterruptedException {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -85,6 +91,8 @@ public class OtherRuntimeTests {
     public void makeSureDeadlockDoesNotOccur1() throws InterruptedException {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -111,6 +119,8 @@ public class OtherRuntimeTests {
     public void makeSureDeadlockDoesNotOccur2() {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -130,6 +140,8 @@ public class OtherRuntimeTests {
     public void makeSureDeadlockDoesNotOccur3() {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -148,6 +160,8 @@ public class OtherRuntimeTests {
     public void makeSureDeadlockDoesNotOccur4() {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -166,6 +180,8 @@ public class OtherRuntimeTests {
     public void makeSureDeadlockDoesNotOccur5() {
         GraphDatabaseService database = new GraphDatabaseFactory()
                 .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot().getPath())
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -185,6 +201,8 @@ public class OtherRuntimeTests {
     public void makeSureDeadlockDoesNotOccur6() throws InterruptedException {
         GraphDatabaseService database = new GraphDatabaseFactory()
                 .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot().getPath())
+                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -21,7 +21,10 @@ import com.graphaware.common.policy.none.IncludeNoNodes;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.*;
+import org.neo4j.helpers.Settings;
+import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.tooling.GlobalGraphOperations;
 
@@ -30,6 +33,7 @@ import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.test.unit.GraphUnit.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.neo4j.helpers.Settings.FALSE;
 import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 
@@ -42,7 +46,12 @@ public class GraphUnitTest {
 
     @Before
     public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        database = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+                .newGraphDatabase();
+
         registerShutdownHook(database);
     }
 

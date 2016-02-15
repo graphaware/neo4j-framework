@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -26,32 +26,56 @@ import static org.springframework.util.Assert.notNull;
 public abstract class BaseTxDrivenModuleConfiguration<T extends BaseTxDrivenModuleConfiguration<T>> implements TxDrivenModuleConfiguration {
 
     private final InclusionPolicies inclusionPolicies;
+    private final long initializeUntil;
 
     /**
      * Construct a new configuration.
      *
      * @param inclusionPolicies policies for inclusion of nodes, relationships, and properties for processing by the module. Must not be <code>null</code>.
+     * @deprecated use {@link #BaseTxDrivenModuleConfiguration(InclusionPolicies, long)}
      */
+    @Deprecated
     protected BaseTxDrivenModuleConfiguration(InclusionPolicies inclusionPolicies) {
+        this(inclusionPolicies, ALWAYS);
+    }
+
+    /**
+     * Construct a new configuration.
+     *
+     * @param inclusionPolicies policies for inclusion of nodes, relationships, and properties for processing by the module. Must not be <code>null</code>.
+     * @param initializeUntil   until what time in ms since epoch it is ok to re(initialize) the entire module in case the configuration
+     *                          has changed since the last time the module was started, or if it is the first time the module was registered.
+     *                          {@link #NEVER} for never, {@link #ALWAYS} for always.
+     */
+    protected BaseTxDrivenModuleConfiguration(InclusionPolicies inclusionPolicies, long initializeUntil) {
         notNull(inclusionPolicies);
         this.inclusionPolicies = inclusionPolicies;
+        this.initializeUntil = initializeUntil;
     }
 
     /**
      * Create a new instance of this {@link TxDrivenModuleConfiguration} with different inclusion policies.
      *
      * @param inclusionPolicies of the new instance.
+     * @param initializeUntil   of the new instance.
      * @return new instance.
      */
-    protected abstract T newInstance(InclusionPolicies inclusionPolicies);
+    protected abstract T newInstance(InclusionPolicies inclusionPolicies, long initializeUntil);
 
     /**
-     * Get inclusion policies encapsulated by this configuration.
-     *
-     * @return policies.
+     * {@inheritDoc}
      */
+    @Override
     public InclusionPolicies getInclusionPolicies() {
         return inclusionPolicies;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long initializeUntil() {
+        return initializeUntil;
     }
 
     /**
@@ -61,7 +85,7 @@ public abstract class BaseTxDrivenModuleConfiguration<T extends BaseTxDrivenModu
      * @return new instance.
      */
     public T with(NodeInclusionPolicy nodeInclusionPolicy) {
-        return newInstance(inclusionPolicies.with(nodeInclusionPolicy));
+        return newInstance(inclusionPolicies.with(nodeInclusionPolicy), initializeUntil);
     }
 
     /**
@@ -71,7 +95,7 @@ public abstract class BaseTxDrivenModuleConfiguration<T extends BaseTxDrivenModu
      * @return new instance.
      */
     public T with(NodePropertyInclusionPolicy nodePropertyInclusionPolicy) {
-        return newInstance(inclusionPolicies.with(nodePropertyInclusionPolicy));
+        return newInstance(inclusionPolicies.with(nodePropertyInclusionPolicy), initializeUntil);
     }
 
     /**
@@ -81,7 +105,7 @@ public abstract class BaseTxDrivenModuleConfiguration<T extends BaseTxDrivenModu
      * @return new instance.
      */
     public T with(RelationshipInclusionPolicy relationshipInclusionPolicy) {
-        return newInstance(inclusionPolicies.with(relationshipInclusionPolicy));
+        return newInstance(inclusionPolicies.with(relationshipInclusionPolicy), initializeUntil);
     }
 
     /**
@@ -91,17 +115,27 @@ public abstract class BaseTxDrivenModuleConfiguration<T extends BaseTxDrivenModu
      * @return new instance.
      */
     public T with(RelationshipPropertyInclusionPolicy relationshipPropertyInclusionPolicy) {
-        return newInstance(inclusionPolicies.with(relationshipPropertyInclusionPolicy));
+        return newInstance(inclusionPolicies.with(relationshipPropertyInclusionPolicy), initializeUntil);
     }
 
     /**
-     * Create w new instance of {@link TxDrivenModuleConfiguration} with different {@link com.graphaware.common.policy.InclusionPolicies}.
+     * Create a new instance of {@link TxDrivenModuleConfiguration} with different {@link com.graphaware.common.policy.InclusionPolicies}.
      *
      * @param inclusionPolicies of the new instance.
      * @return new instance.
      */
     public T with(InclusionPolicies inclusionPolicies) {
-        return newInstance(inclusionPolicies);
+        return newInstance(inclusionPolicies, initializeUntil);
+    }
+
+    /**
+     * Create a new instance of {@link TxDrivenModuleConfiguration} with different initialize-until setting.
+     *
+     * @param initializeUntil of the new instance.
+     * @return new instance.
+     */
+    public T withInitializeUntil(long initializeUntil) {
+        return newInstance(inclusionPolicies, initializeUntil);
     }
 
     /**

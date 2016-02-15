@@ -27,6 +27,6 @@ List of modules to upgrade:
         reco
         reco-meetup
         importer
-        ga-enterprise
         neo4j-to-elasticsearch
+        ga-enterprise
         schema

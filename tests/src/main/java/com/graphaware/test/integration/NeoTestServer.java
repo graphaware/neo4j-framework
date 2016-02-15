@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -29,7 +29,7 @@ import java.io.IOException;
 /**
  * Real Neo4j server, started from an instance of this class using the {@link #start()} method and stopped using the
  * {@link #stop()} method.
- * <p/>
+ * <p>
  * The Neo4j and server configuration file names are provided using a constructor. They defaults to "neo4j.properties"
  * and "neo4j-server.properties" and if no such files are present on the classpath, the ones that ships with Neo4j are used.
  */
@@ -69,10 +69,10 @@ public abstract class NeoTestServer {
 
     private File serverConfigToConfDir() throws IOException {
         String serverConfigContents = IOUtils.toString(new ClassPathResource(neo4jServerConfigFile).getInputStream());
-        serverConfigContents = serverConfigContents.replaceAll("=config/", "=" + temporaryFolder.getRoot().getAbsolutePath() + "/config/");
-        serverConfigContents = serverConfigContents.replaceAll("=data/", "=" + temporaryFolder.getRoot().getAbsolutePath() + "/data/");
+        serverConfigContents = serverConfigContents.replaceAll("=config" + File.separator, "=" + temporaryFolder.getRoot().getAbsolutePath() + File.separator + "conf" + File.separator);
+        serverConfigContents = serverConfigContents.replaceAll("=data" + File.separator, "=" + temporaryFolder.getRoot().getAbsolutePath() + File.separator + "data" + File.separator);
 
-        File serverConfig = temporaryFolder.newFile("config/neo4j-server.properties");
+        File serverConfig = temporaryFolder.newFile("config" + File.separator + "neo4j-server.properties");
         IOUtils.copy(IOUtils.toInputStream(serverConfigContents), new FileOutputStream(serverConfig));
         System.setProperty(ServerSettings.SERVER_CONFIG_FILE_KEY, serverConfig.getAbsolutePath());
         return serverConfig;
@@ -85,7 +85,7 @@ public abstract class NeoTestServer {
     }
 
     protected File copyToConfDir(String classPathResource, String newName) throws IOException {
-        File result = temporaryFolder.newFile("config/" + newName);
+        File result = temporaryFolder.newFile("config" + File.separator + newName);
         IOUtils.copy(new ClassPathResource(classPathResource).getInputStream(), new FileOutputStream(result));
         return result;
     }

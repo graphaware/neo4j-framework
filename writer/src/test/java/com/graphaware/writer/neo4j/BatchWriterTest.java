@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -178,7 +178,7 @@ public class BatchWriterTest extends DatabaseIntegrationTest {
             public Boolean call() throws Exception {
                 throw new IOException("Deliberate Testing Exception");
             }
-        }, "test", 10);
+        }, "test", 20);
     }
 
     @Test

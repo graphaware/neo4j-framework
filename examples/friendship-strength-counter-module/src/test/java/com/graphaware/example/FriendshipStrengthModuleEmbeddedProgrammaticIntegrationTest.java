@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2015 GraphAware
+ * Copyright (c) 2013-2016 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
@@ -23,11 +23,15 @@ import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.*;
+import org.neo4j.helpers.Settings;
+import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.assertEquals;
+import static org.neo4j.helpers.Settings.FALSE;
 
 
 /**
@@ -39,7 +43,12 @@ public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
 
     @Before
     public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        database = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig(OnlineBackupSettings.online_backup_enabled, Settings.FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+                .newGraphDatabase();
+
         registerShutdownHook(database);
 
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);

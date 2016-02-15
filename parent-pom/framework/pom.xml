@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2013-2015 GraphAware
+  ~ Copyright (c) 2013-2016 GraphAware
   ~
   ~ This file is part of the GraphAware Framework.
   ~
@@ -43,6 +43,7 @@
 
         <!--examples-->
         <module>../../examples/node-counter</module>
+        <module>../../examples/node-streaming</module>
         <module>../../examples/friendship-strength-counter</module>
         <module>../../examples/change-logger</module>
         <module>../../examples/friendship-strength-counter-module</module>
@@ -75,7 +76,7 @@
         <system>Travis CI</system>
     </ciManagement>
 
-    <inceptionYear>2013</inceptionYear>
+    <inceptionYear>2013-2016</inceptionYear>
 
     <issueManagement>
         <system>GitHub</system>
@@ -91,7 +92,7 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>resttest</artifactId>
-                <version>2.3.1.35.13</version>
+                <version>2.3.2.37.13</version>
                 <scope>test</scope>
             </dependency>
 
