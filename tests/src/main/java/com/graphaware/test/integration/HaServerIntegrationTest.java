@@ -21,8 +21,10 @@ import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.graphdb.factory.HighlyAvailableGraphDatabaseFactory;
 import org.neo4j.kernel.configuration.Settings;
 import org.neo4j.kernel.ha.HaSettings;
+import org.neo4j.server.enterprise.helpers.EnterpriseServerBuilder;
+import org.neo4j.server.helpers.CommunityServerBuilder;
 
-public class HighAvailabilityDatabaseIntegrationTest extends DatabaseIntegrationTest {
+public class HaServerIntegrationTest extends ServerIntegrationTest {
 
     private static final String SERVER_ID = "1";
     private static final String HA_SERVER = "localhost:6001";
@@ -32,19 +34,21 @@ public class HighAvailabilityDatabaseIntegrationTest extends DatabaseIntegration
     private static final String PATH = "target/graph-master";
 
     @Override
-    protected GraphDatabaseBuilder createGraphDatabaseBuilder() {
-        return new HighlyAvailableGraphDatabaseFactory().newHighlyAvailableDatabaseBuilder(getPath());
+    protected CommunityServerBuilder createServerBuilder() {
+        return EnterpriseServerBuilder.server();
     }
 
     @Override
-    protected void populateConfig(GraphDatabaseBuilder builder) {
-        super.populateConfig(builder);
+    protected CommunityServerBuilder configure(CommunityServerBuilder builder) {
+        builder = super.configure(builder);
 
-        builder.setConfig(ClusterSettings.server_id, getServerId());
-        builder.setConfig(HaSettings.ha_server, getHaServer());
-        builder.setConfig(HaSettings.slave_only, getSlaveOnly());
-        builder.setConfig(ClusterSettings.cluster_server, getClusterServer());
-        builder.setConfig(ClusterSettings.initial_hosts, getInitialHosts());
+        builder = builder.withProperty(ClusterSettings.server_id.name(), getServerId());
+        builder = builder.withProperty(HaSettings.ha_server.name(), getHaServer());
+        builder = builder.withProperty(HaSettings.slave_only.name(), getSlaveOnly());
+        builder = builder.withProperty(ClusterSettings.cluster_server.name(), getClusterServer());
+        builder = builder.withProperty(ClusterSettings.initial_hosts.name(), getInitialHosts());
+
+        return builder;
     }
 
     protected String getServerId() {

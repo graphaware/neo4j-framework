@@ -18,13 +18,15 @@ package com.graphaware.test.integration;
 
 import com.graphaware.test.util.TestHttpClient;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.server.CommunityNeoServer;
+import org.neo4j.server.NeoServer;
 import org.neo4j.server.configuration.ServerSettings;
 import org.neo4j.server.helpers.CommunityServerBuilder;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * {@link DatabaseIntegrationTest} that starts the {@link WrappingNeoServerBootstrapper},
@@ -42,19 +44,19 @@ import java.util.Map;
  * By overriding {@link #additionalServerConfiguration()}, you can provide additional server configuration (which would
  * normally live in neo4j-server.properties).
  * <p>
- * For testing pure Spring MVC code that uses the GraphAware Framework, please use {@link com.graphaware.test.integration.GraphAwareApiTest}.
+ * For testing pure Spring MVC code that uses the GraphAware Framework, please use {@link GraphAwareIntegrationTest}.
  */
-public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationTest {
+public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
 
     private static final int DEFAULT_NEO_PORT = 7575;
 
-    private CommunityNeoServer server;
+    private NeoServer server;
 
     protected TestHttpClient httpClient;
 
     @Override
     public void setUp() throws Exception {
-        startServerWrapper();
+        startServer();
         super.setUp();
         httpClient = createHttpClient();
     }
@@ -67,7 +69,7 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
     }
 
     @Override
-    protected GraphDatabaseService createDatabase() {
+    protected final GraphDatabaseService createDatabase() {
         return server.getDatabase().getGraph();
     }
 
@@ -76,13 +78,28 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
     }
 
     /**
-     * Start the server wrapper.
+     * Start the server.
      */
-    private void startServerWrapper() throws IOException {
-        CommunityServerBuilder builder = CommunityServerBuilder.server().onPort(neoServerPort());
-        builder = populateConfigurator(builder);
-        server = builder.build();
-        server.start();
+    private void startServer() throws IOException {
+        CommunityServerBuilder builder = createServerBuilder();
+
+        if (propertiesFile() != null) {
+            Properties properties = new Properties();
+            properties.load(new FileInputStream(propertiesFile()));
+            for (String key : properties.stringPropertyNames()) {
+                builder = builder.withProperty(key, properties.getProperty(key));
+            }
+        } else {
+            builder = builder.onPort(neoServerPort());
+            builder = configure(builder);
+        }
+
+        this.server = builder.build();
+        this.server.start();
+    }
+
+    protected CommunityServerBuilder createServerBuilder() {
+        return CommunityServerBuilder.server();
     }
 
     /**
@@ -92,7 +109,7 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
      *
      * @param builder to populate.
      */
-    protected CommunityServerBuilder populateConfigurator(CommunityServerBuilder builder) {
+    protected CommunityServerBuilder configure(CommunityServerBuilder builder) {
         for (Map.Entry<String, String> mapping : thirdPartyJaxRsPackageMappings().entrySet()) {
             builder = builder.withThirdPartyJaxRsPackage(mapping.getKey(), mapping.getValue());
         }
@@ -114,7 +131,7 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
      * (typically http://localhost:7575 for tests).
      */
     protected Map<String, String> thirdPartyJaxRsPackageMappings() {
-        return Collections.singletonMap("com.graphaware.server", "/graphaware");
+        return Collections.emptyMap();
     }
 
     /**

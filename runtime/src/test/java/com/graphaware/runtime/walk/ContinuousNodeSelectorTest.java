@@ -21,6 +21,7 @@ import com.graphaware.common.policy.none.IncludeNoNodes;
 import com.graphaware.test.data.DatabasePopulator;
 import com.graphaware.test.data.SingleTransactionPopulator;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
+import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
@@ -31,7 +32,7 @@ import static org.neo4j.graphdb.Label.label;
 /**
  *  Test for {@link ContinuousNodeSelector}.
  */
-public class ContinuousNodeSelectorTest extends DatabaseIntegrationTest {
+public class ContinuousNodeSelectorTest extends EmbeddedDatabaseIntegrationTest {
 
     @Override
     protected DatabasePopulator databasePopulator() {

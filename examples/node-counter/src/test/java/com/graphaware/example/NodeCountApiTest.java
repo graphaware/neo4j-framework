@@ -16,7 +16,7 @@
 
 package com.graphaware.example;
 
-import com.graphaware.test.integration.GraphAwareApiTest;
+import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
@@ -24,9 +24,9 @@ import org.neo4j.graphdb.Transaction;
 import static org.junit.Assert.assertEquals;
 
 /**
- * {@link GraphAwareApiTest} for {@link NodeCountApi}.
+ * {@link GraphAwareIntegrationTest} for {@link NodeCountApi}.
  */
-public class NodeCountApiTest extends GraphAwareApiTest {
+public class NodeCountApiTest extends GraphAwareIntegrationTest {
 
     @Test
     public void emptyDatabaseShouldHaveZeroNodes() {

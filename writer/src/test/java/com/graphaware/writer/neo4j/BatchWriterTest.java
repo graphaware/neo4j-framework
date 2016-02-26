@@ -18,6 +18,7 @@ package com.graphaware.writer.neo4j;
 
 import com.graphaware.common.util.IterableUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
+import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import org.junit.Test;
 import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Transaction;
@@ -33,7 +34,7 @@ import static org.junit.Assert.*;
 /**
  * Test for {@link TxPerTaskWriter}.
  */
-public class BatchWriterTest extends DatabaseIntegrationTest {
+public class BatchWriterTest extends EmbeddedDatabaseIntegrationTest {
 
     private Neo4jWriter writer;
 

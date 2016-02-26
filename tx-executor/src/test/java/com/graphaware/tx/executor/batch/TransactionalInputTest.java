@@ -19,6 +19,7 @@ package com.graphaware.tx.executor.batch;
 import com.graphaware.test.data.CypherPopulator;
 import com.graphaware.test.data.DatabasePopulator;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
+import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import com.graphaware.tx.executor.input.TransactionalInput;
 import com.graphaware.tx.executor.single.TransactionCallback;
 import org.junit.Test;
@@ -37,7 +38,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Unit test for {@link TransactionalInput}.
  */
-public class TransactionalInputTest extends DatabaseIntegrationTest {
+public class TransactionalInputTest extends EmbeddedDatabaseIntegrationTest {
 
     @Override
     protected DatabasePopulator databasePopulator() {

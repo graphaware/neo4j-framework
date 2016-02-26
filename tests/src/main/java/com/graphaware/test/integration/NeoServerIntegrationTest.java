@@ -16,6 +16,9 @@
 
 package com.graphaware.test.integration;
 
+import com.graphaware.test.server.CommunityNeoTestServer;
+import com.graphaware.test.server.EnterpriseNeoTestServer;
+import com.graphaware.test.server.NeoTestServer;
 import com.graphaware.test.util.TestHttpClient;
 import org.junit.After;
 import org.junit.Before;
@@ -31,8 +34,8 @@ import java.io.IOException;
  * The primary purpose of tests that extend this class should be to verify that given a certain Neo4j configuration,
  * a (possibly runtime) module is bootstrapped and started correctly when the Neo4j server starts.
  * <p/>
- * The configuration file names are provided by overriding the {@link #neo4jConfigFile()} and {@link #neo4jServerConfigFile()}
- * methods. They default to "neo4j.properties" and "neo4j-server.properties" and if no such files are present
+ * The configuration file names are provided by overriding the {@link #neo4jConfigFile()} method.
+ * It defaults to "neo4j.conf" and if no such files are present
  * on the classpath of the implementing class, the ones that ships with Neo4j are used.
  */
 public class NeoServerIntegrationTest {
@@ -42,7 +45,7 @@ public class NeoServerIntegrationTest {
 
     @Before
     public void setUp() throws IOException, InterruptedException {
-        neoTestServer = neoTestServer(neo4jConfigFile(), neo4jServerConfigFile());
+        neoTestServer = neoTestServer(neo4jConfigFile());
         neoTestServer.start();
         httpClient = createHttpClient();
     }
@@ -50,12 +53,11 @@ public class NeoServerIntegrationTest {
     /**
      * Construct a {@link NeoTestServer}. Should either be {@link CommunityNeoTestServer} or {@link EnterpriseNeoTestServer}/
      *
-     * @param neo4jConfigFile       neo4j.properties or equivalent.
-     * @param neo4jServerConfigFile neo4j-server.properties or equivalent.
+     * @param neo4jConfigFile       neo4j.conf or equivalent.
      * @return test server.
      */
-    protected NeoTestServer neoTestServer(String neo4jConfigFile, String neo4jServerConfigFile) {
-        return new CommunityNeoTestServer(neo4jConfigFile, neo4jServerConfigFile);
+    protected NeoTestServer neoTestServer(String neo4jConfigFile) {
+        return new CommunityNeoTestServer(neo4jConfigFile);
     }
 
     @After
@@ -78,15 +80,6 @@ public class NeoServerIntegrationTest {
      * @return config file name.
      */
     protected String neo4jConfigFile() {
-        return "neo4j.properties";
-    }
-
-    /**
-     * Get the name of the neo4j server config file on the classpath.
-     *
-     * @return config file name.
-     */
-    protected String neo4jServerConfigFile() {
-        return "neo4j-server.properties";
+        return "neo4j.conf";
     }
 }

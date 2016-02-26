@@ -16,6 +16,7 @@
 
 package com.graphaware.server.foundation.config;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 /**
  * Spring MVC application config.
  */
+@Configuration
 @EnableWebMvc
 public class NeoMvcConfig extends WebMvcConfigurerAdapter {
 

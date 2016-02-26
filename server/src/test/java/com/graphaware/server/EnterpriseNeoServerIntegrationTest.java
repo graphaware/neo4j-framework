@@ -16,9 +16,9 @@
 
 package com.graphaware.server;
 
-import com.graphaware.test.integration.EnterpriseNeoTestServer;
+import com.graphaware.test.server.EnterpriseNeoTestServer;
 import com.graphaware.test.integration.NeoServerIntegrationTest;
-import com.graphaware.test.integration.NeoTestServer;
+import com.graphaware.test.server.NeoTestServer;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -28,8 +28,8 @@ import org.junit.Test;
 public class EnterpriseNeoServerIntegrationTest extends NeoServerIntegrationTest {
 
     @Override
-    protected NeoTestServer neoTestServer(String neo4jConfigFile, String neo4jServerConfigFile) {
-        return new EnterpriseNeoTestServer(neo4jConfigFile, neo4jServerConfigFile);
+    protected NeoTestServer neoTestServer(String neo4jConfigFile) {
+        return new EnterpriseNeoTestServer(neo4jConfigFile);
     }
 
     @Test

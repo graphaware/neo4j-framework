@@ -26,8 +26,8 @@ import org.junit.Test;
 public class CommunityCustomPackageNeoServerIntegrationTest extends NeoServerIntegrationTest {
 
     @Override
-    protected String neo4jServerConfigFile() {
-        return "neo4j-server-custom-package.properties";
+    protected String neo4jConfigFile() {
+        return "neo4j-custom-package.conf";
     }
 
     @Test

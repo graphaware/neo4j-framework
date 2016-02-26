@@ -16,9 +16,9 @@
 
 package com.graphaware.server;
 
-import com.graphaware.test.integration.CommunityNeoTestServer;
+import com.graphaware.test.server.CommunityNeoTestServer;
 import com.graphaware.test.integration.NeoServerIntegrationTest;
-import com.graphaware.test.integration.NeoTestServer;
+import com.graphaware.test.server.NeoTestServer;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -30,18 +30,18 @@ import static org.junit.Assert.assertTrue;
 public class CommunityNeoServerHttpLoggingIntegrationTest extends NeoServerIntegrationTest {
 
     @Override
-    protected NeoTestServer neoTestServer(String neo4jConfigFile, String neo4jServerConfigFile) {
-        return new CommunityNeoTestServer(neo4jConfigFile, neo4jServerConfigFile) {
-            @Override
-            protected String[] otherConfResources() {
-                return new String[]{"neo4j-http-logging.xml"};
-            }
+    protected NeoTestServer neoTestServer(String neo4jConfigFile) {
+        return new CommunityNeoTestServer(neo4jConfigFile) {
+//            @Override
+//            protected String[] otherConfResources() {
+//                return new String[]{"neo4j-http-logging.xml"};
+//            }
         };
     }
 
     @Override
-    protected String neo4jServerConfigFile() {
-        return "neo4j-server-http-log.properties";
+    protected String neo4jConfigFile() {
+        return "neo4j-http-log.conf";
     }
 
     @Test

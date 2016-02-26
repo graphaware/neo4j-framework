@@ -32,8 +32,8 @@ public class HelloWorldUnmanagedExtensionDeploymentTest extends NeoServerIntegra
      * {@inheritDoc}
      */
     @Override
-    protected String neo4jServerConfigFile() {
-        return "neo4j-server-ext.properties";
+    protected String neo4jConfigFile() {
+        return "neo4j-server-ext.conf";
     }
 
     @Test

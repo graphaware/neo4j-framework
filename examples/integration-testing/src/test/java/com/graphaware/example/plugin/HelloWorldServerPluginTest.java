@@ -17,6 +17,7 @@
 package com.graphaware.example.plugin;
 
 import com.graphaware.test.integration.DatabaseIntegrationTest;
+import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import com.graphaware.test.unit.GraphUnit;
 import org.junit.Test;
 import org.neo4j.graphdb.Node;
@@ -29,7 +30,7 @@ import static org.junit.Assert.assertEquals;
  *
  * Tests the logic, but not the API.
  */
-public class HelloWorldServerPluginTest extends DatabaseIntegrationTest {
+public class HelloWorldServerPluginTest extends EmbeddedDatabaseIntegrationTest {
 
     @Test
     public void shouldCreateAndReturnNode() {

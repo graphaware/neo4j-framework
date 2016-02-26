@@ -26,8 +26,8 @@ import org.junit.Test;
 public class CommunityNeoServerSecurityTest extends NeoServerIntegrationTest {
 
     @Override
-    protected String neo4jServerConfigFile() {
-        return "neo4j-server-with-security.properties";
+    protected String neo4jConfigFile() {
+        return "neo4j-with-security.conf";
     }
 
     @Test

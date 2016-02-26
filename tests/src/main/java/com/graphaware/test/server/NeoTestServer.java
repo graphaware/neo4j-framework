@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.test.integration;
+package com.graphaware.test.server;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.rules.TemporaryFolder;
@@ -30,7 +30,7 @@ import java.io.IOException;
  * Real Neo4j server, started from an instance of this class using the {@link #start()} method and stopped using the
  * {@link #stop()} method.
  * <p>
- * The Neo4j and server configuration file names are provided using a constructor. They defaults to "neo4j.properties"
+ * The Neo4j and server configuration file names are provided using a constructor. They defaults to "neo4j.conf"
  * and "neo4j-server.properties" and if no such files are present on the classpath, the ones that ships with Neo4j are used.
  */
 public abstract class NeoTestServer {
@@ -38,57 +38,38 @@ public abstract class NeoTestServer {
     private Bootstrapper bootstrapper;
     private TemporaryFolder temporaryFolder = new TemporaryFolder();
     private final String neo4jConfigFile;
-    private final String neo4jServerConfigFile;
 
     public NeoTestServer() {
-        this("neo4j.properties", "neo4j-server.properties");
+        this("neo4j.conf");
     }
 
-    public NeoTestServer(String neo4jConfigFile, String neo4jServerConfigFile) {
+    public NeoTestServer(String neo4jConfigFile) {
         this.neo4jConfigFile = neo4jConfigFile;
-        this.neo4jServerConfigFile = neo4jServerConfigFile;
     }
 
     public final void start() throws IOException, InterruptedException {
         temporaryFolder.create();
         temporaryFolder.getRoot().deleteOnExit();
 
-        temporaryFolder.newFolder("config");
+        temporaryFolder.newFolder("conf");
 
-        File serverConfig = serverConfigToConfDir();
-
-        copyToConfDir(neo4jConfigFile, "neo4j.properties");
-
-        for (String otherConfig : otherConfResources()) {
-            copyToConfDir(otherConfig, otherConfig);
-        }
+        File serverConfig = configToConfDir();
 
         bootstrapper = createBootstrapper();
         bootstrapper.start(serverConfig.getAbsoluteFile());
     }
 
-    private File serverConfigToConfDir() throws IOException {
-        String serverConfigContents = IOUtils.toString(new ClassPathResource(neo4jServerConfigFile).getInputStream());
-        serverConfigContents = serverConfigContents.replaceAll("=config" + File.separator, "=" + temporaryFolder.getRoot().getAbsolutePath() + File.separator + "conf" + File.separator);
+    private File configToConfDir() throws IOException {
+        String serverConfigContents = IOUtils.toString(new ClassPathResource(neo4jConfigFile).getInputStream());
         serverConfigContents = serverConfigContents.replaceAll("=data" + File.separator, "=" + temporaryFolder.getRoot().getAbsolutePath() + File.separator + "data" + File.separator);
 
-        File serverConfig = temporaryFolder.newFile("config" + File.separator + "neo4j-server.properties");
+        File serverConfig = temporaryFolder.newFile("conf" + File.separator + "neo4j.conf");
         IOUtils.copy(IOUtils.toInputStream(serverConfigContents), new FileOutputStream(serverConfig));
         System.setProperty(ServerSettings.SERVER_CONFIG_FILE_KEY, serverConfig.getAbsolutePath());
         return serverConfig;
     }
 
     protected abstract Bootstrapper createBootstrapper();
-
-    protected String[] otherConfResources() {
-        return new String[0];
-    }
-
-    protected File copyToConfDir(String classPathResource, String newName) throws IOException {
-        File result = temporaryFolder.newFile("config" + File.separator + newName);
-        IOUtils.copy(new ClassPathResource(classPathResource).getInputStream(), new FileOutputStream(result));
-        return result;
-    }
 
     public void stop() throws IOException, InterruptedException {
         bootstrapper.stop();

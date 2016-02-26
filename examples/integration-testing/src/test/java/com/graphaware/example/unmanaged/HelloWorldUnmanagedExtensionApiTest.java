@@ -16,7 +16,7 @@
 
 package com.graphaware.example.unmanaged;
 
-import com.graphaware.test.integration.WrappingServerIntegrationTest;
+import com.graphaware.test.integration.ServerIntegrationTest;
 import com.graphaware.test.unit.GraphUnit;
 import org.junit.Test;
 
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
  * <p/>
  * Tests the logic as well as the API.
  */
-public class HelloWorldUnmanagedExtensionApiTest extends WrappingServerIntegrationTest {
+public class HelloWorldUnmanagedExtensionApiTest extends ServerIntegrationTest {
 
     /**
      * {@inheritDoc}

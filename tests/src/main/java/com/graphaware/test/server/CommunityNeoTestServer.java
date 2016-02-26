@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.test.integration;
+package com.graphaware.test.server;
 
 import org.neo4j.server.Bootstrapper;
 import org.neo4j.server.CommunityBootstrapper;
@@ -27,8 +27,8 @@ public class CommunityNeoTestServer extends NeoTestServer {
     public CommunityNeoTestServer() {
     }
 
-    public CommunityNeoTestServer(String neo4jConfigFile, String neo4jServerConfigFile) {
-        super(neo4jConfigFile, neo4jServerConfigFile);
+    public CommunityNeoTestServer(String neo4jConfigFile) {
+        super(neo4jConfigFile);
     }
 
     @Override

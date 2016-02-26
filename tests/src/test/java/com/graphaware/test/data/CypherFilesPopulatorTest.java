@@ -17,6 +17,7 @@
 package com.graphaware.test.data;
 
 import com.graphaware.test.integration.DatabaseIntegrationTest;
+import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
@@ -28,7 +29,7 @@ import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 /**
  * Test for {@link com.graphaware.test.data.CypherFilesPopulator}.
  */
-public class CypherFilesPopulatorTest extends DatabaseIntegrationTest {
+public class CypherFilesPopulatorTest extends EmbeddedDatabaseIntegrationTest {
 
     @Test
     public void shouldProduceEmptyDatabaseWhenPopulatorReturnsNoFiles() {

@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Component that automatically bootstraps a {@link RuntimeModule} based on config parameters passed to Neo4j.
  * <p>
- * Implementations can expect that if there is the following entry in neo4j.properties
+ * Implementations can expect that if there is the following entry in neo4j.conf
  * <p>
  * com.graphaware.module.x.y = z
  * <p>

@@ -17,9 +17,9 @@
 package com.graphaware.server;
 
 import com.graphaware.service.LifecycleTestService;
-import com.graphaware.test.integration.CommunityNeoTestServer;
-import com.graphaware.test.integration.EnterpriseNeoTestServer;
-import com.graphaware.test.integration.NeoTestServer;
+import com.graphaware.test.server.CommunityNeoTestServer;
+import com.graphaware.test.server.EnterpriseNeoTestServer;
+import com.graphaware.test.server.NeoTestServer;
 import com.graphaware.writer.LifecycleTestWriter;
 import org.junit.Before;
 import org.junit.Test;

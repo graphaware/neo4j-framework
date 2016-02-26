@@ -39,7 +39,7 @@ public class FriendshipStrengthModuleEmbeddedDeclarativeIntegrationTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .loadPropertiesFromFile(this.getClass().getClassLoader().getResource("neo4j-friendship.properties").getPath())
+                .loadPropertiesFromFile(this.getClass().getClassLoader().getResource("neo4j-friendship.conf").getPath())
                 .newGraphDatabase();
 
         registerShutdownHook(database);

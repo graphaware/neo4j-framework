@@ -18,6 +18,7 @@ package com.graphaware.writer.neo4j;
 
 import com.graphaware.common.util.IterableUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
+import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
 
@@ -30,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Test for {@link TxPerTaskWriter}.
  */
-public class DefaultWriterTest extends DatabaseIntegrationTest {
+public class DefaultWriterTest extends EmbeddedDatabaseIntegrationTest {
 
     private Neo4jWriter writer;
 

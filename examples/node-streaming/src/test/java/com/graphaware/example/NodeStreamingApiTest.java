@@ -17,7 +17,7 @@
 package com.graphaware.example;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.graphaware.test.integration.GraphAwareApiTest;
+import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.neo4j.graphdb.*;
@@ -28,11 +28,11 @@ import java.util.Collection;
 import static org.junit.Assert.assertEquals;
 
 /**
- * {@link GraphAwareApiTest} for {@link NodeStreamingApi}.
+ * {@link GraphAwareIntegrationTest} for {@link NodeStreamingApi}.
  */
-public class NodeStreamingApiTest extends GraphAwareApiTest {
+public class NodeStreamingApiTest extends GraphAwareIntegrationTest {
 
-    private static final Label TEST_NODE = DynamicLabel.label("TestNode");
+    private static final Label TEST_NODE = Label.label("TestNode");
     private static final int NUMBER_OF_NODES = 1000;
 
     @Override

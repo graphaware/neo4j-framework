@@ -16,18 +16,18 @@
 
 package com.graphaware.example.graphaware;
 
-import com.graphaware.test.integration.GraphAwareApiTest;
+import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import com.graphaware.test.unit.GraphUnit;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * {@link GraphAwareApiTest} for {@link HelloWorldController}.
+ * {@link GraphAwareIntegrationTest} for {@link HelloWorldController}.
  *
  * Tests the logic as well as the API.
  */
-public class HelloWorldControllerApiTest extends GraphAwareApiTest {
+public class HelloWorldControllerApiTest extends GraphAwareIntegrationTest {
 
     @Test
     public void shouldCreateAndReturnNode() {

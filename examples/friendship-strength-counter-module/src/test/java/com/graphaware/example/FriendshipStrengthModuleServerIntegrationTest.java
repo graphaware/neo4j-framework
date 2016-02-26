@@ -33,7 +33,7 @@ public class FriendshipStrengthModuleServerIntegrationTest extends NeoServerInte
      */
     @Override
     protected String neo4jConfigFile() {
-        return "neo4j-friendship.properties";
+        return "neo4j-friendship.conf";
     }
 
     @Test

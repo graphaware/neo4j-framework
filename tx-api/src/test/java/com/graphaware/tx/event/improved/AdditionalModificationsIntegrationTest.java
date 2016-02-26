@@ -19,6 +19,7 @@ package com.graphaware.tx.event.improved;
 import com.graphaware.test.data.CypherPopulator;
 import com.graphaware.test.data.DatabasePopulator;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
+import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.junit.Test;
@@ -30,8 +31,7 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
 
 import static org.junit.Assert.assertEquals;
 
-public class AdditionalModificationsIntegrationTest extends DatabaseIntegrationTest {
-
+public class AdditionalModificationsIntegrationTest extends EmbeddedDatabaseIntegrationTest {
 
     @Override
     protected DatabasePopulator databasePopulator() {

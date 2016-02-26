@@ -16,12 +16,12 @@
 
 package com.graphaware.test;
 
-import com.graphaware.test.integration.WrappingServerIntegrationTest;
+import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import org.junit.Test;
 
 import static org.apache.http.HttpStatus.SC_OK;
 
-public class WrappingServerIntegrationTestTest extends WrappingServerIntegrationTest {
+public class GraphAwareIntegrationTestTest extends GraphAwareIntegrationTest {
 
     @Test
     public void shouldLoadBrowser() {
@@ -32,4 +32,10 @@ public class WrappingServerIntegrationTestTest extends WrappingServerIntegration
     public void shouldLoadWebAdmin() {
         httpClient.get(baseNeoUrl() + "/webadmin", SC_OK);
     }
+
+    @Test
+    public void shouldLoadAPIs() {
+        httpClient.get(baseUrl() + "/greeting", SC_OK);
+    }
+
 }

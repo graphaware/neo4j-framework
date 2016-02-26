@@ -45,7 +45,7 @@ import static org.neo4j.kernel.configuration.Settings.*;
  * The Runtime is only created when a setting called "com.graphaware.runtime.enabled" with value equal to "true" or "1"
  * is passed as a configuration to the database. This can be achieved by any of the standard mechanisms of passing
  * configuration to the database, for example programmaticaly using {@link org.neo4j.graphdb.factory.GraphDatabaseFactory}
- * (embedded mode), or declaratively using neo4j.properties (typically server mode).
+ * (embedded mode), or declaratively using neo4j.conf (typically server mode).
  * <p/>
  * Modules are registered similarly. For each module that should be registered, there must be an entry in the configuration
  * passed to the database. The key of the entry should be "com.graphaware.module.X.Y", where X becomes the ID

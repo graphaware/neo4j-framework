@@ -32,7 +32,7 @@ import java.util.Map;
  * by overriding the {@link #populateDatabase(org.neo4j.graphdb.GraphDatabaseService)} method, or by providing a
  * {@link com.graphaware.test.data.DatabasePopulator} in {@link #databasePopulator()}.
  */
-public abstract class GraphAwareApiTest extends WrappingServerIntegrationTest {
+public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
 
     @Override
     protected Map<String, String> thirdPartyJaxRsPackageMappings() {

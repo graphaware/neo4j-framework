@@ -51,45 +51,7 @@ public abstract class DatabaseIntegrationTest {
         database.shutdown();
     }
 
-    /**
-     * Instantiate a db builder.
-     *
-     * @return builder.
-     */
-    protected GraphDatabaseBuilder createGraphDatabaseBuilder() {
-        return new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig("online_backup_enabled", FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE);
-    }
-
-    /**
-     * Instantiate a database. By default this will be {@link org.neo4j.test.ImpermanentGraphDatabase}.
-     *
-     * @return new database.
-     */
-    protected GraphDatabaseService createDatabase() {
-        GraphDatabaseBuilder builder = createGraphDatabaseBuilder();
-
-        if (propertiesFile() != null) {
-            builder = builder.loadPropertiesFromFile(propertiesFile());
-        } else {
-            populateConfig(builder);
-        }
-
-        GraphDatabaseService database = builder.newGraphDatabase();
-        registerShutdownHook(database);
-        return database;
-    }
-
-    /**
-     * Provide config on a {@link GraphDatabaseBuilder}. Only called iff {@link #propertiesFile()} returns <code>null</code>.
-     *
-     * @param builder to populate config on.
-     */
-    protected void populateConfig(GraphDatabaseBuilder builder) {
-
-    }
+    protected abstract GraphDatabaseService createDatabase();
 
     /**
      * Get the name of properties file used to configure the database.

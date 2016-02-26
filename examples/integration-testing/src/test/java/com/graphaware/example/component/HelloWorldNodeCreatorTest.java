@@ -17,6 +17,7 @@
 package com.graphaware.example.component;
 
 import com.graphaware.test.integration.DatabaseIntegrationTest;
+import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import com.graphaware.test.unit.GraphUnit;
 import org.junit.Test;
 import org.neo4j.graphdb.Node;
@@ -27,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * {@link DatabaseIntegrationTest} for {@link com.graphaware.example.component.HelloWorldNodeCreator}.
  */
-public class HelloWorldNodeCreatorTest extends DatabaseIntegrationTest {
+public class HelloWorldNodeCreatorTest extends EmbeddedDatabaseIntegrationTest {
 
     @Test
     public void shouldCreateAndReturnNode() {

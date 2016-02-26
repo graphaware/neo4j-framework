@@ -16,14 +16,14 @@
 
 package com.graphaware.test;
 
-import com.graphaware.test.integration.WrappingServerIntegrationTest;
+import com.graphaware.test.integration.ServerIntegrationTest;
 import com.graphaware.test.unit.GraphUnit;
 import org.junit.Test;
 
 /**
  * Test for {@link com.graphaware.test.util.TestUtils}.
  */
-public class TestHttpClientTest extends WrappingServerIntegrationTest {
+public class TestHttpClientTest extends ServerIntegrationTest {
 
     @Test
     public void shouldBeAbleToExecuteCypherStatement() throws InterruptedException {

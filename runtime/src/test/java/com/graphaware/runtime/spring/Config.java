@@ -36,7 +36,7 @@ public class Config {
         GraphDatabaseService database = new GraphDatabaseFactory()
                 .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot().getAbsolutePath())
                 .loadPropertiesFromURL(
-                        Config.class.getClassLoader().getResource("com/graphaware/runtime/spring/neo4j.properties"))
+                        Config.class.getClassLoader().getResource("com/graphaware/runtime/spring/neo4j.conf"))
                 .newGraphDatabase();
         registerShutdownHook(database);
 

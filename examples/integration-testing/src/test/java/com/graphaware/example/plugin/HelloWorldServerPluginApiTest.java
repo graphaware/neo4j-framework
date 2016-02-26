@@ -16,7 +16,7 @@
 
 package com.graphaware.example.plugin;
 
-import com.graphaware.test.integration.WrappingServerIntegrationTest;
+import com.graphaware.test.integration.ServerIntegrationTest;
 import com.graphaware.test.unit.GraphUnit;
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
  *
  * Tests the logic as well as the API.
  */
-public class HelloWorldServerPluginApiTest extends WrappingServerIntegrationTest {
+public class HelloWorldServerPluginApiTest extends ServerIntegrationTest {
 
     @Test
     public void shouldCreateAndReturnNode() {

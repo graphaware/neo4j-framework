@@ -17,6 +17,7 @@
 package com.graphaware.test.data;
 
 import com.graphaware.test.integration.DatabaseIntegrationTest;
+import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import org.junit.Test;
 
 import static com.graphaware.test.unit.GraphUnit.assertEmpty;
@@ -25,7 +26,7 @@ import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 /**
  * Test for {@link com.graphaware.test.data.CypherPopulator}.
  */
-public class CypherPopulatorTest extends DatabaseIntegrationTest {
+public class CypherPopulatorTest extends EmbeddedDatabaseIntegrationTest {
 
     @Test
     public void shouldProduceEmptyDatabaseWhenPopulatorReturnsNoStatementGroups() {
