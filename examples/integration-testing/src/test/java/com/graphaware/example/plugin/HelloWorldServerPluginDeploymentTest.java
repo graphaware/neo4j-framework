@@ -16,19 +16,19 @@
 
 package com.graphaware.example.plugin;
 
-import com.graphaware.test.integration.NeoServerIntegrationTest;
+import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import org.junit.Test;
 
 /**
- * {@link NeoServerIntegrationTest} for {@link HelloWorldServerPlugin}.
+ * {@link GraphAwareIntegrationTest} for {@link HelloWorldServerPlugin}.
  * <p/>
  * Only tests the actual deployment of the extension, not so much the logic.
  */
-public class HelloWorldServerPluginDeploymentTest extends NeoServerIntegrationTest {
+public class HelloWorldServerPluginDeploymentTest extends GraphAwareIntegrationTest {
 
     @Test
     public void shouldCreateAndReturnNode() {
-        httpClient.get(baseUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
-        httpClient.post(baseUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
+        httpClient.get(baseNeoUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
+        httpClient.post(baseNeoUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
     }
 }

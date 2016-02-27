@@ -17,29 +17,29 @@
 package com.graphaware.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.graphaware.test.integration.NeoServerIntegrationTest;
+import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Collections;
 
-public class CommunityTxParticipationIntegrationTest extends NeoServerIntegrationTest {
+public class CommunityTxParticipationIntegrationTest extends GraphAwareIntegrationTest {
 
     @Test
     public void invalidTransactionShouldResultInException() {
-        httpClient.get(baseUrl() + "/graphaware/greeting", Collections.singletonMap("_GA_TX_ID", "invalid"), HttpStatus.SC_BAD_REQUEST);
+        httpClient.get(baseUrl() + "/greeting", Collections.singletonMap("_GA_TX_ID", "invalid"), HttpStatus.SC_BAD_REQUEST);
     }
 
     @Test
     public void nonExistingTransactionShouldResultInException() {
-        httpClient.get(baseUrl() + "/graphaware/greeting", Collections.singletonMap("_GA_TX_ID", "1"), HttpStatus.SC_BAD_REQUEST);
+        httpClient.get(baseUrl() + "/greeting", Collections.singletonMap("_GA_TX_ID", "1"), HttpStatus.SC_BAD_REQUEST);
     }
 
     @Test
     public void moduleApiShouldParticipateInOpenTransaction() throws IOException {
         //First transaction over Cypher transactional rest endpoint, keep open:
-        String response = httpClient.post(baseUrl() + "/db/data/transaction", "{\n" +
+        String response = httpClient.post(baseNeoUrl() + "/db/data/transaction", "{\n" +
                 "  \"statements\" : [ {\n" +
                 "    \"statement\" : \"CREATE (p:Person {props}) RETURN id(p)\",\n" +
                 "    \"parameters\" : {\n" +
@@ -66,7 +66,7 @@ public class CommunityTxParticipationIntegrationTest extends NeoServerIntegratio
                 "}", HttpStatus.SC_OK);
 
         //Third transaction over REST to an extension
-        httpClient.post(baseUrl() + "/graphaware/link/0/1", null, Collections.singletonMap("_GA_TX_ID", "1"), HttpStatus.SC_CREATED);
+        httpClient.post(baseUrl() + "/link/0/1", null, Collections.singletonMap("_GA_TX_ID", "1"), HttpStatus.SC_CREATED);
 
         //Commit transaction over transactional endpoint
         httpClient.post(commitUrl, HttpStatus.SC_OK);

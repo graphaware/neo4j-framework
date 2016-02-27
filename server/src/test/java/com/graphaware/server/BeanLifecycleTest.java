@@ -17,9 +17,7 @@
 package com.graphaware.server;
 
 import com.graphaware.service.LifecycleTestService;
-import com.graphaware.test.server.CommunityNeoTestServer;
-import com.graphaware.test.server.EnterpriseNeoTestServer;
-import com.graphaware.test.server.NeoTestServer;
+import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import com.graphaware.writer.LifecycleTestWriter;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +27,7 @@ import java.io.IOException;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class BeanLifecycleTest {
+public class BeanLifecycleTest extends GraphAwareIntegrationTest {
 
     @Before
     public void setUp() {
@@ -39,18 +37,22 @@ public class BeanLifecycleTest {
         LifecycleTestWriter.destroyCalled = false;
     }
 
+    @Override
+    protected boolean autoStart() {
+        return false;
+    }
+
     @Test
     public void lifecycleAnnotationsShouldBeHonouredInWebContextCommunity() throws IOException, InterruptedException {
         assertFalse(LifecycleTestService.initCalled);
         assertFalse(LifecycleTestService.destroyCalled);
 
-        NeoTestServer testServer = new CommunityNeoTestServer();
-        testServer.start();
+        startServer();
 
         assertTrue(LifecycleTestService.initCalled);
         assertFalse(LifecycleTestService.destroyCalled);
 
-        testServer.stop();
+        stopServer();
 
         assertTrue(LifecycleTestService.initCalled);
         assertTrue(LifecycleTestService.destroyCalled);
@@ -61,13 +63,12 @@ public class BeanLifecycleTest {
         assertFalse(LifecycleTestService.initCalled);
         assertFalse(LifecycleTestService.destroyCalled);
 
-        NeoTestServer testServer = new EnterpriseNeoTestServer();
-        testServer.start();
+        startServer();
 
         assertTrue(LifecycleTestService.initCalled);
         assertFalse(LifecycleTestService.destroyCalled);
 
-        testServer.stop();
+        stopServer();
 
         assertTrue(LifecycleTestService.initCalled);
         assertTrue(LifecycleTestService.destroyCalled);

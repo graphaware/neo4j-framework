@@ -16,13 +16,13 @@
 
 package com.graphaware.test;
 
-import com.graphaware.test.server.EnterpriseNeoTestServer;
-import com.graphaware.test.server.NeoTestServer;
+import org.neo4j.server.enterprise.helpers.EnterpriseServerBuilder;
+import org.neo4j.server.helpers.CommunityServerBuilder;
 
 public class EnterpriseNeoServerIntegrationTestTest extends NeoServerIntegrationTestTest {
 
     @Override
-    protected NeoTestServer neoTestServer(String neo4jConfigFile) {
-        return new EnterpriseNeoTestServer(neo4jConfigFile);
+    protected CommunityServerBuilder createServerBuilder() {
+        return EnterpriseServerBuilder.server();
     }
 }

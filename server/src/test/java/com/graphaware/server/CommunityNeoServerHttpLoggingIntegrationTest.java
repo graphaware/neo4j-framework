@@ -16,9 +16,7 @@
 
 package com.graphaware.server;
 
-import com.graphaware.test.server.CommunityNeoTestServer;
-import com.graphaware.test.integration.NeoServerIntegrationTest;
-import com.graphaware.test.server.NeoTestServer;
+import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
@@ -27,25 +25,15 @@ import static org.junit.Assert.assertTrue;
 /**
  * Integration test for custom server that wires Spring components.
  */
-public class CommunityNeoServerHttpLoggingIntegrationTest extends NeoServerIntegrationTest {
+public class CommunityNeoServerHttpLoggingIntegrationTest extends GraphAwareIntegrationTest {
 
     @Override
-    protected NeoTestServer neoTestServer(String neo4jConfigFile) {
-        return new CommunityNeoTestServer(neo4jConfigFile) {
-//            @Override
-//            protected String[] otherConfResources() {
-//                return new String[]{"neo4j-http-logging.xml"};
-//            }
-        };
-    }
-
-    @Override
-    protected String neo4jConfigFile() {
+    protected String configFile() {
         return "neo4j-http-log.conf";
     }
 
     @Test
     public void componentsShouldBeWired() throws InterruptedException {
-        assertTrue(httpClient.get(baseUrl() + "/graphaware/greeting", HttpStatus.SC_OK).startsWith("Hello"));
+        assertTrue(httpClient.get(baseUrl() + "/greeting", HttpStatus.SC_OK).startsWith("Hello"));
     }
 }

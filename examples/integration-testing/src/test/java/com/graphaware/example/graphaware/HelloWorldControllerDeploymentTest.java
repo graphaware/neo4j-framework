@@ -16,20 +16,20 @@
 
 package com.graphaware.example.graphaware;
 
-import com.graphaware.test.integration.NeoServerIntegrationTest;
+import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * {@link NeoServerIntegrationTest} for {@link HelloWorldController}.
+ * {@link GraphAwareIntegrationTest} for {@link HelloWorldController}.
  * <p/>
  * Only tests the actual deployment of the extension, not so much the logic.
  */
-public class HelloWorldControllerDeploymentTest extends NeoServerIntegrationTest {
+public class HelloWorldControllerDeploymentTest extends GraphAwareIntegrationTest {
 
     @Test
     public void shouldCreateAndReturnNode() {
-        assertEquals("0", httpClient.post(baseUrl() + "/graphaware/helloworld/create", 200));
+        assertEquals("0", httpClient.post(baseUrl() + "/helloworld/create", 200));
     }
 }

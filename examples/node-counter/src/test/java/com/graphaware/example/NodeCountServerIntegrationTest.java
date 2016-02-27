@@ -16,19 +16,19 @@
 
 package com.graphaware.example;
 
-import com.graphaware.test.integration.NeoServerIntegrationTest;
+import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * {@link com.graphaware.test.integration.NeoServerIntegrationTest} for {@link NodeCountApi}.
+ * {@link com.graphaware.test.integration.GraphAwareIntegrationTest} for {@link NodeCountApi}.
  */
-public class NodeCountServerIntegrationTest extends NeoServerIntegrationTest {
+public class NodeCountServerIntegrationTest extends GraphAwareIntegrationTest {
 
     @Test
     public void apiShouldBeMounted() {
-        assertEquals("0", httpClient.get(baseUrl() + "/graphaware/count", HttpStatus.SC_OK));
+        assertEquals("0", httpClient.get(baseUrl() + "/count", HttpStatus.SC_OK));
     }
 }

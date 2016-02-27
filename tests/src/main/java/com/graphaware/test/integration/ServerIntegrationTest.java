@@ -20,16 +20,17 @@ import com.graphaware.test.util.TestHttpClient;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.configuration.ServerSettings;
+import org.neo4j.server.enterprise.helpers.EnterpriseServerBuilder;
 import org.neo4j.server.helpers.CommunityServerBuilder;
+import org.springframework.core.io.ClassPathResource;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 
 /**
- * {@link DatabaseIntegrationTest} that starts the {@link WrappingNeoServerBootstrapper},
+ * {@link DatabaseIntegrationTest} that starts a {@link NeoServer},
  * in order to make the Neo4j browser and potentially custom managed and unmanaged extensions available for testing.
  * <p>
  * This is generally useful for developers who use Neo4j in server mode and want to test their extensions, whilst
@@ -42,9 +43,15 @@ import java.util.Properties;
  * By overriding {@link #neoServerPort()}, you can change the port number of which the server runs (7575 by default).
  * <p>
  * By overriding {@link #additionalServerConfiguration()}, you can provide additional server configuration (which would
- * normally live in neo4j-server.properties).
+ * normally live in neo4j.conf).
  * <p>
- * For testing pure Spring MVC code that uses the GraphAware Framework, please use {@link GraphAwareIntegrationTest}.
+ * By overriding {@link #configFile()}, you can provide a name of a Neo4j configuration file, which must be one
+ * the classpath. This file is then used to entirely configure the test instance, i.e., the previous three methods mentioned
+ * are ignored.
+ * <p>
+ * Use {@link TestHttpClient} for convenient testing of REST APIs. And instance is provided by this class.
+ * <p>
+ * For testing Spring MVC code that uses the GraphAware Framework, please use {@link GraphAwareIntegrationTest}.
  */
 public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
 
@@ -56,23 +63,34 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
 
     @Override
     public void setUp() throws Exception {
-        startServer();
-        super.setUp();
+        if (autoStart()) {
+            startServer(); //super.setUp() called there!
+        }
         httpClient = createHttpClient();
     }
 
     @Override
     public void tearDown() throws Exception {
-        httpClient.close();
-        server.stop();
+        if (httpClient != null) {
+            httpClient.close();
+        }
+        stopServer();
         super.tearDown();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected final GraphDatabaseService createDatabase() {
         return server.getDatabase().getGraph();
     }
 
+    /**
+     * Creates a {@link TestHttpClient}. Override for configuring the client.
+     *
+     * @return test client.
+     */
     protected TestHttpClient createHttpClient() {
         return new TestHttpClient();
     }
@@ -80,24 +98,41 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
     /**
      * Start the server.
      */
-    private void startServer() throws IOException {
-        CommunityServerBuilder builder = createServerBuilder();
-
-        if (propertiesFile() != null) {
-            Properties properties = new Properties();
-            properties.load(new FileInputStream(propertiesFile()));
-            for (String key : properties.stringPropertyNames()) {
-                builder = builder.withProperty(key, properties.getProperty(key));
-            }
-        } else {
-            builder = builder.onPort(neoServerPort());
-            builder = configure(builder);
+    protected final void startServer() {
+        try {
+            doStartServer();
+            super.setUp();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-
-        this.server = builder.build();
-        this.server.start();
     }
 
+    /**
+     * Stop the server.
+     */
+    protected final void stopServer() {
+        if (server != null) {
+            server.stop();
+            server = null;
+        }
+    }
+
+    /**
+     * Override and set to <code>false</code> in order to control the starting/stopping of the server within a test.
+     * This is useful when the server needs to be started/stopped multiple times within a single test.
+     *
+     * @return <code>true</code> iff the server should start and stop automatically. Defaults to <code>true</code>.
+     */
+    protected boolean autoStart() {
+        return true;
+    }
+
+    /**
+     * Create the server builder. By default, this produces {@link CommunityServerBuilder} but can be overridden
+     * to produce {@link EnterpriseServerBuilder} instead.
+     *
+     * @return server builder.
+     */
     protected CommunityServerBuilder createServerBuilder() {
         return CommunityServerBuilder.server();
     }
@@ -106,6 +141,8 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
      * Populate server configurator with additional configuration. This method should rarely be overridden. In order to
      * register extensions, provide additional server config (including changing the port on which the server runs),
      * please override one of the methods below.
+     * <p>
+     * This method is only called iff {@link #configFile()} returns <code>null</code>.
      *
      * @param builder to populate.
      */
@@ -125,6 +162,8 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
 
     /**
      * Provide information for registering unmanaged extensions.
+     * <p>
+     * This method is only called iff {@link #configFile()} returns <code>null</code>.
      *
      * @return map where the key is the package in which a set of extensions live and value is the mount point of those
      * extensions, i.e., a URL under which they will be exposed relative to the server address
@@ -136,6 +175,8 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
 
     /**
      * Provide additional server configuration.
+     * <p>
+     * This method is only called iff {@link #configFile()} returns <code>null</code>.
      *
      * @return map of configuration key-value pairs.
      */
@@ -153,6 +194,8 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
     }
 
     /**
+     * This method is only called iff {@link #configFile()} returns <code>null</code>.
+     *
      * @return <code>true</code> iff Neo4j's native auth functionality should be enable, <code>false</code> (default) for disabled.
      */
     protected boolean authEnabled() {
@@ -166,5 +209,23 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
      */
     protected String baseNeoUrl() {
         return "http://localhost:" + neoServerPort();
+    }
+
+    private void doStartServer() throws IOException {
+        CommunityServerBuilder builder = createServerBuilder();
+
+        if (configFile() != null) {
+            Properties properties = new Properties();
+            properties.load(new ClassPathResource(configFile()).getInputStream());
+            for (String key : properties.stringPropertyNames()) {
+                builder = builder.withProperty(key, properties.getProperty(key));
+            }
+        } else {
+            builder = builder.onPort(neoServerPort());
+            builder = configure(builder);
+        }
+
+        this.server = builder.build();
+        this.server.start();
     }
 }

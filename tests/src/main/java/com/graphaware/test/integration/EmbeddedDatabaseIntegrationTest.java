@@ -24,6 +24,10 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.neo4j.kernel.configuration.Settings.FALSE;
 
+/**
+ * {@link DatabaseIntegrationTest} using an embedded database. Useful for low-level tests of algorithms, queries,
+ * transaction event handlers, and much more, where the server isn't needed.
+ */
 public abstract class EmbeddedDatabaseIntegrationTest extends DatabaseIntegrationTest {
 
     /**
@@ -31,11 +35,12 @@ public abstract class EmbeddedDatabaseIntegrationTest extends DatabaseIntegratio
      *
      * @return new database.
      */
+    @Override
     protected GraphDatabaseService createDatabase() {
         GraphDatabaseBuilder builder = createGraphDatabaseBuilder();
 
-        if (propertiesFile() != null) {
-            builder = builder.loadPropertiesFromFile(propertiesFile());
+        if (configFile() != null) {
+            builder = builder.loadPropertiesFromFile(configFile());
         } else {
             populateConfig(builder);
         }
@@ -58,7 +63,7 @@ public abstract class EmbeddedDatabaseIntegrationTest extends DatabaseIntegratio
     }
 
     /**
-     * Provide config on a {@link GraphDatabaseBuilder}. Only called iff {@link #propertiesFile()} returns <code>null</code>.
+     * Provide config on a {@link GraphDatabaseBuilder}. Only called iff {@link #configFile()} returns <code>null</code>.
      *
      * @param builder to populate config on.
      */

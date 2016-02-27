@@ -16,22 +16,22 @@
 
 package com.graphaware.server;
 
-import com.graphaware.test.integration.NeoServerIntegrationTest;
+import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
 /**
  * Integration test for GraphAware API security.
  */
-public class CommunityNeoServerSecurityTest extends NeoServerIntegrationTest {
+public class CommunityNeoServerSecurityTest extends GraphAwareIntegrationTest {
 
     @Override
-    protected String neo4jConfigFile() {
+    protected String configFile() {
         return "neo4j-with-security.conf";
     }
 
     @Test
     public void apisShouldBeSecured() {
-        httpClient.get(baseUrl() + "/graphaware/greeting", HttpStatus.SC_UNAUTHORIZED);
+        httpClient.get(baseUrl() + "/greeting", HttpStatus.SC_UNAUTHORIZED);
     }
 }

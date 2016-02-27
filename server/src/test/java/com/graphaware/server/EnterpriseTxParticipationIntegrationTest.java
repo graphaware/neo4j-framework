@@ -17,36 +17,36 @@
 package com.graphaware.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.graphaware.test.server.EnterpriseNeoTestServer;
-import com.graphaware.test.integration.NeoServerIntegrationTest;
-import com.graphaware.test.server.NeoTestServer;
+import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
+import org.neo4j.server.enterprise.helpers.EnterpriseServerBuilder;
+import org.neo4j.server.helpers.CommunityServerBuilder;
 
 import java.io.IOException;
 import java.util.Collections;
 
-public class EnterpriseTxParticipationIntegrationTest extends NeoServerIntegrationTest {
+public class EnterpriseTxParticipationIntegrationTest extends GraphAwareIntegrationTest {
 
     @Override
-    protected NeoTestServer neoTestServer(String neo4jConfigFile) {
-        return new EnterpriseNeoTestServer(neo4jConfigFile);
+    protected CommunityServerBuilder createServerBuilder() {
+        return EnterpriseServerBuilder.server();
     }
 
     @Test
     public void invalidTransactionShouldResultInException() {
-        httpClient.get(baseUrl() + "/graphaware/greeting", Collections.singletonMap("_GA_TX_ID", "invalid"), HttpStatus.SC_BAD_REQUEST);
+        httpClient.get(baseUrl() + "/greeting", Collections.singletonMap("_GA_TX_ID", "invalid"), HttpStatus.SC_BAD_REQUEST);
     }
 
     @Test
     public void nonExistingTransactionShouldResultInException() {
-        httpClient.get(baseUrl() + "/graphaware/greeting", Collections.singletonMap("_GA_TX_ID", "1"), HttpStatus.SC_BAD_REQUEST);
+        httpClient.get(baseUrl() + "/greeting", Collections.singletonMap("_GA_TX_ID", "1"), HttpStatus.SC_BAD_REQUEST);
     }
 
     @Test
     public void moduleApiShouldParticipateInOpenTransaction() throws IOException {
         //First transaction over Cypher transactional rest endpoint, keep open:
-        String response = httpClient.post(baseUrl() + "/db/data/transaction", "{\n" +
+        String response = httpClient.post(baseNeoUrl() + "/db/data/transaction", "{\n" +
                 "  \"statements\" : [ {\n" +
                 "    \"statement\" : \"CREATE (p:Person {props}) RETURN id(p)\",\n" +
                 "    \"parameters\" : {\n" +
@@ -73,7 +73,7 @@ public class EnterpriseTxParticipationIntegrationTest extends NeoServerIntegrati
                 "}", HttpStatus.SC_OK);
 
         //Third transaction over REST to an extension
-        httpClient.post(baseUrl() + "/graphaware/link/0/1", null, Collections.singletonMap("_GA_TX_ID", "1"), HttpStatus.SC_CREATED);
+        httpClient.post(baseUrl() + "/link/0/1", null, Collections.singletonMap("_GA_TX_ID", "1"), HttpStatus.SC_CREATED);
 
         //Commit transaction over transactional endpoint
         httpClient.post(commitUrl, HttpStatus.SC_OK);

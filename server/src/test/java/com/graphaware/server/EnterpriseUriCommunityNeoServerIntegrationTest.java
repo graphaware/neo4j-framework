@@ -16,29 +16,29 @@
 
 package com.graphaware.server;
 
-import com.graphaware.test.server.EnterpriseNeoTestServer;
-import com.graphaware.test.integration.NeoServerIntegrationTest;
-import com.graphaware.test.server.NeoTestServer;
+import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
+import org.neo4j.server.enterprise.helpers.EnterpriseServerBuilder;
+import org.neo4j.server.helpers.CommunityServerBuilder;
 
 /**
  * Integration test for custom server that wires Spring components.
  */
-public class EnterpriseUriCommunityNeoServerIntegrationTest extends NeoServerIntegrationTest {
+public class EnterpriseUriCommunityNeoServerIntegrationTest extends GraphAwareIntegrationTest {
 
     @Override
-    protected NeoTestServer neoTestServer(String neo4jConfigFile) {
-        return new EnterpriseNeoTestServer(neo4jConfigFile);
+    protected CommunityServerBuilder createServerBuilder() {
+        return EnterpriseServerBuilder.server();
     }
 
     @Override
-    protected String neo4jConfigFile() {
+    protected String configFile() {
         return "neo4j-custom-uri.conf";
     }
 
     @Test
     public void componentsShouldBeWired() {
-        httpClient.get(baseUrl() + "/mycompany/greeting", HttpStatus.SC_OK);
+        httpClient.get(baseNeoUrl() + "/mycompany/greeting", HttpStatus.SC_OK);
     }
 }

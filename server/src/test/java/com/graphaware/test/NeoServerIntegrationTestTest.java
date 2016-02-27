@@ -16,27 +16,25 @@
 
 package com.graphaware.test;
 
-import com.graphaware.test.integration.NeoServerIntegrationTest;
-import org.junit.Ignore;
+import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import org.junit.Test;
 
 import static org.apache.http.HttpStatus.SC_OK;
 
-public abstract class NeoServerIntegrationTestTest extends NeoServerIntegrationTest {
+public abstract class NeoServerIntegrationTestTest extends GraphAwareIntegrationTest {
 
     @Test
     public void shouldLoadBrowser() {
-        httpClient.get(baseUrl() + "/browser", SC_OK);
+        httpClient.get(baseNeoUrl() + "/browser", SC_OK);
     }
 
     @Test
     public void shouldLoadWebAdmin() {
-        httpClient.get(baseUrl() + "/webadmin", SC_OK);
+        httpClient.get(baseNeoUrl() + "/webadmin", SC_OK);
     }
 
     @Test
-    @Ignore //this will not work - would have to have graphaware server as a dependency, but that would introduce a cycle
     public void shouldLoadAPIs() {
-        httpClient.get(baseUrl() + "/graphaware/greeting", SC_OK);
+        httpClient.get(baseUrl() + "/greeting", SC_OK);
     }
 }

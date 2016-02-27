@@ -16,7 +16,7 @@
 
 package com.graphaware.example.unmanaged;
 
-import com.graphaware.test.integration.NeoServerIntegrationTest;
+import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -26,18 +26,18 @@ import static org.junit.Assert.assertEquals;
  *
  * Tests the logic as well as the API.
  */
-public class HelloWorldUnmanagedExtensionDeploymentTest extends NeoServerIntegrationTest {
+public class HelloWorldUnmanagedExtensionDeploymentTest extends GraphAwareIntegrationTest {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected String neo4jConfigFile() {
+    protected String configFile() {
         return "neo4j-server-ext.conf";
     }
 
     @Test
     public void shouldCreateAndReturnNode() {
-        assertEquals("0", httpClient.post(baseUrl() + "/ext/helloworld/create", 200));
+        assertEquals("0", httpClient.post(baseNeoUrl() + "/ext/helloworld/create", 200));
     }
 }

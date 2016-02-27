@@ -20,19 +20,13 @@ import com.graphaware.test.data.DatabasePopulator;
 import org.junit.After;
 import org.junit.Before;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
-import org.neo4j.shell.ShellSettings;
-import org.neo4j.test.TestGraphDatabaseFactory;
-
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static org.neo4j.kernel.configuration.Settings.*;
 
 /**
  * Base class for all kinds of Neo4j integration tests.
  * <p>
- * Creates an {@link org.neo4j.test.ImpermanentGraphDatabase} (by default) at the beginning of each test and allows
- * subclasses to populate it by overriding the {@link #populateDatabase(org.neo4j.graphdb.GraphDatabaseService)} method,
- * or by providing a {@link com.graphaware.test.data.DatabasePopulator} by overriding the {@link #databasePopulator()} method.
+ * Allows subclasses to create a database at the beginning of each test by overriding {@link #createDatabase()} and allows
+ * them to populate it by overriding {@link #populateDatabase(org.neo4j.graphdb.GraphDatabaseService)},
+ * or by providing a {@link com.graphaware.test.data.DatabasePopulator} by overriding {@link #databasePopulator()}.
  * <p>
  * Shuts the database down at the end of each test.
  */
@@ -51,14 +45,19 @@ public abstract class DatabaseIntegrationTest {
         database.shutdown();
     }
 
+    /**
+     * Create a database.
+     *
+     * @return database.
+     */
     protected abstract GraphDatabaseService createDatabase();
 
     /**
-     * Get the name of properties file used to configure the database.
+     * Get the name of config file used to configure the database.
      *
-     * @return properties file, <code>null</code> for none.
+     * @return config file, <code>null</code> for none.
      */
-    protected String propertiesFile() {
+    protected String configFile() {
         return null;
     }
 
