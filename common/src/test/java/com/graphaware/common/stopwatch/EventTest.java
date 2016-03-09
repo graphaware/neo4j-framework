@@ -20,7 +20,7 @@ public class EventTest {
         Event event = new Event();
         sleep(100L);
         event.stop();
-        assertTrue(event.duration() > 100);
+        assertTrue(event.duration() >= 100);
         assertEquals(1, event.getPeriods().size());
     }
 
