@@ -17,8 +17,8 @@
 package com.graphaware.runtime.monitor;
 
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.impl.transaction.TransactionCounters;
+import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
 /**
  * {@link DatabaseLoadMonitor} returning the database load based on the number of transactions started in a period of time.

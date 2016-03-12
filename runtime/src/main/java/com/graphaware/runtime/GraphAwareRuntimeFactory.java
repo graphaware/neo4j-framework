@@ -26,7 +26,7 @@ import com.graphaware.runtime.metadata.GraphPropertiesMetadataRepository;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.module.TxDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.GraphDatabaseAPI;
+import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.TIMER_MODULES_PROPERTY_PREFIX;
 import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROPERTY_PREFIX;

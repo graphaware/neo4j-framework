@@ -27,8 +27,8 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.helpers.collection.Iterables;
-import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.impl.transaction.TransactionCounters;
+import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
 import java.util.HashSet;
 import java.util.Set;

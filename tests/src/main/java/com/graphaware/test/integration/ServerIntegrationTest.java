@@ -18,6 +18,7 @@ package com.graphaware.test.integration;
 
 import com.graphaware.test.util.TestHttpClient;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.configuration.ServerSettings;
 import org.neo4j.server.enterprise.helpers.EnterpriseServerBuilder;
@@ -151,7 +152,7 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
             builder = builder.withThirdPartyJaxRsPackage(mapping.getKey(), mapping.getValue());
         }
 
-        builder = builder.withProperty(ServerSettings.auth_enabled.name(), Boolean.toString(authEnabled()));
+        builder = builder.withProperty(GraphDatabaseSettings.auth_enabled.name(), Boolean.toString(authEnabled()));
 
         for (Map.Entry<String, String> config : additionalServerConfiguration().entrySet()) {
             builder = builder.withProperty(config.getKey(), config.getValue());

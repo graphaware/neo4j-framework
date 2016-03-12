@@ -41,11 +41,6 @@ public final class FakeTransaction implements Transaction {
     }
 
     @Override
-    public void finish() {
-        //intentionally do nothing, this is a fake tx
-    }
-
-    @Override
     public void close() {
         //intentionally do nothing, this is a fake tx
     }

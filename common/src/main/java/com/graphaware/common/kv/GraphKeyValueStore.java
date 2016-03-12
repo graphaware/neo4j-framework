@@ -17,9 +17,9 @@
 package com.graphaware.common.kv;
 
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.GraphDatabaseAPI;
 import org.neo4j.kernel.impl.core.GraphProperties;
 import org.neo4j.kernel.impl.core.NodeManager;
+import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
 /**
  * {@link com.graphaware.common.kv.KeyValueStore} backed by {@link org.neo4j.graphdb.GraphDatabaseService}.
