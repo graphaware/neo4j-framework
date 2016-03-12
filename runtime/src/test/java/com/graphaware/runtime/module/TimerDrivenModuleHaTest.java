@@ -23,11 +23,12 @@ import com.graphaware.runtime.config.FluentTimerDrivenModuleConfiguration;
 import com.graphaware.runtime.config.NullTimerDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TimerDrivenModuleConfiguration;
 import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.cluster.ClusterSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.graphdb.factory.HighlyAvailableGraphDatabaseFactory;
 import org.neo4j.helpers.Settings;
 import org.neo4j.kernel.ha.HaSettings;
@@ -45,7 +46,17 @@ import static org.neo4j.helpers.Settings.FALSE;
 
 public class TimerDrivenModuleHaTest {
 
-    private ExecutorService executor = Executors.newFixedThreadPool(5);
+    private ExecutorService executor;
+
+    @Before
+    public void setUp() {
+        executor = Executors.newFixedThreadPool(5);
+    }
+
+    @After
+    public void tearDown() {
+        executor.shutdownNow();
+    }
 
     @Test
     public void shouldRespectSettingsOnMaster() throws InterruptedException, ExecutionException {
