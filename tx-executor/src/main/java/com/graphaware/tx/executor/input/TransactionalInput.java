@@ -23,9 +23,9 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.PrefetchingIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * An {@link Iterable}, items of which are retrieved from the database in batches. Intended to be used as
@@ -51,9 +51,11 @@ public class TransactionalInput<T> extends PrefetchingIterator<T> implements Ite
      * @param callback  which actually retrieves an iterable from the database.
      */
     public TransactionalInput(GraphDatabaseService database, int batchSize, TransactionCallback<Iterable<T>> callback) {
-        Assert.notNull(database);
-        Assert.isTrue(batchSize > 0);
-        Assert.notNull(callback);
+        Objects.requireNonNull(database);
+        if (batchSize <= 0) {
+            throw new IllegalArgumentException("batchSize argument must be greater than zero");
+        }
+        Objects.requireNonNull(callback);
 
         this.database = database;
         this.callback = callback;

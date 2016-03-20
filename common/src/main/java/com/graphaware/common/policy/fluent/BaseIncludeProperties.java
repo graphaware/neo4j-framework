@@ -17,8 +17,8 @@
 package com.graphaware.common.policy.fluent;
 
 import com.graphaware.common.policy.PropertyInclusionPolicy;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.graphdb.PropertyContainer;
-import org.parboiled.common.StringUtils;
 
 /**
  * Abstract base class for {@link com.graphaware.common.policy.PropertyInclusionPolicy} implementations with fluent interface,

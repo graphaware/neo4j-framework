@@ -18,10 +18,9 @@ package com.graphaware.common.policy.fluent;
 
 import com.graphaware.common.description.property.DetachedPropertiesDescription;
 import com.graphaware.common.policy.NodeInclusionPolicy;
-import org.neo4j.graphdb.Label;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.parboiled.common.StringUtils;
 
 /**
  * Abstract base class for {@link NodeInclusionPolicy} implementations with fluent interface,
