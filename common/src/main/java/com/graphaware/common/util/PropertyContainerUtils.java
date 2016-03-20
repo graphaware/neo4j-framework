@@ -18,17 +18,16 @@ package com.graphaware.common.util;
 
 import com.graphaware.common.policy.ObjectInclusionPolicy;
 import com.graphaware.common.policy.all.IncludeAll;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Relationship;
-import org.parboiled.common.StringUtils;
 
 import java.util.*;
 
 import static com.graphaware.common.util.ArrayUtils.isPrimitiveOrStringArray;
 import static com.graphaware.common.util.ArrayUtils.primitiveOrStringArrayToString;
-import static org.springframework.util.Assert.notNull;
 
 /**
  * Utility methods for dealing with {@link org.neo4j.graphdb.PropertyContainer}s.
@@ -60,7 +59,7 @@ public final class PropertyContainerUtils {
      * @throws IllegalStateException in case the propertyContainer is not a {@link org.neo4j.graphdb.Node} or a {@link org.neo4j.graphdb.Relationship}.
      */
     public static long id(PropertyContainer propertyContainer) {
-        notNull(propertyContainer);
+        Objects.requireNonNull(propertyContainer);
 
         if (Node.class.isAssignableFrom(propertyContainer.getClass())) {
             return ((Node) propertyContainer).getId();
