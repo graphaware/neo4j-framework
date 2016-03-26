@@ -16,9 +16,7 @@ notes:
         git push origin :refs/tags/graphaware-parent-2.1.7.28
 
 List of modules to upgrade:
-        relcount
         warmup
-        changefeed
         uuid
         resttest
         algorithms
@@ -30,5 +28,5 @@ List of modules to upgrade:
         importer
         neo4j-to-elasticsearch
         ga-enterprise
-        schema
         audit
+        schema

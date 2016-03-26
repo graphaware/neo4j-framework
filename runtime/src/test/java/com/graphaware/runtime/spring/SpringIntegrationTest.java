@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime.spring;
 
-import com.graphaware.module.changefeed.io.GraphChangeReader;
+import com.graphaware.module.uuid.UuidReader;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -33,7 +33,7 @@ public class SpringIntegrationTest {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Config.class);
 
         assertNotNull(context.getBean(GraphDatabaseService.class));
-        assertNotNull(context.getBean(GraphChangeReader.class));
+        assertNotNull(context.getBean(UuidReader.class));
 
         context.destroy();
     }

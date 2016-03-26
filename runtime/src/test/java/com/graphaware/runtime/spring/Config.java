@@ -16,8 +16,8 @@
 
 package com.graphaware.runtime.spring;
 
-import com.graphaware.module.changefeed.cache.CachingGraphChangeReader;
-import com.graphaware.module.changefeed.io.GraphChangeReader;
+import com.graphaware.module.uuid.UuidConfiguration;
+import com.graphaware.module.uuid.UuidReader;
 import com.graphaware.runtime.RuntimeRegistry;
 import org.junit.rules.TemporaryFolder;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -46,8 +46,8 @@ public class Config {
     }
 
     @Bean
-    public GraphChangeReader graphChangeReader() throws IOException {
-        return new CachingGraphChangeReader(graphDatabaseService(temporaryFolder()));
+    public UuidReader uuidReader() throws IOException {
+        return new UuidReader(UuidConfiguration.defaultConfiguration(), graphDatabaseService(temporaryFolder()));
     }
 
     @Bean(destroyMethod = "delete")

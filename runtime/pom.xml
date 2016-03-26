@@ -68,8 +68,8 @@
         </dependency>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>changefeed</artifactId>
-            <version>2.3.2.37.7</version>
+            <artifactId>uuid</artifactId>
+            <version>2.3.3.37.8</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
