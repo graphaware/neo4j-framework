@@ -106,7 +106,9 @@ public abstract class NeoTestServer {
     }
 
     public void destroy() {
-        temporaryFolder.delete();
-        temporaryFolder = null;
+        if (temporaryFolder != null) {
+            temporaryFolder.delete();
+            temporaryFolder = null;
+        }
     }
 }
