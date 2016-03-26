@@ -19,8 +19,8 @@ package com.graphaware.common.policy.fluent;
 import com.graphaware.common.description.property.DetachedPropertiesDescription;
 import com.graphaware.common.policy.RelationshipInclusionPolicy;
 import com.graphaware.common.util.DirectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.neo4j.graphdb.*;
-import org.parboiled.common.StringUtils;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -181,7 +181,7 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
         List<RelationshipType> types = new LinkedList<>();
 
         for (String type : relationshipTypes) {
-            if (type == null || StringUtils.isEmpty(type)) {
+            if (StringUtils.isEmpty(type)) {
                 throw new IllegalArgumentException("Empty and null relationships types are not supported");
             }
             types.add(DynamicRelationshipType.withName(type));
