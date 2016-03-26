@@ -36,7 +36,7 @@ import java.io.IOException;
 public abstract class NeoTestServer {
 
     private Bootstrapper bootstrapper;
-    private TemporaryFolder temporaryFolder = new TemporaryFolder();
+    private TemporaryFolder temporaryFolder;
     private final String neo4jConfigFile;
     private final String neo4jServerConfigFile;
 
@@ -49,11 +49,17 @@ public abstract class NeoTestServer {
         this.neo4jServerConfigFile = neo4jServerConfigFile;
     }
 
-    public final void start() throws IOException, InterruptedException {
-        temporaryFolder.create();
-        temporaryFolder.getRoot().deleteOnExit();
+    public void create() throws IOException {
+        if (temporaryFolder == null) {
+            temporaryFolder = new TemporaryFolder();
+            temporaryFolder.create();
+            temporaryFolder.getRoot().deleteOnExit();
+            temporaryFolder.newFolder("conf");
+        }
+    }
 
-        temporaryFolder.newFolder("conf");
+    public final void start() throws IOException, InterruptedException {
+        create();
 
         File serverConfig = serverConfigToConfDir();
 
@@ -70,12 +76,16 @@ public abstract class NeoTestServer {
     private File serverConfigToConfDir() throws IOException {
         String serverConfigContents = IOUtils.toString(new ClassPathResource(neo4jServerConfigFile).getInputStream());
         serverConfigContents = serverConfigContents.replaceAll("=conf" + File.separator, "=" + temporaryFolder.getRoot().getAbsolutePath() + File.separator + "conf" + File.separator);
-        serverConfigContents = serverConfigContents.replaceAll("=data" + File.separator, "=" + temporaryFolder.getRoot().getAbsolutePath() + File.separator + "data" + File.separator);
+        serverConfigContents = serverConfigContents.replaceAll("=data" + File.separator, "=" + pathToData());
 
         File serverConfig = temporaryFolder.newFile("conf" + File.separator + "neo4j-server.properties");
         IOUtils.copy(IOUtils.toInputStream(serverConfigContents), new FileOutputStream(serverConfig));
         System.setProperty(Configurator.NEO_SERVER_CONFIG_FILE_KEY, serverConfig.getAbsolutePath());
         return serverConfig;
+    }
+
+    protected String pathToData() {
+        return temporaryFolder.getRoot().getAbsolutePath() + File.separator + "data" + File.separator;
     }
 
     protected abstract Bootstrapper createBootstrapper();
@@ -92,6 +102,11 @@ public abstract class NeoTestServer {
 
     public void stop() throws IOException, InterruptedException {
         bootstrapper.stop();
+        destroy();
+    }
+
+    public void destroy() {
         temporaryFolder.delete();
+        temporaryFolder = null;
     }
 }
