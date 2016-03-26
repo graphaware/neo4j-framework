@@ -72,7 +72,6 @@ public abstract class WrappingServerIntegrationTest extends DatabaseIntegrationT
 
     /**
      * Start the server wrapper.
-     * //todo change to CommunityServerBuilder
      */
     private void startServerWrapper() {
         ServerConfigurator configurator = new ServerConfigurator((GraphDatabaseAPI) getDatabase());
