@@ -35,8 +35,8 @@ import java.io.IOException;
  */
 public abstract class NeoTestServer {
 
-    private Bootstrapper bootstrapper;
-    private TemporaryFolder temporaryFolder;
+    protected Bootstrapper bootstrapper;
+    protected TemporaryFolder temporaryFolder;
     private final String neo4jConfigFile;
     private final String neo4jServerConfigFile;
 
