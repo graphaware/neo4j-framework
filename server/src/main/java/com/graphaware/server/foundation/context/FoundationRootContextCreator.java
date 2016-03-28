@@ -18,6 +18,7 @@ package com.graphaware.server.foundation.context;
 
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.RuntimeRegistry;
+import org.neo4j.kernel.impl.proc.Procedures;
 import org.neo4j.server.NeoServer;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
@@ -29,6 +30,7 @@ public class FoundationRootContextCreator implements RootContextCreator {
         GenericApplicationContext parent = new GenericApplicationContext();
         parent.registerShutdownHook();
         parent.getBeanFactory().registerSingleton("database", neoServer.getDatabase().getGraph());
+        parent.getBeanFactory().registerSingleton("procedures", neoServer.getDatabase().getGraph().getDependencyResolver().resolveDependency(Procedures.class));
 
         GraphAwareRuntime runtime = RuntimeRegistry.getRuntime(neoServer.getDatabase().getGraph());
         if (runtime != null) {

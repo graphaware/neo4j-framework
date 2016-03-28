@@ -19,6 +19,7 @@ package com.ga;
 import com.graphaware.common.util.IterableUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.kernel.impl.proc.Procedures;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,15 @@ public class HelloWorldService implements GreetingService {
     @Autowired
     private GraphDatabaseService database;
 
+    @Autowired
+    private Procedures procedures;
+
     @Override
     public String greet() {
+        if (procedures == null) {
+            throw new IllegalStateException("Procedures not wired in!");
+        }
+
         try (Transaction tx = database.beginTx()) {
             return "Hello World! There are " + IterableUtils.count(GlobalGraphOperations.at(database).getAllNodes()) + " nodes in the database.";
         }
