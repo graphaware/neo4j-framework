@@ -47,8 +47,7 @@ import java.util.Properties;
  * normally live in neo4j.conf).
  * <p>
  * By overriding {@link #configFile()}, you can provide a name of a Neo4j configuration file, which must be one
- * the classpath. This file is then used to entirely configure the test instance, i.e., the previous three methods mentioned
- * are ignored.
+ * the classpath. This file is then used to supply additional configuration.
  * <p>
  * Use {@link TestHttpClient} for convenient testing of REST APIs. And instance is provided by this class.
  * <p>
