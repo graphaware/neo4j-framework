@@ -19,7 +19,6 @@ package com.graphaware.common.policy.fluent;
 import com.graphaware.common.description.property.DetachedPropertiesDescription;
 import com.graphaware.common.policy.NodeInclusionPolicy;
 import org.apache.commons.lang3.StringUtils;
-import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 
@@ -57,7 +56,7 @@ public abstract class BaseIncludeNodes<T extends BaseIncludeNodes<T>> extends In
             throw new IllegalArgumentException("Empty labels are not supported"); //just because it's not a good idea and usually indicates a bug
         }
 
-        return with(DynamicLabel.label(label));
+        return with(Label.label(label));
     }
 
     /**

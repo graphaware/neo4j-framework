@@ -20,11 +20,8 @@ import com.graphaware.api.transform.NodeIdTransformer;
 import com.graphaware.common.representation.NodeRepresentation;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.springframework.util.Assert;
 
 import java.util.Map;
-
-import static org.springframework.util.Assert.*;
 
 /**
  * Serializable {@link NodeRepresentation} with custom node ID. It is recommended not to expose Neo4j internal IDs (graphId)
