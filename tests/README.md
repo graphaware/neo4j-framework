@@ -16,14 +16,14 @@ Add the following snippet to your pom.xml:
  <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>tests</artifactId>
-    <version>3.0.0.36</version>
+    <version>3.0.0.37</version>
     <scope>test</scope>
 </dependency>
 ```
 
 Note: if your pom.xml inherits from a parent that brings in a Jetty version (e.g. if you're using Spring Boot), please put
 the following in your `<properties>` section:
-`<jetty.version>9.2.1.v20140609</jetty.version>`
+`<jetty.version>9.2.9.v20150224</jetty.version>`
 
 <a name="graphunit"/>
 ### GraphUnit
