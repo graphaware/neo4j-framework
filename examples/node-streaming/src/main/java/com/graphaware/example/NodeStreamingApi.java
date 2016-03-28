@@ -23,7 +23,6 @@ import com.graphaware.api.json.LongIdJsonNode;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.tooling.GlobalGraphOperations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.stereotype.Controller;
@@ -65,7 +64,7 @@ public class NodeStreamingApi {
                 try (Transaction tx = database.beginTx()) {
                     emitter.send("[");
 
-                    for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+                    for (Node node : database.getAllNodes()) {
                         if (!first) {
                             emitter.send(",");
                         } else {
@@ -98,7 +97,7 @@ public class NodeStreamingApi {
                 jsonGenerator.writeStartArray();
 
                 try (Transaction tx = database.beginTx()) {
-                    for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+                    for (Node node : database.getAllNodes()) {
                         jsonGenerator.writeObject(new LongIdJsonNode(node));
                     }
                     tx.success();

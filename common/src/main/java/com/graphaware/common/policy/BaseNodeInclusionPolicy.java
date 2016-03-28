@@ -18,7 +18,6 @@ package com.graphaware.common.policy;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * Base class for {@link NodeInclusionPolicy} implementations. Implements the {@link #getAll(GraphDatabaseService)} method
@@ -31,6 +30,6 @@ public abstract class BaseNodeInclusionPolicy extends BasePropertyContainerInclu
      */
     @Override
     protected Iterable<Node> doGetAll(GraphDatabaseService database) {
-        return GlobalGraphOperations.at(database).getAllNodes();
+        return database.getAllNodes();
     }
 }

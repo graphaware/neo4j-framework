@@ -20,7 +20,6 @@ import com.graphaware.common.util.IterableUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.impl.proc.Procedures;
-import org.neo4j.tooling.GlobalGraphOperations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +39,7 @@ public class HelloWorldService implements GreetingService {
         }
 
         try (Transaction tx = database.beginTx()) {
-            return "Hello World! There are " + IterableUtils.count(GlobalGraphOperations.at(database).getAllNodes()) + " nodes in the database.";
+            return "Hello World! There are " + IterableUtils.count(database.getAllNodes()) + " nodes in the database.";
         }
     }
 }

@@ -25,7 +25,6 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.kernel.impl.storageengine.impl.recordstorage.RecordStorageEngine;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * {@link NodeSelector} that selects a {@link Node} at random from all {@link Node}s available in the database that match
@@ -104,7 +103,7 @@ public class RandomNodeSelector implements NodeSelector {
      * @return random node, null if not successful.
      */
     private Node randomNodeON(GraphDatabaseService database) {
-        Iterable<Node> allNodes = GlobalGraphOperations.at(database).getAllNodes();
+        Iterable<Node> allNodes = database.getAllNodes();
 
         ReservoirSampler<Node> randomSampler = new ReservoirSampler<>(1);
         for (Node node : allNodes) {

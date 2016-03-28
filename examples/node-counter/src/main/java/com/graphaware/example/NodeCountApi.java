@@ -19,7 +19,6 @@ package com.graphaware.example;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.Iterables;
-import org.neo4j.tooling.GlobalGraphOperations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,7 +45,7 @@ public class NodeCountApi {
         long count;
 
         try (Transaction tx = database.beginTx()) {
-            count = Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
+            count = Iterables.count(database.getAllNodes());
             tx.success();
         }
 

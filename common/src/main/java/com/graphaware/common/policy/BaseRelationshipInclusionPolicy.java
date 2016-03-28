@@ -18,7 +18,6 @@ package com.graphaware.common.policy;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * Base class for {@link RelationshipInclusionPolicy} implementations. Implements the {@link #getAll(GraphDatabaseService)} method
@@ -31,6 +30,6 @@ public abstract class BaseRelationshipInclusionPolicy extends BasePropertyContai
      */
     @Override
     protected Iterable<Relationship> doGetAll(GraphDatabaseService database) {
-        return GlobalGraphOperations.at(database).getAllRelationships();
+        return database.getAllRelationships();
     }
 }

@@ -24,7 +24,6 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.assertEquals;
@@ -57,7 +56,7 @@ public class IncludeAllRelationshipsTest {
     @Test
     public void shouldIncludeAllRels() {
         try (Transaction tx = database.beginTx()) {
-            for (Relationship r : GlobalGraphOperations.at(database).getAllRelationships()) {
+            for (Relationship r : database.getAllRelationships()) {
                 assertTrue(IncludeAllRelationships.getInstance().include(r));
             }
             tx.success();

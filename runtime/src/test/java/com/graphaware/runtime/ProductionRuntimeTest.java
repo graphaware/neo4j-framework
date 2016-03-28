@@ -39,7 +39,6 @@ import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -189,7 +188,7 @@ public class ProductionRuntimeTest {
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(0, Iterables.count(GlobalGraphOperations.at(database).getAllNodes()));
+            assertEquals(0, Iterables.count(database.getAllNodes()));
             tx.success();
         }
     }
@@ -212,7 +211,7 @@ public class ProductionRuntimeTest {
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(0, Iterables.count(GlobalGraphOperations.at(database).getAllNodes()));
+            assertEquals(0, Iterables.count(database.getAllNodes()));
             tx.success();
         }
     }

@@ -24,7 +24,6 @@ import org.mockito.Mockito;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -64,7 +63,7 @@ public class PropertyContainerUtilsTest {
     @Test
     public void shouldConvertContainersToMap() {
         try (Transaction tx = database.beginTx()) {
-            Map<Long, Node> nodeMap = propertyContainersToMap(Iterables.toList(GlobalGraphOperations.at(database).getAllNodes()));
+            Map<Long, Node> nodeMap = propertyContainersToMap(Iterables.asList(database.getAllNodes()));
             assertEquals(0, nodeMap.get(0L).getId());
             assertEquals(1, nodeMap.get(1L).getId());
             assertEquals(2, nodeMap.get(2L).getId());
@@ -89,14 +88,14 @@ public class PropertyContainerUtilsTest {
     @Test
     public void shouldFindNodeIds() {
         try (Transaction tx = database.beginTx()) {
-            assertEquals("[0, 1, 2]", Arrays.toString(ids(GlobalGraphOperations.at(database).getAllNodes())));
+            assertEquals("[0, 1, 2]", Arrays.toString(ids(database.getAllNodes())));
         }
     }
 
     @Test
     public void shouldFindRelationshipIds() {
         try (Transaction tx = database.beginTx()) {
-            assertEquals("[0]", Arrays.toString((ids(GlobalGraphOperations.at(database).getAllRelationships()))));
+            assertEquals("[0]", Arrays.toString((ids(database.getAllRelationships()))));
         }
     }
 

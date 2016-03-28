@@ -19,7 +19,6 @@ package com.graphaware.tx.executor.input;
 import com.graphaware.tx.executor.single.TransactionCallback;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * {@link TransactionalInput} returning all relationships in the database.
@@ -33,11 +32,6 @@ public final class AllRelationships extends TransactionalInput<Relationship> {
      * @param batchSize how many relationships in a batch.
      */
     public AllRelationships(GraphDatabaseService database, int batchSize) {
-        super(database, batchSize, new TransactionCallback<Iterable<Relationship>>() {
-            @Override
-            public Iterable<Relationship> doInTransaction(GraphDatabaseService database) throws Exception {
-                return GlobalGraphOperations.at(database).getAllRelationships();
-            }
-        });
+        super(database, batchSize, GraphDatabaseService::getAllRelationships);
     }
 }

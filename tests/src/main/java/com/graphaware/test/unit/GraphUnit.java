@@ -20,9 +20,9 @@ import com.graphaware.common.policy.InclusionPolicies;
 import com.graphaware.common.util.PropertyContainerUtils;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.helpers.collection.Iterators;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.tooling.GlobalGraphOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,6 @@ import static org.junit.Assert.fail;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.helpers.collection.Iterables.count;
 import static org.neo4j.kernel.configuration.Settings.*;
-import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
  * A set of assertion methods useful for writing tests for Neo4j. Uses the {@link org.junit.Assert} class from JUnit
@@ -203,13 +202,13 @@ public final class GraphUnit {
         }
 
         try (Transaction tx = database.beginTx()) {
-            for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+            for (Node node : database.getAllNodes()) {
                 if (inclusionPolicies.getNodeInclusionPolicy().include(node)) {
                     fail("The database is not empty, there are nodes");
                 }
             }
 
-            for (Relationship relationship : GlobalGraphOperations.at(database).getAllRelationships()) {
+            for (Relationship relationship : database.getAllRelationships()) {
                 if (inclusionPolicies.getRelationshipInclusionPolicy().include(relationship)) {
                     fail("The database is not empty, there are relationships");
                 }
@@ -240,13 +239,13 @@ public final class GraphUnit {
             throw new IllegalArgumentException("Database must not be null");
         }
 
-        for (Relationship rel : GlobalGraphOperations.at(database).getAllRelationships()) {
+        for (Relationship rel : database.getAllRelationships()) {
             if (isRelationshipIncluded(rel, inclusionPolicies)) {
                 rel.delete();
             }
         }
 
-        for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+        for (Node node : database.getAllNodes()) {
             if (isNodeIncluded(node, inclusionPolicies)) {
                 node.delete();
             }
@@ -276,14 +275,14 @@ public final class GraphUnit {
 
         try (Transaction tx = database.beginTx()) {
             System.out.println("Nodes:");
-            for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+            for (Node node : database.getAllNodes()) {
                 if (isNodeIncluded(node, inclusionPolicies)) {
                     System.out.println(PropertyContainerUtils.nodeToString(node));
                 }
             }
 
             System.out.println("Relationships:");
-            for (Relationship rel : GlobalGraphOperations.at(database).getAllRelationships()) {
+            for (Relationship rel : database.getAllRelationships()) {
                 if (isRelationshipIncluded(rel, inclusionPolicies)) {
                     System.out.println(PropertyContainerUtils.relationshipToString(rel));
                 }
@@ -382,7 +381,7 @@ public final class GraphUnit {
     private static Map<Long, Long[]> buildSameNodesMap(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies inclusionPolicies, String firstDatabaseName) {
         Map<Long, Long[]> sameNodesMap = new HashMap<>();  //map of nodeID and IDs of nodes that match
 
-        for (Node node : at(otherDatabase).getAllNodes()) {
+        for (Node node : otherDatabase.getAllNodes()) {
             if (!isNodeIncluded(node, inclusionPolicies)) {
                 continue;
             }
@@ -437,7 +436,7 @@ public final class GraphUnit {
         LOG.debug("Attempting a node mapping...");
 
         Set<Long> usedRelationships = new HashSet<>();
-        for (Relationship relationship : at(otherDatabase).getAllRelationships()) {
+        for (Relationship relationship : otherDatabase.getAllRelationships()) {
             if (!relationshipMappingExists(database, relationship, mapping, usedRelationships, inclusionPolicies)) {
                 LOG.debug("Failure... No corresponding relationship found to: " + relationshipToString(relationship));
                 return false;
@@ -450,7 +449,7 @@ public final class GraphUnit {
 
     private static void assertRelationshipsMappingExistsForSingleNodeMapping(GraphDatabaseService database, GraphDatabaseService otherDatabase, Map<Long, Long> mapping, InclusionPolicies inclusionPolicies, String firstDatabaseName) {
         Set<Long> usedRelationships = new HashSet<>();
-        for (Relationship relationship : at(otherDatabase).getAllRelationships()) {
+        for (Relationship relationship : otherDatabase.getAllRelationships()) {
             if (!relationshipMappingExists(database, relationship, mapping, usedRelationships, inclusionPolicies)) {
                 fail("No corresponding relationship found to " + relationshipToString(relationship) + " in " + firstDatabaseName);
             }
@@ -486,7 +485,7 @@ public final class GraphUnit {
     private static Iterable<Node> findSameNodesByLabel(GraphDatabaseService database, Node node, Label label, InclusionPolicies inclusionPolicies) {
         Set<Node> result = new HashSet<>();
 
-        for (Node candidate : Iterables.asResourceIterable(database.findNodes(label))) {
+        for (Node candidate : Iterators.asResourceIterable(database.findNodes(label))) {
             if (isNodeIncluded(candidate, inclusionPolicies)) {
                 if (areSame(node, candidate, inclusionPolicies)) {
                     result.add(candidate);
@@ -500,7 +499,7 @@ public final class GraphUnit {
     private static Iterable<Node> findSameNodesWithoutLabel(GraphDatabaseService database, Node node, InclusionPolicies inclusionPolicies) {
         Set<Node> result = new HashSet<>();
 
-        for (Node candidate : GlobalGraphOperations.at(database).getAllNodes()) {
+        for (Node candidate : database.getAllNodes()) {
             if (isNodeIncluded(candidate, inclusionPolicies)) {
                 if (areSame(node, candidate, inclusionPolicies)) {
                     result.add(candidate);

@@ -21,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.RelationshipUtils.*;
@@ -89,7 +88,7 @@ public class RelationshipUtilsTest {
 
             Relationship r = createRelationshipIfNotExists(node1, node2, withName("TEST"), OUTGOING);
             assertEquals(0, r.getId());
-            assertEquals(1, IterableUtils.count(GlobalGraphOperations.at(database).getAllRelationships()));
+            assertEquals(1, IterableUtils.count(database.getAllRelationships()));
 
             tx.success();
         }
@@ -103,7 +102,7 @@ public class RelationshipUtilsTest {
 
             Relationship r = createRelationshipIfNotExists(node2, node1, withName("TEST"), OUTGOING);
             assertEquals(1, r.getId());
-            assertEquals(2, IterableUtils.count(GlobalGraphOperations.at(database).getAllRelationships()));
+            assertEquals(2, IterableUtils.count(database.getAllRelationships()));
 
             assertTrue(relationshipExists(node2, node1, withName("TEST"), OUTGOING));
 
@@ -119,7 +118,7 @@ public class RelationshipUtilsTest {
 
             Relationship r = createRelationshipIfNotExists(node1, node2, withName("TEST"), INCOMING);
             assertEquals(1, r.getId());
-            assertEquals(2, IterableUtils.count(GlobalGraphOperations.at(database).getAllRelationships()));
+            assertEquals(2, IterableUtils.count(database.getAllRelationships()));
 
             assertTrue(relationshipExists(node1, node2, withName("TEST"), INCOMING));
 
@@ -134,7 +133,7 @@ public class RelationshipUtilsTest {
             Node node2 = database.getNodeById(1);
 
             deleteRelationshipIfExists(node1, node2, withName("TEST"), OUTGOING);
-            assertEquals(0, IterableUtils.count(GlobalGraphOperations.at(database).getAllRelationships()));
+            assertEquals(0, IterableUtils.count(database.getAllRelationships()));
 
             tx.success();
         }
@@ -147,7 +146,7 @@ public class RelationshipUtilsTest {
             Node node2 = database.getNodeById(1);
 
             deleteRelationshipIfExists(node2, node1, withName("TEST"), OUTGOING);
-            assertEquals(1, IterableUtils.count(GlobalGraphOperations.at(database).getAllRelationships()));
+            assertEquals(1, IterableUtils.count(database.getAllRelationships()));
 
             tx.success();
         }

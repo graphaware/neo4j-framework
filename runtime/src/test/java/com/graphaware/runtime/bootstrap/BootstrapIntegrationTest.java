@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime.bootstrap;
 
+import com.graphaware.runtime.RuntimeRegistry;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.backup.OnlineBackupSettings;
@@ -44,6 +45,7 @@ public class BootstrapIntegrationTest {
     @Before
     public void setUp() {
         TEST_RUNTIME_MODULES.clear();
+        RuntimeRegistry.clear();
     }
 
     @Test

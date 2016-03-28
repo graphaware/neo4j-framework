@@ -19,8 +19,8 @@ package com.graphaware.test.integration;
 import com.graphaware.test.util.TestHttpClient;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
+import org.neo4j.helpers.HostnamePort;
 import org.neo4j.server.NeoServer;
-import org.neo4j.server.configuration.ServerSettings;
 import org.neo4j.server.enterprise.helpers.EnterpriseServerBuilder;
 import org.neo4j.server.helpers.CommunityServerBuilder;
 import org.springframework.core.io.ClassPathResource;
@@ -147,12 +147,22 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
      *
      * @param builder to populate.
      */
-    protected CommunityServerBuilder configure(CommunityServerBuilder builder) {
+    protected CommunityServerBuilder configure(CommunityServerBuilder builder) throws IOException {
+        builder = builder.onAddress(new HostnamePort("localhost", neoServerPort()));
+
         for (Map.Entry<String, String> mapping : thirdPartyJaxRsPackageMappings().entrySet()) {
             builder = builder.withThirdPartyJaxRsPackage(mapping.getKey(), mapping.getValue());
         }
 
         builder = builder.withProperty(GraphDatabaseSettings.auth_enabled.name(), Boolean.toString(authEnabled()));
+
+        if (configFile() != null) {
+            Properties properties = new Properties();
+            properties.load(new ClassPathResource(configFile()).getInputStream());
+            for (String key : properties.stringPropertyNames()) {
+                builder = builder.withProperty(key, properties.getProperty(key));
+            }
+        }
 
         for (Map.Entry<String, String> config : additionalServerConfiguration().entrySet()) {
             builder = builder.withProperty(config.getKey(), config.getValue());
@@ -215,16 +225,7 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
     private void doStartServer() throws IOException {
         CommunityServerBuilder builder = createServerBuilder();
 
-        if (configFile() != null) {
-            Properties properties = new Properties();
-            properties.load(new ClassPathResource(configFile()).getInputStream());
-            for (String key : properties.stringPropertyNames()) {
-                builder = builder.withProperty(key, properties.getProperty(key));
-            }
-        } else {
-            builder = builder.onPort(neoServerPort());
-            builder = configure(builder);
-        }
+        builder = configure(builder);
 
         this.server = builder.build();
         this.server.start();

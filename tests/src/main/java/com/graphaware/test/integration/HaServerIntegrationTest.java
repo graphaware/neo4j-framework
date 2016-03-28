@@ -24,6 +24,10 @@ import org.neo4j.kernel.ha.HaSettings;
 import org.neo4j.server.enterprise.helpers.EnterpriseServerBuilder;
 import org.neo4j.server.helpers.CommunityServerBuilder;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 public class HaServerIntegrationTest extends ServerIntegrationTest {
 
     private static final String SERVER_ID = "1";
@@ -39,16 +43,16 @@ public class HaServerIntegrationTest extends ServerIntegrationTest {
     }
 
     @Override
-    protected CommunityServerBuilder configure(CommunityServerBuilder builder) {
-        builder = super.configure(builder);
+    protected Map<String, String> additionalServerConfiguration() {
+        Map<String, String> result = new HashMap<>();
 
-        builder = builder.withProperty(ClusterSettings.server_id.name(), getServerId());
-        builder = builder.withProperty(HaSettings.ha_server.name(), getHaServer());
-        builder = builder.withProperty(HaSettings.slave_only.name(), getSlaveOnly());
-        builder = builder.withProperty(ClusterSettings.cluster_server.name(), getClusterServer());
-        builder = builder.withProperty(ClusterSettings.initial_hosts.name(), getInitialHosts());
+        result.put(ClusterSettings.server_id.name(), getServerId());
+        result.put(HaSettings.ha_server.name(), getHaServer());
+        result.put(HaSettings.slave_only.name(), getSlaveOnly());
+        result.put(ClusterSettings.cluster_server.name(), getClusterServer());
+        result.put(ClusterSettings.initial_hosts.name(), getInitialHosts());
 
-        return builder;
+        return result;
     }
 
     protected String getServerId() {

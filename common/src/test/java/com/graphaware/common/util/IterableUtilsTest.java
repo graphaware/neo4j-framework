@@ -34,7 +34,6 @@ import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.*;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
-import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 /**
  * Unit test for {@link com.graphaware.common.util.IterableUtils}.
@@ -94,7 +93,7 @@ public class IterableUtilsTest {
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertTrue(contains(at(database).getAllNodes(), node));
+            assertTrue(contains(database.getAllNodes(), node));
         }
 
         try (Transaction tx = database.beginTx()) {
@@ -103,7 +102,7 @@ public class IterableUtilsTest {
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertFalse(contains(at(database).getAllNodes(), node));
+            assertFalse(contains(database.getAllNodes(), node));
         }
     }
 
@@ -118,11 +117,11 @@ public class IterableUtilsTest {
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertTrue(asList(0L, 1L).contains(random(at(database).getAllNodes()).getId()));
-            assertTrue(asList(0L, 1L).contains(random(at(database).getAllNodes()).getId()));
-            assertTrue(asList(0L, 1L).contains(random(at(database).getAllNodes()).getId()));
-            assertTrue(asList(0L, 1L).contains(random(at(database).getAllNodes()).getId()));
-            assertTrue(asList(0L, 1L).contains(random(at(database).getAllNodes()).getId()));
+            assertTrue(asList(0L, 1L).contains(random(database.getAllNodes()).getId()));
+            assertTrue(asList(0L, 1L).contains(random(database.getAllNodes()).getId()));
+            assertTrue(asList(0L, 1L).contains(random(database.getAllNodes()).getId()));
+            assertTrue(asList(0L, 1L).contains(random(database.getAllNodes()).getId()));
+            assertTrue(asList(0L, 1L).contains(random(database.getAllNodes()).getId()));
         }
     }
 

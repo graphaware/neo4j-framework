@@ -22,7 +22,6 @@ import com.graphaware.common.serialize.SingletonSerializer;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * Policy that includes all business / application level relationships, but exclude any
@@ -56,6 +55,6 @@ public final class IncludeAllBusinessRelationships extends RelationshipInclusion
      */
     @Override
     protected Iterable<Relationship> doGetAll(GraphDatabaseService database) {
-        return GlobalGraphOperations.at(database).getAllRelationships();
+        return database.getAllRelationships();
     }
 }

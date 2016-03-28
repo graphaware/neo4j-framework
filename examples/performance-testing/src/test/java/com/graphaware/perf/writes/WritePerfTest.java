@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +34,7 @@ public class WritePerfTest {
 
     @Test
     public void testPerf() {
-        final GraphDatabaseService database = new GraphDatabaseFactory().newEmbeddedDatabase("/tmp/db" + System.currentTimeMillis());
+        final GraphDatabaseService database = new GraphDatabaseFactory().newEmbeddedDatabase(new File("/tmp/db" + System.currentTimeMillis()));
 
         for (int i = 0; i < 10; i++) {
             ExecutorService executorService = Executors.newFixedThreadPool(10);

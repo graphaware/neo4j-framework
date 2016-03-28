@@ -33,7 +33,6 @@ import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 import static com.graphaware.test.unit.GraphUnit.clearGraph;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.neo4j.tooling.GlobalGraphOperations.at;
 
 
 /**
@@ -66,7 +65,7 @@ public class GraphUnitTest extends EmbeddedDatabaseIntegrationTest {
         }
 
         try (Transaction tx = getDatabase().beginTx()) {
-            assertEquals(0, count(at(getDatabase()).getAllNodes()));
+            assertEquals(0, count(getDatabase().getAllNodes()));
             assertTrue(new GraphKeyValueStore(getDatabase()).hasKey("_GA_TX_MODULE_test"));
             tx.success();
         }

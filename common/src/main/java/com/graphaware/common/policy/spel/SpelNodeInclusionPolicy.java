@@ -20,7 +20,6 @@ import com.graphaware.common.policy.NodeInclusionPolicy;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.helpers.collection.FilteringIterable;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * {@link NodeInclusionPolicy} based on a SPEL expression. The expression can use methods defined in {@link NodeExpressions}.
@@ -44,6 +43,6 @@ public class SpelNodeInclusionPolicy extends SpelInclusionPolicy implements Node
      */
     @Override
     public Iterable<Node> getAll(GraphDatabaseService database) {
-        return new FilteringIterable<>(GlobalGraphOperations.at(database).getAllNodes(), this::include);
+        return new FilteringIterable<>(database.getAllNodes(), this::include);
     }
 }

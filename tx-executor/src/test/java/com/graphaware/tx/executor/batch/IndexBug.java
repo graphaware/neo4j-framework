@@ -22,6 +22,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.helpers.collection.Iterators;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Iterator;
@@ -44,7 +45,7 @@ public class IndexBug {
         try (Transaction tx = database.beginTx()) {
             for (int i = 0; i < NUMBER_OF_NODES; i++) {
                 Node node = database.createNode();
-                node.addLabel(DynamicLabel.label("FirstLabel"));
+                node.addLabel(Label.label("FirstLabel"));
             }
             tx.success();
         }
@@ -60,7 +61,7 @@ public class IndexBug {
         Iterator<Node> allNodes;
 
         try (Transaction tx = database.beginTx()) {
-            allNodes = Iterables.asResourceIterable(database.findNodes(DynamicLabel.label("FirstLabel"))).iterator();
+            allNodes = database.findNodes(Label.label("FirstLabel"));
             tx.success();
         }
 
@@ -71,7 +72,7 @@ public class IndexBug {
 
         int i = 0;
         try (Transaction tx = database.beginTx()) {
-            ResourceIterator<Node> nodes = database.findNodes(DynamicLabel.label("SecondLabel"));
+            ResourceIterator<Node> nodes = database.findNodes(Label.label("SecondLabel"));
             while (nodes.hasNext()) {
                 i++;
                 nodes.next();
@@ -94,7 +95,7 @@ public class IndexBug {
                 }
 
                 Node next = allNodes.next();
-                next.addLabel(DynamicLabel.label("SecondLabel"));
+                next.addLabel(Label.label("SecondLabel"));
             }
             tx.success();
         }

@@ -21,7 +21,6 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.helpers.collection.FilteringIterable;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * {@link RelationshipInclusionPolicy} based on a SPEL expression. The expression can use methods defined in
@@ -59,6 +58,6 @@ public class SpelRelationshipInclusionPolicy extends SpelInclusionPolicy impleme
      */
     @Override
     public Iterable<Relationship> getAll(GraphDatabaseService database) {
-        return new FilteringIterable<>(GlobalGraphOperations.at(database).getAllRelationships(), this::include);
+        return new FilteringIterable<>(database.getAllRelationships(), this::include);
     }
 }

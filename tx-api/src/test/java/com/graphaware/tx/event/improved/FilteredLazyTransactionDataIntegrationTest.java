@@ -36,7 +36,6 @@ import org.neo4j.graphdb.traversal.Uniqueness;
 import org.neo4j.kernel.configuration.Settings;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1301,7 +1300,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                 new BeforeCommitCallback() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+                        for (Node node : database.getAllNodes()) {
                             deleteNodeAndRelationships(node);
                         }
                     }

@@ -31,7 +31,12 @@ public class CommunityCustomPackageNeoServerIntegrationTest extends GraphAwareIn
     }
 
     @Test
-    public void componentsShouldBeWired() {
+    public void componentsShouldBeWired() throws InterruptedException {
         httpClient.get(baseUrl() + "/greet", HttpStatus.SC_OK);
+    }
+
+    @Override
+    protected int neoServerPort() {
+        return 7575;
     }
 }

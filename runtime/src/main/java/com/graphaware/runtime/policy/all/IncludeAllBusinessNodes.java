@@ -24,7 +24,6 @@ import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 /**
  * Policy that includes all business / application level nodes, but exclude any
@@ -64,6 +63,6 @@ public final class IncludeAllBusinessNodes extends BasePropertyContainerInclusio
      */
     @Override
     protected Iterable<Node> doGetAll(GraphDatabaseService database) {
-        return GlobalGraphOperations.at(database).getAllNodes();
+        return database.getAllNodes();
     }
 }

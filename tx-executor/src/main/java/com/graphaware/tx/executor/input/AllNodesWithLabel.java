@@ -16,11 +16,10 @@
 
 package com.graphaware.tx.executor.input;
 
-import com.graphaware.tx.executor.single.TransactionCallback;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.helpers.collection.Iterators;
 
 /**
  * {@link TransactionalInput} returning all nodes with a specific label.
@@ -35,11 +34,6 @@ public final class AllNodesWithLabel  extends TransactionalInput<Node> {
      * @param label which all returned nodes have.
      */
     public AllNodesWithLabel(GraphDatabaseService database, int batchSize, final Label label) {
-        super(database, batchSize, new TransactionCallback<Iterable<Node>>() {
-            @Override
-            public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
-                return Iterables.asResourceIterable(database.findNodes(label));
-            }
-        });
+        super(database, batchSize, db -> Iterators.asResourceIterable(db.findNodes(label)));
     }
 }

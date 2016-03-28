@@ -200,7 +200,7 @@ public abstract class PerformanceTestSuite {
      * @return builder.
      */
     protected GraphDatabaseBuilder createGraphDatabaseBuilder() {
-        return new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(temporaryFolder.getRoot().getPath());
+        return new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(temporaryFolder.getRoot());
     }
 
     /**

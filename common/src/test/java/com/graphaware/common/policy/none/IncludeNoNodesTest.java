@@ -24,7 +24,6 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.assertEquals;
@@ -57,7 +56,7 @@ public class IncludeNoNodesTest {
     @Test
     public void shouldIncludeNoNodes() {
         try (Transaction tx = database.beginTx()) {
-            for (Node node : GlobalGraphOperations.at(database).getAllNodes()) {
+            for (Node node : database.getAllNodes()) {
                 assertFalse(IncludeNoNodes.getInstance().include(node));
             }
             tx.success();

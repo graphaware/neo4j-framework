@@ -31,7 +31,6 @@ import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Uniqueness;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.tooling.GlobalGraphOperations;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -1384,7 +1383,7 @@ public class LazyTransactionDataComprehensiveTest {
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData td) {
-                        for (Node node : GlobalGraphOperations.at(db).getAllNodes()) {
+                        for (Node node : db.getAllNodes()) {
                             deleteNodeAndRelationships(node);
                         }
                     }

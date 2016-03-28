@@ -179,7 +179,7 @@ public class OtherRuntimeTests {
     @RepeatRule.Repeat(times = 10)
     public void makeSureDeadlockDoesNotOccur5() {
         GraphDatabaseService database = new GraphDatabaseFactory()
-                .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot().getPath())
+                .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot())
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
@@ -200,7 +200,7 @@ public class OtherRuntimeTests {
     @RepeatRule.Repeat(times = 10)
     public void makeSureDeadlockDoesNotOccur6() throws InterruptedException {
         GraphDatabaseService database = new GraphDatabaseFactory()
-                .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot().getPath())
+                .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot())
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
