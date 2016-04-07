@@ -56,6 +56,16 @@ public abstract class CypherPopulator implements DatabasePopulator {
     }
 
     /**
+     * Normalize the Cypher String. Designed to be overridden, especially on Windows.
+     *
+     * @param input to normalize.
+     * @return normalized input.
+     */
+    protected String normalize(String input) {
+        return input.replaceAll("\\r\\n", "\n");
+    }
+
+    /**
      * @return separator used for separating statements in statement groups.
      */
     protected String separator() {
