@@ -75,8 +75,8 @@ public abstract class NeoTestServer {
 
     private File serverConfigToConfDir() throws IOException {
         String serverConfigContents = IOUtils.toString(new ClassPathResource(neo4jServerConfigFile).getInputStream());
-        serverConfigContents = serverConfigContents.replaceAll("=conf" + File.separator, "=" + temporaryFolder.getRoot().getAbsolutePath() + File.separator + "conf" + File.separator);
-        serverConfigContents = serverConfigContents.replaceAll("=data" + File.separator, "=" + pathToData());
+        serverConfigContents = serverConfigContents.replace("=conf/", "=" + temporaryFolder.getRoot().getAbsolutePath() +"/conf/");
+        serverConfigContents = serverConfigContents.replace("=data/", "=" + pathToData());
 
         File serverConfig = temporaryFolder.newFile("conf" + File.separator + "neo4j-server.properties");
         IOUtils.copy(IOUtils.toInputStream(serverConfigContents), new FileOutputStream(serverConfig));
