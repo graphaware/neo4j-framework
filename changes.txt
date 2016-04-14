@@ -1,3 +1,6 @@
+2.3.3.38:
+    - fixed Windows build issues
+
 2.3.3.37:
     - upgraded Neo4j to 2.3.3
 

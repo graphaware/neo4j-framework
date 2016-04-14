@@ -37,7 +37,7 @@ public abstract class CypherPopulator implements DatabasePopulator {
 
         for (String statementGroup : statementGroups) {
             try (Transaction tx = database.beginTx()) {
-                for (String statement : statementGroup.split(separator)) {
+                for (String statement : normalize(statementGroup).split(separator)) {
                     database.execute(statement);
                 }
                 tx.success();
@@ -46,10 +46,20 @@ public abstract class CypherPopulator implements DatabasePopulator {
     }
 
     /**
+     * Normalize the Cypher String. Designed to be overridden, especially on Windows.
+     *
+     * @param input to normalize.
+     * @return normalized input.
+     */
+    protected String normalize(String input) {
+        return input.replaceAll("\\r\\n", "\n");
+    }
+
+    /**
      * @return separator used for separating statements in statement groups.
      */
     protected String separator() {
-        return ";" + System.getProperty("line.separator");
+        return ";" + "\n";
     }
 
     /**
