@@ -15,7 +15,7 @@ Upgrading to Neo4j 2.3
 
 Please note that a number of things have changed in Neo4j 2.3 and consequently in the GraphAware Framework. Notably:
 * There is now only one .jar file for both enterprise and community deployments.
-* You need to add `org.neo4j.server.thirdparty_jaxrs_classes=com.graphaware.server=/graphaware` to `neo4j-server.properties` to make the Framework work.
+* You need to add `dbms.unmanaged_extension_classes=com.graphaware.server=/graphaware` to `neo4j.conf` to make the Framework work.
 
 Features Overview
 -----------------
@@ -57,7 +57,7 @@ When using Neo4j in the <a href="http://docs.neo4j.org/chunked/stable/server-ins
 deploying the GraphAware Framework (and any code using it) is a matter of :
 * [downloading](#download) the appropriate .jar files
 * copying them into the _plugins_ directory in your Neo4j installation
-* adding `org.neo4j.server.thirdparty_jaxrs_classes=com.graphaware.server=/graphaware` to `neo4j-server.properties`
+* adding `dbms.unmanaged_extension_classes=com.graphaware.server=/graphaware` to `neo4j-server.properties`
 * restarting the server
 
 The framework and modules are then used via calls to their REST APIs, if they provide any.

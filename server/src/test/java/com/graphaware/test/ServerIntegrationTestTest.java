@@ -27,9 +27,4 @@ public class ServerIntegrationTestTest extends ServerIntegrationTest {
     public void shouldLoadBrowser() {
         httpClient.get(baseNeoUrl() + "/browser", SC_OK);
     }
-
-    @Test
-    public void shouldLoadWebAdmin() {
-        httpClient.get(baseNeoUrl() + "/webadmin", SC_OK);
-    }
 }

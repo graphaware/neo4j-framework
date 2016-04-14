@@ -29,11 +29,6 @@ public abstract class NeoServerIntegrationTestTest extends GraphAwareIntegration
     }
 
     @Test
-    public void shouldLoadWebAdmin() {
-        httpClient.get(baseNeoUrl() + "/webadmin", SC_OK);
-    }
-
-    @Test
     public void shouldLoadAPIs() {
         httpClient.get(baseUrl() + "/greeting", SC_OK);
     }
