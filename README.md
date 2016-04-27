@@ -10,13 +10,6 @@ etc.
 
 See the <a href="http://graphaware.com/neo4j/2014/05/28/graph-aware-neo4j-framework.html" target="_blank">announcement on our blog</a>.
 
-Upgrading to Neo4j 2.3
-----------------------
-
-Please note that a number of things have changed in Neo4j 2.3 and consequently in the GraphAware Framework. Notably:
-* There is now only one .jar file for both enterprise and community deployments.
-* You need to add `dbms.unmanaged_extension_classes=com.graphaware.server=/graphaware` to `neo4j.conf` to make the Framework work.
-
 Features Overview
 -----------------
 
