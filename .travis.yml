@@ -2,12 +2,10 @@ language: java
 
 jdk:
   - oraclejdk8
-  - oraclejdk7
 
 branches:
   only:
     - master
-    - 3.0
 
 after_success:
   - echo "<settings><servers><server><id>ossrh</id><username>\${env.OSSRH_USER}</username><password>\${env.OSSRH_PASS}</password></server></servers></settings>" > ~/settings.xml
