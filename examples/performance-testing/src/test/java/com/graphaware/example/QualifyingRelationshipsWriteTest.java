@@ -45,13 +45,13 @@ public class QualifyingRelationshipsWriteTest implements PerformanceTest {
     private static final int NO_NODES = 100;
     private static final int NO_RELATIONSHIPS = 1000;
 
-    private static final RelationshipType RATED = DynamicRelationshipType.withName("RATED");
+    private static final RelationshipType RATED = RelationshipType.withName("RATED");
     private static final RelationshipType[] TYPES = new RelationshipType[]{
-            DynamicRelationshipType.withName("LOVES"),
-            DynamicRelationshipType.withName("LIKES"),
-            DynamicRelationshipType.withName("NEUTRAL"),
-            DynamicRelationshipType.withName("DISLIKES"),
-            DynamicRelationshipType.withName("HATES")
+            RelationshipType.withName("LOVES"),
+            RelationshipType.withName("LIKES"),
+            RelationshipType.withName("NEUTRAL"),
+            RelationshipType.withName("DISLIKES"),
+            RelationshipType.withName("HATES")
     };
 
     /**

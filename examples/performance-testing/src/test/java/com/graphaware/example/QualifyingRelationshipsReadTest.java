@@ -51,14 +51,14 @@ public abstract class QualifyingRelationshipsReadTest implements PerformanceTest
     protected static final int OPS_PER_TRIAL = 100;
     protected static final int TRIALS = 100;
 
-    protected static final RelationshipType RATED = DynamicRelationshipType.withName("RATED");
+    protected static final RelationshipType RATED = RelationshipType.withName("RATED");
 
     protected static final RelationshipType[] REL_TYPES;
 
     static {
         List<RelationshipType> types = new LinkedList<>();
         for (int i = 0; i < NO_TYPES; i++) {
-            types.add(DynamicRelationshipType.withName(TYPE + i));
+            types.add(RelationshipType.withName(TYPE + i));
         }
         REL_TYPES = types.toArray(new RelationshipType[NO_TYPES]);
     }

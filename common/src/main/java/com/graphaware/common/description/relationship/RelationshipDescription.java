@@ -33,7 +33,7 @@ public interface RelationshipDescription extends PartiallyComparable<Relationshi
      *
      * @return type.
      */
-    RelationshipType getType();
+    String getType();
 
     /**
      * Get the relationship direction.

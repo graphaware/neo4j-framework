@@ -66,6 +66,10 @@ public abstract class BaseIncludeNodes<T extends BaseIncludeNodes<T>> extends In
      * @return reconfigured policy.
      */
     public T with(Label label) {
+        if (label == null) {
+            return with((String) null);
+        }
+
         return with(label.name());
     }
 

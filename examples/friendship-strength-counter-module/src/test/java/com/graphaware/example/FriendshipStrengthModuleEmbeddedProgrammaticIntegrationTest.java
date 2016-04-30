@@ -86,8 +86,8 @@ public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
             Node p1 = database.createNode(Label.label("Person"));
             Node p2 = database.createNode(Label.label("Person"));
             Node p3 = database.createNode(Label.label("Person"));
-            p1.createRelationshipTo(p2, DynamicRelationshipType.withName("FRIEND_OF")).setProperty("strength", 1L);
-            p1.createRelationshipTo(p3, DynamicRelationshipType.withName("FRIEND_OF")).setProperty("strength", 2L);
+            p1.createRelationshipTo(p2, RelationshipType.withName("FRIEND_OF")).setProperty("strength", 1L);
+            p1.createRelationshipTo(p3, RelationshipType.withName("FRIEND_OF")).setProperty("strength", 2L);
             tx.success();
         }
 

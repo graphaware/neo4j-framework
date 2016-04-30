@@ -62,7 +62,7 @@ public class TestRuntimeModule extends BaseTxDrivenModule<Void> {
         try (Transaction tx = database.beginTx()){
             Node n1 = database.createNode(Label.label("test"));
             Node n2 = database.createNode();
-            n1.createRelationshipTo(n2, DynamicRelationshipType.withName("TEST"));
+            n1.createRelationshipTo(n2, RelationshipType.withName("TEST"));
             n1.getRelationships().iterator().next().getType();
             Thread.sleep(200); //takes some time to initialize
             tx.success();

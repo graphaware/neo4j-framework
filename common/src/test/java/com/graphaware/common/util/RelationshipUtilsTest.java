@@ -26,7 +26,7 @@ import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.RelationshipUtils.*;
 import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.*;
-import static org.neo4j.graphdb.DynamicRelationshipType.withName;
+import static org.neo4j.graphdb.RelationshipType.*;
 
 /**
  * Unit test for {@link RelationshipUtils}.

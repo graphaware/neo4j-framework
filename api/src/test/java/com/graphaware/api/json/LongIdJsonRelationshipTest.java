@@ -49,17 +49,17 @@ public class LongIdJsonRelationshipTest {
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
         try (Transaction tx = database.beginTx()) {
-            Node node1 = database.createNode(DynamicLabel.label("L1"), DynamicLabel.label("L2"));
+            Node node1 = database.createNode(Label.label("L1"), Label.label("L2"));
             Node node2 = database.createNode();
 
             node1.setProperty("k1", "v1");
             node1.setProperty("k2", 2);
 
-            Relationship r = node1.createRelationshipTo(node2, DynamicRelationshipType.withName("R"));
+            Relationship r = node1.createRelationshipTo(node2, RelationshipType.withName("R"));
             r.setProperty("k1", "v1");
             r.setProperty("k2", 2);
 
-            Relationship r2 = node1.createRelationshipTo(node2, DynamicRelationshipType.withName("R2"));
+            Relationship r2 = node1.createRelationshipTo(node2, RelationshipType.withName("R2"));
             r2.setProperty("k1", "v2");
             r2.setProperty("k2", 4);
 

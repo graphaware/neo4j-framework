@@ -20,7 +20,7 @@ import com.graphaware.common.serialize.Serializer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -50,7 +50,7 @@ public class DetachedRelationshipDescriptionImplTest {
         try (Transaction tx = database.beginTx()) {
             Node root = database.createNode();
             Node one = database.createNode();
-            root.createRelationshipTo(one, DynamicRelationshipType.withName("TEST")).setProperty("k", new int[]{2, 3, 4});
+            root.createRelationshipTo(one, RelationshipType.withName("TEST")).setProperty("k", new int[]{2, 3, 4});
             tx.success();
         }
     }

@@ -19,12 +19,13 @@ package com.graphaware.common.policy.spel;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.RelationshipType;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.neo4j.graphdb.Direction.valueOf;
-import static org.neo4j.graphdb.DynamicRelationshipType.withName;
+import static org.neo4j.graphdb.RelationshipType.*;
 
 /**
  * {@link PropertyContainerExpressions} for {@link Node}s.

@@ -18,11 +18,12 @@ package com.graphaware.common.policy.spel;
 
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
 
 import static com.graphaware.common.util.DirectionUtils.resolveDirection;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.graphdb.DynamicRelationshipType.withName;
+import static org.neo4j.graphdb.RelationshipType.*;
 
 /**
  * {@link PropertyContainerExpressions} for {@link Relationship}s.

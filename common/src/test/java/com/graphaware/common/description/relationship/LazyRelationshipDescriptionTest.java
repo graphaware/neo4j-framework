@@ -22,13 +22,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.assertEquals;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.graphdb.DynamicRelationshipType.withName;
+import static org.neo4j.graphdb.RelationshipType.*;
 
 /**
  * Unit test for {@link com.graphaware.common.description.relationship.LazyRelationshipDescription}.
@@ -62,7 +63,7 @@ public class LazyRelationshipDescriptionTest {
                     database.getNodeById(0).getSingleRelationship(withName("TEST"), OUTGOING),
                     database.getNodeById(0));
 
-            assertEquals("TEST", relationshipDescription.getType().name());
+            assertEquals("TEST", relationshipDescription.getType());
             assertEquals(OUTGOING, relationshipDescription.getDirection());
             assertEquals(new LazyPropertiesDescription(database.getNodeById(0).getSingleRelationship(withName("TEST"), OUTGOING)), relationshipDescription.getPropertiesDescription());
         }

@@ -542,7 +542,7 @@ public class ProductionRuntimeTest {
 
         try (Transaction tx = database.beginTx()) {
             node1 = database.createNode(new Label[]{});
-            node1.createRelationshipTo(database.createNode(new Label[]{}), DynamicRelationshipType.withName("TEST"));
+            node1.createRelationshipTo(database.createNode(new Label[]{}), RelationshipType.withName("TEST"));
             tx.success();
         }
 

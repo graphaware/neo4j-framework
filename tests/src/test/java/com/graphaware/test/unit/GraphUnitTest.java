@@ -526,7 +526,7 @@ public class GraphUnitTest {
         try (Transaction tx = database.beginTx()) {
             Node node1 = database.createNode();
             Node node2 = database.createNode();
-            node1.createRelationshipTo(node2, DynamicRelationshipType.withName("ACCIDENT"));
+            node1.createRelationshipTo(node2, RelationshipType.withName("ACCIDENT"));
             tx.success();
         }
 

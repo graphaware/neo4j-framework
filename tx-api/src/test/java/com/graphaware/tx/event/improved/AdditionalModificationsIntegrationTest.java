@@ -23,7 +23,7 @@ import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.junit.Test;
-import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.event.TransactionData;
@@ -61,7 +61,7 @@ public class AdditionalModificationsIntegrationTest extends EmbeddedDatabaseInte
 
                 for (Node node : transactionData.getAllCreatedNodes()) {
                     Node unknownCity = node.getGraphDatabase().createNode(Label.label("City"));
-                    node.createRelationshipTo(unknownCity, DynamicRelationshipType.withName("LIVES_IN"));
+                    node.createRelationshipTo(unknownCity, RelationshipType.withName("LIVES_IN"));
                 }
 
                 assertEquals(1, transactionData.getAllCreatedNodes().size());

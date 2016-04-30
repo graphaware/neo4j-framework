@@ -16,12 +16,13 @@
 
 package com.graphaware.common.representation;
 
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
 
 import java.util.Map;
 
+import static org.neo4j.graphdb.RelationshipType.*;
 import static org.springframework.util.Assert.hasLength;
 
 /**
@@ -111,7 +112,7 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
      */
     @Override
     protected Relationship create(GraphDatabaseService database) {
-        return database.getNodeById(startNodeGraphId).createRelationshipTo(database.getNodeById(endNodeGraphId), DynamicRelationshipType.withName(type));
+        return database.getNodeById(startNodeGraphId).createRelationshipTo(database.getNodeById(endNodeGraphId), withName(type));
     }
 
     /**

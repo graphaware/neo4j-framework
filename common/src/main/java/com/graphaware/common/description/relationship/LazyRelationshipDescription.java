@@ -35,6 +35,6 @@ public class LazyRelationshipDescription extends BaseRelationshipDescription<Laz
      * @param pointOfView  node whose point of view this relationship description is being constructed from.
      */
     public LazyRelationshipDescription(Relationship relationship, Node pointOfView) {
-        super(relationship.getType(), DirectionUtils.resolveDirection(relationship, pointOfView), new LazyPropertiesDescription(relationship));
+        super(relationship.getType().name(), DirectionUtils.resolveDirection(relationship, pointOfView), new LazyPropertiesDescription(relationship));
     }
 }

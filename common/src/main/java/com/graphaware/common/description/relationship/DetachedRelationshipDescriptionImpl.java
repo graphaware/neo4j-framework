@@ -33,7 +33,7 @@ public class DetachedRelationshipDescriptionImpl extends BaseRelationshipDescrip
      * @param direction             direction.
      * @param propertiesDescription properties description.
      */
-    public DetachedRelationshipDescriptionImpl(RelationshipType relationshipType, Direction direction, DetachedPropertiesDescription propertiesDescription) {
+    public DetachedRelationshipDescriptionImpl(String relationshipType, Direction direction, DetachedPropertiesDescription propertiesDescription) {
         super(relationshipType, direction, propertiesDescription);
     }
 
@@ -50,6 +50,6 @@ public class DetachedRelationshipDescriptionImpl extends BaseRelationshipDescrip
      */
     @Override
     public String toString() {
-        return getType().name() + "#" + getDirection() + "#" + getPropertiesDescription().toString();
+        return getType() + "#" + getDirection() + "#" + getPropertiesDescription().toString();
     }
 }

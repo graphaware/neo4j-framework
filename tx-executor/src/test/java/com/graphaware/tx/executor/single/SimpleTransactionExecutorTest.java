@@ -119,7 +119,7 @@ public class SimpleTransactionExecutorTest {
     private void createNodeAndRelationship() {
         executor.executeInTransaction(db -> {
             Node node = db.createNode();
-            node.createRelationshipTo(db.getNodeById(0), DynamicRelationshipType.withName("TEST_REL_TYPE"));
+            node.createRelationshipTo(db.getNodeById(0), RelationshipType.withName("TEST_REL_TYPE"));
             return null;
         });
     }

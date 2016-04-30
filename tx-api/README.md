@@ -113,7 +113,7 @@ total strength on a special node (with label `FriendshipCounter`) as a `totalFri
  */
 public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<Void> {
 
-    public static final RelationshipType FRIEND_OF = DynamicRelationshipType.withName("FRIEND_OF");
+    public static final RelationshipType FRIEND_OF = RelationshipType.withName("FRIEND_OF");
     public static final String STRENGTH = "strength";
     public static final String TOTAL_FRIENDSHIP_STRENGTH = "totalFriendshipStrength";
     public static final Label COUNTER_NODE_LABEL = Label.label("FriendshipCounter");

@@ -27,7 +27,7 @@ import org.neo4j.graphdb.RelationshipType;
 
 import java.util.Collections;
 
-import static org.neo4j.graphdb.DynamicRelationshipType.withName;
+import static org.neo4j.graphdb.RelationshipType.*;
 
 /**
  * Factory for {@link RelationshipDescription}s.
@@ -51,7 +51,7 @@ public final class RelationshipDescriptionFactory {
      * @return relationship description.
      */
     public static DetachedRelationshipDescription literal(Relationship relationship, Node pointOfView) {
-        return new DetachedRelationshipDescriptionImpl(relationship.getType(), DirectionUtils.resolveDirection(relationship, pointOfView), new LiteralPropertiesDescription(relationship));
+        return new DetachedRelationshipDescriptionImpl(relationship.getType().name(), DirectionUtils.resolveDirection(relationship, pointOfView), new LiteralPropertiesDescription(relationship));
     }
 
     /**
@@ -63,7 +63,7 @@ public final class RelationshipDescriptionFactory {
      * @return relationship description.
      */
     public static DetachedRelationshipDescription literal(RelationshipType type, Direction direction) {
-        return new DetachedRelationshipDescriptionImpl(type, direction, new LiteralPropertiesDescription(Collections.<String, Predicate>emptyMap()));
+        return new DetachedRelationshipDescriptionImpl(type.name(), direction, new LiteralPropertiesDescription(Collections.<String, Predicate>emptyMap()));
     }
 
     /**
@@ -75,7 +75,7 @@ public final class RelationshipDescriptionFactory {
      * @return relationship description.
      */
     public static DetachedRelationshipDescription literal(String type, Direction direction) {
-        return new DetachedRelationshipDescriptionImpl(withName(type), direction, new LiteralPropertiesDescription(Collections.<String, Predicate>emptyMap()));
+        return new DetachedRelationshipDescriptionImpl(type, direction, new LiteralPropertiesDescription(Collections.<String, Predicate>emptyMap()));
     }
 
     /**
@@ -91,7 +91,7 @@ public final class RelationshipDescriptionFactory {
      * @return relationship description.
      */
     public static DetachedRelationshipDescription wildcard(Relationship relationship, Node pointOfView) {
-        return new DetachedRelationshipDescriptionImpl(relationship.getType(), DirectionUtils.resolveDirection(relationship, pointOfView), new WildcardPropertiesDescription(relationship));
+        return new DetachedRelationshipDescriptionImpl(relationship.getType().name(), DirectionUtils.resolveDirection(relationship, pointOfView), new WildcardPropertiesDescription(relationship));
     }
 
     /**
@@ -103,7 +103,7 @@ public final class RelationshipDescriptionFactory {
      * @return relationship description.
      */
     public static DetachedRelationshipDescription wildcard(RelationshipType type, Direction direction) {
-        return new DetachedRelationshipDescriptionImpl(type, direction, new WildcardPropertiesDescription(Collections.<String, Predicate>emptyMap()));
+        return new DetachedRelationshipDescriptionImpl(type.name(), direction, new WildcardPropertiesDescription(Collections.<String, Predicate>emptyMap()));
     }
 
     /**
@@ -115,6 +115,6 @@ public final class RelationshipDescriptionFactory {
      * @return relationship description.
      */
     public static DetachedRelationshipDescription wildcard(String type, Direction direction) {
-        return new DetachedRelationshipDescriptionImpl(withName(type), direction, new WildcardPropertiesDescription(Collections.<String, Predicate>emptyMap()));
+        return new DetachedRelationshipDescriptionImpl(type, direction, new WildcardPropertiesDescription(Collections.<String, Predicate>emptyMap()));
     }
 }

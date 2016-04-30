@@ -20,8 +20,9 @@ import com.graphaware.common.description.BasePartiallyComparable;
 import com.graphaware.common.description.property.PropertiesDescription;
 import com.graphaware.common.util.DirectionUtils;
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.RelationshipType;
+
+import static org.neo4j.graphdb.RelationshipType.*;
 
 /**
  * Base class for {@link RelationshipDescription} implementations.
@@ -30,7 +31,7 @@ import org.neo4j.graphdb.RelationshipType;
  */
 public abstract class BaseRelationshipDescription<P extends PropertiesDescription> extends BasePartiallyComparable<RelationshipDescription> implements RelationshipDescription {
 
-    private final RelationshipType relationshipType;
+    private final String relationshipType;
     private final Direction direction;
     private final P propertiesDescription;
 
@@ -41,8 +42,8 @@ public abstract class BaseRelationshipDescription<P extends PropertiesDescriptio
      * @param direction             direction.
      * @param propertiesDescription properties description.
      */
-    protected BaseRelationshipDescription(RelationshipType relationshipType, Direction direction, P propertiesDescription) {
-        this.relationshipType = DynamicRelationshipType.withName(relationshipType.name());
+    protected BaseRelationshipDescription(String relationshipType, Direction direction, P propertiesDescription) {
+        this.relationshipType = relationshipType;
         this.direction = direction;
         this.propertiesDescription = propertiesDescription;
     }
@@ -52,7 +53,7 @@ public abstract class BaseRelationshipDescription<P extends PropertiesDescriptio
      */
     @Override
     public boolean isMoreGeneralThan(RelationshipDescription other) {
-        return getType().name().equals(other.getType().name())
+        return getType().equals(other.getType())
                 && DirectionUtils.matches(getDirection(), other.getDirection())
                 && getPropertiesDescription().isMoreGeneralThan(other.getPropertiesDescription());
     }
@@ -62,7 +63,7 @@ public abstract class BaseRelationshipDescription<P extends PropertiesDescriptio
      */
     @Override
     public boolean isMutuallyExclusive(RelationshipDescription other) {
-        return !getType().name().equals(other.getType().name())
+        return !getType().equals(other.getType())
                 || !DirectionUtils.matches(getDirection(), other.getDirection())
                 || getPropertiesDescription().isMutuallyExclusive(other.getPropertiesDescription());
     }
@@ -79,7 +80,7 @@ public abstract class BaseRelationshipDescription<P extends PropertiesDescriptio
      * {@inheritDoc}
      */
     @Override
-    public RelationshipType getType() {
+    public String getType() {
         return relationshipType;
     }
 
@@ -111,7 +112,7 @@ public abstract class BaseRelationshipDescription<P extends PropertiesDescriptio
 
         if (direction != that.direction) return false;
         if (!propertiesDescription.equals(that.propertiesDescription)) return false;
-        if (!relationshipType.name().equals(that.relationshipType.name())) return false;
+        if (!relationshipType.equals(that.relationshipType)) return false;
 
         return true;
     }
@@ -121,7 +122,7 @@ public abstract class BaseRelationshipDescription<P extends PropertiesDescriptio
      */
     @Override
     public int hashCode() {
-        int result = relationshipType.name().hashCode();
+        int result = relationshipType.hashCode();
         result = 31 * result + direction.hashCode();
         result = 31 * result + propertiesDescription.hashCode();
         return result;

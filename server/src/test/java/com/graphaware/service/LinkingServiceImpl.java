@@ -16,7 +16,7 @@
 
 package com.graphaware.service;
 
-import org.neo4j.graphdb.DynamicRelationshipType;
+import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class LinkingServiceImpl implements LinkingService {
     public void link(long startNodeId, long endNodeId) {
         try (Transaction tx = database.beginTx()) {
             database.getNodeById(startNodeId).createRelationshipTo(database.getNodeById(endNodeId),
-                    DynamicRelationshipType.withName("TEST"));
+                    RelationshipType.withName("TEST"));
             tx.success();
         }
     }
