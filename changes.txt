@@ -1,4 +1,8 @@
-2.3.3.38:
+3.0.0.38:
+    - fixed a serialisation bug
+
+3.0.0.37:
+    - upgraded to Neo4j 3.0.0
     - fixed Windows build issues
 
 2.3.3.37:
