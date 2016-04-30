@@ -39,7 +39,7 @@ public class IncludeRelationships extends BaseIncludeRelationships<IncludeRelati
      * @return a policy including all relationships.
      */
     public static IncludeRelationships all() {
-        return new IncludeRelationships(Direction.BOTH, new RelationshipType[0], new WildcardPropertiesDescription(Collections.<String, Predicate>emptyMap()));
+        return new IncludeRelationships(Direction.BOTH, new String[0], new WildcardPropertiesDescription(Collections.<String, Predicate>emptyMap()));
     }
 
     /**
@@ -49,7 +49,7 @@ public class IncludeRelationships extends BaseIncludeRelationships<IncludeRelati
      * @param relationshipTypes     one of which the matching relationships must have, empty for all.
      * @param propertiesDescription of the matching relationships.
      */
-    protected IncludeRelationships(Direction direction, RelationshipType[] relationshipTypes, DetachedPropertiesDescription propertiesDescription) {
+    protected IncludeRelationships(Direction direction, String[] relationshipTypes, DetachedPropertiesDescription propertiesDescription) {
         super(direction, relationshipTypes, propertiesDescription);
     }
 
@@ -57,7 +57,7 @@ public class IncludeRelationships extends BaseIncludeRelationships<IncludeRelati
      * {@inheritDoc}
      */
     @Override
-    protected IncludeRelationships newInstance(Direction direction, RelationshipType... relationshipTypes) {
+    protected IncludeRelationships newInstance(Direction direction, String... relationshipTypes) {
         return new IncludeRelationships(direction, relationshipTypes, getPropertiesDescription());
     }
 

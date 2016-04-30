@@ -20,7 +20,6 @@ import com.graphaware.common.description.predicate.Predicate;
 import com.graphaware.common.description.property.DetachedPropertiesDescription;
 import com.graphaware.common.description.property.WildcardPropertiesDescription;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 
 import java.util.Collections;
@@ -47,7 +46,7 @@ public class IncludeNodes extends BaseIncludeNodes<IncludeNodes> {
      * @param label                 that matching nodes must have, can be null for all labels.
      * @param propertiesDescription of the matching nodes.
      */
-    protected IncludeNodes(Label label, DetachedPropertiesDescription propertiesDescription) {
+    protected IncludeNodes(String label, DetachedPropertiesDescription propertiesDescription) {
         super(label, propertiesDescription);
     }
 
@@ -55,7 +54,7 @@ public class IncludeNodes extends BaseIncludeNodes<IncludeNodes> {
      * {@inheritDoc}
      */
     @Override
-    protected IncludeNodes newInstance(Label label) {
+    protected IncludeNodes newInstance(String label) {
         return new IncludeNodes(label, getPropertiesDescription());
     }
 

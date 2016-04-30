@@ -33,7 +33,7 @@ import java.util.List;
 public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationships<T>> extends IncludePropertyContainers<T, Relationship> implements RelationshipInclusionPolicy {
 
     private final Direction direction;
-    private final RelationshipType[] relationshipTypes;
+    private final String[] relationshipTypes;
 
     /**
      * Create a new policy.
@@ -42,7 +42,7 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
      * @param relationshipTypes     one of which the matching relationships must have, empty for all.
      * @param propertiesDescription of the matching relationships.
      */
-    protected BaseIncludeRelationships(Direction direction, RelationshipType[] relationshipTypes, DetachedPropertiesDescription propertiesDescription) {
+    protected BaseIncludeRelationships(Direction direction, String[] relationshipTypes, DetachedPropertiesDescription propertiesDescription) {
         super(propertiesDescription);
 
         if (direction == null) {
@@ -64,7 +64,7 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
      * @return reconfigured policy.
      */
     public T with(String... relationshipTypes) {
-        return with(stringsToTypes(relationshipTypes));
+        return with(getDirection(), relationshipTypes);
     }
 
     /**
@@ -94,8 +94,8 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
      * @param relationshipTypes one of which the matching relationships must have, empty for all.
      * @return reconfigured policy.
      */
-    public T with(Direction direction, String... relationshipTypes) {
-        return with(direction, stringsToTypes(relationshipTypes));
+    public T with(Direction direction, RelationshipType... relationshipTypes) {
+        return with(direction, typeToStrings(relationshipTypes));
     }
 
     /**
@@ -105,13 +105,19 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
      * @param relationshipTypes one of which the matching relationships must have, empty for all.
      * @return reconfigured policy.
      */
-    public T with(Direction direction, RelationshipType... relationshipTypes) {
+    public T with(Direction direction, String... relationshipTypes) {
         if (direction == null) {
             throw new IllegalArgumentException("Direction must not be null");
         }
 
         if (relationshipTypes == null) {
             throw new IllegalArgumentException("RelationshipTypes must not be null");
+        }
+
+        for (String type : relationshipTypes) {
+            if (StringUtils.isEmpty(type)) {
+                throw new IllegalArgumentException("Empty and null relationships types are not supported");
+            }
         }
 
         return newInstance(direction, relationshipTypes);
@@ -124,7 +130,7 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
      * @param relationshipTypes of the new policy.
      * @return new policy.
      */
-    protected abstract T newInstance(Direction direction, RelationshipType... relationshipTypes);
+    protected abstract T newInstance(Direction direction, String... relationshipTypes);
 
     /**
      * {@inheritDoc}
@@ -135,8 +141,8 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
             return super.include(relationship);
         }
 
-        for (RelationshipType type : relationshipTypes) {
-            if (relationship.isType(type)) {
+        for (String type : relationshipTypes) {
+            if (relationship.isType(RelationshipType.withName(type))) {
                 return super.include(relationship);
             }
         }
@@ -167,46 +173,28 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
      *
      * @return types, never null.
      */
-    public RelationshipType[] getRelationshipTypes() {
+    public String[] getRelationshipTypes() {
         return relationshipTypes;
     }
 
     /**
-     * Convert relationship types represented as strings to {@link RelationshipType} objects.
+     * Convert {@link RelationshipType}s to Strings.
      *
      * @param relationshipTypes to convert.
      * @return converted.
      */
-    private RelationshipType[] stringsToTypes(String[] relationshipTypes) {
-        List<RelationshipType> types = new LinkedList<>();
-
-        for (String type : relationshipTypes) {
-            if (StringUtils.isEmpty(type)) {
-                throw new IllegalArgumentException("Empty and null relationships types are not supported");
-            }
-            types.add(DynamicRelationshipType.withName(type));
-        }
-
-        return types.toArray(new RelationshipType[types.size()]);
-    }
-
-    /**
-     * Convert relationship types represented as  {@link RelationshipType} objects to strings.
-     *
-     * @param relationshipTypes to convert.
-     * @return converted.
-     */
-    private String[] typesToStrings(RelationshipType[] relationshipTypes) {
-        List<String> strings = new LinkedList<>();
+    private String[] typeToStrings(RelationshipType[] relationshipTypes) {
+        List<String> types = new LinkedList<>();
 
         for (RelationshipType type : relationshipTypes) {
             if (type == null) {
-                throw new IllegalArgumentException("Null relationships types are not supported");
+                throw new IllegalArgumentException("Relationship Type must not be null");
             }
-            strings.add(type.name());
+
+            types.add(type.name());
         }
 
-        return strings.toArray(new String[strings.size()]);
+        return types.toArray(new String[types.size()]);
     }
 
     /**
@@ -221,7 +209,7 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
         BaseIncludeRelationships that = (BaseIncludeRelationships) o;
 
         if (direction != that.direction) return false;
-        if (!Arrays.equals(typesToStrings(relationshipTypes), typesToStrings(that.relationshipTypes))) return false;
+        if (!Arrays.equals(relationshipTypes, that.relationshipTypes)) return false;
 
         return true;
     }
@@ -233,7 +221,7 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + direction.hashCode();
-        result = 31 * result + Arrays.hashCode(typesToStrings(relationshipTypes));
+        result = 31 * result + Arrays.hashCode(relationshipTypes);
         return result;
     }
 }

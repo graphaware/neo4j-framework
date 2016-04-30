@@ -32,7 +32,6 @@ import com.graphaware.common.policy.none.IncludeNoRelationshipProperties;
 import com.graphaware.common.policy.none.IncludeNoRelationships;
 import org.apache.commons.codec.binary.Base64;
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.objenesis.strategy.StdInstantiatorStrategy;
 
 import java.io.ByteArrayOutputStream;
@@ -54,7 +53,6 @@ public final class Serializer {
         kryo.setRegistrationRequired(false);
         kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
 
-        kryo.register(DynamicRelationshipType.class, 10);
         kryo.register(Direction.class, 11);
         kryo.register(HashMap.class, 15);
         kryo.register(TreeMap.class, 16);

@@ -28,7 +28,7 @@ import org.neo4j.graphdb.Node;
  */
 public abstract class BaseIncludeNodes<T extends BaseIncludeNodes<T>> extends IncludePropertyContainers<T, Node> implements NodeInclusionPolicy {
 
-    private final Label label;
+    private final String label;
 
     /**
      * Create a new policy.
@@ -36,7 +36,7 @@ public abstract class BaseIncludeNodes<T extends BaseIncludeNodes<T>> extends In
      * @param label                 that matching nodes must have, can be null for all labels.
      * @param propertiesDescription of the matching nodes.
      */
-    public BaseIncludeNodes(Label label, DetachedPropertiesDescription propertiesDescription) {
+    public BaseIncludeNodes(String label, DetachedPropertiesDescription propertiesDescription) {
         super(propertiesDescription);
         this.label = label;
     }
@@ -49,14 +49,14 @@ public abstract class BaseIncludeNodes<T extends BaseIncludeNodes<T>> extends In
      */
     public T with(String label) {
         if (label == null) {
-            return with((Label) null);
+            return newInstance((String) null);
         }
 
         if (StringUtils.isEmpty(label)) {
             throw new IllegalArgumentException("Empty labels are not supported"); //just because it's not a good idea and usually indicates a bug
         }
 
-        return with(Label.label(label));
+        return newInstance(label);
     }
 
     /**
@@ -66,7 +66,7 @@ public abstract class BaseIncludeNodes<T extends BaseIncludeNodes<T>> extends In
      * @return reconfigured policy.
      */
     public T with(Label label) {
-        return newInstance(label);
+        return with(label.name());
     }
 
     /**
@@ -75,18 +75,14 @@ public abstract class BaseIncludeNodes<T extends BaseIncludeNodes<T>> extends In
      * @param label of the new policy.
      * @return new policy.
      */
-    protected abstract T newInstance(Label label);
+    protected abstract T newInstance(String label);
 
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean include(Node node) {
-        if (label != null && !node.hasLabel(label)) {
-            return false;
-        }
-
-        return super.include(node);
+        return !(label != null && !node.hasLabel(Label.label(label))) && super.include(node);
     }
 
     /**
@@ -94,7 +90,7 @@ public abstract class BaseIncludeNodes<T extends BaseIncludeNodes<T>> extends In
      *
      * @return label, can be <code>null</code> (representing any label incl. none).
      */
-    public Label getLabel() {
+    public String getLabel() {
         return label;
     }
 
