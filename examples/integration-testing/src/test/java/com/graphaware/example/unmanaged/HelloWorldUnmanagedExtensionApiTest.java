@@ -26,7 +26,7 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 /**
- * {@link com.graphaware.test.integration.DatabaseIntegrationTest} for {@link com.graphaware.example.plugin.HelloWorldServerPlugin}.
+ * {@link com.graphaware.test.integration.ServerIntegrationTest} for {@link com.graphaware.example.plugin.HelloWorldServerPlugin}.
  * <p/>
  * Tests the logic as well as the API.
  */

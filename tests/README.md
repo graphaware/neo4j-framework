@@ -99,15 +99,15 @@ the code against an instance of `ImpermanentGraphDatabase`, which needs to be cr
 the test starts, and finally torn down after the test is finished. It then leaves no trace, because it only exists in memory.
 
 A simple test would look like this, utilising [GraphUnit](#graphunit) to assert the state of the database, and
-extending [`DatabaseIntegrationTest`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/test/integration/DatabaseIntegrationTest.html)
+extending [`EmbeddedDatabaseIntegrationTest`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/test/integration/EmbeddedDatabaseIntegrationTest.html)
 that handles the creation and destruction of the database. It allows tests to override a few methods, such as
 `populateDatabase`, which is called before every test and does what it says on the tin.
 
 ```java
 /**
- * {@link DatabaseIntegrationTest} for {@link com.graphaware.example.component.HelloWorldNodeCreator}.
+ * {@link EmbeddedDatabaseIntegrationTest} for {@link com.graphaware.example.component.HelloWorldNodeCreator}.
  */
-public class HelloWorldNodeCreatorTest extends DatabaseIntegrationTest {
+public class HelloWorldNodeCreatorTest extends EmbeddedDatabaseIntegrationTest {
 
     @Test
     public void shouldCreateAndReturnNode() {
@@ -150,11 +150,11 @@ as previously:
 
 ```java
 /**
- * {@link DatabaseIntegrationTest} for {@link HelloWorldServerPlugin}.
+ * {@link EmbeddedDatabaseIntegrationTest} for {@link HelloWorldServerPlugin}.
  *
  * Tests the logic, but not the API.
  */
-public class HelloWorldServerPluginTest extends DatabaseIntegrationTest {
+public class HelloWorldServerPluginTest extends EmbeddedDatabaseIntegrationTest {
 
     @Test
     public void shouldCreateAndReturnNode() {
@@ -172,7 +172,7 @@ public class HelloWorldServerPluginTest extends DatabaseIntegrationTest {
 
 One might also want to test the actual API, i.e., perform an end-to-end test by calling the API that the plugin will expose
 and verify the HTTP response status code and body contents. At the same time, one might still want to make sure that
-the database is in the correct state after the API call. For such kind of test, [`WrappingServerIntegrationTest`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/test/integration/WrappingServerIntegrationTest.html)
+the database is in the correct state after the API call. For such kind of test, [`ServerIntegrationTest`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/test/integration/ServerIntegrationTest.html)
 can be extended. It starts a database instance (again, just in memory) and also a server around it, simulating a server
 deployment.
 
@@ -181,7 +181,7 @@ on the same machine. This can easily be changed by overriding the `neoServerPort
 to worry about the port too much, because calling `baseNeoUrl()` will give you the base URL to execute requests against
 (localhost:7575 by default).
 
-The API can be exercised by using [`TestUtils`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/test/util/TestUtils.html),
+The API can be exercised by using the inherited `protected` [`TestHttpClient`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/test/util/TestHttpClient.html),
 namely the `get`, `post`, `put`, and `delete` methods. They take the URL to call and expected response status code as parameters,
 and return the body of the response (which you might choose to assert as well). The test fails if the response status code
 is different from what was expected.
@@ -190,41 +190,19 @@ Here's an example of a plugin API test:
 
 ```java
 /**
- * {@link com.graphaware.test.integration.DatabaseIntegrationTest} for {@link HelloWorldServerPlugin}.
+ * {@link com.graphaware.test.integration.ServerIntegrationTest} for {@link HelloWorldServerPlugin}.
  *
  * Tests the logic as well as the API.
  */
-public class HelloWorldServerPluginApiTest extends WrappingServerIntegrationTest {
+public class HelloWorldServerPluginApiTest extends ServerIntegrationTest {
 
     @Test
     public void shouldCreateAndReturnNode() {
-        TestUtils.get(baseNeoUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
-        String result = TestUtils.post(baseNeoUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
+        httpClient.get(baseNeoUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
+        String result = httpClient.post(baseNeoUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
 
         assertTrue(result.contains(" \"hello\" : \"world\""));
         GraphUnit.assertSameGraph(getDatabase(), "CREATE (:HelloWorld {hello:'world'})");
-    }
-}
-```
-
-Finally, one might want to test that the plugin will be correctly deployed to a real Neo4j server. Such test is possible
-to execute by extending [`NeoServerIntegrationTest`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/test/integration/NeoServerIntegrationTest.html).
-Such tests starts the real Neo4j server with a real database (in a temporary directory that is deleted at the end of the test).
-Therefore, this test does not provide programmatic low-level access to the database. All you're left with is the standard
-mechanisms of talking to a Neo4j server instance, i.e. its REST API.
-
-```java
-/**
- * {@link NeoServerIntegrationTest} for {@link HelloWorldServerPlugin}.
- * <p/>
- * Only tests the actual deployment of the extension, not so much the logic.
- */
-public class HelloWorldServerPluginDeploymentTest extends NeoServerIntegrationTest {
-
-    @Test
-    public void shouldCreateAndReturnNode() {
-        TestUtils.get(baseUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
-        TestUtils.post(baseUrl() + "/db/data/ext/HelloWorldServerPlugin/graphdb/hello_world_node", 200);
     }
 }
 ```
@@ -256,26 +234,26 @@ public class HelloWorldUnmanagedExtension {
 }
 ```
 
-Note that the following line needs to be added to neo4j-server.properties in order for the extension to be deployed
+Note that the following line needs to be added to neo4j.conf in order for the extension to be deployed
 (assuming the extension lives in the `com.graphaware.example.unmanaged` package):
-`org.neo4j.server.thirdparty_jaxrs_classes=com.graphaware.example.unmanaged=/ext`
+`dbms.unmanaged_extension_classes=com.graphaware.example.unmanaged=/ext`
 
-We'll illustrate two ways of testing this extension, assuming that the business logic of `HelloWorldNodeCreator` has been
-tested separately, as illustrated earlier.
+We'll illustrate a way of integration-testing this extension, assuming that the business logic of `HelloWorldNodeCreator` has been
+tested separately, as discussed earlier.
 
 Similarly to the previous section where we were testing a server plugin the API of an unmanaged extension can be tested
-using  [`WrappingServerIntegrationTest`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/test/integration/WrappingServerIntegrationTest.html).
-It is just a simulation of the server, so rather than having to modify a properties file, we can override the
+using [`ServerIntegrationTest`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/test/integration/ServerIntegrationTest.html).
+It is just a simulation of the server, so rather than having to modify a configuration file, we can override the
 `thirdPartyJaxRsPackageMappings` and provide the key (package) - value (url) pairs as a `Map<String, String>`. Again,
 the server will run on port 7575, but you will typically not need to worry about it:
 
 ```java
 /**
- * {@link com.graphaware.test.integration.DatabaseIntegrationTest} for {@link com.graphaware.example.plugin.HelloWorldServerPlugin}.
+ * {@link com.graphaware.test.integration.ServerIntegrationTest} for {@link com.graphaware.example.plugin.HelloWorldServerPlugin}.
  * <p/>
  * Tests the logic as well as the API.
  */
-public class HelloWorldUnmanagedExtensionApiTest extends WrappingServerIntegrationTest {
+public class HelloWorldUnmanagedExtensionApiTest extends ServerIntegrationTest {
 
     /**
      * {@inheritDoc}
@@ -287,45 +265,13 @@ public class HelloWorldUnmanagedExtensionApiTest extends WrappingServerIntegrati
 
     @Test
     public void shouldCreateAndReturnNode() {
-        String result = TestUtils.post(baseNeoUrl() + "/ext/helloworld/create", 200);
+        String result = httpClient.post(baseNeoUrl() + "/ext/helloworld/create", 200);
         assertEquals("0", result);
 
         GraphUnit.assertSameGraph(getDatabase(), "CREATE (:HelloWorld {hello:'world'})");
     }
 }
 ```
-
-In order to test correct deployment to a real Neo4j server, we'll extend `NeoServerIntegrationTest` again. This time, we
-will need to provide a configuration file that is equivalent to neo4j-server.properties in live deployments. The name of
-the config file is provided by overriding the `neo4jServerConfigFile()` method and returning the name of the file, which
-must be present on the test classpath (typically in the _resources_ directory).
-
-```java
-/**
- * {@link com.graphaware.test.integration.DatabaseIntegrationTest} for {@link com.graphaware.example.plugin.HelloWorldServerPlugin}.
- *
- * Tests the logic as well as the API.
- */
-public class HelloWorldUnmanagedExtensionDeploymentTest extends NeoServerIntegrationTest {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String neo4jServerConfigFile() {
-        return "neo4j-server-ext.properties";
-    }
-
-    @Test
-    public void shouldCreateAndReturnNode() {
-        assertEquals("0", TestUtils.post(baseUrl() + "/ext/helloworld/create", 200));
-    }
-}
-```
-
-Of course, the _neo4j-server-ext.properties_ must contain this line:
-
-`org.neo4j.server.thirdparty_jaxrs_classes=com.graphaware.example.unmanaged=/ext`
 
 #### Spring MVC Controller
 
@@ -371,15 +317,15 @@ public class HelloWorldController {
 }
 ```
 
-Again, we can test the controller logic by extending `DatabaseIntegrationTest`:
+Again, we can test the controller logic by extending `EmbeddedDatabaseIntegrationTest`:
 
 ```java
 /**
- * {@link DatabaseIntegrationTest} for {@link com.graphaware.example.plugin.HelloWorldServerPlugin}.
+ * {@link EmbeddedDatabaseIntegrationTest} for {@link com.graphaware.example.plugin.HelloWorldServerPlugin}.
  *
  * Tests the logic, but not the API.
  */
-public class HelloWorldControllerTest extends DatabaseIntegrationTest {
+public class HelloWorldControllerTest extends EmbeddedDatabaseIntegrationTest {
 
     @Test
     public void shouldCreateAndReturnNode() {
@@ -396,41 +342,22 @@ public class HelloWorldControllerTest extends DatabaseIntegrationTest {
 ```
 
 In order to test the API (end-to-end) test of a Spring MVC Controller deployed to Neo4j/GraphAware, one can extend the
-`GraphAwareApiTest`, which deploys the wrapping Neo4j server as before (on port 7575) and additionally exposes the MVC
+`GraphAwareIntegrationTest`, which deploys the wrapping Neo4j server as before (on port 7575) and additionally exposes the MVC
 Controllers. A test would then looks like this:
 
 ```java
 /**
- * {@link GraphAwareApiTest} for {@link HelloWorldController}.
+ * {@link GraphAwareIntegrationTest} for {@link HelloWorldController}.
  *
  * Tests the logic as well as the API.
  */
-public class HelloWorldControllerApiTest extends GraphAwareApiTest {
+public class HelloWorldControllerApiTest extends GraphAwareIntegrationTest {
 
     @Test
     public void shouldCreateAndReturnNode() {
-        assertEquals("0", TestUtils.post(baseUrl() + "/helloworld/create", 200));
+        assertEquals("0", httpClient.post(baseUrl() + "/helloworld/create", 200));
 
         GraphUnit.assertSameGraph(getDatabase(), "CREATE (:HelloWorld {hello:'world'})");
-    }
-}
-```
-
-Finally, in order to test with real database and real server again, `NeoServerIntegrationTest` can be extended. Spring
-MVC modules get deployed automatically if GraphAware Server is present on the classpath, so there is no need to override
-any methods, just implement tests:
-
-```java
-/**
- * {@link NeoServerIntegrationTest} for {@link HelloWorldController}.
- * <p/>
- * Only tests the actual deployment of the extension, not so much the logic.
- */
-public class HelloWorldControllerDeploymentTest extends NeoServerIntegrationTest {
-
-    @Test
-    public void shouldCreateAndReturnNode() {
-        assertEquals("0", TestUtils.post(baseUrl() + "/graphaware/helloworld/create", 200));
     }
 }
 ```

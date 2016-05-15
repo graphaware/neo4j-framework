@@ -26,7 +26,7 @@ import org.neo4j.graphdb.Transaction;
 import static org.junit.Assert.assertEquals;
 
 /**
- * {@link DatabaseIntegrationTest} for {@link com.graphaware.example.plugin.HelloWorldServerPlugin}.
+ * {@link EmbeddedDatabaseIntegrationTest} for {@link com.graphaware.example.plugin.HelloWorldServerPlugin}.
  *
  * Tests the logic, but not the API.
  */

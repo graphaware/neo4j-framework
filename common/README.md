@@ -74,7 +74,7 @@ public class IncludeAllPeople implements NodeInclusionPolicy {
 ```
 
 Many GraphAware Framework Modules, however, can be used without writing any code, especially when using Neo4j in server mode.
-When these modules need to be configured (usually in _neo4j.properties_), one can use expressions to define `InclusionPolicies`.
+When these modules need to be configured (in _neo4j.conf_), one can use expressions to define `InclusionPolicies`.
 For those familiar with the Spring Framework, the expressions are SPeL expressions and are parsed using GraphAware's
 `InclusionPolicy` implementation, for example `SpelNodeInclusionPolicy`, `SpelRelationshipInclusionPolicy`, etc.
 

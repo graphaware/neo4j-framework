@@ -50,7 +50,7 @@ When using Neo4j in the <a href="http://docs.neo4j.org/chunked/stable/server-ins
 deploying the GraphAware Framework (and any code using it) is a matter of :
 * [downloading](#download) the appropriate .jar files
 * copying them into the _plugins_ directory in your Neo4j installation
-* adding `dbms.unmanaged_extension_classes=com.graphaware.server=/graphaware` to `neo4j-server.properties`
+* adding `dbms.unmanaged_extension_classes=com.graphaware.server=/graphaware` to `neo4j.conf`
 * restarting the server
 
 The framework and modules are then used via calls to their REST APIs, if they provide any.
@@ -70,13 +70,8 @@ Getting GraphAware Framework
 
 ### Releases
 
-To use the latest release, download the appropriate version and put it
+To use the latest release, <a href="http://products.graphaware.com/" target="_blank">download</a> the appropriate version and put it
 the _plugins_ directory in your Neo4j server installation and restart the server (server mode), or on the classpath (embedded mode).
-
-The following downloads are available:
-* [GraphAware Framework for Embedded Mode, version 3.0.1.38](http://products.graphaware.com/download/framework-embedded/graphaware-embedded-all-3.0.1.38.jar)
-* [GraphAware Framework for Server Mode (Community), version 3.0.1.38](http://products.graphaware.com/download/framework-server-community/graphaware-server-community-all-3.0.1.38.jar)
-* [GraphAware Framework for Server Mode (Enterprise), version 3.0.1.38](http://products.graphaware.com/download/framework-server-enterprise/graphaware-server-enterprise-all-3.0.1.38.jar)
 
 Releases are synced to <a href="http://search.maven.org/#search%7Cga%7C1%7Ccom.graphaware.neo4j" target="_blank">Maven Central
 repository</a>. When using Maven for dependency management, include one or more dependencies in your pom.xml. To find out

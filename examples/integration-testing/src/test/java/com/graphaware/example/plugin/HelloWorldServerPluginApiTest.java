@@ -23,7 +23,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
 /**
- * {@link com.graphaware.test.integration.DatabaseIntegrationTest} for {@link HelloWorldServerPlugin}.
+ * {@link com.graphaware.test.integration.ServerIntegrationTest} for {@link HelloWorldServerPlugin}.
  *
  * Tests the logic as well as the API.
  */

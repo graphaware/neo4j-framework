@@ -35,11 +35,11 @@ To achieve any of the above, developers need to create a GraphAware Runtime Modu
 A single module can implement both interfaces and thus be driven by both transactions and the timer.
 
 The following Runtime Modules are developed and provided by GraphAware. They are useful in their own right, but also serve as reference implementations:
-* [Relationship Count Module](https://github.com/graphaware/neo4j-relcount)
-* [Change Feed Module](https://github.com/graphaware/neo4j-changefeed)
 * [Node Rank Module](https://github.com/graphaware/neo4j-noderank)
 * [UUID Module](https://github.com/graphaware/neo4j-uuid)
 * [TimeTree Module](https://github.com/graphaware/neo4j-timetree) (the Runtime part is optional for the TimeTree)
+* [Relationship Count Module](https://github.com/graphaware/neo4j-relcount) (retired)
+* [Change Feed Module](https://github.com/graphaware/neo4j-changefeed) (retired)
 
 
 ### Getting the Runtime
@@ -73,12 +73,12 @@ for bootstrapping the module in server mode.
 Let us assume we have a module called `FriendshipStrengthModule` with a corresponding `FriendshipStrengthModuleBootstrapper`
 that we would like to use with the runtime (we will develop the module and the bootstrapper later). Provided that
 the GraphAware Framework .jar file is present in the Neo4j _plugins_ directory, the following line needs to
-be added to _neo4j.properties_ in order for the GraphAware Runtime to be enabled:
+be added to _neo4j.conf_ in order for the GraphAware Runtime to be enabled:
 
 `com.graphaware.runtime.enabled=true`
 
 Then, assuming the module bootstrapper lives in `com.graphaware.example.module` package, it must be registered
-with the runtime using the following line in _neo4j.properties_:
+with the runtime using the following line in _neo4j.conf_:
 
 `com.graphaware.module.FSM.1=com.graphaware.example.module.FriendshipStrengthModuleBootstrapper`
 
@@ -97,8 +97,8 @@ runtime.registerModule(new FriendshipStrengthModule("FSM", database));
 runtime.start();
 ```
 
-It is, however, also possible to pass a _neo4j.properties_ file to the database. Same rules as in the server mode
- apply. For example, if we have a neo4j-friendship.properties file with the following lines
+It is, however, also possible to pass a _neo4j.conf_ file to the database. Same rules as in the server mode
+ apply. For example, if we have a neo4j-friendship.conf file with the following lines
 
 ```
 # GraphAware Config
@@ -111,7 +111,7 @@ the runtime and modules will be configured correctly by just doing
 ```java
 database = new TestGraphDatabaseFactory()
               .newImpermanentDatabaseBuilder()
-              .loadPropertiesFromFile("neo4j-friendship.properties")
+              .loadPropertiesFromFile("neo4j-friendship.conf")
               .newGraphDatabase();
 
 RuntimeRegistry.getStartedRuntime(database);  //this line is needed when configuring with properties file
@@ -213,7 +213,7 @@ throttle back the regularity with which timer-driven modules are invoked.  Simil
 database is less busy, it will increase the invocation rate so that background processing performed by these scheduled
 modules isn't delayed unnecessarily.
 
-As of GraphAware Framework version 2.1.3.10, the following configuration properties can be added to _neo4j.properties_ in
+As of GraphAware Framework version 2.1.3.10, the following configuration properties can be added to _neo4j.conf_ in
 order to configure the scheduling of these timer-driven modules.  The default values for each setting are also shown below.
 
 ```

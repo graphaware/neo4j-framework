@@ -13,7 +13,7 @@ of the GraphAware Framework and place it into the _plugins_ directory of Neo4j.
 
 The following APIs are developed and provided by GraphAware:
 * [Algorithms](https://github.com/graphaware/neo4j-algorithms)
-* [ChangeFeed](https://github.com/graphaware/neo4j-changefeed) (primarily a [runtime module](../runtime))
+* [ChangeFeed](https://github.com/graphaware/neo4j-changefeed) (primarily a [runtime module](../runtime)) (retired)
 * [NodeRank](https://github.com/graphaware/neo4j-noderank) (primarily a [runtime module](../runtime))
 * [RestTest](https://github.com/graphaware/neo4j-resttest)
 * [TimeTree](https://github.com/graphaware/neo4j-timetree) (optionally also a [runtime module](../runtime))
@@ -25,7 +25,7 @@ The following APIs are developed and provided by GraphAware:
 **Example:** An example is provided in [examples/node-counter](../examples/node-counter).
 
 With GraphAware Framework in the _plugins_ directory of your Neo4j server installation and
- `org.neo4j.server.thirdparty_jaxrs_classes=com.graphaware.server=/graphaware` in `neo4j-server.properties`, it is possible to develop Spring
+ `dbms.unmanaged_extension_classes=com.graphaware.server=/graphaware` in `neo4j.conf`, it is possible to develop Spring
 MVC controllers that have the Neo4j database wired in as `GraphDatabaseService`.
 
 For example, to develop an API endpoint that counts all the nodes in the database using Spring MVC, create the following
@@ -50,7 +50,7 @@ public class NodeCountApi {
     @ResponseBody
     public long count() {
         try (Transaction tx = database.beginTx()) {
-            return Iterables.count(GlobalGraphOperations.at(database).getAllNodes());
+            return Iterables.count(database.getAllNodes());
         }
     }
 }
@@ -72,7 +72,7 @@ public class GraphAwareIntegration {
 
 Then your controllers can reside in any subpackage of `com.yourdomain`.
 
-Yet another alternative is to add the following line to `neo4j.properties`:
+Yet another alternative is to add the following line to `neo4j.conf`:
 ```
 com.graphaware.server.api.scan=com.your_domain_here.**
 ```
@@ -83,10 +83,10 @@ The value part of the property is a Spring expression for which packages to scan
 
 Compile this code into a .jar file (with dependencies, see below) and place it into the _plugins_ directory of your
 Neo4j server installation. You will then be able to issue a `GET` request to `http://your-neo4j-url:7474/graphaware/count`
-and receive the number of nodes in the database in the response body. Note that the `graphaware` part of the URL comes from `neo4j-server.properties`
+and receive the number of nodes in the database in the response body. Note that the `graphaware` part of the URL comes from `neo4j.conf`
 and can be change, e.g.:
 ```
-`org.neo4j.server.thirdparty_jaxrs_classes=com.graphaware.server=/your_uri_here`
+`dbms.unmanaged_extension_classes=com.graphaware.server=/your_uri_here`
 ```
 
 To get started quickly, start with the [pom file from the example above](https://github.com/graphaware/neo4j-framework/blob/master/examples/node-counter/pom.xml) and modify to your needs.

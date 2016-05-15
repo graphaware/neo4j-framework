@@ -127,7 +127,7 @@ BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(
         new TransactionalInput<>(database, 1000, new TransactionCallback<Iterable<Node>>() {
             @Override
             public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
-                return GlobalGraphOperations.at(database).getAllNodes();
+                return database.getAllNodes();
             }
         }),
         new UnitOfWork<Node>() {
