@@ -20,6 +20,9 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
+import org.springframework.core.io.ClassPathResource;
+
+import java.io.IOException;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.neo4j.kernel.configuration.Settings.FALSE;
@@ -40,7 +43,11 @@ public abstract class EmbeddedDatabaseIntegrationTest extends DatabaseIntegratio
         GraphDatabaseBuilder builder = createGraphDatabaseBuilder();
 
         if (configFile() != null) {
-            builder = builder.loadPropertiesFromFile(configFile());
+            try {
+                builder = builder.loadPropertiesFromFile(new ClassPathResource(configFile()).getFile().getAbsolutePath());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         } else {
             populateConfig(builder);
         }
