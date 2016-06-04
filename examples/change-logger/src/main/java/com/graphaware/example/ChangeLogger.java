@@ -16,6 +16,7 @@
 
 package com.graphaware.example;
 
+import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.util.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
@@ -23,8 +24,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.neo4j.logging.Log;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,7 +39,7 @@ import static com.graphaware.common.util.PropertyContainerUtils.relationshipToSt
  */
 public class ChangeLogger extends TransactionEventHandler.Adapter<Void> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ChangeLogger.class);
+    private static final Log LOG = LoggerFactory.getLogger(ChangeLogger.class);
 
     /**
      * {@inheritDoc}

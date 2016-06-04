@@ -21,8 +21,9 @@ import com.graphaware.tx.executor.single.TransactionCallback;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.PrefetchingIterator;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.Objects;
@@ -34,7 +35,7 @@ import java.util.Objects;
  * @param <T> type of fetched input.
  */
 public class TransactionalInput<T> extends PrefetchingIterator<T> implements Iterable<T>, Iterator<T> {
-    private static final Logger LOG = LoggerFactory.getLogger(TransactionalInput.class);
+    private static final Log LOG = LoggerFactory.getLogger(TransactionalInput.class);
 
     private final GraphDatabaseService database;
     private final TransactionCallback<Iterable<T>> callback;

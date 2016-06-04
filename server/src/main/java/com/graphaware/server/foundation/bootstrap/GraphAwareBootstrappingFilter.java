@@ -32,12 +32,13 @@ import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ArrayUtil;
 import org.neo4j.kernel.configuration.Config;
+import org.neo4j.logging.Log;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.configuration.ServerSettings;
 import org.neo4j.server.configuration.ThirdPartyJaxRsPackage;
 import org.neo4j.server.web.Jetty9WebServer;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
@@ -52,7 +53,7 @@ import java.lang.reflect.Method;
  */
 public class GraphAwareBootstrappingFilter implements Filter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GraphAwareBootstrappingFilter.class);
+    private static final Log LOG = LoggerFactory.getLogger(GraphAwareBootstrappingFilter.class);
 
     private static final String GA_PACKAGE = "com.graphaware.server";
 
@@ -197,7 +198,7 @@ public class GraphAwareBootstrappingFilter implements Filter {
             if (rsPackage.getPackageName().equals(getPackage())) {
                 String path = rsPackage.getMountPoint();
                 if (StringUtils.isNotBlank(path)) {
-                    LOG.info("Mounting GraphAware Framework at {}", path);
+                    LOG.info("Mounting GraphAware Framework at %s", path);
                     return path;
                 } else {
                     throw new IllegalArgumentException("Illegal GraphAware mount point: " + path);

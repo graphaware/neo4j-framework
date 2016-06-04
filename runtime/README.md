@@ -55,12 +55,12 @@ add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>runtime-api</artifactId>
-    <version>3.0.1.38</version>
+    <version>3.0.2.39</version>
 </dependency>
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>runtime</artifactId>
-    <version>3.0.1.38</version>
+    <version>3.0.2.39</version>
 </dependency>
 ```
 
@@ -135,56 +135,56 @@ To start from scratch, you will need the following dependencies in your pom.xml
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>api</artifactId>
-        <version>3.0.1.38</version>
+        <version>3.0.2.39</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>common</artifactId>
-        <version>3.0.1.38</version>
+        <version>3.0.2.39</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>runtime-api</artifactId>
-        <version>3.0.1.38</version>
+        <version>3.0.2.39</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>runtime</artifactId>
-        <version>3.0.1.38</version>
+        <version>3.0.2.39</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tests</artifactId>
-        <version>3.0.1.38</version>
+        <version>3.0.2.39</version>
         <scope>test</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tx-api</artifactId>
-        <version>3.0.1.38</version>
+        <version>3.0.2.39</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>tx-executor</artifactId>
-        <version>3.0.1.38</version>
+        <version>3.0.2.39</version>
         <scope>provided</scope>
     </dependency>
      <!-- needed if the module wants to use the Writer API -->
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>writer-api</artifactId>
-        <version>3.0.1.38</version>
+        <version>3.0.2.39</version>
         <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>writer</artifactId>
-        <version>3.0.1.38</version>
+        <version>3.0.2.39</version>
         <scope>provided</scope>
     </dependency>
     ...
@@ -281,46 +281,8 @@ For more information on how to express `InclusionPolicies` using String, see [In
 
 ### Logging
 
-To enable logging from your GraphAware Runtime Modules, set up a dependency on `slf4j-api` like this:
-
-```xml
-<dependency>
-    <groupId>org.slf4j</groupId>
-    <artifactId>slf4j-api</artifactId>
-    <version>${slf4j.version}</version>
-    <scope>provided</scope>
-</dependency>
-```
-Make sure you do not include any other slf4j implementations.
-
-Create config/custom-logback.xml in your Neo4j install path and add
-
-```xml
-<configuration>
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSSZ} %-5level %msg%n</pattern>
-        </encoder>
-    </appender>
-
-    <appender name="EXTENSIONLOG"  class="ch.qos.logback.core.FileAppender">
-        <file>data/log/extensions.log</file>
-        <encoder>
-            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSSZ} %-5level [%logger{15}]: %message%n</pattern>
-        </encoder>
-    </appender>
-
-    <logger name="com.graphaware" level="debug">
-        <appender-ref ref="EXTENSIONLOG"/>
-    </logger>
-
-    <root level="INFO">
-        <appender-ref ref="STDOUT"/>
-    </root>
-</configuration>
-```
-
-In the example above, logging is set to `debug` level and log statements are written to an extensions.log file in the Neo4j data/log directory.
+Logging uses standard Neo4j logging infrastructure. When writing modules, use `com.graphaware.common.log.LoggerFactory` to
+obtain `com.graphaware.common.log.Log`.
 
 License
 -------

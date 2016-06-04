@@ -18,8 +18,9 @@ package com.graphaware.tx.executor.single;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 /**
  * A convenience class that executes work in the context of a {@link org.neo4j.graphdb.Transaction}.
@@ -27,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * This class is thread-safe.
  */
 public class SimpleTransactionExecutor implements TransactionExecutor {
-    private static final Logger LOG = LoggerFactory.getLogger(SimpleTransactionExecutor.class);
+    private static final Log LOG = LoggerFactory.getLogger(SimpleTransactionExecutor.class);
 
     private final GraphDatabaseService database;
 

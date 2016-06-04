@@ -26,10 +26,11 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 import org.neo4j.kernel.internal.KernelData;
+import org.neo4j.logging.Log;
 import org.neo4j.management.HighAvailability;
 import org.neo4j.management.Neo4jManager;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -48,7 +49,7 @@ import static com.graphaware.runtime.schedule.TimingStrategy.UNKNOWN;
  * in which the modules were registered. All work performed by this implementation is done by a single thread.
  */
 public class RotatingTaskScheduler implements TaskScheduler {
-    private static final Logger LOG = LoggerFactory.getLogger(RotatingTaskScheduler.class);
+    private static final Log LOG = LoggerFactory.getLogger(RotatingTaskScheduler.class);
 
     private final GraphDatabaseService database;
     private final ModuleMetadataRepository repository;
@@ -144,7 +145,7 @@ public class RotatingTaskScheduler implements TaskScheduler {
      */
     private void scheduleNextTask(long lastTaskDuration) {
         long nextDelayMillis = timingStrategy.nextDelay(lastTaskDuration);
-        LOG.debug("Scheduling next task with a delay of {} ms.", nextDelayMillis);
+        LOG.debug("Scheduling next task with a delay of %s ms.", nextDelayMillis);
         worker.schedule(nextTask(), nextDelayMillis, TimeUnit.MILLISECONDS);
     }
 

@@ -18,8 +18,9 @@ package com.graphaware.writer.neo4j;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
@@ -30,8 +31,7 @@ import java.util.concurrent.RunnableFuture;
  */
 public class TxPerTaskWriter extends SingleThreadedWriter implements Neo4jWriter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TxPerTaskWriter.class);
-
+    private static final Log LOG = LoggerFactory.getLogger(TxPerTaskWriter.class);
 
     /**
      * Construct a new writer with a default queue capacity of 10,000.

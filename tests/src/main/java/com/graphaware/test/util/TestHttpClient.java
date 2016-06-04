@@ -27,8 +27,9 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -42,7 +43,7 @@ import static org.junit.Assert.fail;
  */
 public class TestHttpClient {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestHttpClient.class);
+    private static final Log LOG = LoggerFactory.getLogger(TestHttpClient.class);
 
     private final CloseableHttpClient client;
 

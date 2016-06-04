@@ -1,3 +1,7 @@
+3.0.2.39:
+    -upgraded to Neo4j 3.0.2
+    -fix logging (issue #49)
+
 3.0.1.38:
     -upgraded to Neo4j 3.0.1
 

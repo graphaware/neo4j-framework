@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime.manager;
 
+import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
@@ -24,8 +25,7 @@ import com.graphaware.runtime.module.NeedsInitializationException;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.neo4j.logging.Log;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extends BaseModuleManager<TxDrivenModuleMetadata, T> implements TxDrivenModuleManager<T> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BaseTxDrivenModuleManager.class);
+    private static final Log LOG = LoggerFactory.getLogger(BaseTxDrivenModuleManager.class);
 
     /**
      * Construct a new manager.

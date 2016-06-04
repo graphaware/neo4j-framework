@@ -30,8 +30,9 @@ import com.graphaware.writer.neo4j.Neo4jWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.kernel.DeadlockDetectedException;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Neo4jGraphGenerator extends BaseGraphGenerator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Neo4jGraphGenerator.class);
+    private static final Log LOG = LoggerFactory.getLogger(Neo4jGraphGenerator.class);
 
     private final GraphDatabaseService database;
     private final int noThreads;

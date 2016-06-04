@@ -17,8 +17,9 @@
 package com.graphaware.writer.service;
 
 import com.google.common.util.concurrent.AbstractScheduledService;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -36,7 +37,7 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class QueueBackedScheduledService<E> extends AbstractScheduledService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(QueueBackedScheduledService.class);
+    private static final Log LOG = LoggerFactory.getLogger(QueueBackedScheduledService.class);
     private static final int LOGGING_INTERVAL_MS = 5000;
     public static final int DEFAULT_QUEUE_CAPACITY = 10000;
 

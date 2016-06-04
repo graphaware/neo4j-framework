@@ -16,13 +16,13 @@
 
 package com.graphaware.common.ping;
 
+import com.graphaware.common.log.LoggerFactory;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.neo4j.logging.Log;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class GoogleAnalyticsStatsCollector implements StatsCollector {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GoogleAnalyticsStatsCollector.class);
+    private static final Log LOG = LoggerFactory.getLogger(GoogleAnalyticsStatsCollector.class);
     private static final UUID uuid = UUID.randomUUID();
     private static final String TID = "UA-1428985-8";
     private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();

@@ -18,18 +18,15 @@ package com.graphaware.perf.writes;
 
 import com.graphaware.tx.executor.batch.BatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.DisposableBatchTransactionExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.neo4j.logging.Log;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by bachmanm on 17/02/15.
- */
 public class MutiThreadedExecutor extends DisposableBatchTransactionExecutor {
-    private static final Logger LOG = LoggerFactory.getLogger(MutiThreadedExecutor.class);
+    private static final Log LOG = LoggerFactory.getLogger(MutiThreadedExecutor.class);
 
     private final BatchTransactionExecutor wrappedExecutor;
     private final int numberOfThreads;

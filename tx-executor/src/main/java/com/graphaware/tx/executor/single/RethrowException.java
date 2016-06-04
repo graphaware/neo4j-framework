@@ -16,8 +16,9 @@
 
 package com.graphaware.tx.executor.single;
 
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 /**
  * {@link ExceptionHandlingStrategy} that logs the exception and re-throws it.
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
  * Note that this is a singleton.
  */
 public final class RethrowException implements ExceptionHandlingStrategy {
-    private static final Logger LOG = LoggerFactory.getLogger(RethrowException.class);
+    private static final Log LOG = LoggerFactory.getLogger(RethrowException.class);
 
     private static final RethrowException INSTANCE = new RethrowException();
 

@@ -21,8 +21,9 @@ import org.junit.rules.TemporaryFolder;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -34,7 +35,7 @@ import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
  */
 public abstract class PerformanceTestSuite {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PerformanceTestSuite.class);
+    private static final Log LOG = LoggerFactory.getLogger(PerformanceTestSuite.class);
 
     protected TemporaryFolder temporaryFolder;
     protected GraphDatabaseService database;

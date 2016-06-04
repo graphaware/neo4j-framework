@@ -24,8 +24,9 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.event.LabelEntry;
 import org.neo4j.graphdb.event.PropertyEntry;
 import org.neo4j.graphdb.event.TransactionData;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.*;
 
@@ -33,7 +34,7 @@ import java.util.*;
  * {@link LazyPropertyContainerTransactionData} for {@link org.neo4j.graphdb.Node}s.
  */
 public class LazyNodeTransactionData extends LazyPropertyContainerTransactionData<Node> implements NodeTransactionData {
-    private static final Logger LOG = LoggerFactory.getLogger(LazyNodeTransactionData.class);
+    private static final Log LOG = LoggerFactory.getLogger(LazyNodeTransactionData.class);
 
     private final TransactionData transactionData;
     private final TransactionDataContainer transactionDataContainer;

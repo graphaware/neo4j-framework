@@ -16,8 +16,8 @@
 
 package com.graphaware.common.description.predicate;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
+import org.neo4j.logging.Log;
 
 import static com.graphaware.common.util.ArrayUtils.arrayFriendlyEquals;
 
@@ -29,7 +29,7 @@ import static com.graphaware.common.util.ArrayUtils.arrayFriendlyEquals;
  */
 abstract class ComparablePredicate extends ValueBasedPredicate<Comparable> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ComparablePredicate.class);
+    private static final Log LOG = LoggerFactory.getLogger(ComparablePredicate.class);
 
     /**
      * Construct a new predicate.

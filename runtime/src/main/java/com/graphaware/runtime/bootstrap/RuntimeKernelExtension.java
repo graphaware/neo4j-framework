@@ -25,8 +25,9 @@ import org.neo4j.helpers.collection.Pair;
 import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.configuration.Settings;
 import org.neo4j.kernel.lifecycle.Lifecycle;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -75,7 +76,7 @@ import static org.neo4j.kernel.configuration.Settings.*;
  * @see Neo4jConfigBasedRuntimeConfiguration
  */
 public class RuntimeKernelExtension implements Lifecycle {
-    private static final Logger LOG = LoggerFactory.getLogger(RuntimeKernelExtension.class);
+    private static final Log LOG = LoggerFactory.getLogger(RuntimeKernelExtension.class);
 
     public static final Setting<Boolean> RUNTIME_ENABLED = setting("com.graphaware.runtime.enabled", BOOLEAN, "false");
     public static final String MODULE_CONFIG_KEY = "com.graphaware.module"; //.ID.Order = fully qualified class name of bootstrapper
@@ -113,15 +114,12 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         registerModules(runtime);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (database.isAvailable(5 * 60 * 1000)) {
-                    runtime.start();
-                    LOG.info("GraphAware Runtime automatically started.");
-                } else {
-                    LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within 5 minutes.");
-                }
+        new Thread(() -> {
+            if (database.isAvailable(5 * 60 * 1000)) {
+                runtime.start();
+                LOG.info("GraphAware Runtime automatically started.");
+            } else {
+                LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within 5 minutes.");
             }
         }, "GraphAware Starter").start();
 

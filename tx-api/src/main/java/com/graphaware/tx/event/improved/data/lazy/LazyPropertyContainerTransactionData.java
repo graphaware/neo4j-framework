@@ -21,8 +21,9 @@ import com.graphaware.common.util.Change;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.event.PropertyEntry;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -38,7 +39,7 @@ import static com.graphaware.common.util.PropertyContainerUtils.id;
  * @param <T> type of the property container.
  */
 public abstract class LazyPropertyContainerTransactionData<T extends PropertyContainer> implements PropertyContainerTransactionData<T> {
-    private static final Logger LOG = LoggerFactory.getLogger(LazyPropertyContainerTransactionData.class);
+    private static final Log LOG = LoggerFactory.getLogger(LazyPropertyContainerTransactionData.class);
 
     private Map<Long, T> created = null;
     private Map<Long, T> deleted = null;

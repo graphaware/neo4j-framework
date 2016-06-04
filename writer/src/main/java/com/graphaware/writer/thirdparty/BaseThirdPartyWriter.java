@@ -16,9 +16,9 @@
 
 package com.graphaware.writer.thirdparty;
 
+import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.writer.service.QueueBackedScheduledService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.neo4j.logging.Log;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -30,7 +30,7 @@ import java.util.List;
  */
 public abstract class BaseThirdPartyWriter extends QueueBackedScheduledService<Collection<WriteOperation<?>>> implements ThirdPartyWriter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BaseThirdPartyWriter.class);
+    private static final Log LOG = LoggerFactory.getLogger(BaseThirdPartyWriter.class);
 
     /**
      * Construct a new writer with a default queue capacity of {@link #DEFAULT_QUEUE_CAPACITY}.

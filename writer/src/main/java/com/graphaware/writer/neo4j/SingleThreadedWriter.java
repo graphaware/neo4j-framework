@@ -18,8 +18,9 @@ package com.graphaware.writer.neo4j;
 
 import com.graphaware.writer.service.QueueBackedScheduledService;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -38,7 +39,7 @@ import static java.util.concurrent.Executors.callable;
  */
 public abstract class SingleThreadedWriter extends QueueBackedScheduledService<RunnableFuture<?>> implements Neo4jWriter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SingleThreadedWriter.class);
+    private static final Log LOG = LoggerFactory.getLogger(SingleThreadedWriter.class);
     protected final GraphDatabaseService database;
 
     /**

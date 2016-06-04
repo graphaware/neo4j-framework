@@ -16,12 +16,12 @@
 
 package com.graphaware.runtime.manager;
 
+import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.runtime.metadata.CorruptMetadataException;
 import com.graphaware.runtime.metadata.ModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.module.RuntimeModule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.neo4j.logging.Log;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -33,7 +33,7 @@ import java.util.Set;
  */
 public abstract class BaseModuleManager<M extends ModuleMetadata, T extends RuntimeModule> implements ModuleManager<T> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BaseModuleManager.class);
+    private static final Log LOG = LoggerFactory.getLogger(BaseModuleManager.class);
 
     protected final Map<String, T> modules = new LinkedHashMap<>();
     protected final ModuleMetadataRepository metadataRepository;

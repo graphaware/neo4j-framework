@@ -22,14 +22,15 @@ import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 /**
  * A {@link PropertyContainerSnapshot} representing a {@link org.neo4j.graphdb.Node}.
  */
 public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Node, NodeWrapper {
-    private static final Logger LOG = LoggerFactory.getLogger(NodeSnapshot.class);
+    private static final Log LOG = LoggerFactory.getLogger(NodeSnapshot.class);
 
     /**
      * Construct a snapshot.

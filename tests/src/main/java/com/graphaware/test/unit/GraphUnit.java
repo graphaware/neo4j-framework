@@ -21,10 +21,11 @@ import com.graphaware.common.util.PropertyContainerUtils;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.helpers.collection.Iterators;
+import org.neo4j.logging.Log;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.*;
 
@@ -45,7 +46,7 @@ import static org.neo4j.kernel.configuration.Settings.*;
  */
 public final class GraphUnit {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GraphUnit.class);
+    private static final Log LOG = LoggerFactory.getLogger(GraphUnit.class);
 
     /**
      * Private constructor - this class is a utility and should not be instantiated.

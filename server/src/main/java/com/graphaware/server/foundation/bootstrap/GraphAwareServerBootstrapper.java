@@ -19,6 +19,7 @@ package com.graphaware.server.foundation.bootstrap;
 import com.graphaware.server.tx.LongRunningTransactionFilter;
 import org.apache.commons.configuration.Configuration;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.logging.Log;
 import org.neo4j.server.AbstractNeoServer;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.plugins.Injectable;
@@ -27,7 +28,7 @@ import org.neo4j.server.rest.transactional.TransactionFacade;
 import org.neo4j.server.web.Jetty9WebServer;
 import org.neo4j.server.web.WebServer;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import javax.ws.rs.Path;
 import java.lang.reflect.Field;
@@ -45,13 +46,15 @@ import java.util.Collections;
 @Path("/")
 public class GraphAwareServerBootstrapper implements SPIPluginLifecycle {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GraphAwareServerBootstrapper.class);
+    private static final Log LOG = LoggerFactory.getLogger(GraphAwareServerBootstrapper.class);
 
     /**
      * {@inheritDoc}
      */
     @Override
     public Collection<Injectable<?>> start(NeoServer neoServer) {
+        LOG.info("started");
+
         addFilters(neoServer);
 
         return Collections.emptyList();

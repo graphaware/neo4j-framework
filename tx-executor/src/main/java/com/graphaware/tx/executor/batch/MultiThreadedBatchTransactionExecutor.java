@@ -16,8 +16,9 @@
 
 package com.graphaware.tx.executor.batch;
 
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * Decorator for a {@link IterableInputBatchTransactionExecutor}, which allows it to be executed using multiple threads.
  */
 public class MultiThreadedBatchTransactionExecutor extends DisposableBatchTransactionExecutor {
-    private static final Logger LOG = LoggerFactory.getLogger(MultiThreadedBatchTransactionExecutor.class);
+    private static final Log LOG = LoggerFactory.getLogger(MultiThreadedBatchTransactionExecutor.class);
 
     private final IterableInputBatchTransactionExecutor<?> wrappedExecutor;
     private final int numberOfThreads;

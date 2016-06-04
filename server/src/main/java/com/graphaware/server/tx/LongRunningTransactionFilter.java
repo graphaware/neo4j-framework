@@ -16,13 +16,14 @@
 
 package com.graphaware.server.tx;
 
+import org.neo4j.logging.Log;
 import org.neo4j.server.rest.transactional.GraphAwareLongRunningTransaction;
 import org.neo4j.server.rest.transactional.TransactionFacade;
 import org.neo4j.server.rest.transactional.TransactionHandle;
 import org.neo4j.server.rest.transactional.error.Neo4jError;
 import org.neo4j.server.rest.transactional.error.TransactionLifecycleException;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +40,7 @@ import java.io.IOException;
  */
 public class LongRunningTransactionFilter implements Filter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LongRunningTransactionFilter.class);
+    private static final Log LOG = LoggerFactory.getLogger(LongRunningTransactionFilter.class);
     private static final String TX_HEADER = "_GA_TX_ID";
 
     private final TransactionFacade transactionFacade;

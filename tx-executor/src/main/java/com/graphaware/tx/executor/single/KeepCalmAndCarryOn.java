@@ -16,8 +16,9 @@
 
 package com.graphaware.tx.executor.single;
 
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 /**
  * {@link ExceptionHandlingStrategy} that merely logs the exception. It is good for batch imports, for instance, when we
@@ -27,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * Note that this is a singleton.
  */
 public final class KeepCalmAndCarryOn implements ExceptionHandlingStrategy {
-    private static final Logger LOG = LoggerFactory.getLogger(KeepCalmAndCarryOn.class);
+    private static final Log LOG = LoggerFactory.getLogger(KeepCalmAndCarryOn.class);
 
     private static final KeepCalmAndCarryOn INSTANCE = new KeepCalmAndCarryOn();
 

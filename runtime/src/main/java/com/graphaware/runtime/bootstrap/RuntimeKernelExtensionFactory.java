@@ -17,20 +17,25 @@
 package com.graphaware.runtime.bootstrap;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.helpers.Service;
 import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.extension.KernelExtensionFactory;
+import org.neo4j.kernel.impl.logging.LogService;
 import org.neo4j.kernel.impl.spi.KernelContext;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 
 /**
  * {@link KernelExtensionFactory} that initializes the {@link RuntimeKernelExtension}.
  */
+@Service.Implementation(KernelExtensionFactory.class)
 public class RuntimeKernelExtensionFactory extends KernelExtensionFactory<RuntimeKernelExtensionFactory.Dependencies> {
 
     public interface Dependencies {
         Config getConfig();
 
         GraphDatabaseService getDatabase();
+
+        LogService getLogging();
     }
 
     public static final String KEY = "GraphAware Runtime";

@@ -32,8 +32,9 @@ import com.graphaware.writer.neo4j.DefaultWriter;
 import com.graphaware.writer.neo4j.Neo4jWriter;
 import com.graphaware.writer.neo4j.TxPerTaskWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -46,7 +47,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class WritePerformanceTest implements PerformanceTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(WritePerformanceTest.class);
+    private static final Log LOG = LoggerFactory.getLogger(WritePerformanceTest.class);
 
     private static final String BATCH_SIZE = "batchSize";
     private static final String NETWORK_SIZE = "networkSize";

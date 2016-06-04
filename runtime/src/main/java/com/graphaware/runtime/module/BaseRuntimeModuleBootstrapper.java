@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime.module;
 
+import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.policy.*;
 import com.graphaware.runtime.config.BaseTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
@@ -24,8 +25,7 @@ import com.graphaware.runtime.config.function.StringToNodePropertyInclusionPolic
 import com.graphaware.runtime.config.function.StringToRelationshipInclusionPolicy;
 import com.graphaware.runtime.config.function.StringToRelationshipPropertyInclusionPolicy;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.neo4j.logging.Log;
 
 import java.util.Map;
 
@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public abstract class BaseRuntimeModuleBootstrapper<C extends BaseTxDrivenModuleConfiguration<C>> implements RuntimeModuleBootstrapper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BaseRuntimeModuleBootstrapper.class);
+    private static final Log LOG = LoggerFactory.getLogger(BaseRuntimeModuleBootstrapper.class);
 
     protected static final String INITIALIZE_UNTIL = "initializeUntil";
 
@@ -78,25 +78,25 @@ public abstract class BaseRuntimeModuleBootstrapper<C extends BaseTxDrivenModule
     protected C configureInclusionPolicies(Map<String, String> config, C configuration) {
         if (configExists(config, NODE)) {
             NodeInclusionPolicy policy = StringToNodeInclusionPolicy.getInstance().apply(config.get(NODE));
-            LOG.info("Node Inclusion Policy set to {}", policy);
+            LOG.info("Node Inclusion Policy set to %s", policy);
             configuration = configuration.with(policy);
         }
 
         if (configExists(config, NODE_PROPERTY)) {
             NodePropertyInclusionPolicy policy = StringToNodePropertyInclusionPolicy.getInstance().apply(config.get(NODE_PROPERTY));
-            LOG.info("Node Property Inclusion Policy set to {}", policy);
+            LOG.info("Node Property Inclusion Policy set to %s", policy);
             configuration = configuration.with(policy);
         }
 
         if (configExists(config, RELATIONSHIP)) {
             RelationshipInclusionPolicy policy = StringToRelationshipInclusionPolicy.getInstance().apply(config.get(RELATIONSHIP));
-            LOG.info("Relationship Inclusion Policy set to {}", policy);
+            LOG.info("Relationship Inclusion Policy set to %s", policy);
             configuration = configuration.with(policy);
         }
 
         if (configExists(config, RELATIONSHIP_PROPERTY)) {
             RelationshipPropertyInclusionPolicy policy = StringToRelationshipPropertyInclusionPolicy.getInstance().apply(config.get(RELATIONSHIP_PROPERTY));
-            LOG.info("Relationship Property Inclusion Policy set to {}", policy);
+            LOG.info("Relationship Property Inclusion Policy set to %s", policy);
             configuration = configuration.with(policy);
         }
 
@@ -127,7 +127,7 @@ public abstract class BaseRuntimeModuleBootstrapper<C extends BaseTxDrivenModule
     }
 
     private void logInitUntil(String moduleId, C configuration) {
-        LOG.info(moduleId + " (re-)initialize until set to {}", initUntilAsString(configuration));
+        LOG.info(moduleId + " (re-)initialize until set to %s", initUntilAsString(configuration));
         if (configuration.initializeUntil() != TxDrivenModuleConfiguration.ALWAYS && configuration.initializeUntil() != TxDrivenModuleConfiguration.NEVER) {
             long now = System.currentTimeMillis();
             LOG.info("That's " + Math.abs(now - configuration.initializeUntil()) + " ms in the " + (now > configuration.initializeUntil() ? "past" : "future"));

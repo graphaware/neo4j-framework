@@ -19,13 +19,14 @@ package com.graphaware.server.foundation.context;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.neo4j.kernel.configuration.Config;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 public class GraphAwareWebContextCreator extends BaseWebContextCreator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GraphAwareWebContextCreator.class);
+    private static final Log LOG = LoggerFactory.getLogger(GraphAwareWebContextCreator.class);
 
     private static final String GA_API_PACKAGE_SCAN_SETTING = "com.graphaware.server.api.scan";
     private static final String[] GA_API_PACKAGE_SCAN_DEFAULT = new String[]{"com.**.graphaware.**", "org.**.graphaware.**", "net.**.graphaware.**"};

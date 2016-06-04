@@ -21,8 +21,9 @@ import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -37,7 +38,7 @@ import java.util.HashSet;
  * @param <T> type of the wrapped property container.
  */
 public abstract class PropertyContainerSnapshot<T extends PropertyContainer> extends BasePropertyContainerWrapper<T> implements PropertyContainer {
-    private static final Logger LOG = LoggerFactory.getLogger(PropertyContainerSnapshot.class);
+    private static final Log LOG = LoggerFactory.getLogger(PropertyContainerSnapshot.class);
 
     protected final T wrapped;
     protected final TransactionDataContainer transactionDataContainer;

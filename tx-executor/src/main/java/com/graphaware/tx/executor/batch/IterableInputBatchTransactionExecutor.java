@@ -24,8 +24,9 @@ import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.TransactionCallback;
 import com.graphaware.tx.executor.single.TransactionExecutor;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,7 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @param <T> type of the input item, on which steps are executed.
  */
 public class IterableInputBatchTransactionExecutor<T> extends DisposableBatchTransactionExecutor {
-    private static final Logger LOG = LoggerFactory.getLogger(IterableInputBatchTransactionExecutor.class);
+    private static final Log LOG = LoggerFactory.getLogger(IterableInputBatchTransactionExecutor.class);
 
     private final int batchSize;
     private final UnitOfWork<T> unitOfWork;
@@ -98,8 +99,8 @@ public class IterableInputBatchTransactionExecutor<T> extends DisposableBatchTra
         while (notFinished()) {
             final int batchNo = batches.incrementAndGet();
 
-            if (LOG.isTraceEnabled()) {
-                LOG.trace("Starting a transaction for batch number " + batchNo);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Starting a transaction for batch number " + batchNo);
             }
 
             final AtomicInteger currentBatchSteps = new AtomicInteger(0);
@@ -134,8 +135,8 @@ public class IterableInputBatchTransactionExecutor<T> extends DisposableBatchTra
 
             if (result != null) {
                 successfulSteps.addAndGet(currentBatchSteps.get());
-                if (LOG.isTraceEnabled()) {
-                    LOG.trace("Committed transaction for batch number " + batchNo);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Committed transaction for batch number " + batchNo);
                 }
             } else {
                 LOG.warn("Rolled back transaction for batch number " + batchNo);

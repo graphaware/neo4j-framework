@@ -16,14 +16,14 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.event.ErrorState;
 import org.neo4j.graphdb.event.KernelEventHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.neo4j.logging.Log;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, KernelEventHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BaseGraphAwareRuntime.class);
+    private static final Log LOG = LoggerFactory.getLogger(BaseGraphAwareRuntime.class);
 
     private static final ThreadLocal<Boolean> startingThread = new ThreadLocal<Boolean>() {
         @Override

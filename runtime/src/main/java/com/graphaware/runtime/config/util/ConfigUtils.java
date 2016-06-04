@@ -16,8 +16,9 @@
 
 package com.graphaware.runtime.config.util;
 
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -28,7 +29,7 @@ import java.util.Map;
  */
 public final class ConfigUtils {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ConfigUtils.class);
+    private static final Log LOG = LoggerFactory.getLogger(ConfigUtils.class);
 
     private ConfigUtils() {
     }

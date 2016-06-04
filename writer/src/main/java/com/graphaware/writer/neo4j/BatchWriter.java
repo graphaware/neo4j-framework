@@ -19,8 +19,9 @@ package com.graphaware.writer.neo4j;
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.UnitOfWork;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +35,7 @@ import java.util.concurrent.RunnableFuture;
  */
 public class BatchWriter extends SingleThreadedWriter implements Neo4jWriter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BatchWriter.class);
+    private static final Log LOG = LoggerFactory.getLogger(BatchWriter.class);
     public static final int DEFAULT_BATCH_SIZE = 1000;
     private final int batchSize;
 

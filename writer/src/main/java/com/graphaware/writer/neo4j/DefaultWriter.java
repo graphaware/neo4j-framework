@@ -18,8 +18,9 @@ package com.graphaware.writer.neo4j;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 import java.util.concurrent.Callable;
 
@@ -29,7 +30,7 @@ import java.util.concurrent.Callable;
  */
 public class DefaultWriter extends BaseNeo4jWriter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultWriter.class);
+    private static final Log LOG = LoggerFactory.getLogger(DefaultWriter.class);
 
     /**
      * Create a new writer.

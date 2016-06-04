@@ -16,15 +16,16 @@
 
 package com.graphaware.runtime.schedule;
 
+import org.neo4j.logging.Log;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.graphaware.common.log.LoggerFactory;
 
 /**
  * Simple implementation of {@link DelayAdjuster} that makes adjustments of a constant size depending on the activity
  * delta and threshold values.
  */
 public class ConstantDeltaDelayAdjuster implements DelayAdjuster {
-    private static final Logger LOG = LoggerFactory.getLogger(ConstantDeltaDelayAdjuster.class);
+    private static final Log LOG = LoggerFactory.getLogger(ConstantDeltaDelayAdjuster.class);
 
     private final long delta;
     private final long defaultDelay;
@@ -74,6 +75,6 @@ public class ConstantDeltaDelayAdjuster implements DelayAdjuster {
     }
 
     private void log(long result, long rate) {
-        LOG.debug("Next delay updated to {} ms based on average load of {} tx/s", result, rate);
+        LOG.debug("Next delay updated to %s ms based on average load of %s tx/s", result, rate);
     }
 }
