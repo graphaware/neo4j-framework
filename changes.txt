@@ -1,5 +1,7 @@
 3.0.3.39:
     -upgraded to Neo4j 3.0.3
+    -overhauled stats reporting
+    -fixed a critical issue with registering runtime, which made the previous version no good
 
 3.0.2.39:
     -upgraded to Neo4j 3.0.2
