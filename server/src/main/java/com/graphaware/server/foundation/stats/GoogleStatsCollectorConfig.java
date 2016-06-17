@@ -14,26 +14,25 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.service;
+package com.graphaware.server.foundation.stats;
 
-import org.springframework.stereotype.Service;
+import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
+import com.graphaware.common.ping.StatsCollector;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+@Configuration
+@Profile("stats-google")
+public class GoogleStatsCollectorConfig {
 
-@Service
-public class LifecycleTestService {
+    @Autowired
+    private GraphDatabaseService database;
 
-    public static boolean initCalled = false;
-    public static boolean destroyCalled = false;
-
-    @PostConstruct
-    public void init() {
-        initCalled = true;
-    }
-
-    @PreDestroy
-    public void destroy() {
-        destroyCalled = true;
+    @Bean
+    public StatsCollector statsCollector() {
+        return new GoogleAnalyticsStatsCollector(database);
     }
 }

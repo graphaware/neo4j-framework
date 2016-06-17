@@ -136,7 +136,7 @@ public class GraphAwareBootstrappingFilter implements Filter {
     private ServletContextHandler createGraphAwareHandler(SessionManager sessionManager, ApplicationContext rootContext) {
         ServletContextHandler handler = createNewHandler(sessionManager, getContextPath(neoServer.getConfig()));
 
-        addSpringToHandler(handler, getGraphAwareContextCreator(neoServer.getDatabase().getGraph()), rootContext, neoServer.getConfig());
+        addSpringToHandler(handler, getGraphAwareContextCreator(), rootContext, neoServer.getConfig());
         addDefaultFilters(handler);
 
         return handler;
@@ -154,8 +154,8 @@ public class GraphAwareBootstrappingFilter implements Filter {
         handler.setServer(webServer.getJetty());
     }
 
-    protected WebContextCreator getGraphAwareContextCreator(GraphDatabaseService database) {
-        return new GraphAwareWebContextCreator(database);
+    protected WebContextCreator getGraphAwareContextCreator() {
+        return new GraphAwareWebContextCreator();
     }
 
     protected final void addSpringToHandler(ServletContextHandler handler, WebContextCreator contextCreator, ApplicationContext rootContext, Config config) {

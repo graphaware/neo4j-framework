@@ -14,26 +14,20 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.service;
+package com.graphaware.server.foundation.stats;
 
-import org.springframework.stereotype.Service;
+import com.graphaware.common.ping.NullStatsCollector;
+import com.graphaware.common.ping.StatsCollector;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+@Configuration
+@Profile("stats-null")
+public class NullStatsCollectorConfig {
 
-@Service
-public class LifecycleTestService {
-
-    public static boolean initCalled = false;
-    public static boolean destroyCalled = false;
-
-    @PostConstruct
-    public void init() {
-        initCalled = true;
-    }
-
-    @PreDestroy
-    public void destroy() {
-        destroyCalled = true;
+    @Bean
+    public StatsCollector statsCollector() {
+        return NullStatsCollector.getInstance();
     }
 }

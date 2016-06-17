@@ -36,18 +36,10 @@ public class GraphAwareWebContextCreator extends BaseWebContextCreator {
     private static final String[] GA_API_PACKAGE_SCAN_DEFAULT = new String[]{"com.**.graphaware.**", "org.**.graphaware.**", "net.**.graphaware.**"};
     private static final String GA_STATS_PACKAGE = "com.graphaware.server.foundation.stats";
 
-    private final GraphDatabaseService database;
-
-    public GraphAwareWebContextCreator(GraphDatabaseService database) {
-        this.database = database;
-    }
-
     @Override
     protected void registerConfigClasses(AnnotationConfigWebApplicationContext context, Config config) {
-        context.scan(addStatsPackage(getPackagesToScan(config)));
-        context.refresh();
-
         configureStatsCollector(context, config);
+        context.scan(addStatsPackage(getPackagesToScan(config)));
     }
 
     private String[] addStatsPackage(String[] packagesToScan) {
@@ -57,10 +49,10 @@ public class GraphAwareWebContextCreator extends BaseWebContextCreator {
 
     private void configureStatsCollector(AnnotationConfigWebApplicationContext context, Config config) {
         if (Boolean.valueOf(config.getParams().getOrDefault(GA_API_STATS_DISABLE_SETTING, "false"))) {
-            context.getBeanFactory().registerSingleton("statsCollector", NullStatsCollector.getInstance());
+            context.getEnvironment().setActiveProfiles("stats-null");
         }
         else {
-            context.getBeanFactory().registerSingleton("statsCollector", new GoogleAnalyticsStatsCollector(database));
+            context.getEnvironment().setActiveProfiles("stats-google");
         }
     }
 
