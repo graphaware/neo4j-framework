@@ -50,7 +50,7 @@ public class Neo4jConfigBasedRuntimeConfigurationTest {
                 .withMaxSamples(201)
                 .withMaxTime(2001);
 
-        assertEquals(expected, new Neo4jConfigBasedRuntimeConfiguration(config).getTimingStrategy());
+        assertEquals(expected, new Neo4jConfigBasedRuntimeConfiguration(null, config).getTimingStrategy());
     }
 
     @Test
@@ -66,7 +66,7 @@ public class Neo4jConfigBasedRuntimeConfigurationTest {
                 .withDelay(50)
                 .withInitialDelay(100);
 
-        assertEquals(expected, new Neo4jConfigBasedRuntimeConfiguration(config).getTimingStrategy());
+        assertEquals(expected, new Neo4jConfigBasedRuntimeConfiguration(null, config).getTimingStrategy());
     }
 
     @Test
@@ -77,7 +77,7 @@ public class Neo4jConfigBasedRuntimeConfigurationTest {
         TimingStrategy expected = AdaptiveTimingStrategy
                 .defaultConfiguration();
 
-        assertEquals(expected, new Neo4jConfigBasedRuntimeConfiguration(config).getTimingStrategy());
+        assertEquals(expected, new Neo4jConfigBasedRuntimeConfiguration(null, config).getTimingStrategy());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -86,6 +86,6 @@ public class Neo4jConfigBasedRuntimeConfigurationTest {
         parameterMap.put("com.graphaware.runtime.timing.strategy", "unknown");
         Config config = new Config(parameterMap);
 
-        new Neo4jConfigBasedRuntimeConfiguration(config).getTimingStrategy();
+        new Neo4jConfigBasedRuntimeConfiguration(null, config).getTimingStrategy();
     }
 }

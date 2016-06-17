@@ -34,7 +34,7 @@ public class GraphPropertiesMetadataRepositoryTest extends EmbeddedDatabaseInteg
 
     @Test
     public void shouldPersistAndRetrieveMetadata1() {
-        repository = new GraphPropertiesMetadataRepository(getDatabase(), FluentRuntimeConfiguration.defaultConfiguration(), "TEST");
+        repository = new GraphPropertiesMetadataRepository(getDatabase(), FluentRuntimeConfiguration.defaultConfiguration(getDatabase()), "TEST");
 
         ModuleMetadata metadata = new DefaultTxDrivenModuleMetadata(FluentTxDrivenModuleConfiguration.defaultConfiguration());
 
@@ -45,7 +45,7 @@ public class GraphPropertiesMetadataRepositoryTest extends EmbeddedDatabaseInteg
 
     @Test
     public void shouldPersistAndRetrieveMetadata2() {
-        repository = new GraphPropertiesMetadataRepository(getDatabase(), FluentRuntimeConfiguration.defaultConfiguration(), "TEST");
+        repository = new GraphPropertiesMetadataRepository(getDatabase(), FluentRuntimeConfiguration.defaultConfiguration(getDatabase()), "TEST");
 
         ModuleMetadata metadata = new DefaultTxDrivenModuleMetadata(FluentTxDrivenModuleConfiguration.defaultConfiguration()
                 .with(IncludeNodes.all().with("TestLabel"))

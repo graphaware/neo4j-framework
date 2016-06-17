@@ -155,23 +155,20 @@ public class RotatingTaskScheduler implements TaskScheduler {
      * @return next task to be run wrapped in a {@link Runnable}.
      */
     protected Runnable nextTask() {
-        return new Runnable() {
-            @Override
-            public void run() {
-                long totalTime = UNKNOWN;
-                try {
-                    LOG.debug("Running a scheduled task...");
-                    long startTime = System.currentTimeMillis();
+        return () -> {
+            long totalTime = UNKNOWN;
+            try {
+                LOG.debug("Running a scheduled task...");
+                long startTime = System.currentTimeMillis();
 
-                    runNextTask();
+                runNextTask();
 
-                    totalTime = (System.currentTimeMillis() - startTime);
-                    LOG.debug("Successfully completed scheduled task in " + totalTime + " ms");
-                } catch (Exception e) {
-                    LOG.warn("Task execution threw an exception: " + e.getMessage(), e);
-                } finally {
-                    scheduleNextTask(totalTime);
-                }
+                totalTime = (System.currentTimeMillis() - startTime);
+                LOG.debug("Successfully completed scheduled task in " + totalTime + " ms");
+            } catch (Exception e) {
+                LOG.warn("Task execution threw an exception: " + e.getMessage(), e);
+            } finally {
+                scheduleNextTask(totalTime);
             }
         };
     }

@@ -16,6 +16,7 @@
 
 package com.graphaware.server.foundation.context;
 
+import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.RuntimeRegistry;
 import org.neo4j.kernel.impl.proc.Procedures;
@@ -26,11 +27,14 @@ import org.springframework.context.support.GenericApplicationContext;
 public class FoundationRootContextCreator implements RootContextCreator {
 
     @Override
-    public AbstractApplicationContext createContext(NeoServer neoServer) {
+    public AbstractApplicationContext createContext(NeoServer neoServer, StatsCollector statsCollector) {
         GenericApplicationContext parent = new GenericApplicationContext();
         parent.registerShutdownHook();
         parent.getBeanFactory().registerSingleton("database", neoServer.getDatabase().getGraph());
         parent.getBeanFactory().registerSingleton("procedures", neoServer.getDatabase().getGraph().getDependencyResolver().resolveDependency(Procedures.class));
+
+
+        parent.getBeanFactory().registerSingleton("getStatsCollector", statsCollector);
 
         GraphAwareRuntime runtime = RuntimeRegistry.getRuntime(neoServer.getDatabase().getGraph());
         if (runtime != null) {

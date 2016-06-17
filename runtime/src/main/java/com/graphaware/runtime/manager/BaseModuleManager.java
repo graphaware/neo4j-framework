@@ -17,6 +17,7 @@
 package com.graphaware.runtime.manager;
 
 import com.graphaware.common.log.LoggerFactory;
+import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.metadata.CorruptMetadataException;
 import com.graphaware.runtime.metadata.ModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
@@ -37,14 +38,16 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
 
     protected final Map<String, T> modules = new LinkedHashMap<>();
     protected final ModuleMetadataRepository metadataRepository;
+    private final StatsCollector statsCollector;
 
     /**
      * Construct a new manager.
      *
      * @param metadataRepository repository for storing module metadata.
      */
-    protected BaseModuleManager(ModuleMetadataRepository metadataRepository) {
+    protected BaseModuleManager(ModuleMetadataRepository metadataRepository, StatsCollector statsCollector) {
         this.metadataRepository = metadataRepository;
+        this.statsCollector = statsCollector;
     }
 
     /**
@@ -224,6 +227,16 @@ public abstract class BaseModuleManager<M extends ModuleMetadata, T extends Runt
         for (String moduleId : unusedModules) {
             LOG.info("Removing unused module " + moduleId + ".");
             metadataRepository.removeModuleMetadata(moduleId);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void startModules() {
+        for (T module : modules.values()) {
+            statsCollector.moduleStart(module.getClass().getCanonicalName());
         }
     }
 

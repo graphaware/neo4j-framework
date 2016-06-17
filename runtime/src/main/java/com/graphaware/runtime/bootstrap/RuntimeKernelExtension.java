@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime.bootstrap;
 
+import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.config.Neo4jConfigBasedRuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
@@ -23,11 +24,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.helpers.collection.Pair;
 import org.neo4j.kernel.configuration.Config;
-import org.neo4j.kernel.configuration.Settings;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 import org.neo4j.logging.Log;
-import org.slf4j.Logger;
-import com.graphaware.common.log.LoggerFactory;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -110,7 +108,7 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         LOG.info("GraphAware Runtime enabled, bootstrapping...");
 
-        final GraphAwareRuntime runtime = createRuntime(database, new Neo4jConfigBasedRuntimeConfiguration(config));
+        final GraphAwareRuntime runtime = createRuntime(database, new Neo4jConfigBasedRuntimeConfiguration(database, config));
 
         registerModules(runtime);
 
@@ -163,12 +161,7 @@ public class RuntimeKernelExtension implements Lifecycle {
             }
         }
 
-        Collections.sort(orderedBootstrappers, new Comparator<Pair<Integer, Pair<String, String>>>() {
-            @Override
-            public int compare(Pair<Integer, Pair<String, String>> o1, Pair<Integer, Pair<String, String>> o2) {
-                return Integer.compare(o1.first(), o2.first());
-            }
-        });
+        Collections.sort(orderedBootstrappers, (o1, o2) -> Integer.compare(o1.first(), o2.first()));
 
         return orderedBootstrappers;
     }

@@ -29,6 +29,7 @@ public class LifecycleTestService {
 
     @PostConstruct
     public void init() {
+        destroyCalled = false;
         initCalled = true;
     }
 

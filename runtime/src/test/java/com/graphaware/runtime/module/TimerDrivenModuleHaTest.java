@@ -91,7 +91,7 @@ public class TimerDrivenModuleHaTest {
 
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database,
                 FluentRuntimeConfiguration
-                        .defaultConfiguration()
+                        .defaultConfiguration(database)
                         .withTimingStrategy(FixedDelayTimingStrategy.getInstance().withInitialDelay(0).withDelay(10)));
 
         RunCountingTimerDrivenModule module = new RunCountingTimerDrivenModule(NullTimerDrivenModuleConfiguration.getInstance());
@@ -147,7 +147,7 @@ public class TimerDrivenModuleHaTest {
     private RunCountingTimerDrivenModule startFramework(GraphDatabaseService database, TimerDrivenModuleConfiguration.InstanceRolePolicy instanceRolePolicy) {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database,
                 FluentRuntimeConfiguration
-                        .defaultConfiguration()
+                        .defaultConfiguration(database)
                         .withTimingStrategy(FixedDelayTimingStrategy.getInstance().withInitialDelay(0).withDelay(10)));
 
         RunCountingTimerDrivenModule module = new RunCountingTimerDrivenModule(FluentTimerDrivenModuleConfiguration.defaultConfiguration().with(instanceRolePolicy));

@@ -14,13 +14,21 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server.foundation.context;
+package com.graphaware.server.foundation.stats;
 
 import com.graphaware.common.ping.StatsCollector;
-import org.neo4j.server.NeoServer;
-import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
-public interface RootContextCreator {
+@Component
+public class ControllerStatsCollector {
 
-    AbstractApplicationContext createContext(NeoServer neoServer, StatsCollector statsCollector);
+    @Autowired
+    public ControllerStatsCollector(StatsCollector statsCollector, ApplicationContext context) {
+        for (Object bean : context.getBeansWithAnnotation(Controller.class).values()) {
+            statsCollector.moduleStart(bean.getClass().getCanonicalName());
+        }
+    }
 }

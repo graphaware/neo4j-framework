@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime.manager;
 
+import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.metadata.DefaultTimerDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TimerDrivenModuleMetadata;
@@ -41,10 +42,10 @@ public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerD
      * @param metadataRepository for storing module metadata.
      * @param timingStrategy     the {@link TimingStrategy} to use for scheduling the timer-driven modules.
      */
-    public ProductionTimerDrivenModuleManager(GraphDatabaseService database, ModuleMetadataRepository metadataRepository, TimingStrategy timingStrategy) {
-    	super(metadataRepository);
-    	this.database = database;
-    	taskScheduler = new RotatingTaskScheduler(database, metadataRepository, timingStrategy);
+    public ProductionTimerDrivenModuleManager(GraphDatabaseService database, ModuleMetadataRepository metadataRepository, TimingStrategy timingStrategy, StatsCollector statsCollector) {
+        super(metadataRepository, statsCollector);
+        this.database = database;
+        taskScheduler = new RotatingTaskScheduler(database, metadataRepository, timingStrategy);
     }
 
     /**
@@ -69,6 +70,8 @@ public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerD
      */
     @Override
     public void startModules() {
+        super.startModules();
+
         taskScheduler.start();
     }
 

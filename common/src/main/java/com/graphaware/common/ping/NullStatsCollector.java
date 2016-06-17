@@ -14,13 +14,34 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.server.foundation.context;
+package com.graphaware.common.ping;
 
-import com.graphaware.common.ping.StatsCollector;
-import org.neo4j.server.NeoServer;
-import org.springframework.context.support.AbstractApplicationContext;
+/**
+ * {@link StatsCollector} that doesn't report anything anywhere.
+ */
+public class NullStatsCollector implements StatsCollector {
 
-public interface RootContextCreator {
+    private static final NullStatsCollector INSTANCE = new NullStatsCollector();
 
-    AbstractApplicationContext createContext(NeoServer neoServer, StatsCollector statsCollector);
+    public static NullStatsCollector getInstance() {
+        return INSTANCE;
+    }
+
+    private NullStatsCollector() {
+    }
+
+    @Override
+    public void frameworkStart(String edition) {
+
+    }
+
+    @Override
+    public void runtimeStart() {
+
+    }
+
+    @Override
+    public void moduleStart(String moduleClassName) {
+
+    }
 }

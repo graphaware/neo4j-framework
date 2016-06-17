@@ -16,11 +16,13 @@
 
 package com.graphaware.server.foundation.context;
 
-import org.apache.commons.lang.ArrayUtils;
+import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
+import com.graphaware.common.ping.NullStatsCollector;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.configuration.Config;
 import org.neo4j.logging.Log;
-import org.slf4j.Logger;
 import com.graphaware.common.log.LoggerFactory;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
@@ -29,11 +31,37 @@ public class GraphAwareWebContextCreator extends BaseWebContextCreator {
     private static final Log LOG = LoggerFactory.getLogger(GraphAwareWebContextCreator.class);
 
     private static final String GA_API_PACKAGE_SCAN_SETTING = "com.graphaware.server.api.scan";
+    private static final String GA_API_STATS_DISABLE_SETTING = "com.graphaware.server.stats.disable";
+
     private static final String[] GA_API_PACKAGE_SCAN_DEFAULT = new String[]{"com.**.graphaware.**", "org.**.graphaware.**", "net.**.graphaware.**"};
+    private static final String GA_STATS_PACKAGE = "com.graphaware.server.foundation.stats";
+
+    private final GraphDatabaseService database;
+
+    public GraphAwareWebContextCreator(GraphDatabaseService database) {
+        this.database = database;
+    }
 
     @Override
     protected void registerConfigClasses(AnnotationConfigWebApplicationContext context, Config config) {
-        context.scan(getPackagesToScan(config));
+        context.scan(addStatsPackage(getPackagesToScan(config)));
+        context.refresh();
+
+        configureStatsCollector(context, config);
+    }
+
+    private String[] addStatsPackage(String[] packagesToScan) {
+        packagesToScan = ArrayUtils.add(packagesToScan, GA_STATS_PACKAGE);
+        return packagesToScan;
+    }
+
+    private void configureStatsCollector(AnnotationConfigWebApplicationContext context, Config config) {
+        if (Boolean.valueOf(config.getParams().getOrDefault(GA_API_STATS_DISABLE_SETTING, "false"))) {
+            context.getBeanFactory().registerSingleton("statsCollector", NullStatsCollector.getInstance());
+        }
+        else {
+            context.getBeanFactory().registerSingleton("statsCollector", new GoogleAnalyticsStatsCollector(database));
+        }
     }
 
     private String[] getPackagesToScan(Config config) {

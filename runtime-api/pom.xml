@@ -33,6 +33,11 @@
     <dependencies>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
             <artifactId>writer-api</artifactId>
         </dependency>
     </dependencies>

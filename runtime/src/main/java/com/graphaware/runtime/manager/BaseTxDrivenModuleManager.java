@@ -17,6 +17,7 @@
 package com.graphaware.runtime.manager;
 
 import com.graphaware.common.log.LoggerFactory;
+import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
@@ -43,8 +44,8 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      *
      * @param metadataRepository repository for storing module metadata.
      */
-    protected BaseTxDrivenModuleManager(ModuleMetadataRepository metadataRepository) {
-        super(metadataRepository);
+    protected BaseTxDrivenModuleManager(ModuleMetadataRepository metadataRepository, StatsCollector statsCollector) {
+        super(metadataRepository, statsCollector);
     }
 
     /**
@@ -99,6 +100,8 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
      */
     @Override
     public void startModules() {
+        super.startModules();
+
         LOG.info("Starting transaction-driven modules...");
         for (T module : modules.values()) {
             start(module);

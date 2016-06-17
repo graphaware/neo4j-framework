@@ -93,8 +93,15 @@ Data Collection
 ---------------
 
 Note that framework sends a POST request to Google Analytics every 5 minutes after start just so we know how many people
-actually use it. The only data transmitted are module class names, version and edition of the framework,
-and an anonymous UUID that changes with restart.
+actually use it. The only data transmitted are module and controller class names, version and edition of the framework,
+and the database store ID.
+
+If you wish to completely disable stats collection, please add the following to `neo4j.conf`:
+
+```
+com.graphaware.runtime.stats.disabled=true
+com.graphaware.server.stats.disabled=true
+```
 
 
 License

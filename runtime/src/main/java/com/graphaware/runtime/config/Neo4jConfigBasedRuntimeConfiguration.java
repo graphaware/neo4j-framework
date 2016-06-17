@@ -16,6 +16,9 @@
 
 package com.graphaware.runtime.config;
 
+import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
+import com.graphaware.common.ping.NullStatsCollector;
+import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.config.function.StringToDatabaseWriterType;
 import com.graphaware.runtime.config.function.StringToTimingStrategy;
 import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
@@ -27,18 +30,18 @@ import com.graphaware.runtime.write.WritingConfig;
 import com.graphaware.writer.neo4j.BatchWriter;
 import com.graphaware.writer.neo4j.DefaultWriter;
 import com.graphaware.writer.neo4j.TxPerTaskWriter;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.kernel.configuration.Config;
-import org.neo4j.kernel.configuration.Settings;
 
 import static org.neo4j.kernel.configuration.Settings.*;
 
 /**
  * Implementation of {@link RuntimeConfiguration} that loads bespoke settings from Neo4j's configuration properties, falling
  * back to default values when overrides aren't available. Intended for internal framework use, mainly for server deployments.
- * <p/>
- * There are two main things configured using this mechanism: the {@link TimingStrategy} and the {@link DatabaseWriterType}.
- * <p/>
+ * <p>
+ * There are three main things configured using this mechanism: the {@link TimingStrategy}, the {@link DatabaseWriterType}, and the {@link StatsCollector}.
+ * <p>
  * For {@link TimingStrategy}, there are two choices. The first one is {@link AdaptiveTimingStrategy}, configured by using the following settings
  * <pre>
  *     com.graphaware.runtime.timing.strategy=adaptive
@@ -51,27 +54,27 @@ import static org.neo4j.kernel.configuration.Settings.*;
  * </pre>
  * The above are also the default values, if no configuration is provided. For exact meaning of the values, please refer
  * to the Javadoc of {@link AdaptiveTimingStrategy}.
- * <p/>
+ * <p>
  * The other option is {@link FixedDelayTimingStrategy}, configured by using the following settings
  * <pre>
  *     com.graphaware.runtime.timing.strategy=fixed
  *     com.graphaware.runtime.timing.delay=200
  *     com.graphaware.runtime.timing.initialDelay=1000
  * </pre>
- * <p/>
+ * <p>
  * For {@link WritingConfig}, there are three choices:
  * <pre>
  *     com.graphaware.runtime.db.writer=default
  * </pre>
  * results in a {@link DefaultWriter} being constructed.
- * <p/>
+ * <p>
  * <pre>
  *     com.graphaware.runtime.db.writer=single
  *     #optional queue size, defaults to 10,000
  *     com.graphaware.runtime.db.writer.queueSize=10000
  * </pre>
  * results in a {@link TxPerTaskWriter} being constructed with the configured queue size
- * <p/>
+ * <p>
  * <pre>
  *     com.graphaware.runtime.db.writer=batch
  *     #optional queue size, defaults to 10,000
@@ -80,6 +83,12 @@ import static org.neo4j.kernel.configuration.Settings.*;
  *     com.graphaware.runtime.db.writer.batchSize=1000
  * </pre>
  * results in a {@link BatchWriter} being constructed with the configured queue and batch sizes.
+ * <p>
+ * For {@link StatsCollector}, {@link GoogleAnalyticsStatsCollector} is used by default. For disabling statistics reporting, use
+ * <pre>
+ *     com.graphaware.runtime.stats.disable=true
+ * </pre>
+ * With this setting in place, {@link NullStatsCollector} will be used.
  */
 public final class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfiguration {
 
@@ -104,13 +113,16 @@ public final class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfi
     private static final Setting<Integer> MAX_SAMPLES_SETTING = setting("com.graphaware.runtime.timing.maxSamples", INTEGER, (String) null);
     private static final Setting<Integer> MAX_TIME_SETTING = setting("com.graphaware.runtime.timing.maxTime", INTEGER, (String) null);
 
+    //stats
+    private static final Setting<Boolean> STATS_DISABLE_SETTING = setting("com.graphaware.runtime.stats.disable", BOOLEAN, "false");
+
     /**
      * Constructs a new {@link Neo4jConfigBasedRuntimeConfiguration} based on the given Neo4j {@link Config}.
      *
      * @param config The {@link Config} containing the settings used to configure the runtime
      */
-    public Neo4jConfigBasedRuntimeConfiguration(Config config) {
-        super(createTimingStrategy(config), createWritingConfig(config));
+    public Neo4jConfigBasedRuntimeConfiguration(GraphDatabaseService database, Config config) {
+        super(createTimingStrategy(config), createWritingConfig(config), createStatsCollector(database, config));
     }
 
     private static TimingStrategy createTimingStrategy(Config config) {
@@ -187,5 +199,11 @@ public final class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfi
         return result;
     }
 
+    private static StatsCollector createStatsCollector(GraphDatabaseService database, Config config) {
+        if (config.get(STATS_DISABLE_SETTING)) {
+            return NullStatsCollector.getInstance();
+        }
 
+        return new GoogleAnalyticsStatsCollector(database);
+    }
 }

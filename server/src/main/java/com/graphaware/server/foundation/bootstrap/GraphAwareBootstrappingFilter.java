@@ -17,6 +17,7 @@
 package com.graphaware.server.foundation.bootstrap;
 
 import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
+import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.server.foundation.context.FoundationRootContextCreator;
 import com.graphaware.server.foundation.context.GraphAwareWebContextCreator;
 import com.graphaware.server.foundation.context.RootContextCreator;
@@ -31,6 +32,7 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ArrayUtil;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.configuration.Config;
 import org.neo4j.logging.Log;
 import org.neo4j.server.NeoServer;
@@ -72,8 +74,12 @@ public class GraphAwareBootstrappingFilter implements Filter {
         if (rootContext != null) {
             return;
         }
-        bootstrapGraphAware(filterConfig);
-        GoogleAnalyticsStatsCollector.getInstance().frameworkStart("all");
+
+        GoogleAnalyticsStatsCollector statsCollector = new GoogleAnalyticsStatsCollector(neoServer.getDatabase().getGraph());
+
+        bootstrapGraphAware(filterConfig, statsCollector);
+
+        statsCollector.frameworkStart("all");
     }
 
     @Override
@@ -89,14 +95,12 @@ public class GraphAwareBootstrappingFilter implements Filter {
         }
     }
 
-    private void bootstrapGraphAware(FilterConfig filterConfig) {
+    private void bootstrapGraphAware(FilterConfig filterConfig, StatsCollector statsCollector) {
         HandlerList handlerList = findHandlerList(filterConfig);
 
         SessionManager sessionManager = findSessionManager(handlerList);
 
-        rootContext = getRootContextCreator().createContext(neoServer);
-
-        //addSpringToNeoHandlers(handlerList, sessionManager, rootContext);
+        rootContext = getRootContextCreator().createContext(neoServer, statsCollector);
 
         addGraphAwareHandlers(handlerList, sessionManager, rootContext, neoServer.getConfig());
     }
@@ -125,22 +129,6 @@ public class GraphAwareBootstrappingFilter implements Filter {
         return new FoundationRootContextCreator();
     }
 
-//    private void addSpringToNeoHandlers(HandlerCollection handlerList, SessionManager sessionManager, ApplicationContext rootContext) {
-//        for (Handler neoHandler : handlerList.getHandlers()) {
-//            if (!(neoHandler instanceof ServletContextHandler)) {
-//                LOG.info(neoHandler + " is not a ServletContextHandler. Not adding Spring.");
-//                continue;
-//            }
-//            LOG.info("Adding Spring to " + neoHandler);
-//
-//            addSpringToHandler((ServletContextHandler) neoHandler, getNeoContextCreator(), rootContext, neoServer.getConfig());
-//        }
-//    }
-
-//    protected WebContextCreator getNeoContextCreator() {
-//        return new NeoWebContextCreator();
-//    }
-
     protected void addGraphAwareHandlers(HandlerCollection handlerList, SessionManager sessionManager, ApplicationContext rootContext, Config config) {
         prependHandler(handlerList, createGraphAwareHandler(sessionManager, rootContext));
     }
@@ -148,7 +136,7 @@ public class GraphAwareBootstrappingFilter implements Filter {
     private ServletContextHandler createGraphAwareHandler(SessionManager sessionManager, ApplicationContext rootContext) {
         ServletContextHandler handler = createNewHandler(sessionManager, getContextPath(neoServer.getConfig()));
 
-        addSpringToHandler(handler, getGraphAwareContextCreator(), rootContext, neoServer.getConfig());
+        addSpringToHandler(handler, getGraphAwareContextCreator(neoServer.getDatabase().getGraph()), rootContext, neoServer.getConfig());
         addDefaultFilters(handler);
 
         return handler;
@@ -166,8 +154,8 @@ public class GraphAwareBootstrappingFilter implements Filter {
         handler.setServer(webServer.getJetty());
     }
 
-    protected WebContextCreator getGraphAwareContextCreator() {
-        return new GraphAwareWebContextCreator();
+    protected WebContextCreator getGraphAwareContextCreator(GraphDatabaseService database) {
+        return new GraphAwareWebContextCreator(database);
     }
 
     protected final void addSpringToHandler(ServletContextHandler handler, WebContextCreator contextCreator, ApplicationContext rootContext, Config config) {

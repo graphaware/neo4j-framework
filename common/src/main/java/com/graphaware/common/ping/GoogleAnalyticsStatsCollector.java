@@ -22,10 +22,11 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.internal.GraphDatabaseAPI;
 import org.neo4j.logging.Log;
 
 import java.io.IOException;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -36,23 +37,25 @@ import java.util.concurrent.TimeUnit;
 public class GoogleAnalyticsStatsCollector implements StatsCollector {
 
     private static final Log LOG = LoggerFactory.getLogger(GoogleAnalyticsStatsCollector.class);
-    private static final UUID uuid = UUID.randomUUID();
-    private static final String TID = "UA-1428985-8";
-    private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private static final String TID = "UA-1428985-11";
 
-    private static final GoogleAnalyticsStatsCollector INSTANCE = new GoogleAnalyticsStatsCollector();
+    private static ScheduledExecutorService executor;
+    private final String storeId;
 
-    public static GoogleAnalyticsStatsCollector getInstance() {
-        return INSTANCE;
+    public GoogleAnalyticsStatsCollector(GraphDatabaseService database) {
+        this.storeId = findStoreId(database);
     }
 
-    private GoogleAnalyticsStatsCollector() {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                executor.shutdownNow();
-            }
-        });
+    private static String findStoreId(GraphDatabaseService database) {
+        if (database == null) {
+            return "unknown";
+        }
+
+        if (((GraphDatabaseAPI) database).storeId() == null) {
+            return "unknown";
+        }
+
+        return String.valueOf(((GraphDatabaseAPI) database).storeId().getRandomId());
     }
 
     /**
@@ -80,22 +83,64 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
     }
 
     private void post(final String body) {
-        executor.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                HttpPost httpPost = new HttpPost("http://www.google-analytics.com/collect");
-                httpPost.setEntity(new StringEntity(body, ContentType.TEXT_PLAIN));
+        initializeExecutorIfNeeded();
 
-                try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                    httpClient.execute(httpPost);
-                } catch (IOException e1) {
-                    LOG.warn("Unable to collect stats", e1);
-                }
+        executor.scheduleAtFixedRate(() -> {
+            HttpPost httpPost = new HttpPost("http://www.google-analytics.com/collect");
+            httpPost.setEntity(new StringEntity(body, ContentType.TEXT_PLAIN));
+
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                httpClient.execute(httpPost);
+            } catch (IOException e1) {
+                LOG.warn("Unable to collect stats", e1);
             }
         }, 5, 5, TimeUnit.MINUTES);
     }
 
+    private void initializeExecutorIfNeeded() {
+        if (executor == null) {
+            synchronized (this) {
+                if (executor == null) {
+                    executor = Executors.newSingleThreadScheduledExecutor();
+
+                    Runtime.getRuntime().addShutdownHook(new Thread() {
+                        @Override
+                        public void run() {
+                            executor.shutdownNow();
+                        }
+                    });
+                }
+            }
+        }
+    }
+
     private String constructBody(String appId) {
-        return "v=1&tid=" + TID + "&cid=" + uuid + "&t=event&ea=" + appId + "&ec=Run&el=" + VERSION;
+        return "v=1&tid=" + TID + "&cid=" + storeId + "&t=event&ea=" + appId + "&ec=Run&el=" + VERSION;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        GoogleAnalyticsStatsCollector that = (GoogleAnalyticsStatsCollector) o;
+
+        return !(storeId != null ? !storeId.equals(that.storeId) : that.storeId != null);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return storeId != null ? storeId.hashCode() : 0;
     }
 }

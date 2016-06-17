@@ -38,7 +38,7 @@ public final class GraphAwareRuntimeFactory {
 
     /**
      * Create a runtime backed by a database using default runtime configuration.
-     * <p/>
+     * <p>
      * The runtime only supports {@link com.graphaware.runtime.module.TimerDrivenModule}s if the database is a real transactional
      * (rather than batch) database, i.e., that it implements {@link GraphDatabaseAPI}.
      *
@@ -46,12 +46,12 @@ public final class GraphAwareRuntimeFactory {
      * @return runtime.
      */
     public static GraphAwareRuntime createRuntime(GraphDatabaseService database) {
-        return createRuntime(database, FluentRuntimeConfiguration.defaultConfiguration());
+        return createRuntime(database, FluentRuntimeConfiguration.defaultConfiguration(database));
     }
 
     /**
      * Create a runtime backed by a database using specific runtime configuration.
-     * <p/>
+     * <p>
      * The runtime only supports {@link com.graphaware.runtime.module.TimerDrivenModule}s if the database is a real transactional
      * (rather than batch) database, i.e., that it implements {@link GraphDatabaseAPI}.
      *
@@ -63,8 +63,8 @@ public final class GraphAwareRuntimeFactory {
         ModuleMetadataRepository timerRepo = new GraphPropertiesMetadataRepository(database, configuration, TIMER_MODULES_PROPERTY_PREFIX);
         ModuleMetadataRepository txRepo = new GraphPropertiesMetadataRepository(database, configuration, TX_MODULES_PROPERTY_PREFIX);
 
-        TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo, configuration.getTimingStrategy());
-        TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, txRepo);
+        TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo, configuration.getTimingStrategy(), configuration.getStatsCollector());
+        TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, txRepo, configuration.getStatsCollector());
 
         return new ProductionRuntime(configuration, database, txDrivenModuleManager, timerDrivenModuleManager, configuration.getWritingConfig().produceWriter(database));
     }

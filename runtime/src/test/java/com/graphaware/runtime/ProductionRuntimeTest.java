@@ -81,8 +81,8 @@ public class ProductionRuntimeTest {
 
         registerShutdownHook(database);
 
-        txRepo = new GraphPropertiesMetadataRepository(database, defaultConfiguration(), TX_MODULES_PROPERTY_PREFIX);
-        timerRepo = new GraphPropertiesMetadataRepository(database, defaultConfiguration(), TIMER_MODULES_PROPERTY_PREFIX);
+        txRepo = new GraphPropertiesMetadataRepository(database, defaultConfiguration(database), TX_MODULES_PROPERTY_PREFIX);
+        timerRepo = new GraphPropertiesMetadataRepository(database, defaultConfiguration(database), TIMER_MODULES_PROPERTY_PREFIX);
         keyValueStore = new GraphKeyValueStore(database);
     }
 
@@ -175,7 +175,7 @@ public class ProductionRuntimeTest {
         TxDrivenModule mockModule = mockTxModule(MOCK);
         doThrow(new DeliberateTransactionRollbackException("Deliberate testing exception")).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
         runtime.start();
 
@@ -198,7 +198,7 @@ public class ProductionRuntimeTest {
         TxDrivenModule mockModule = mockTxModule(MOCK);
         doThrow(new RuntimeException("Deliberate testing exception")).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
         runtime.start();
 
@@ -218,14 +218,14 @@ public class ProductionRuntimeTest {
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotBeAbleToRegisterDifferentModulesWithSameId() {
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockTxModule());
         runtime.registerModule(mockTimerModule());
     }
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotBeAbleToRegisterSameTimerModuleTwice() {
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockTimerModule());
         runtime.registerModule(mockTimerModule());
     }
@@ -241,7 +241,7 @@ public class ProductionRuntimeTest {
             tx.success();
         }
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -263,7 +263,7 @@ public class ProductionRuntimeTest {
             tx.success();
         }
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -284,7 +284,7 @@ public class ProductionRuntimeTest {
         TimerDrivenModule mockModule2 = mockTimerModule(MOCK + "2");
         TimerDrivenModule mockModule3 = mockTimerModule(MOCK + "3");
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
         runtime.registerModule(mockModule3);
@@ -317,7 +317,7 @@ public class ProductionRuntimeTest {
         TimerDrivenModule mockModule2 = mockTimerModule(MOCK + "2");
 
         GraphAwareRuntime runtime = createRuntime(database,
-                defaultConfiguration()
+                defaultConfiguration(database)
                         .withTimingStrategy(
                                 AdaptiveTimingStrategy
                                         .defaultConfiguration()
@@ -354,7 +354,7 @@ public class ProductionRuntimeTest {
         when(mockModule2.createInitialContext(database)).thenReturn(context1);
         when(mockModule2.doSomeWork(context1, database)).thenReturn(context2);
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
         runtime.registerModule(mockModule3);
@@ -391,7 +391,7 @@ public class ProductionRuntimeTest {
         when(mockModule1.createInitialContext(database)).thenReturn(context);
         when(mockModule2.createInitialContext(database)).thenReturn(context);
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
 
@@ -420,7 +420,7 @@ public class ProductionRuntimeTest {
         when(mockModule.doSomeWork(null, database)).thenReturn(firstContext);
         when(mockModule.doSomeWork(firstContext, database)).thenReturn(secondContext);
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -453,7 +453,7 @@ public class ProductionRuntimeTest {
             tx.success();
         }
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -469,7 +469,7 @@ public class ProductionRuntimeTest {
     public void shutdownShouldBeCalledBeforeShutdownOnTimerDrivenModules() {
         TimerDrivenModule mockModule = mockTimerModule();
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
         runtime.start();
 
@@ -485,7 +485,7 @@ public class ProductionRuntimeTest {
 
         TimerDrivenModule mockModule2 = mockTimerModule(MOCK + "2");
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
 
@@ -513,7 +513,7 @@ public class ProductionRuntimeTest {
         when(mockModule.createInitialContext(database)).thenReturn(null);
         when(mockModule.getConfiguration()).thenReturn(NullTxAndTimerDrivenModuleConfiguration.getInstance());
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -549,7 +549,7 @@ public class ProductionRuntimeTest {
         TxDrivenModule mockModule1 = mockTxModule(MOCK + "1");
         TxDrivenModule mockModule2 = mockTxModule(MOCK + "2");
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
 
@@ -593,7 +593,7 @@ public class ProductionRuntimeTest {
         TxDrivenModule mockModule2 = mockTxModule(MOCK + "2");
         TimerDrivenModule mockModule3 = mockTimerModule(MOCK + "3");
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
         runtime.registerModule(mockModule3);
@@ -617,7 +617,7 @@ public class ProductionRuntimeTest {
         M6 mockM6a = mockTimerModule("M6a", M6.class);
         M6 mockM6b = mockTimerModule("M6b", M6.class);
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockM1);
         runtime.registerModule(mockM2a);
         runtime.registerModule(mockM2b);
@@ -666,7 +666,7 @@ public class ProductionRuntimeTest {
 
     @Test(expected = NotFoundException.class)
     public void shouldThrowExceptionWhenAskedForNonExistingModule() {
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.getModule("non-existing", TxAndTimerDrivenModule.class);
     }
 
@@ -677,7 +677,7 @@ public class ProductionRuntimeTest {
         TxDrivenModule mockModule2 = mockTxModule(MOCK + "2");
         TimerDrivenModule mockModule3 = mockTimerModule(MOCK + "3");
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
         runtime.registerModule(mockModule3);
@@ -692,7 +692,7 @@ public class ProductionRuntimeTest {
         TxDrivenModule mockModule2 = mockTxModule(MOCK + "2");
         TimerDrivenModule mockModule3 = mockTimerModule(MOCK + "3");
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
         runtime.registerModule(mockModule3);
@@ -704,7 +704,7 @@ public class ProductionRuntimeTest {
     public void moduleRegisteredForTheFirstTimeShouldBeInitialized() {
         final TxDrivenModule mockModule = mockTxModule();
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -729,7 +729,7 @@ public class ProductionRuntimeTest {
 
         final TxDrivenModule mockModule = mockTxModule(configuration);
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -754,7 +754,7 @@ public class ProductionRuntimeTest {
 
         final TxDrivenModule mockModule = mockTxModule(configuration);
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -781,7 +781,7 @@ public class ProductionRuntimeTest {
             tx.success();
         }
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -810,7 +810,7 @@ public class ProductionRuntimeTest {
             tx.success();
         }
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -842,7 +842,7 @@ public class ProductionRuntimeTest {
             tx.success();
         }
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -871,7 +871,7 @@ public class ProductionRuntimeTest {
             tx.success();
         }
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -903,7 +903,7 @@ public class ProductionRuntimeTest {
             tx.success();
         }
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -925,7 +925,7 @@ public class ProductionRuntimeTest {
     public void shouldNotBeAbleToRegisterTheSameModuleTwice() {
         final TxDrivenModule mockModule = mockTxModule();
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
         runtime.registerModule(mockModule);
     }
@@ -937,7 +937,7 @@ public class ProductionRuntimeTest {
         when(mockModule1.getId()).thenReturn("ID");
         when(mockModule2.getId()).thenReturn("ID");
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
     }
@@ -953,7 +953,7 @@ public class ProductionRuntimeTest {
             tx.success();
         }
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -977,7 +977,7 @@ public class ProductionRuntimeTest {
             tx.success();
         }
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -1005,7 +1005,7 @@ public class ProductionRuntimeTest {
             tx.success();
         }
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -1035,7 +1035,7 @@ public class ProductionRuntimeTest {
             tx.success();
         }
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -1056,7 +1056,7 @@ public class ProductionRuntimeTest {
         TxDrivenModule mockModule2 = mockTxModule(MOCK + "2");
         TxDrivenModule mockModule3 = mockTxModule(MOCK + "3", FluentTxDrivenModuleConfiguration.defaultConfiguration().with(InclusionPolicies.none()));
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
         runtime.registerModule(mockModule3);
@@ -1103,7 +1103,7 @@ public class ProductionRuntimeTest {
         when(mockModule.getConfiguration()).thenReturn(NullTxDrivenModuleConfiguration.getInstance());
         Mockito.doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -1134,7 +1134,7 @@ public class ProductionRuntimeTest {
         when(mockModule.getConfiguration()).thenReturn(NullTxDrivenModuleConfiguration.getInstance());
         doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
 
         runtime.start();
@@ -1170,14 +1170,14 @@ public class ProductionRuntimeTest {
     public void modulesCannotBeRegisteredAfterStart() {
         final TxDrivenModule mockModule = mockTxModule();
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.start();
         runtime.registerModule(mockModule);
     }
 
     @Test
     public void multipleCallsToStartFrameworkHaveNoEffect() {
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.start();
         runtime.start();
         runtime.start();
@@ -1188,7 +1188,7 @@ public class ProductionRuntimeTest {
     public void shutdownShouldBeCalledBeforeShutdown() {
         TxDrivenModule mockModule = mockTxModule();
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule);
         runtime.start();
 
@@ -1204,7 +1204,7 @@ public class ProductionRuntimeTest {
 
         TxDrivenModule mockModule2 = mockTxModule(MOCK + "2");
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
 
@@ -1245,7 +1245,7 @@ public class ProductionRuntimeTest {
 
         doThrow(new DeliberateTransactionRollbackException()).when(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
         runtime.registerModule(mockModule3);
@@ -1292,7 +1292,7 @@ public class ProductionRuntimeTest {
 
     @Test(expected = RuntimeException.class)
     public void whenRuntimeIsNotStartedExceptionShouldBeThrown() {
-        createRuntime(database, defaultConfiguration().withTimingStrategy(TIMING_STRATEGY));
+        createRuntime(database, defaultConfiguration(database).withTimingStrategy(TIMING_STRATEGY));
 
         try (Transaction tx = database.beginTx()) {
             database.createNode(new Label[]{});
@@ -1304,7 +1304,7 @@ public class ProductionRuntimeTest {
     public void shouldStartAndStopDatabaseWriter() {
         final AtomicBoolean started = new AtomicBoolean(false);
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration().withWritingConfig(new WritingConfig() {
+        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withWritingConfig(new WritingConfig() {
             @Override
             public Neo4jWriter produceWriter(GraphDatabaseService database) {
                 return new BaseNeo4jWriter(database) {

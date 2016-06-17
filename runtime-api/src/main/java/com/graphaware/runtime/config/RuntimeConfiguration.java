@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime.config;
 
+import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.runtime.write.WritingConfig;
 
@@ -28,17 +29,17 @@ public interface RuntimeConfiguration {
      * Prefix for GraphAware internal nodes, relationships, and properties. This is fixed as there is little chance
      * that users would have a reason to change it.
      */
-    public static final String GA_PREFIX = "_GA_";
+    String GA_PREFIX = "_GA_";
 
     /**
      * Prefix for property keys of properties storing {@link com.graphaware.runtime.metadata.TxDrivenModuleMetadata}.
      */
-    public static final String TX_MODULES_PROPERTY_PREFIX = "TX_MODULE";
+    String TX_MODULES_PROPERTY_PREFIX = "TX_MODULE";
 
     /**
      * Prefix for property keys of properties storing {@link com.graphaware.runtime.metadata.TimerDrivenModuleMetadata}.
      */
-    public static final String TIMER_MODULES_PROPERTY_PREFIX = "TIMER_MODULE";
+    String TIMER_MODULES_PROPERTY_PREFIX = "TIMER_MODULE";
 
 
     /**
@@ -62,4 +63,9 @@ public interface RuntimeConfiguration {
      * @return The {@link WritingConfig}, may not be null.
      */
     WritingConfig getWritingConfig();
+
+    /**
+     * @return statistics collector.
+     */
+    StatsCollector getStatsCollector();
 }

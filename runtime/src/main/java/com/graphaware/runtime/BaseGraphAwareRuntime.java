@@ -17,7 +17,6 @@
 package com.graphaware.runtime;
 
 import com.graphaware.common.log.LoggerFactory;
-import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -92,8 +91,6 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
 
         checkNotAlreadyRegistered(module);
         doRegisterModule(module);
-
-        GoogleAnalyticsStatsCollector.getInstance().moduleStart(module.getClass().getCanonicalName());
     }
 
     /**
@@ -146,7 +143,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
      * Start stats collector.
      */
     private void startStatsCollector() {
-        GoogleAnalyticsStatsCollector.getInstance().runtimeStart();
+        configuration.getStatsCollector().runtimeStart();
     }
 
     /**
