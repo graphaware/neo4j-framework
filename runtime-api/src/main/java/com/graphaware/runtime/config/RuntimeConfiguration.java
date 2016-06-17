@@ -32,12 +32,12 @@ public interface RuntimeConfiguration {
     String GA_PREFIX = "_GA_";
 
     /**
-     * Prefix for property keys of properties storing {@link com.graphaware.runtime.metadata.TxDrivenModuleMetadata}.
+     * Prefix for property keys of properties storing {@link com.graphaware.runtime.metadata.ModuleMetadata}.
      */
     String TX_MODULES_PROPERTY_PREFIX = "TX_MODULE";
 
     /**
-     * Prefix for property keys of properties storing {@link com.graphaware.runtime.metadata.TimerDrivenModuleMetadata}.
+     * Prefix for property keys of properties storing {@link com.graphaware.runtime.metadata.ModuleMetadata}.
      */
     String TIMER_MODULES_PROPERTY_PREFIX = "TIMER_MODULE";
 
@@ -51,7 +51,7 @@ public interface RuntimeConfiguration {
     String createPrefix(String id);
 
     /**
-     * Retrieves the {@link TimingStrategy} used for scheduling of work for {@link com.graphaware.runtime.module.TimerDrivenModule}s.
+     * Retrieves the {@link TimingStrategy} used for scheduling of work for {@link com.graphaware.runtime.module.ModuleMetadata}s.
      *
      * @return The {@link TimingStrategy}, which may not be <code>null</code>.
      */
