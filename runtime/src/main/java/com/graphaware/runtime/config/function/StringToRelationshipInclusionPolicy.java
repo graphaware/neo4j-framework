@@ -18,6 +18,7 @@ package com.graphaware.runtime.config.function;
 
 import com.graphaware.common.policy.RelationshipInclusionPolicy;
 import com.graphaware.common.policy.composite.CompositeRelationshipInclusionPolicy;
+import com.graphaware.common.policy.none.IncludeNoRelationships;
 import com.graphaware.common.policy.spel.SpelRelationshipInclusionPolicy;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessRelationships;
 
@@ -30,6 +31,15 @@ public final class StringToRelationshipInclusionPolicy extends StringToInclusion
 
     public static StringToRelationshipInclusionPolicy getInstance() {
         return INSTANCE;
+    }
+
+    @Override
+    public RelationshipInclusionPolicy apply(String expression) {
+        switch (expression) {
+            case "true": return IncludeAllBusinessRelationships.getInstance();
+            case "false": return IncludeNoRelationships.getInstance();
+            default: return super.apply(expression);
+        }
     }
 
     /**
