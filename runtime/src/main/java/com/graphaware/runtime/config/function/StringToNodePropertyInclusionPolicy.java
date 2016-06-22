@@ -17,7 +17,9 @@
 package com.graphaware.runtime.config.function;
 
 import com.graphaware.common.policy.NodePropertyInclusionPolicy;
+import com.graphaware.common.policy.all.IncludeAllNodeProperties;
 import com.graphaware.common.policy.composite.CompositeNodePropertyInclusionPolicy;
+import com.graphaware.common.policy.none.IncludeNoNodeProperties;
 import com.graphaware.common.policy.spel.SpelNodePropertyInclusionPolicy;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodeProperties;
 
@@ -30,6 +32,15 @@ public final class StringToNodePropertyInclusionPolicy extends StringToInclusion
 
     public static StringToNodePropertyInclusionPolicy getInstance() {
         return INSTANCE;
+    }
+
+    @Override
+    public NodePropertyInclusionPolicy apply(String expression) {
+        switch (expression) {
+            case "true": return IncludeAllNodeProperties.getInstance();
+            case "false": return IncludeNoNodeProperties.getInstance();
+            default: return super.apply(expression);
+        }
     }
 
     /**
