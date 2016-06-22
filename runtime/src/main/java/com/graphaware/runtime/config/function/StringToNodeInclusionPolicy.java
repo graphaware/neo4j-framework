@@ -33,15 +33,6 @@ public final class StringToNodeInclusionPolicy extends StringToInclusionPolicy<N
         return INSTANCE;
     }
 
-    @Override
-    public NodeInclusionPolicy apply(String expression) {
-        switch (expression) {
-            case "true": return IncludeAllBusinessNodes.getInstance();
-            case "false": return IncludeNoNodes.getInstance();
-            default: return super.apply(expression);
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -56,5 +47,21 @@ public final class StringToNodeInclusionPolicy extends StringToInclusionPolicy<N
     @Override
     protected NodeInclusionPolicy spelPolicy(String spel) {
         return new SpelNodeInclusionPolicy(spel);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NodeInclusionPolicy all() {
+        return IncludeAllBusinessNodes.getInstance();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NodeInclusionPolicy none() {
+        return IncludeNoNodes.getInstance();
     }
 }

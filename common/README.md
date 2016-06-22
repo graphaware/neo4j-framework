@@ -87,6 +87,8 @@ com.graphaware.module.reco.node=hasLabel('Person')
 
 The following expressions can be used:
 * For all Property Containers (Nodes and Relationships):
+    * `true` - include all
+    * `false` - include none
     * `hasProperty('propertyName')` - returns boolean. Example: `hasProperty('name')`
     * `getProperty('propertyName','defaultValue')` - returns Object. Example: `getProperty('name','unknown') == 'Michal'`
 * For Nodes only:

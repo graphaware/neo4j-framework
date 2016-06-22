@@ -34,15 +34,6 @@ public final class StringToNodePropertyInclusionPolicy extends StringToInclusion
         return INSTANCE;
     }
 
-    @Override
-    public NodePropertyInclusionPolicy apply(String expression) {
-        switch (expression) {
-            case "true": return IncludeAllNodeProperties.getInstance();
-            case "false": return IncludeNoNodeProperties.getInstance();
-            default: return super.apply(expression);
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -57,5 +48,21 @@ public final class StringToNodePropertyInclusionPolicy extends StringToInclusion
     @Override
     protected NodePropertyInclusionPolicy spelPolicy(String spel) {
         return new SpelNodePropertyInclusionPolicy(spel);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NodePropertyInclusionPolicy all() {
+        return IncludeAllNodeProperties.getInstance();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NodePropertyInclusionPolicy none() {
+        return IncludeNoNodeProperties.getInstance();
     }
 }

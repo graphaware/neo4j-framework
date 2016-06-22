@@ -17,6 +17,8 @@
 package com.graphaware.runtime.config.function;
 
 import com.graphaware.common.policy.InclusionPolicy;
+import com.graphaware.common.policy.all.IncludeAllNodeProperties;
+import com.graphaware.common.policy.none.IncludeNoNodeProperties;
 
 import java.lang.reflect.Method;
 import java.util.function.Function;
@@ -36,6 +38,14 @@ public abstract class StringToInclusionPolicy<T extends InclusionPolicy> impleme
      */
     @Override
     public T apply(String s) {
+        if ("true".equals(s)) {
+            return all();
+        }
+
+        if ("false".equals(s)) {
+            return none();
+        }
+
         if (CLASS_NAME_REGEX.matcher(s).matches()) {
             try {
                 Class<?> clazz = Class.forName(s);
@@ -76,4 +86,14 @@ public abstract class StringToInclusionPolicy<T extends InclusionPolicy> impleme
      * @return policy.
      */
     protected abstract T spelPolicy(String spel);
+
+    /**
+     * @return an all-including policy.
+     */
+    protected abstract T all();
+
+    /**
+     * @return a none-including policy.
+     */
+    protected abstract T none();
 }

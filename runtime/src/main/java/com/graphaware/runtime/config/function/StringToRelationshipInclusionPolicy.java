@@ -33,15 +33,6 @@ public final class StringToRelationshipInclusionPolicy extends StringToInclusion
         return INSTANCE;
     }
 
-    @Override
-    public RelationshipInclusionPolicy apply(String expression) {
-        switch (expression) {
-            case "true": return IncludeAllBusinessRelationships.getInstance();
-            case "false": return IncludeNoRelationships.getInstance();
-            default: return super.apply(expression);
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -56,5 +47,21 @@ public final class StringToRelationshipInclusionPolicy extends StringToInclusion
     @Override
     protected RelationshipInclusionPolicy spelPolicy(String spel) {
         return new SpelRelationshipInclusionPolicy(spel);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected RelationshipInclusionPolicy all() {
+        return IncludeAllBusinessRelationships.getInstance();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected RelationshipInclusionPolicy none() {
+        return IncludeNoRelationships.getInstance();
     }
 }

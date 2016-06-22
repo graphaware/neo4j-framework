@@ -34,15 +34,6 @@ public final class StringToRelationshipPropertyInclusionPolicy extends StringToI
         return INSTANCE;
     }
 
-    @Override
-    public RelationshipPropertyInclusionPolicy apply(String expression) {
-        switch (expression) {
-            case "true": return IncludeAllRelationshipProperties.getInstance();
-            case "false": return IncludeNoRelationshipProperties.getInstance();
-            default: return super.apply(expression);
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -57,5 +48,21 @@ public final class StringToRelationshipPropertyInclusionPolicy extends StringToI
     @Override
     protected RelationshipPropertyInclusionPolicy spelPolicy(String spel) {
         return new SpelRelationshipPropertyInclusionPolicy(spel);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected RelationshipPropertyInclusionPolicy all() {
+        return IncludeAllRelationshipProperties.getInstance();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected RelationshipPropertyInclusionPolicy none() {
+        return  IncludeNoRelationshipProperties.getInstance();
     }
 }
