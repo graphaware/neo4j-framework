@@ -70,6 +70,8 @@ Getting GraphAware Framework
 
 ### Releases
 
+*** WARNING ***: The framework does not work with the .exe or .dmg Neo4j installers. Please use the .zip/.tgz versions!
+
 To use the latest release, <a href="http://products.graphaware.com/" target="_blank">download</a> the appropriate version and put it
 the _plugins_ directory in your Neo4j server installation and restart the server (server mode), or on the classpath (embedded mode).
 
