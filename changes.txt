@@ -5,6 +5,7 @@
 
 3.0.2.39:
     -upgraded to Neo4j 3.0.2
+    -dropped slf4j in favour of using neo4j logging module
     -fix logging (issue #49)
 
 3.0.1.38:
