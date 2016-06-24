@@ -17,7 +17,6 @@
 package com.graphaware.tx.executor.single;
 
 import org.neo4j.logging.Log;
-import org.slf4j.Logger;
 import com.graphaware.common.log.LoggerFactory;
 
 /**

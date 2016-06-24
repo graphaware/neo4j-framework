@@ -25,7 +25,6 @@ import com.graphaware.tx.executor.single.TransactionCallback;
 import com.graphaware.tx.executor.single.TransactionExecutor;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.logging.Log;
-import org.slf4j.Logger;
 import com.graphaware.common.log.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;

@@ -18,7 +18,6 @@ package com.graphaware.writer.service;
 
 import com.google.common.util.concurrent.AbstractScheduledService;
 import org.neo4j.logging.Log;
-import org.slf4j.Logger;
 import com.graphaware.common.log.LoggerFactory;
 
 import java.util.concurrent.Executors;

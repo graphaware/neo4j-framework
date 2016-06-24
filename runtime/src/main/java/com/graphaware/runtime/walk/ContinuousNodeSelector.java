@@ -24,7 +24,6 @@ import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.kernel.impl.storageengine.impl.recordstorage.RecordStorageEngine;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 import org.neo4j.logging.Log;
-import org.slf4j.Logger;
 import com.graphaware.common.log.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicLong;

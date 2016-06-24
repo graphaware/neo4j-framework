@@ -33,7 +33,6 @@ import com.graphaware.writer.neo4j.Neo4jWriter;
 import com.graphaware.writer.neo4j.TxPerTaskWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.logging.Log;
-import org.slf4j.Logger;
 import com.graphaware.common.log.LoggerFactory;
 
 import java.util.LinkedList;
