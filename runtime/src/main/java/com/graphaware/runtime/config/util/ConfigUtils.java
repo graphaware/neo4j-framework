@@ -17,7 +17,6 @@
 package com.graphaware.runtime.config.util;
 
 import org.neo4j.logging.Log;
-import org.slf4j.Logger;
 import com.graphaware.common.log.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;

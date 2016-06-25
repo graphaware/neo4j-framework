@@ -29,7 +29,6 @@ import org.neo4j.kernel.internal.KernelData;
 import org.neo4j.logging.Log;
 import org.neo4j.management.HighAvailability;
 import org.neo4j.management.Neo4jManager;
-import org.slf4j.Logger;
 import com.graphaware.common.log.LoggerFactory;
 
 import java.util.Iterator;

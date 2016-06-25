@@ -17,7 +17,6 @@
 package com.graphaware.runtime.schedule;
 
 import org.neo4j.logging.Log;
-import org.slf4j.Logger;
 import com.graphaware.common.log.LoggerFactory;
 
 /**

@@ -23,7 +23,6 @@ import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.logging.Log;
-import org.slf4j.Logger;
 import com.graphaware.common.log.LoggerFactory;
 
 /**

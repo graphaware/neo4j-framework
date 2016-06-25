@@ -22,7 +22,6 @@ import org.neo4j.server.rest.transactional.TransactionFacade;
 import org.neo4j.server.rest.transactional.TransactionHandle;
 import org.neo4j.server.rest.transactional.error.Neo4jError;
 import org.neo4j.server.rest.transactional.error.TransactionLifecycleException;
-import org.slf4j.Logger;
 import com.graphaware.common.log.LoggerFactory;
 
 import javax.servlet.*;

@@ -19,12 +19,10 @@ package com.graphaware.test.unit;
 import com.graphaware.common.policy.InclusionPolicies;
 import com.graphaware.common.util.PropertyContainerUtils;
 import org.neo4j.graphdb.*;
-import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.helpers.collection.Iterators;
 import org.neo4j.logging.Log;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
-import org.slf4j.Logger;
 import com.graphaware.common.log.LoggerFactory;
 
 import java.util.*;

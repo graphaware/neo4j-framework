@@ -27,7 +27,6 @@ import org.neo4j.server.plugins.SPIPluginLifecycle;
 import org.neo4j.server.rest.transactional.TransactionFacade;
 import org.neo4j.server.web.Jetty9WebServer;
 import org.neo4j.server.web.WebServer;
-import org.slf4j.Logger;
 import com.graphaware.common.log.LoggerFactory;
 
 import javax.ws.rs.Path;
