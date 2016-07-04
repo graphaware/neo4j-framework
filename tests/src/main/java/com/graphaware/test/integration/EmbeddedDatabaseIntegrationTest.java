@@ -22,6 +22,7 @@ import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.springframework.core.io.ClassPathResource;
 
+import java.io.File;
 import java.io.IOException;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
@@ -64,7 +65,7 @@ public abstract class EmbeddedDatabaseIntegrationTest extends DatabaseIntegratio
      */
     protected GraphDatabaseBuilder createGraphDatabaseBuilder() {
         return new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
+                .newImpermanentDatabaseBuilder(new File("target/test-data/impermanent-db-" + System.currentTimeMillis()))
                 .setConfig("online_backup_enabled", FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE);
     }
