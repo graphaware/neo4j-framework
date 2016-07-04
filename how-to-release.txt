@@ -16,7 +16,6 @@ notes:
         git push origin :refs/tags/graphaware-parent-2.1.7.28
 
 List of modules to upgrade:
-        warmup
         uuid
         resttest
         algorithms
