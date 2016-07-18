@@ -16,8 +16,18 @@
 
 package com.graphaware.test.integration;
 
-import java.util.Collections;
-import java.util.Map;
+import org.apache.commons.io.FileUtils;
+import org.neo4j.kernel.api.exceptions.KernelException;
+import org.neo4j.kernel.impl.proc.Procedures;
+import org.neo4j.procedure.Procedure;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
+
 
 /**
  * Base-class for tests of APIs that are written as Spring MVC {@link org.springframework.stereotype.Controller}s
@@ -31,8 +41,28 @@ import java.util.Map;
  * {@link com.graphaware.test.unit.GraphUnit} to assert the database state. Before tests are run, the database can be populated
  * by overriding the {@link #populateDatabase(org.neo4j.graphdb.GraphDatabaseService)} method, or by providing a
  * {@link com.graphaware.test.data.DatabasePopulator} in {@link #databasePopulator()}.
+ * <p>
+ * Also works around the issue that Neo4j only registers procedures that it finds in .jar files (not .class) files, so
+ * this class by default registers all {@link Procedure}s that are part of the current project (are on classpath). You
+ * can disable this behaviour by overridding {@link #shouldRegisterProcedures()}.
  */
 public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void registerProcedures(Procedures procedures) {
+        super.registerProcedures(procedures);
+
+        for (Class cls : proceduresOnClassPath()) {
+            try {
+                procedures.register(cls);
+            } catch (KernelException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 
     @Override
     protected Map<String, String> thirdPartyJaxRsPackageMappings() {
@@ -41,5 +71,53 @@ public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
 
     public String baseUrl() {
         return baseNeoUrl() + "/graphaware";
+    }
+
+    /**
+     * Find all classes on classpath (only .class files) that have a method annotated with {@link Procedure}.
+     *
+     * @return classes with procedures.
+     */
+    private Iterable<Class> proceduresOnClassPath() {
+        Enumeration<URL> urls;
+
+        try {
+            urls = this.getClass().getClassLoader().getResources("");
+        } catch (IOException e) {
+            throw new RuntimeException();
+        }
+
+        List<Class> classes = new ArrayList<>();
+
+        while (urls.hasMoreElements()) {
+            Iterator<File> fileIterator;
+            File directory;
+
+            try {
+                directory = new File(urls.nextElement().toURI());
+                fileIterator = FileUtils.iterateFiles(directory, new String[]{"class"}, true);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+
+            while (fileIterator.hasNext()) {
+                File file = fileIterator.next();
+                try {
+                    String path = file.getAbsolutePath();
+                    Class<?> candidate = Class.forName(path.substring(directory.getAbsolutePath().length() + 1, path.length() - 6).replaceAll("\\/", "."));
+
+                    for (Method m : candidate.getDeclaredMethods()) {
+                        if (m.isAnnotationPresent(Procedure.class)) {
+                            classes.add(candidate);
+                        }
+                    }
+
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        return classes;
     }
 }

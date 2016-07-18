@@ -17,6 +17,7 @@
 package com.graphaware.test;
 
 import com.graphaware.test.integration.GraphAwareIntegrationTest;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.apache.http.HttpStatus.SC_OK;
@@ -33,4 +34,15 @@ public class GraphAwareIntegrationTestTest extends GraphAwareIntegrationTest {
         httpClient.get(baseUrl() + "/greeting", SC_OK);
     }
 
+    @Test
+    public void shouldRegisterProcedureOnClasspath() {
+        Assert.assertEquals(
+                "+---------+\n" +
+                "| string  |\n" +
+                "+---------+\n" +
+                "| \"hello\" |\n" +
+                "+---------+\n" +
+                "1 row\n",
+                getDatabase().execute("CALL ga.hello()").resultAsString());
+    }
 }

@@ -1,15 +1,19 @@
+3.0.4.39 (not released):
+    - upgraded to Neo4j 3.0.4
+    - integration tests register procedures on classpath
+
 3.0.3.39:
-    -upgraded to Neo4j 3.0.3
-    -overhauled stats reporting
-    -fixed a critical issue with registering runtime, which made the previous version no good
+    - upgraded to Neo4j 3.0.3
+    - overhauled stats reporting
+    - fixed a critical issue with registering runtime, which made the previous version no good
 
 3.0.2.39:
-    -upgraded to Neo4j 3.0.2
-    -dropped slf4j in favour of using neo4j logging module
-    -fix logging (issue #49)
+    - upgraded to Neo4j 3.0.2
+    - dropped slf4j in favour of using neo4j logging module
+    - fix logging (issue #49)
 
 3.0.1.38:
-    -upgraded to Neo4j 3.0.1
+    - upgraded to Neo4j 3.0.1
 
 3.0.0.38:
     - fixed a serialisation bug

@@ -20,6 +20,8 @@ import com.graphaware.test.data.DatabasePopulator;
 import org.junit.After;
 import org.junit.Before;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.impl.factory.GraphDatabaseFacade;
+import org.neo4j.kernel.impl.proc.Procedures;
 
 /**
  * Base class for all kinds of Neo4j integration tests.
@@ -38,6 +40,10 @@ public abstract class DatabaseIntegrationTest {
     public void setUp() throws Exception {
         database = createDatabase();
         populateDatabase(database);
+
+        if (shouldRegisterProcedures()) {
+            registerProcedures(((GraphDatabaseFacade) database).getDependencyResolver().resolveDependency(Procedures.class));
+        }
     }
 
     @After
@@ -71,6 +77,22 @@ public abstract class DatabaseIntegrationTest {
         if (populator != null) {
             populator.populate(database);
         }
+    }
+
+    /**
+     * @return <code>iff</code> the {@link #registerProcedures(Procedures)} method should be called during {@link #setUp()}.
+     */
+    protected boolean shouldRegisterProcedures() {
+        return true;
+    }
+
+    /**
+     * Register procedures.
+     *
+     * @param procedures to register against.
+     */
+    protected void registerProcedures(Procedures procedures) {
+        //no-op by default
     }
 
     /**
