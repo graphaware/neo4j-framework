@@ -18,8 +18,16 @@ package com.graphaware.common.policy.spel;
 
 import com.graphaware.common.policy.NodeInclusionPolicy;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.helpers.collection.FilteringIterable;
+import org.springframework.expression.spel.SpelNode;
+import org.springframework.expression.spel.ast.OpOr;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+
+import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * {@link NodeInclusionPolicy} based on a SPEL expression. The expression can use methods defined in {@link NodeExpressions}.
@@ -43,6 +51,20 @@ public class SpelNodeInclusionPolicy extends SpelInclusionPolicy implements Node
      */
     @Override
     public Iterable<Node> getAll(GraphDatabaseService database) {
+        //In simple cases, we can fetch nodes using more efficient native syntax
+        if(expressionNode.toStringAST().startsWith("hasLabel")) {
+            String labelName = stripWrappingQuotes(expressionNode.getChild(0).toStringAST());
+            return () -> database.findNodes(Label.label(labelName));
+        }
+
+
         return new FilteringIterable<>(database.getAllNodes(), this::include);
+    }
+
+    private String stripWrappingQuotes(String s) {
+        if(s.startsWith("\"") || s.startsWith("\'")) {
+            return s.substring(1, s.length() - 1);
+        }
+        return s;
     }
 }

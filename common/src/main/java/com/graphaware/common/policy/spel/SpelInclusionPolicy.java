@@ -17,6 +17,8 @@
 package com.graphaware.common.policy.spel;
 
 import org.springframework.expression.Expression;
+import org.springframework.expression.spel.SpelNode;
+import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 /**
@@ -26,11 +28,15 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 public abstract class SpelInclusionPolicy {
 
     protected transient final Expression exp;
+    protected transient final SpelNode expressionNode;
+
     private final String expression;
 
     protected SpelInclusionPolicy(String expression) {
+        SpelExpressionParser parser = new SpelExpressionParser();
         this.expression = expression;
-        this.exp = new SpelExpressionParser().parseExpression(expression);
+        this.expressionNode = parser.parseRaw(expression).getAST();
+        this.exp = parser.parseExpression(expression);
     }
 
     /**
