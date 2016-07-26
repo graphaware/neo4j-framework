@@ -20,14 +20,7 @@ import com.graphaware.common.policy.NodeInclusionPolicy;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.helpers.collection.FilteringIterable;
-import org.springframework.expression.spel.SpelNode;
-import org.springframework.expression.spel.ast.OpOr;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-
-import java.util.Iterator;
-import java.util.Objects;
 
 /**
  * {@link NodeInclusionPolicy} based on a SPEL expression. The expression can use methods defined in {@link NodeExpressions}.

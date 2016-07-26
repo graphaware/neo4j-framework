@@ -18,7 +18,6 @@ package com.graphaware.common.policy.spel;
 
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.SpelNode;
-import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 /**
