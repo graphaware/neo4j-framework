@@ -17,6 +17,7 @@
 package com.graphaware.runtime.config.function;
 
 import com.graphaware.common.policy.NodeInclusionPolicy;
+import com.graphaware.common.policy.none.IncludeNoNodes;
 import com.graphaware.common.policy.spel.SpelNodeInclusionPolicy;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodes;
 import org.junit.Test;
@@ -29,6 +30,33 @@ import static org.junit.Assert.assertNotNull;
  * Unit test for {@link StringToNodeInclusionPolicy}.
  */
 public class StringToNodeInclusionPolicyTest {
+
+
+    @Test
+    public void shouldConstructPolicyFromAllNodesKeywords() {
+        NodeInclusionPolicy policy1 = StringToNodeInclusionPolicy.getInstance().apply("all");
+
+        assertNotNull(policy1);
+        assertEquals(IncludeAllBusinessNodes.getInstance(), policy1);
+
+        NodeInclusionPolicy policy2 = StringToNodeInclusionPolicy.getInstance().apply("true");
+
+        assertNotNull(policy2);
+        assertEquals(IncludeAllBusinessNodes.getInstance(), policy2);
+    }
+
+    @Test
+    public void shouldConstructPolicyFromExcludeAllNodesKeywords() {
+        NodeInclusionPolicy policy1 = StringToNodeInclusionPolicy.getInstance().apply("false");
+
+        assertNotNull(policy1);
+        assertEquals(IncludeNoNodes.getInstance(), policy1);
+
+        NodeInclusionPolicy policy2 = StringToNodeInclusionPolicy.getInstance().apply("none");
+
+        assertNotNull(policy2);
+        assertEquals(IncludeNoNodes.getInstance(), policy2);
+    }
 
     @Test
     public void shouldConstructPolicyFromClassName() {
