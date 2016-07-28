@@ -55,12 +55,20 @@ add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>runtime-api</artifactId>
+<<<<<<< HEAD
     <version>3.1.0.40</version>
+=======
+    <version>3.1.0.38</version>
+>>>>>>> 0991d0cf615abbc587b9fb5a53e50b6f99427928
 </dependency>
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>runtime</artifactId>
+<<<<<<< HEAD
     <version>3.1.0.40</version>
+=======
+    <version>3.1.0.38</version>
+>>>>>>> 0991d0cf615abbc587b9fb5a53e50b6f99427928
 </dependency>
 ```
 
