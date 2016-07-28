@@ -36,6 +36,8 @@ public class SpelNodeInclusionPolicyTest extends SpelInclusionPolicyTest {
     private NodeInclusionPolicy policy3;
     private NodeInclusionPolicy policy4;
     private NodeInclusionPolicy policy5;
+    private NodeInclusionPolicy policy6;
+    private NodeInclusionPolicy policy7;
 
     @Override
     public void setUp() {
@@ -49,6 +51,8 @@ public class SpelNodeInclusionPolicyTest extends SpelInclusionPolicyTest {
         policy3 = new SpelNodeInclusionPolicy("getDegree('WORKS_FOR', 'BOTH') > 1");
         policy4 = new SpelNodeInclusionPolicy("getDegree('WORKS_FOR', 'incoming') > 1");
         policy5 = new SpelNodeInclusionPolicy("degree > 2");
+        policy6 = new SpelNodeInclusionPolicy("hasLabel('Employee') || hasLabel('Intern')");
+        policy7 = new SpelNodeInclusionPolicy("hasLabel('Intern') || hasLabel('Employee')");
     }
 
     @Test
@@ -112,6 +116,9 @@ public class SpelNodeInclusionPolicyTest extends SpelInclusionPolicyTest {
             assertEquals(graphaware(), policy4.getAll(database).iterator().next());
 
             assertEquals(0, Iterables.count(policy5.getAll(database)));
+
+            assertEquals(2, Iterables.count(policy6.getAll(database)));
+            assertEquals(2, Iterables.count(policy7.getAll(database)));
 
             tx.success();
         }
