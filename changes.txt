@@ -1,6 +1,7 @@
-3.0.4.39 (not released):
+3.0.4.40:
     - upgraded to Neo4j 3.0.4
     - integration tests register procedures on classpath
+    - performance improvements in inclusion strategies
 
 3.0.3.39:
     - upgraded to Neo4j 3.0.3
