@@ -78,7 +78,7 @@ public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
      *
      * @return classes with procedures.
      */
-    private Iterable<Class> proceduresOnClassPath() {
+    protected final Iterable<Class> proceduresOnClassPath() {
         Enumeration<URL> urls;
 
         try {
@@ -87,7 +87,7 @@ public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
             throw new RuntimeException();
         }
 
-        List<Class> classes = new ArrayList<>();
+        Set<Class> classes = new HashSet<>();
 
         while (urls.hasMoreElements()) {
             Iterator<File> fileIterator;
