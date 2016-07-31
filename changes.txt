@@ -1,3 +1,6 @@
+3.0.4.41:
+    - no changes
+
 3.0.4.40:
     - upgraded to Neo4j 3.0.4
     - integration tests register procedures on classpath
