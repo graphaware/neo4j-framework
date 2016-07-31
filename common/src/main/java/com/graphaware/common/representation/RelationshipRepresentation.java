@@ -19,7 +19,6 @@ package com.graphaware.common.representation;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
 
 import java.util.Map;
 
@@ -50,8 +49,7 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
      */
     public RelationshipRepresentation(Relationship relationship) {
         this(relationship, null);
-        this.startNode = new NodeRepresentation(relationship.getStartNode(), propertyKeySetAsStringArray(relationship.getStartNode().getPropertyKeys()));
-        this.endNode = new NodeRepresentation(relationship.getEndNode(), propertyKeySetAsStringArray(relationship.getEndNode().getPropertyKeys()));
+        createBothNodesRepresentations(relationship);
     }
 
     /**
@@ -66,6 +64,8 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
         startNodeGraphId = relationship.getStartNode().getId();
         endNodeGraphId = relationship.getEndNode().getId();
         setType(relationship.getType().name());
+        createBothNodesRepresentations(relationship);
+
     }
 
     /**
@@ -195,6 +195,11 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
     @JsonIgnore
     public NodeRepresentation getEndNode() {
         return endNode;
+    }
+
+    private void createBothNodesRepresentations(Relationship relationship) {
+        startNode = new NodeRepresentation(relationship.getStartNode(), propertyKeySetAsStringArray(relationship.getStartNode().getPropertyKeys()));
+        endNode = new NodeRepresentation(relationship.getEndNode(), propertyKeySetAsStringArray(relationship.getEndNode().getPropertyKeys()));
     }
 
     /**
