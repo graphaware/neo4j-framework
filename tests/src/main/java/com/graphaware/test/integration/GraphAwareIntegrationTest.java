@@ -24,6 +24,7 @@ import org.neo4j.procedure.Procedure;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
@@ -93,11 +94,14 @@ public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
             Iterator<File> fileIterator;
             File directory;
 
+            URI uri = null;
             try {
-                directory = new File(urls.nextElement().toURI());
+                uri = urls.nextElement().toURI();
+                directory = new File(uri);
                 fileIterator = FileUtils.iterateFiles(directory, new String[]{"class"}, true);
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                System.out.println("Skipping " + (uri != null ? uri.toString() : null) + "... " + e.getMessage());
+                continue;
             }
 
             while (fileIterator.hasNext()) {
