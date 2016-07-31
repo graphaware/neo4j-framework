@@ -92,6 +92,13 @@ public class ThirdPartyIntegrationModuleTest {
                 new RelationshipRepresentation(1L, 2L, 1L, "WORKS_FOR", MapUtil.map("since", 2014L))
         )));
 
+        for (WriteOperation<?> operation : writeOperations) {
+            if (operation.getDetails() instanceof RelationshipRepresentation) {
+                assertTrue(((RelationshipRepresentation) operation.getDetails()).getStartNode() instanceof NodeRepresentation);
+                assertTrue(((RelationshipRepresentation) operation.getDetails()).getEndNode() instanceof NodeRepresentation);
+            }
+        }
+
         database.shutdown();
     }
 }

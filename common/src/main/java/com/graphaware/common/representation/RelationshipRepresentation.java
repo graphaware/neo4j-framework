@@ -16,6 +16,7 @@
 
 package com.graphaware.common.representation;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
@@ -32,6 +33,8 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
 
     private long startNodeGraphId = NEW;
     private long endNodeGraphId = NEW;
+    private NodeRepresentation startNode;
+    private NodeRepresentation endNode;
     private String type;
 
     /**
@@ -47,6 +50,8 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
      */
     public RelationshipRepresentation(Relationship relationship) {
         this(relationship, null);
+        this.startNode = new NodeRepresentation(relationship.getStartNode(), propertyKeySetAsStringArray(relationship.getStartNode().getPropertyKeys()));
+        this.endNode = new NodeRepresentation(relationship.getEndNode(), propertyKeySetAsStringArray(relationship.getEndNode().getPropertyKeys()));
     }
 
     /**
@@ -180,6 +185,16 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
 
     public void setEndNodeGraphId(long endNodeGraphId) {
         this.endNodeGraphId = endNodeGraphId;
+    }
+
+    @JsonIgnore
+    public NodeRepresentation getStartNode() {
+        return startNode;
+    }
+
+    @JsonIgnore
+    public NodeRepresentation getEndNode() {
+        return endNode;
     }
 
     /**
