@@ -33,13 +33,13 @@ public class RelationshipRepresentationTest {
 
     @Test
     public void relationshipRepresentationIsCorrectlyConvertedToJson() throws JsonProcessingException, JSONException {
-        RelationshipRepresentation representation = new RelationshipRepresentation(0, 1, 2, "TYPE", Collections.singletonMap("key", "value"));
-        assertEquals("{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"startNodeGraphId\":1,\"endNodeGraphId\":2,\"type\":\"TYPE\"}", mapper.writeValueAsString(representation), true);
+        RelationshipRepresentation representation = new RelationshipRepresentation(0, new NodeRepresentation(0, new String[]{"Label1, Label2"}, Collections.singletonMap("key", "value")), new NodeRepresentation(1, new String[]{"Label1, Label2"}, Collections.singletonMap("key", "value")), "TYPE", Collections.singletonMap("key", "value"));
+        assertEquals("{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"startNode\":{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"labels\":[\"Label1, Label2\"]},\"endNode\":{\"graphId\":1,\"properties\":{\"key\":\"value\"},\"labels\":[\"Label1, Label2\"]},\"type\":\"TYPE\"}", mapper.writeValueAsString(representation), true);
     }
 
     @Test
     public void relationshipRepresentationIsCorrectlyConvertedFromJson() throws IOException, JSONException {
-        String json = "{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"startNodeGraphId\":1,\"endNodeGraphId\":2,\"type\":\"TYPE\"}";
-        Assert.assertEquals(new RelationshipRepresentation(0, 1, 2, "TYPE", Collections.singletonMap("key", "value")), mapper.readValue(json, RelationshipRepresentation.class));
+        String json = "{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"startNode\":{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"labels\":[\"Label1, Label2\"]},\"endNode\":{\"graphId\":1,\"properties\":{\"key\":\"value\"},\"labels\":[\"Label1, Label2\"]},\"type\":\"TYPE\"}";
+        Assert.assertEquals(new RelationshipRepresentation(0, new NodeRepresentation(0, new String[]{"Label1, Label2"}, Collections.singletonMap("key", "value")), new NodeRepresentation(1, new String[]{"Label1, Label2"}, Collections.singletonMap("key", "value")), "TYPE", Collections.singletonMap("key", "value")), mapper.readValue(json, RelationshipRepresentation.class));
     }
 }

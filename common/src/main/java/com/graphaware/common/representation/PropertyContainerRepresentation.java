@@ -22,7 +22,9 @@ import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Transaction;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.util.Assert.notNull;
@@ -222,6 +224,15 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
         notNull(properties);
         initPropsIfNeeded();
         this.properties.putAll(properties);
+    }
+
+    protected String[] propertiesKeySetToStringArray(Iterable<String> keySet) {
+        List<String> keysAsList = new ArrayList<>();
+        for (String key : keySet) {
+            keysAsList.add(key);
+        }
+
+        return keysAsList.toArray(new String[keysAsList.size()]);
     }
 
     /**

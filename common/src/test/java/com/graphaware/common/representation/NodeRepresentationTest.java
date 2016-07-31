@@ -34,6 +34,7 @@ public class NodeRepresentationTest {
     @Test
     public void nodeRepresentationIsCorrectlyConvertedToJson() throws JsonProcessingException, JSONException {
         NodeRepresentation representation = new NodeRepresentation(0, new String[]{"Label1, Label2"}, Collections.singletonMap("key", "value"));
+        System.out.println(mapper.writeValueAsString(representation));
         assertEquals("{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"labels\":[\"Label1, Label2\"]}", mapper.writeValueAsString(representation), true);
     }
 
