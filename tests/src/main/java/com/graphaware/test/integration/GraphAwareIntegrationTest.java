@@ -53,15 +53,11 @@ public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
      * {@inheritDoc}
      */
     @Override
-    protected void registerProcedures(Procedures procedures) {
+    protected void registerProcedures(Procedures procedures) throws Exception {
         super.registerProcedures(procedures);
 
         for (Class cls : proceduresOnClassPath()) {
-            try {
-                procedures.register(cls);
-            } catch (KernelException e) {
-                throw new RuntimeException(e);
-            }
+            procedures.register(cls);
         }
     }
 
