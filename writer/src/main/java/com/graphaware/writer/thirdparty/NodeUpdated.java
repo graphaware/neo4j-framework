@@ -16,13 +16,14 @@
 
 package com.graphaware.writer.thirdparty;
 
-import com.graphaware.common.representation.NodeRepresentation;
+import com.graphaware.common.representation.DetachedNode;
+import com.graphaware.common.representation.GraphDetachedNode;
 import org.neo4j.graphdb.Node;
 
 /**
  * {@link WriteOperation} representing a {@link Node} being updated.
  */
-public class NodeUpdated extends Update<NodeRepresentation, Node> {
+public class NodeUpdated<ID> extends Update<ID, DetachedNode<ID>, Node> {
 
     /**
      * Create the operation.
@@ -30,7 +31,7 @@ public class NodeUpdated extends Update<NodeRepresentation, Node> {
      * @param previous representation of the previous state of the updated {@link Node}. Must not be <code>null</code>.
      * @param current representation of the current state of the updated {@link Node}. Must not be <code>null</code>.
      */
-    public NodeUpdated(NodeRepresentation previous, NodeRepresentation current) {
+    public NodeUpdated(DetachedNode<ID> previous, DetachedNode<ID> current) {
         super(previous, current);
     }
 

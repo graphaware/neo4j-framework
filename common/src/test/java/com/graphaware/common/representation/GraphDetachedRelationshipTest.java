@@ -27,19 +27,19 @@ import java.util.Collections;
 
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-public class NodeRepresentationTest {
+public class GraphDetachedRelationshipTest {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Test
-    public void nodeRepresentationIsCorrectlyConvertedToJson() throws JsonProcessingException, JSONException {
-        NodeRepresentation representation = new NodeRepresentation(0, new String[]{"Label1, Label2"}, Collections.singletonMap("key", "value"));
-        assertEquals("{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"labels\":[\"Label1, Label2\"]}", mapper.writeValueAsString(representation), true);
+    public void relationshipRepresentationIsCorrectlyConvertedToJson() throws JsonProcessingException, JSONException {
+        DetachedRelationship representation = new GraphDetachedRelationship(0, 1, 2, "TYPE", Collections.singletonMap("key", "value"));
+        assertEquals("{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"startNodeGraphId\":1,\"endNodeGraphId\":2,\"type\":\"TYPE\"}", mapper.writeValueAsString(representation), true);
     }
 
     @Test
-    public void nodeRepresentationIsCorrectlyConvertedFromJson() throws IOException, JSONException {
-        String json = "{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"labels\":[\"Label1, Label2\"]}";
-        Assert.assertEquals(new NodeRepresentation(0, new String[]{"Label1, Label2"}, Collections.singletonMap("key", "value")), mapper.readValue(json, NodeRepresentation.class));
+    public void relationshipRepresentationIsCorrectlyConvertedFromJson() throws IOException, JSONException {
+        String json = "{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"startNodeGraphId\":1,\"endNodeGraphId\":2,\"type\":\"TYPE\"}";
+        Assert.assertEquals(new GraphDetachedRelationship(0, 1, 2, "TYPE", Collections.singletonMap("key", "value")), mapper.readValue(json, GraphDetachedRelationship.class));
     }
 }

@@ -14,12 +14,32 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.api.transform;
+package com.graphaware.common.transform;
 
-import org.neo4j.graphdb.Node;
+import com.graphaware.common.util.PropertyContainerUtils;
+import org.neo4j.graphdb.PropertyContainer;
+
+import static org.springframework.util.Assert.notNull;
 
 /**
- * {@link IdTransformer} for {@link Node}s.
+ * Abstract base-class for trivial {@link IdTransformer} implementations that in fact perform no transformation.
  */
-public interface NodeIdTransformer<ID> extends IdTransformer<ID, Node> {
+public abstract class BaseTrivialIdTransformer<P extends PropertyContainer> extends BaseIdTransformer<Long, P> {
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected long toExistingGraphId(Long id) {
+        return id;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final Long fromContainer(P pc) {
+        notNull(pc);
+        return PropertyContainerUtils.id(pc);
+    }
 }

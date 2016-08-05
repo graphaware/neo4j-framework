@@ -17,29 +17,31 @@
 package com.graphaware.common.representation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.graphaware.common.expression.SupportsDetachedRelationshipExpressions;
+import com.graphaware.common.transform.NodeIdTransformer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
 
 import java.util.Map;
 
-import static org.neo4j.graphdb.RelationshipType.*;
+import static org.neo4j.graphdb.RelationshipType.withName;
 import static org.springframework.util.Assert.hasLength;
 
 /**
- * {@link PropertyContainerRepresentation} for a {@link Relationship}.
+ * {@link DetachedPropertyContainer} for a {@link Relationship}.
  */
-public class RelationshipRepresentation extends PropertyContainerRepresentation<Relationship> {
+public abstract class DetachedRelationship<ID, N extends DetachedNode<ID>> extends DetachedPropertyContainer<ID, Relationship> implements SupportsDetachedRelationshipExpressions<ID, DetachedNode> {
 
     private long startNodeGraphId = NEW;
     private long endNodeGraphId = NEW;
-    private NodeRepresentation startNode;
-    private NodeRepresentation endNode;
+    private N startNode;
+    private N endNode;
     private String type;
 
     /**
      * Public no-arg constructor (for Jackson et al).
      */
-    public RelationshipRepresentation() {
+    protected DetachedRelationship() {
     }
 
     /**
@@ -47,9 +49,11 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
      *
      * @param relationship to create the representation from. Must not be <code>null</code>.
      */
-    public RelationshipRepresentation(Relationship relationship) {
-        this(relationship, null);
-        createBothNodesRepresentations(relationship);
+    protected DetachedRelationship(Relationship relationship, NodeIdTransformer<ID> nodeIdTransformer) {
+        this(relationship, null, nodeIdTransformer);
+
+        startNode = startNode(relationship, nodeIdTransformer);
+        endNode = endNode(relationship, nodeIdTransformer);
     }
 
     /**
@@ -59,13 +63,14 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
      * @param properties   keys of properties to be included in the representation.
      *                     Can be <code>null</code>, which represents all. Empty array represents none.
      */
-    public RelationshipRepresentation(Relationship relationship, String[] properties) {
+    protected DetachedRelationship(Relationship relationship, String[] properties, NodeIdTransformer<ID> nodeIdTransformer) {
         super(relationship, properties);
         startNodeGraphId = relationship.getStartNode().getId();
         endNodeGraphId = relationship.getEndNode().getId();
         setType(relationship.getType().name());
-        createBothNodesRepresentations(relationship);
 
+        startNode = startNode(relationship, nodeIdTransformer);
+        endNode = endNode(relationship, nodeIdTransformer);
     }
 
     /**
@@ -73,7 +78,7 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
      *
      * @param graphId ID.
      */
-    public RelationshipRepresentation(long graphId) {
+    protected DetachedRelationship(long graphId) {
         super(graphId);
     }
 
@@ -85,7 +90,7 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
      * @param type             relationship type. Must not be <code>null</code> or empty.
      * @param properties       relationship properties. Can be <code>null</code>, which is equivalent to an empty map.
      */
-    public RelationshipRepresentation(long startNodeGraphId, long endNodeGraphId, String type, Map<String, Object> properties) {
+    protected DetachedRelationship(long startNodeGraphId, long endNodeGraphId, String type, Map<String, Object> properties) {
         super(properties);
         hasLength(type);
         this.startNodeGraphId = startNodeGraphId;
@@ -104,7 +109,7 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
      * @param type             relationship type. Must not be <code>null</code> or empty.
      * @param properties       relationship properties. Can be <code>null</code>, which is equivalent to an empty map.
      */
-    public RelationshipRepresentation(long graphId, long startNodeGraphId, long endNodeGraphId, String type, Map<String, Object> properties) {
+    protected DetachedRelationship(long graphId, long startNodeGraphId, long endNodeGraphId, String type, Map<String, Object> properties) {
         super(graphId, properties);
         hasLength(type);
         this.startNodeGraphId = startNodeGraphId;
@@ -188,18 +193,22 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
     }
 
     @JsonIgnore
-    public NodeRepresentation getStartNode() {
+    public DetachedNode getStartNode() {
         return startNode;
     }
 
     @JsonIgnore
-    public NodeRepresentation getEndNode() {
+    public DetachedNode getEndNode() {
         return endNode;
     }
 
-    private void createBothNodesRepresentations(Relationship relationship) {
-        startNode = new NodeRepresentation(relationship.getStartNode(), propertyKeySetAsStringArray(relationship.getStartNode().getPropertyKeys()));
-        endNode = new NodeRepresentation(relationship.getEndNode(), propertyKeySetAsStringArray(relationship.getEndNode().getPropertyKeys()));
+    protected abstract N startNode(Relationship relationship, NodeIdTransformer<ID> nodeIdTransformer);
+
+    protected abstract N endNode(Relationship relationship, NodeIdTransformer<ID> nodeIdTransformer);
+
+    @Override
+    public boolean isType(String type) {
+        return getType().equals(type);
     }
 
     /**
@@ -217,7 +226,7 @@ public class RelationshipRepresentation extends PropertyContainerRepresentation<
             return false;
         }
 
-        RelationshipRepresentation that = (RelationshipRepresentation) o;
+        DetachedRelationship that = (DetachedRelationship) o;
 
         if (startNodeGraphId != that.startNodeGraphId) {
             return false;

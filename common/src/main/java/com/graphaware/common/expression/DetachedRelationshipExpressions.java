@@ -14,25 +14,19 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.common.policy.spel;
+package com.graphaware.common.expression;
 
-import org.neo4j.graphdb.PropertyContainer;
+public class DetachedRelationshipExpressions<T extends SupportsDetachedRelationshipExpressions<?, N>, N extends SupportsDetachedNodeExpressions> extends PropertyContainerExpressions<T> {
 
-/**
- * Property key and its containing {@link PropertyContainer} wrapper that defines delegating methods usable in SPEL
- * expressions when constructing {@link SpelInclusionPolicy}s.
- */
-abstract class PropertyExpressions<T extends PropertyContainer> {
-
-    protected final String key;
-    protected final T propertyContainer;
-
-    PropertyExpressions(String key, T propertyContainer) {
-        this.key = key;
-        this.propertyContainer = propertyContainer;
+    public DetachedRelationshipExpressions(T relationship) {
+        super(relationship);
     }
 
-    public String getKey() {
-        return key;
+    public String getType() {
+        return propertyContainer.getType();
+    }
+
+    public boolean isType(String type) {
+        return propertyContainer.isType(type);
     }
 }

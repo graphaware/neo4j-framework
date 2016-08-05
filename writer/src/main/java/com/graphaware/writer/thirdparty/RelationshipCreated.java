@@ -16,20 +16,22 @@
 
 package com.graphaware.writer.thirdparty;
 
-import com.graphaware.common.representation.RelationshipRepresentation;
+import com.graphaware.common.representation.DetachedNode;
+import com.graphaware.common.representation.DetachedRelationship;
+import com.graphaware.common.representation.GraphDetachedRelationship;
 import org.neo4j.graphdb.Relationship;
 
 /**
  * {@link WriteOperation} representing a {@link Relationship} being created.
  */
-public class RelationshipCreated extends CreateOrDelete<RelationshipRepresentation, Relationship> {
+public class RelationshipCreated<ID> extends CreateOrDelete<ID, DetachedRelationship<ID, ? extends DetachedNode<ID>>, Relationship> {
 
     /**
      * Create the operation.
      *
      * @param createdRelationship representation of the created relationship. Must not be <code>null</code>.
      */
-    public RelationshipCreated(RelationshipRepresentation createdRelationship) {
+    public RelationshipCreated(DetachedRelationship<ID, ? extends DetachedNode<ID>> createdRelationship) {
         super(createdRelationship);
     }
 

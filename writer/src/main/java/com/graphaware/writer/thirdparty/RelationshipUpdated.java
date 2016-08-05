@@ -16,13 +16,15 @@
 
 package com.graphaware.writer.thirdparty;
 
-import com.graphaware.common.representation.RelationshipRepresentation;
+import com.graphaware.common.representation.DetachedNode;
+import com.graphaware.common.representation.DetachedRelationship;
+import com.graphaware.common.representation.GraphDetachedRelationship;
 import org.neo4j.graphdb.Relationship;
 
 /**
  * {@link WriteOperation} representing a {@link Relationship} being updated.
  */
-public class RelationshipUpdated extends Update<RelationshipRepresentation, Relationship> {
+public class RelationshipUpdated<ID> extends Update<ID, DetachedRelationship<ID, ? extends DetachedNode<ID>>, Relationship> {
 
     /**
      * Create the operation.
@@ -30,7 +32,7 @@ public class RelationshipUpdated extends Update<RelationshipRepresentation, Rela
      * @param previous representation of the previous state of the updated {@link Relationship}. Must not be <code>null</code>.
      * @param current representation of the current state of the updated {@link Relationship}. Must not be <code>null</code>.
      */
-    public RelationshipUpdated(RelationshipRepresentation previous, RelationshipRepresentation current) {
+    public RelationshipUpdated(DetachedRelationship<ID, ? extends DetachedNode<ID>> previous, DetachedRelationship<ID, ? extends DetachedNode<ID>> current) {
         super(previous, current);
     }
 

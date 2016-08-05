@@ -14,9 +14,9 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.api.transform;
+package com.graphaware.common.transform;
 
-import com.graphaware.common.representation.PropertyContainerRepresentation;
+import com.graphaware.common.representation.DetachedPropertyContainer;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
@@ -31,7 +31,7 @@ public interface IdTransformer<ID, P extends PropertyContainer> {
      * Transform a custom ID to internal Neo4j ID.
      *
      * @param id to transform. Can be <code>null</code>, which represents a new container not yet persisted to the database.
-     * @return internal Neo4j ID. {@link PropertyContainerRepresentation#NEW} should be returned in case the id parameter is <code>null</code>.
+     * @return internal Neo4j ID. {@link DetachedPropertyContainer#NEW} should be returned in case the id parameter is <code>null</code>.
      */
     long toGraphId(ID id);
 

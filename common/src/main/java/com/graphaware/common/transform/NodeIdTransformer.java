@@ -14,22 +14,12 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.api.transform;
+package com.graphaware.common.transform;
 
 import org.neo4j.graphdb.Node;
 
 /**
- * Trivial {@link NodeIdTransformer} that performs no transformation of the ID. Singleton.
+ * {@link IdTransformer} for {@link Node}s.
  */
-public class TrivialNodeIdTransformer extends BaseTrivialIdTransformer<Node> implements NodeIdTransformer<Long> {
-
-    private static final TrivialNodeIdTransformer INSTANCE = new TrivialNodeIdTransformer();
-
-    public static TrivialNodeIdTransformer getInstance() {
-        return INSTANCE;
-    }
-
-    private TrivialNodeIdTransformer() {
-    }
+public interface NodeIdTransformer<ID> extends IdTransformer<ID, Node> {
 }
-

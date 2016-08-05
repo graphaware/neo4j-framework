@@ -14,31 +14,12 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.writer.thirdparty;
+package com.graphaware.common.transform;
 
-import com.graphaware.common.representation.DetachedNode;
-import com.graphaware.common.representation.GraphDetachedNode;
-import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 /**
- * {@link WriteOperation} representing a {@link Node} being deleted.
+ * {@link IdTransformer} for {@link Relationship}s.
  */
-public class NodeDeleted<ID> extends CreateOrDelete<ID, DetachedNode<ID>, Node> {
-
-    /**
-     * Create the operation.
-     *
-     * @param deletedNode representation of the deleted node. Must not be <code>null</code>.
-     */
-    public NodeDeleted(DetachedNode<ID> deletedNode) {
-        super(deletedNode);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public OperationType getType() {
-        return OperationType.NODE_DELETED;
-    }
+public interface RelationshipIdTransformer<ID> extends IdTransformer<ID, Relationship> {
 }

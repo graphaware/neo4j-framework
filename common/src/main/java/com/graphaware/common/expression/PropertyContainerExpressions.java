@@ -14,31 +14,21 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.writer.thirdparty;
+package com.graphaware.common.expression;
 
-import com.graphaware.common.representation.DetachedNode;
-import com.graphaware.common.representation.GraphDetachedNode;
-import org.neo4j.graphdb.Node;
+public abstract class PropertyContainerExpressions<T extends SupportsPropertyContainerExpressions<?>> {
 
-/**
- * {@link WriteOperation} representing a {@link Node} being deleted.
- */
-public class NodeDeleted<ID> extends CreateOrDelete<ID, DetachedNode<ID>, Node> {
+    protected final T propertyContainer;
 
-    /**
-     * Create the operation.
-     *
-     * @param deletedNode representation of the deleted node. Must not be <code>null</code>.
-     */
-    public NodeDeleted(DetachedNode<ID> deletedNode) {
-        super(deletedNode);
+    protected PropertyContainerExpressions(T propertyContainer) {
+        this.propertyContainer = propertyContainer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public OperationType getType() {
-        return OperationType.NODE_DELETED;
+    public boolean hasProperty(String key) {
+        return propertyContainer.hasProperty(key);
+    }
+
+    public Object getProperty(String key, Object defaultValue) {
+        return propertyContainer.getProperty(key, defaultValue);
     }
 }

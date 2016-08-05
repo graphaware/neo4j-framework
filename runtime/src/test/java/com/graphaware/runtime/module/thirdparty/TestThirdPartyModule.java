@@ -16,14 +16,20 @@
 
 package com.graphaware.runtime.module.thirdparty;
 
+import com.graphaware.common.representation.DetachedNode;
+import com.graphaware.common.representation.DetachedRelationship;
+import com.graphaware.common.representation.GraphDetachedNode;
+import com.graphaware.common.representation.GraphDetachedRelationship;
 import com.graphaware.writer.thirdparty.WriteOperation;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 
 import java.util.Collection;
 
 /**
  * A {@link ThirdPartyIntegrationModule} for testing.
  */
-public class TestThirdPartyModule extends ThirdPartyIntegrationModule {
+public class TestThirdPartyModule extends ThirdPartyIntegrationModule<Long> {
 
     private Collection<WriteOperation<?>> writeOperations;
 
@@ -39,5 +45,15 @@ public class TestThirdPartyModule extends ThirdPartyIntegrationModule {
 
     public Collection<WriteOperation<?>> getWriteOperations() {
         return writeOperations;
+    }
+
+    @Override
+    protected DetachedRelationship<Long, ? extends DetachedNode<Long>> relationshipRepresentation(Relationship relationship) {
+        return new GraphDetachedRelationship(relationship);
+    }
+
+    @Override
+    protected DetachedNode<Long> nodeRepresentation(Node node) {
+        return new GraphDetachedNode(node);
     }
 }

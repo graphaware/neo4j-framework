@@ -14,12 +14,22 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.api.transform;
+package com.graphaware.common.transform;
 
 import org.neo4j.graphdb.Relationship;
 
 /**
- * {@link IdTransformer} for {@link Relationship}s.
+ * Trivial {@link RelationshipIdTransformer} that performs no transformation of the ID. Singleton.
  */
-public interface RelationshipIdTransformer<ID> extends IdTransformer<ID, Relationship> {
+public class TrivialRelationshipIdTransformer extends BaseTrivialIdTransformer<Relationship> implements RelationshipIdTransformer<Long> {
+
+    private static final TrivialRelationshipIdTransformer INSTANCE = new TrivialRelationshipIdTransformer();
+
+    public static TrivialRelationshipIdTransformer getInstance() {
+        return INSTANCE;
+    }
+
+    private TrivialRelationshipIdTransformer() {
+    }
 }
+

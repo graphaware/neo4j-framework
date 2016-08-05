@@ -17,6 +17,8 @@
 package com.graphaware.common.util;
 
 import com.graphaware.common.log.LoggerFactory;
+import com.graphaware.common.expression.SupportsAttachedNodeExpressions;
+import com.graphaware.common.expression.SupportsAttachedRelationshipExpressions;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -52,6 +54,29 @@ public final class DirectionUtils {
      * @return direction of the relationship from the given node's point of view.
      */
     public static Direction resolveDirection(Relationship relationship, Node pointOfView, Direction defaultDirection) {
+        if (relationship.getEndNode().getId() != pointOfView.getId() && relationship.getStartNode().getId() != pointOfView.getId()) {
+            String message = "Provided relationship (" + relationship.getId() + ") does not have node (" + pointOfView.getId() + ") on either of its ends!";
+            LOG.error(message);
+            throw new IllegalArgumentException(message);
+        }
+
+        if (relationship.getEndNode().getId() == relationship.getStartNode().getId()) {
+            return defaultDirection;
+        }
+
+        return ((relationship.getStartNode().getId() == pointOfView.getId()) ? OUTGOING : INCOMING);
+    }
+
+    /**
+     * Resolve the direction of a relationship from a node's point of view.
+     *
+     * @param relationship     to resolve direction for.
+     * @param pointOfView      direction will be from this node's point of view.
+     * @param defaultDirection value returned in case the relationship is a "self-relationships", i.e. the start and
+     *                         end nodes are the same.
+     * @return direction of the relationship from the given node's point of view.
+     */
+    public static Direction resolveDirection(SupportsAttachedRelationshipExpressions<?, ?> relationship, SupportsAttachedNodeExpressions<?> pointOfView, Direction defaultDirection) {
         if (relationship.getEndNode().getId() != pointOfView.getId() && relationship.getStartNode().getId() != pointOfView.getId()) {
             String message = "Provided relationship (" + relationship.getId() + ") does not have node (" + pointOfView.getId() + ") on either of its ends!";
             LOG.error(message);

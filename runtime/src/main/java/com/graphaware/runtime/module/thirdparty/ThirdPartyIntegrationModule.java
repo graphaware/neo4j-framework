@@ -16,9 +16,8 @@
 
 package com.graphaware.runtime.module.thirdparty;
 
-import com.graphaware.common.representation.NodeRepresentation;
-import com.graphaware.common.representation.RelationshipRepresentation;
-import com.graphaware.common.util.Change;
+import com.graphaware.common.representation.DetachedNode;
+import com.graphaware.common.representation.DetachedRelationship;
 import com.graphaware.runtime.module.BaseTxDrivenModule;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -28,6 +27,7 @@ import org.neo4j.graphdb.Relationship;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  * Base-class for GraphAware Runtime Modules that wish to implement integrations with third-party systems.
@@ -38,7 +38,7 @@ import java.util.HashSet;
  * The collection of {@link WriteOperation}s is passed into the {@link #afterCommit(Object)} method after the transaction
  * has successfully committed. The {@link #afterCommit(Object)} should be overridden by sub-classes.
  */
-public abstract class ThirdPartyIntegrationModule extends BaseTxDrivenModule<Collection<WriteOperation<?>>> {
+public abstract class ThirdPartyIntegrationModule<ID> extends BaseTxDrivenModule<Collection<WriteOperation<?>>> {
 
     /**
      * Construct a new module.
@@ -54,32 +54,18 @@ public abstract class ThirdPartyIntegrationModule extends BaseTxDrivenModule<Col
      */
     @Override
     public Collection<WriteOperation<?>> beforeCommit(ImprovedTransactionData transactionData) throws DeliberateTransactionRollbackException {
-        Collection<WriteOperation<?>> result = new HashSet<>();
+        Collection<WriteOperation<?>> result = transactionData.getAllCreatedNodes().stream().map(createdNode -> new NodeCreated<>(nodeRepresentation(createdNode))).collect(Collectors.toCollection(HashSet::new));
 
-        for (Node createdNode : transactionData.getAllCreatedNodes()) {
-            result.add(new NodeCreated(new NodeRepresentation(createdNode)));
-        }
-
-        for (Change<Node> updatedNode : transactionData.getAllChangedNodes()) {
-            result.add(new NodeUpdated(new NodeRepresentation(updatedNode.getPrevious()), new NodeRepresentation(updatedNode.getCurrent())));
-        }
-
-        for (Node deletedNode : transactionData.getAllDeletedNodes()) {
-            result.add(new NodeDeleted(new NodeRepresentation(deletedNode)));
-        }
-
-        for (Relationship createdRelationship : transactionData.getAllCreatedRelationships()) {
-            result.add(new RelationshipCreated(new RelationshipRepresentation(createdRelationship)));
-        }
-
-        for (Change<Relationship> updatedRelationship : transactionData.getAllChangedRelationships()) {
-            result.add(new RelationshipUpdated(new RelationshipRepresentation(updatedRelationship.getPrevious()), new RelationshipRepresentation(updatedRelationship.getCurrent())));
-        }
-
-        for (Relationship deletedRelationship : transactionData.getAllDeletedRelationships()) {
-            result.add(new RelationshipDeleted(new RelationshipRepresentation(deletedRelationship)));
-        }
+        result.addAll(transactionData.getAllChangedNodes().stream().map(updatedNode -> new NodeUpdated<>(nodeRepresentation(updatedNode.getPrevious()), nodeRepresentation(updatedNode.getCurrent()))).collect(Collectors.toList()));
+        result.addAll(transactionData.getAllDeletedNodes().stream().map(deletedNode -> new NodeDeleted<>(nodeRepresentation(deletedNode))).collect(Collectors.toList()));
+        result.addAll(transactionData.getAllCreatedRelationships().stream().map(createdRelationship -> new RelationshipCreated<>(relationshipRepresentation(createdRelationship))).collect(Collectors.toList()));
+        result.addAll(transactionData.getAllChangedRelationships().stream().map(updatedRelationship -> new RelationshipUpdated<>(relationshipRepresentation(updatedRelationship.getPrevious()), relationshipRepresentation(updatedRelationship.getCurrent()))).collect(Collectors.toList()));
+        result.addAll(transactionData.getAllDeletedRelationships().stream().map(deletedRelationship -> new RelationshipDeleted<>(relationshipRepresentation(deletedRelationship))).collect(Collectors.toList()));
 
         return result;
     }
+
+    protected abstract DetachedRelationship<ID, ? extends DetachedNode<ID>> relationshipRepresentation(Relationship relationship);
+
+    protected abstract DetachedNode<ID> nodeRepresentation(Node node);
 }

@@ -16,8 +16,10 @@
 
 package com.graphaware.runtime.module.thirdparty;
 
-import com.graphaware.common.representation.NodeRepresentation;
-import com.graphaware.common.representation.RelationshipRepresentation;
+import com.graphaware.common.representation.DetachedNode;
+import com.graphaware.common.representation.DetachedRelationship;
+import com.graphaware.common.representation.GraphDetachedNode;
+import com.graphaware.common.representation.GraphDetachedRelationship;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.writer.thirdparty.*;
@@ -70,32 +72,32 @@ public class ThirdPartyIntegrationModuleTest {
         Collection<WriteOperation<?>> writeOperations = module.getWriteOperations();
         assertEquals(6, writeOperations.size());
 
-        assertTrue(writeOperations.contains(new NodeCreated(
-                new NodeRepresentation(3L, new String[]{"Person"}, MapUtil.map("name", "Daniela")))));
+        assertTrue(writeOperations.contains(new NodeCreated<>(
+                new GraphDetachedNode(3L, new String[]{"Person"}, MapUtil.map("name", "Daniela")))));
 
-        assertTrue(writeOperations.contains(new NodeUpdated(
-                new NodeRepresentation(0L, new String[]{"Person"}, MapUtil.map("name", "Michal", "age", 30L)),
-                new NodeRepresentation(0L, new String[]{"Person"}, MapUtil.map("name", "Michal", "age", 31L)))));
+        assertTrue(writeOperations.contains(new NodeUpdated<>(
+                new GraphDetachedNode(0L, new String[]{"Person"}, MapUtil.map("name", "Michal", "age", 30L)),
+                new GraphDetachedNode(0L, new String[]{"Person"}, MapUtil.map("name", "Michal", "age", 31L)))));
 
-        assertTrue(writeOperations.contains(new NodeDeleted(
-                new NodeRepresentation(2L, new String[]{"Person"}, MapUtil.map("name", "Adam")))));
+        assertTrue(writeOperations.contains(new NodeDeleted<>(
+                new GraphDetachedNode(2L, new String[]{"Person"}, MapUtil.map("name", "Adam")))));
 
-        assertTrue(writeOperations.contains(new RelationshipCreated(
-                new RelationshipRepresentation(2L, 3L, 1L, "WORKS_FOR", Collections.<String, Object>emptyMap())
+        assertTrue(writeOperations.contains(new RelationshipCreated<>(
+                new GraphDetachedRelationship(2L, 3L, 1L, "WORKS_FOR", Collections.<String, Object>emptyMap())
         )));
 
-        assertTrue(writeOperations.contains(new RelationshipUpdated(
-                new RelationshipRepresentation(0L, 0L, 1L, "WORKS_FOR", MapUtil.map("since", 2013L, "role", "MD")),
-                new RelationshipRepresentation(0L, 0L, 1L, "WORKS_FOR", MapUtil.map("since", 2013L)))));
+        assertTrue(writeOperations.contains(new RelationshipUpdated<>(
+                new GraphDetachedRelationship(0L, 0L, 1L, "WORKS_FOR", MapUtil.map("since", 2013L, "role", "MD")),
+                new GraphDetachedRelationship(0L, 0L, 1L, "WORKS_FOR", MapUtil.map("since", 2013L)))));
 
-        assertTrue(writeOperations.contains(new RelationshipDeleted(
-                new RelationshipRepresentation(1L, 2L, 1L, "WORKS_FOR", MapUtil.map("since", 2014L))
+        assertTrue(writeOperations.contains(new RelationshipDeleted<>(
+                new GraphDetachedRelationship(1L, 2L, 1L, "WORKS_FOR", MapUtil.map("since", 2014L))
         )));
 
         for (WriteOperation<?> operation : writeOperations) {
-            if (operation.getDetails() instanceof RelationshipRepresentation) {
-                assertTrue(((RelationshipRepresentation) operation.getDetails()).getStartNode() instanceof NodeRepresentation);
-                assertTrue(((RelationshipRepresentation) operation.getDetails()).getEndNode() instanceof NodeRepresentation);
+            if (operation.getDetails() instanceof GraphDetachedRelationship) {
+                assertTrue(((GraphDetachedRelationship) operation.getDetails()).getStartNode() instanceof GraphDetachedNode);
+                assertTrue(((GraphDetachedRelationship) operation.getDetails()).getEndNode() instanceof GraphDetachedNode);
             }
         }
 

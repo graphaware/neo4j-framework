@@ -16,7 +16,7 @@
 
 package com.graphaware.writer.thirdparty;
 
-import com.graphaware.common.representation.PropertyContainerRepresentation;
+import com.graphaware.common.representation.DetachedPropertyContainer;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
@@ -25,7 +25,7 @@ import org.neo4j.graphdb.PropertyContainer;
  * @param <R> type of the details object.
  * @param <T> type of the {@link PropertyContainer} that the operation was performed on.
  */
-public abstract class CreateOrDelete<R extends PropertyContainerRepresentation<T>, T extends PropertyContainer> extends BaseWriteOperation<R> {
+public abstract class CreateOrDelete<ID, R extends DetachedPropertyContainer<ID, T>, T extends PropertyContainer> extends BaseWriteOperation<R> {
 
     /**
      * Create the operation.

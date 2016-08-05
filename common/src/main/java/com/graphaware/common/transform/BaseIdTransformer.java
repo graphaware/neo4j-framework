@@ -14,9 +14,10 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.api.transform;
+package com.graphaware.common.transform;
 
-import com.graphaware.common.representation.PropertyContainerRepresentation;
+import com.graphaware.common.representation.DetachedPropertyContainer;
+import com.graphaware.common.transform.IdTransformer;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
@@ -33,7 +34,7 @@ public abstract class BaseIdTransformer<ID, P extends PropertyContainer> impleme
     @Override
     public final long toGraphId(ID id) {
         if (id == null) {
-            return PropertyContainerRepresentation.NEW;
+            return DetachedPropertyContainer.NEW;
         }
 
         return toExistingGraphId(id);

@@ -16,6 +16,7 @@
 
 package com.graphaware.common.representation;
 
+import com.graphaware.common.expression.SupportsPropertyContainerExpressions;
 import com.graphaware.common.util.PropertyContainerUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.PropertyContainer;
@@ -34,7 +35,7 @@ import static org.springframework.util.Assert.notNull;
  *
  * @param <T> type of the {@link PropertyContainer} this class represents.
  */
-public abstract class PropertyContainerRepresentation<T extends PropertyContainer> implements Serializable {
+public abstract class DetachedPropertyContainer<ID, T extends PropertyContainer> implements Serializable, SupportsPropertyContainerExpressions<ID> {
     public static final long NEW = -1;
 
     private long graphId = NEW;
@@ -44,7 +45,7 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
     /**
      * No-arg constructor (for Jackson et al).
      */
-    protected PropertyContainerRepresentation() {
+    protected DetachedPropertyContainer() {
     }
 
     /**
@@ -54,7 +55,7 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
      * @param properties keys of properties to be included in the representation.
      *                   Can be <code>null</code>, which represents all. Empty array represents none.
      */
-    protected PropertyContainerRepresentation(T pc, String[] properties) {
+    protected DetachedPropertyContainer(T pc, String[] properties) {
         this(PropertyContainerUtils.id(pc));
 
         initPropsIfNeeded();
@@ -76,7 +77,7 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
      *
      * @param graphId ID.
      */
-    protected PropertyContainerRepresentation(long graphId) {
+    protected DetachedPropertyContainer(long graphId) {
         this.graphId = graphId;
     }
 
@@ -85,7 +86,7 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
      *
      * @param properties of the new container. Must not be <code>null</code>, but can be empty.
      */
-    protected PropertyContainerRepresentation(Map<String, Object> properties) {
+    protected DetachedPropertyContainer(Map<String, Object> properties) {
         notNull(properties);
         setProperties(properties);
     }
@@ -98,7 +99,7 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
      * @param graphId    ID.
      * @param properties of the new container. Must not be <code>null</code>, but can be empty.
      */
-    protected PropertyContainerRepresentation(long graphId, Map<String, Object> properties) {
+    protected DetachedPropertyContainer(long graphId, Map<String, Object> properties) {
         notNull(properties);
         this.graphId = graphId;
         setProperties(properties);
@@ -240,6 +241,29 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
         return keysAsList.toArray(new String[keysAsList.size()]);
     }
 
+    @Override
+    public boolean hasProperty(String key) {
+        return properties != null && properties.containsKey(key);
+    }
+
+    @Override
+    public Object getProperty(String key) {
+        if (properties == null) {
+            return null;
+        }
+
+        return properties.get(key);
+    }
+
+    @Override
+    public Object getProperty(String key, Object defaultValue) {
+        if (!hasProperty(key)) {
+            return defaultValue;
+        }
+
+        return getProperty(key);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -252,7 +276,7 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
             return false;
         }
 
-        PropertyContainerRepresentation<?> that = (PropertyContainerRepresentation<?>) o;
+        DetachedPropertyContainer<?, ?> that = (DetachedPropertyContainer<?, ?>) o;
 
         if (graphId != that.graphId) {
             return false;

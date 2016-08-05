@@ -14,22 +14,25 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.api.transform;
+package com.graphaware.common.expression;
 
-import org.neo4j.graphdb.Relationship;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
-/**
- * Trivial {@link RelationshipIdTransformer} that performs no transformation of the ID. Singleton.
- */
-public class TrivialRelationshipIdTransformer extends BaseTrivialIdTransformer<Relationship> implements RelationshipIdTransformer<Long> {
+public class DetachedNodeExpressions<T extends SupportsDetachedNodeExpressions<?>> extends PropertyContainerExpressions<T> {
 
-    private static final TrivialRelationshipIdTransformer INSTANCE = new TrivialRelationshipIdTransformer();
-
-    public static TrivialRelationshipIdTransformer getInstance() {
-        return INSTANCE;
+    public DetachedNodeExpressions(T node) {
+        super(node);
     }
 
-    private TrivialRelationshipIdTransformer() {
+    public boolean hasLabel(String label) {
+        return propertyContainer.hasLabel(label);
+    }
+
+    public String[] getLabels() {
+        List<String> labels = new LinkedList<>();
+        Collections.addAll(labels, propertyContainer.getLabels());
+        return labels.toArray(new String[labels.size()]);
     }
 }
-

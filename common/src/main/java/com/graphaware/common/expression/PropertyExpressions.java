@@ -14,20 +14,19 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.common.policy.spel;
+package com.graphaware.common.expression;
 
-import org.neo4j.graphdb.Node;
+public abstract class PropertyExpressions<T extends SupportsPropertyContainerExpressions<?>> {
 
-/**
- *  {@link PropertyExpressions} for {@link Node} properties.
- */
-class NodePropertyExpressions extends PropertyExpressions<Node> {
+    private final String key;
+    protected final T propertyContainer;
 
-    NodePropertyExpressions(String key, Node node) {
-        super(key, node);
+    protected PropertyExpressions(String key, T propertyContainer) {
+        this.key = key;
+        this.propertyContainer = propertyContainer;
     }
 
-    public NodeExpressions getNode() {
-        return new NodeExpressions(propertyContainer);
+    public String getKey() {
+        return key;
     }
 }

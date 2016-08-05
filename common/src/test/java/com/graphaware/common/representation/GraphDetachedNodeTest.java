@@ -27,19 +27,21 @@ import java.util.Collections;
 
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-public class RelationshipRepresentationTest {
+public class GraphDetachedNodeTest {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Test
-    public void relationshipRepresentationIsCorrectlyConvertedToJson() throws JsonProcessingException, JSONException {
-        RelationshipRepresentation representation = new RelationshipRepresentation(0, 1, 2, "TYPE", Collections.singletonMap("key", "value"));
-        assertEquals("{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"startNodeGraphId\":1,\"endNodeGraphId\":2,\"type\":\"TYPE\"}", mapper.writeValueAsString(representation), true);
+    public void nodeRepresentationIsCorrectlyConvertedToJson() throws JsonProcessingException, JSONException {
+        GraphDetachedNode representation = new GraphDetachedNode(0, new String[]{"Label1, Label2"}, Collections.singletonMap("key", "value"));
+        String actualStr = mapper.writeValueAsString(representation);
+        System.out.println(actualStr);
+        assertEquals("{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"labels\":[\"Label1, Label2\"]}", actualStr, true);
     }
 
     @Test
-    public void relationshipRepresentationIsCorrectlyConvertedFromJson() throws IOException, JSONException {
-        String json = "{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"startNodeGraphId\":1,\"endNodeGraphId\":2,\"type\":\"TYPE\"}";
-        Assert.assertEquals(new RelationshipRepresentation(0, 1, 2, "TYPE", Collections.singletonMap("key", "value")), mapper.readValue(json, RelationshipRepresentation.class));
+    public void nodeRepresentationIsCorrectlyConvertedFromJson() throws IOException, JSONException {
+        String json = "{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"labels\":[\"Label1, Label2\"]}";
+        Assert.assertEquals(new GraphDetachedNode(0, new String[]{"Label1, Label2"}, Collections.singletonMap("key", "value")), mapper.readValue(json, GraphDetachedNode.class));
     }
 }
