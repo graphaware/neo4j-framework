@@ -36,7 +36,7 @@ public class RuntimeRegistry {
      * @param runtime  the runtime.
      */
     public static void registerRuntime(GraphDatabaseService database, GraphAwareRuntime runtime) {
-        RUNTIMES.put(storeId(database), runtime);
+        RUNTIMES.put(storeDir(database), runtime);
     }
 
     /**
@@ -46,7 +46,7 @@ public class RuntimeRegistry {
      * @return the runtime, null if none registered.
      */
     public static GraphAwareRuntime getRuntime(GraphDatabaseService database) {
-        return RUNTIMES.get(storeId(database));
+        return RUNTIMES.get(storeDir(database));
     }
 
     /**
@@ -71,14 +71,14 @@ public class RuntimeRegistry {
      * @param database against which the runtime to be removed is running.
      */
     public static void removeRuntime(GraphDatabaseService database) {
-        RUNTIMES.remove(storeId(database));
+        RUNTIMES.remove(storeDir(database));
     }
 
     public static void clear() {
         RUNTIMES.clear();
     }
 
-    private static String storeId(GraphDatabaseService database) {
-        return ((GraphDatabaseAPI) database).getStoreDir(); //todo eventually move to storeId, but it is sometimes null in 3.0-M05
+    private static String storeDir(GraphDatabaseService database) {
+        return ((GraphDatabaseAPI) database).getStoreDir();
     }
 }

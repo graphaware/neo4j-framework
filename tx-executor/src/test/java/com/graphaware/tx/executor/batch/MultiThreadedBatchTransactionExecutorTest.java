@@ -18,7 +18,6 @@ package com.graphaware.tx.executor.batch;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -28,10 +27,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.countNodes;
-import static com.graphaware.test.util.TestUtils.Timed;
-import static com.graphaware.test.util.TestUtils.time;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.neo4j.kernel.configuration.Settings.FALSE;
 
 /**
@@ -66,30 +62,5 @@ public class MultiThreadedBatchTransactionExecutorTest {
         try (Transaction tx = database.beginTx()) {
             assertEquals(40000, countNodes(database));
         }
-    }
-
-    @Test
-    @Ignore("Multi-threaded not faster for some reason in CI") //todo investigate
-    public void executionShouldBeFasterWhenExecutedInMultipleThreads() {
-        final BatchTransactionExecutor singleThreadedBatchExecutor = new NoInputBatchTransactionExecutor(database, 100, 40000, CreateNode.getInstance());
-        final BatchTransactionExecutor multiThreadedBatchExecutor = new MultiThreadedBatchTransactionExecutor(new NoInputBatchTransactionExecutor(database, 100, 40000, CreateNode.getInstance()), 4);
-
-        long singleThreadedTime = time(new Timed() {
-            @Override
-            public void time() {
-                singleThreadedBatchExecutor.execute();
-            }
-        });
-
-        long multiThreadedTime = time(new Timed() {
-            @Override
-            public void time() {
-                multiThreadedBatchExecutor.execute();
-            }
-        });
-
-        System.out.println("Multi threaded execution faster by " + Math.round(100.00 * multiThreadedTime / singleThreadedTime) + "%");
-
-        assertTrue(singleThreadedTime > multiThreadedTime);
     }
 }
