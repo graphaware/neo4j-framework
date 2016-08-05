@@ -14,13 +14,21 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.common.expression;
+package com.graphaware.common.representation;
 
-public abstract class RelationshipPropertyExpressions<N extends SupportsDetachedNodeExpressions<?>, T extends SupportsDetachedRelationshipExpressions<?, N>> extends PropertyExpressions<T> {
+import com.graphaware.common.expression.PropertyContainerExpressions;
 
-    protected RelationshipPropertyExpressions(String key, T propertyContainer) {
-        super(key, propertyContainer);
+public abstract class Property<T extends PropertyContainerExpressions> {
+
+    private final String key;
+    protected final T propertyContainer;
+
+    protected Property(String key, T propertyContainer) {
+        this.key = key;
+        this.propertyContainer = propertyContainer;
     }
 
-    public abstract T getRelationship();
+    public String getKey() {
+        return key;
+    }
 }

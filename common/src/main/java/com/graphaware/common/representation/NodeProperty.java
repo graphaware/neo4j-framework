@@ -14,11 +14,13 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.common.expression;
+package com.graphaware.common.representation;
 
-public abstract class NodePropertyExpressions<T extends SupportsDetachedNodeExpressions<?>> extends PropertyExpressions<T> {
+import com.graphaware.common.expression.DetachedNodeExpressions;
 
-    protected NodePropertyExpressions(String key, T propertyContainer) {
+public abstract class NodeProperty<T extends DetachedNodeExpressions> extends Property<T> {
+
+    protected NodeProperty(String key, T propertyContainer) {
         super(key, propertyContainer);
     }
 

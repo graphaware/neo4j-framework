@@ -16,15 +16,15 @@
 
 package com.graphaware.common.policy.spel;
 
-import com.graphaware.common.expression.AttachedRelationshipPropertyExpressions;
-import com.graphaware.common.expression.RelationshipPropertyExpressions;
 import com.graphaware.common.policy.RelationshipPropertyInclusionPolicy;
 import com.graphaware.common.representation.AttachedRelationship;
+import com.graphaware.common.representation.AttachedRelationshipProperty;
+import com.graphaware.common.representation.RelationshipProperty;
 import org.neo4j.graphdb.Relationship;
 
 /**
  * {@link RelationshipPropertyInclusionPolicy} based on a SPEL expression. The expression can use methods defined in
- * {@link RelationshipPropertyExpressions}.
+ * {@link RelationshipProperty}.
  */
 public class SpelRelationshipPropertyInclusionPolicy extends SpelInclusionPolicy implements RelationshipPropertyInclusionPolicy {
 
@@ -37,6 +37,6 @@ public class SpelRelationshipPropertyInclusionPolicy extends SpelInclusionPolicy
      */
     @Override
     public boolean include(String key, Relationship relationship) {
-        return (Boolean) exp.getValue(new AttachedRelationshipPropertyExpressions(key, new AttachedRelationship(relationship)));
+        return (Boolean) exp.getValue(new AttachedRelationshipProperty(key, new AttachedRelationship(relationship)));
     }
 }

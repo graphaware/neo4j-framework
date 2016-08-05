@@ -16,15 +16,15 @@
 
 package com.graphaware.common.policy.spel;
 
-import com.graphaware.common.expression.AttachedNodePropertyExpressions;
-import com.graphaware.common.expression.NodePropertyExpressions;
 import com.graphaware.common.policy.NodePropertyInclusionPolicy;
 import com.graphaware.common.representation.AttachedNode;
+import com.graphaware.common.representation.AttachedNodeProperty;
+import com.graphaware.common.representation.NodeProperty;
 import org.neo4j.graphdb.Node;
 
 /**
  * {@link NodePropertyInclusionPolicy} based on a SPEL expression. The expression can use methods defined in
- * {@link NodePropertyExpressions}.
+ * {@link NodeProperty}.
  */
 public class SpelNodePropertyInclusionPolicy extends SpelInclusionPolicy implements NodePropertyInclusionPolicy {
 
@@ -37,6 +37,6 @@ public class SpelNodePropertyInclusionPolicy extends SpelInclusionPolicy impleme
      */
     @Override
     public boolean include(String key, Node node) {
-        return (Boolean) exp.getValue(new AttachedNodePropertyExpressions(key, new AttachedNode(node)));
+        return (Boolean) exp.getValue(new AttachedNodeProperty(key, new AttachedNode(node)));
     }
 }

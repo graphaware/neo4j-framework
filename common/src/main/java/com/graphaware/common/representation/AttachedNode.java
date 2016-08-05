@@ -1,6 +1,6 @@
 package com.graphaware.common.representation;
 
-import com.graphaware.common.expression.SupportsAttachedNodeExpressions;
+import com.graphaware.common.expression.AttachedNodeExpressions;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 
@@ -10,7 +10,7 @@ import java.util.List;
 import static org.neo4j.graphdb.Direction.valueOf;
 import static org.neo4j.graphdb.RelationshipType.withName;
 
-public class AttachedNode extends AttachedPropertyContainer<Node> implements SupportsAttachedNodeExpressions<Long> {
+public class AttachedNode extends AttachedPropertyContainer<Node> implements AttachedNodeExpressions {
 
     public AttachedNode(Node node) {
         super(node);
@@ -47,4 +47,6 @@ public class AttachedNode extends AttachedPropertyContainer<Node> implements Sup
         }
         return labels.toArray(new String[labels.size()]);
     }
+
+
 }

@@ -16,19 +16,21 @@
 
 package com.graphaware.common.representation;
 
-import com.graphaware.common.expression.SupportsDetachedNodeExpressions;
-import org.neo4j.graphdb.Label;
+import com.graphaware.common.expression.DetachedNodeExpressions;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+import org.neo4j.helpers.collection.Iterables;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
 
 import static org.springframework.util.Assert.notNull;
 
 /**
  * {@link DetachedPropertyContainer} for a {@link Node}.
  */
-public abstract class DetachedNode<ID> extends DetachedPropertyContainer<ID, Node> implements SupportsDetachedNodeExpressions<ID> {
+public abstract class DetachedNode<ID> extends DetachedPropertyContainer<ID, Node> implements DetachedNodeExpressions {
 
     private String[] labels;
 
@@ -56,7 +58,7 @@ public abstract class DetachedNode<ID> extends DetachedPropertyContainer<ID, Nod
      */
     protected DetachedNode(Node node, String[] properties) {
         super(node, properties);
-        setLabels(labelsToStringArray(node.getLabels()));
+        setLabels(Iterables.asArray(String.class, Iterables.map(Label::name, node.getLabels())));
     }
 
     /**
@@ -151,19 +153,6 @@ public abstract class DetachedNode<ID> extends DetachedPropertyContainer<ID, Nod
     }
 
     //helpers
-
-    private String[] labelsToStringArray(Iterable<Label> labels) {
-        List<String> labelsAsList = new LinkedList<>();
-        for (Label label : labels) {
-            labelsAsList.add(label.name());
-        }
-        return labelsAsList.toArray(new String[labelsAsList.size()]);
-    }
-
-    @Override
-    public boolean hasLabel(String label) {
-        return new HashSet<>(Arrays.asList(getLabels())).contains(label);
-    }
 
     /**
      * {@inheritDoc}

@@ -17,7 +17,7 @@
 package com.graphaware.common.representation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.graphaware.common.expression.SupportsDetachedRelationshipExpressions;
+import com.graphaware.common.expression.DetachedRelationshipExpressions;
 import com.graphaware.common.transform.NodeIdTransformer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
@@ -30,7 +30,7 @@ import static org.springframework.util.Assert.hasLength;
 /**
  * {@link DetachedPropertyContainer} for a {@link Relationship}.
  */
-public abstract class DetachedRelationship<ID, N extends DetachedNode<ID>> extends DetachedPropertyContainer<ID, Relationship> implements SupportsDetachedRelationshipExpressions<ID, DetachedNode> {
+public abstract class DetachedRelationship<ID, N extends DetachedNode<ID>> extends DetachedPropertyContainer<ID, Relationship> implements DetachedRelationshipExpressions {
 
     private long startNodeGraphId = NEW;
     private long endNodeGraphId = NEW;
@@ -205,11 +205,6 @@ public abstract class DetachedRelationship<ID, N extends DetachedNode<ID>> exten
     protected abstract N startNode(Relationship relationship, NodeIdTransformer<ID> nodeIdTransformer);
 
     protected abstract N endNode(Relationship relationship, NodeIdTransformer<ID> nodeIdTransformer);
-
-    @Override
-    public boolean isType(String type) {
-        return getType().equals(type);
-    }
 
     /**
      * {@inheritDoc}

@@ -38,7 +38,7 @@ public class SpelNodeInclusionPolicy extends SpelInclusionPolicy implements Node
      */
     @Override
     public boolean include(Node node) {
-        return (Boolean) exp.getValue(new AttachedNodeExpressions<>(new AttachedNode(node)));
+        return (Boolean) exp.getValue(new AttachedNode(node));
     }
 
     /**

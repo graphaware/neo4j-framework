@@ -44,7 +44,7 @@ public class SpelRelationshipInclusionPolicy extends SpelInclusionPolicy impleme
      */
     @Override
     public boolean include(Relationship relationship) {
-        return (Boolean) exp.getValue(new AttachedRelationshipExpressions<>(new AttachedRelationship(relationship)));
+        return (Boolean) exp.getValue(new AttachedRelationship(relationship));
     }
 
     /**
@@ -52,7 +52,7 @@ public class SpelRelationshipInclusionPolicy extends SpelInclusionPolicy impleme
      */
     @Override
     public boolean include(Relationship relationship, Node pointOfView) {
-        return (Boolean) exp.getValue(new AttachedRelationshipExpressions<>(new AttachedRelationship(relationship, pointOfView)));
+        return (Boolean) exp.getValue(new AttachedRelationship(relationship, pointOfView));
     }
 
     /**

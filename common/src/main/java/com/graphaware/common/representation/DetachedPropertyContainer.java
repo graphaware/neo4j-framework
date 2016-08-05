@@ -16,7 +16,7 @@
 
 package com.graphaware.common.representation;
 
-import com.graphaware.common.expression.SupportsPropertyContainerExpressions;
+import com.graphaware.common.expression.PropertyContainerExpressions;
 import com.graphaware.common.util.PropertyContainerUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.PropertyContainer;
@@ -35,7 +35,7 @@ import static org.springframework.util.Assert.notNull;
  *
  * @param <T> type of the {@link PropertyContainer} this class represents.
  */
-public abstract class DetachedPropertyContainer<ID, T extends PropertyContainer> implements Serializable, SupportsPropertyContainerExpressions<ID> {
+public abstract class DetachedPropertyContainer<ID, T extends PropertyContainer> implements Serializable, PropertyContainerExpressions {
     public static final long NEW = -1;
 
     private long graphId = NEW;
@@ -47,6 +47,8 @@ public abstract class DetachedPropertyContainer<ID, T extends PropertyContainer>
      */
     protected DetachedPropertyContainer() {
     }
+
+    protected abstract ID getId();
 
     /**
      * Construct a new representation from a property container.
@@ -239,29 +241,6 @@ public abstract class DetachedPropertyContainer<ID, T extends PropertyContainer>
         }
 
         return keysAsList.toArray(new String[keysAsList.size()]);
-    }
-
-    @Override
-    public boolean hasProperty(String key) {
-        return properties != null && properties.containsKey(key);
-    }
-
-    @Override
-    public Object getProperty(String key) {
-        if (properties == null) {
-            return null;
-        }
-
-        return properties.get(key);
-    }
-
-    @Override
-    public Object getProperty(String key, Object defaultValue) {
-        if (!hasProperty(key)) {
-            return defaultValue;
-        }
-
-        return getProperty(key);
     }
 
     /**

@@ -1,11 +1,10 @@
 package com.graphaware.common.representation;
 
-import com.graphaware.common.expression.SupportsAttachedRelationshipExpressions;
+import com.graphaware.common.expression.AttachedRelationshipExpressions;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.RelationshipType;
 
-public class AttachedRelationship extends AttachedPropertyContainer<Relationship> implements SupportsAttachedRelationshipExpressions<Long, AttachedNode> {
+public class AttachedRelationship extends AttachedPropertyContainer<Relationship> implements AttachedRelationshipExpressions<AttachedNode> {
 
     private final Node pointOfView;
 
@@ -21,11 +20,6 @@ public class AttachedRelationship extends AttachedPropertyContainer<Relationship
     @Override
     public String getType() {
         return propertyContainer.getType().name();
-    }
-
-    @Override
-    public boolean isType(String type) {
-        return propertyContainer.isType(RelationshipType.withName(type));
     }
 
     @Override

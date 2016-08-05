@@ -16,9 +16,9 @@
 
 package com.graphaware.common.util;
 
+import com.graphaware.common.expression.AttachedNodeExpressions;
+import com.graphaware.common.expression.AttachedRelationshipExpressions;
 import com.graphaware.common.log.LoggerFactory;
-import com.graphaware.common.expression.SupportsAttachedNodeExpressions;
-import com.graphaware.common.expression.SupportsAttachedRelationshipExpressions;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -76,18 +76,18 @@ public final class DirectionUtils {
      *                         end nodes are the same.
      * @return direction of the relationship from the given node's point of view.
      */
-    public static Direction resolveDirection(SupportsAttachedRelationshipExpressions<?, ?> relationship, SupportsAttachedNodeExpressions<?> pointOfView, Direction defaultDirection) {
-        if (relationship.getEndNode().getId() != pointOfView.getId() && relationship.getStartNode().getId() != pointOfView.getId()) {
-            String message = "Provided relationship (" + relationship.getId() + ") does not have node (" + pointOfView.getId() + ") on either of its ends!";
+    public static Direction resolveDirection(AttachedRelationshipExpressions<?> relationship, AttachedNodeExpressions pointOfView, Direction defaultDirection) {
+        if (!relationship.getEndNode().equals(pointOfView) && !relationship.getStartNode().equals(pointOfView)) {
+            String message = "Provided relationship (" + relationship + ") does not have node (" + pointOfView + ") on either of its ends!";
             LOG.error(message);
             throw new IllegalArgumentException(message);
         }
 
-        if (relationship.getEndNode().getId() == relationship.getStartNode().getId()) {
+        if (relationship.getEndNode().equals(relationship.getStartNode())) {
             return defaultDirection;
         }
 
-        return ((relationship.getStartNode().getId() == pointOfView.getId()) ? OUTGOING : INCOMING);
+        return ((relationship.getStartNode().equals(pointOfView) ? OUTGOING : INCOMING));
     }
 
     /**
