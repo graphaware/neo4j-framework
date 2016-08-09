@@ -16,7 +16,6 @@
 
 package com.graphaware.common.log;
 
-import org.neo4j.helpers.Service;
 import org.neo4j.kernel.extension.KernelExtensionFactory;
 import org.neo4j.kernel.impl.logging.LogService;
 import org.neo4j.kernel.impl.spi.KernelContext;
@@ -31,7 +30,6 @@ import org.neo4j.logging.LogProvider;
  * {@link Log} object for logging. In case Neo4j isn't running when logging, e.g. in unit tests, logging will be done
  * to System.out.
  */
-@Service.Implementation(KernelExtensionFactory.class)
 public final class LoggerFactory extends KernelExtensionFactory<LoggerFactory.Dependencies> {
 
     private static LogProvider LOG_PROVIDER = FormattedLogProvider.toOutputStream(System.out);

@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime.spring;
 
-import com.graphaware.module.uuid.UuidReader;
+import com.graphaware.module.uuid.read.UuidReader;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -29,7 +29,7 @@ import static org.junit.Assert.assertNotNull;
 public class SpringIntegrationTest {
 
     @Test
-    public void changeFeedShouldWorkWithSpring() {
+    public void uuidShouldWorkWithSpring() {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Config.class);
 
         assertNotNull(context.getBean(GraphDatabaseService.class));

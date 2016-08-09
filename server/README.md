@@ -13,11 +13,9 @@ of the GraphAware Framework and place it into the _plugins_ directory of Neo4j.
 
 The following APIs are developed and provided by GraphAware:
 * [Algorithms](https://github.com/graphaware/neo4j-algorithms)
-* [ChangeFeed](https://github.com/graphaware/neo4j-changefeed) (primarily a [runtime module](../runtime)) (retired)
 * [NodeRank](https://github.com/graphaware/neo4j-noderank) (primarily a [runtime module](../runtime))
 * [RestTest](https://github.com/graphaware/neo4j-resttest)
 * [TimeTree](https://github.com/graphaware/neo4j-timetree) (optionally also a [runtime module](../runtime))
-* [WarmUp](https://github.com/graphaware/neo4j-warmup)
 
 
 ### Usage
