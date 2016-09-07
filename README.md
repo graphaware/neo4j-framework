@@ -49,7 +49,7 @@ Framework Usage
 When using Neo4j in the <a href="http://docs.neo4j.org/chunked/stable/server-installation.html" target="_blank">standalone server</a> mode,
 deploying the GraphAware Framework (and any code using it) is a matter of :
 * [downloading](#download) the appropriate .jar files
-* copying them into the _plugins_ directory in your Neo4j installation (if you installed using .dmg installer, this will be in /Applications/Neo4j [Community|Enterprise] Edition.app/Contents/Resources/app/plugins/)
+* copying them into the _plugins_ directory in your Neo4j installation (if you installed using .dmg installer, this will be in `/Applications/Neo4j [Community|Enterprise] Edition.app/Contents/Resources/app/plugins/`)
 * adding `dbms.unmanaged_extension_classes=com.graphaware.server=/graphaware` to `neo4j.conf`
 * restarting the server
 
