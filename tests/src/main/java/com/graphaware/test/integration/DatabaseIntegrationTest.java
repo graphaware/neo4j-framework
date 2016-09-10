@@ -91,7 +91,7 @@ public abstract class DatabaseIntegrationTest {
      *
      * @param procedures to register against.
      */
-    protected void registerProcedures(Procedures procedures) {
+    protected void registerProcedures(Procedures procedures) throws Exception {
         //no-op by default
     }
 

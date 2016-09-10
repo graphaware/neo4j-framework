@@ -16,7 +16,9 @@
 
 package com.graphaware.common.policy.spel;
 
+import com.graphaware.common.expression.AttachedRelationshipExpressions;
 import com.graphaware.common.policy.RelationshipInclusionPolicy;
+import com.graphaware.common.representation.AttachedRelationship;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -24,10 +26,10 @@ import org.neo4j.helpers.collection.FilteringIterable;
 
 /**
  * {@link RelationshipInclusionPolicy} based on a SPEL expression. The expression can use methods defined in
- * {@link RelationshipExpressions}.
+ * {@link AttachedRelationshipExpressions}.
  * <p>
- * Note that there are certain methods (like {@link RelationshipExpressions#getOtherNode()}
- * or {@link RelationshipExpressions#isOutgoing()}) that rely on providing
+ * Note that there are certain methods (like {@link AttachedRelationshipExpressions#getOtherNode()}
+ * or {@link AttachedRelationshipExpressions#isOutgoing()}) that rely on providing
  * a node whose point of view the call is being made. These methods only work when calling {@link #include(org.neo4j.graphdb.Relationship, org.neo4j.graphdb.Node)}.
  * {@link IllegalArgumentException} is thrown when an incompatible method is invoked.
  */
@@ -42,7 +44,7 @@ public class SpelRelationshipInclusionPolicy extends SpelInclusionPolicy impleme
      */
     @Override
     public boolean include(Relationship relationship) {
-        return (Boolean) exp.getValue(new RelationshipExpressions(relationship));
+        return (Boolean) exp.getValue(new AttachedRelationship(relationship));
     }
 
     /**
@@ -50,7 +52,7 @@ public class SpelRelationshipInclusionPolicy extends SpelInclusionPolicy impleme
      */
     @Override
     public boolean include(Relationship relationship, Node pointOfView) {
-        return (Boolean) exp.getValue(new RelationshipExpressions(relationship, pointOfView));
+        return (Boolean) exp.getValue(new AttachedRelationship(relationship, pointOfView));
     }
 
     /**

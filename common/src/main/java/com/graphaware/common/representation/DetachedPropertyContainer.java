@@ -16,13 +16,16 @@
 
 package com.graphaware.common.representation;
 
+import com.graphaware.common.expression.PropertyContainerExpressions;
 import com.graphaware.common.util.PropertyContainerUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.graphdb.Transaction;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.util.Assert.notNull;
@@ -32,7 +35,7 @@ import static org.springframework.util.Assert.notNull;
  *
  * @param <T> type of the {@link PropertyContainer} this class represents.
  */
-public abstract class PropertyContainerRepresentation<T extends PropertyContainer> implements Serializable {
+public abstract class DetachedPropertyContainer<ID, T extends PropertyContainer> implements Serializable, PropertyContainerExpressions {
     public static final long NEW = -1;
 
     private long graphId = NEW;
@@ -42,8 +45,10 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
     /**
      * No-arg constructor (for Jackson et al).
      */
-    protected PropertyContainerRepresentation() {
+    protected DetachedPropertyContainer() {
     }
+
+    protected abstract ID getId();
 
     /**
      * Construct a new representation from a property container.
@@ -52,7 +57,7 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
      * @param properties keys of properties to be included in the representation.
      *                   Can be <code>null</code>, which represents all. Empty array represents none.
      */
-    protected PropertyContainerRepresentation(T pc, String[] properties) {
+    protected DetachedPropertyContainer(T pc, String[] properties) {
         this(PropertyContainerUtils.id(pc));
 
         initPropsIfNeeded();
@@ -74,7 +79,7 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
      *
      * @param graphId ID.
      */
-    protected PropertyContainerRepresentation(long graphId) {
+    protected DetachedPropertyContainer(long graphId) {
         this.graphId = graphId;
     }
 
@@ -83,7 +88,7 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
      *
      * @param properties of the new container. Must not be <code>null</code>, but can be empty.
      */
-    protected PropertyContainerRepresentation(Map<String, Object> properties) {
+    protected DetachedPropertyContainer(Map<String, Object> properties) {
         notNull(properties);
         setProperties(properties);
     }
@@ -96,7 +101,7 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
      * @param graphId    ID.
      * @param properties of the new container. Must not be <code>null</code>, but can be empty.
      */
-    protected PropertyContainerRepresentation(long graphId, Map<String, Object> properties) {
+    protected DetachedPropertyContainer(long graphId, Map<String, Object> properties) {
         notNull(properties);
         this.graphId = graphId;
         setProperties(properties);
@@ -225,6 +230,20 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
     }
 
     /**
+     * Returns a properties keyset from a graph object to a string array
+     *
+     * @param keySet properties keyset
+     */
+    protected String[] propertyKeySetAsStringArray(Iterable<String> keySet) {
+        List<String> keysAsList = new ArrayList<>();
+        for (String k : keySet) {
+            keysAsList.add(k);
+        }
+
+        return keysAsList.toArray(new String[keysAsList.size()]);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -236,7 +255,7 @@ public abstract class PropertyContainerRepresentation<T extends PropertyContaine
             return false;
         }
 
-        PropertyContainerRepresentation<?> that = (PropertyContainerRepresentation<?>) o;
+        DetachedPropertyContainer<?, ?> that = (DetachedPropertyContainer<?, ?>) o;
 
         if (graphId != that.graphId) {
             return false;

@@ -14,12 +14,12 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.api.transform;
+package com.graphaware.common.transform;
 
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Node;
 
 /**
- * {@link IdTransformer} for {@link Relationship}s.
+ * {@link IdTransformer} for {@link Node}s.
  */
-public interface RelationshipIdTransformer<ID> extends IdTransformer<ID, Relationship> {
+public interface NodeIdTransformer<ID> extends IdTransformer<ID, Node> {
 }

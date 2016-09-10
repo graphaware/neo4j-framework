@@ -71,7 +71,6 @@ public class CommunityTxParticipationIntegrationTest extends GraphAwareIntegrati
         //Commit transaction over transactional endpoint
         httpClient.post(commitUrl, HttpStatus.SC_OK);
 
-        //todo re-enable when resttest is compatible again
-//        httpClient.post(baseUrl() + "/graphaware/resttest/assertSameGraph", "{\"cypher\": \"CREATE (m:Person {name:'Michal'})-[:TEST]->(d:Person {name:'Daniela'})\"}", HttpStatus.SC_OK);
+        httpClient.post(baseUrl() + "/resttest/assertSameGraph", "{\"cypher\": \"CREATE (m:Person {name:'Michal'})-[:TEST]->(d:Person {name:'Daniela'})\"}", HttpStatus.SC_OK);
     }
 }

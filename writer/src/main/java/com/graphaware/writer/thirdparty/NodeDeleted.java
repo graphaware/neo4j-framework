@@ -16,20 +16,21 @@
 
 package com.graphaware.writer.thirdparty;
 
-import com.graphaware.common.representation.NodeRepresentation;
+import com.graphaware.common.representation.DetachedNode;
+import com.graphaware.common.representation.GraphDetachedNode;
 import org.neo4j.graphdb.Node;
 
 /**
  * {@link WriteOperation} representing a {@link Node} being deleted.
  */
-public class NodeDeleted extends CreateOrDelete<NodeRepresentation, Node> {
+public class NodeDeleted<ID> extends CreateOrDelete<ID, DetachedNode<ID>, Node> {
 
     /**
      * Create the operation.
      *
      * @param deletedNode representation of the deleted node. Must not be <code>null</code>.
      */
-    public NodeDeleted(NodeRepresentation deletedNode) {
+    public NodeDeleted(DetachedNode<ID> deletedNode) {
         super(deletedNode);
     }
 

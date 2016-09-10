@@ -19,8 +19,8 @@ package com.graphaware.api.json;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.graphaware.api.SerializationSpecification;
-import com.graphaware.api.transform.NodeIdTransformer;
-import com.graphaware.common.representation.PropertyContainerRepresentation;
+import com.graphaware.common.transform.NodeIdTransformer;
+import com.graphaware.common.representation.DetachedPropertyContainer;
 import com.graphaware.test.unit.GraphUnit;
 import org.json.JSONException;
 import org.junit.After;
@@ -155,7 +155,7 @@ public class LongIdJsonNodeTest {
         }
 
         try (Transaction tx = database.beginTx()) {
-            LongIdJsonNode jsonNode = new LongIdJsonNode(PropertyContainerRepresentation.NEW, new String[]{"L1"}, Collections.<String, Object>singletonMap("k1", "v1"));
+            LongIdJsonNode jsonNode = new LongIdJsonNode(DetachedPropertyContainer.NEW, new String[]{"L1"}, Collections.<String, Object>singletonMap("k1", "v1"));
             Node node = jsonNode.producePropertyContainer(database);
 
             assertEquals(5, node.getId());
@@ -353,7 +353,7 @@ public class LongIdJsonNodeTest {
         @Override
         public long toGraphId(Long id) {
             if (id == null) {
-                return PropertyContainerRepresentation.NEW;
+                return DetachedPropertyContainer.NEW;
             }
 
             return id / 1000;

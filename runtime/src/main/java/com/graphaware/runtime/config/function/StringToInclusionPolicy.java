@@ -21,6 +21,9 @@ import com.graphaware.common.policy.all.IncludeAllNodeProperties;
 import com.graphaware.common.policy.none.IncludeNoNodeProperties;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -33,16 +36,19 @@ public abstract class StringToInclusionPolicy<T extends InclusionPolicy> impleme
 
     private static final Pattern CLASS_NAME_REGEX = Pattern.compile("([\\p{L}_$][\\p{L}\\p{N}_$]*\\.)*[\\p{L}_$][\\p{L}\\p{N}_$]*");
 
+    private static final Set<String> ALL_BUSINESS_NODES_POLICY = new HashSet<>(Arrays.asList("true", "all"));
+    private static final Set<String> EXCLUDE_ALL_NODES_POLICY = new HashSet<>(Arrays.asList("false", "none"));
+
     /**
      * {@inheritDoc}
      */
     @Override
     public T apply(String s) {
-        if ("true".equals(s)) {
+        if (ALL_BUSINESS_NODES_POLICY.contains(s)) {
             return all();
         }
 
-        if ("false".equals(s)) {
+        if (EXCLUDE_ALL_NODES_POLICY.contains(s)) {
             return none();
         }
 

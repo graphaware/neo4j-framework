@@ -16,7 +16,7 @@
 
 package com.graphaware.api.json;
 
-import com.graphaware.api.transform.NodeIdTransformer;
+import com.graphaware.common.transform.NodeIdTransformer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 

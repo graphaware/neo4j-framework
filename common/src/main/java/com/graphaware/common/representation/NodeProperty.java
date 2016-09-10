@@ -14,12 +14,15 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.api.transform;
+package com.graphaware.common.representation;
 
-import org.neo4j.graphdb.Node;
+import com.graphaware.common.expression.DetachedNodeExpressions;
 
-/**
- * {@link IdTransformer} for {@link Node}s.
- */
-public interface NodeIdTransformer<ID> extends IdTransformer<ID, Node> {
+public abstract class NodeProperty<T extends DetachedNodeExpressions> extends Property<T> {
+
+    protected NodeProperty(String key, T propertyContainer) {
+        super(key, propertyContainer);
+    }
+
+    public abstract T getNode();
 }

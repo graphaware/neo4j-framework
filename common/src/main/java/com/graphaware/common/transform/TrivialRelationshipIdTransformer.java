@@ -14,27 +14,22 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.common.policy.spel;
+package com.graphaware.common.transform;
 
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Relationship;
 
 /**
- * {@link PropertyContainer} wrapper that defines delegating methods usable in SPEL expressions when constructing
- * {@link SpelInclusionPolicy}s.
+ * Trivial {@link RelationshipIdTransformer} that performs no transformation of the ID. Singleton.
  */
-abstract class PropertyContainerExpressions<T extends PropertyContainer> {
+public class TrivialRelationshipIdTransformer extends BaseTrivialIdTransformer<Relationship> implements RelationshipIdTransformer<Long> {
 
-    protected final T propertyContainer;
+    private static final TrivialRelationshipIdTransformer INSTANCE = new TrivialRelationshipIdTransformer();
 
-    PropertyContainerExpressions(T propertyContainer) {
-        this.propertyContainer = propertyContainer;
+    public static TrivialRelationshipIdTransformer getInstance() {
+        return INSTANCE;
     }
 
-    public boolean hasProperty(String key) {
-        return propertyContainer.hasProperty(key);
-    }
-
-    public Object getProperty(String key, Object defaultValue) {
-        return propertyContainer.getProperty(key, defaultValue);
+    private TrivialRelationshipIdTransformer() {
     }
 }
+

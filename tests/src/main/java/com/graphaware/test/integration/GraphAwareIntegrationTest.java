@@ -24,6 +24,7 @@ import org.neo4j.procedure.Procedure;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
@@ -52,15 +53,11 @@ public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
      * {@inheritDoc}
      */
     @Override
-    protected void registerProcedures(Procedures procedures) {
+    protected void registerProcedures(Procedures procedures) throws Exception {
         super.registerProcedures(procedures);
 
         for (Class cls : proceduresOnClassPath()) {
-            try {
-                procedures.register(cls);
-            } catch (KernelException e) {
-                throw new RuntimeException(e);
-            }
+            procedures.register(cls);
         }
     }
 
@@ -78,7 +75,7 @@ public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
      *
      * @return classes with procedures.
      */
-    private Iterable<Class> proceduresOnClassPath() {
+    protected final Iterable<Class> proceduresOnClassPath() {
         Enumeration<URL> urls;
 
         try {
@@ -87,17 +84,20 @@ public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
             throw new RuntimeException();
         }
 
-        List<Class> classes = new ArrayList<>();
+        Set<Class> classes = new HashSet<>();
 
         while (urls.hasMoreElements()) {
             Iterator<File> fileIterator;
             File directory;
 
+            URI uri = null;
             try {
-                directory = new File(urls.nextElement().toURI());
+                uri = urls.nextElement().toURI();
+                directory = new File(uri);
                 fileIterator = FileUtils.iterateFiles(directory, new String[]{"class"}, true);
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                System.out.println("Skipping " + (uri != null ? uri.toString() : null) + "... " + e.getMessage());
+                continue;
             }
 
             while (fileIterator.hasNext()) {

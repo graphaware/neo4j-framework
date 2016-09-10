@@ -19,8 +19,8 @@ package com.graphaware.api.json;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.graphaware.api.SerializableRelationship;
-import com.graphaware.api.transform.NodeIdTransformer;
-import com.graphaware.api.transform.RelationshipIdTransformer;
+import com.graphaware.common.transform.NodeIdTransformer;
+import com.graphaware.common.transform.RelationshipIdTransformer;
 import org.neo4j.graphdb.Relationship;
 
 import java.util.Map;

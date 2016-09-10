@@ -1,38 +1,18 @@
-/*
- * Copyright (c) 2013-2016 GraphAware
- *
- * This file is part of the GraphAware Framework.
- *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License for more details. You should have received a copy of
- * the GNU General Public License along with this program.  If not, see
- * <http://www.gnu.org/licenses/>.
- */
+package com.graphaware.common.representation;
 
-package com.graphaware.common.policy.spel;
-
-import org.neo4j.graphdb.Label;
+import com.graphaware.common.expression.AttachedNodeExpressions;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.RelationshipType;
 
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.neo4j.graphdb.Direction.valueOf;
-import static org.neo4j.graphdb.RelationshipType.*;
+import static org.neo4j.graphdb.RelationshipType.withName;
 
-/**
- * {@link PropertyContainerExpressions} for {@link Node}s.
- */
-class NodeExpressions extends PropertyContainerExpressions<Node> {
+public class AttachedNode extends AttachedPropertyContainer<Node> implements AttachedNodeExpressions {
 
-    NodeExpressions(Node node) {
+    public AttachedNode(Node node) {
         super(node);
     }
 
@@ -40,6 +20,7 @@ class NodeExpressions extends PropertyContainerExpressions<Node> {
         return propertyContainer.getDegree();
     }
 
+    @Override
     public int getDegree(String typeOrDirection) {
         try {
             return propertyContainer.getDegree(valueOf(typeOrDirection.toUpperCase()));
@@ -48,14 +29,17 @@ class NodeExpressions extends PropertyContainerExpressions<Node> {
         }
     }
 
+    @Override
     public int getDegree(String type, String direction) {
         return propertyContainer.getDegree(withName(type), valueOf(direction.toUpperCase()));
     }
 
+    @Override
     public boolean hasLabel(String label) {
         return propertyContainer.hasLabel(Label.label(label));
     }
 
+    @Override
     public String[] getLabels() {
         List<String> labels = new LinkedList<>();
         for (Label label : propertyContainer.getLabels()) {
@@ -63,4 +47,6 @@ class NodeExpressions extends PropertyContainerExpressions<Node> {
         }
         return labels.toArray(new String[labels.size()]);
     }
+
+
 }

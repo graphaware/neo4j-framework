@@ -19,7 +19,7 @@ package com.graphaware.api.json;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.graphaware.api.SerializableNode;
-import com.graphaware.api.transform.NodeIdTransformer;
+import com.graphaware.common.transform.NodeIdTransformer;
 import org.neo4j.graphdb.Node;
 
 import java.util.Map;

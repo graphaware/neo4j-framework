@@ -16,6 +16,8 @@
 
 package com.graphaware.common.util;
 
+import com.graphaware.common.expression.AttachedNodeExpressions;
+import com.graphaware.common.expression.AttachedRelationshipExpressions;
 import com.graphaware.common.log.LoggerFactory;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
@@ -63,6 +65,29 @@ public final class DirectionUtils {
         }
 
         return ((relationship.getStartNode().getId() == pointOfView.getId()) ? OUTGOING : INCOMING);
+    }
+
+    /**
+     * Resolve the direction of a relationship from a node's point of view.
+     *
+     * @param relationship     to resolve direction for.
+     * @param pointOfView      direction will be from this node's point of view.
+     * @param defaultDirection value returned in case the relationship is a "self-relationships", i.e. the start and
+     *                         end nodes are the same.
+     * @return direction of the relationship from the given node's point of view.
+     */
+    public static Direction resolveDirection(AttachedRelationshipExpressions<?> relationship, AttachedNodeExpressions pointOfView, Direction defaultDirection) {
+        if (!relationship.getEndNode().equals(pointOfView) && !relationship.getStartNode().equals(pointOfView)) {
+            String message = "Provided relationship (" + relationship + ") does not have node (" + pointOfView + ") on either of its ends!";
+            LOG.error(message);
+            throw new IllegalArgumentException(message);
+        }
+
+        if (relationship.getEndNode().equals(relationship.getStartNode())) {
+            return defaultDirection;
+        }
+
+        return ((relationship.getStartNode().equals(pointOfView) ? OUTGOING : INCOMING));
     }
 
     /**

@@ -16,21 +16,21 @@
 
 package com.graphaware.api;
 
-import com.graphaware.api.transform.NodeIdTransformer;
-import com.graphaware.api.transform.RelationshipIdTransformer;
-import com.graphaware.common.representation.RelationshipRepresentation;
+import com.graphaware.common.transform.NodeIdTransformer;
+import com.graphaware.common.transform.RelationshipIdTransformer;
+import com.graphaware.common.representation.DetachedRelationship;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
 
 import java.util.Map;
 
 /**
- * Serializable {@link RelationshipRepresentation} with custom ID. It is recommended not to expose Neo4j internal IDs (graphId)
+ * Serializable {@link DetachedRelationship} with custom ID. It is recommended not to expose Neo4j internal IDs (graphId)
  * outside of the database.
  *
  * @param <ID> type of custom node/relationship IDs.
  */
-public class SerializableRelationship<ID> extends RelationshipRepresentation {
+public class SerializableRelationship<ID> extends DetachedRelationship<ID, SerializableNode<ID>> {
 
     private ID id;
     private ID startNodeId;
@@ -43,7 +43,7 @@ public class SerializableRelationship<ID> extends RelationshipRepresentation {
     }
 
     /**
-     * Create a Serializable {@link RelationshipRepresentation} from a Neo4j relationship. All properties will be included.
+     * Create a Serializable {@link DetachedRelationship} from a Neo4j relationship. All properties will be included.
      *
      * @param relationship              relationship to create the representation from.
      * @param relationshipIdTransformer ID transformer for relationship IDs.
@@ -54,7 +54,7 @@ public class SerializableRelationship<ID> extends RelationshipRepresentation {
     }
 
     /**
-     * Create a Serializable {@link RelationshipRepresentation} from a Neo4j relationship. All properties will be included.
+     * Create a Serializable {@link DetachedRelationship} from a Neo4j relationship. All properties will be included.
      *
      * @param relationship              relationship to create the representation from.
      * @param properties                keys of properties to be included in the representation.
@@ -63,14 +63,15 @@ public class SerializableRelationship<ID> extends RelationshipRepresentation {
      * @param nodeIdTransformer         ID transformer for node IDs.
      */
     public SerializableRelationship(Relationship relationship, String[] properties, RelationshipIdTransformer<ID> relationshipIdTransformer, NodeIdTransformer<ID> nodeIdTransformer) {
-        super(relationship, properties);
+        super(relationship, properties, nodeIdTransformer);
+
         setId(relationshipIdTransformer.fromContainer(relationship));
         setStartNodeId(nodeIdTransformer.fromContainer(relationship.getStartNode()));
         setEndNodeId(nodeIdTransformer.fromContainer(relationship.getEndNode()));
     }
 
     /**
-     * Create a Serializable {@link RelationshipRepresentation} from own relationship ID.
+     * Create a Serializable {@link DetachedRelationship} from own relationship ID.
      *
      * @param id          of the relationship. Must not be <code>null</code>.
      */
@@ -79,7 +80,7 @@ public class SerializableRelationship<ID> extends RelationshipRepresentation {
     }
 
     /**
-     * Construct Serializable {@link RelationshipRepresentation} of a relationship.
+     * Construct Serializable {@link DetachedRelationship} of a relationship.
      *
      * @param id                custom ID of the relationship. Can be <code>null</code> to represent a new relationship.
      * @param startNodeId       own start node ID.
@@ -132,6 +133,16 @@ public class SerializableRelationship<ID> extends RelationshipRepresentation {
 
     public void setEndNodeId(ID endNodeId) {
         this.endNodeId = endNodeId;
+    }
+
+    @Override
+    protected SerializableNode<ID> startNode(Relationship relationship, NodeIdTransformer<ID> nodeIdTransformer) {
+        return new SerializableNode<>(relationship.getStartNode(), nodeIdTransformer);
+    }
+
+    @Override
+    protected SerializableNode<ID> endNode(Relationship relationship, NodeIdTransformer<ID> nodeIdTransformer) {
+        return new SerializableNode<>(relationship.getEndNode(), nodeIdTransformer);
     }
 
     /**

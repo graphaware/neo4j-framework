@@ -14,20 +14,15 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.common.policy.spel;
+package com.graphaware.common.representation;
 
-import org.neo4j.graphdb.Relationship;
+import com.graphaware.common.expression.DetachedRelationshipExpressions;
 
-/**
- *  {@link PropertyExpressions} for {@link Relationship} properties.
- */
-class RelationshipPropertyExpressions extends PropertyExpressions<Relationship> {
+public abstract class RelationshipProperty<T extends DetachedRelationshipExpressions> extends Property<T> {
 
-    RelationshipPropertyExpressions(String key, Relationship relationship) {
-        super(key, relationship);
+    protected RelationshipProperty(String key, T propertyContainer) {
+        super(key, propertyContainer);
     }
 
-    public RelationshipExpressions getRelationship() {
-        return new RelationshipExpressions(propertyContainer);
-    }
+    public abstract T getRelationship();
 }

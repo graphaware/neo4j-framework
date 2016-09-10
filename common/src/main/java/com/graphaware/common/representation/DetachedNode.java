@@ -16,29 +16,28 @@
 
 package com.graphaware.common.representation;
 
-import org.neo4j.graphdb.Label;
+import com.graphaware.common.expression.DetachedNodeExpressions;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+import org.neo4j.helpers.collection.Iterables;
 
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import static org.springframework.util.Assert.notNull;
 
 /**
- * {@link PropertyContainerRepresentation} for a {@link Node}.
+ * {@link DetachedPropertyContainer} for a {@link Node}.
  */
-public class NodeRepresentation extends PropertyContainerRepresentation<Node> {
+public abstract class DetachedNode<ID> extends DetachedPropertyContainer<ID, Node> implements DetachedNodeExpressions {
 
     private String[] labels;
 
     /**
      * Public no-arg constructor (for Jackson et al).
      */
-    public NodeRepresentation() {
+    protected DetachedNode() {
     }
 
     /**
@@ -46,7 +45,7 @@ public class NodeRepresentation extends PropertyContainerRepresentation<Node> {
      *
      * @param node node to create the representation from. Must not be <code>null</code>.
      */
-    public NodeRepresentation(Node node) {
+    protected DetachedNode(Node node) {
         this(node, null);
     }
 
@@ -57,9 +56,9 @@ public class NodeRepresentation extends PropertyContainerRepresentation<Node> {
      * @param properties keys of properties to be included in the representation.
      *                   Can be <code>null</code>, which represents all. Empty array represents none.
      */
-    public NodeRepresentation(Node node, String[] properties) {
+    protected DetachedNode(Node node, String[] properties) {
         super(node, properties);
-        setLabels(labelsToStringArray(node.getLabels()));
+        setLabels(Iterables.asArray(String.class, Iterables.map(Label::name, node.getLabels())));
     }
 
     /**
@@ -67,7 +66,7 @@ public class NodeRepresentation extends PropertyContainerRepresentation<Node> {
      *
      * @param graphId of a node to create the representation from.
      */
-    public NodeRepresentation(long graphId) {
+    protected DetachedNode(long graphId) {
         super(graphId);
     }
 
@@ -77,7 +76,7 @@ public class NodeRepresentation extends PropertyContainerRepresentation<Node> {
      * @param labels     of the new node. Must not be <code>null</code>, but can be empty.
      * @param properties of the new node. Can be <code>null</code>, which is equivalent to an empty map.
      */
-    public NodeRepresentation(String[] labels, Map<String, Object> properties) {
+    protected DetachedNode(String[] labels, Map<String, Object> properties) {
         super(properties);
 
         notNull(labels);
@@ -93,7 +92,7 @@ public class NodeRepresentation extends PropertyContainerRepresentation<Node> {
      * @param labels     of the new node. Must not be <code>null</code>, but can be empty.
      * @param properties of the new node. Can be <code>null</code>, which is equivalent to an empty map.
      */
-    public NodeRepresentation(long graphId, String[] labels, Map<String, Object> properties) {
+    protected DetachedNode(long graphId, String[] labels, Map<String, Object> properties) {
         super(graphId, properties);
 
         notNull(labels);
@@ -155,14 +154,6 @@ public class NodeRepresentation extends PropertyContainerRepresentation<Node> {
 
     //helpers
 
-    private String[] labelsToStringArray(Iterable<Label> labels) {
-        List<String> labelsAsList = new LinkedList<>();
-        for (Label label : labels) {
-            labelsAsList.add(label.name());
-        }
-        return labelsAsList.toArray(new String[labelsAsList.size()]);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -178,7 +169,7 @@ public class NodeRepresentation extends PropertyContainerRepresentation<Node> {
             return false;
         }
 
-        NodeRepresentation that = (NodeRepresentation) o;
+        DetachedNode that = (DetachedNode) o;
 
         return Arrays.equals(labels, that.labels);
 

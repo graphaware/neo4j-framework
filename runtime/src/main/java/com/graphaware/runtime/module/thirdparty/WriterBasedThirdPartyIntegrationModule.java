@@ -27,7 +27,7 @@ import static org.springframework.util.Assert.notNull;
 /**
  * A {@link ThirdPartyIntegrationModule} that integrates with the third-party system by using a {@link ThirdPartyWriter}.
  */
-public class WriterBasedThirdPartyIntegrationModule extends ThirdPartyIntegrationModule {
+public abstract class WriterBasedThirdPartyIntegrationModule<ID> extends ThirdPartyIntegrationModule<ID> {
 
     private final ThirdPartyWriter writer;
 
@@ -37,7 +37,7 @@ public class WriterBasedThirdPartyIntegrationModule extends ThirdPartyIntegratio
      * @param moduleId ID of this module. Must not be <code>null</code> or empty.
      * @param writer to use for integrating with third-party system. Must not be <code>null</code>.
      */
-    public WriterBasedThirdPartyIntegrationModule(String moduleId, ThirdPartyWriter writer) {
+    protected WriterBasedThirdPartyIntegrationModule(String moduleId, ThirdPartyWriter writer) {
         super(moduleId);
 
         notNull(writer);

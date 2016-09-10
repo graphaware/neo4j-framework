@@ -16,7 +16,7 @@
 
 package com.graphaware.writer.thirdparty;
 
-import com.graphaware.common.representation.PropertyContainerRepresentation;
+import com.graphaware.common.representation.DetachedPropertyContainer;
 import com.graphaware.common.util.Change;
 import org.neo4j.graphdb.PropertyContainer;
 
@@ -28,7 +28,7 @@ import static org.springframework.util.Assert.notNull;
  * @param <R> type of the details object.
  * @param <T> type of the {@link PropertyContainer} that the operation was performed on.
  */
-public abstract class Update<R extends PropertyContainerRepresentation<T>, T extends PropertyContainer> extends BaseWriteOperation<Change<R>> {
+public abstract class Update<ID, R extends DetachedPropertyContainer<ID, T>, T extends PropertyContainer> extends BaseWriteOperation<Change<R>> {
 
     /**
      * Create the operation.

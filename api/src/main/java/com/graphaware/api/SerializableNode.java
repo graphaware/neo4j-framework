@@ -16,20 +16,20 @@
 
 package com.graphaware.api;
 
-import com.graphaware.api.transform.NodeIdTransformer;
-import com.graphaware.common.representation.NodeRepresentation;
+import com.graphaware.common.transform.NodeIdTransformer;
+import com.graphaware.common.representation.DetachedNode;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
 import java.util.Map;
 
 /**
- * Serializable {@link NodeRepresentation} with custom node ID. It is recommended not to expose Neo4j internal IDs (graphId)
+ * Serializable {@link DetachedNode} with custom node ID. It is recommended not to expose Neo4j internal IDs (graphId)
  * outside of the database.
  *
  * @param <ID> type of custom node ID.
  */
-public class SerializableNode<ID> extends NodeRepresentation {
+public class SerializableNode<ID> extends DetachedNode<ID> {
 
     private ID id;
 
@@ -40,7 +40,7 @@ public class SerializableNode<ID> extends NodeRepresentation {
     }
 
     /**
-     * Create a Serializable {@link NodeRepresentation} from a Neo4j node. All properties will be included.
+     * Create a Serializable {@link DetachedNode} from a Neo4j node. All properties will be included.
      *
      * @param node        node to create the representation from.
      * @param transformer ID transformer.
@@ -50,7 +50,7 @@ public class SerializableNode<ID> extends NodeRepresentation {
     }
 
     /**
-     * Create a Serializable {@link NodeRepresentation} from a Neo4j node.
+     * Create a Serializable {@link DetachedNode} from a Neo4j node.
      *
      * @param node        node to create the representation from. Must not be <code>null</code>.
      * @param properties  keys of properties to be included in the representation.
@@ -63,7 +63,7 @@ public class SerializableNode<ID> extends NodeRepresentation {
     }
 
     /**
-     * Create a Serializable {@link NodeRepresentation} from custom node ID.
+     * Create a Serializable {@link DetachedNode} from custom node ID.
      *
      * @param id          custom ID of the node. Can be <code>null</code> to represent a new node.
      */
@@ -72,7 +72,7 @@ public class SerializableNode<ID> extends NodeRepresentation {
     }
 
     /**
-     * Construct Serializable {@link NodeRepresentation} of a node.
+     * Construct Serializable {@link DetachedNode} of a node.
      *
      * @param id         custom ID of the node. Can be <code>null</code> to represent a new node.
      * @param labels     of the new node representation.

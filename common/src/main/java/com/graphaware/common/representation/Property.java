@@ -14,20 +14,16 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.common.policy.spel;
+package com.graphaware.common.representation;
 
-import org.neo4j.graphdb.PropertyContainer;
+import com.graphaware.common.expression.PropertyContainerExpressions;
 
-/**
- * Property key and its containing {@link PropertyContainer} wrapper that defines delegating methods usable in SPEL
- * expressions when constructing {@link SpelInclusionPolicy}s.
- */
-abstract class PropertyExpressions<T extends PropertyContainer> {
+public abstract class Property<T extends PropertyContainerExpressions> {
 
-    protected final String key;
+    private final String key;
     protected final T propertyContainer;
 
-    PropertyExpressions(String key, T propertyContainer) {
+    protected Property(String key, T propertyContainer) {
         this.key = key;
         this.propertyContainer = propertyContainer;
     }
