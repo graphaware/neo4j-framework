@@ -19,6 +19,7 @@ package com.graphaware.server;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import org.apache.http.HttpStatus;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.server.enterprise.helpers.EnterpriseServerBuilder;
 import org.neo4j.server.helpers.CommunityServerBuilder;
@@ -26,6 +27,7 @@ import org.neo4j.server.helpers.CommunityServerBuilder;
 import java.io.IOException;
 import java.util.Collections;
 
+@Ignore("until resttest is upgraded to 3.1")
 public class EnterpriseTxParticipationIntegrationTest extends GraphAwareIntegrationTest {
 
     @Override
