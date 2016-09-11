@@ -30,3 +30,5 @@ List of modules to upgrade:
         ga-enterprise
         audit
         schema
+
+mvn license:aggregate-add-third-party to generate TPL
