@@ -246,7 +246,7 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-executor</artifactId>
-                <version>3.0.4.44-SNAPSHOT</version>
+                <version>3.0.6.43-SNAPSHOT</version>
             </dependency>
 
             <!-- Neo4j -->
