@@ -18,7 +18,6 @@ notes:
 List of modules to upgrade:
         uuid
         resttest
-        algorithms
         noderank
         timetree
         expire
