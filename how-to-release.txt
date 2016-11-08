@@ -18,7 +18,6 @@ notes:
 List of modules to upgrade:
         uuid
         resttest
-        algorithms
         noderank
         timetree
         expire
@@ -30,3 +29,5 @@ List of modules to upgrade:
         ga-enterprise
         audit
         schema
+
+mvn license:aggregate-add-third-party to generate TPL

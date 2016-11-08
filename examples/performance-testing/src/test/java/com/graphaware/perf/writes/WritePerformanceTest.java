@@ -16,12 +16,6 @@
 
 package com.graphaware.perf.writes;
 
-import com.graphaware.module.algo.generator.config.BarabasiAlbertConfig;
-import com.graphaware.module.algo.generator.config.BasicGeneratorConfig;
-import com.graphaware.module.algo.generator.config.GeneratorConfiguration;
-import com.graphaware.module.algo.generator.node.SocialNetworkNodeCreator;
-import com.graphaware.module.algo.generator.relationship.BarabasiAlbertRelationshipGenerator;
-import com.graphaware.module.algo.generator.relationship.SocialNetworkRelationshipCreator;
 import com.graphaware.test.performance.EnumParameter;
 import com.graphaware.test.performance.ExponentialParameter;
 import com.graphaware.test.performance.Parameter;
@@ -52,8 +46,6 @@ public class WritePerformanceTest implements PerformanceTest {
     private static final String NETWORK_SIZE = "networkSize";
     private static final String NUMBER_OF_THREADS = "numberOfThreads";
     private static final String WRITER = "writer";
-
-    private GeneratorConfiguration generatorConfiguration;
 
     enum Writer {
         NONE,
@@ -101,16 +93,6 @@ public class WritePerformanceTest implements PerformanceTest {
 
     @Override
     public void prepare(GraphDatabaseService database, final Map<String, Object> params) {
-        generatorConfiguration = new BasicGeneratorConfig(
-                new BarabasiAlbertRelationshipGenerator(new BarabasiAlbertConfig((Integer) params.get(NETWORK_SIZE), 3)),
-                SocialNetworkNodeCreator.getInstance(),
-                SocialNetworkRelationshipCreator.getInstance()) {
-
-            @Override
-            public int getBatchSize() {
-                return (int) params.get(BATCH_SIZE);
-            }
-        };
     }
 
     @Override
@@ -122,15 +104,12 @@ public class WritePerformanceTest implements PerformanceTest {
 
         final Neo4jGraphGenerator generator = new Neo4jGraphGenerator(database, (Integer) params.get(NUMBER_OF_THREADS), writer);
 
-        generator.generateGraph(generatorConfiguration);
+        generator.generateGraph((Integer) params.get(NETWORK_SIZE));
 
         long timeToProcessQueue = 0;
-        timeToProcessQueue += TestUtils.time(new TestUtils.Timed() {
-            @Override
-            public void time() {
-                if (writer != null) {
-                    writer.stop();
-                }
+        timeToProcessQueue += TestUtils.time(() -> {
+            if (writer != null) {
+                writer.stop();
             }
         });
 
