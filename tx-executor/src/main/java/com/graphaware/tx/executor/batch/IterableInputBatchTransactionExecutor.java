@@ -78,18 +78,15 @@ public class IterableInputBatchTransactionExecutor<T> extends DisposableBatchTra
     }
 
     protected final void populateQueue() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    for (T input : IterableInputBatchTransactionExecutor.this.input) {
-                        queue.offer(input);
-                    }
-                } catch (Exception e) {
-                    LOG.warn("Exception while producing input!", e);
-                } finally {
-                    finished.set(true);
+        new Thread(() -> {
+            try {
+                for (T input : IterableInputBatchTransactionExecutor.this.input) {
+                    queue.offer(input);
                 }
+            } catch (Exception e) {
+                LOG.warn("Exception while producing input!", e);
+            } finally {
+                finished.set(true);
             }
         }).start();
     }
@@ -104,32 +101,29 @@ public class IterableInputBatchTransactionExecutor<T> extends DisposableBatchTra
 
             final AtomicInteger currentBatchSteps = new AtomicInteger(0);
             final AtomicBoolean polled = new AtomicBoolean(false);
-            NullItem result = executor.executeInTransaction(new TransactionCallback<NullItem>() {
-                @Override
-                public NullItem doInTransaction(GraphDatabaseService database) {
-                    while ((notFinished()) && currentBatchSteps.get() < batchSize) {
-                        T next;
-                        try {
-                            next = queue.poll(100, TimeUnit.MILLISECONDS);
-                        } catch (InterruptedException e) {
-                            continue;
-                        }
+            NullItem result = executor.executeInTransaction(database -> {
+                while ((notFinished()) && currentBatchSteps.get() < batchSize) {
+                    T next;
+                    try {
+                        next = queue.poll(100, TimeUnit.MILLISECONDS);
+                    } catch (InterruptedException e) {
+                        continue;
+                    }
 
-                        if (next != null) {
-                            polled.set(true);
-                            totalSteps.incrementAndGet();
-                            unitOfWork.execute(database, next, batchNo, currentBatchSteps.incrementAndGet());
+                    if (next != null) {
+                        polled.set(true);
+                        totalSteps.incrementAndGet();
+                        unitOfWork.execute(database, next, batchNo, currentBatchSteps.incrementAndGet());
+                    } else {
+                        if (!finished.get()) {
+                            LOG.warn("Waited for over 100ms but no input arrived. Still expecting more input. ");
                         } else {
-                            if (!finished.get()) {
-                                LOG.warn("Waited for over 100ms but no input arrived. Still expecting more input. ");
-                            } else {
-                                break;
-                            }
+                            break;
                         }
                     }
-                    return NullItem.getInstance();
-
                 }
+                return NullItem.getInstance();
+
             }, KeepCalmAndCarryOn.getInstance());
 
             if (result != null) {

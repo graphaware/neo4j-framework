@@ -106,26 +106,9 @@ public class TimerDrivenModuleHaTest {
     }
 
     private int[] run(TimerDrivenModuleConfiguration.InstanceRolePolicy instanceRolePolicy) throws InterruptedException, ExecutionException {
-        Future<GraphDatabaseService> masterFuture = executor.submit(new Callable<GraphDatabaseService>() {
-            @Override
-            public GraphDatabaseService call() throws Exception {
-                return haDb("1", false);
-            }
-        });
-
-        Future<GraphDatabaseService> slave1Future = executor.submit(new Callable<GraphDatabaseService>() {
-            @Override
-            public GraphDatabaseService call() throws Exception {
-                return haDb("2", true);
-            }
-        });
-
-        Future<GraphDatabaseService> slave2Future = executor.submit(new Callable<GraphDatabaseService>() {
-            @Override
-            public GraphDatabaseService call() throws Exception {
-                return haDb("3", true);
-            }
-        });
+        Future<GraphDatabaseService> masterFuture = executor.submit(() -> haDb("1", false));
+        Future<GraphDatabaseService> slave1Future = executor.submit(() -> haDb("2", true));
+        Future<GraphDatabaseService> slave2Future = executor.submit(() -> haDb("3", true));
 
         GraphDatabaseService master = masterFuture.get();
         GraphDatabaseService slave1 = slave1Future.get();
@@ -164,8 +147,8 @@ public class TimerDrivenModuleHaTest {
                 .setConfig(ClusterSettings.server_id, id)
                 .setConfig(HaSettings.ha_server, "localhost:600" + id)
                 .setConfig(HaSettings.slave_only, Boolean.toString(slave))
-                .setConfig(ClusterSettings.cluster_server, "localhost:500" + id)
-                .setConfig(ClusterSettings.initial_hosts, "localhost:5001,localhost:5002,localhost:5003")
+                .setConfig(ClusterSettings.cluster_server, "localhost:510" + id)
+                .setConfig(ClusterSettings.initial_hosts, "localhost:5101,localhost:5102,localhost:5103")
                 .newGraphDatabase();
 
         registerShutdownHook(database);

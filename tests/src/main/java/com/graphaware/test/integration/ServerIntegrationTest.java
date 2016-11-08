@@ -20,6 +20,7 @@ import com.graphaware.test.util.TestHttpClient;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.helpers.HostnamePort;
+import org.neo4j.helpers.ListenSocketAddress;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.enterprise.helpers.EnterpriseServerBuilder;
 import org.neo4j.server.helpers.CommunityServerBuilder;
@@ -147,7 +148,7 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
      * @param builder to populate.
      */
     protected CommunityServerBuilder configure(CommunityServerBuilder builder) throws IOException {
-        builder = builder.onAddress(new HostnamePort("localhost", neoServerPort()));
+        builder = builder.onAddress(new ListenSocketAddress("localhost", neoServerPort()));
 
         for (Map.Entry<String, String> mapping : thirdPartyJaxRsPackageMappings().entrySet()) {
             builder = builder.withThirdPartyJaxRsPackage(mapping.getKey(), mapping.getValue());

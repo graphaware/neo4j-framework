@@ -57,7 +57,7 @@ public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
         super.registerProcedures(procedures);
 
         for (Class cls : proceduresOnClassPath()) {
-            procedures.register(cls);
+            procedures.registerProcedure(cls);
         }
     }
 
