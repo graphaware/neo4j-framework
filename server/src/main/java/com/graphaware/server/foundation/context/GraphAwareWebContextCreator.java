@@ -16,11 +16,8 @@
 
 package com.graphaware.server.foundation.context;
 
-import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
-import com.graphaware.common.ping.NullStatsCollector;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.configuration.Config;
 import org.neo4j.logging.Log;
 import com.graphaware.common.log.LoggerFactory;
@@ -31,7 +28,8 @@ public class GraphAwareWebContextCreator extends BaseWebContextCreator {
     private static final Log LOG = LoggerFactory.getLogger(GraphAwareWebContextCreator.class);
 
     private static final String GA_API_PACKAGE_SCAN_SETTING = "com.graphaware.server.api.scan";
-    private static final String GA_API_STATS_DISABLE_SETTING = "com.graphaware.server.stats.disable";
+    private static final String GA_API_STATS_DISABLE_SETTING_LEGACY = "com.graphaware.server.stats.disable"; //see https://github.com/graphaware/neo4j-framework/issues/59k
+    private static final String GA_API_STATS_DISABLE_SETTING = "com.graphaware.server.stats.disabled";
 
     private static final String[] GA_API_PACKAGE_SCAN_DEFAULT = new String[]{"com.**.graphaware.**", "org.**.graphaware.**", "net.**.graphaware.**"};
     private static final String GA_STATS_PACKAGE = "com.graphaware.server.foundation.stats";
@@ -48,7 +46,10 @@ public class GraphAwareWebContextCreator extends BaseWebContextCreator {
     }
 
     private void configureStatsCollector(AnnotationConfigWebApplicationContext context, Config config) {
-        if (Boolean.valueOf(config.getParams().getOrDefault(GA_API_STATS_DISABLE_SETTING, "false"))) {
+        if (Boolean.valueOf(config.getParams().getOrDefault(GA_API_STATS_DISABLE_SETTING_LEGACY, "false"))) {
+            context.getEnvironment().setActiveProfiles("stats-null");
+        }
+        else if (Boolean.valueOf(config.getParams().getOrDefault(GA_API_STATS_DISABLE_SETTING, "false"))) {
             context.getEnvironment().setActiveProfiles("stats-null");
         }
         else {
