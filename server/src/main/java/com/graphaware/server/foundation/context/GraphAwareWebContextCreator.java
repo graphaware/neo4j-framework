@@ -28,7 +28,7 @@ public class GraphAwareWebContextCreator extends BaseWebContextCreator {
     private static final Log LOG = LoggerFactory.getLogger(GraphAwareWebContextCreator.class);
 
     private static final String GA_API_PACKAGE_SCAN_SETTING = "com.graphaware.server.api.scan";
-    private static final String GA_API_STATS_DISABLE_SETTING_LEGACY = "com.graphaware.server.stats.disable"; //see https://github.com/graphaware/neo4j-framework/issues/59k
+    private static final String GA_API_STATS_DISABLE_SETTING_LEGACY = "com.graphaware.server.stats.disable"; //see https://github.com/graphaware/neo4j-framework/issues/59
     private static final String GA_API_STATS_DISABLE_SETTING = "com.graphaware.server.stats.disabled";
 
     private static final String[] GA_API_PACKAGE_SCAN_DEFAULT = new String[]{"com.**.graphaware.**", "org.**.graphaware.**", "net.**.graphaware.**"};
