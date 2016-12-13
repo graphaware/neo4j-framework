@@ -19,13 +19,13 @@
 
     <groupId>com.graphaware.neo4j.example</groupId>
     <artifactId>performance-testing</artifactId>
-    <version>3.1.0.44</version>
+    <version>3.1.0.45-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>module-parent</artifactId>
-        <version>3.1.0.44</version>
+        <version>3.1.0.45-SNAPSHOT</version>
         <relativePath>../../parent-pom/module/pom.xml</relativePath>
     </parent>
 
