@@ -114,7 +114,9 @@ public final class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfi
     private static final Setting<Integer> MAX_TIME_SETTING = setting("com.graphaware.runtime.timing.maxTime", INTEGER, (String) null);
 
     //stats
-    private static final Setting<Boolean> STATS_DISABLE_SETTING = setting("com.graphaware.runtime.stats.disable", BOOLEAN, "false");
+    //see https://github.com/graphaware/neo4j-framework/issues/59
+    private static final Setting<Boolean> STATS_DISABLE_SETTING_LEGACY = setting("com.graphaware.runtime.stats.disable", BOOLEAN, "false");
+    private static final Setting<Boolean> STATS_DISABLE_SETTING = setting("com.graphaware.runtime.stats.disabled", BOOLEAN, "false");
 
     /**
      * Constructs a new {@link Neo4jConfigBasedRuntimeConfiguration} based on the given Neo4j {@link Config}.
@@ -200,6 +202,10 @@ public final class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfi
     }
 
     private static StatsCollector createStatsCollector(GraphDatabaseService database, Config config) {
+        if (config.get(STATS_DISABLE_SETTING_LEGACY)) {
+            return NullStatsCollector.getInstance();
+        }
+
         if (config.get(STATS_DISABLE_SETTING)) {
             return NullStatsCollector.getInstance();
         }
