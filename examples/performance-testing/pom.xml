@@ -42,12 +42,6 @@
 
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
-            <version>3.0.3.39.5</version>
-            <artifactId>algorithms</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
             <artifactId>writer</artifactId>
         </dependency>
 
