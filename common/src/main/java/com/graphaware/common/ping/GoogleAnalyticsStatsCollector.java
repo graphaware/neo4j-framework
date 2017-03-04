@@ -38,21 +38,35 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
 
     private static final Log LOG = LoggerFactory.getLogger(GoogleAnalyticsStatsCollector.class);
     private static final String TID = "UA-1428985-11";
+    private static final String UNKNOWN = "unknown";
 
+    private final GraphDatabaseService database;
     private static ScheduledExecutorService executor;
-    private final String storeId;
+    private String storeId = UNKNOWN;
 
     public GoogleAnalyticsStatsCollector(GraphDatabaseService database) {
-        this.storeId = findStoreId(database);
+        this.database = database;
     }
 
-    private static String findStoreId(GraphDatabaseService database) {
+    private String findStoreIdIfNeeded() {
+        if (UNKNOWN.equals(storeId)) {
+            try {
+                storeId = findStoreId();
+            } catch (Exception e) {
+                //do nothing
+            }
+        }
+
+        return storeId;
+    }
+
+    private String findStoreId() {
         if (database == null) {
-            return "unknown";
+            return UNKNOWN;
         }
 
         if (((GraphDatabaseAPI) database).storeId() == null) {
-            return "unknown";
+            return UNKNOWN;
         }
 
         return String.valueOf(((GraphDatabaseAPI) database).storeId().getRandomId());
@@ -63,7 +77,7 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
      */
     @Override
     public void frameworkStart(String edition) {
-        post(constructBody("framework-" + edition));
+        post("framework-" + edition);
     }
 
     /**
@@ -71,7 +85,7 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
      */
     @Override
     public void runtimeStart() {
-        post(constructBody("runtime"));
+        post("runtime");
     }
 
     /**
@@ -79,15 +93,15 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
      */
     @Override
     public void moduleStart(String moduleClassName) {
-        post(constructBody(moduleClassName));
+        post(moduleClassName);
     }
 
-    private void post(final String body) {
+    private void post(final String appId) {
         initializeExecutorIfNeeded();
 
         executor.scheduleAtFixedRate(() -> {
             HttpPost httpPost = new HttpPost("http://www.google-analytics.com/collect");
-            httpPost.setEntity(new StringEntity(body, ContentType.TEXT_PLAIN));
+            httpPost.setEntity(new StringEntity(constructBody(findStoreIdIfNeeded(), appId), ContentType.TEXT_PLAIN));
 
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
                 httpClient.execute(httpPost);
@@ -114,7 +128,7 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
         }
     }
 
-    private String constructBody(String appId) {
+    private String constructBody(String storeId, String appId) {
         return "v=1&tid=" + TID + "&cid=" + storeId + "&t=event&ea=" + appId + "&ec=Run&el=" + VERSION;
     }
 

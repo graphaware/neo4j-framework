@@ -164,8 +164,8 @@ public class TimerDrivenModuleHaTest {
                 .setConfig(ClusterSettings.server_id, id)
                 .setConfig(HaSettings.ha_server, "localhost:600" + id)
                 .setConfig(HaSettings.slave_only, Boolean.toString(slave))
-                .setConfig(ClusterSettings.cluster_server, "localhost:500" + id)
-                .setConfig(ClusterSettings.initial_hosts, "localhost:5001,localhost:5002,localhost:5003")
+                .setConfig(ClusterSettings.cluster_server, "localhost:510" + id)
+                .setConfig(ClusterSettings.initial_hosts, "localhost:5101,localhost:5102,localhost:5103")
                 .newGraphDatabase();
 
         registerShutdownHook(database);
