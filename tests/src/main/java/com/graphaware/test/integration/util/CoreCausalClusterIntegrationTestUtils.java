@@ -13,37 +13,42 @@
  * the GNU General Public License along with this program.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package com.graphaware.runtime.config;
+package com.graphaware.test.integration.util;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.neo4j.causalclustering.core.CausalClusteringSettings;
-import org.neo4j.causalclustering.readreplica.ReadReplicaGraphDatabase;
+import org.neo4j.causalclustering.core.CoreGraphDatabase;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.impl.factory.GraphDatabaseFacadeFactory.Dependencies;
 
 /**
- * Utility for reaa_replica in a (another) causal cluster 
+ * Utility for causal cluster core instances 
  */
-public class ReplicaCausalClusterIntegrationTestUtils extends AbstractClusterIntegrationTestUtils {
+public class CoreCausalClusterIntegrationTestUtils extends AbstractClusterIntegrationTestUtils {
 
 	@Override
 	protected GraphDatabaseService newDatabaseInstance(File storeDir, Map<String, String> params,
 			Dependencies dependencies) {
-		return new  ReadReplicaGraphDatabase(storeDir, params, dependencies);
+		return new CoreGraphDatabase(storeDir, params, dependencies);
 	}
 
 	@Override
 	protected Map<String, String> addictionalParams(int i, int clusterSize) {
 		Map<String, String> params = new HashMap<>();
 		
+		params.put(CausalClusteringSettings.expected_core_cluster_size.name(), String.valueOf(clusterSize));
+		
 		params.put(CausalClusteringSettings.initial_discovery_members.name(), buildDiscoveryAddresses(5000,clusterSize));
+		params.put(CausalClusteringSettings.discovery_listen_address.name(), "localhost:500"+i);
+		params.put(CausalClusteringSettings.transaction_listen_address.name(), "localhost:600"+i);
+		params.put(CausalClusteringSettings.raft_listen_address.name(), "localhost:700"+i);
 		
 		params.put("dbms.connector.bolt.enabled", "true");
-		params.put("dbms.connector.bolt.listen_address", "localhost:"+ String.valueOf( 8000+i ));
-
+		params.put("dbms.connector.bolt.listen_address", "localhost:"+ String.valueOf( 7687+i ));
+		
 		return params;
 	}
 

@@ -27,11 +27,12 @@ import org.neo4j.kernel.impl.factory.OperationalMode;
 
 import com.graphaware.runtime.config.util.InstanceRole;
 import com.graphaware.runtime.config.util.InstanceRoleUtils;
+import com.graphaware.test.integration.util.HAClusterIntegrationTestUtils;
 
 /**
  * Test for @InstanceRoleUtils in HA (1 master, 1 slave) cluster
  */
-public class InstaceRoleUtilsHATest {
+public class InstanceRoleUtilsHATest {
 
 	private static HAClusterIntegrationTestUtils clusterUtils = new HAClusterIntegrationTestUtils();
 	

@@ -13,41 +13,37 @@
  * the GNU General Public License along with this program.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package com.graphaware.runtime.config;
+package com.graphaware.test.integration.util;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.neo4j.causalclustering.core.CausalClusteringSettings;
-import org.neo4j.cluster.ClusterSettings;
+import org.neo4j.causalclustering.readreplica.ReadReplicaGraphDatabase;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.ha.HaSettings;
-import org.neo4j.kernel.ha.HighlyAvailableGraphDatabase;
 import org.neo4j.kernel.impl.factory.GraphDatabaseFacadeFactory.Dependencies;
 
 /**
- * Utility for HA cluster
+ * Utility for reaa_replica in a (another) causal cluster 
  */
-public class HAClusterIntegrationTestUtils extends AbstractClusterIntegrationTestUtils {
+public class ReplicaCausalClusterIntegrationTestUtils extends AbstractClusterIntegrationTestUtils {
 
 	@Override
 	protected GraphDatabaseService newDatabaseInstance(File storeDir, Map<String, String> params,
 			Dependencies dependencies) {
-		return new HighlyAvailableGraphDatabase(storeDir, params, dependencies);
+		return new  ReadReplicaGraphDatabase(storeDir, params, dependencies);
 	}
 
 	@Override
 	protected Map<String, String> addictionalParams(int i, int clusterSize) {
 		Map<String, String> params = new HashMap<>();
 		
-		params.put(CausalClusteringSettings.expected_core_cluster_size.name(), String.valueOf(clusterSize));
+		params.put(CausalClusteringSettings.initial_discovery_members.name(), buildDiscoveryAddresses(5000,clusterSize));
 		
-		params.put(ClusterSettings.server_id.name(), String.valueOf(i));
-		params.put(HaSettings.ha_server.name(), "localhost:600"+i);//"ha.host.data"
-		params.put(ClusterSettings.cluster_server.name(), "localhost:500"+i);//"ha.host.coordination"
-		params.put(ClusterSettings.initial_hosts.name(), buildDiscoveryAddresses(5000,clusterSize));//ha.initial_hosts
-		
+		params.put("dbms.connector.bolt.enabled", "true");
+		params.put("dbms.connector.bolt.listen_address", "localhost:"+ String.valueOf( 8000+i ));
+
 		return params;
 	}
 

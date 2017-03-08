@@ -27,11 +27,13 @@ import org.neo4j.kernel.impl.factory.OperationalMode;
 
 import com.graphaware.runtime.config.util.InstanceRole;
 import com.graphaware.runtime.config.util.InstanceRoleUtils;
+import com.graphaware.test.integration.util.CoreCausalClusterIntegrationTestUtils;
+import com.graphaware.test.integration.util.ReplicaCausalClusterIntegrationTestUtils;
 
 /**
  * Test for @InstanceRoleUtils in causal cluster mode (1 leader, 2 followers, 1 read_replica)
  */
-public class InstaceRoleUtilsCausalTest {
+public class InstanceRoleUtilsCausalTest {
 
 	private static CoreCausalClusterIntegrationTestUtils clusterUtils = new CoreCausalClusterIntegrationTestUtils();
 	private static ReplicaCausalClusterIntegrationTestUtils clusterReplicaUtils = new ReplicaCausalClusterIntegrationTestUtils();

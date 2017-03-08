@@ -30,7 +30,7 @@ import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 /**
  * Test for @InstanceRoleUtils in single instance mode
  */
-public class InstaceRoleUtilsSingleTest extends EmbeddedDatabaseIntegrationTest {
+public class InstanceRoleUtilsSingleTest extends EmbeddedDatabaseIntegrationTest {
 
 	private InstanceRoleUtils utils;
 	

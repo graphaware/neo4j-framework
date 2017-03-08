@@ -13,7 +13,7 @@
  * the GNU General Public License along with this program.  If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package com.graphaware.runtime.config;
+package com.graphaware.test.integration.util;
 
 import java.io.File;
 import java.io.IOException;

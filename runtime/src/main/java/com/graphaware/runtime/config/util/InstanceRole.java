@@ -16,6 +16,9 @@
 
 package com.graphaware.runtime.config.util;
 
+/**
+ * The role of instance database in a cluster 
+ */
 public enum InstanceRole {
 	// CAUSAL CLUSTER
 	FOLLOWER,
