@@ -172,6 +172,30 @@
                 </plugins>
             </build>
         </profile>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${maven.plugin.surefire}</version>
+						<configuration>
+							<includes>
+								<include>**/*Test.java</include>
+							</includes>
+							<excludes>
+								<exclude>**/*TestHighAvailability.java</exclude>
+								<exclude>**/*TestCausalCluster.java</exclude>
+							</excludes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>        
         <!-- 
         Run only the integration tests for High Availability Cluster
          -->
@@ -182,10 +206,10 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
-						<version>2.12.4</version>
+						<version>${maven.plugin.surefire}</version>
 						<configuration>
 							<includes>
-								<include>**/*HighAvailabilityTest.java</include>
+								<include>**/*TestHighAvailability.java</include>
 							</includes>
 						</configuration>
 					</plugin>
@@ -202,10 +226,10 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
-						<version>2.12.4</version>
+						<version>${maven.plugin.surefire}</version>
 						<configuration>
 							<includes>
-								<include>**/*CausalClusterTest.java</include>
+								<include>**/*TestCausalCluster.java</include>
 							</includes>
 						</configuration>
 					</plugin>
@@ -220,6 +244,7 @@
         <neo4j.version>3.1.0</neo4j.version>
         <spring.version>4.2.2.RELEASE</spring.version>
         <logback.version>1.1.2</logback.version>
+        <maven.plugin.surefire>2.12.4</maven.plugin.surefire>
     </properties>
 
     <dependencyManagement>

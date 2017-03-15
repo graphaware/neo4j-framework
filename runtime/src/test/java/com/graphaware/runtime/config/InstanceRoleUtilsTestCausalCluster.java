@@ -20,46 +20,34 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.kernel.impl.factory.OperationalMode;
 
 import com.graphaware.runtime.config.util.InstanceRole;
 import com.graphaware.runtime.config.util.InstanceRoleUtils;
-import com.graphaware.test.integration.util.CoreCausalClusterIntegrationTestUtils;
-import com.graphaware.test.integration.util.ReplicaCausalClusterIntegrationTestUtils;
+import com.graphaware.test.integration.cluster.CausalClusterDatabasesintegrationTest;
 
 /**
- * Test for @InstanceRoleUtils in causal cluster mode (1 leader, 2 followers, 1 read_replica)
+ * Test for @InstanceRoleUtils in causal cluster mode 
  */
-public class InstanceRoleUtilsCausalTest {
+public class InstanceRoleUtilsTestCausalCluster extends CausalClusterDatabasesintegrationTest{
 
-	private static CoreCausalClusterIntegrationTestUtils clusterUtils = new CoreCausalClusterIntegrationTestUtils();
-	private static ReplicaCausalClusterIntegrationTestUtils clusterReplicaUtils = new ReplicaCausalClusterIntegrationTestUtils();
-	
-	private static InstanceRoleUtils utilsLeader;
-	private static InstanceRoleUtils utilsFollower1;
-	private static InstanceRoleUtils utilsFollower2;
-	private static InstanceRoleUtils utilsReplica;
+	private InstanceRoleUtils utilsLeader;
+	private InstanceRoleUtils utilsFollower1;
+	private InstanceRoleUtils utilsFollower2;
+	private InstanceRoleUtils utilsReplica;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		clusterUtils.setUpDatabases(3);
-		clusterReplicaUtils.setUpDatabases(1);
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
 		
-		utilsLeader = new InstanceRoleUtils(clusterUtils.getMainDatabase());
+		utilsLeader = new InstanceRoleUtils(getLeaderDatabase());
 		
-		utilsFollower1 = new InstanceRoleUtils(clusterUtils.getSecondaryDatabases().get(0));
-		utilsFollower2 = new InstanceRoleUtils(clusterUtils.getSecondaryDatabases().get(1));
+		utilsFollower1 = new InstanceRoleUtils(getFollowers().get(0));
+		utilsFollower2 = new InstanceRoleUtils(getFollowers().get(1));
 		
-		utilsReplica = new InstanceRoleUtils(clusterReplicaUtils.getMainDatabase());
-	}
-
-	@AfterClass
-	public static void tearDown() throws Exception {
-		clusterReplicaUtils.shutdownDatabases();
-		clusterUtils.shutdownDatabases();
+		utilsReplica = new InstanceRoleUtils(getReplicas().get(0));
 	}
 
 	@Test

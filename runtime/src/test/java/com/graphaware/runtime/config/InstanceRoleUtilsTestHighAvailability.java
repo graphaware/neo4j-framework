@@ -20,37 +20,28 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.kernel.impl.factory.OperationalMode;
 
 import com.graphaware.runtime.config.util.InstanceRole;
 import com.graphaware.runtime.config.util.InstanceRoleUtils;
-import com.graphaware.test.integration.util.HAClusterIntegrationTestUtils;
+import com.graphaware.test.integration.cluster.HighAvailabilityClusterDatabasesIntegrationTest;
 
 /**
  * Test for @InstanceRoleUtils in HA (1 master, 1 slave) cluster
  */
-public class InstanceRoleUtilsHATest {
+public class InstanceRoleUtilsTestHighAvailability extends HighAvailabilityClusterDatabasesIntegrationTest {
 
-	private static HAClusterIntegrationTestUtils clusterUtils = new HAClusterIntegrationTestUtils();
-	
-	private static InstanceRoleUtils utilsMaster;
-	private static InstanceRoleUtils utilsSlave;
+	private InstanceRoleUtils utilsMaster;
+	private InstanceRoleUtils utilsSlave;
 	
 	
-	@BeforeClass
-	public static void setUp() throws Exception {
-		clusterUtils.setUpDatabases(2);
-		
-		utilsMaster = new InstanceRoleUtils(clusterUtils.getMainDatabase());
-		utilsSlave = new InstanceRoleUtils(clusterUtils.getSecondaryDatabases().get(0));
-	}
-
-	@AfterClass
-	public static void tearDown() throws Exception {
-		clusterUtils.shutdownDatabases();
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+		utilsMaster = new InstanceRoleUtils(getMasterDatabase());
+		utilsSlave = new InstanceRoleUtils(getOneSlaveDatabase());
 	}
 
 	@Test

@@ -19,54 +19,53 @@ package com.graphaware.runtime.metadata;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import com.graphaware.runtime.config.FluentRuntimeConfiguration;
 import com.graphaware.runtime.config.FluentTxDrivenModuleConfiguration;
-import com.graphaware.test.integration.util.CoreCausalClusterIntegrationTestUtils;
+import com.graphaware.test.integration.cluster.CausalClusterDatabasesintegrationTest;
 
-public class GraphPropertiesMetadataRepositoryCausalTest {
+public class GraphPropertiesMetadataRepositoryTestCausalCluster extends CausalClusterDatabasesintegrationTest {
 
-	private CoreCausalClusterIntegrationTestUtils clusterIntegrationTestUtils;
     private ModuleMetadataRepository repository;
 
-    @Before
-    public void setUp() throws Exception{
-    	clusterIntegrationTestUtils = new CoreCausalClusterIntegrationTestUtils();
-    	clusterIntegrationTestUtils.setUpDatabases(3);
-    }
-    
-    @After
-    public void tearDown(){
-    	clusterIntegrationTestUtils.shutdownDatabases();
-    }
-    
     @Test
     public void shouldPersistAndRetrieveMetadataLeader() {
-    	GraphDatabaseService mainDatabase = clusterIntegrationTestUtils.getMainDatabase();
+    	GraphDatabaseService mainDatabase = getLeaderDatabase();
         
-    	repository = new GraphPropertiesMetadataRepository(mainDatabase, FluentRuntimeConfiguration.defaultConfiguration(mainDatabase), "TEST");
+    	repository = new GraphPropertiesMetadataRepository(mainDatabase, FluentRuntimeConfiguration.defaultConfiguration(mainDatabase), "TEST-LEADER");
 
         ModuleMetadata metadata = new DefaultTxDrivenModuleMetadata(FluentTxDrivenModuleConfiguration.defaultConfiguration());
 
-        repository.persistModuleMetadata("TEST", metadata);
+        repository.persistModuleMetadata("TEST-LEADER", metadata);
 
-        assertEquals(metadata, repository.getModuleMetadata("TEST"));
+        assertEquals(metadata, repository.getModuleMetadata("TEST-LEADER"));
     }
 
     @Test
     public void shouldPersistAndRetrieveMetadataFollower() {
-    	GraphDatabaseService mainDatabase = clusterIntegrationTestUtils.getSecondaryDatabases().get(0);
+    	GraphDatabaseService mainDatabase = getOneFollowerDatabase();
     	
-        repository = new GraphPropertiesMetadataRepository(mainDatabase, FluentRuntimeConfiguration.defaultConfiguration(mainDatabase), "TEST");
+        repository = new GraphPropertiesMetadataRepository(mainDatabase, FluentRuntimeConfiguration.defaultConfiguration(mainDatabase), "TEST-FOLLOW");
 
         ModuleMetadata metadata = new DefaultTxDrivenModuleMetadata(FluentTxDrivenModuleConfiguration.defaultConfiguration());
 
-        repository.persistModuleMetadata("TEST", metadata);
+        repository.persistModuleMetadata("TEST-FOLLOW", metadata);
 
-        assertNull(repository.getModuleMetadata("TEST"));
+        assertNull(repository.getModuleMetadata("TEST-FOLLOW"));
+    }
+    
+    @Test
+    public void shouldPersistAndRetrieveMetadataReplica() {
+    	GraphDatabaseService mainDatabase = getOneReplicaDatabase();
+    	
+        repository = new GraphPropertiesMetadataRepository(mainDatabase, FluentRuntimeConfiguration.defaultConfiguration(mainDatabase), "TEST-REPLICA");
+
+        ModuleMetadata metadata = new DefaultTxDrivenModuleMetadata(FluentTxDrivenModuleConfiguration.defaultConfiguration());
+
+        repository.persistModuleMetadata("TEST-REPLICA", metadata);
+
+        assertNull(repository.getModuleMetadata("TEST-REPLICA"));
     }
 }
