@@ -27,8 +27,14 @@ public interface TimerDrivenModuleConfiguration {
      * Specifies which role a machine must have in order to run the module with this configuration.
      */
     enum InstanceRolePolicy {
+    	// HA
         MASTER_ONLY,
         SLAVES_ONLY,
+        // CAUSAL CLUSTER
+        LEADER_ONLY,
+        FOLLOWERS_ONLY,
+        READ_REPLICAS_ONLY,
+        // ANY POLICY
         ANY
     }
 

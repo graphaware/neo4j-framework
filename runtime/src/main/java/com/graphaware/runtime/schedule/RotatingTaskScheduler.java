@@ -16,32 +16,36 @@
 
 package com.graphaware.runtime.schedule;
 
-import com.graphaware.common.util.Pair;
-import com.graphaware.runtime.config.TimerDrivenModuleConfiguration;
-import com.graphaware.runtime.metadata.DefaultTimerDrivenModuleMetadata;
-import com.graphaware.runtime.metadata.ModuleMetadataRepository;
-import com.graphaware.runtime.metadata.TimerDrivenModuleContext;
-import com.graphaware.runtime.module.TimerDrivenModule;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.internal.GraphDatabaseAPI;
-import org.neo4j.kernel.internal.KernelData;
-import org.neo4j.logging.Log;
-import org.neo4j.management.HighAvailability;
-import org.neo4j.management.Neo4jManager;
-import com.graphaware.common.log.LoggerFactory;
+import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.ANY;
+import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.FOLLOWERS_ONLY;
+import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.LEADER_ONLY;
+import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.MASTER_ONLY;
+import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.READ_REPLICAS_ONLY;
+import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.SLAVES_ONLY;
+import static com.graphaware.runtime.schedule.TimingStrategy.NEVER_RUN;
+import static com.graphaware.runtime.schedule.TimingStrategy.UNKNOWN;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.*;
-import static com.graphaware.runtime.schedule.TimingStrategy.NEVER_RUN;
-import static com.graphaware.runtime.schedule.TimingStrategy.UNKNOWN;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.kernel.impl.factory.OperationalMode;
+import org.neo4j.logging.Log;
+
+import com.graphaware.common.log.LoggerFactory;
+import com.graphaware.common.util.Pair;
+import com.graphaware.runtime.config.TimerDrivenModuleConfiguration;
+import com.graphaware.runtime.config.util.InstanceRole;
+import com.graphaware.runtime.config.util.InstanceRoleUtils;
+import com.graphaware.runtime.metadata.DefaultTimerDrivenModuleMetadata;
+import com.graphaware.runtime.metadata.ModuleMetadataRepository;
+import com.graphaware.runtime.metadata.TimerDrivenModuleContext;
+import com.graphaware.runtime.module.TimerDrivenModule;
 
 /**
  * {@link TaskScheduler} that delegates to the registered {@link TimerDrivenModule}s in round-robin fashion, in the order
@@ -59,7 +63,8 @@ public class RotatingTaskScheduler implements TaskScheduler {
     private Iterator<Map.Entry<TimerDrivenModule, TimerDrivenModuleContext>> moduleContextIterator;
 
     private final ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor();
-    private final HighAvailability haBean;
+    
+    private final InstanceRoleUtils instanceRoleUtils;
 
     /**
      * Construct a new task scheduler.
@@ -72,24 +77,8 @@ public class RotatingTaskScheduler implements TaskScheduler {
         this.database = database;
         this.repository = repository;
         this.timingStrategy = timingStrategy;
-        this.haBean = getHaBean();
-    }
-
-    private HighAvailability getHaBean() {
-        try {
-            HighAvailability bean = Neo4jManager.get(((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(KernelData.class).instanceId()).getHighAvailabilityBean();
-            LOG.info("Running in a clustered architecture, obtained HA bean.");
-            return bean;
-        } catch (NoSuchElementException e) {
-            LOG.info("Running in a single-node architecture.");
-            return null;
-        } catch (Exception e) {
-            LOG.warn("Failed to obtain Neo4j Manager, assuming a single-node architecture.", e);
-            return null;
-        } catch (NoClassDefFoundError error) {
-            LOG.info("Running in a single-node architecture (Neo4j Community)");
-            return null;
-        }
+        
+        this.instanceRoleUtils = new InstanceRoleUtils(database);
     }
 
     /**
@@ -229,21 +218,43 @@ public class RotatingTaskScheduler implements TaskScheduler {
      * @param module to check for.
      * @return <code>true</code> iff can run.
      */
-    private boolean hasCorrectRole(TimerDrivenModule<?> module) {
-        if (haBean == null) {
-            return true; //no HA
-        }
+	private boolean hasCorrectRole(TimerDrivenModule<?> module) {
+		// Probably, in general, we should consider the write/read permission of this instance
+		InstanceRole role = instanceRoleUtils.getInstaceRole();
 
-        TimerDrivenModuleConfiguration.InstanceRolePolicy policy = module.getConfiguration().getInstanceRolePolicy();
+		if (role.equals(InstanceRole.SINGLE)) {
+			LOG.info("Running instance in single mode");
+			return true; // no HA or Causal Cluster
+		}
 
-        if (policy.equals(ANY)) {
-            return true;
-        }
+		TimerDrivenModuleConfiguration.InstanceRolePolicy policy = module.getConfiguration().getInstanceRolePolicy();
 
-        String currentRole = haBean.getRole();
+		// Does "ANY" always return true? Probably we have to consider write/read permissions
+		if (policy.equals(ANY)) {
+			return true;
+		}
 
-        return "master".equals(currentRole) && policy.equals(MASTER_ONLY) || "slave".equals(currentRole) && policy.equals(SLAVES_ONLY);
-    }
+		// First we match the Operational Mode of the current instance: HA versus Causal Cluster (CORE + READ REPLICA)
+		OperationalMode operationalMode = instanceRoleUtils.getOperationalMode();
+		switch (operationalMode) {
+		case ha:
+			LOG.info("Running instance in HA mode");
+			// Only MASTER_ONLY and SLAVES_ONLY will be accepted
+			return role.equals(InstanceRole.MASTER) && policy.equals(MASTER_ONLY)
+					|| role.equals(InstanceRole.SLAVE) && policy.equals(SLAVES_ONLY);
+		case core:
+			LOG.info("Running instance in Causal Cluster (CORE)");
+			// Only LEADER_ONLY and FOLLOWERS_ONLY will be accepted
+			return role.equals(InstanceRole.LEADER) && policy.equals(LEADER_ONLY)
+					|| role.equals(InstanceRole.FOLLOWER) && policy.equals(FOLLOWERS_ONLY);
+		case read_replica:
+			LOG.info("Running instance in Causal Cluster (READ REPLICA)");
+			return role.equals(InstanceRole.READ_REPLICA) && policy.equals(READ_REPLICAS_ONLY);
+		default:
+			// By default we don't match any role so we have an incorrect role
+			return false;
+		}
+	}
 
     /**
      * Find the next module whose turn it would be and its context.
