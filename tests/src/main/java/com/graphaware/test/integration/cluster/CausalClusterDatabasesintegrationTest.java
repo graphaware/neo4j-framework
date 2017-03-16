@@ -15,11 +15,11 @@
  */
 package com.graphaware.test.integration.cluster;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.neo4j.causalclustering.core.CausalClusteringSettings;
 import org.neo4j.causalclustering.core.CoreGraphDatabase;
@@ -55,7 +55,13 @@ public abstract class CausalClusterDatabasesintegrationTest extends ClusterDatab
 	protected Map<String, String> addictionalParams(int i, Class<?> instanceClass) {
 		Map<String, String> params = new HashMap<>();
 
-		int coreClusterSize = 3;
+		int coreClusterSize = getTopology().stream().filter(topologyClass -> {
+			if (topologyClass.equals(CoreGraphDatabase.class)) {
+				return true;
+			}
+			return false;
+		}).collect(Collectors.toList()).size();
+		
 		params.put(CausalClusteringSettings.initial_discovery_members.name(),
 				buildDiscoveryAddresses(5000, coreClusterSize));
 
@@ -74,62 +80,61 @@ public abstract class CausalClusterDatabasesintegrationTest extends ClusterDatab
 	}
 
 	/**
-	 * The master instance
+	 * Get the leader instance
 	 * 
-	 * @return
+	 * @return the leader instance
 	 */
 	protected GraphDatabaseService getLeaderDatabase() {
 		return getMainDatabase();
 	}
 
 	/**
-	 * One of two slaves
+	 * Get the first follower
 	 * 
-	 * @return
+	 * @return a follower instance
 	 */
 	protected GraphDatabaseService getOneFollowerDatabase() {
 		return getDatabases().get(1);
 	}
-	
+
+	/**
+	 * Get the first replica
+	 * 
+	 * @return a replica instance
+	 */
 	protected GraphDatabaseService getOneReplicaDatabase() {
 		return getReplicas().get(0);
 	}
 
 	/**
 	 * Get the followers nodes
-	 * @return
+	 * 
+	 * @return a final list containing all the followers
 	 */
 	protected List<GraphDatabaseService> getFollowers() {
-		List<GraphDatabaseService> followers = new ArrayList<>();
-		
-		List<Class<?>> topos = getTopology();
-		int i = 0;
-		for (Class<?> top : topos) {
-			if(top.equals(CoreGraphDatabase.class)){
-				followers.add(getDatabases().get(i));
+		final List<GraphDatabaseService> followers = getDatabases().stream().filter(database -> {
+			if (database instanceof CoreGraphDatabase) {
+				return true;
 			}
-			i++;
-		}
-		
+			return false;
+		}).collect(Collectors.toList());
+
 		return followers.subList(1, followers.size());
 	}
-	
+
 	/**
 	 * Get the replica nodes
-	 * @return
+	 * 
+	 * @return a final list containing all the replicas
 	 */
 	protected List<GraphDatabaseService> getReplicas() {
-		List<GraphDatabaseService> replicas = new ArrayList<>();
-		
-		List<Class<?>> topos = getTopology();
-		int i = 0;
-		for (Class<?> top : topos) {
-			if(top.equals(ReadReplicaGraphDatabase.class)){
-				replicas.add(getDatabases().get(i));
+		final List<GraphDatabaseService> replicas = getDatabases().stream().filter(database -> {
+			if (database instanceof ReadReplicaGraphDatabase) {
+				return true;
 			}
-			i++;
-		}
-		
+			return false;
+		}).collect(Collectors.toList());
+
 		return replicas;
 	}
 }

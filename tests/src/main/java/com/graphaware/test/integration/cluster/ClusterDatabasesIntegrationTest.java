@@ -39,8 +39,10 @@ import org.neo4j.kernel.GraphDatabaseDependencies;
 import org.neo4j.kernel.impl.factory.GraphDatabaseFacade;
 import org.neo4j.kernel.impl.factory.GraphDatabaseFacadeFactory;
 import org.neo4j.kernel.impl.proc.Procedures;
+import org.neo4j.logging.Log;
 import org.springframework.core.io.ClassPathResource;
 
+import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.test.data.DatabasePopulator;
 
 /**
@@ -51,6 +53,8 @@ public abstract class ClusterDatabasesIntegrationTest {
 	private static final String CONF_PATH = "/com/graphaware/test/integration/neo4j.conf";
 
 	private static final String TMP_PATH_PREFIX = "neo4j-test-cluster-";
+	
+	protected final Log LOG = LoggerFactory.getLogger(ClusterDatabasesIntegrationTest.class);
 
 	/**
 	 * All the instances that will be available for tests. We should consider 3
@@ -117,6 +121,10 @@ public abstract class ClusterDatabasesIntegrationTest {
 		GraphDatabaseService database = (GraphDatabaseService) instanceClass
 				.getConstructor(File.class, Map.class, GraphDatabaseFacadeFactory.Dependencies.class)
 				.newInstance(storeDir, params, dependencies);
+		
+		LOG.info("An instance of class " + instanceClass.getSimpleName() + " has been created");
+		// Too verbose, we leave it at debug level
+		LOG.debug("Configuration parameters: " + params);
 
 		return database;
 	}
