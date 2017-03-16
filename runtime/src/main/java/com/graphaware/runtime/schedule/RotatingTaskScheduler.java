@@ -218,7 +218,7 @@ public class RotatingTaskScheduler implements TaskScheduler {
      * @param module to check for.
      * @return <code>true</code> iff can run.
      */
-	private boolean hasCorrectRole(TimerDrivenModule<?> module) {
+    protected boolean hasCorrectRole(TimerDrivenModule<?> module) {
 		// Probably, in general, we should consider the write/read permission of this instance
 		InstanceRole role = instanceRoleUtils.getInstaceRole();
 
