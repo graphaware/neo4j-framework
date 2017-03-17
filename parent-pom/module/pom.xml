@@ -18,13 +18,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>module-parent</artifactId>
-    <version>3.1.0.45-SNAPSHOT</version>
+    <version>3.1.1.45-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>graphaware-parent</artifactId>
-        <version>3.1.0.45-SNAPSHOT</version>
+        <version>3.1.1.45-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -48,13 +48,13 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>api</artifactId>
-                <version>3.1.0.45-SNAPSHOT</version>
+                <version>3.1.1.45-SNAPSHOT</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
-                <version>3.1.0.45-SNAPSHOT</version>
+                <version>3.1.1.45-SNAPSHOT</version>
                 <artifactId>common</artifactId>
                 <scope>provided</scope>
                 <exclusions>
@@ -68,49 +68,49 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime</artifactId>
-                <version>3.1.0.45-SNAPSHOT</version>
+                <version>3.1.1.45-SNAPSHOT</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime-api</artifactId>
-                <version>3.1.0.45-SNAPSHOT</version>
+                <version>3.1.1.45-SNAPSHOT</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer</artifactId>
-                <version>3.1.0.45-SNAPSHOT</version>
+                <version>3.1.1.45-SNAPSHOT</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer-api</artifactId>
-                <version>3.1.0.45-SNAPSHOT</version>
+                <version>3.1.1.45-SNAPSHOT</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>server</artifactId>
-                <version>3.1.0.45-SNAPSHOT</version>
+                <version>3.1.1.45-SNAPSHOT</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-api</artifactId>
-                <version>3.1.0.45-SNAPSHOT</version>
+                <version>3.1.1.45-SNAPSHOT</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-executor</artifactId>
-                <version>3.1.0.45-SNAPSHOT</version>
+                <version>3.1.1.45-SNAPSHOT</version>
                 <scope>provided</scope>
             </dependency>
 
