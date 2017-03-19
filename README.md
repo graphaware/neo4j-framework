@@ -1,6 +1,5 @@
 <a name="top"/>
-GraphAware Neo4j Framework
-==========================
+# GraphAware Neo4j Framework
 
 [![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework) | <a href="http://graphaware.com/downloads/" target="_blank">Downloads</a> | <a href="http://graphaware.com/site/framework/latest/apidocs/" target="_blank">Javadoc</a> | Latest Release: 3.1.1.45
 
@@ -10,8 +9,7 @@ etc.
 
 See the <a href="http://graphaware.com/neo4j/2014/05/28/graph-aware-neo4j-framework.html" target="_blank">announcement on our blog</a>.
 
-Features Overview
------------------
+## Features Overview
 
 On a high level, there are two key pieces of functionality:
 * [GraphAware Server](server) is a Neo4j server extension that allows developers to rapidly build (REST) APIs
@@ -40,8 +38,7 @@ Whether or not you use the code in this repository as a framework or runtime as 
 
 Please take a look at the provided [examples](examples).
 
-Framework Usage
----------------
+## Framework Usage
 
 <a name="servermode"/>
 ### Server Mode
@@ -65,8 +62,7 @@ for their Java project and use it as a library of useful tested code, in additio
 [server mode](#servermode).
 
 <a name="download"/>
-Getting GraphAware Framework
-----------------------------
+## Getting GraphAware Framework
 
 ### Releases
 
@@ -89,8 +85,7 @@ The version number has two parts. The first three numbers indicate compatibility
  compatible with Neo4j 2.2.0
 
 
-Data Collection
----------------
+## Data Collection
 
 Note that framework sends a POST request to Google Analytics every 5 minutes after start just so we know how many people
 actually use it. The only data transmitted are module and controller class names, version and edition of the framework,
@@ -104,8 +99,7 @@ com.graphaware.server.stats.disabled=true
 ```
 
 
-License
--------
+## License
 
 Copyright (c) 2013-16 GraphAware
 
