@@ -47,13 +47,13 @@ public class GraphAwareWebContextCreator extends BaseWebContextCreator {
 
     private void configureStatsCollector(AnnotationConfigWebApplicationContext context, Config config) {
         if (Boolean.valueOf(config.getParams().getOrDefault(GA_API_STATS_DISABLE_SETTING_LEGACY, "false"))) {
-            context.getEnvironment().setActiveProfiles("stats-null");
+            context.getEnvironment().addActiveProfile("stats-null");
         }
         else if (Boolean.valueOf(config.getParams().getOrDefault(GA_API_STATS_DISABLE_SETTING, "false"))) {
-            context.getEnvironment().setActiveProfiles("stats-null");
+            context.getEnvironment().addActiveProfile("stats-null");
         }
         else {
-            context.getEnvironment().setActiveProfiles("stats-google");
+            context.getEnvironment().addActiveProfile("stats-google");
         }
     }
 
