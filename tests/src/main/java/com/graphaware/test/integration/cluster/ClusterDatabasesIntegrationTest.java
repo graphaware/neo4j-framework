@@ -80,7 +80,6 @@ public abstract class ClusterDatabasesIntegrationTest {
 			databases = createDatabases();
 			populateDatabases();
 
-			// FIXME ???
 			if (shouldRegisterProcedures()) {
 				for (GraphDatabaseService database : databases) {
 					registerProcedures(((GraphDatabaseFacade) database).getDependencyResolver()
@@ -221,7 +220,7 @@ public abstract class ClusterDatabasesIntegrationTest {
 	 *         method should be called during {@link #setUp()}.
 	 */
 	protected boolean shouldRegisterProcedures() {
-		return true;
+		return false;
 	}
 
 	/**
