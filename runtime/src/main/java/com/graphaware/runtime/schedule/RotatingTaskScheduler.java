@@ -223,7 +223,7 @@ public class RotatingTaskScheduler implements TaskScheduler {
 		InstanceRole role = instanceRoleUtils.getInstaceRole();
 
 		if (role.equals(InstanceRole.SINGLE)) {
-			LOG.info("Running instance in single mode");
+//			LOG.info("Running instance in single mode");
 			return true; // no HA or Causal Cluster
 		}
 
@@ -238,17 +238,17 @@ public class RotatingTaskScheduler implements TaskScheduler {
 		OperationalMode operationalMode = instanceRoleUtils.getOperationalMode();
 		switch (operationalMode) {
 		case ha:
-			LOG.info("Running instance in HA mode");
+//			LOG.info("Running instance in HA mode");
 			// Only MASTER_ONLY and SLAVES_ONLY will be accepted
 			return role.equals(InstanceRole.MASTER) && policy.equals(MASTER_ONLY)
 					|| role.equals(InstanceRole.SLAVE) && policy.equals(SLAVES_ONLY);
 		case core:
-			LOG.info("Running instance in Causal Cluster (CORE)");
+//			LOG.info("Running instance in Causal Cluster (CORE)");
 			// Only LEADER_ONLY and FOLLOWERS_ONLY will be accepted
 			return role.equals(InstanceRole.LEADER) && policy.equals(LEADER_ONLY)
 					|| role.equals(InstanceRole.FOLLOWER) && policy.equals(FOLLOWERS_ONLY);
 		case read_replica:
-			LOG.info("Running instance in Causal Cluster (READ REPLICA)");
+//			LOG.info("Running instance in Causal Cluster (READ REPLICA)");
 			return role.equals(InstanceRole.READ_REPLICA) && policy.equals(READ_REPLICAS_ONLY);
 		default:
 			// By default we don't match any role so we have an incorrect role
