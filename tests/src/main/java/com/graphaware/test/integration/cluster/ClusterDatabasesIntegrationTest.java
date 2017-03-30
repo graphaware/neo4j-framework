@@ -78,15 +78,20 @@ public abstract class ClusterDatabasesIntegrationTest {
 		if (databases == null) {
 
 			databases = createDatabases();
-			populateDatabases();
 
-			// FIXME ???
-			if (shouldRegisterProcedures()) {
-				for (GraphDatabaseService database : databases) {
+			for (GraphDatabaseService database : databases) {
+				
+				if (shouldRegisterProcedures()) {
 					registerProcedures(((GraphDatabaseFacade) database).getDependencyResolver()
 							.resolveDependency(Procedures.class));
 				}
+				
+				if(shouldRegisterModules()){
+					registerModule(database);
+				}
 			}
+
+			populateDatabases();
 		}
 	}
 
@@ -221,9 +226,17 @@ public abstract class ClusterDatabasesIntegrationTest {
 	 *         method should be called during {@link #setUp()}.
 	 */
 	protected boolean shouldRegisterProcedures() {
-		return true;
+		return false;
 	}
 
+	/**
+	 * @return <code>iff</code> the {@link #registerModule(GraphDatabaseService)}
+	 *         method should be called during {@link #setUp()}.
+	 */
+	protected boolean shouldRegisterModules() {
+		return false;
+	}
+	
 	/**
 	 * Register procedures.
 	 *
@@ -234,6 +247,16 @@ public abstract class ClusterDatabasesIntegrationTest {
 		// no-op by default
 	}
 
+	/**
+	 * Register modules or what you want into database.
+	 *
+	 * @param procedures
+	 *            to register against.
+	 */
+	protected void registerModule(GraphDatabaseService db) throws Exception {
+		// no-op by default
+	}
+	
 	/**
 	 * @return {@link com.graphaware.test.data.DatabasePopulator},
 	 *         <code>null</code> (no population) by default.
