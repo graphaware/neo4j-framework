@@ -1,5 +1,7 @@
 <a name="top"/>
-# GraphAware Neo4j Framework
+
+GraphAware Neo4j Framework
+==========================
 
 [![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework) | <a href="http://graphaware.com/downloads/" target="_blank">Downloads</a> | <a href="http://graphaware.com/site/framework/latest/apidocs/" target="_blank">Javadoc</a> | Latest Release: 3.1.3.45
 
@@ -41,6 +43,7 @@ Please take a look at the provided [examples](examples).
 ## Framework Usage
 
 <a name="servermode"/>
+
 ### Server Mode
 
 When using Neo4j in the <a href="http://docs.neo4j.org/chunked/stable/server-installation.html" target="_blank">standalone server</a> mode,
@@ -62,6 +65,7 @@ for their Java project and use it as a library of useful tested code, in additio
 [server mode](#servermode).
 
 <a name="download"/>
+
 ## Getting GraphAware Framework
 
 ### Releases
