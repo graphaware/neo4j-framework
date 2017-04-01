@@ -106,7 +106,7 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
                 httpClient.execute(httpPost);
             } catch (IOException e1) {
-                LOG.warn("Unable to collect stats", e1);
+                //LOG.warn("Unable to collect stats", e1);
             }
         }, 5, 5, TimeUnit.MINUTES);
     }
