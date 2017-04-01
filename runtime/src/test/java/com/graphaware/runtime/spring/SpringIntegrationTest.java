@@ -30,7 +30,6 @@ import static org.junit.Assert.assertNotNull;
 public class SpringIntegrationTest {
 
     @Test
-    @Ignore // need a new version of UUID module
     public void uuidShouldWorkWithSpring() {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Config.class);
 
