@@ -80,7 +80,7 @@ public class TimerDrivenModuleHaTest {
     }
 
     @Test
-    public void shouldInSingleMode() {
+    public void shouldRunInSingleMode() {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
