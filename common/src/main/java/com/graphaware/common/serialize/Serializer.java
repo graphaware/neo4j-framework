@@ -30,6 +30,10 @@ import com.graphaware.common.policy.inclusion.none.IncludeNoNodeProperties;
 import com.graphaware.common.policy.inclusion.none.IncludeNoNodes;
 import com.graphaware.common.policy.inclusion.none.IncludeNoRelationshipProperties;
 import com.graphaware.common.policy.inclusion.none.IncludeNoRelationships;
+import com.graphaware.common.policy.role.AnyRole;
+import com.graphaware.common.policy.role.MasterOnly;
+import com.graphaware.common.policy.role.SlavesOnly;
+import com.graphaware.common.policy.role.WritableRole;
 import org.apache.commons.codec.binary.Base64;
 import org.neo4j.graphdb.Direction;
 import org.objenesis.strategy.StdInstantiatorStrategy;
@@ -81,6 +85,11 @@ public final class Serializer {
         register(IncludeNoNodes.class, new SingletonSerializer());
         register(IncludeNoRelationshipProperties.class, new SingletonSerializer());
         register(IncludeNoRelationships.class, new SingletonSerializer());
+
+        register(AnyRole.class, new SingletonSerializer());
+        register(MasterOnly.class, new SingletonSerializer());
+        register(SlavesOnly.class, new SingletonSerializer());
+        register(WritableRole.class, new SingletonSerializer());
     }
 
     private Serializer() {
