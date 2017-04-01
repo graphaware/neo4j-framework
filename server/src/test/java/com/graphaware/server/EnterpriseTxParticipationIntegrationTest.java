@@ -27,7 +27,6 @@ import org.neo4j.server.helpers.CommunityServerBuilder;
 import java.io.IOException;
 import java.util.Collections;
 
-@Ignore("until resttest is upgraded to 3.1")
 public class EnterpriseTxParticipationIntegrationTest extends GraphAwareIntegrationTest {
 
     @Override

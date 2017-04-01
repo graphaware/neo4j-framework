@@ -25,7 +25,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Collections;
 
-@Ignore("until resttest is upgraded to 3.1")
 public class CommunityTxParticipationIntegrationTest extends GraphAwareIntegrationTest {
 
     @Test
