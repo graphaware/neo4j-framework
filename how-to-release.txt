@@ -23,10 +23,8 @@ List of modules to upgrade:
         expire
         reco
         reco-meetup
-        importer
         neo4j-to-elasticsearch
         graphaware-starter
-        ga-enterprise
         audit
         schema
 
