@@ -19,13 +19,13 @@
 
     <groupId>com.graphaware.neo4j.example</groupId>
     <artifactId>friendship-strength-counter</artifactId>
-    <version>3.1.3.45-SNAPSHOT</version>
+    <version>3.1.3.45</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>module-parent</artifactId>
-        <version>3.1.3.45-SNAPSHOT</version>
+        <version>3.1.3.45</version>
         <relativePath>../../parent-pom/module/pom.xml</relativePath>
     </parent>
 
