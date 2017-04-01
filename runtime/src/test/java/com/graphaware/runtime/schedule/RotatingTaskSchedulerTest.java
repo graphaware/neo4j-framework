@@ -16,14 +16,15 @@
 package com.graphaware.runtime.schedule;
 
 import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROPERTY_PREFIX;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import com.graphaware.common.policy.role.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import com.graphaware.runtime.config.FluentRuntimeConfiguration;
-import com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy;
 import com.graphaware.runtime.metadata.GraphPropertiesMetadataRepository;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
@@ -50,31 +51,21 @@ public class RotatingTaskSchedulerTest extends EmbeddedDatabaseIntegrationTest{
 	
 	@Test
 	public void testHasCorrectRole_MASTER_ONLY() {
-		assertTrue(rotatingTaskScheduler.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.MASTER_ONLY)));
+		assertTrue(rotatingTaskScheduler.hasCorrectRole(MockTimerModuleContext.buildModule(MasterOnly.getInstance())));
 	}
-	
+
 	@Test
 	public void testHasCorrectRole_SLAVES_ONLY() {
-		assertTrue(rotatingTaskScheduler.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.SLAVES_ONLY)));
+		assertFalse(rotatingTaskScheduler.hasCorrectRole(MockTimerModuleContext.buildModule(SlavesOnly.getInstance())));
 	}
 
 	@Test
 	public void testHasCorrectRole_ANY() {
-		assertTrue(rotatingTaskScheduler.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.ANY)));
+		assertTrue(rotatingTaskScheduler.hasCorrectRole(MockTimerModuleContext.buildModule(AnyRole.getInstance())));
 	}
-	
+
 	@Test
-	public void testHasCorrectRole_LEADER_ONLY() {
-		assertTrue(rotatingTaskScheduler.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.LEADER_ONLY)));
-	}
-	
-	@Test
-	public void testHasCorrectRole_FOLLOWERS_ONLY() {
-		assertTrue(rotatingTaskScheduler.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.FOLLOWERS_ONLY)));
-	}
-	
-	@Test
-	public void testHasCorrectRole_READ_REPLICAS_ONLY() {
-		assertTrue(rotatingTaskScheduler.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.READ_REPLICAS_ONLY)));
+	public void testHasCorrectRole_WRITEABLE() {
+		assertTrue(rotatingTaskScheduler.hasCorrectRole(MockTimerModuleContext.buildModule(WritableRole.getInstance())));
 	}
 }

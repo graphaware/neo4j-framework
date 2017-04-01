@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime.config.function;
 
-import com.graphaware.common.policy.BaseNodeInclusionPolicy;
+import com.graphaware.common.policy.inclusion.BaseNodeInclusionPolicy;
 import org.neo4j.graphdb.Node;
 
 public class SingletonNodeInclusionPolicy extends BaseNodeInclusionPolicy {

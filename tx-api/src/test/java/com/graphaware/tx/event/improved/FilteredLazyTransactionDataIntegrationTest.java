@@ -16,8 +16,8 @@
 
 package com.graphaware.tx.event.improved;
 
-import com.graphaware.common.policy.*;
-import com.graphaware.common.policy.fluent.IncludeNodes;
+import com.graphaware.common.policy.inclusion.*;
+import com.graphaware.common.policy.inclusion.fluent.IncludeNodes;
 import com.graphaware.common.util.Change;
 import com.graphaware.test.util.TestDataBuilder;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
@@ -33,7 +33,6 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Uniqueness;
-import org.neo4j.kernel.configuration.Settings;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 

@@ -16,27 +16,14 @@
 
 package com.graphaware.runtime.config;
 
+import com.graphaware.common.policy.role.InstanceRolePolicy;
+
 /**
  * Encapsulates all configuration of a single {@link com.graphaware.runtime.module.TimerDrivenModule}. Modules that need
  * no configuration should use {@link NullTimerDrivenModuleConfiguration}. Otherwise, start with
  * {@link FluentTimerDrivenModuleConfiguration}.
  */
 public interface TimerDrivenModuleConfiguration {
-
-    /**
-     * Specifies which role a machine must have in order to run the module with this configuration.
-     */
-    enum InstanceRolePolicy {
-    	// HA
-        MASTER_ONLY,
-        SLAVES_ONLY,
-        // CAUSAL CLUSTER
-        LEADER_ONLY,
-        FOLLOWERS_ONLY,
-        READ_REPLICAS_ONLY,
-        // ANY POLICY
-        ANY
-    }
 
     /**
      * Get the instance role policy used by this module. If unsure, return {@link com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy#MASTER_ONLY}.

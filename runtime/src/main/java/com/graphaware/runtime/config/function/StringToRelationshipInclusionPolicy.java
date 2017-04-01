@@ -16,14 +16,14 @@
 
 package com.graphaware.runtime.config.function;
 
-import com.graphaware.common.policy.RelationshipInclusionPolicy;
-import com.graphaware.common.policy.composite.CompositeRelationshipInclusionPolicy;
-import com.graphaware.common.policy.none.IncludeNoRelationships;
-import com.graphaware.common.policy.spel.SpelRelationshipInclusionPolicy;
+import com.graphaware.common.policy.inclusion.RelationshipInclusionPolicy;
+import com.graphaware.common.policy.inclusion.composite.CompositeRelationshipInclusionPolicy;
+import com.graphaware.common.policy.inclusion.none.IncludeNoRelationships;
+import com.graphaware.common.policy.inclusion.spel.SpelRelationshipInclusionPolicy;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessRelationships;
 
 /**
- * A {@link StringToInclusionPolicy} that converts String to {@link com.graphaware.common.policy.RelationshipInclusionPolicy}. Singleton.
+ * A {@link StringToInclusionPolicy} that converts String to {@link RelationshipInclusionPolicy}. Singleton.
  */
 public final class StringToRelationshipInclusionPolicy extends StringToInclusionPolicy<RelationshipInclusionPolicy> {
 

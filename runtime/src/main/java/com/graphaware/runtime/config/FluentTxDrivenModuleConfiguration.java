@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime.config;
 
-import com.graphaware.common.policy.InclusionPolicies;
+import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
 
 /**

@@ -16,7 +16,8 @@
 
 package com.graphaware.runtime.config;
 
-import com.graphaware.common.policy.InclusionPolicies;
+import com.graphaware.common.policy.inclusion.InclusionPolicies;
+import com.graphaware.common.policy.role.InstanceRolePolicy;
 import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.serialize.SingletonSerializer;
 

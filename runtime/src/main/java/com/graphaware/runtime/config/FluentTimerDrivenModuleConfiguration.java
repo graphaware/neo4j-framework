@@ -16,6 +16,9 @@
 
 package com.graphaware.runtime.config;
 
+import com.graphaware.common.policy.role.InstanceRolePolicy;
+import com.graphaware.common.policy.role.WritableRole;
+
 /**
  * {@link TxDrivenModuleConfiguration} with fluent interface.
  * Intended for users of Neo4j in embedded mode for programmatic configuration.
@@ -23,7 +26,7 @@ package com.graphaware.runtime.config;
 public final class FluentTimerDrivenModuleConfiguration extends BaseTimerDrivenModuleConfiguration<FluentTimerDrivenModuleConfiguration> {
 
     /**
-     * Creates an instance with default values, i.e., with {@link com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy#MASTER_ONLY}.
+     * Creates an instance with default values, i.e., with {@link WritableRole}.
      *
      * @return The {@link FluentTimerDrivenModuleConfiguration} instance.
      */
@@ -32,10 +35,10 @@ public final class FluentTimerDrivenModuleConfiguration extends BaseTimerDrivenM
     }
 
     /**
-     * Create a new configuration with {@link com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy#MASTER_ONLY}.
+     * Create a new configuration with {@link WritableRole}.
      */
     private FluentTimerDrivenModuleConfiguration() {
-        super(InstanceRolePolicy.MASTER_ONLY);
+        super(WritableRole.getInstance());
     }
 
     /**

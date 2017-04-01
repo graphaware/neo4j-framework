@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.kernel.impl.factory.OperationalMode;
 
-import com.graphaware.runtime.config.util.InstanceRole;
+import com.graphaware.common.policy.role.InstanceRole;
 import com.graphaware.runtime.config.util.InstanceRoleUtils;
 import com.graphaware.test.integration.cluster.HighAvailabilityClusterDatabasesIntegrationTest;
 
@@ -64,8 +64,8 @@ public class InstanceRoleUtilsTestHighAvailability extends HighAvailabilityClust
 
 	@Test
 	public void testIsReadOnly() {
-		assertFalse(utilsMaster.isReadOnly());
-		assertTrue(utilsSlave.isReadOnly());
+		assertFalse(utilsMaster.getInstaceRole().isReadOnly());
+		assertTrue(utilsSlave.getInstaceRole().isReadOnly());
 	}
 
 }

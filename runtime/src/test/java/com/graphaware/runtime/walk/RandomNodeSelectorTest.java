@@ -16,8 +16,8 @@
 
 package com.graphaware.runtime.walk;
 
-import com.graphaware.common.policy.BaseNodeInclusionPolicy;
-import com.graphaware.common.policy.none.IncludeNoNodes;
+import com.graphaware.common.policy.inclusion.BaseNodeInclusionPolicy;
+import com.graphaware.common.policy.inclusion.none.IncludeNoNodes;
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor;
 import com.graphaware.tx.executor.input.AllNodes;
@@ -29,7 +29,6 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.configuration.Settings;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 

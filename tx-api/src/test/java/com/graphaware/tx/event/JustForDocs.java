@@ -16,9 +16,9 @@
 
 package com.graphaware.tx.event;
 
-import com.graphaware.common.policy.BaseNodeInclusionPolicy;
-import com.graphaware.common.policy.InclusionPolicies;
-import com.graphaware.common.policy.none.IncludeNoRelationships;
+import com.graphaware.common.policy.inclusion.BaseNodeInclusionPolicy;
+import com.graphaware.common.policy.inclusion.InclusionPolicies;
+import com.graphaware.common.policy.inclusion.none.IncludeNoRelationships;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;

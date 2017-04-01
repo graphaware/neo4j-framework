@@ -16,14 +16,14 @@
 
 package com.graphaware.tx.event.improved.propertycontainer.filtered;
 
-import com.graphaware.common.policy.PropertyInclusionPolicy;
+import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
 import org.neo4j.graphdb.PropertyContainer;
 import org.neo4j.helpers.collection.PrefetchingIterator;
 
 import java.util.Iterator;
 
 /**
- * A property key {@link java.util.Iterator} decorator that filters out keys not needed by the contained {@link com.graphaware.common.policy.PropertyInclusionPolicy}.
+ * A property key {@link java.util.Iterator} decorator that filters out keys not needed by the contained {@link PropertyInclusionPolicy}.
  */
 public class FilteredPropertyKeyIterator<T extends PropertyContainer> extends PrefetchingIterator<String> implements Iterable<String> {
 

@@ -16,14 +16,14 @@
 
 package com.graphaware.runtime.policy;
 
-import com.graphaware.common.policy.InclusionPolicies;
+import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodeProperties;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodes;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessRelationshipProperties;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessRelationships;
 
 /**
- * Factory for {@link com.graphaware.common.policy.InclusionPolicies}.
+ * Factory for {@link InclusionPolicies}.
  */
 public final class InclusionPoliciesFactory {
 
@@ -31,7 +31,7 @@ public final class InclusionPoliciesFactory {
     }
 
     /**
-     * Produce {@link com.graphaware.common.policy.InclusionPolicies} that do not include internal nodes, relationships, and properties.
+     * Produce {@link InclusionPolicies} that do not include internal nodes, relationships, and properties.
      *
      * @return a policy that includes all nodes, relationships, and properties, except framework internal ones.
      */

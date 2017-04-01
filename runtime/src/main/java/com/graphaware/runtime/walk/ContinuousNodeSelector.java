@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime.walk;
 
-import com.graphaware.common.policy.NodeInclusionPolicy;
+import com.graphaware.common.policy.inclusion.NodeInclusionPolicy;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodes;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -50,7 +50,7 @@ public class ContinuousNodeSelector implements NodeSelector {
 
     /**
      * Constructs a new {@link com.graphaware.runtime.walk.ContinuousNodeSelector} that selects a node that matches
-     * the given {@link com.graphaware.common.policy.NodeInclusionPolicy}.
+     * the given {@link NodeInclusionPolicy}.
      *
      * @param lastNodeId ID of the last node selected by this selector.
      */
@@ -60,9 +60,9 @@ public class ContinuousNodeSelector implements NodeSelector {
 
     /**
      * Constructs a new {@link com.graphaware.runtime.walk.ContinuousNodeSelector} that selects a node that matches
-     * the given {@link com.graphaware.common.policy.NodeInclusionPolicy}.
+     * the given {@link NodeInclusionPolicy}.
      *
-     * @param inclusionPolicy The {@link com.graphaware.common.policy.NodeInclusionPolicy} to consider when selecting
+     * @param inclusionPolicy The {@link NodeInclusionPolicy} to consider when selecting
      *                        nodes.
      */
     public ContinuousNodeSelector(NodeInclusionPolicy inclusionPolicy) {
@@ -71,9 +71,9 @@ public class ContinuousNodeSelector implements NodeSelector {
 
     /**
      * Constructs a new {@link com.graphaware.runtime.walk.ContinuousNodeSelector} that selects a node that matches
-     * the given {@link com.graphaware.common.policy.NodeInclusionPolicy}.
+     * the given {@link NodeInclusionPolicy}.
      *
-     * @param inclusionPolicy The {@link com.graphaware.common.policy.NodeInclusionPolicy} to consider when selecting
+     * @param inclusionPolicy The {@link NodeInclusionPolicy} to consider when selecting
      *                        nodes.
      * @param lastNodeId      ID of the last node selected by this selector.
      */

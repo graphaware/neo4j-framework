@@ -16,7 +16,7 @@
 
 package com.graphaware.common.policy;
 
-import com.graphaware.common.policy.fluent.IncludeNodes;
+import com.graphaware.common.policy.inclusion.fluent.IncludeNodes;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 import static org.neo4j.graphdb.Label.label;
 
 /**
- * Unit test for  {@link com.graphaware.common.policy.fluent.IncludeNodes}.
+ * Unit test for  {@link com.graphaware.common.policy.inclusion.fluent.IncludeNodes}.
  */
 public class IncludeNodesTest {
 

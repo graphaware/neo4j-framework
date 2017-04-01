@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.kernel.impl.factory.OperationalMode;
 
-import com.graphaware.runtime.config.util.InstanceRole;
+import com.graphaware.common.policy.role.InstanceRole;
 import com.graphaware.runtime.config.util.InstanceRoleUtils;
 import com.graphaware.test.integration.cluster.CausalClusterDatabasesintegrationTest;
 
@@ -70,11 +70,11 @@ public class InstanceRoleUtilsTestCausalCluster extends CausalClusterDatabasesin
 
 	@Test
 	public void testIsReadOnly() {
-		assertFalse(utilsLeader.isReadOnly());
-		assertTrue(utilsFollower1.isReadOnly());
-		assertTrue(utilsFollower2.isReadOnly());
+		assertFalse(utilsLeader.getInstaceRole().isReadOnly());
+		assertTrue(utilsFollower1.getInstaceRole().isReadOnly());
+		assertTrue(utilsFollower2.getInstaceRole().isReadOnly());
 		
-		assertTrue(utilsReplica.isReadOnly());
+		assertTrue(utilsReplica.getInstaceRole().isReadOnly());
 	}
 
 }

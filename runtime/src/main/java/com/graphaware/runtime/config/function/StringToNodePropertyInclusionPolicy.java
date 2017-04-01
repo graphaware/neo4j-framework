@@ -16,15 +16,15 @@
 
 package com.graphaware.runtime.config.function;
 
-import com.graphaware.common.policy.NodePropertyInclusionPolicy;
-import com.graphaware.common.policy.all.IncludeAllNodeProperties;
-import com.graphaware.common.policy.composite.CompositeNodePropertyInclusionPolicy;
-import com.graphaware.common.policy.none.IncludeNoNodeProperties;
-import com.graphaware.common.policy.spel.SpelNodePropertyInclusionPolicy;
+import com.graphaware.common.policy.inclusion.NodePropertyInclusionPolicy;
+import com.graphaware.common.policy.inclusion.all.IncludeAllNodeProperties;
+import com.graphaware.common.policy.inclusion.composite.CompositeNodePropertyInclusionPolicy;
+import com.graphaware.common.policy.inclusion.none.IncludeNoNodeProperties;
+import com.graphaware.common.policy.inclusion.spel.SpelNodePropertyInclusionPolicy;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodeProperties;
 
 /**
- * A {@link StringToInclusionPolicy} that converts String to {@link com.graphaware.common.policy.NodePropertyInclusionPolicy}. Singleton.
+ * A {@link StringToInclusionPolicy} that converts String to {@link NodePropertyInclusionPolicy}. Singleton.
  */
 public final class StringToNodePropertyInclusionPolicy extends StringToInclusionPolicy<NodePropertyInclusionPolicy> {
 

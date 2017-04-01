@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime.config.util;
 
+import com.graphaware.common.policy.role.InstanceRole;
 import org.neo4j.causalclustering.core.consensus.RaftMachine;
 import org.neo4j.causalclustering.core.consensus.roles.Role;
 import org.neo4j.graphdb.DependencyResolver;
@@ -119,13 +120,5 @@ public class InstanceRoleUtils {
 		return InstanceRole.SLAVE;
 	}
 
-	/**
-	 * Check if the instance has write permission
-	 * 
-	 * @return true if the instance cannot write into the database
-	 */
-	public boolean isReadOnly() {
-		InstanceRole role = getInstaceRole();
-		return !(role == InstanceRole.MASTER || role == InstanceRole.SINGLE || role == InstanceRole.LEADER);
-	}
+
 }

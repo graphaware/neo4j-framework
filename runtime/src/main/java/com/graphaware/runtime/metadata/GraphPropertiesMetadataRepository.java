@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * {@link ModuleMetadataRepository} backed by a {@link org.neo4j.kernel.impl.core.GraphProperties}.
@@ -103,7 +104,7 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
      */
     @Override
     public <M extends ModuleMetadata> void persistModuleMetadata(String moduleId, M metadata) {
-    	if(! this.instanceRoleUtils.isReadOnly()){
+    	if(instanceRoleUtils.getInstaceRole().isWritable()){
 
     		try (Transaction tx = database.beginTx()) {
     			keyValueStore.set(moduleKey(moduleId), Serializer.toByteArray(metadata));
@@ -118,11 +119,7 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
      */
     @Override
     public Set<String> getAllModuleIds() {
-        Set<String> result = new HashSet<>();
-        for (String key : getInternalProperties().keySet()) {
-            result.add(key.replace(propertyPrefix, ""));
-        }
-        return result;
+        return getInternalProperties().keySet().stream().map(key -> key.replace(propertyPrefix, "")).collect(Collectors.toSet());
     }
 
     /**
@@ -130,7 +127,7 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
      */
     @Override
     public void removeModuleMetadata(String moduleId) {
-		if (!this.instanceRoleUtils.isReadOnly()) {
+		if (instanceRoleUtils.getInstaceRole().isWritable()) {
 			
 			try (Transaction tx = database.beginTx()) {
 				keyValueStore.remove(moduleKey(moduleId));

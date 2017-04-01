@@ -16,7 +16,7 @@
 
 package com.graphaware.common.policy;
 
-import com.graphaware.common.policy.fluent.IncludeRelationships;
+import com.graphaware.common.policy.inclusion.fluent.IncludeRelationships;
 import org.junit.Test;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
@@ -30,7 +30,7 @@ import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.RelationshipType.*;
 
 /**
- * Unit test for  {@link com.graphaware.common.policy.fluent.IncludeRelationships}.
+ * Unit test for  {@link com.graphaware.common.policy.inclusion.fluent.IncludeRelationships}.
  */
 public class IncludeRelationshipsTest {
 

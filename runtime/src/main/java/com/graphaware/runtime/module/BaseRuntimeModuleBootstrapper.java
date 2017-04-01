@@ -17,7 +17,7 @@
 package com.graphaware.runtime.module;
 
 import com.graphaware.common.log.LoggerFactory;
-import com.graphaware.common.policy.*;
+import com.graphaware.common.policy.inclusion.*;
 import com.graphaware.runtime.config.BaseTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.function.StringToNodeInclusionPolicy;

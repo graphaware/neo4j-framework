@@ -16,11 +16,11 @@
 
 package com.graphaware.tx.event.improved.api;
 
-import com.graphaware.common.policy.InclusionPolicies;
-import com.graphaware.common.policy.none.IncludeNoNodeProperties;
-import com.graphaware.common.policy.none.IncludeNoNodes;
-import com.graphaware.common.policy.none.IncludeNoRelationshipProperties;
-import com.graphaware.common.policy.none.IncludeNoRelationships;
+import com.graphaware.common.policy.inclusion.InclusionPolicies;
+import com.graphaware.common.policy.inclusion.none.IncludeNoNodeProperties;
+import com.graphaware.common.policy.inclusion.none.IncludeNoNodes;
+import com.graphaware.common.policy.inclusion.none.IncludeNoRelationshipProperties;
+import com.graphaware.common.policy.inclusion.none.IncludeNoRelationships;
 import com.graphaware.tx.event.improved.data.BaseImprovedTransactionData;
 import com.graphaware.tx.event.improved.data.NodeTransactionData;
 import com.graphaware.tx.event.improved.data.RelationshipTransactionData;
@@ -29,7 +29,7 @@ import com.graphaware.tx.event.improved.data.filtered.FilteredNodeTransactionDat
 import com.graphaware.tx.event.improved.data.filtered.FilteredRelationshipTransactionData;
 
 /**
- * {@link ImprovedTransactionData} with filtering capabilities defined by {@link com.graphaware.common.policy.InclusionPolicies}, delegating to
+ * {@link ImprovedTransactionData} with filtering capabilities defined by {@link InclusionPolicies}, delegating to
  * {@link com.graphaware.tx.event.improved.data.filtered.FilteredNodeTransactionData} and {@link com.graphaware.tx.event.improved.data.filtered.FilteredRelationshipTransactionData}.
  * <p/>
  * Results of methods returning {@link java.util.Collection}s and {@link java.util.Map}s will be filtered. <code>boolean</code>
@@ -39,7 +39,7 @@ import com.graphaware.tx.event.improved.data.filtered.FilteredRelationshipTransa
  * return true for more of them, as it ignores the filtering.
  * <p/>
  * When traversing the graph using an object returned by this API (such as {@link com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode}),
- * nodes, properties, and relationships not included by the {@link com.graphaware.common.policy.InclusionPolicies} will be excluded. The only exception
+ * nodes, properties, and relationships not included by the {@link InclusionPolicies} will be excluded. The only exception
  * to this are relationship start and end nodes - they are returned even if they would normally be filtered out. This is
  * a design decision in order to honor the requirement that relationships must have start and end node.
  */

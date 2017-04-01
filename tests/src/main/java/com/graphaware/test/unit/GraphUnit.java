@@ -16,7 +16,8 @@
 
 package com.graphaware.test.unit;
 
-import com.graphaware.common.policy.InclusionPolicies;
+import com.graphaware.common.policy.inclusion.InclusionPolicies;
+import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
 import com.graphaware.common.util.PropertyContainerUtils;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.Iterators;
@@ -79,7 +80,7 @@ public final class GraphUnit {
      *                          method.
      * @param sameGraphCypher   second graph expressed as a Cypher create statement, which communicates the desired state
      *                          of the database (first parameter) iff the code that created it is correct.
-     * @param inclusionPolicies {@link com.graphaware.common.policy.InclusionPolicies} deciding whether to include nodes/relationships/properties in the comparisons.
+     * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships/properties in the comparisons.
      * @throws AssertionError in case the graphs are not the same.
      */
     public static void assertSameGraph(GraphDatabaseService database, String sameGraphCypher, InclusionPolicies inclusionPolicies) {
@@ -151,7 +152,7 @@ public final class GraphUnit {
      *                          this method.
      * @param subgraphCypher    second graph expressed as a Cypher create statement, which communicates the desired state
      *                          of the database (first parameter) iff the code that created it is correct.
-     * @param inclusionPolicies {@link com.graphaware.common.policy.InclusionPolicies} deciding whether to include nodes/relationships/properties or not.
+     * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships/properties or not.
      * @throws AssertionError in case the "cypher" graph is not a subgraph of the "database" graph.
      */
     public static void assertSubgraph(GraphDatabaseService database, String subgraphCypher, InclusionPolicies inclusionPolicies) {
@@ -193,7 +194,7 @@ public final class GraphUnit {
      * Assert that the database is empty.
      *
      * @param database          to run the assertion against.
-     * @param inclusionPolicies {@link com.graphaware.common.policy.InclusionPolicies} deciding whether to include nodes/relationships/properties or not in the assertion.
+     * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships/properties or not in the assertion.
      */
     public static void assertEmpty(GraphDatabaseService database, InclusionPolicies inclusionPolicies) {
         if (database == null) {
@@ -230,8 +231,8 @@ public final class GraphUnit {
      * Clear the graph by deleting all nodes and relationships specified by inclusionPolicies
      *
      * @param database          graph, typically the one that has been created by some code that is being tested.
-     * @param inclusionPolicies {@link com.graphaware.common.policy.InclusionPolicies} deciding whether to include nodes/relationships or not.
-     *                          Note that {@link com.graphaware.common.policy.PropertyInclusionPolicy}s are ignored when clearing the graph.
+     * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships or not.
+     *                          Note that {@link PropertyInclusionPolicy}s are ignored when clearing the graph.
      */
     public static void clearGraph(GraphDatabaseService database, InclusionPolicies inclusionPolicies) {
         if (database == null) {
@@ -264,8 +265,8 @@ public final class GraphUnit {
      * Prints the contents of the graph.
      *
      * @param database          to print.
-     * @param inclusionPolicies {@link com.graphaware.common.policy.InclusionPolicies} deciding whether to include nodes/relationships or not.
-     *                          Note that {@link com.graphaware.common.policy.PropertyInclusionPolicy}s are ignored when printing the graph.
+     * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships or not.
+     *                          Note that {@link PropertyInclusionPolicy}s are ignored when printing the graph.
      */
     public static void printGraph(GraphDatabaseService database, InclusionPolicies inclusionPolicies) {
         if (database == null) {
@@ -317,8 +318,8 @@ public final class GraphUnit {
      *
      * @param node1             first node to compare.
      * @param node2             second node to compare.
-     * @param inclusionPolicies {@link com.graphaware.common.policy.InclusionPolicies} deciding whether to include nodes/relationships or not.
-     *                          Note that {@link com.graphaware.common.policy.PropertyInclusionPolicy}s are ignored when printing the graph.
+     * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships or not.
+     *                          Note that {@link PropertyInclusionPolicy}s are ignored when printing the graph.
      * @return boolean are the nodes the same.
      */
     public static boolean areSame(Node node1, Node node2, InclusionPolicies inclusionPolicies) {
@@ -330,8 +331,8 @@ public final class GraphUnit {
      *
      * @param relationship1     first relationship to compare.
      * @param relationship2     second relationship to compare.
-     * @param inclusionPolicies {@link com.graphaware.common.policy.InclusionPolicies} deciding whether to include nodes/relationships or not.
-     *                          Note that {@link com.graphaware.common.policy.PropertyInclusionPolicy}s are ignored when printing the graph.
+     * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships or not.
+     *                          Note that {@link PropertyInclusionPolicy}s are ignored when printing the graph.
      * @return boolean are the relationships the same.
      */
     public static boolean areSame(Relationship relationship1, Relationship relationship2, InclusionPolicies inclusionPolicies) {

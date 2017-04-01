@@ -16,7 +16,7 @@
 
 package com.graphaware.common.util;
 
-import com.graphaware.common.policy.ObjectInclusionPolicy;
+import com.graphaware.common.policy.inclusion.ObjectInclusionPolicy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

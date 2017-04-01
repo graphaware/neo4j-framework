@@ -16,7 +16,8 @@
 
 package com.graphaware.runtime.walk;
 
-import com.graphaware.common.policy.RelationshipInclusionPolicy;
+import com.graphaware.common.policy.inclusion.RelationshipInclusionPolicy;
+import com.graphaware.common.policy.inclusion.ObjectInclusionPolicy;
 import com.graphaware.common.util.ReservoirSampler;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessRelationships;
 import org.neo4j.graphdb.Node;
@@ -25,7 +26,7 @@ import org.neo4j.graphdb.Relationship;
 /**
  * {@link RelationshipSelector} that selects a {@link org.neo4j.graphdb.Relationship} at random from all the given
  * {@link org.neo4j.graphdb.Node}'s {@link org.neo4j.graphdb.Relationship}s, such that match the selected
- * {@link org.neo4j.graphdb.Relationship} matches the provided {@link com.graphaware.common.policy.RelationshipInclusionPolicy}.
+ * {@link org.neo4j.graphdb.Relationship} matches the provided {@link RelationshipInclusionPolicy}.
  * <p/>
  * This is an O(n) algorithm.
  */
@@ -43,9 +44,9 @@ public class RandomRelationshipSelector implements RelationshipSelector {
 
     /**
      * Constructs a new {@link RandomRelationshipSelector} that chooses relationships in accordance with the given
-     * {@link com.graphaware.common.policy.ObjectInclusionPolicy}.
+     * {@link ObjectInclusionPolicy}.
      *
-     * @param relationshipInclusionPolicy The {@link com.graphaware.common.policy.ObjectInclusionPolicy} used to select relationships to follow.
+     * @param relationshipInclusionPolicy The {@link ObjectInclusionPolicy} used to select relationships to follow.
      */
     public RandomRelationshipSelector(RelationshipInclusionPolicy relationshipInclusionPolicy) {
         this.relationshipInclusionPolicy = relationshipInclusionPolicy;

@@ -23,7 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.kernel.impl.factory.OperationalMode;
 
-import com.graphaware.runtime.config.util.InstanceRole;
+import com.graphaware.common.policy.role.InstanceRole;
 import com.graphaware.runtime.config.util.InstanceRoleUtils;
 import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 
@@ -59,7 +59,7 @@ public class InstanceRoleUtilsSingleTest extends EmbeddedDatabaseIntegrationTest
 
 	@Test
 	public void testIsReadOnly() {
-		assertFalse(utils.isReadOnly());
+		assertFalse(utils.getInstaceRole().isReadOnly());
 	}
 
 }

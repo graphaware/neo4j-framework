@@ -24,7 +24,7 @@ import com.esotericsoftware.kryo.io.Output;
  * {@link com.esotericsoftware.kryo.Serializer} for singletons. Singletons must declare a
  * <code>public static X getInstance</code> method, where <code>X</code> is the singleton class.
  *
- * @see com.graphaware.common.policy.none.IncludeNoNodes, for example.
+ * @see com.graphaware.common.policy.inclusion.none.IncludeNoNodes, for example.
  */
 public class SingletonSerializer extends com.esotericsoftware.kryo.Serializer {
 

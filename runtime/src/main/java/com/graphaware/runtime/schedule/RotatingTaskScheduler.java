@@ -16,12 +16,6 @@
 
 package com.graphaware.runtime.schedule;
 
-import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.ANY;
-import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.FOLLOWERS_ONLY;
-import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.LEADER_ONLY;
-import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.MASTER_ONLY;
-import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.READ_REPLICAS_ONLY;
-import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.SLAVES_ONLY;
 import static com.graphaware.runtime.schedule.TimingStrategy.NEVER_RUN;
 import static com.graphaware.runtime.schedule.TimingStrategy.UNKNOWN;
 
@@ -32,6 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.graphaware.common.policy.role.InstanceRolePolicy;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.kernel.impl.factory.OperationalMode;
@@ -40,7 +35,7 @@ import org.neo4j.logging.Log;
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.util.Pair;
 import com.graphaware.runtime.config.TimerDrivenModuleConfiguration;
-import com.graphaware.runtime.config.util.InstanceRole;
+import com.graphaware.common.policy.role.InstanceRole;
 import com.graphaware.runtime.config.util.InstanceRoleUtils;
 import com.graphaware.runtime.metadata.DefaultTimerDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
@@ -219,41 +214,7 @@ public class RotatingTaskScheduler implements TaskScheduler {
      * @return <code>true</code> iff can run.
      */
     protected boolean hasCorrectRole(TimerDrivenModule<?> module) {
-		// Probably, in general, we should consider the write/read permission of this instance
-		InstanceRole role = instanceRoleUtils.getInstaceRole();
-
-		if (role.equals(InstanceRole.SINGLE)) {
-//			LOG.info("Running instance in single mode");
-			return true; // no HA or Causal Cluster
-		}
-
-		TimerDrivenModuleConfiguration.InstanceRolePolicy policy = module.getConfiguration().getInstanceRolePolicy();
-
-		// Does "ANY" always return true? Probably we have to consider write/read permissions
-		if (policy.equals(ANY)) {
-			return true;
-		}
-
-		// First we match the Operational Mode of the current instance: HA versus Causal Cluster (CORE + READ REPLICA)
-		OperationalMode operationalMode = instanceRoleUtils.getOperationalMode();
-		switch (operationalMode) {
-		case ha:
-//			LOG.info("Running instance in HA mode");
-			// Only MASTER_ONLY and SLAVES_ONLY will be accepted
-			return role.equals(InstanceRole.MASTER) && policy.equals(MASTER_ONLY)
-					|| role.equals(InstanceRole.SLAVE) && policy.equals(SLAVES_ONLY);
-		case core:
-//			LOG.info("Running instance in Causal Cluster (CORE)");
-			// Only LEADER_ONLY and FOLLOWERS_ONLY will be accepted
-			return role.equals(InstanceRole.LEADER) && policy.equals(LEADER_ONLY)
-					|| role.equals(InstanceRole.FOLLOWER) && policy.equals(FOLLOWERS_ONLY);
-		case read_replica:
-//			LOG.info("Running instance in Causal Cluster (READ REPLICA)");
-			return role.equals(InstanceRole.READ_REPLICA) && policy.equals(READ_REPLICAS_ONLY);
-		default:
-			// By default we don't match any role so we have an incorrect role
-			return false;
-		}
+        return module.getConfiguration().getInstanceRolePolicy().comply(instanceRoleUtils.getInstaceRole());
 	}
 
     /**

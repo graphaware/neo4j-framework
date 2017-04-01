@@ -16,11 +16,10 @@
 
 package com.graphaware.runtime.walk;
 
-import com.graphaware.common.policy.fluent.IncludeNodes;
-import com.graphaware.common.policy.none.IncludeNoNodes;
+import com.graphaware.common.policy.inclusion.fluent.IncludeNodes;
+import com.graphaware.common.policy.inclusion.none.IncludeNoNodes;
 import com.graphaware.test.data.DatabasePopulator;
 import com.graphaware.test.data.SingleTransactionPopulator;
-import com.graphaware.test.integration.DatabaseIntegrationTest;
 import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;

@@ -16,8 +16,8 @@
 
 package com.graphaware.runtime.walk;
 
-import com.graphaware.common.policy.fluent.IncludeRelationships;
-import com.graphaware.common.policy.spel.SpelRelationshipInclusionPolicy;
+import com.graphaware.common.policy.inclusion.fluent.IncludeRelationships;
+import com.graphaware.common.policy.inclusion.spel.SpelRelationshipInclusionPolicy;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -16,8 +16,8 @@
 
 package com.graphaware.runtime.policy;
 
-import com.graphaware.common.policy.composite.CompositeNodeInclusionPolicy;
-import com.graphaware.common.policy.fluent.IncludeNodes;
+import com.graphaware.common.policy.inclusion.composite.CompositeNodeInclusionPolicy;
+import com.graphaware.common.policy.inclusion.fluent.IncludeNodes;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodes;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -28,7 +28,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
-import static com.graphaware.common.policy.composite.CompositeNodeInclusionPolicy.of;
+import static com.graphaware.common.policy.inclusion.composite.CompositeNodeInclusionPolicy.of;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
 import static org.junit.Assert.assertFalse;

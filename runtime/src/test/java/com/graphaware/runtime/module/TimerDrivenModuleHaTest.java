@@ -16,12 +16,15 @@
 
 package com.graphaware.runtime.module;
 
+import com.graphaware.common.policy.role.AnyRole;
+import com.graphaware.common.policy.role.InstanceRolePolicy;
+import com.graphaware.common.policy.role.MasterOnly;
+import com.graphaware.common.policy.role.SlavesOnly;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.runtime.config.FluentRuntimeConfiguration;
 import com.graphaware.runtime.config.FluentTimerDrivenModuleConfiguration;
 import com.graphaware.runtime.config.NullTimerDrivenModuleConfiguration;
-import com.graphaware.runtime.config.TimerDrivenModuleConfiguration;
 import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
 import org.junit.After;
 import org.junit.Before;
@@ -38,9 +41,6 @@ import java.io.File;
 import java.util.concurrent.*;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.ANY;
-import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.MASTER_ONLY;
-import static com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy.SLAVES_ONLY;
 import static com.graphaware.test.util.TestUtils.waitFor;
 import static org.junit.Assert.assertTrue;
 import static org.neo4j.kernel.configuration.Settings.FALSE;
@@ -61,9 +61,9 @@ public class TimerDrivenModuleHaTest {
 
     @Test
     public void shouldRespectSettingsOnMaster() throws InterruptedException, ExecutionException {
-        int[] runMasterOnly = run(MASTER_ONLY);
-        int[] runSlavesOnly = run(SLAVES_ONLY);
-        int[] runAny = run(ANY);
+        int[] runMasterOnly = run(MasterOnly.getInstance());
+        int[] runSlavesOnly = run(SlavesOnly.getInstance());
+        int[] runAny = run(AnyRole.getInstance());
 
         assertTrue(runMasterOnly[0] > 10);
         assertTrue(runMasterOnly[1] == 0);
@@ -105,7 +105,7 @@ public class TimerDrivenModuleHaTest {
         database.shutdown();
     }
 
-    private int[] run(TimerDrivenModuleConfiguration.InstanceRolePolicy instanceRolePolicy) throws InterruptedException, ExecutionException {
+    private int[] run(InstanceRolePolicy instanceRolePolicy) throws InterruptedException, ExecutionException {
         Future<GraphDatabaseService> masterFuture = executor.submit(() -> haDb("1", false));
         Future<GraphDatabaseService> slave1Future = executor.submit(() -> haDb("2", true));
         Future<GraphDatabaseService> slave2Future = executor.submit(() -> haDb("3", true));
@@ -127,7 +127,7 @@ public class TimerDrivenModuleHaTest {
         return new int[]{moduleMaster.getRuns(), moduleSlave1.getRuns(), moduleSlave2.getRuns()};
     }
 
-    private RunCountingTimerDrivenModule startFramework(GraphDatabaseService database, TimerDrivenModuleConfiguration.InstanceRolePolicy instanceRolePolicy) {
+    private RunCountingTimerDrivenModule startFramework(GraphDatabaseService database, InstanceRolePolicy instanceRolePolicy) {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database,
                 FluentRuntimeConfiguration
                         .defaultConfiguration(database)

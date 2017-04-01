@@ -16,7 +16,8 @@
 
 package com.graphaware.runtime.config;
 
-import com.graphaware.common.policy.InclusionPolicies;
+import com.graphaware.common.policy.inclusion.InclusionPolicies;
+import com.graphaware.common.policy.role.InstanceRolePolicy;
 
 /**
  * Base-class for {@link TimerDrivenModuleConfiguration} implementations.

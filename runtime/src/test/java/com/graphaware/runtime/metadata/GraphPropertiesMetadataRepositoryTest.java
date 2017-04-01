@@ -16,10 +16,10 @@
 
 package com.graphaware.runtime.metadata;
 
-import com.graphaware.common.policy.fluent.IncludeNodeProperties;
-import com.graphaware.common.policy.fluent.IncludeNodes;
-import com.graphaware.common.policy.fluent.IncludeRelationshipProperties;
-import com.graphaware.common.policy.fluent.IncludeRelationships;
+import com.graphaware.common.policy.inclusion.fluent.IncludeNodeProperties;
+import com.graphaware.common.policy.inclusion.fluent.IncludeNodes;
+import com.graphaware.common.policy.inclusion.fluent.IncludeRelationshipProperties;
+import com.graphaware.common.policy.inclusion.fluent.IncludeRelationships;
 import com.graphaware.runtime.config.FluentRuntimeConfiguration;
 import com.graphaware.runtime.config.FluentTxDrivenModuleConfiguration;
 import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;

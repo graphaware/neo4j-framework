@@ -16,8 +16,8 @@
 
 package com.graphaware.test.unit;
 
-import com.graphaware.common.policy.*;
-import com.graphaware.common.policy.none.IncludeNoNodes;
+import com.graphaware.common.policy.inclusion.*;
+import com.graphaware.common.policy.inclusion.none.IncludeNoNodes;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

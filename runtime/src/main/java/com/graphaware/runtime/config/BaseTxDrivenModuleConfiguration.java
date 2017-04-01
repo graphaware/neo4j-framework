@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime.config;
 
-import com.graphaware.common.policy.*;
+import com.graphaware.common.policy.inclusion.*;
 
 import static org.springframework.util.Assert.notNull;
 
@@ -119,7 +119,7 @@ public abstract class BaseTxDrivenModuleConfiguration<T extends BaseTxDrivenModu
     }
 
     /**
-     * Create a new instance of {@link TxDrivenModuleConfiguration} with different {@link com.graphaware.common.policy.InclusionPolicies}.
+     * Create a new instance of {@link TxDrivenModuleConfiguration} with different {@link InclusionPolicies}.
      *
      * @param inclusionPolicies of the new instance.
      * @return new instance.

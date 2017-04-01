@@ -16,12 +16,12 @@
 
 package com.graphaware.runtime.policy.all;
 
-import com.graphaware.common.policy.PropertyInclusionPolicy;
+import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.neo4j.graphdb.PropertyContainer;
 
 /**
- * Base-class for all {@link com.graphaware.common.policy.PropertyInclusionPolicy}
+ * Base-class for all {@link PropertyInclusionPolicy}
  * implementations that include arbitrary business / application level
  * properties (up to subclasses to decide which ones), but exclude any
  * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link com.graphaware.runtime.module.TxDrivenModule} internal properties.

@@ -18,7 +18,7 @@ package com.graphaware.runtime;
 
 import com.graphaware.common.kv.GraphKeyValueStore;
 import com.graphaware.common.kv.KeyValueStore;
-import com.graphaware.common.policy.InclusionPolicies;
+import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.runtime.config.*;
 import com.graphaware.runtime.metadata.*;
 import com.graphaware.runtime.module.*;
@@ -304,6 +304,9 @@ public class ProductionRuntimeTest {
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule3, atLeastOnce()).getId();
+        verify(mockModule1, atLeastOnce()).getConfiguration();
+        verify(mockModule2, atLeastOnce()).getConfiguration();
+        verify(mockModule3, atLeastOnce()).getConfiguration();
         verify(mockModule1, times(2)).doSomeWork(null, database);
         verify(mockModule2, times(2)).doSomeWork(null, database);
         verify(mockModule3).doSomeWork(null, database);
@@ -351,6 +354,7 @@ public class ProductionRuntimeTest {
 
         TimerDrivenModule mockModule2 = mock(TimerDrivenModule.class);
         when(mockModule2.getId()).thenReturn(MOCK + "2");
+        when(mockModule2.getConfiguration()).thenReturn(NullTimerDrivenModuleConfiguration.getInstance());
         when(mockModule2.createInitialContext(database)).thenReturn(context1);
         when(mockModule2.doSomeWork(context1, database)).thenReturn(context2);
 
@@ -374,6 +378,9 @@ public class ProductionRuntimeTest {
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule3, atLeastOnce()).getId();
+        verify(mockModule1, atLeastOnce()).getConfiguration();
+        verify(mockModule2, atLeastOnce()).getConfiguration();
+        verify(mockModule3, atLeastOnce()).getConfiguration();
         verify(mockModule1, times(3)).doSomeWork(null, database);
         verify(mockModule2).doSomeWork(context1, database);
         verify(mockModule2).doSomeWork(context2, database);
@@ -407,6 +414,8 @@ public class ProductionRuntimeTest {
 
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule1, atLeastOnce()).getConfiguration();
+        verify(mockModule2, atLeastOnce()).getConfiguration();
 
         verifyNoMoreInteractions(mockModule1, mockModule2);
     }
@@ -432,6 +441,7 @@ public class ProductionRuntimeTest {
         Thread.sleep(INITIAL_DELAY + 2 * DELAY - 100);
 
         verify(mockModule, atLeastOnce()).getId();
+        verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule).doSomeWork(null, database);
         verify(mockModule).doSomeWork(firstContext, database);
 
@@ -461,6 +471,7 @@ public class ProductionRuntimeTest {
         Thread.sleep(INITIAL_DELAY + DELAY - 100);
 
         verify(mockModule, atLeastOnce()).getId();
+        verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule).doSomeWork(lastContext, database);
         verifyNoMoreInteractions(mockModule);
     }
@@ -501,6 +512,8 @@ public class ProductionRuntimeTest {
 
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
+        verify(mockModule1, atLeastOnce()).getConfiguration();
+        verify(mockModule2, atLeastOnce()).getConfiguration();
         verify(mockModule1).doSomeWork(null, database);
         verify(mockModule2).doSomeWork(null, database);
         verifyNoMoreInteractions(mockModule1, mockModule2);
@@ -1371,17 +1384,14 @@ public class ProductionRuntimeTest {
     }
 
     private TimerDrivenModule mockTimerModule(String id) {
-        TimerDrivenModule mockModule = mock(TimerDrivenModule.class);
-        when(mockModule.getId()).thenReturn(id);
-        when(mockModule.createInitialContext(database)).thenReturn(null);
-
-        return mockModule;
+        return mockTimerModule(id, TimerDrivenModule.class);
     }
 
     private <T extends TimerDrivenModule> T mockTimerModule(String id, Class<T> cls) {
         T mockModule = mock(cls);
         when(mockModule.getId()).thenReturn(id);
         when(mockModule.createInitialContext(database)).thenReturn(null);
+        when(mockModule.getConfiguration()).thenReturn(NullTxAndTimerDrivenModuleConfiguration.getInstance());
 
         return mockModule;
     }

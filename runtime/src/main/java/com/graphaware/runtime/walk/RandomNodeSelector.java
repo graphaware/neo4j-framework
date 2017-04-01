@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime.walk;
 
-import com.graphaware.common.policy.NodeInclusionPolicy;
+import com.graphaware.common.policy.inclusion.NodeInclusionPolicy;
 import com.graphaware.common.util.ReservoirSampler;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodes;
 import org.apache.commons.math3.random.RandomDataGenerator;
@@ -28,7 +28,7 @@ import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
 /**
  * {@link NodeSelector} that selects a {@link Node} at random from all {@link Node}s available in the database that match
- * the provided {@link com.graphaware.common.policy.NodeInclusionPolicy}.
+ * the provided {@link NodeInclusionPolicy}.
  */
 public class RandomNodeSelector implements NodeSelector {
 
@@ -46,9 +46,9 @@ public class RandomNodeSelector implements NodeSelector {
 
     /**
      * Constructs a new {@link RandomNodeSelector} that selects a random node that matches the given
-     * {@link com.graphaware.common.policy.NodeInclusionPolicy}.
+     * {@link NodeInclusionPolicy}.
      *
-     * @param inclusionPolicy The {@link com.graphaware.common.policy.NodeInclusionPolicy} to consider when selecting
+     * @param inclusionPolicy The {@link NodeInclusionPolicy} to consider when selecting
      *                          nodes.
      */
     public RandomNodeSelector(NodeInclusionPolicy inclusionPolicy) {

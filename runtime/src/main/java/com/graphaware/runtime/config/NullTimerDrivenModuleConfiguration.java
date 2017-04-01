@@ -16,13 +16,15 @@
 
 package com.graphaware.runtime.config;
 
+import com.graphaware.common.policy.role.InstanceRolePolicy;
+import com.graphaware.common.policy.role.WritableRole;
 import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.serialize.SingletonSerializer;
 
 /**
  * {@link TimerDrivenModuleConfiguration} for {@link com.graphaware.runtime.module.TimerDrivenModule}s with no configuration. Singleton.
  * <p/>
- * Implies the {@link com.graphaware.runtime.module.TimerDrivenModule} will only run on Master nodes.
+ * Implies the {@link com.graphaware.runtime.module.TimerDrivenModule} will only run on Master or Leader nodes.
  */
 public final class NullTimerDrivenModuleConfiguration implements TimerDrivenModuleConfiguration {
 
@@ -49,6 +51,6 @@ public final class NullTimerDrivenModuleConfiguration implements TimerDrivenModu
      */
     @Override
     public InstanceRolePolicy getInstanceRolePolicy() {
-        return InstanceRolePolicy.MASTER_ONLY;
+        return WritableRole.getInstance();
     }
 }

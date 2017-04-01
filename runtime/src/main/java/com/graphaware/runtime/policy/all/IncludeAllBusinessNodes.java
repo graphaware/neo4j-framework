@@ -16,8 +16,8 @@
 
 package com.graphaware.runtime.policy.all;
 
-import com.graphaware.common.policy.BasePropertyContainerInclusionPolicy;
-import com.graphaware.common.policy.NodeInclusionPolicy;
+import com.graphaware.common.policy.inclusion.BasePropertyContainerInclusionPolicy;
+import com.graphaware.common.policy.inclusion.NodeInclusionPolicy;
 import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.serialize.SingletonSerializer;
 import com.graphaware.runtime.config.RuntimeConfiguration;

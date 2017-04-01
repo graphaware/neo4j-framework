@@ -16,13 +16,13 @@
 
 package com.graphaware.runtime.config.function;
 
-import com.graphaware.common.policy.NodeInclusionPolicy;
-import com.graphaware.common.policy.none.IncludeNoNodes;
-import com.graphaware.common.policy.spel.SpelNodeInclusionPolicy;
+import com.graphaware.common.policy.inclusion.NodeInclusionPolicy;
+import com.graphaware.common.policy.inclusion.none.IncludeNoNodes;
+import com.graphaware.common.policy.inclusion.spel.SpelNodeInclusionPolicy;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodes;
 import org.junit.Test;
 
-import static com.graphaware.common.policy.composite.CompositeNodeInclusionPolicy.of;
+import static com.graphaware.common.policy.inclusion.composite.CompositeNodeInclusionPolicy.of;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 

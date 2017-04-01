@@ -16,9 +16,7 @@
 
 package com.graphaware.runtime.config.function;
 
-import com.graphaware.common.policy.InclusionPolicy;
-import com.graphaware.common.policy.all.IncludeAllNodeProperties;
-import com.graphaware.common.policy.none.IncludeNoNodeProperties;
+import com.graphaware.common.policy.inclusion.InclusionPolicy;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -28,9 +26,9 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 /**
- * A {@link Function} that converts String to {@link com.graphaware.common.policy.InclusionPolicy}.
+ * A {@link Function} that converts String to {@link InclusionPolicy}.
  * <p/>
- * Converts a fully qualified class name to an instance of the class, or a SPEL expression to {@link com.graphaware.common.policy.InclusionPolicy}.
+ * Converts a fully qualified class name to an instance of the class, or a SPEL expression to {@link InclusionPolicy}.
  */
 public abstract class StringToInclusionPolicy<T extends InclusionPolicy> implements Function<String, T> {
 

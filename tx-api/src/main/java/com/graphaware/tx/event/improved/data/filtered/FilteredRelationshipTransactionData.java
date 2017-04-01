@@ -16,9 +16,9 @@
 
 package com.graphaware.tx.event.improved.data.filtered;
 
-import com.graphaware.common.policy.InclusionPolicies;
-import com.graphaware.common.policy.PropertyContainerInclusionPolicy;
-import com.graphaware.common.policy.PropertyInclusionPolicy;
+import com.graphaware.common.policy.inclusion.InclusionPolicies;
+import com.graphaware.common.policy.inclusion.PropertyContainerInclusionPolicy;
+import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import com.graphaware.tx.event.improved.data.RelationshipTransactionData;
 import com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredRelationship;

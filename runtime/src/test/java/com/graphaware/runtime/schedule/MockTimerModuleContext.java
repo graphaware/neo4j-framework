@@ -15,10 +15,10 @@
  */
 package com.graphaware.runtime.schedule;
 
+import com.graphaware.common.policy.role.InstanceRolePolicy;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import com.graphaware.runtime.config.TimerDrivenModuleConfiguration;
-import com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy;
 import com.graphaware.runtime.metadata.PositionNotFoundException;
 import com.graphaware.runtime.metadata.TimerDrivenModuleContext;
 import com.graphaware.runtime.module.RunCountingTimerDrivenModule;
@@ -37,13 +37,7 @@ class MockTimerModuleContext implements TimerDrivenModuleContext<String>{
 	}
 	
 	public static TimerDrivenModule<MockTimerModuleContext> buildModule(final InstanceRolePolicy policy) {
-		TimerDrivenModuleConfiguration config = new TimerDrivenModuleConfiguration() {
-			
-			@Override
-			public InstanceRolePolicy getInstanceRolePolicy() {
-				return policy;
-			}
-		};
+		TimerDrivenModuleConfiguration config = () -> policy;
 		@SuppressWarnings("unchecked")
 		TimerDrivenModule<MockTimerModuleContext> module = new RunCountingTimerDrivenModule(config);
 		return module;

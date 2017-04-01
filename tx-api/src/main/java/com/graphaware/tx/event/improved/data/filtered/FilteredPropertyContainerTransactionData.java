@@ -16,11 +16,11 @@
 
 package com.graphaware.tx.event.improved.data.filtered;
 
-import com.graphaware.common.policy.InclusionPolicies;
-import com.graphaware.common.policy.PropertyContainerInclusionPolicy;
-import com.graphaware.common.policy.PropertyInclusionPolicy;
-import com.graphaware.common.policy.none.IncludeNoProperties;
-import com.graphaware.common.policy.none.IncludeNone;
+import com.graphaware.common.policy.inclusion.InclusionPolicies;
+import com.graphaware.common.policy.inclusion.PropertyContainerInclusionPolicy;
+import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
+import com.graphaware.common.policy.inclusion.none.IncludeNoProperties;
+import com.graphaware.common.policy.inclusion.none.IncludeNone;
 import com.graphaware.common.util.Change;
 import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
 import org.neo4j.graphdb.PropertyContainer;
@@ -29,7 +29,7 @@ import java.util.*;
 
 /**
  * Decorator of {@link com.graphaware.tx.event.improved.data.PropertyContainerTransactionData} that filters out {@link org.neo4j.graphdb.PropertyContainer}s and properties
- * based on provided {@link com.graphaware.common.policy.PropertyContainerInclusionPolicy} and {@link com.graphaware.common.policy.PropertyInclusionPolicy}.
+ * based on provided {@link PropertyContainerInclusionPolicy} and {@link PropertyInclusionPolicy}.
  * <p/>
  * Results of most methods returning {@link java.util.Collection}s and {@link java.util.Map}s will be filtered. <code>boolean</code>
  * and single object returning methods (and {@link #propertiesOfDeletedContainer(org.neo4j.graphdb.PropertyContainer)}
@@ -42,7 +42,7 @@ import java.util.*;
  * return true for more of them, as it ignores the filtering.
  * <p/>
  * When traversing the graph using an object returned by this API (such as {@link com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode}),
- * nodes, properties, and relationships not included by the {@link com.graphaware.common.policy.InclusionPolicies} will be excluded. The only exception
+ * nodes, properties, and relationships not included by the {@link InclusionPolicies} will be excluded. The only exception
  * to this are relationship start and end nodes - they are returned even if they would normally be filtered out. This is
  * a design decision in order to honor the requirement that relationships must have start and end node.
  */
@@ -198,7 +198,7 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      *
      * @param container for which to get created properties.
      * @return read-only properties created for the given container. Filtered according to provided
-     * {@link com.graphaware.common.policy.PropertyInclusionPolicy}. Compliance with the {@link com.graphaware.common.policy.PropertyContainerInclusionPolicy} is not
+     * {@link PropertyInclusionPolicy}. Compliance with the {@link PropertyContainerInclusionPolicy} is not
      * verified.
      */
     public Map<String, Object> createdProperties(T container) {
@@ -226,7 +226,7 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      * @param container for which to get deleted properties.
      * @return read-only properties deleted for the given container, where the value is the property value before the
      * transaction started. Filtered according to provided
-     * {@link com.graphaware.common.policy.PropertyInclusionPolicy}. Compliance with the {@link com.graphaware.common.policy.PropertyContainerInclusionPolicy} is not
+     * {@link PropertyInclusionPolicy}. Compliance with the {@link PropertyContainerInclusionPolicy} is not
      * verified.
      */
     public Map<String, Object> deletedProperties(T container) {
@@ -267,7 +267,7 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
      * @param container for which to get changed properties.
      * @return read-only properties changed for the given container, where the value is the property value before and
      * after the transaction started, respectively. Filtered according to provided
-     * {@link com.graphaware.common.policy.PropertyInclusionPolicy}. Compliance with the {@link com.graphaware.common.policy.PropertyContainerInclusionPolicy} is not
+     * {@link PropertyInclusionPolicy}. Compliance with the {@link PropertyContainerInclusionPolicy} is not
      * verified.
      */
     public Map<String, Change<Object>> changedProperties(T container) {
@@ -278,7 +278,7 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
     }
 
     /**
-     * Filter property containers according to provided {@link com.graphaware.common.policy.PropertyContainerInclusionPolicy}.
+     * Filter property containers according to provided {@link PropertyContainerInclusionPolicy}.
      *
      * @param toFilter property containers to filter.
      * @return filtered property containers.
@@ -295,8 +295,8 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
 
     /**
      * Filter changed property containers according to provided policies. Only those complying with the provided
-     * {@link com.graphaware.common.policy.PropertyContainerInclusionPolicy} with at least one property created, deleted, or changed that complies
-     * with the provided {@link com.graphaware.common.policy.PropertyInclusionPolicy} will be returned.
+     * {@link PropertyContainerInclusionPolicy} with at least one property created, deleted, or changed that complies
+     * with the provided {@link PropertyInclusionPolicy} will be returned.
      *
      * @param toFilter changed property containers to filter.
      * @return filtered changed property containers.
@@ -322,8 +322,8 @@ public abstract class FilteredPropertyContainerTransactionData<T extends Propert
     }
 
     /**
-     * Filter properties according to provided {@link com.graphaware.common.policy.PropertyInclusionPolicy}.
-     * {@link com.graphaware.common.policy.PropertyContainerInclusionPolicy} is ignored!
+     * Filter properties according to provided {@link PropertyInclusionPolicy}.
+     * {@link PropertyContainerInclusionPolicy} is ignored!
      *
      * @param properties to filter.
      * @param container  to which the properties belong.

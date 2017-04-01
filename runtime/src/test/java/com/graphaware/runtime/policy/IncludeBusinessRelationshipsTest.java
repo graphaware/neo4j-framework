@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime.policy;
 
-import com.graphaware.common.policy.fluent.IncludeRelationships;
+import com.graphaware.common.policy.inclusion.fluent.IncludeRelationships;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessRelationships;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -27,7 +27,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
-import static com.graphaware.common.policy.composite.CompositeRelationshipInclusionPolicy.of;
+import static com.graphaware.common.policy.inclusion.composite.CompositeRelationshipInclusionPolicy.of;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
 import static org.junit.Assert.assertFalse;
@@ -36,7 +36,7 @@ import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.RelationshipType.withName;
 
 /**
- * Test for {@link com.graphaware.common.policy.composite.CompositeRelationshipInclusionPolicy} with {@link com.graphaware.runtime.policy.all.IncludeAllBusinessNodes} and a programmatically configured {@link com.graphaware.common.policy.fluent.IncludeRelationships}
+ * Test for {@link com.graphaware.common.policy.inclusion.composite.CompositeRelationshipInclusionPolicy} with {@link com.graphaware.runtime.policy.all.IncludeAllBusinessNodes} and a programmatically configured {@link com.graphaware.common.policy.inclusion.fluent.IncludeRelationships}
  */
 public class IncludeBusinessRelationshipsTest {
 

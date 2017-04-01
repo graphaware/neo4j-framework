@@ -56,7 +56,7 @@ Besides some frameworky internal code, the following functionality is provided b
 
 ### Inclusion Policies
 
-Throughout the framework, a class hierarchy stemming from `com.graphaware.common.policy.InclusionPolicy` is used. Its
+Throughout the framework, a class hierarchy stemming from `com.graphaware.common.policy.inclusion.InclusionPolicy` is used. Its
 subtypes, such as `NodeInclusionPolicy`, `RelationshipInclusionPolicy`, `NodePropertyInclusionPolicy`, etc. are used
 in various places to determine, whether to use certain nodes, relationships, or properties for something.
 

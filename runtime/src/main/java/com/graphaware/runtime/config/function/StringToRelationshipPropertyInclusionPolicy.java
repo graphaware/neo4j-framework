@@ -16,15 +16,15 @@
 
 package com.graphaware.runtime.config.function;
 
-import com.graphaware.common.policy.RelationshipPropertyInclusionPolicy;
-import com.graphaware.common.policy.all.IncludeAllRelationshipProperties;
-import com.graphaware.common.policy.composite.CompositeRelationshipPropertyInclusionPolicy;
-import com.graphaware.common.policy.none.IncludeNoRelationshipProperties;
-import com.graphaware.common.policy.spel.SpelRelationshipPropertyInclusionPolicy;
+import com.graphaware.common.policy.inclusion.RelationshipPropertyInclusionPolicy;
+import com.graphaware.common.policy.inclusion.all.IncludeAllRelationshipProperties;
+import com.graphaware.common.policy.inclusion.composite.CompositeRelationshipPropertyInclusionPolicy;
+import com.graphaware.common.policy.inclusion.none.IncludeNoRelationshipProperties;
+import com.graphaware.common.policy.inclusion.spel.SpelRelationshipPropertyInclusionPolicy;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessRelationshipProperties;
 
 /**
- * A {@link StringToInclusionPolicy} that converts String to {@link com.graphaware.common.policy.RelationshipPropertyInclusionPolicy}. Singleton.
+ * A {@link StringToInclusionPolicy} that converts String to {@link RelationshipPropertyInclusionPolicy}. Singleton.
  */
 public final class StringToRelationshipPropertyInclusionPolicy extends StringToInclusionPolicy<RelationshipPropertyInclusionPolicy> {
 

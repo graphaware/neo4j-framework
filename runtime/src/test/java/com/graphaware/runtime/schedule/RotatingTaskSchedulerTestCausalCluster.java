@@ -19,12 +19,15 @@ import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROP
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import com.graphaware.common.policy.role.AnyRole;
+import com.graphaware.common.policy.role.MasterOnly;
+import com.graphaware.common.policy.role.SlavesOnly;
+import com.graphaware.common.policy.role.WritableRole;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import com.graphaware.runtime.config.FluentRuntimeConfiguration;
-import com.graphaware.runtime.config.TimerDrivenModuleConfiguration.InstanceRolePolicy;
 import com.graphaware.runtime.metadata.GraphPropertiesMetadataRepository;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.test.integration.cluster.CausalClusterDatabasesintegrationTest;
@@ -58,43 +61,43 @@ public class RotatingTaskSchedulerTestCausalCluster extends CausalClusterDatabas
 	
 	@Test
 	public void testHasCorrectRole_MASTER_ONLY() {
-		assertFalse(rotatingTaskSchedulerLeader.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.MASTER_ONLY)));
-		assertFalse(rotatingTaskSchedulerFollower.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.MASTER_ONLY)));
-		assertFalse(rotatingTaskSchedulerReplica.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.MASTER_ONLY)));
+		assertFalse(rotatingTaskSchedulerLeader.hasCorrectRole(MockTimerModuleContext.buildModule(MasterOnly.getInstance())));
+		assertFalse(rotatingTaskSchedulerFollower.hasCorrectRole(MockTimerModuleContext.buildModule(MasterOnly.getInstance())));
+		assertFalse(rotatingTaskSchedulerReplica.hasCorrectRole(MockTimerModuleContext.buildModule(MasterOnly.getInstance())));
 	}
 	
 	@Test
 	public void testHasCorrectRole_SLAVES_ONLY() {
-		assertFalse(rotatingTaskSchedulerLeader.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.SLAVES_ONLY)));
-		assertFalse(rotatingTaskSchedulerFollower.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.SLAVES_ONLY)));
-		assertFalse(rotatingTaskSchedulerReplica.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.SLAVES_ONLY)));
+		assertFalse(rotatingTaskSchedulerLeader.hasCorrectRole(MockTimerModuleContext.buildModule(SlavesOnly.getInstance())));
+		assertFalse(rotatingTaskSchedulerFollower.hasCorrectRole(MockTimerModuleContext.buildModule(SlavesOnly.getInstance())));
+		assertFalse(rotatingTaskSchedulerReplica.hasCorrectRole(MockTimerModuleContext.buildModule(SlavesOnly.getInstance())));
 	}
 
 	@Test
 	public void testHasCorrectRole_ANY() {
-		assertTrue(rotatingTaskSchedulerLeader.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.ANY)));
-		assertTrue(rotatingTaskSchedulerFollower.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.ANY)));
-		assertTrue(rotatingTaskSchedulerReplica.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.ANY)));
+		assertTrue(rotatingTaskSchedulerLeader.hasCorrectRole(MockTimerModuleContext.buildModule(AnyRole.getInstance())));
+		assertTrue(rotatingTaskSchedulerFollower.hasCorrectRole(MockTimerModuleContext.buildModule(AnyRole.getInstance())));
+		assertTrue(rotatingTaskSchedulerReplica.hasCorrectRole(MockTimerModuleContext.buildModule(AnyRole.getInstance())));
 	}
 	
 	@Test
-	public void testHasCorrectRole_LEADER_ONLY() {
-		assertTrue(rotatingTaskSchedulerLeader.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.LEADER_ONLY)));
-		assertFalse(rotatingTaskSchedulerFollower.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.LEADER_ONLY)));
-		assertFalse(rotatingTaskSchedulerReplica.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.LEADER_ONLY)));
+	public void testHasCorrectRole_WRITABLE() {
+		assertTrue(rotatingTaskSchedulerLeader.hasCorrectRole(MockTimerModuleContext.buildModule(WritableRole.getInstance())));
+		assertFalse(rotatingTaskSchedulerFollower.hasCorrectRole(MockTimerModuleContext.buildModule(WritableRole.getInstance())));
+		assertFalse(rotatingTaskSchedulerReplica.hasCorrectRole(MockTimerModuleContext.buildModule(WritableRole.getInstance())));
 	}
 	
-	@Test
-	public void testHasCorrectRole_FOLLOWERS_ONLY() {
-		assertFalse(rotatingTaskSchedulerLeader.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.FOLLOWERS_ONLY)));
-		assertTrue(rotatingTaskSchedulerFollower.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.FOLLOWERS_ONLY)));
-		assertFalse(rotatingTaskSchedulerReplica.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.FOLLOWERS_ONLY)));
-	}
-	
-	@Test
-	public void testHasCorrectRole_READ_REPLICAS_ONLY() {
-		assertFalse(rotatingTaskSchedulerLeader.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.READ_REPLICAS_ONLY)));
-		assertFalse(rotatingTaskSchedulerFollower.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.READ_REPLICAS_ONLY)));
-		assertTrue(rotatingTaskSchedulerReplica.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.READ_REPLICAS_ONLY)));
-	}
+//	@Test
+//	public void testHasCorrectRole_FOLLOWERS_ONLY() {
+//		assertFalse(rotatingTaskSchedulerLeader.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.FOLLOWERS_ONLY)));
+//		assertTrue(rotatingTaskSchedulerFollower.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.FOLLOWERS_ONLY)));
+//		assertFalse(rotatingTaskSchedulerReplica.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.FOLLOWERS_ONLY)));
+//	}
+//
+//	@Test
+//	public void testHasCorrectRole_READ_REPLICAS_ONLY() {
+//		assertFalse(rotatingTaskSchedulerLeader.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.READ_REPLICAS_ONLY)));
+//		assertFalse(rotatingTaskSchedulerFollower.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.READ_REPLICAS_ONLY)));
+//		assertTrue(rotatingTaskSchedulerReplica.hasCorrectRole(MockTimerModuleContext.buildModule(InstanceRolePolicy.READ_REPLICAS_ONLY)));
+//	}
 }

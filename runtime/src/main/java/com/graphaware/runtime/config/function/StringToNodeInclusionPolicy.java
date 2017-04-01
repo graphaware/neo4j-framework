@@ -16,14 +16,14 @@
 
 package com.graphaware.runtime.config.function;
 
-import com.graphaware.common.policy.NodeInclusionPolicy;
-import com.graphaware.common.policy.composite.CompositeNodeInclusionPolicy;
-import com.graphaware.common.policy.none.IncludeNoNodes;
-import com.graphaware.common.policy.spel.SpelNodeInclusionPolicy;
+import com.graphaware.common.policy.inclusion.NodeInclusionPolicy;
+import com.graphaware.common.policy.inclusion.composite.CompositeNodeInclusionPolicy;
+import com.graphaware.common.policy.inclusion.none.IncludeNoNodes;
+import com.graphaware.common.policy.inclusion.spel.SpelNodeInclusionPolicy;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodes;
 
 /**
- * A {@link StringToInclusionPolicy} that converts String to {@link com.graphaware.common.policy.NodeInclusionPolicy}. Singleton.
+ * A {@link StringToInclusionPolicy} that converts String to {@link NodeInclusionPolicy}. Singleton.
  */
 public final class StringToNodeInclusionPolicy extends StringToInclusionPolicy<NodeInclusionPolicy> {
 

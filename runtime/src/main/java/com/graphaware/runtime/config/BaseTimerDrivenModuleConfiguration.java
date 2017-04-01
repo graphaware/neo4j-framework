@@ -16,6 +16,8 @@
 
 package com.graphaware.runtime.config;
 
+import com.graphaware.common.policy.role.InstanceRolePolicy;
+
 import static org.springframework.util.Assert.notNull;
 
 /**

@@ -16,8 +16,8 @@
 
 package com.graphaware.common.util;
 
-import com.graphaware.common.policy.ObjectInclusionPolicy;
-import com.graphaware.common.policy.all.IncludeAll;
+import com.graphaware.common.policy.inclusion.ObjectInclusionPolicy;
+import com.graphaware.common.policy.inclusion.all.IncludeAll;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
