@@ -8,7 +8,7 @@ It contains essential APIs for [GraphAware Runtime](../runtime) and only exists 
 License
 -------
 
-Copyright (c) 2013-2016 GraphAware
+Copyright (c) 2013-2017 GraphAware
 
 GraphAware is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
