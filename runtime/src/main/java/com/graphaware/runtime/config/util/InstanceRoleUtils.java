@@ -93,15 +93,19 @@ public class InstanceRoleUtils {
 	 * @return
 	 */
 	private InstanceRole getCoreRole() {
-		Role role = resolveDependency(RaftMachine.class).currentRole();
-		switch (role) {
-		case LEADER:
-			return InstanceRole.LEADER;
-		case FOLLOWER:
-			return InstanceRole.FOLLOWER;
-		case CANDIDATE:
-			return InstanceRole.CANDIDATE;
-		default:
+		try{
+			Role role = resolveDependency(RaftMachine.class).currentRole();
+			//avoid "switch" statement because it creates a dependency with Role that doesn't exist in community edition
+			if (role == Role.LEADER) {
+				return InstanceRole.LEADER;
+			} else if (role == Role.FOLLOWER) {
+				return InstanceRole.FOLLOWER;
+			} else if (role == Role.CANDIDATE) {
+				return InstanceRole.CANDIDATE;
+			} else {
+				return InstanceRole.SINGLE;
+			}
+		}catch(NoClassDefFoundError e){
 			return InstanceRole.SINGLE;
 		}
 	}
@@ -111,13 +115,17 @@ public class InstanceRoleUtils {
 	 * @return
 	 */
 	private InstanceRole getHARole() {
-		String role = resolveDependency(ClusterMembers.class).getCurrentMemberRole();
-
-		if ("master".equalsIgnoreCase(role)) {
-			return InstanceRole.MASTER;
+		try{
+			String role = resolveDependency(ClusterMembers.class).getCurrentMemberRole();
+			
+			if ("master".equalsIgnoreCase(role)) {
+				return InstanceRole.MASTER;
+			}
+			
+			return InstanceRole.SLAVE;			
+		}catch(NoClassDefFoundError e){
+			return InstanceRole.SINGLE;
 		}
-		
-		return InstanceRole.SLAVE;
 	}
 
 
