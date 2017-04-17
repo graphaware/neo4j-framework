@@ -26,16 +26,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.graphaware.common.policy.role.InstanceRolePolicy;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.kernel.impl.factory.OperationalMode;
 import org.neo4j.logging.Log;
 
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.util.Pair;
-import com.graphaware.runtime.config.TimerDrivenModuleConfiguration;
-import com.graphaware.common.policy.role.InstanceRole;
 import com.graphaware.runtime.config.util.InstanceRoleUtils;
 import com.graphaware.runtime.metadata.DefaultTimerDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
@@ -214,7 +210,7 @@ public class RotatingTaskScheduler implements TaskScheduler {
      * @return <code>true</code> iff can run.
      */
     protected boolean hasCorrectRole(TimerDrivenModule<?> module) {
-        return module.getConfiguration().getInstanceRolePolicy().comply(instanceRoleUtils.getInstaceRole());
+        return module.getConfiguration().getInstanceRolePolicy().comply(instanceRoleUtils.getInstanceRole());
 	}
 
     /**

@@ -61,20 +61,20 @@ public class InstanceRoleUtilsTestCausalCluster extends CausalClusterDatabasesin
 
 	@Test
 	public void testGetInstaceRole() {
-		assertEquals(InstanceRole.LEADER, utilsLeader.getInstaceRole());
-		assertEquals(InstanceRole.FOLLOWER, utilsFollower1.getInstaceRole());
-		assertEquals(InstanceRole.FOLLOWER, utilsFollower2.getInstaceRole());
+		assertEquals(InstanceRole.LEADER, utilsLeader.getInstanceRole());
+		assertEquals(InstanceRole.FOLLOWER, utilsFollower1.getInstanceRole());
+		assertEquals(InstanceRole.FOLLOWER, utilsFollower2.getInstanceRole());
 		
-		assertEquals(InstanceRole.READ_REPLICA, utilsReplica.getInstaceRole());
+		assertEquals(InstanceRole.READ_REPLICA, utilsReplica.getInstanceRole());
 	}
 
 	@Test
 	public void testIsReadOnly() {
-		assertFalse(utilsLeader.getInstaceRole().isReadOnly());
-		assertTrue(utilsFollower1.getInstaceRole().isReadOnly());
-		assertTrue(utilsFollower2.getInstaceRole().isReadOnly());
+		assertFalse(utilsLeader.getInstanceRole().isReadOnly());
+		assertTrue(utilsFollower1.getInstanceRole().isReadOnly());
+		assertTrue(utilsFollower2.getInstanceRole().isReadOnly());
 		
-		assertTrue(utilsReplica.getInstaceRole().isReadOnly());
+		assertTrue(utilsReplica.getInstanceRole().isReadOnly());
 	}
 
 }

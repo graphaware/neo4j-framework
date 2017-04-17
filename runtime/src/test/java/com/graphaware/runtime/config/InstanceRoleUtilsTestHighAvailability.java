@@ -55,17 +55,17 @@ public class InstanceRoleUtilsTestHighAvailability extends HighAvailabilityClust
 
 	@Test
 	public void testGetInstaceRole() {
-		InstanceRole roleMaster = utilsMaster.getInstaceRole();
+		InstanceRole roleMaster = utilsMaster.getInstanceRole();
 		assertEquals(InstanceRole.MASTER, roleMaster);
 		
-		InstanceRole roleSlave = utilsSlave.getInstaceRole();
+		InstanceRole roleSlave = utilsSlave.getInstanceRole();
 		assertEquals(InstanceRole.SLAVE, roleSlave);
 	}
 
 	@Test
 	public void testIsReadOnly() {
-		assertFalse(utilsMaster.getInstaceRole().isReadOnly());
-		assertTrue(utilsSlave.getInstaceRole().isReadOnly());
+		assertFalse(utilsMaster.getInstanceRole().isReadOnly());
+		assertTrue(utilsSlave.getInstanceRole().isReadOnly());
 	}
 
 }

@@ -29,7 +29,6 @@ import org.neo4j.logging.Log;
 import com.graphaware.common.log.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -104,7 +103,7 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
      */
     @Override
     public <M extends ModuleMetadata> void persistModuleMetadata(String moduleId, M metadata) {
-    	if(instanceRoleUtils.getInstaceRole().isWritable()){
+    	if(instanceRoleUtils.getInstanceRole().isWritable()){
 
     		try (Transaction tx = database.beginTx()) {
     			keyValueStore.set(moduleKey(moduleId), Serializer.toByteArray(metadata));
@@ -127,7 +126,7 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
      */
     @Override
     public void removeModuleMetadata(String moduleId) {
-		if (instanceRoleUtils.getInstaceRole().isWritable()) {
+		if (instanceRoleUtils.getInstanceRole().isWritable()) {
 			
 			try (Transaction tx = database.beginTx()) {
 				keyValueStore.remove(moduleKey(moduleId));

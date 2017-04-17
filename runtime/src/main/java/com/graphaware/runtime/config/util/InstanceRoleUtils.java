@@ -69,9 +69,9 @@ public class InstanceRoleUtils {
 	 * Get the role of the instance in the cluster 
 	 * @return SINGLE if no cluster exists
 	 */
-	public InstanceRole getInstaceRole() {
+	public InstanceRole getInstanceRole() {
 		OperationalMode operationalMode = getOperationalMode();
-		InstanceRole res = InstanceRole.SINGLE;
+		InstanceRole res;
 		switch (operationalMode) {
 		case ha:
 			res = getHARole();

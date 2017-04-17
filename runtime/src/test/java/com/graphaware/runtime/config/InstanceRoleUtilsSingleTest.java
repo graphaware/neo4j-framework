@@ -53,13 +53,13 @@ public class InstanceRoleUtilsSingleTest extends EmbeddedDatabaseIntegrationTest
 
 	@Test
 	public void testGetInstaceRole() {
-		InstanceRole role = utils.getInstaceRole();
+		InstanceRole role = utils.getInstanceRole();
 		assertEquals(InstanceRole.SINGLE, role);
 	}
 
 	@Test
 	public void testIsReadOnly() {
-		assertFalse(utils.getInstaceRole().isReadOnly());
+		assertFalse(utils.getInstanceRole().isReadOnly());
 	}
 
 }

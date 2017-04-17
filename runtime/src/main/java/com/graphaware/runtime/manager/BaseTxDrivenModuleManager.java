@@ -18,6 +18,7 @@ package com.graphaware.runtime.manager;
 
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.ping.StatsCollector;
+import com.graphaware.runtime.config.util.InstanceRoleUtils;
 import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
@@ -39,13 +40,18 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
 
     private static final Log LOG = LoggerFactory.getLogger(BaseTxDrivenModuleManager.class);
 
+    private final InstanceRoleUtils instanceRoleUtils;
+
     /**
      * Construct a new manager.
      *
      * @param metadataRepository repository for storing module metadata.
+     * @param statsCollector     stats collector.
+     * @param instanceRoleUtils  instance role utils.
      */
-    protected BaseTxDrivenModuleManager(ModuleMetadataRepository metadataRepository, StatsCollector statsCollector) {
+    protected BaseTxDrivenModuleManager(ModuleMetadataRepository metadataRepository, StatsCollector statsCollector, InstanceRoleUtils instanceRoleUtils) {
         super(metadataRepository, statsCollector);
+        this.instanceRoleUtils = instanceRoleUtils;
     }
 
     /**
@@ -130,6 +136,11 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
     }
 
     private boolean allowedToInitialize(T module, String logMessage) {
+        if (instanceRoleUtils.getInstanceRole().isReadOnly()) {
+            LOG.info("Instance not writable. Will NOT " + logMessage + ".");
+            return false;
+        }
+
         long initUntil = module.getConfiguration().initializeUntil();
         long now = System.currentTimeMillis();
 

@@ -17,6 +17,7 @@
 package com.graphaware.runtime.manager;
 
 import com.graphaware.common.ping.StatsCollector;
+import com.graphaware.runtime.config.util.InstanceRoleUtils;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.runtime.module.TxDrivenModule;
@@ -36,7 +37,7 @@ public class ProductionTxDrivenModuleManager extends BaseTxDrivenModuleManager<T
      * @param metadataRepository for storing module metadata.
      */
     public ProductionTxDrivenModuleManager(GraphDatabaseService database, ModuleMetadataRepository metadataRepository, StatsCollector statsCollector) {
-        super(metadataRepository, statsCollector);
+        super(metadataRepository, statsCollector, new InstanceRoleUtils(database));
         this.database = database;
     }
 
