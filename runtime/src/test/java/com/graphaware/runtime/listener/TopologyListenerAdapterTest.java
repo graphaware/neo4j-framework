@@ -69,7 +69,11 @@ public class TopologyListenerAdapterTest extends HighAvailabilityClusterDatabase
         adapter.removeListener(listener);
         assertEquals(0, adapter.topologyChangeEventListeners.size());
 
-        adapter.joinedCluster(instanceId, null);
+        adapter.fireEvent(new TopologyListener.TopologyChangeEventImpl(
+                instanceId.toString(),
+                instanceId.toString(),
+                InstanceRole.MASTER,
+                TopologyChangeEvent.EventType.CLUSTER_JOIN));
     }
 
     @Test
@@ -81,7 +85,11 @@ public class TopologyListenerAdapterTest extends HighAvailabilityClusterDatabase
         });
 
         // fire fake event
-        adapter.joinedCluster(instanceId, null);
+        adapter.fireEvent(new TopologyListener.TopologyChangeEventImpl(
+                instanceId.toString(),
+                instanceId.toString(),
+                InstanceRole.MASTER,
+                TopologyChangeEvent.EventType.CLUSTER_JOIN));
     }
 
     @Test
@@ -93,7 +101,11 @@ public class TopologyListenerAdapterTest extends HighAvailabilityClusterDatabase
         });
 
         // fire fake event
-        adapter.leftCluster(instanceId, null);
+        adapter.fireEvent(new TopologyListener.TopologyChangeEventImpl(
+                instanceId.toString(),
+                instanceId.toString(),
+                InstanceRole.SLAVE,
+                TopologyChangeEvent.EventType.CLUSTER_LEAVE));
     }
 
     @Test
@@ -106,6 +118,10 @@ public class TopologyListenerAdapterTest extends HighAvailabilityClusterDatabase
         });
 
         // fire fake event
-        adapter.elected("elected", instanceId, null);
+        adapter.fireEvent(new TopologyListener.TopologyChangeEventImpl(
+                instanceId.toString(),
+                instanceId.toString(),
+                InstanceRole.MASTER,
+                TopologyChangeEvent.EventType.ELECTION));
     }
 }
