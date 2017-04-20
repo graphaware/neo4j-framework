@@ -45,8 +45,8 @@ public abstract class HighAvailabilityClusterDatabasesIntegrationTest extends Cl
 
 		params.put(ClusterSettings.server_id.name(), String.valueOf(i));
 		params.put(HaSettings.ha_server.name(), "localhost:600" + i);// "ha.host.data"
-		params.put(ClusterSettings.cluster_server.name(), "localhost:500" + i);// "ha.host.coordination"
-		params.put(ClusterSettings.initial_hosts.name(), buildDiscoveryAddresses(5000, getTopology().size()));// ha.initial_hosts
+		params.put(ClusterSettings.cluster_server.name(), "localhost:510" + i);// "ha.host.coordination"
+		params.put(ClusterSettings.initial_hosts.name(), buildDiscoveryAddresses(5100, getTopology().size()));// ha.initial_hosts
 
 		return params;
 	}
