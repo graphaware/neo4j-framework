@@ -1,4 +1,7 @@
 3.1.3.47:
+    - topology change listeners (enterprise only)
+
+3.1.3.47:
     -critical bugfix for Causal Clusters (modules trying to initialize in FOLLOWERS)
 
 3.1.3.46:
