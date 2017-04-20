@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime;
 
+import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.listener.TopologyChangeEventListener;
 import com.graphaware.runtime.listener.TopologyListenerAdapter;
@@ -25,6 +26,7 @@ import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.writer.neo4j.Neo4jWriter;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
+import org.neo4j.logging.Log;
 
 
 /**
@@ -35,6 +37,8 @@ import org.neo4j.kernel.internal.GraphDatabaseAPI;
  * To use this {@link com.graphaware.runtime.GraphAwareRuntime}, please construct it using {@link com.graphaware.runtime.GraphAwareRuntimeFactory}.
  */
 public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
+
+    private static final Log LOG = LoggerFactory.getLogger(DatabaseRuntime.class);
 
     private final GraphDatabaseService database;
     private final TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager;
@@ -59,7 +63,11 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
 
         // Register to topology change events
         // In Community Edition this raises a ClassNotFoundException
-        this.topologyListenerAdapter = new TopologyListenerAdapter((GraphDatabaseAPI) database);
+        try {
+            this.topologyListenerAdapter = new TopologyListenerAdapter((GraphDatabaseAPI) database);
+        } catch (Exception exception) {
+            LOG.warn("Topology change adapter is not available on community edition");
+        }
     }
 
 
