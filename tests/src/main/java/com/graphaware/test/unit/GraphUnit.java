@@ -111,6 +111,64 @@ public final class GraphUnit {
     }
 
     /**
+     * Compare that the graph in the given database is exactly the same as the graph that would be created by the given
+     * Cypher query. It is transaction-safe method, it can be used in stored procedures, without making the TopLevelTransaction failed.
+     * The only thing that can be different in those two graphs are IDs of nodes and relationships.
+     * Properties values are converted to {@link String} before comparison, which means 123L (long) is equal to 123 (int),
+     * but also "123" (String) is considered equal to 123 (int).
+     *
+     * @param database        first graph, typically the one that has been created by some code that is being tested by this
+     *                        method.
+     * @param sameGraphCypher second graph expressed as a Cypher create statement, which communicates the desired state
+     *                        of the database (first parameter) iff the code that created it is correct.
+     * @return boolean value true in case the graphs are the same, false otherwise
+     */
+    public boolean areSameGraph(GraphDatabaseService database, String sameGraphCypher) {
+        return areSameGraph(database, sameGraphCypher, InclusionPolicies.all());
+    }
+
+    /**
+     * Compare that the graph in the given database is exactly the same as the graph that would be created by the given
+     * Cypher query. It is transaction-safe method, it can be used in stored procedures, without making the TopLevelTransaction failed.
+     * The only thing that can be different in those two graphs are IDs of nodes and relationships
+     * and nodes/relationships/properties explicitly excluded from comparisons by provided inclusionPolicies.
+     * Properties values are converted to {@link String} before comparison, which means 123L (long) is equal to 123 (int),
+     * but also "123" (String) is considered equal to 123 (int).
+     *
+     * @param database        first graph, typically the one that has been created by some code that is being tested by this
+     *                        method.
+     * @param sameGraphCypher second graph expressed as a Cypher create statement, which communicates the desired state
+     *                        of the database (first parameter) iff the code that created it is correct.
+     * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships/properties in the comparisons.
+     * @return boolean value true in case the graphs are the same, false otherwise
+     */
+    public static boolean areSameGraph(GraphDatabaseService database, String sameGraphCypher, InclusionPolicies inclusionPolicies) {
+        if (database == null) {
+            throw new IllegalArgumentException("Database must not be null");
+        }
+
+        if (sameGraphCypher == null || sameGraphCypher.trim().isEmpty()) {
+            return isEmpty(database, inclusionPolicies);
+        }
+
+        GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig("online_backup_enabled", FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+                .newGraphDatabase();
+
+        registerShutdownHook(otherDatabase);
+
+        otherDatabase.execute(sameGraphCypher);
+
+        try {
+            return areSameGraph(database, otherDatabase, inclusionPolicies);
+        } finally {
+            otherDatabase.shutdown();
+        }
+    }
+
+    /**
      * Assert that the graph that would be created by the given Cypher query is a subgraph of the graph in the given
      * database. This means that every node and every relationship in the (Cypher) subgraph must be present in the
      * (database) graph.
@@ -182,6 +240,79 @@ public final class GraphUnit {
     }
 
     /**
+     * Check that the graph that would be created by the given Cypher query is a subgraph of the graph in the given
+     * database. This means that every node and every relationship in the (Cypher) subgraph must be present in the
+     * (database) graph. It is transaction-safe method, it can be used in stored procedures, without making the
+     * TopLevelTransaction failed.
+     * <p/>
+     * Nodes are considered equal if they have the exact same labels and properties. Relationships
+     * are considered equal if they have the same type and properties. IDs of nodes and relationships are not taken
+     * into account.  Properties are included for comparison based on the InclusionPolicies.
+     * Properties values are converted to {@link String} before comparison, which means 123L (long) is
+     * equal to 123 (int), but also "123" (String) is considered equal to 123 (int).
+     * <p/>
+     * This method is useful for testing that some portion of a graph has been created correctly without the need to
+     * express the entire graph structure in Cypher.
+     *
+     * @param database       first graph, typically the one that has been created by some code that is being tested by
+     *                       this method.
+     * @param subgraphCypher second graph expressed as a Cypher create statement, which communicates the desired state
+     *                       of the database (first parameter) iff the code that created it is correct.
+     * @return boolean value true in case the "cypher" graph is a subgraph of the "database" graph, false otherwise.
+     */
+    public static boolean isSubgraph(GraphDatabaseService database, String subgraphCypher) {
+        return isSubgraph(database, subgraphCypher, InclusionPolicies.all());
+    }
+
+    /**
+     * Check that the graph that would be created by the given Cypher query is a subgraph of the graph in the given
+     * database. This means that every node and every relationship in the (Cypher) subgraph included as specified by
+     * the inclusionPolicies must be present in the (database) graph. It is transaction-safe method, it can be used
+     * in stored procedures, without making the TopLevelTransaction failed.
+     * <p/>
+     * Nodes are considered equal if they have the exact same labels and properties. Relationships
+     * are considered equal if they have the same type and properties. IDs of nodes and relationships are not taken
+     * into account.  Properties are included for comparison based on the InclusionPolicies.
+     * Properties values are converted to {@link String} before comparison, which means 123L (long) is
+     * equal to 123 (int), but also "123" (String) is considered equal to 123 (int).
+     * <p/>
+     * This method is useful for testing that some portion of a graph has been created correctly without the need to
+     * express the entire graph structure in Cypher.
+     *
+     * @param database       first graph, typically the one that has been created by some code that is being tested by
+     *                       this method.
+     * @param subgraphCypher second graph expressed as a Cypher create statement, which communicates the desired state
+     *                       of the database (first parameter) iff the code that created it is correct.
+     * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships/properties or not.
+     * @return boolean value true in case the "cypher" graph is a subgraph of the "database" graph, false otherwise.
+     */
+    public static boolean isSubgraph(GraphDatabaseService database, String subgraphCypher, InclusionPolicies inclusionPolicies) {
+        if (database == null) {
+            throw new IllegalArgumentException("Database must not be null");
+        }
+
+        if (subgraphCypher == null || subgraphCypher.trim().isEmpty()) {
+            throw new IllegalArgumentException("Cypher statement must not be null or empty");
+        }
+
+        GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder()
+                .setConfig("online_backup_enabled", FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+                .newGraphDatabase();
+
+        registerShutdownHook(otherDatabase);
+
+        otherDatabase.execute(subgraphCypher);
+
+        try {
+            return isSubgraph(database, otherDatabase, inclusionPolicies);
+        } finally {
+            otherDatabase.shutdown();
+        }
+    }
+
+    /**
      * Assert that the database is empty.
      *
      * @param database to run the assertion against.
@@ -216,6 +347,42 @@ public final class GraphUnit {
 
             tx.success();
         }
+    }
+
+    /**
+     * Check that the database is empty.
+     *
+     * @param database          to run the assertion against.
+     * @return boolean true if the database is empty, false otherwise.
+     */
+    public static boolean isEmpty(GraphDatabaseService database) {
+        return isEmpty(database, InclusionPolicies.all());
+    }
+
+    /**
+     * Check that the database is empty.
+     *
+     * @param database          to run the assertion against.
+     * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships/properties or not in the assertion.
+     * @return boolean true if the database is empty, false otherwise.
+     */
+    public static boolean isEmpty(GraphDatabaseService database, InclusionPolicies inclusionPolicies) {
+        if (database == null) {
+            throw new IllegalArgumentException("Database must not be null");
+        }
+        for (Node node : database.getAllNodes()) {
+            if (inclusionPolicies.getNodeInclusionPolicy().include(node)) {
+                return false;
+            }
+        }
+
+        for (Relationship relationship : database.getAllRelationships()) {
+            if (inclusionPolicies.getRelationshipInclusionPolicy().include(relationship)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -349,6 +516,40 @@ public final class GraphUnit {
             tx.failure();
         }
     }
+
+    private static boolean areSameGraph(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies InclusionPolicies) {
+        try (Transaction tx = database.beginTx()) {
+            try (Transaction tx2 = otherDatabase.beginTx()) {
+                try {
+                    doAssertSubgraph(database, otherDatabase, InclusionPolicies, "existing database");
+                    doAssertSubgraph(otherDatabase, database, InclusionPolicies, "Cypher-created database");
+                } catch (AssertionError error) {
+                    return false;
+                }finally {
+                    tx2.success();
+                    tx.success();
+                }
+            }
+        }
+        return true;
+    }
+
+    private static boolean isSubgraph(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies InclusionPolicies) {
+        try (Transaction tx = database.beginTx()) {
+            try (Transaction tx2 = otherDatabase.beginTx()) {
+                try {
+                    doAssertSubgraph(database, otherDatabase, InclusionPolicies, "existing database");
+                } catch (AssertionError error) {
+                    return false;
+                } finally {
+                    tx2.success();
+                    tx.success();
+                }
+            }
+        }
+        return true;
+    }
+
 
     private static void assertSubgraph(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies InclusionPolicies) {
         try (Transaction tx = database.beginTx()) {
