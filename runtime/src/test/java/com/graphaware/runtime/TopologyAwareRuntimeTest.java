@@ -76,7 +76,7 @@ public class TopologyAwareRuntimeTest extends HighAvailabilityClusterDatabasesIn
     }
 
     @Override
-    public void registerModule(GraphDatabaseService db) throws Exception {
+    public void registerModules(GraphDatabaseService db) throws Exception {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(db);
         runtime.registerModule(new TopologyAwareModule());
     }

@@ -15,6 +15,8 @@
  */
 package com.graphaware.test.integration.cluster;
 
+import static com.graphaware.test.integration.ClassPathProcedureUtils.proceduresAndFunctionsOnClassPath;
+import static com.graphaware.test.integration.ClassPathProcedureUtils.registerAllProceduresAndFunctions;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -50,228 +52,215 @@ import com.graphaware.test.data.DatabasePopulator;
  */
 public abstract class ClusterDatabasesIntegrationTest {
 
-	private static final String CONF_PATH = "/com/graphaware/test/integration/neo4j.conf";
+    private static final String CONF_PATH = "/com/graphaware/test/integration/neo4j.conf";
 
-	private static final String TMP_PATH_PREFIX = "neo4j-test-cluster-";
-	
-	protected final Log LOG = LoggerFactory.getLogger(ClusterDatabasesIntegrationTest.class);
+    private static final String TMP_PATH_PREFIX = "neo4j-test-cluster-";
 
-	/**
-	 * All the instances that will be available for tests. We should consider 3
-	 * main use cases:
-	 * <ul>
-	 * <li>single instance</li>
-	 * <li>high availability topology (at least two instances: master + slave)
-	 * </li>
-	 * <li>causal cluster topology (at least three cores 1 leader + 2 followers
-	 * and one read replica)</li>
-	 * </ul>
-	 */
-	private static List<GraphDatabaseService> databases;
+    protected final Log LOG = LoggerFactory.getLogger(ClusterDatabasesIntegrationTest.class);
 
-	/**
-	 * Load the cluster's instances just one time
-	 * @throws Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-		if (databases == null) {
+    /**
+     * All the instances that will be available for tests. We should consider 3
+     * main use cases:
+     * <ul>
+     * <li>single instance</li>
+     * <li>high availability topology (at least two instances: master + slave)
+     * </li>
+     * <li>causal cluster topology (at least three cores 1 leader + 2 followers
+     * and one read replica)</li>
+     * </ul>
+     */
+    private static List<GraphDatabaseService> databases;
 
-			databases = createDatabases();
+    /**
+     * Load the cluster's instances just one time
+     *
+     * @throws Exception
+     */
+    @Before
+    public void setUp() throws Exception {
+        if (databases == null) {
 
-			for (GraphDatabaseService database : databases) {
-				
-				if (shouldRegisterProcedures()) {
-					registerProcedures(((GraphDatabaseFacade) database).getDependencyResolver()
-							.resolveDependency(Procedures.class));
-				}
-				
-				if(shouldRegisterModules()){
-					registerModule(database);
-				}
-			}
+            databases = createDatabases();
 
-			populateDatabases();
-		}
-	}
+            for (GraphDatabaseService database : databases) {
 
-	@AfterClass
-	public static void tearDown() throws Exception {
-		databases.forEach(GraphDatabaseService::shutdown);
-		databases = null;
-	}
+                if (shouldRegisterProceduresAndFunctions()) {
+                    registerAllProceduresAndFunctions(database);
+                }
+
+                if (shouldRegisterModules()) {
+                    registerModules(database);
+                }
+            }
+
+            populateDatabases();
+        }
+    }
+
+    @AfterClass
+    public static void tearDown() throws Exception {
+        databases.forEach(GraphDatabaseService::shutdown);
+        databases = null;
+    }
 
 
-	protected abstract List<Class<?>> getTopology();
+    protected abstract List<Class<?>> getTopology();
 
-	
-	private final GraphDatabaseService createDatabase(int i, Class<?> instanceClass) throws Exception {
 
-		GraphDatabaseFacadeFactory.Dependencies dependencies = new GraphDatabaseFactoryState().databaseDependencies();
-		dependencies = GraphDatabaseDependencies.newDependencies(dependencies);
+    private final GraphDatabaseService createDatabase(int i, Class<?> instanceClass) throws Exception {
 
-		Properties properties = new Properties();
-		properties.load(new ClassPathResource(configFile()).getInputStream());
+        GraphDatabaseFacadeFactory.Dependencies dependencies = new GraphDatabaseFactoryState().databaseDependencies();
+        dependencies = GraphDatabaseDependencies.newDependencies(dependencies);
 
-		Map<String, String> params = new HashMap<>();
-		for (final String propertyName : properties.stringPropertyNames()) {
-			params.put(propertyName, properties.getProperty(propertyName));
-		}
+        Properties properties = new Properties();
+        properties.load(new ClassPathResource(configFile()).getInputStream());
 
-		params.putAll(addictionalParams(i, instanceClass));
+        Map<String, String> params = new HashMap<>();
+        for (final String propertyName : properties.stringPropertyNames()) {
+            params.put(propertyName, properties.getProperty(propertyName));
+        }
 
-		File storeDir = Files.createTempDirectory(TMP_PATH_PREFIX + i).toFile();
-		storeDir.deleteOnExit(); // it doesn't work very well
+        params.putAll(addictionalParams(i, instanceClass));
 
-		GraphDatabaseService database = (GraphDatabaseService) instanceClass
-				.getConstructor(File.class, Map.class, GraphDatabaseFacadeFactory.Dependencies.class)
-				.newInstance(storeDir, params, dependencies);
-		
-		LOG.info("An instance of class " + instanceClass.getSimpleName() + " has been created");
-		// Too verbose, we leave it at debug level
-		LOG.debug("Configuration parameters: " + params);
+        File storeDir = Files.createTempDirectory(TMP_PATH_PREFIX + i).toFile();
+        storeDir.deleteOnExit(); // it doesn't work very well
 
-		return database;
-	}
+        GraphDatabaseService database = (GraphDatabaseService) instanceClass
+                .getConstructor(File.class, Map.class, GraphDatabaseFacadeFactory.Dependencies.class)
+                .newInstance(storeDir, params, dependencies);
 
-	/**
-	 * Build the initial/discovery addresses for the instance configuration
-	 * @param startPort 
-	 * @param clusterSize
-	 * @return
-	 */
-	protected String buildDiscoveryAddresses(int startPort, int clusterSize) {
-		return IntStream.range(startPort, startPort + clusterSize).mapToObj(p -> "localhost:" + p)
-				.collect(Collectors.joining(","));
-	}
-	
-	/**
-	 * Add the specific configuration for the cluster type
-	 * 
-	 * @param i
-	 *            index of instance in the cluster
-	 * @param instanceClass the type of instance 
-	 * @param clusterSize
-	 *            the number of instances in the cluster
-	 * @return
-	 */
-	protected abstract Map<String, String> addictionalParams(int i, Class<?> instanceClass);
+        LOG.info("An instance of class " + instanceClass.getSimpleName() + " has been created");
+        // Too verbose, we leave it at debug level
+        LOG.debug("Configuration parameters: " + params);
 
-	/**
-	 * Create a database.
-	 *
-	 * @return database.
-	 * @throws Exception
-	 */
-	protected List<GraphDatabaseService> createDatabases() throws Exception {
-		List<Class<?>> topology = getTopology();
-		assertNotNull(topology);
-		assertTrue(topology.size() > 0);
+        return database;
+    }
 
-		ExecutorService exec = Executors.newFixedThreadPool(topology.size());
-		List<Future<GraphDatabaseService>> futures = new ArrayList<>(topology.size());
+    /**
+     * Build the initial/discovery addresses for the instance configuration
+     *
+     * @param startPort
+     * @param clusterSize
+     * @return
+     */
+    protected String buildDiscoveryAddresses(int startPort, int clusterSize) {
+        return IntStream.range(startPort, startPort + clusterSize).mapToObj(p -> "localhost:" + p)
+                .collect(Collectors.joining(","));
+    }
 
-		int i = 0;
-		for (Class<?> instanceClass : topology) {
-			final int j = i;
-			Future<GraphDatabaseService> f = exec.submit(() -> {
-				return createDatabase(j, instanceClass);
-			});
-			futures.add(f);
-			i++;
-		}
+    /**
+     * Add the specific configuration for the cluster type
+     *
+     * @param i             index of instance in the cluster
+     * @param instanceClass the type of instance
+     * @param clusterSize   the number of instances in the cluster
+     * @return
+     */
+    protected abstract Map<String, String> addictionalParams(int i, Class<?> instanceClass);
 
-		List<GraphDatabaseService>  dbs = new ArrayList<>();
+    /**
+     * Create a database.
+     *
+     * @return database.
+     * @throws Exception
+     */
+    protected List<GraphDatabaseService> createDatabases() throws Exception {
+        List<Class<?>> topology = getTopology();
+        assertNotNull(topology);
+        assertTrue(topology.size() > 0);
 
-		for (Future<GraphDatabaseService> f : futures) {
-			dbs.add(f.get());
-		}
+        ExecutorService exec = Executors.newFixedThreadPool(topology.size());
+        List<Future<GraphDatabaseService>> futures = new ArrayList<>(topology.size());
 
-		return dbs;
-	}
+        int i = 0;
+        for (Class<?> instanceClass : topology) {
+            final int j = i;
+            Future<GraphDatabaseService> f = exec.submit(() -> {
+                return createDatabase(j, instanceClass);
+            });
+            futures.add(f);
+            i++;
+        }
 
-	/**
-	 * Returns the principal instance of cluster (writable)
-	 * @return
-	 */
-	protected GraphDatabaseService getMainDatabase(){
-		return databases.get(0);
-	}
-	
-	/**
-	 * Populate all the databases. Can be overridden. By default, it populates
-	 * all the databases using {@link #databasePopulator()}.
-	 *
-	 * @param database
-	 *            to populate.
-	 */
-	protected void populateDatabases() {
-		DatabasePopulator populator = databasePopulator();
-		if (populator != null) {
-			populator.populate(getMainDatabase());
-		}
-	}
+        List<GraphDatabaseService> dbs = new ArrayList<>();
 
-	/**
-	 * Get the name of config file used to configure the database.
-	 *
-	 * @return config file, <code>null</code> for none.
-	 */
-	protected String configFile() {
-		return CONF_PATH;
-	}
+        for (Future<GraphDatabaseService> f : futures) {
+            dbs.add(f.get());
+        }
 
-	/**
-	 * @return <code>iff</code> the {@link #registerProcedures(Procedures)}
-	 *         method should be called during {@link #setUp()}.
-	 */
-	protected boolean shouldRegisterProcedures() {
-		return false;
-	}
+        return dbs;
+    }
 
-	/**
-	 * @return <code>iff</code> the {@link #registerModule(GraphDatabaseService)}
-	 *         method should be called during {@link #setUp()}.
-	 */
-	protected boolean shouldRegisterModules() {
-		return false;
-	}
-	
-	/**
-	 * Register procedures.
-	 *
-	 * @param procedures
-	 *            to register against.
-	 */
-	protected void registerProcedures(Procedures procedures) throws Exception {
-		// no-op by default
-	}
+    /**
+     * Returns the principal instance of cluster (writable)
+     *
+     * @return
+     */
+    protected GraphDatabaseService getMainDatabase() {
+        return databases.get(0);
+    }
 
-	/**
-	 * Register modules or what you want into database.
-	 *
-	 * @param procedures
-	 *            to register against.
-	 */
-	protected void registerModule(GraphDatabaseService db) throws Exception {
-		// no-op by default
-	}
-	
-	/**
-	 * @return {@link com.graphaware.test.data.DatabasePopulator},
-	 *         <code>null</code> (no population) by default.
-	 */
-	protected DatabasePopulator databasePopulator() {
-		return null;
-	}
+    /**
+     * Populate all the databases. Can be overridden. By default, it populates
+     * all the databases using {@link #databasePopulator()}.
+     *
+     * @param database to populate.
+     */
+    protected void populateDatabases() {
+        DatabasePopulator populator = databasePopulator();
+        if (populator != null) {
+            populator.populate(getMainDatabase());
+        }
+    }
 
-	/**
-	 * Get the database instantiated for this test.
-	 *
-	 * @return database.
-	 */
-	protected List<GraphDatabaseService> getDatabases() {
-		return databases;
-	}
+    /**
+     * Get the name of config file used to configure the database.
+     *
+     * @return config file, <code>null</code> for none.
+     */
+    protected String configFile() {
+        return CONF_PATH;
+    }
+
+    /**
+     * @return <code>true</code> iff all procedures and functions should be registered during {@link #setUp()}.
+     */
+    protected boolean shouldRegisterProceduresAndFunctions() {
+        return false;
+    }
+
+    /**
+     * @return <code>iff</code> the {@link #registerModules(GraphDatabaseService)}
+     * method should be called during {@link #setUp()}.
+     */
+    protected boolean shouldRegisterModules() {
+        return false;
+    }
+
+    /**
+     * Register modules or what you want into database.
+     *
+     * @param db to register against.
+     */
+    protected void registerModules(GraphDatabaseService db) throws Exception {
+        // no-op by default
+    }
+
+    /**
+     * @return {@link com.graphaware.test.data.DatabasePopulator},
+     * <code>null</code> (no population) by default.
+     */
+    protected DatabasePopulator databasePopulator() {
+        return null;
+    }
+
+    /**
+     * Get the database instantiated for this test.
+     *
+     * @return database.
+     */
+    protected List<GraphDatabaseService> getDatabases() {
+        return databases;
+    }
 
 }
