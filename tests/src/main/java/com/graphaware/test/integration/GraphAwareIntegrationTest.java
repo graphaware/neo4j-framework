@@ -17,15 +17,14 @@
 package com.graphaware.test.integration;
 
 import org.apache.commons.io.FileUtils;
-import org.neo4j.kernel.api.exceptions.KernelException;
 import org.neo4j.kernel.impl.proc.Procedures;
 import org.neo4j.procedure.Procedure;
+import org.neo4j.procedure.UserFunction;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
@@ -45,7 +44,7 @@ import java.util.*;
  * <p>
  * Also works around the issue that Neo4j only registers procedures that it finds in .jar files (not .class) files, so
  * this class by default registers all {@link Procedure}s that are part of the current project (are on classpath). You
- * can disable this behaviour by overridding {@link #shouldRegisterProcedures()}.
+ * can disable this behaviour by overridding {@link #shouldRegisterProceduresAndFunctions()}.
  */
 public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
 
@@ -53,11 +52,12 @@ public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
      * {@inheritDoc}
      */
     @Override
-    protected void registerProcedures(Procedures procedures) throws Exception {
-        super.registerProcedures(procedures);
+    protected void registerProceduresAndFunctions(Procedures procedures) throws Exception {
+        super.registerProceduresAndFunctions(procedures);
 
-        for (Class cls : proceduresOnClassPath()) {
+        for (Class cls : proceduresAndFunctionsOnClassPath()) {
             procedures.registerProcedure(cls);
+            procedures.registerFunction(cls);
         }
     }
 
@@ -71,11 +71,11 @@ public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
     }
 
     /**
-     * Find all classes on classpath (only .class files) that have a method annotated with {@link Procedure}.
+     * Find all classes on classpath (only .class files) that have a method annotated with {@link Procedure} or {@link org.neo4j.procedure.UserFunction}.
      *
      * @return classes with procedures.
      */
-    protected final Iterable<Class> proceduresOnClassPath() {
+    protected final Iterable<Class> proceduresAndFunctionsOnClassPath() {
         Enumeration<URL> urls;
 
         try {
@@ -107,7 +107,7 @@ public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
                     Class<?> candidate = Class.forName(path.substring(directory.getAbsolutePath().length() + 1, path.length() - 6).replaceAll("\\/", "."));
 
                     for (Method m : candidate.getDeclaredMethods()) {
-                        if (m.isAnnotationPresent(Procedure.class)) {
+                        if (m.isAnnotationPresent(Procedure.class) || m.isAnnotationPresent(UserFunction.class)) {
                             classes.add(candidate);
                         }
                     }

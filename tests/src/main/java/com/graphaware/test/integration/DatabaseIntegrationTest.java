@@ -41,8 +41,8 @@ public abstract class DatabaseIntegrationTest {
         database = createDatabase();
         populateDatabase(database);
 
-        if (shouldRegisterProcedures()) {
-            registerProcedures(((GraphDatabaseFacade) database).getDependencyResolver().resolveDependency(Procedures.class));
+        if (shouldRegisterProceduresAndFunctions()) {
+            registerProceduresAndFunctions(((GraphDatabaseFacade) database).getDependencyResolver().resolveDependency(Procedures.class));
         }
     }
 
@@ -80,18 +80,18 @@ public abstract class DatabaseIntegrationTest {
     }
 
     /**
-     * @return <code>iff</code> the {@link #registerProcedures(Procedures)} method should be called during {@link #setUp()}.
+     * @return <code>iff</code> the {@link #registerProceduresAndFunctions(Procedures)} method should be called during {@link #setUp()}.
      */
-    protected boolean shouldRegisterProcedures() {
+    protected boolean shouldRegisterProceduresAndFunctions() {
         return true;
     }
 
     /**
-     * Register procedures.
+     * Register procedures and functions.
      *
      * @param procedures to register against.
      */
-    protected void registerProcedures(Procedures procedures) throws Exception {
+    protected void registerProceduresAndFunctions(Procedures procedures) throws Exception {
         //no-op by default
     }
 
