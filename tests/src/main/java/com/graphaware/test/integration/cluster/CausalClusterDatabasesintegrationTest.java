@@ -71,9 +71,9 @@ public abstract class CausalClusterDatabasesintegrationTest extends ClusterDatab
 		if (instanceClass.equals(CoreGraphDatabase.class)) {
 			params.put(CausalClusteringSettings.expected_core_cluster_size.name(), String.valueOf(coreClusterSize));
 
-			params.put(CausalClusteringSettings.discovery_listen_address.name(), "localhost:510" + i);
-			params.put(CausalClusteringSettings.transaction_listen_address.name(), "localhost:600" + i);
-			params.put(CausalClusteringSettings.raft_listen_address.name(), "localhost:700" + i);
+			params.put(CausalClusteringSettings.discovery_listen_address.name(), "127.0.0.1:510" + i);
+			params.put(CausalClusteringSettings.transaction_listen_address.name(), "127.0.0.1:600" + i);
+			params.put(CausalClusteringSettings.raft_listen_address.name(), "127.0.0.1:700" + i);
 		}
 
 		return params;
