@@ -38,6 +38,7 @@ public class CommunityTxParticipationIntegrationTest extends GraphAwareIntegrati
     }
 
     @Test
+    @Ignore //until resttest is enabled again
     public void moduleApiShouldParticipateInOpenTransaction() throws IOException {
         //First transaction over Cypher transactional rest endpoint, keep open:
         String response = httpClient.post(baseNeoUrl() + "/db/data/transaction", "{\n" +

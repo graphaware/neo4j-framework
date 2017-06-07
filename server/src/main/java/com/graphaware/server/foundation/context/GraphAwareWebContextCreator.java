@@ -18,6 +18,7 @@ package com.graphaware.server.foundation.context;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.neo4j.configuration.ConfigValue;
 import org.neo4j.kernel.configuration.Config;
 import org.neo4j.logging.Log;
 import com.graphaware.common.log.LoggerFactory;
@@ -46,10 +47,10 @@ public class GraphAwareWebContextCreator extends BaseWebContextCreator {
     }
 
     private void configureStatsCollector(AnnotationConfigWebApplicationContext context, Config config) {
-        if (Boolean.valueOf(config.getParams().getOrDefault(GA_API_STATS_DISABLE_SETTING_LEGACY, "false"))) {
+        if (Boolean.valueOf(config.getRaw().getOrDefault(GA_API_STATS_DISABLE_SETTING_LEGACY, "false"))) {
             context.getEnvironment().addActiveProfile("stats-null");
         }
-        else if (Boolean.valueOf(config.getParams().getOrDefault(GA_API_STATS_DISABLE_SETTING, "false"))) {
+        else if (Boolean.valueOf(config.getRaw().getOrDefault(GA_API_STATS_DISABLE_SETTING, "false"))) {
             context.getEnvironment().addActiveProfile("stats-null");
         }
         else {
@@ -58,8 +59,8 @@ public class GraphAwareWebContextCreator extends BaseWebContextCreator {
     }
 
     private String[] getPackagesToScan(Config config) {
-        if (config.getParams().containsKey(GA_API_PACKAGE_SCAN_SETTING)) {
-            String packageExpression = config.getParams().get(GA_API_PACKAGE_SCAN_SETTING);
+        if (config.getRaw().containsKey(GA_API_PACKAGE_SCAN_SETTING)) {
+            String packageExpression = config.getRaw().get(GA_API_PACKAGE_SCAN_SETTING);
             if (StringUtils.isNotBlank(packageExpression)) {
                 LOG.info("Will try to scan the following packages: " + packageExpression);
                 return packageExpression.split(",");

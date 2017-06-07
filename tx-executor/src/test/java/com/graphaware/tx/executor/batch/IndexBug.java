@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 @Ignore
 public class IndexBug {
 
-    private static final int NUMBER_OF_NODES = 132_000;
+    private static final int NUMBER_OF_NODES = 10_000;
     private static final int BATCH_SIZE = 1_000;
     private GraphDatabaseService database;
 
@@ -95,7 +95,8 @@ public class IndexBug {
                 }
 
                 Node next = allNodes.next();
-                next.addLabel(Label.label("SecondLabel"));
+                System.out.println(next.getProperty("test", "nothing"));
+                //next.addLabel(Label.label("SecondLabel"));
             }
             tx.success();
         }

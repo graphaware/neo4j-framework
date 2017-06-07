@@ -28,10 +28,9 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.neo4j.kernel.configuration.Settings;
 import org.neo4j.shell.ShellSettings;
-import org.neo4j.test.RepeatRule;
 import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.test.rule.RepeatRule;
 
 import java.util.Random;
 

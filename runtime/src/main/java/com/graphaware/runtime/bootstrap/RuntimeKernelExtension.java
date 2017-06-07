@@ -150,7 +150,7 @@ public class RuntimeKernelExtension implements Lifecycle {
     private List<Pair<Integer, Pair<String, String>>> findOrderedBootstrappers() {
         List<Pair<Integer, Pair<String, String>>> orderedBootstrappers = new ArrayList<>();
 
-        for (String paramKey : config.getParams().keySet()) {
+        for (String paramKey : config.getConfiguredSettingKeys()) {
             Matcher matcher = MODULE_ENABLED_KEY.matcher(paramKey);
 
             if (matcher.find()) {
@@ -170,9 +170,9 @@ public class RuntimeKernelExtension implements Lifecycle {
         Map<String, String> moduleConfig = new HashMap<>();
 
         String moduleConfigKeyPrefix = MODULE_CONFIG_KEY + "." + moduleId + ".";
-        for (String paramKey : config.getParams().keySet()) {
+        for (String paramKey : config.getConfiguredSettingKeys()) {
             if (paramKey.startsWith(moduleConfigKeyPrefix) || !MODULE_ENABLED_KEY.matcher(paramKey).find()) {
-                moduleConfig.put(paramKey.replace(moduleConfigKeyPrefix, ""), config.getParams().get(paramKey));
+                moduleConfig.put(paramKey.replace(moduleConfigKeyPrefix, ""), config.getRaw(paramKey).get());
             }
         }
 
