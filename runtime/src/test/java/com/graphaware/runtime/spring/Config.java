@@ -16,9 +16,6 @@
 
 package com.graphaware.runtime.spring;
 
-import com.graphaware.module.uuid.UuidConfiguration;
-import com.graphaware.module.uuid.read.DefaultUuidReader;
-import com.graphaware.module.uuid.read.UuidReader;
 import com.graphaware.runtime.RuntimeRegistry;
 import org.junit.rules.TemporaryFolder;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -45,11 +42,11 @@ public class Config {
 
         return database;
     }
-
-    @Bean
-    public UuidReader uuidReader() throws IOException {
-        return new DefaultUuidReader(UuidConfiguration.defaultConfiguration(), graphDatabaseService(temporaryFolder()));
-    }
+//
+//    @Bean
+//    public UuidReader uuidReader() throws IOException {
+//        return new DefaultUuidReader(UuidConfiguration.defaultConfiguration(), graphDatabaseService(temporaryFolder()));
+//    }
 
     @Bean(destroyMethod = "delete")
     public TemporaryFolder temporaryFolder() throws IOException {
