@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>framework-parent</artifactId>
-        <version>3.1.4.50-SNAPSHOT</version>
+        <version>3.2.1.50-SNAPSHOT</version>
         <relativePath>../parent-pom/framework/pom.xml</relativePath>
     </parent>
 
@@ -69,7 +69,7 @@
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>uuid</artifactId>
-            <version>3.1.4.49.14</version>
+            <version>3.2.1.50.14</version>
             <scope>test</scope>
         </dependency>
         <dependency>
