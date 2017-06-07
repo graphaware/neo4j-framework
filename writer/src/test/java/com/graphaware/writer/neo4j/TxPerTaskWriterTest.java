@@ -298,7 +298,7 @@ public class TxPerTaskWriterTest extends EmbeddedDatabaseIntegrationTest {
 
     private void waitABit() {
         try {
-            Thread.sleep(100);
+            Thread.sleep(200);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
