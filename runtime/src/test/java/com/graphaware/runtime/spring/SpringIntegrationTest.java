@@ -26,7 +26,6 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Integration test for Spring.
  */
-@Ignore //until w have a compatible version of UUID
 public class SpringIntegrationTest {
 
     @Test
