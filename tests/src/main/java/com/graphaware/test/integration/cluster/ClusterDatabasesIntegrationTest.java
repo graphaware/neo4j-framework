@@ -15,7 +15,6 @@
  */
 package com.graphaware.test.integration.cluster;
 
-import static com.graphaware.test.integration.ClassPathProcedureUtils.proceduresAndFunctionsOnClassPath;
 import static com.graphaware.test.integration.ClassPathProcedureUtils.registerAllProceduresAndFunctions;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -35,6 +34,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.graphaware.common.log.LoggerFactory;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -45,9 +45,9 @@ import org.neo4j.kernel.impl.factory.GraphDatabaseFacade;
 import org.neo4j.kernel.impl.factory.GraphDatabaseFacadeFactory;
 import org.neo4j.kernel.impl.proc.Procedures;
 import org.neo4j.logging.Log;
+import org.neo4j.logging.LogProvider;
 import org.springframework.core.io.ClassPathResource;
 
-import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.test.data.DatabasePopulator;
 
 /**
@@ -125,20 +125,14 @@ public abstract class ClusterDatabasesIntegrationTest {
 
         params.putAll(addictionalParams(i, instanceClass));
 
-        //localhost -> 127.0.0.1 for Hazelcast
-        Set<Entry<String, String>> entrySet = params.entrySet();
-        for (Entry<String, String> entry : entrySet) {
-			String value = entry.getValue();
-			value = value.replaceAll("localhost", "127.0.0.1");
-			entry.setValue(value);
-		}
-        
+        Config config = Config.embeddedDefaults(params);
+
         File storeDir = Files.createTempDirectory(TMP_PATH_PREFIX + i).toFile();
         storeDir.deleteOnExit(); // it doesn't work very well
         
         GraphDatabaseService database = (GraphDatabaseService) instanceClass
                 .getConstructor(File.class, Config.class, GraphDatabaseFacadeFactory.Dependencies.class)
-                .newInstance(storeDir, Config.empty().augment(params), dependencies);
+                .newInstance(storeDir, config, dependencies);
 
         LOG.info("An instance of class " + instanceClass.getSimpleName() + " has been created");
         // Too verbose, we leave it at debug level

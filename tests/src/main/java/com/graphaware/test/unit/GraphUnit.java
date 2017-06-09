@@ -26,6 +26,7 @@ import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import com.graphaware.common.log.LoggerFactory;
 
+import java.io.File;
 import java.util.*;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
@@ -46,6 +47,7 @@ import static org.neo4j.kernel.configuration.Settings.*;
 public final class GraphUnit {
 
     private static final Log LOG = LoggerFactory.getLogger(GraphUnit.class);
+    private static final File PATH = new File("target/test-data/graphunit-db");
 
     /**
      * Private constructor - this class is a utility and should not be instantiated.
@@ -93,13 +95,7 @@ public final class GraphUnit {
             return;
         }
 
-        GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig("online_backup_enabled", FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
-                .newGraphDatabase();
-
-        registerShutdownHook(otherDatabase);
+        GraphDatabaseService otherDatabase = createTemporaryDb();
 
         otherDatabase.execute(sameGraphCypher);
 
@@ -151,13 +147,7 @@ public final class GraphUnit {
             return isEmpty(database, inclusionPolicies);
         }
 
-        GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig("online_backup_enabled", FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
-                .newGraphDatabase();
-
-        registerShutdownHook(otherDatabase);
+        GraphDatabaseService otherDatabase = createTemporaryDb();
 
         otherDatabase.execute(sameGraphCypher);
 
@@ -222,13 +212,7 @@ public final class GraphUnit {
             throw new IllegalArgumentException("Cypher statement must not be null or empty");
         }
 
-        GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig("online_backup_enabled", FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
-                .newGraphDatabase();
-
-        registerShutdownHook(otherDatabase);
+        GraphDatabaseService otherDatabase = createTemporaryDb();
 
         otherDatabase.execute(subgraphCypher);
 
@@ -295,13 +279,7 @@ public final class GraphUnit {
             throw new IllegalArgumentException("Cypher statement must not be null or empty");
         }
 
-        GraphDatabaseService otherDatabase = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig("online_backup_enabled", FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
-                .newGraphDatabase();
-
-        registerShutdownHook(otherDatabase);
+        GraphDatabaseService otherDatabase = createTemporaryDb();
 
         otherDatabase.execute(subgraphCypher);
 
@@ -591,7 +569,6 @@ public final class GraphUnit {
         return true;
     }
 
-
     private static void assertSubgraph(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies InclusionPolicies) {
         try (Transaction tx = database.beginTx()) {
             try (Transaction tx2 = otherDatabase.beginTx()) {
@@ -601,6 +578,7 @@ public final class GraphUnit {
             tx.failure();
         }
     }
+
 
     private static void doAssertSubgraph(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies inclusionPolicies, String firstDatabaseName) {
         Map<Long, Long[]> sameNodesMap = buildSameNodesMap(database, otherDatabase, inclusionPolicies, firstDatabaseName);
@@ -809,5 +787,17 @@ public final class GraphUnit {
         }
 
         throw new IllegalStateException("Property container is not a Node or Relationship!");
+    }
+
+    private static GraphDatabaseService createTemporaryDb() {
+        GraphDatabaseService result = new TestGraphDatabaseFactory()
+                .newImpermanentDatabaseBuilder(PATH)
+                .setConfig("online_backup_enabled", FALSE)
+                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+                .newGraphDatabase();
+
+        registerShutdownHook(result);
+
+        return result;
     }
 }

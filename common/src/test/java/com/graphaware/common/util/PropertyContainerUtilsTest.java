@@ -134,6 +134,7 @@ public class PropertyContainerUtilsTest {
 
     @Test
     public void shouldDeleteNodeWithAllRelationships() {
+        database.shutdown();
         database = new TestGraphDatabaseFactory().newImpermanentDatabase();
         registerShutdownHook(database);
 

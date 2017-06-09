@@ -45,7 +45,7 @@ public class LabelSnapshotIterator extends PrefetchingIterator<Label> implements
             this.removedLabelsIterator = transactionDataContainer.getNodeTransactionData().labelsOfDeletedNode(node).iterator();
         }
         else {
-            this.removedLabelsIterator = Iterators.emptyIterator();
+            this.removedLabelsIterator = Iterators.emptyResourceIterator();
         }
     }
 

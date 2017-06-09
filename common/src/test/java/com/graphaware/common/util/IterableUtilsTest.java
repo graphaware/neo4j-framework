@@ -108,9 +108,6 @@ public class IterableUtilsTest {
 
     @Test
     public void testRandom() {
-        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-
         try (Transaction tx = database.beginTx()) {
             database.createNode();
             tx.success();

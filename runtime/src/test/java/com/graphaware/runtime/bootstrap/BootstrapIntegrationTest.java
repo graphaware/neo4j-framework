@@ -17,6 +17,7 @@
 package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.runtime.RuntimeRegistry;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.backup.OnlineBackupSettings;
@@ -211,6 +212,8 @@ public class BootstrapIntegrationTest {
         assertEquals("test1", TEST_RUNTIME_MODULES.get(0).getId());
         assertEquals("test2", TEST_RUNTIME_MODULES.get(1).getId());
         assertEquals("test3", TEST_RUNTIME_MODULES.get(2).getId());
+
+        database.shutdown();
     }
 
     @Test
@@ -234,6 +237,8 @@ public class BootstrapIntegrationTest {
         assertTrue(remaining.remove(TEST_RUNTIME_MODULES.get(1).getId()));
         assertTrue(remaining.remove(TEST_RUNTIME_MODULES.get(2).getId()));
         assertTrue(remaining.isEmpty());
+
+        database.shutdown();
     }
 
     private GraphDatabaseBuilder builder() {

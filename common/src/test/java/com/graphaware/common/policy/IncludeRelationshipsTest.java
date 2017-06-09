@@ -81,5 +81,7 @@ public class IncludeRelationshipsTest {
 
             tx.success();
         }
+
+        database.shutdown();
     }
 }

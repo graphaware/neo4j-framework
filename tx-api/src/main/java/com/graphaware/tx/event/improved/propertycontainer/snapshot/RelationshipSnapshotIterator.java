@@ -40,7 +40,7 @@ public class RelationshipSnapshotIterator extends PrefetchingIterator<Relationsh
         this.deletedRelationshipIterator = transactionDataContainer.getRelationshipTransactionData().getDeleted(node, direction, relationshipTypes).iterator();
 
         if (transactionDataContainer.getNodeTransactionData().hasBeenDeleted(node)) {
-            this.wrappedIterator = Iterators.emptyIterator();
+            this.wrappedIterator = Iterators.emptyResourceIterator();
         } else {
             this.wrappedIterator = wrappedIterable.iterator();
         }

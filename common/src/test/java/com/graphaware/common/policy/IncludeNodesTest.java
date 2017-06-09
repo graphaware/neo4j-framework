@@ -67,5 +67,7 @@ public class IncludeNodesTest {
 
             tx.success();
         }
+
+        database.shutdown();
     }
 }
