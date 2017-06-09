@@ -17,6 +17,7 @@
 package com.graphaware.server.foundation.bootstrap;
 
 import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
+import com.graphaware.common.ping.NullStatsCollector;
 import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.server.foundation.context.FoundationRootContextCreator;
 import com.graphaware.server.foundation.context.GraphAwareWebContextCreator;
@@ -32,6 +33,7 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ArrayUtil;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.configuration.Config;
 import org.neo4j.logging.Log;
 import org.neo4j.server.NeoServer;
@@ -73,11 +75,27 @@ public class GraphAwareBootstrappingFilter implements Filter {
             return;
         }
 
-        GoogleAnalyticsStatsCollector statsCollector = new GoogleAnalyticsStatsCollector(neoServer.getDatabase().getGraph());
-
-        bootstrapGraphAware(filterConfig, statsCollector);
+        StatsCollector statsCollector = createStatsCollector();
+        
+		bootstrapGraphAware(filterConfig, statsCollector);
 
         statsCollector.frameworkStart("all");
+    }
+    
+    private StatsCollector createStatsCollector() {
+    	
+        String disable = neoServer.getConfig().getRaw().get("com.graphaware.runtime.stats.disable");
+        String disabled = neoServer.getConfig().getRaw().get("com.graphaware.runtime.stats.disabled");
+    	
+        if (Boolean.parseBoolean(disable) || Boolean.parseBoolean(disabled)) {
+        	LOG.info("Google Analytics disabled");
+            return NullStatsCollector.getInstance();
+        }else
+        {
+        	LOG.info("Google Analytics enabled");
+        }
+
+        return new GoogleAnalyticsStatsCollector(neoServer.getDatabase().getGraph());
     }
 
     @Override
