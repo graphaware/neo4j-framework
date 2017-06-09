@@ -26,7 +26,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -38,6 +40,7 @@ import org.junit.Before;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseFactoryState;
 import org.neo4j.kernel.GraphDatabaseDependencies;
+import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.impl.factory.GraphDatabaseFacade;
 import org.neo4j.kernel.impl.factory.GraphDatabaseFacadeFactory;
 import org.neo4j.kernel.impl.proc.Procedures;
@@ -122,12 +125,20 @@ public abstract class ClusterDatabasesIntegrationTest {
 
         params.putAll(addictionalParams(i, instanceClass));
 
+        //localhost -> 127.0.0.1 for Hazelcast
+        Set<Entry<String, String>> entrySet = params.entrySet();
+        for (Entry<String, String> entry : entrySet) {
+			String value = entry.getValue();
+			value = value.replaceAll("localhost", "127.0.0.1");
+			entry.setValue(value);
+		}
+        
         File storeDir = Files.createTempDirectory(TMP_PATH_PREFIX + i).toFile();
         storeDir.deleteOnExit(); // it doesn't work very well
-
+        
         GraphDatabaseService database = (GraphDatabaseService) instanceClass
-                .getConstructor(File.class, Map.class, GraphDatabaseFacadeFactory.Dependencies.class)
-                .newInstance(storeDir, params, dependencies);
+                .getConstructor(File.class, Config.class, GraphDatabaseFacadeFactory.Dependencies.class)
+                .newInstance(storeDir, Config.empty().augment(params), dependencies);
 
         LOG.info("An instance of class " + instanceClass.getSimpleName() + " has been created");
         // Too verbose, we leave it at debug level
