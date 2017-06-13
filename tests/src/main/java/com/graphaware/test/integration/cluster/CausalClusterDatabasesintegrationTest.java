@@ -63,17 +63,18 @@ public abstract class CausalClusterDatabasesintegrationTest extends ClusterDatab
 		}).collect(Collectors.toList()).size();
 		
 		params.put(CausalClusteringSettings.initial_discovery_members.name(),
-				buildDiscoveryAddresses(5100, coreClusterSize));
+				buildDiscoveryAddresses(5000, coreClusterSize));
 
 		params.put("dbms.connector.bolt.enabled", "true");
 		params.put("dbms.connector.bolt.listen_address", "localhost:" + String.valueOf(7687 + i));
 
+		params.put(CausalClusteringSettings.transaction_listen_address.name(), "localhost:601" + i);
+		params.put(CausalClusteringSettings.transaction_advertised_address.name(), "localhost:601" + i);
+
 		if (instanceClass.equals(CoreGraphDatabase.class)) {
 			params.put(CausalClusteringSettings.expected_core_cluster_size.name(), String.valueOf(coreClusterSize));
-
-			params.put(CausalClusteringSettings.discovery_listen_address.name(), "127.0.0.1:510" + i);
-			params.put(CausalClusteringSettings.transaction_listen_address.name(), "127.0.0.1:600" + i);
-			params.put(CausalClusteringSettings.raft_listen_address.name(), "127.0.0.1:700" + i);
+			params.put(CausalClusteringSettings.discovery_listen_address.name(), "localhost:500" + i);
+			params.put(CausalClusteringSettings.raft_listen_address.name(), "localhost:700" + i);
 		}
 
 		return params;
