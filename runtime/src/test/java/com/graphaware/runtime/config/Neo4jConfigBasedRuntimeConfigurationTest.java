@@ -16,16 +16,19 @@
 
 package com.graphaware.runtime.config;
 
-import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
-import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
-import com.graphaware.runtime.schedule.TimingStrategy;
-import org.junit.Test;
-import org.neo4j.kernel.configuration.Config;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.neo4j.kernel.configuration.Config;
+
+import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
+import com.graphaware.common.ping.NullStatsCollector;
+import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
+import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
+import com.graphaware.runtime.schedule.TimingStrategy;
 
 public class Neo4jConfigBasedRuntimeConfigurationTest {
 
@@ -88,4 +91,25 @@ public class Neo4jConfigBasedRuntimeConfigurationTest {
 
         new Neo4jConfigBasedRuntimeConfiguration(null, config).getTimingStrategy();
     }
+    
+    @Test
+    public void shouldDisableGoogleAnalytics() {
+        Map<String, String> parameterMap = new HashMap<>();
+        parameterMap.put("com.graphaware.runtime.stats.disabled", "true");
+
+        Config config = Config.empty().with(parameterMap);
+
+        assertEquals(NullStatsCollector.getInstance(), new Neo4jConfigBasedRuntimeConfiguration(null, config).getStatsCollector());
+    }
+    
+    @Test
+    public void shouldEnableGoogleAnalytics() {
+        Map<String, String> parameterMap = new HashMap<>();
+        parameterMap.put("com.graphaware.runtime.stats.disabled", "false");
+
+        Config config = Config.empty().with(parameterMap);
+
+        assertEquals(GoogleAnalyticsStatsCollector.class.getName(), new Neo4jConfigBasedRuntimeConfiguration(null, config).getStatsCollector().getClass().getName());
+    }
+
 }
