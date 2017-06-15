@@ -69,7 +69,7 @@
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>uuid</artifactId>
-            <version>3.2.1.50.14</version>
+            <version>3.2.1.51.14</version>
             <scope>test</scope>
         </dependency>
         <dependency>

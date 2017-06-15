@@ -1,3 +1,6 @@
+3.2.1.51:
+    - bugfixes
+
 3.2.1.50:
     - upgrade to Neo4j 3.2.1
 
