@@ -222,7 +222,7 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
 
     private Map<String, Object> handleException(Map<String, Object> result, T module, Object state, RuntimeException e) {
         result.put(module.getId(), state);      //just so the module gets afterRollback called as well
-        afterRollback(result); //remove this when https://github.com/neo4j/neo4j/issues/2660 is resolved
+        afterRollback(result); //remove this when https://github.com/neo4j/neo4j/issues/2660 is resolved (todo this is fixed in 3.3)
         throw e;               //will cause rollback
     }
 
