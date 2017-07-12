@@ -39,6 +39,7 @@ public class LazyTransactionData extends BaseImprovedTransactionData implements 
      * @param transactionData data about the transaction.
      */
     public LazyTransactionData(TransactionData transactionData) {
+        super(transactionData);
         nodeTransactionData = new LazyNodeTransactionData(transactionData, this);
         relationshipTransactionData = new LazyRelationshipTransactionData(transactionData, this);
     }

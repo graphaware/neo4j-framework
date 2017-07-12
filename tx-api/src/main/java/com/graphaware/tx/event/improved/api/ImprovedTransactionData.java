@@ -17,6 +17,7 @@
 package com.graphaware.tx.event.improved.api;
 
 import com.graphaware.common.util.Change;
+import com.graphaware.tx.event.improved.data.TransactionDataWrapper;
 import org.neo4j.graphdb.*;
 
 import java.util.Collection;
@@ -81,7 +82,7 @@ import java.util.Set;
  * commits. Through deleted and/or previous versions of {@link org.neo4j.graphdb.PropertyContainer}s, one can traverse
  * the previous snapshot of the graph, as it was before the transaction started.
  */
-public interface ImprovedTransactionData {
+public interface ImprovedTransactionData extends TransactionDataWrapper {
 
     /**
      * Check whether the given node has been created in the transaction.

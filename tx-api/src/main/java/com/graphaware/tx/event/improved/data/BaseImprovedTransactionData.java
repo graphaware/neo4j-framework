@@ -18,6 +18,7 @@ package com.graphaware.tx.event.improved.data;
 
 import com.graphaware.common.util.Change;
 import org.neo4j.graphdb.*;
+import org.neo4j.graphdb.event.TransactionData;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -32,6 +33,12 @@ import static com.graphaware.common.util.PropertyContainerUtils.relationshipToSt
  * {@link NodeTransactionData} and {@link RelationshipTransactionData} provided by subclasses.
  */
 public abstract class BaseImprovedTransactionData {
+
+    private final TransactionData wrapped;
+
+    public BaseImprovedTransactionData(TransactionData wrapped) {
+        this.wrapped = wrapped;
+    }
 
     /**
      * Get {@link NodeTransactionData} to delegate to.
@@ -328,5 +335,9 @@ public abstract class BaseImprovedTransactionData {
         }
 
         return result;
+    }
+
+    public TransactionData getWrapped() {
+        return wrapped;
     }
 }

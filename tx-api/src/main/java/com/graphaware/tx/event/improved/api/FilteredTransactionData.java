@@ -56,6 +56,7 @@ public class FilteredTransactionData extends BaseImprovedTransactionData impleme
      * @param inclusionPolicies      policies for filtering.
      */
     public FilteredTransactionData(TransactionDataContainer transactionDataContainer, InclusionPolicies inclusionPolicies) {
+        super(transactionDataContainer.getWrapped());
         this.inclusionPolicies = inclusionPolicies;
         nodeTransactionData = new FilteredNodeTransactionData(transactionDataContainer.getNodeTransactionData(), inclusionPolicies);
         relationshipTransactionData = new FilteredRelationshipTransactionData(transactionDataContainer.getRelationshipTransactionData(), inclusionPolicies);
