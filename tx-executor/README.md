@@ -13,7 +13,7 @@ Add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>tx-executor</artifactId>
-    <version>3.2.1.51</version>
+    <version>3.2.3.51</version>
 </dependency>
 ```
 
