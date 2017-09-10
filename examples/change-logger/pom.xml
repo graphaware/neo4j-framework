@@ -19,13 +19,13 @@
 
     <groupId>com.graphaware.neo4j.example</groupId>
     <artifactId>change-logger</artifactId>
-    <version>3.2.3.51</version>
+    <version>3.2.3.52-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>module-parent</artifactId>
-        <version>3.2.3.51</version>
+        <version>3.2.3.52-SNAPSHOT</version>
         <relativePath>../../parent-pom/module/pom.xml</relativePath>
     </parent>
 
