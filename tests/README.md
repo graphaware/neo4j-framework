@@ -16,7 +16,7 @@ Add the following snippet to your pom.xml:
  <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>tests</artifactId>
-    <version>3.2.3.51</version>
+    <version>3.2.5.51</version>
     <scope>test</scope>
 </dependency>
 ```
