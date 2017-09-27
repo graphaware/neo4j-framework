@@ -16,7 +16,6 @@
 
 package com.graphaware.runtime.spring;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

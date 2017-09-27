@@ -66,12 +66,12 @@
             <artifactId>spring-context</artifactId>
             <scope>test</scope>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.graphaware.neo4j</groupId>-->
-            <!--<artifactId>uuid</artifactId>-->
-            <!--<version>3.2.1.51.14</version>-->
-            <!--<scope>test</scope>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>com.graphaware.neo4j</groupId>
+            <artifactId>uuid</artifactId>
+            <version>3.2.5.51.14</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-common</artifactId>
