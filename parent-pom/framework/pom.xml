@@ -18,13 +18,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>framework-parent</artifactId>
-    <version>3.2.6.51-SNAPSHOT</version>
+    <version>3.2.6.51</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>graphaware-parent</artifactId>
-        <version>3.2.6.51-SNAPSHOT</version>
+        <version>3.2.6.51</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
