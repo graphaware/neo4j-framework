@@ -29,8 +29,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.test.unit.GraphUnit.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static org.neo4j.kernel.configuration.Settings.*;
 
 
@@ -718,6 +717,23 @@ public class GraphUnitTest {
 
         assertSameGraph(database, " ", InclusionPolicies.all().with(IncludeNoNodes.getInstance()));
     }
+
+    @Test
+    public void shouldCorrectlyIdentifyNotEmptyDatabase() {
+        assertEmpty(database);
+        populateDatabase("CREATE (n:Person {name:'Michal'})");
+        assertNotEmpty(database);
+
+        populateDatabase("MATCH (n) DETACH DELETE n");
+        try {
+            assertNotEmpty(database);
+            fail("Should have failed");
+        }
+        catch (AssertionError e) {
+            assertTrue(e.getMessage().startsWith("The database is empty with respect to inclusion policies:"));
+        }
+    }
+
 
     @Test
     public void shouldCorrectlyIdentifyEmptyDatabase2() {
