@@ -18,7 +18,6 @@ notes:
 List of modules to upgrade:
         uuid
         resttest
-        noderank
         timetree
         expire
         reco
