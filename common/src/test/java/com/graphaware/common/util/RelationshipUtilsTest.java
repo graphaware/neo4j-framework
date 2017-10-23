@@ -101,7 +101,6 @@ public class RelationshipUtilsTest {
             Node node2 = database.getNodeById(1);
 
             Relationship r = createRelationshipIfNotExists(node2, node1, withName("TEST"), OUTGOING);
-            assertEquals(1, r.getId());
             assertEquals(2, IterableUtils.count(database.getAllRelationships()));
 
             assertTrue(relationshipExists(node2, node1, withName("TEST"), OUTGOING));
@@ -117,7 +116,6 @@ public class RelationshipUtilsTest {
             Node node2 = database.getNodeById(1);
 
             Relationship r = createRelationshipIfNotExists(node1, node2, withName("TEST"), INCOMING);
-            assertEquals(1, r.getId());
             assertEquals(2, IterableUtils.count(database.getAllRelationships()));
 
             assertTrue(relationshipExists(node1, node2, withName("TEST"), INCOMING));
