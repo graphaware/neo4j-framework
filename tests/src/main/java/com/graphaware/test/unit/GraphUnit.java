@@ -370,6 +370,7 @@ public final class GraphUnit {
         if (database == null) {
             throw new IllegalArgumentException("Database must not be null");
         }
+
         for (Node node : database.getAllNodes()) {
             if (inclusionPolicies.getNodeInclusionPolicy().include(node)) {
                 return false;
@@ -384,6 +385,46 @@ public final class GraphUnit {
 
         return true;
     }
+
+	/**
+	 * Assert that the database is not empty.
+	 *
+	 * @param database to run the assertion against.
+	 */
+	public static void assertNotEmpty(GraphDatabaseService database) {
+		assertNotEmpty(database, InclusionPolicies.all());
+	}
+
+	/**
+	 * Assert that the database is not empty.
+	 *
+	 * @param database to run the assertion against.
+	 * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships/properties or not in the assertion.
+	 */
+	public static void assertNotEmpty(GraphDatabaseService database, InclusionPolicies inclusionPolicies) {
+		if (database == null) {
+			throw new IllegalArgumentException("Database must not be null");
+		}
+
+        try (Transaction tx = database.beginTx()) {
+            for (Node node : database.getAllNodes()) {
+                if (inclusionPolicies.getNodeInclusionPolicy().include(node)) {
+                    return;
+                }
+            }
+
+            for (Relationship relationship : database.getAllRelationships()) {
+                if (inclusionPolicies.getRelationshipInclusionPolicy().include(relationship)) {
+                    return;
+                }
+            }
+            tx.success();
+        }
+
+        fail(String.format("The database is empty with respect to inclusion policies: %s",
+                inclusionPolicies.toString()));
+
+	}
 
     /**
      * Clear the graph by deleting all nodes and relationships.
