@@ -16,16 +16,17 @@
 
 package com.graphaware.runtime.module.thirdparty;
 
-import com.graphaware.common.representation.DetachedNode;
-import com.graphaware.common.representation.DetachedRelationship;
 import com.graphaware.common.representation.GraphDetachedNode;
 import com.graphaware.common.representation.GraphDetachedRelationship;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.writer.thirdparty.*;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.MapUtil;
 import org.neo4j.shell.ShellSettings;
@@ -41,20 +42,39 @@ import static org.neo4j.kernel.configuration.Settings.FALSE;
 
 public class ThirdPartyIntegrationModuleTest {
 
-    @Test
-    public void modificationsShouldBeCorrectlyBuilt() {
-        GraphDatabaseService database = new TestGraphDatabaseFactory()
+    private GraphDatabaseService database;
+
+    @Before
+    public void setUp() {
+        database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 
         registerShutdownHook(database);
+    }
 
+    @After
+    public void tearDown() {
+        database.shutdown();
+    }
+
+    @Test
+    public void modificationsShouldBeCorrectlyBuilt() {
         TestThirdPartyModule module = new TestThirdPartyModule("test");
 
         database.execute("CREATE (p:Person {name:'Michal', age:30})-[:WORKS_FOR {since:2013, role:'MD'}]->(c:Company {name:'GraphAware', est: 2013})");
         database.execute("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Adam'})-[:WORKS_FOR {since:2014}]->(ga)");
+
+        long danielaId, michalId, adamId, gaId;
+        try (Transaction tx = database.beginTx()) {
+            michalId = database.findNode(Label.label("Person"), "name", "Michal").getId();
+            adamId = database.findNode(Label.label("Person"), "name", "Adam").getId();
+            gaId = database.findNode(Label.label("Company"), "name", "GraphAware").getId();
+
+            tx.success();
+        }
 
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
         runtime.registerModule(module);
@@ -69,29 +89,34 @@ public class ThirdPartyIntegrationModuleTest {
             tx.success();
         }
 
+        try (Transaction tx = database.beginTx()) {
+            danielaId = database.findNode(Label.label("Person"), "name", "Daniela").getId();
+            tx.success();
+        }
+
         Collection<WriteOperation<?>> writeOperations = module.getWriteOperations();
         assertEquals(6, writeOperations.size());
 
         assertTrue(writeOperations.contains(new NodeCreated<>(
-                new GraphDetachedNode(3L, new String[]{"Person"}, MapUtil.map("name", "Daniela")))));
+                new GraphDetachedNode(danielaId, new String[]{"Person"}, MapUtil.map("name", "Daniela")))));
 
         assertTrue(writeOperations.contains(new NodeUpdated<>(
-                new GraphDetachedNode(0L, new String[]{"Person"}, MapUtil.map("name", "Michal", "age", 30L)),
-                new GraphDetachedNode(0L, new String[]{"Person"}, MapUtil.map("name", "Michal", "age", 31L)))));
+                new GraphDetachedNode(michalId, new String[]{"Person"}, MapUtil.map("name", "Michal", "age", 30L)),
+                new GraphDetachedNode(michalId, new String[]{"Person"}, MapUtil.map("name", "Michal", "age", 31L)))));
 
         assertTrue(writeOperations.contains(new NodeDeleted<>(
-                new GraphDetachedNode(2L, new String[]{"Person"}, MapUtil.map("name", "Adam")))));
+                new GraphDetachedNode(adamId, new String[]{"Person"}, MapUtil.map("name", "Adam")))));
 
         assertTrue(writeOperations.contains(new RelationshipCreated<>(
-                new GraphDetachedRelationship(2L, 3L, 1L, "WORKS_FOR", Collections.<String, Object>emptyMap())
+                new GraphDetachedRelationship(1L, danielaId, gaId, "WORKS_FOR", Collections.<String, Object>emptyMap())
         )));
 
         assertTrue(writeOperations.contains(new RelationshipUpdated<>(
-                new GraphDetachedRelationship(0L, 0L, 1L, "WORKS_FOR", MapUtil.map("since", 2013L, "role", "MD")),
-                new GraphDetachedRelationship(0L, 0L, 1L, "WORKS_FOR", MapUtil.map("since", 2013L)))));
+                new GraphDetachedRelationship(0L, michalId, gaId, "WORKS_FOR", MapUtil.map("since", 2013L, "role", "MD")),
+                new GraphDetachedRelationship(0L, michalId, gaId, "WORKS_FOR", MapUtil.map("since", 2013L)))));
 
         assertTrue(writeOperations.contains(new RelationshipDeleted<>(
-                new GraphDetachedRelationship(1L, 2L, 1L, "WORKS_FOR", MapUtil.map("since", 2014L))
+                new GraphDetachedRelationship(20L, adamId, gaId, "WORKS_FOR", MapUtil.map("since", 2014L))
         )));
 
         for (WriteOperation<?> operation : writeOperations) {

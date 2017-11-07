@@ -65,10 +65,15 @@ public class FriendshipStrengthCounterTest {
 
     @Test
     public void totalFriendshipStrengthShouldBeCounted() {
+        long p1id, p2id;
+
         try (Transaction tx = database.beginTx()) {
             Node person1 = database.createNode();
             Node person2 = database.createNode();
             Node person3 = database.createNode();
+
+            p1id = person1.getId();
+            p2id = person2.getId();
 
             person1.setProperty("name", "Person One");
             person2.setProperty("name", "Person Two");
@@ -87,8 +92,8 @@ public class FriendshipStrengthCounterTest {
 
         //delete and change some friendships
         try (Transaction tx = database.beginTx()) {
-            for (Relationship relationship : database.getNodeById(1).getRelationships(FRIEND_OF, Direction.OUTGOING)) {
-                if (relationship.getEndNode().getId() == 2) {
+            for (Relationship relationship : database.getNodeById(p1id).getRelationships(FRIEND_OF, Direction.OUTGOING)) {
+                if (relationship.getEndNode().getId() == p2id) {
                     relationship.delete(); //remove 2 from total strength
                 } else {
                     relationship.setProperty(STRENGTH, 2L); //add 1 to total strength

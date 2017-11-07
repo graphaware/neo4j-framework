@@ -19,7 +19,6 @@ package com.graphaware.tx.event.improved;
 import com.graphaware.common.policy.inclusion.*;
 import com.graphaware.common.policy.inclusion.fluent.IncludeNodes;
 import com.graphaware.common.util.Change;
-import com.graphaware.test.util.TestDataBuilder;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
@@ -36,14 +35,10 @@ import org.neo4j.graphdb.traversal.Uniqueness;
 import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.graphaware.common.util.Change.changesToMap;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.common.util.IterableUtils.countNodes;
@@ -66,10 +61,12 @@ public class FilteredLazyTransactionDataIntegrationTest {
     private static final String INTERNAL_NODE_PROPERTY = INTERNAL_PREFIX + "LABEL";
 
     private GraphDatabaseService database;
+    private final Map<Long, Long> ids = new HashMap<>();
 
     @After
     public void tearDown() {
         database.shutdown();
+        ids.clear();
     }
 
     @Test
@@ -99,7 +96,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
         mutateGraph(new VoidReturningCallback() {
                         @Override
                         protected void doInTx(GraphDatabaseService database) {
-                            Node three = database.getNodeById(3);
+                            Node three = getNodeById(3);
                             Relationship r = three.getSingleRelationship(withName("R4"), OUTGOING);
                             r.setProperty("non-internal", 4); //this makes it non-internal
                         }
@@ -185,8 +182,8 @@ public class FilteredLazyTransactionDataIntegrationTest {
             public Void beforeCommit(TransactionData data) throws Exception {
                 ImprovedTransactionData improvedTransactionData = new FilteredTransactionData(new LazyTransactionData(data), InclusionPolicies.none());
                 assertFalse(improvedTransactionData.mutationsOccurred());
-                assertTrue(improvedTransactionData.hasBeenChanged(database.getNodeById(1)));
-                assertTrue(improvedTransactionData.changedProperties(database.getNodeById(1)).isEmpty());
+                assertTrue(improvedTransactionData.hasBeenChanged(getNodeById(1)));
+                assertTrue(improvedTransactionData.changedProperties(getNodeById(1)).isEmpty());
                 return null;
             }
         });
@@ -206,17 +203,17 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         Map<Long, Relationship> created = propertyContainersToMap(transactionData.getAllCreatedRelationships());
                         assertEquals(2, created.size());
 
-                        long r1Id = database.getNodeById(5).getSingleRelationship(withName("R2"), OUTGOING).getId();
+                        long r1Id = getNodeById(5).getSingleRelationship(withName("R2"), OUTGOING).getId();
                         Relationship r1 = created.get(r1Id);
                         assertProperties(r1);
 
-                        long r2Id = database.getNodeById(1).getSingleRelationship(withName("R1"), OUTGOING).getId();
+                        long r2Id = getNodeById(1).getSingleRelationship(withName("R1"), OUTGOING).getId();
                         Relationship r2 = created.get(r2Id);
                         assertProperties(r2);
 
                         assertTrue(transactionData.hasBeenCreated(r1));
                         assertTrue(transactionData.hasBeenCreated(r2));
-                        assertFalse(transactionData.hasBeenCreated(database.getNodeById(3).getSingleRelationship(withName("R1"), OUTGOING)));
+                        assertFalse(transactionData.hasBeenCreated(getNodeById(3).getSingleRelationship(withName("R1"), OUTGOING)));
 
                         assertFalse(r2.getEndNode().hasProperty("place"));  //filtered out
                         assertEquals(4, r2.getEndNode().getSingleRelationship(withName("R1"), OUTGOING).getEndNode().getId()); //node filtered out but when accessed as a relationship end node it is present
@@ -237,12 +234,12 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
                         Map<Long, Relationship> created = propertyContainersToMap(transactionData.getAllCreatedRelationships());
 
-                        long r2Id = database.getNodeById(1).getSingleRelationship(withName("R1"), OUTGOING).getId();
+                        long r2Id = getNodeById(1).getSingleRelationship(withName("R1"), OUTGOING).getId();
                         Relationship r2 = created.get(r2Id);
                         assertProperties(r2.getStartNode(), NAME, "NewOne", TAGS, new String[]{"one", "three"});
 
                         assertNull(r2.getEndNode().getSingleRelationship(withName("R3"), INCOMING));
-                        assertEquals(5, r2.getEndNode().getSingleRelationship(withName("R2"), INCOMING).getStartNode().getId());
+                        assertEquals((long) ids.get(5L), r2.getEndNode().getSingleRelationship(withName("R2"), INCOMING).getStartNode().getId());
                     }
                 }
         );
@@ -254,7 +251,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
         final AtomicLong changedRelId = new AtomicLong();
         try (Transaction tx = database.beginTx()) {
-            changedRelId.set(database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
+            changedRelId.set(getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
         }
 
         mutateGraph(
@@ -281,7 +278,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
         final AtomicLong changedRelId = new AtomicLong();
         try (Transaction tx = database.beginTx()) {
-            changedRelId.set(database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
+            changedRelId.set(getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
         }
 
         mutateGraph(
@@ -291,7 +288,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         assertTrue(transactionData.mutationsOccurred());
 
                         Relationship previous = transactionData.getChanged(database.getRelationshipById(changedRelId.get())).getPrevious();
-                        assertProperties(previous.getEndNode(), NAME, "One", COUNT, 1, TAGS, new String[]{"one", "two"});
+                        assertProperties(previous.getEndNode(), NAME, "One", COUNT, 1L, TAGS, new String[]{"one", "two"});
 
                         assertEquals("Three", previous.getStartNode().getProperty("name"));
                         assertEquals("nothing", previous.getStartNode().getProperty("tags", "nothing"));
@@ -311,7 +308,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
         final AtomicLong changedRelId = new AtomicLong();
         try (Transaction tx = database.beginTx()) {
-            changedRelId.set(database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
+            changedRelId.set(getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
         }
 
         mutateGraph(
@@ -342,7 +339,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
         final AtomicLong changedRelId = new AtomicLong();
         try (Transaction tx = database.beginTx()) {
-            changedRelId.set(database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
+            changedRelId.set(getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
         }
 
         mutateGraph(
@@ -372,7 +369,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
         final AtomicLong changedRelId = new AtomicLong();
         try (Transaction tx = database.beginTx()) {
-            changedRelId.set(database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
+            changedRelId.set(getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
         }
 
         mutateGraph(
@@ -403,8 +400,8 @@ public class FilteredLazyTransactionDataIntegrationTest {
         final Holder<Relationship> deletedRelationship = new Holder<>();
         final Holder<Node> deletedNode = new Holder<>();
         try (Transaction tx = database.beginTx()) {
-            deletedRelationship.set(database.getNodeById(1).getSingleRelationship(withName("R3"), OUTGOING));
-            deletedNode.set(database.getNodeById(2));
+            deletedRelationship.set(getNodeById(1).getSingleRelationship(withName("R3"), OUTGOING));
+            deletedNode.set(getNodeById(2));
         }
 
         mutateGraph(
@@ -446,7 +443,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         assertTrue(transactionData.hasBeenDeleted(r2));
                         assertTrue(transactionData.hasBeenDeleted(r3));
                         assertTrue(transactionData.hasBeenDeleted(r4));
-                        assertFalse(transactionData.hasBeenDeleted(database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING)));
+                        assertFalse(transactionData.hasBeenDeleted(getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING)));
 
                         assertEquals(3, count(transactionData.getDeletedRelationships(deletedNode.get())));
                         assertEquals(3, count(transactionData.getDeletedRelationships(deletedNode.get(), withName("R2"), withName("R1"))));
@@ -466,7 +463,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
         final Holder<Relationship> deletedRel = new Holder<>();
         try (Transaction tx = database.beginTx()) {
-            deletedRel.set(database.getNodeById(1).getSingleRelationship(withName("R3"), OUTGOING));
+            deletedRel.set(getNodeById(1).getSingleRelationship(withName("R3"), OUTGOING));
         }
 
         mutateGraph(
@@ -478,7 +475,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         Relationship r4 = transactionData.getDeleted(deletedRel.get());
 
                         Relationship deletedRel = transactionData.getDeleted(r4);
-                        assertProperties(deletedRel.getStartNode(), NAME, "One", COUNT, 1, TAGS, new String[]{"one", "two"});
+                        assertProperties(deletedRel.getStartNode(), NAME, "One", COUNT, 1L, TAGS, new String[]{"one", "two"});
 
                         assertEquals("Three", deletedRel.getEndNode().getProperty("name"));
                         assertEquals("nothing", deletedRel.getEndNode().getProperty("tags", "nothing"));
@@ -503,7 +500,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
         final Holder<Relationship> deletedRelationship = new Holder<>();
         try (Transaction tx = database.beginTx()) {
-            deletedRelationship.set(database.getNodeById(1).getSingleRelationship(withName("R3"), OUTGOING));
+            deletedRelationship.set(getNodeById(1).getSingleRelationship(withName("R3"), OUTGOING));
         }
 
         mutateGraph(
@@ -533,7 +530,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
         createTestDatabase();
         final AtomicLong changedRelId = new AtomicLong();
         try (Transaction tx = database.beginTx()) {
-            changedRelId.set(database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
+            changedRelId.set(getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
         }
         mutateGraph(
                 new BeforeCommitCallback() {
@@ -556,7 +553,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         assertFalse(transactionData.hasPropertyBeenCreated(transactionData.getAllDeletedRelationships().iterator().next(), "tags"));
 
                         //created relationship should not fall into this category
-                        assertFalse(transactionData.hasPropertyBeenCreated(database.getNodeById(5).getSingleRelationship(withName("R2"), OUTGOING), "time"));
+                        assertFalse(transactionData.hasPropertyBeenCreated(getNodeById(5).getSingleRelationship(withName("R2"), OUTGOING), "time"));
                     }
                 }
         );
@@ -567,7 +564,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
         createTestDatabase();
         final AtomicLong changedRelId = new AtomicLong();
         try (Transaction tx = database.beginTx()) {
-            changedRelId.set(database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
+            changedRelId.set(getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
         }
         mutateGraph(
                 new BeforeCommitCallback() {
@@ -594,7 +591,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
         createTestDatabase();
         final AtomicLong changedRelId = new AtomicLong();
         try (Transaction tx = database.beginTx()) {
-            changedRelId.set(database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
+            changedRelId.set(getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
         }
         mutateGraph(
                 new BeforeCommitCallback() {
@@ -636,11 +633,11 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         Map<Long, Node> createdNodes = propertyContainersToMap(transactionData.getAllCreatedNodes());
                         assertEquals(1, createdNodes.size());
 
-                        Node createdNode = createdNodes.get(5L);
+                        Node createdNode = createdNodes.get(ids.get(5L));
                         assertProperties(createdNode, NAME, "Five", "size", 4L);
 
                         assertTrue(transactionData.hasBeenCreated(createdNode));
-                        assertFalse(transactionData.hasBeenCreated(database.getNodeById(3)));
+                        assertFalse(transactionData.hasBeenCreated(getNodeById(3)));
                     }
                 }
         );
@@ -656,7 +653,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         assertTrue(transactionData.mutationsOccurred());
 
                         Map<Long, Node> createdNodes = propertyContainersToMap(transactionData.getAllCreatedNodes());
-                        Node createdNode = createdNodes.get(5L);
+                        Node createdNode = createdNodes.get(ids.get(5L));
 
                         assertEquals("one", createdNode.getSingleRelationship(withName("R2"), OUTGOING).getEndNode().getProperty("tags"));
                         assertEquals("not there", createdNode.getSingleRelationship(withName("R2"), OUTGOING).getEndNode().getProperty("place", "not there"));
@@ -679,7 +676,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         assertEquals(2, changed.size());
 
                         Node previous1 = changed.get(1L).getPrevious();
-                        assertProperties(previous1, NAME, "One", COUNT, 1, TAGS, new String[]{"one", "two"});
+                        assertProperties(previous1, NAME, "One", COUNT, 1L, TAGS, new String[]{"one", "two"});
 
                         Node current1 = changed.get(1L).getCurrent();
                         assertProperties(current1, NAME, "NewOne", TAGS, new String[]{"one", "three"});
@@ -694,7 +691,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         assertTrue(transactionData.hasBeenChanged(previous2));
                         assertTrue(transactionData.hasBeenChanged(current1));
                         assertTrue(transactionData.hasBeenChanged(current2));
-                        assertFalse(transactionData.hasBeenChanged(database.getNodeById(4)));
+                        assertFalse(transactionData.hasBeenChanged(getNodeById(4)));
                     }
                 }
         );
@@ -740,7 +737,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         assertFalse(previous.hasRelationship(withName("R1"), INCOMING));
                         assertFalse(previous.hasRelationship(withName("R2")));
 
-                        previous.createRelationshipTo(database.getNodeById(4), withName("R3"));
+                        previous.createRelationshipTo(getNodeById(4), withName("R3"));
                         assertNull(previous.getSingleRelationship(withName("R3"), OUTGOING));
                     }
                 }
@@ -1005,8 +1002,8 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
                         assertEquals(1, transactionData.deletedProperties(changed.getCurrent()).size());
                         assertEquals(1, transactionData.deletedProperties(changed.getPrevious()).size());
-                        assertEquals(1, transactionData.deletedProperties(changed.getCurrent()).get("count"));
-                        assertEquals(1, transactionData.deletedProperties(changed.getPrevious()).get("count"));
+                        assertEquals(1L, transactionData.deletedProperties(changed.getCurrent()).get("count"));
+                        assertEquals(1L, transactionData.deletedProperties(changed.getPrevious()).get("count"));
 
                         changed = changesToMap(transactionData.getAllChangedNodes()).get(3L);
                         assertEquals(0, transactionData.deletedProperties(changed.getCurrent()).size());
@@ -1040,7 +1037,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
                         Map<Long, Relationship> created = propertyContainersToMap(transactionData.getAllCreatedRelationships());
 
-                        long r1Id = database.getNodeById(5).getSingleRelationship(withName("R2"), OUTGOING).getId();
+                        long r1Id = getNodeById(5).getSingleRelationship(withName("R2"), OUTGOING).getId();
                         Relationship r1 = created.get(r1Id);
 
                         r1.setProperty("additional", "someValue");
@@ -1050,7 +1047,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
         );
 
         try (Transaction tx = database.beginTx()) {
-            Relationship r1 = database.getNodeById(5).getSingleRelationship(withName("R2"), OUTGOING);
+            Relationship r1 = getNodeById(5).getSingleRelationship(withName("R2"), OUTGOING);
             assertEquals(1, count(r1.getPropertyKeys()));
             assertEquals("someValue", r1.getProperty("additional"));
             assertFalse(r1.hasProperty("time"));
@@ -1069,7 +1066,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         }
 
                         Map<Long, Node> createdNodes = propertyContainersToMap(transactionData.getAllCreatedNodes());
-                        Node createdNode = createdNodes.get(5L);
+                        Node createdNode = createdNodes.get(ids.get(5L));
 
                         createdNode.setProperty("name", "NewFive");
                         createdNode.setProperty("additional", "something");
@@ -1080,7 +1077,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
         try (Transaction tx = database.beginTx()) {
 
-            Node createdNode = database.getNodeById(5L);
+            Node createdNode = getNodeById(5L);
             assertProperties(createdNode, NAME, "NewFive", "additional", "something");
             assertFalse(createdNode.hasProperty("size"));
         }
@@ -1110,7 +1107,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
         try (Transaction tx = database.beginTx()) {
 
-            Node node = database.getNodeById(1L);
+            Node node = getNodeById(1L);
             assertProperties(node, NAME, "YetAnotherOne", "additional", "something");
             assertFalse(node.hasProperty("tags"));
         }
@@ -1140,7 +1137,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
         try (Transaction tx = database.beginTx()) {
 
-            Node node = database.getNodeById(1L);
+            Node node = getNodeById(1L);
 
             assertEquals(2, count(node.getPropertyKeys()));
             assertEquals("YetAnotherOne", node.getProperty("name"));
@@ -1209,7 +1206,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
                         Node deleted = deletedNodes.get(2L);
 
-                        deleted.createRelationshipTo(database.getNodeById(3), withName("illegal"));
+                        deleted.createRelationshipTo(getNodeById(3), withName("illegal"));
                     }
                 }
         );
@@ -1226,7 +1223,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
                         Node deleted = deletedNodes.get(2L);
 
-                        database.getNodeById(3).createRelationshipTo(deleted, withName("illegal"));
+                        getNodeById(3).createRelationshipTo(deleted, withName("illegal"));
                     }
                 }
         );
@@ -1248,11 +1245,11 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
         try (Transaction tx = database.beginTx()) {
 
-            long r4Id = database.getNodeById(3L).getSingleRelationship(withName("R3"), INCOMING).getId();
+            long r4Id = getNodeById(3L).getSingleRelationship(withName("R3"), INCOMING).getId();
             Relationship r4 = database.getRelationshipById(r4Id);
 
             assertEquals("One", r4.getStartNode().getProperty("name"));
-            assertEquals(1, r4.getStartNode().getProperty("count", 2));
+            assertEquals(1L, r4.getStartNode().getProperty("count", 2));
             assertTrue(Arrays.equals(new String[]{"one", "two"}, (String[]) r4.getStartNode().getProperty("tags")));
             assertEquals(3, count(r4.getStartNode().getPropertyKeys()));
 
@@ -1279,7 +1276,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                 new BeforeCommitCallback() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        Change<Node> change = transactionData.getChanged(database.getNodeById(1));
+                        Change<Node> change = transactionData.getChanged(getNodeById(1));
                         //must first delete the new relationship
                         change.getCurrent().getSingleRelationship(withName("R1"), OUTGOING).delete();
                         deleteNodeAndRelationships(change.getPrevious().getGraphDatabase().getNodeById(change.getPrevious().getId()));
@@ -1353,7 +1350,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
         );
 
         try (Transaction tx = database.beginTx()) {
-            Relationship newRelationship = database.getNodeById(1).getSingleRelationship(withName("R4"), OUTGOING);
+            Relationship newRelationship = getNodeById(1).getSingleRelationship(withName("R4"), OUTGOING);
             assertNotNull(newRelationship);
             assertEquals("Six", newRelationship.getEndNode().getProperty("name"));
             assertEquals(true, newRelationship.getProperty("new"));
@@ -1383,7 +1380,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
         );
 
         try (Transaction tx = database.beginTx()) {
-            Relationship newRelationship = database.getNodeById(1).getSingleRelationship(withName("R4"), OUTGOING);
+            Relationship newRelationship = getNodeById(1).getSingleRelationship(withName("R4"), OUTGOING);
             assertNotNull(newRelationship);
             assertEquals("Six", newRelationship.getEndNode().getProperty("name"));
             assertEquals(true, newRelationship.getProperty("new"));
@@ -1395,7 +1392,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
         createTestDatabase();
         final AtomicLong changedRelId = new AtomicLong();
         try (Transaction tx = database.beginTx()) {
-            changedRelId.set(database.getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
+            changedRelId.set(getNodeById(3).getSingleRelationship(withName("R3"), OUTGOING).getId());
         }
         mutateGraph(
                 new BeforeCommitCallback() {
@@ -1425,7 +1422,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         @Override
                         protected void doInTx(GraphDatabaseService database) {
                             //change that should not be picked up as a change
-                            Node four = database.getNodeById(4);
+                            Node four = getNodeById(4);
                             four.setProperty("name", "Three");
                             four.setProperty("name", "Four");
                         }
@@ -1530,43 +1527,49 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
         registerShutdownHook(database);
 
-        new TestDataBuilder(database)
-                .node() //ID=0
-                .node().setProp("name", "One").setProp("count", 1).setProp("tags", new String[]{"one", "two"})
+        database.execute("CREATE " +
+                "(zero:Zero), " +
+                "(one:One {name:'One', count:1, tags:['one', 'two']}), " +
+                "(two:Two {name:'Two', size: 2}), " +
+                "(two)<-[:R1 {time:1}]-(one), " +
+                "(two)<-[:R2]-(two), " +
+                "(three:Three {name:'Three', place:'London'}), " +
+                "(three)<-[:R2 {time:2}]-(two), " +
+                "(three)-[:R3 {time:3, tag:'cool'}]->(one), " +
+                "(three)<-[:R3]-(one), " +
+                "(four:Four {name:'Four'}), " +
+                "(four)<-[:R1 {time:1}]-(three), " +
+                "(four)<-[:WHATEVER]-(one)");
 
-                .node().setProp("name", "Two").setProp("size", 2L)
-                .relationshipFrom(1, "R1").setProp("time", 1)
-                .relationshipFrom(2, "R2")
-
-                .node().setProp("name", "Three").setProp("place", "London")
-                .relationshipFrom(2, "R2").setProp("time", 2)
-                .relationshipTo(1, "R3").setProp("time", 3).setProp("tag", "cool")
-                .relationshipFrom(1, "R3")
-
-                .node().setProp("name", "Four")
-                .relationshipFrom(3, "R1").setProp("time", 1)
-                .relationshipFrom(1, "WHATEVER");
+        try (Transaction tx = database.beginTx()) {
+            ids.put(0L, database.findNodes(Label.label("Zero")).next().getId());
+            ids.put(1L, database.findNodes(Label.label("One")).next().getId());
+            ids.put(2L, database.findNodes(Label.label("Two")).next().getId());
+            ids.put(3L, database.findNodes(Label.label("Three")).next().getId());
+            ids.put(4L, database.findNodes(Label.label("Four")).next().getId());
+        }
     }
 
     private class TestGraphMutation extends VoidReturningCallback {
 
         @Override
         public void doInTx(GraphDatabaseService database) {
-            Node one = database.getNodeById(1);
+            Node one = getNodeById(1);
             one.setProperty("name", "NewOne");
             one.removeProperty("count");
             one.setProperty("tags", new String[]{"one"});
             one.setProperty("tags", new String[]{"one", "three"});
 
-            Node two = database.getNodeById(2);
+            Node two = getNodeById(2);
             deleteNodeAndRelationships(two);
 
-            Node three = database.getNodeById(3);
+            Node three = getNodeById(3);
             three.setProperty("tags", "one");
             three.setProperty("place", "Rome");
             three.setProperty("place", "London");
 
             Node five = database.createNode();
+            ids.put(5L, five.getId());
             five.setProperty("name", "Five");
             five.setProperty("size", 3L);
             five.setProperty("size", 4L);
@@ -1583,7 +1586,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
             one.createRelationshipTo(three, withName("R1"));
 
             //change that should not be picked up as a change
-            Node four = database.getNodeById(4);
+            Node four = getNodeById(4);
             four.setProperty("name", "Three");
             four.setProperty("name", "Four");
         }
@@ -1598,42 +1601,48 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
         registerShutdownHook(database);
 
-        new TestDataBuilder(database)
-                .node() //ID=0
-                .node().setProp(INTERNAL_NODE_PROPERTY, "whatever").setProp(INTERNAL_PREFIX + "name", "One").setProp(INTERNAL_PREFIX + "count", 1).setProp(INTERNAL_PREFIX + "tags", new String[]{"one", "two"})
+        database.execute("CREATE " +
+                "(zero:Zero), " +
+                "(one:One {_GA_LABEL: 'whatever', _GA_name:'One', _GA_count:1, _GA_tags:['one', 'two']}), " +
+                "(two:Two {_GA_LABEL: 'whatever', name:'Two', size: 2}), " +
+                "(two)<-[:_GA_R1 {time:1}]-(one), " +
+                "(two)<-[:_GA_R2]-(two), " +
+                "(three:Three {name:'Three', place:'London'}), " +
+                "(three)<-[:_GA_R2 {time:2}]-(two), " +
+                "(three)-[:R4 {_GA_time:3, _GA_tag:'cool'}]->(one), " +
+                "(three)<-[:_GA_R3]-(one), " +
+                "(four:Four {_GA_LABEL: 'whatever', name:'Four'}), " +
+                "(four)<-[:_GA_R1 {time:1}]-(three)");
 
-                .node().setProp(INTERNAL_NODE_PROPERTY, "whatever").setProp("name", "Two").setProp("size", 2L)
-                .relationshipFrom(1, INTERNAL_PREFIX + "R1").setProp("time", 1)
-                .relationshipFrom(2, INTERNAL_PREFIX + "R2")
-
-                .node().setProp("name", "Three").setProp("place", "London")
-                .relationshipFrom(2, INTERNAL_PREFIX + "R2").setProp("time", 2)
-                .relationshipTo(1, "R4").setProp(INTERNAL_PREFIX + "time", 3).setProp(INTERNAL_PREFIX + "tag", "cool")
-                .relationshipFrom(1, INTERNAL_PREFIX + "R3")
-
-                .node().setProp(INTERNAL_NODE_PROPERTY, "whatever").setProp("name", "Four")
-                .relationshipFrom(3, INTERNAL_PREFIX + "R1").setProp("time", 1);
+        try (Transaction tx = database.beginTx()) {
+            ids.put(0L, database.findNodes(Label.label("Zero")).next().getId());
+            ids.put(1L, database.findNodes(Label.label("One")).next().getId());
+            ids.put(2L, database.findNodes(Label.label("Two")).next().getId());
+            ids.put(3L, database.findNodes(Label.label("Three")).next().getId());
+            ids.put(4L, database.findNodes(Label.label("Four")).next().getId());
+        }
     }
 
     private class InternalTestGraphMutation extends VoidReturningCallback {
 
         @Override
         public void doInTx(GraphDatabaseService database) {
-            Node one = database.getNodeById(1);
+            Node one = getNodeById(1);
             one.setProperty(INTERNAL_PREFIX + "name", "NewOne");
             one.removeProperty(INTERNAL_PREFIX + "count");
             one.setProperty(INTERNAL_PREFIX + "tags", new String[]{"one"});
             one.setProperty(INTERNAL_PREFIX + "tags", new String[]{"one", "three"});
 
-            Node two = database.getNodeById(2);
+            Node two = getNodeById(2);
             deleteNodeAndRelationships(two);
 
-            Node three = database.getNodeById(3);
+            Node three = getNodeById(3);
             three.setProperty(INTERNAL_PREFIX + "tags", "one");
             three.setProperty("place", "Rome");
             three.setProperty("place", "London");
 
             Node five = database.createNode();
+            ids.put(5L, five.getId());
             five.setProperty("name", "Five");
             five.setProperty("size", 3L);
             five.setProperty("size", 4L);
@@ -1651,10 +1660,28 @@ public class FilteredLazyTransactionDataIntegrationTest {
             one.createRelationshipTo(three, withName(INTERNAL_PREFIX + "R1"));
 
             //change that should not be picked up as a change
-            Node four = database.getNodeById(4);
+            Node four = getNodeById(4);
             four.setProperty("name", "Three");
             four.setProperty("name", "Four");
         }
+    }
+
+    private Node getNodeById(long id) {
+        return database.getNodeById(ids.get(id));
+    }
+
+    private  <T extends PropertyContainer> Map<Long, Change<T>> changesToMap(Collection<Change<T>> changes) {
+        Map<Long, Change<T>> result = new HashMap<>();
+
+        for (Change<T> change : changes) {
+            long id = id(change.getPrevious());
+            if (id != id(change.getCurrent())) {
+                throw new IllegalArgumentException("IDs of the Property Containers in Change do not match!");
+            }
+            result.put(ids.get(id), change);
+        }
+
+        return result;
     }
 
     private class LabelChange extends VoidReturningCallback {

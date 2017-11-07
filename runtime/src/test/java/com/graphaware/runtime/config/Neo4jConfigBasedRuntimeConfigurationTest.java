@@ -42,7 +42,7 @@ public class Neo4jConfigBasedRuntimeConfigurationTest {
         parameterMap.put("com.graphaware.runtime.timing.busyThreshold", "94");
         parameterMap.put("com.graphaware.runtime.timing.maxSamples", "201");
         parameterMap.put("com.graphaware.runtime.timing.maxTime", "2001");
-        Config config = Config.empty().with(parameterMap);
+        Config config = Config.defaults(parameterMap);
 
         TimingStrategy expected = AdaptiveTimingStrategy
                 .defaultConfiguration()
@@ -62,7 +62,7 @@ public class Neo4jConfigBasedRuntimeConfigurationTest {
         parameterMap.put("com.graphaware.runtime.timing.strategy", "fixed");
         parameterMap.put("com.graphaware.runtime.timing.initialDelay", "100");
         parameterMap.put("com.graphaware.runtime.timing.delay", "50");
-        Config config = Config.empty().with(parameterMap);
+        Config config = Config.defaults(parameterMap);
 
         TimingStrategy expected = FixedDelayTimingStrategy
                 .getInstance()
@@ -75,7 +75,7 @@ public class Neo4jConfigBasedRuntimeConfigurationTest {
     @Test
     public void shouldFallBackToValueDefaultConfigurationIfValueIsNotFoundInConfig() {
         Map<String, String> parameterMap = new HashMap<>();
-        Config config = Config.empty().with(parameterMap);
+        Config config = Config.defaults(parameterMap);
 
         TimingStrategy expected = AdaptiveTimingStrategy
                 .defaultConfiguration();
@@ -87,7 +87,7 @@ public class Neo4jConfigBasedRuntimeConfigurationTest {
     public void shouldFailWithUnknownStrategy() {
         Map<String, String> parameterMap = new HashMap<>();
         parameterMap.put("com.graphaware.runtime.timing.strategy", "unknown");
-        Config config = Config.empty().with(parameterMap);
+        Config config = Config.defaults(parameterMap);
 
         new Neo4jConfigBasedRuntimeConfiguration(null, config).getTimingStrategy();
     }
@@ -97,7 +97,7 @@ public class Neo4jConfigBasedRuntimeConfigurationTest {
         Map<String, String> parameterMap = new HashMap<>();
         parameterMap.put("com.graphaware.runtime.stats.disabled", "true");
 
-        Config config = Config.empty().with(parameterMap);
+        Config config = Config.defaults(parameterMap);
 
         assertEquals(NullStatsCollector.getInstance(), new Neo4jConfigBasedRuntimeConfiguration(null, config).getStatsCollector());
     }
@@ -107,7 +107,7 @@ public class Neo4jConfigBasedRuntimeConfigurationTest {
         Map<String, String> parameterMap = new HashMap<>();
         parameterMap.put("com.graphaware.runtime.stats.disabled", "false");
 
-        Config config = Config.empty().with(parameterMap);
+        Config config = Config.defaults(parameterMap);
 
         assertEquals(GoogleAnalyticsStatsCollector.class.getName(), new Neo4jConfigBasedRuntimeConfiguration(null, config).getStatsCollector().getClass().getName());
     }

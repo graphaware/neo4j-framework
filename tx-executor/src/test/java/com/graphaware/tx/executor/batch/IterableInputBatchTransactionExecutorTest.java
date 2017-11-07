@@ -80,7 +80,7 @@ public class IterableInputBatchTransactionExecutorTest {
             assertEquals(3, countNodes(database));
             assertEquals("Name111", database.getNodeById(0).getProperty("name"));
             assertEquals("Name212", database.getNodeById(1).getProperty("name"));
-            assertEquals("Name321", database.getNodeById(2).getProperty("name"));
+            assertEquals("Name321", database.getNodeById(20).getProperty("name"));
         }
     }
 

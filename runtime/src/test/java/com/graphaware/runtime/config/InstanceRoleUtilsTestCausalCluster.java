@@ -21,6 +21,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.kernel.impl.factory.OperationalMode;
 
@@ -29,52 +30,52 @@ import com.graphaware.runtime.config.util.InstanceRoleUtils;
 import com.graphaware.test.integration.cluster.CausalClusterDatabasesintegrationTest;
 
 /**
- * Test for @InstanceRoleUtils in causal cluster mode 
+ * Test for @InstanceRoleUtils in causal cluster mode
  */
-public class InstanceRoleUtilsTestCausalCluster extends CausalClusterDatabasesintegrationTest{
+public class InstanceRoleUtilsTestCausalCluster extends CausalClusterDatabasesintegrationTest {
 
-	private InstanceRoleUtils utilsLeader;
-	private InstanceRoleUtils utilsFollower1;
-	private InstanceRoleUtils utilsFollower2;
-	private InstanceRoleUtils utilsReplica;
+    private InstanceRoleUtils utilsLeader;
+    private InstanceRoleUtils utilsFollower1;
+    private InstanceRoleUtils utilsFollower2;
+    private InstanceRoleUtils utilsReplica;
 
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-		
-		utilsLeader = new InstanceRoleUtils(getLeaderDatabase());
-		
-		utilsFollower1 = new InstanceRoleUtils(getFollowers().get(0));
-		utilsFollower2 = new InstanceRoleUtils(getFollowers().get(1));
-		
-		utilsReplica = new InstanceRoleUtils(getReplicas().get(0));
-	}
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
 
-	@Test
-	public void testGetOperationalMode() {
-		assertEquals(OperationalMode.core, utilsLeader.getOperationalMode());
-		assertEquals(OperationalMode.core, utilsFollower1.getOperationalMode());
-		assertEquals(OperationalMode.core, utilsFollower2.getOperationalMode());
-		
-		assertEquals(OperationalMode.read_replica, utilsReplica.getOperationalMode());
-	}
+        utilsLeader = new InstanceRoleUtils(getLeaderDatabase());
 
-	@Test
-	public void testGetInstaceRole() {
-		assertEquals(InstanceRole.LEADER, utilsLeader.getInstanceRole());
-		assertEquals(InstanceRole.FOLLOWER, utilsFollower1.getInstanceRole());
-		assertEquals(InstanceRole.FOLLOWER, utilsFollower2.getInstanceRole());
-		
-		assertEquals(InstanceRole.READ_REPLICA, utilsReplica.getInstanceRole());
-	}
+        utilsFollower1 = new InstanceRoleUtils(getFollowers().get(0));
+        utilsFollower2 = new InstanceRoleUtils(getFollowers().get(1));
 
-	@Test
-	public void testIsReadOnly() {
-		assertFalse(utilsLeader.getInstanceRole().isReadOnly());
-		assertTrue(utilsFollower1.getInstanceRole().isReadOnly());
-		assertTrue(utilsFollower2.getInstanceRole().isReadOnly());
-		
-		assertTrue(utilsReplica.getInstanceRole().isReadOnly());
-	}
+        utilsReplica = new InstanceRoleUtils(getReplicas().get(0));
+    }
+
+    @Test
+    public void testGetOperationalMode() {
+        assertEquals(OperationalMode.core, utilsLeader.getOperationalMode());
+        assertEquals(OperationalMode.core, utilsFollower1.getOperationalMode());
+        assertEquals(OperationalMode.core, utilsFollower2.getOperationalMode());
+
+        assertEquals(OperationalMode.read_replica, utilsReplica.getOperationalMode());
+    }
+
+    @Test
+    public void testGetInstaceRole() {
+        assertEquals(InstanceRole.LEADER, utilsLeader.getInstanceRole());
+        assertEquals(InstanceRole.FOLLOWER, utilsFollower1.getInstanceRole());
+        assertEquals(InstanceRole.FOLLOWER, utilsFollower2.getInstanceRole());
+
+        assertEquals(InstanceRole.READ_REPLICA, utilsReplica.getInstanceRole());
+    }
+
+    @Test
+    public void testIsReadOnly() {
+        assertFalse(utilsLeader.getInstanceRole().isReadOnly());
+        assertTrue(utilsFollower1.getInstanceRole().isReadOnly());
+        assertTrue(utilsFollower2.getInstanceRole().isReadOnly());
+
+        assertTrue(utilsReplica.getInstanceRole().isReadOnly());
+    }
 
 }

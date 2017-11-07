@@ -18,6 +18,8 @@ package com.graphaware.runtime.policy;
 
 import com.graphaware.common.policy.inclusion.fluent.IncludeRelationships;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessRelationships;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -40,11 +42,21 @@ import static org.neo4j.graphdb.RelationshipType.withName;
  */
 public class IncludeBusinessRelationshipsTest {
 
+    private GraphDatabaseService database;
+
+    @Before
+    public void setUp() {
+        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        registerShutdownHook(database);
+    }
+
+    @After
+    public void tearDown() {
+        database.shutdown();
+    }
+
     @Test
     public void shouldIncludeCorrectRelationships() {
-        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-
         try (Transaction tx = database.beginTx()) {
             Node n1 = database.createNode();
             Node n2 = database.createNode();

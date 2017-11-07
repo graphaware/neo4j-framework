@@ -150,13 +150,13 @@ public class RuntimeKernelExtension implements Lifecycle {
     private List<Pair<Integer, Pair<String, String>>> findOrderedBootstrappers() {
         List<Pair<Integer, Pair<String, String>>> orderedBootstrappers = new ArrayList<>();
 
-        for (String paramKey : config.getConfiguredSettingKeys()) {
+        for (String paramKey : config.getRaw().keySet()) {
             Matcher matcher = MODULE_ENABLED_KEY.matcher(paramKey);
 
             if (matcher.find()) {
                 String moduleId = matcher.group(1);
                 Integer moduleOrder = Integer.valueOf(matcher.group(2));
-                String bootstrapperClass = config.get(setting(paramKey, STRING, MANDATORY));
+                String bootstrapperClass = config.getRaw(paramKey).orElse("UNKNOWN");
                 orderedBootstrappers.add(Pair.of(moduleOrder, Pair.of(moduleId, bootstrapperClass)));
             }
         }
@@ -170,7 +170,7 @@ public class RuntimeKernelExtension implements Lifecycle {
         Map<String, String> moduleConfig = new HashMap<>();
 
         String moduleConfigKeyPrefix = MODULE_CONFIG_KEY + "." + moduleId + ".";
-        for (String paramKey : config.getConfiguredSettingKeys()) {
+        for (String paramKey : config.getRaw().keySet()) {
             if (paramKey.startsWith(moduleConfigKeyPrefix) || !MODULE_ENABLED_KEY.matcher(paramKey).find()) {
                 moduleConfig.put(paramKey.replace(moduleConfigKeyPrefix, ""), config.getRaw(paramKey).get());
             }

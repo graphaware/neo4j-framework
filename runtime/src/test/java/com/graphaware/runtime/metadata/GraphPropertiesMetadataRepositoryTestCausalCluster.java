@@ -19,6 +19,7 @@ package com.graphaware.runtime.metadata;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -26,6 +27,7 @@ import com.graphaware.runtime.config.FluentRuntimeConfiguration;
 import com.graphaware.runtime.config.FluentTxDrivenModuleConfiguration;
 import com.graphaware.test.integration.cluster.CausalClusterDatabasesintegrationTest;
 
+@Ignore
 public class GraphPropertiesMetadataRepositoryTestCausalCluster extends CausalClusterDatabasesintegrationTest {
 
     private ModuleMetadataRepository repository;

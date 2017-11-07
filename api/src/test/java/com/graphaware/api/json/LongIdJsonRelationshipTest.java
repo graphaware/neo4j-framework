@@ -84,7 +84,7 @@ public class LongIdJsonRelationshipTest {
             JSONAssert.assertEquals("{\"id\":1000,\"properties\":{\"k1\":\"v2\",\"k2\":4},\"startNodeId\":0,\"endNodeId\":1000,\"type\":\"R2\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r2, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer())), true);
             JSONAssert.assertEquals("{\"id\":1000,\"properties\":{\"k1\":\"v2\"},\"startNodeId\":0,\"endNodeId\":1000,\"type\":\"R2\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r2, new String[]{"k1"}, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer())), true);
 
-            JSONAssert.assertEquals("{\"id\":33,\"properties\":{\"a\":\"b\"},\"startNodeId\":44,\"endNodeId\":55,\"type\":\"XX\"}", mapper.writeValueAsString(new LongIdJsonRelationship(33, 44, 55, "XX", Collections.<String, Object>singletonMap("a", "b"))), true);
+            JSONAssert.assertEquals("{\"id\":33,\"properties\":{\"a\":\"b\"},\"startNodeId\":44,\"endNodeId\":55,\"type\":\"XX\"}", mapper.writeValueAsString(new LongIdJsonRelationship(33, 44, 55, "XX", Collections.singletonMap("a", "b"))), true);
 
             SerializationSpecification jsonInput1 = new SerializationSpecification();
             jsonInput1.setRelationshipProperties(null);
@@ -136,12 +136,14 @@ public class LongIdJsonRelationshipTest {
             tx.success();
         }
 
+        int i = 19; //for whatever reason
+
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"startNodeId\":0, \"endNodeId\":1, \"properties\":{\"k1\":\"v1\",\"k2\":2},\"type\":\"R\"}", LongIdJsonRelationship.class);
             Relationship rel = jsonRel.producePropertyContainer(database);
 
-            assertEquals(2, rel.getId());
-            JSONAssert.assertEquals("{\"id\":2,\"properties\":{\"k1\":\"v1\",\"k2\":2},\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(rel)), true);
+            assertEquals(++i, rel.getId());
+            JSONAssert.assertEquals("{\"id\":" + i + ",\"properties\":{\"k1\":\"v1\",\"k2\":2},\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(rel)), true);
 
             tx.success();
         }
@@ -150,8 +152,8 @@ public class LongIdJsonRelationshipTest {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"startNodeId\":0, \"endNodeId\":1, \"properties\":{},\"type\":\"R\"}", LongIdJsonRelationship.class);
             Relationship rel = jsonRel.producePropertyContainer(database);
 
-            assertEquals(3, rel.getId());
-            JSONAssert.assertEquals("{\"id\":3,\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\",\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonRelationship(rel)), true);
+            assertEquals(++i, rel.getId());
+            JSONAssert.assertEquals("{\"id\":" + i + ",\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\",\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonRelationship(rel)), true);
 
             tx.success();
         }
@@ -160,18 +162,18 @@ public class LongIdJsonRelationshipTest {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"startNodeId\":0, \"endNodeId\":1,\"type\":\"R\"}", LongIdJsonRelationship.class);
             Relationship rel = jsonRel.producePropertyContainer(database);
 
-            assertEquals(4, rel.getId());
-            JSONAssert.assertEquals("{\"id\":4,\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\",\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonRelationship(rel)), true);
+            assertEquals(++i, rel.getId());
+            JSONAssert.assertEquals("{\"id\":" + i + ",\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\",\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonRelationship(rel)), true);
 
             tx.success();
         }
 
         try (Transaction tx = database.beginTx()) {
-            LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 1, "R", Collections.<String, Object>singletonMap("k1", "v1"));
+            LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 1, "R", Collections.singletonMap("k1", "v1"));
             Relationship rel = jsonRel.producePropertyContainer(database);
 
-            assertEquals(5, rel.getId());
-            JSONAssert.assertEquals("{\"id\":5,\"properties\":{\"k1\":\"v1\"},\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(rel)), true);
+            assertEquals(++i, rel.getId());
+            JSONAssert.assertEquals("{\"id\":" + i + ",\"properties\":{\"k1\":\"v1\"},\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(rel)), true);
 
             tx.success();
         }
@@ -354,7 +356,7 @@ public class LongIdJsonRelationshipTest {
         }
 
         try (Transaction tx = database.beginTx()) {
-            LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 0, 0, "test", Collections.<String, Object>emptyMap());
+            LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 0, 0, "test", Collections.emptyMap());
             jsonRel.producePropertyContainer(database);
             tx.success();
         } catch (IllegalStateException e) {
@@ -362,7 +364,7 @@ public class LongIdJsonRelationshipTest {
         }
 
         try (Transaction tx = database.beginTx()) {
-            LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 0, 0, "test", Collections.<String, Object>emptyMap());
+            LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 0, 0, "test", Collections.emptyMap());
             jsonRel.producePropertyContainer(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
             tx.success();
         } catch (IllegalStateException e) {
@@ -370,17 +372,17 @@ public class LongIdJsonRelationshipTest {
         }
 
         try (Transaction tx = database.beginTx()) {
-            LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 1000, "TEST", Collections.<String, Object>singletonMap("k", "v"));
+            LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 1000, "TEST", Collections.singletonMap("k", "v"));
             Relationship r = jsonRel.producePropertyContainer(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
-            assertEquals(2, r.getId());
+            assertEquals(20, r.getId());
 
             tx.success();
         }
 
         try (Transaction tx = database.beginTx()) {
-            LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 1, "TEST", Collections.<String, Object>singletonMap("k", "v"));
+            LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 1, "TEST", Collections.singletonMap("k", "v"));
             Relationship r = jsonRel.producePropertyContainer(database);
-            assertEquals(3, r.getId());
+            assertEquals(2, r.getId());
 
             tx.success();
         }

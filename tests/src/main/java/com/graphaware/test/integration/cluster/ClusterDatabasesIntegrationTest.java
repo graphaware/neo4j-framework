@@ -110,7 +110,8 @@ public abstract class ClusterDatabasesIntegrationTest {
     protected abstract List<Class<?>> getTopology();
 
 
-    private final GraphDatabaseService createDatabase(int i, Class<?> instanceClass) throws Exception {
+    private GraphDatabaseService createDatabase(int i, Class<?> instanceClass, long delay) throws Exception {
+        Thread.sleep(delay);
 
         GraphDatabaseFacadeFactory.Dependencies dependencies = new GraphDatabaseFactoryState().databaseDependencies();
         dependencies = GraphDatabaseDependencies.newDependencies(dependencies);
@@ -125,7 +126,7 @@ public abstract class ClusterDatabasesIntegrationTest {
 
         params.putAll(addictionalParams(i, instanceClass));
 
-        Config config = Config.embeddedDefaults(params);
+        Config config = Config.defaults(params);
 
         File storeDir = Files.createTempDirectory(TMP_PATH_PREFIX + i).toFile();
         storeDir.deleteOnExit(); // it doesn't work very well
@@ -158,7 +159,6 @@ public abstract class ClusterDatabasesIntegrationTest {
      *
      * @param i             index of instance in the cluster
      * @param instanceClass the type of instance
-     * @param clusterSize   the number of instances in the cluster
      * @return
      */
     protected abstract Map<String, String> addictionalParams(int i, Class<?> instanceClass);
@@ -180,10 +180,8 @@ public abstract class ClusterDatabasesIntegrationTest {
         int i = 0;
         for (Class<?> instanceClass : topology) {
             final int j = i;
-            Future<GraphDatabaseService> f = exec.submit(() -> {
-                return createDatabase(j, instanceClass);
-            });
-            futures.add(f);
+            long delay = i == 0 ? 0 : 1000;
+            futures.add(exec.submit(() -> createDatabase(j, instanceClass, delay)));
             i++;
         }
 
@@ -208,8 +206,6 @@ public abstract class ClusterDatabasesIntegrationTest {
     /**
      * Populate all the databases. Can be overridden. By default, it populates
      * all the databases using {@link #databasePopulator()}.
-     *
-     * @param database to populate.
      */
     protected void populateDatabases() {
         DatabasePopulator populator = databasePopulator();

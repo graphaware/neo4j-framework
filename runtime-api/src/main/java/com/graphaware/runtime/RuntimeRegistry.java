@@ -79,6 +79,6 @@ public class RuntimeRegistry {
     }
 
     private static String storeDir(GraphDatabaseService database) {
-        return ((GraphDatabaseAPI) database).getStoreDir();
+        return ((GraphDatabaseAPI) database).getStoreDir().getAbsolutePath();
     }
 }

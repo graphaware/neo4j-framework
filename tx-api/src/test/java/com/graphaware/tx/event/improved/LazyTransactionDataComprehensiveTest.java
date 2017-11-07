@@ -18,7 +18,6 @@ package com.graphaware.tx.event.improved;
 
 import com.graphaware.common.util.Change;
 import com.graphaware.test.unit.GraphUnit;
-import com.graphaware.test.util.TestDataBuilder;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import com.graphaware.tx.executor.single.*;
@@ -35,13 +34,12 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.graphaware.common.util.Change.changesToMap;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.*;
 import static com.graphaware.common.util.PropertyContainerUtils.*;
 import static com.graphaware.tx.event.improved.LazyTransactionDataComprehensiveTest.RelationshipTypes.*;
 import static com.graphaware.tx.event.improved.PropertiesAssert.assertProperties;
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.Label.label;
@@ -103,10 +101,12 @@ public class LazyTransactionDataComprehensiveTest {
     }
 
     private GraphDatabaseService db;
+    private final Map<Long, Long> ids = new HashMap<>();
 
     @After
     public void tearDown() {
         db.shutdown();
+        ids.clear();
     }
 
     @Test
@@ -119,17 +119,17 @@ public class LazyTransactionDataComprehensiveTest {
                         Map<Long, Relationship> created = toMap(td.getAllCreatedRelationships());
                         assertEquals(2, created.size());
 
-                        long r1Id = db.getNodeById(7).getSingleRelationship(R2, OUTGOING).getId();
+                        long r1Id = getNodeById(7).getSingleRelationship(R2, OUTGOING).getId();
                         Relationship r1 = created.get(r1Id);
                         assertProperties(r1, TIME, 4);
 
-                        long r2Id = db.getNodeById(1).getSingleRelationship(R1, OUTGOING).getId();
+                        long r2Id = getNodeById(1).getSingleRelationship(R1, OUTGOING).getId();
                         Relationship r2 = created.get(r2Id);
                         assertProperties(r2);
 
                         assertTrue(td.hasBeenCreated(r1));
                         assertTrue(td.hasBeenCreated(r2));
-                        assertFalse(td.hasBeenCreated(db.getNodeById(3).getSingleRelationship(R1, OUTGOING)));
+                        assertFalse(td.hasBeenCreated(getNodeById(3).getSingleRelationship(R1, OUTGOING)));
 
                         //in contrast to filtered version:
                         assertProperties(r2.getEndNode(), NAME, "Three", PLACE, "London", TAGS, "one");
@@ -148,7 +148,7 @@ public class LazyTransactionDataComprehensiveTest {
                     public void doBeforeCommit(ImprovedTransactionData td) {
                         Map<Long, Relationship> created = toMap(td.getAllCreatedRelationships());
 
-                        long r2Id = db.getNodeById(1).getSingleRelationship(R1, OUTGOING).getId();
+                        long r2Id = getNodeById(1).getSingleRelationship(R1, OUTGOING).getId();
                         Relationship r2 = created.get(r2Id);
 
                         Node one = r2.getStartNode();
@@ -161,7 +161,7 @@ public class LazyTransactionDataComprehensiveTest {
 
                         Node three = r2.getEndNode();
                         assertNull(three.getSingleRelationship(R3, INCOMING));
-                        assertEquals(7, three.getSingleRelationship(R2, INCOMING).getStartNode().getId());
+                        assertEquals((long) ids.get(7L), three.getSingleRelationship(R2, INCOMING).getStartNode().getId());
                     }
                 }
         );
@@ -178,14 +178,14 @@ public class LazyTransactionDataComprehensiveTest {
                         assertEquals(1, changed.size());
 
                         Relationship previous = getSingleValue(changed).getPrevious();
-                        assertProperties(previous, TIME, 3, TAG, "cool");
+                        assertProperties(previous, TIME, 3L, TAG, "cool");
 
                         Relationship current = getSingleValue(changed).getCurrent();
                         assertProperties(current, TIME, 4, TAGS, "cool");
 
                         assertTrue(td.hasBeenChanged(previous));
                         assertTrue(td.hasBeenChanged(current));
-                        assertFalse(td.hasBeenChanged(db.getNodeById(3).getSingleRelationship(R1, OUTGOING)));
+                        assertFalse(td.hasBeenChanged(getNodeById(3).getSingleRelationship(R1, OUTGOING)));
                     }
                 }
         );
@@ -202,7 +202,7 @@ public class LazyTransactionDataComprehensiveTest {
                         Relationship previous = getSingleValue(changed).getPrevious();
 
                         Node one = previous.getEndNode();
-                        assertProperties(one, NAME, "One", COUNT, 1, TAGS, new String[]{"one", "two"});
+                        assertProperties(one, NAME, "One", COUNT, 1L, TAGS, new String[]{"one", "two"});
 
                         assertEquals(1, count(one.getLabels()));
                         assertTrue(contains(one.getLabels(), label("One")));
@@ -298,7 +298,7 @@ public class LazyTransactionDataComprehensiveTest {
         final Holder<Node> deletedNode = new Holder<>();
 
         try (Transaction tx = db.beginTx()) {
-            deletedNode.set(db.getNodeById(2));
+            deletedNode.set(getNodeById(2));
             tx.success();
         }
 
@@ -309,11 +309,11 @@ public class LazyTransactionDataComprehensiveTest {
                         Map<Long, Relationship> deleted = toMap(td.getAllDeletedRelationships());
                         assertEquals(4, deleted.size());
 
-                        long r1Id = toMap(td.getAllDeletedNodes()).get(2L).getSingleRelationship(R1, INCOMING).getId();
+                        long r1Id = toMap(td.getAllDeletedNodes()).get(ids.get(2L)).getSingleRelationship(R1, INCOMING).getId();
                         Relationship r1 = deleted.get(r1Id);
-                        assertProperties(r1, TIME, 1);
+                        assertProperties(r1, TIME, 1L);
 
-                        long r2Id = toMap(td.getAllDeletedNodes()).get(2L).getSingleRelationship(R2, INCOMING).getId();
+                        long r2Id = toMap(td.getAllDeletedNodes()).get(ids.get(2L)).getSingleRelationship(R2, INCOMING).getId();
                         Relationship r2 = deleted.get(r2Id);
                         assertProperties(r2);
 
@@ -323,7 +323,7 @@ public class LazyTransactionDataComprehensiveTest {
                             r3Id = relationships.next().getId();
                         }
                         Relationship r3 = deleted.get(r3Id);
-                        assertProperties(r3, TIME, 2);
+                        assertProperties(r3, TIME, 2L);
 
                         long r4Id = changesToMap(td.getAllChangedNodes()).get(3L).getPrevious().getSingleRelationship(R3, INCOMING).getId();
                         Relationship r4 = deleted.get(r4Id);
@@ -333,7 +333,7 @@ public class LazyTransactionDataComprehensiveTest {
                         assertTrue(td.hasBeenDeleted(r2));
                         assertTrue(td.hasBeenDeleted(r3));
                         assertTrue(td.hasBeenDeleted(r4));
-                        assertFalse(td.hasBeenDeleted(db.getNodeById(3).getSingleRelationship(R3, OUTGOING)));
+                        assertFalse(td.hasBeenDeleted(getNodeById(3).getSingleRelationship(R3, OUTGOING)));
 
                         assertEquals(3, count(td.getDeletedRelationships(deletedNode.get())));
                         assertEquals(3, count(td.getDeletedRelationships(deletedNode.get(), R2, R1)));
@@ -363,7 +363,7 @@ public class LazyTransactionDataComprehensiveTest {
                         Relationship deletedRel = td.getDeleted(r4);
 
                         Node one = deletedRel.getStartNode();
-                        assertProperties(one, NAME, "One", COUNT, 1, TAGS, new String[]{"one", "two"});
+                        assertProperties(one, NAME, "One", COUNT, 1L, TAGS, new String[]{"one", "two"});
 
                         assertEquals(1, count(one.getLabels()));
                         assertTrue(contains(one.getLabels(), label("One")));
@@ -430,7 +430,7 @@ public class LazyTransactionDataComprehensiveTest {
                         assertFalse(td.hasPropertyBeenCreated(td.getAllDeletedRelationships().iterator().next(), TAGS));
 
                         //created relationship should not fall into this category
-                        assertFalse(td.hasPropertyBeenCreated(db.getNodeById(7).getSingleRelationship(R2, OUTGOING), TIME));
+                        assertFalse(td.hasPropertyBeenCreated(getNodeById(7).getSingleRelationship(R2, OUTGOING), TIME));
                     }
                 }
         );
@@ -452,8 +452,8 @@ public class LazyTransactionDataComprehensiveTest {
 
                         assertEquals(1, td.changedProperties(change.getCurrent()).size());
                         assertEquals(1, td.changedProperties(change.getPrevious()).size());
-                        assertEquals(3, td.changedProperties(change.getCurrent()).get(TIME).getPrevious());
-                        assertEquals(3, td.changedProperties(change.getPrevious()).get(TIME).getPrevious());
+                        assertEquals(3L, td.changedProperties(change.getCurrent()).get(TIME).getPrevious());
+                        assertEquals(3L, td.changedProperties(change.getPrevious()).get(TIME).getPrevious());
                         assertEquals(4, td.changedProperties(change.getCurrent()).get(TIME).getCurrent());
                         assertEquals(4, td.changedProperties(change.getPrevious()).get(TIME).getCurrent());
 
@@ -506,12 +506,12 @@ public class LazyTransactionDataComprehensiveTest {
                         Map<Long, Node> createdNodes = toMap(td.getAllCreatedNodes());
                         assertEquals(1, createdNodes.size());
 
-                        Node createdNode = createdNodes.get(7L);
+                        Node createdNode = createdNodes.get(ids.get(7L));
                         assertProperties(createdNode, NAME, "Seven", "size", 4L);
                         assertTrue(contains(createdNode.getLabels(), label("SomeLabel")));
 
                         assertTrue(td.hasBeenCreated(createdNode));
-                        assertFalse(td.hasBeenCreated(db.getNodeById(3)));
+                        assertFalse(td.hasBeenCreated(getNodeById(3)));
                     }
                 }
         );
@@ -525,7 +525,7 @@ public class LazyTransactionDataComprehensiveTest {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData td) {
                         Map<Long, Node> createdNodes = toMap(td.getAllCreatedNodes());
-                        Node createdNode = createdNodes.get(7L);
+                        Node createdNode = createdNodes.get(ids.get(7L));
 
                         Node three = createdNode.getSingleRelationship(R2, OUTGOING).getEndNode();
                         assertEquals("one", three.getProperty(TAGS));
@@ -555,7 +555,7 @@ public class LazyTransactionDataComprehensiveTest {
                         assertEquals(4, changed.size());
 
                         Node previous1 = changed.get(1L).getPrevious();
-                        assertProperties(previous1, NAME, "One", COUNT, 1, TAGS, new String[]{"one", "two"});
+                        assertProperties(previous1, NAME, "One", COUNT, 1L, TAGS, new String[]{"one", "two"});
 
                         Node current1 = changed.get(1L).getCurrent();
                         assertProperties(current1, NAME, "NewOne", TAGS, new String[]{"one", "three"});
@@ -594,11 +594,11 @@ public class LazyTransactionDataComprehensiveTest {
                         assertTrue(td.hasBeenChanged(current2));
                         assertTrue(td.hasBeenChanged(current3));
                         assertTrue(td.hasBeenChanged(current4));
-                        assertFalse(td.hasBeenChanged(db.getNodeById(4)));
-                        assertFalse(td.hasBeenChanged(db.getNodeById(0)));
+                        assertFalse(td.hasBeenChanged(getNodeById(4)));
+                        assertFalse(td.hasBeenChanged(getNodeById(0)));
 
                         try {
-                            td.getChanged(db.getNodeById(4));
+                            td.getChanged(getNodeById(4));
                             fail();
                         } catch (IllegalArgumentException e) {
                             //ok
@@ -622,7 +622,7 @@ public class LazyTransactionDataComprehensiveTest {
                         assertEquals(1, count(previous.getLabels()));
                         assertTrue(contains(previous.getLabels(), label("One")));
 
-                        assertEquals(1, previous.getSingleRelationship(R1, OUTGOING).getProperty(TIME));
+                        assertEquals(1L, previous.getSingleRelationship(R1, OUTGOING).getProperty(TIME));
                         assertEquals("Two", previous.getRelationships(R1, OUTGOING).iterator().next().getEndNode().getProperty(NAME));
                         assertEquals("Three", previous.getRelationships(OUTGOING, R3).iterator().next().getEndNode().getProperty(NAME));
                         assertEquals(2L, previous.getRelationships(R1).iterator().next().getEndNode().getProperty("size"));
@@ -649,7 +649,7 @@ public class LazyTransactionDataComprehensiveTest {
                         assertFalse(previous.hasRelationship(R1, INCOMING));
                         assertFalse(previous.hasRelationship(R2));
 
-                        previous.createRelationshipTo(db.getNodeById(4), R3);
+                        previous.createRelationshipTo(getNodeById(4), R3);
                         try {
                             previous.getSingleRelationship(R3, OUTGOING);
                             fail();
@@ -740,7 +740,7 @@ public class LazyTransactionDataComprehensiveTest {
                         Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
                         assertEquals(1, deletedNodes.size());
 
-                        Node deleted = deletedNodes.get(2L);
+                        Node deleted = deletedNodes.get(ids.get(2L));
                         Node one = td.getDeleted(deleted).getSingleRelationship(R1, INCOMING).getStartNode();
 
                         assertProperties(deleted, NAME, "Two", "size", 2L);
@@ -749,7 +749,7 @@ public class LazyTransactionDataComprehensiveTest {
                         assertFalse(td.hasBeenDeleted(one));
 
                         try {
-                            td.getDeleted(db.getNodeById(4L));
+                            td.getDeleted(getNodeById(4L));
                             fail();
                         } catch (IllegalArgumentException e) {
                             //ok
@@ -768,13 +768,13 @@ public class LazyTransactionDataComprehensiveTest {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData td) {
                         Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
-                        Node deleted = deletedNodes.get(2L);
+                        Node deleted = deletedNodes.get(ids.get(2L));
 
                         Node one = td.getDeleted(deleted).getSingleRelationship(R1, INCOMING).getStartNode();
                         assertEquals(1, count(one.getLabels()));
                         assertTrue(contains(one.getLabels(), label("One")));
 
-                        assertEquals(1, one.getSingleRelationship(R1, OUTGOING).getProperty(TIME));
+                        assertEquals(1L, one.getSingleRelationship(R1, OUTGOING).getProperty(TIME));
                         assertEquals("Two", one.getRelationships(R1, OUTGOING).iterator().next().getEndNode().getProperty(NAME));
                         assertEquals("Three", one.getRelationships(OUTGOING, R3).iterator().next().getEndNode().getProperty(NAME));
                         assertEquals(2L, one.getRelationships(R1).iterator().next().getEndNode().getProperty("size"));
@@ -791,7 +791,7 @@ public class LazyTransactionDataComprehensiveTest {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData td) {
                         Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
-                        Node deleted = deletedNodes.get(2L);
+                        Node deleted = deletedNodes.get(ids.get(2L));
 
                         Node one = td.getDeleted(deleted).getSingleRelationship(R1, INCOMING).getStartNode();
 
@@ -850,9 +850,9 @@ public class LazyTransactionDataComprehensiveTest {
                         assertEquals("NewLabel", getSingleOrNull(td.assignedLabels(changed5.getPrevious())).name());
 
                         //not changed at all
-                        assertTrue(td.createdProperties(db.getNodeById(4)).isEmpty());
-                        assertTrue(td.deletedProperties(db.getNodeById(4)).isEmpty());
-                        assertTrue(td.changedProperties(db.getNodeById(4)).isEmpty());
+                        assertTrue(td.createdProperties(getNodeById(4)).isEmpty());
+                        assertTrue(td.deletedProperties(getNodeById(4)).isEmpty());
+                        assertTrue(td.changedProperties(getNodeById(4)).isEmpty());
                     }
                 }
         );
@@ -947,10 +947,10 @@ public class LazyTransactionDataComprehensiveTest {
                         assertEquals(0, td.assignedLabels(changed.getPrevious()).size());
                         assertEquals(0, td.assignedLabels(changed.getCurrent()).size());
 
-                        assertTrue(td.assignedLabels(db.getNodeById(4)).isEmpty());
-                        assertTrue(td.removedLabels(db.getNodeById(4)).isEmpty());
-                        assertFalse(td.hasLabelBeenAssigned(db.getNodeById(4), label("any")));
-                        assertFalse(td.hasLabelBeenRemoved(db.getNodeById(4), label("any")));
+                        assertTrue(td.assignedLabels(getNodeById(4)).isEmpty());
+                        assertTrue(td.removedLabels(getNodeById(4)).isEmpty());
+                        assertFalse(td.hasLabelBeenAssigned(getNodeById(4), label("any")));
+                        assertFalse(td.hasLabelBeenRemoved(getNodeById(4), label("any")));
                     }
                 }
         );
@@ -974,8 +974,8 @@ public class LazyTransactionDataComprehensiveTest {
 
                         assertEquals(1, td.deletedProperties(changed.getCurrent()).size());
                         assertEquals(1, td.deletedProperties(changed.getPrevious()).size());
-                        assertEquals(1, td.deletedProperties(changed.getCurrent()).get(COUNT));
-                        assertEquals(1, td.deletedProperties(changed.getPrevious()).get(COUNT));
+                        assertEquals(1L, td.deletedProperties(changed.getCurrent()).get(COUNT));
+                        assertEquals(1L, td.deletedProperties(changed.getPrevious()).get(COUNT));
 
                         assertTrue(td.hasLabelBeenRemoved(changed.getCurrent(), label("One")));
                         assertTrue(td.hasLabelBeenRemoved(changed.getPrevious(), label("One")));
@@ -1005,10 +1005,10 @@ public class LazyTransactionDataComprehensiveTest {
                         assertEquals("ToBeRemoved", getSingleOrNull(td.removedLabels(changed.getCurrent())).name());
                         assertEquals("ToBeRemoved", getSingleOrNull(td.removedLabels(changed.getPrevious())).name());
 
-                        assertTrue(td.assignedLabels(db.getNodeById(4)).isEmpty());
-                        assertTrue(td.removedLabels(db.getNodeById(4)).isEmpty());
-                        assertFalse(td.hasLabelBeenAssigned(db.getNodeById(4), label("any")));
-                        assertFalse(td.hasLabelBeenRemoved(db.getNodeById(4), label("any")));
+                        assertTrue(td.assignedLabels(getNodeById(4)).isEmpty());
+                        assertTrue(td.removedLabels(getNodeById(4)).isEmpty());
+                        assertFalse(td.hasLabelBeenAssigned(getNodeById(4), label("any")));
+                        assertFalse(td.hasLabelBeenRemoved(getNodeById(4), label("any")));
                     }
                 }
         );
@@ -1029,7 +1029,7 @@ public class LazyTransactionDataComprehensiveTest {
 
                         Map<Long, Relationship> created = toMap(td.getAllCreatedRelationships());
 
-                        long r1Id = db.getNodeById(7).getSingleRelationship(R2, OUTGOING).getId();
+                        long r1Id = getNodeById(7).getSingleRelationship(R2, OUTGOING).getId();
                         Relationship r1 = created.get(r1Id);
 
                         r1.setProperty("additional", "someValue");
@@ -1039,7 +1039,7 @@ public class LazyTransactionDataComprehensiveTest {
         );
 
         try (Transaction tx = db.beginTx()) {
-            Relationship r1 = db.getNodeById(7).getSingleRelationship(R2, OUTGOING);
+            Relationship r1 = getNodeById(7).getSingleRelationship(R2, OUTGOING);
             assertEquals(1, count(r1.getPropertyKeys()));
             assertEquals("someValue", r1.getProperty("additional"));
             assertFalse(r1.hasProperty(TIME));
@@ -1058,7 +1058,7 @@ public class LazyTransactionDataComprehensiveTest {
                         }
 
                         Map<Long, Node> createdNodes = toMap(td.getAllCreatedNodes());
-                        Node createdNode = createdNodes.get(7L);
+                        Node createdNode = createdNodes.get(ids.get(7L));
 
                         createdNode.setProperty(NAME, "NewSeven");
                         createdNode.setProperty("additional", "something");
@@ -1070,7 +1070,7 @@ public class LazyTransactionDataComprehensiveTest {
 
         try (Transaction tx = db.beginTx()) {
 
-            Node createdNode = db.getNodeById(7L);
+            Node createdNode = getNodeById(7L);
 
             assertEquals("NewSeven", createdNode.getProperty(NAME));
             assertEquals("something", createdNode.getProperty("additional"));
@@ -1103,7 +1103,7 @@ public class LazyTransactionDataComprehensiveTest {
         );
 
         try (Transaction tx = db.beginTx()) {
-            Relationship r = db.getNodeById(3).getSingleRelationship(R3, OUTGOING);
+            Relationship r = getNodeById(3).getSingleRelationship(R3, OUTGOING);
 
             assertEquals(2, count(r.getPropertyKeys()));
             assertEquals(5, r.getProperty(TIME));
@@ -1136,7 +1136,7 @@ public class LazyTransactionDataComprehensiveTest {
 
         try (Transaction tx = db.beginTx()) {
 
-            Relationship r = db.getNodeById(3).getSingleRelationship(R3, OUTGOING);
+            Relationship r = getNodeById(3).getSingleRelationship(R3, OUTGOING);
 
             assertEquals(2, count(r.getPropertyKeys()));
             assertEquals(5, r.getProperty(TIME));
@@ -1170,7 +1170,7 @@ public class LazyTransactionDataComprehensiveTest {
 
         try (Transaction tx = db.beginTx()) {
 
-            Node node = db.getNodeById(1L);
+            Node node = getNodeById(1L);
 
             assertEquals(2, count(node.getPropertyKeys()));
             assertEquals("YetAnotherOne", node.getProperty(NAME));
@@ -1206,7 +1206,7 @@ public class LazyTransactionDataComprehensiveTest {
 
         try (Transaction tx = db.beginTx()) {
 
-            Node node = db.getNodeById(1L);
+            Node node = getNodeById(1L);
 
             assertEquals(2, count(node.getPropertyKeys()));
             assertEquals("YetAnotherOne", node.getProperty(NAME));
@@ -1230,7 +1230,7 @@ public class LazyTransactionDataComprehensiveTest {
 
                         Map<Long, Relationship> deleted = toMap(td.getAllDeletedRelationships());
 
-                        long r1Id = toMap(td.getAllDeletedNodes()).get(2L).getSingleRelationship(R1, INCOMING).getId();
+                        long r1Id = toMap(td.getAllDeletedNodes()).get(ids.get(2L)).getSingleRelationship(R1, INCOMING).getId();
                         Relationship r1 = deleted.get(r1Id);
 
                         try {
@@ -1255,7 +1255,7 @@ public class LazyTransactionDataComprehensiveTest {
                     public void doBeforeCommit(ImprovedTransactionData td) {
                         Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
 
-                        Node deleted = deletedNodes.get(2L);
+                        Node deleted = deletedNodes.get(ids.get(2L));
 
                         try {
                             deleted.setProperty("irrelevant", "irrelevant");
@@ -1294,9 +1294,9 @@ public class LazyTransactionDataComprehensiveTest {
                     public void doBeforeCommit(ImprovedTransactionData td) {
                         Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
 
-                        Node deleted = deletedNodes.get(2L);
+                        Node deleted = deletedNodes.get(ids.get(2L));
 
-                        deleted.createRelationshipTo(db.getNodeById(3), withName("illegal"));
+                        deleted.createRelationshipTo(getNodeById(3), withName("illegal"));
                     }
                 }
         );
@@ -1311,9 +1311,9 @@ public class LazyTransactionDataComprehensiveTest {
                     public void doBeforeCommit(ImprovedTransactionData td) {
                         Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
 
-                        Node deleted = deletedNodes.get(2L);
+                        Node deleted = deletedNodes.get(ids.get(2L));
 
-                        db.getNodeById(3).createRelationshipTo(deleted, withName("illegal"));
+                        getNodeById(3).createRelationshipTo(deleted, withName("illegal"));
                     }
                 }
         );
@@ -1335,11 +1335,11 @@ public class LazyTransactionDataComprehensiveTest {
 
         try (Transaction tx = db.beginTx()) {
 
-            long r4Id = db.getNodeById(3L).getSingleRelationship(R3, INCOMING).getId();
+            long r4Id = getNodeById(3L).getSingleRelationship(R3, INCOMING).getId();
             Relationship r4 = db.getRelationshipById(r4Id);
 
             Node one = r4.getStartNode();
-            assertProperties(one, NAME, "One", COUNT, 1, TAGS, new String[]{"one", "two"});
+            assertProperties(one, NAME, "One", COUNT, 1L, TAGS, new String[]{"one", "two"});
             assertEquals(1, count(one.getLabels()));
             assertTrue(contains(one.getLabels(), label("One")));
 
@@ -1363,7 +1363,7 @@ public class LazyTransactionDataComprehensiveTest {
                 new BeforeCommitCallback.RememberingAdapter() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData td) {
-                        Change<Node> change = td.getChanged(db.getNodeById(1));
+                        Change<Node> change = td.getChanged(getNodeById(1));
                         //must first delete the new relationship
                         change.getCurrent().getSingleRelationship(R1, OUTGOING).delete();
                         deleteNodeAndRelationships(change.getPrevious());
@@ -1403,7 +1403,7 @@ public class LazyTransactionDataComprehensiveTest {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData td) {
                         Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
-                        Node deleted = deletedNodes.get(2L);
+                        Node deleted = deletedNodes.get(ids.get(2L));
                         deleteNodeAndRelationships(deleted);
                     }
                 }
@@ -1437,7 +1437,7 @@ public class LazyTransactionDataComprehensiveTest {
         );
 
         try (Transaction tx = db.beginTx()) {
-            Relationship newRelationship = db.getNodeById(1).getSingleRelationship(withName("R4"), OUTGOING);
+            Relationship newRelationship = getNodeById(1).getSingleRelationship(withName("R4"), OUTGOING);
             assertNotNull(newRelationship);
             assertEquals("Eight", newRelationship.getEndNode().getProperty(NAME));
             assertEquals(true, newRelationship.getProperty("new"));
@@ -1468,7 +1468,7 @@ public class LazyTransactionDataComprehensiveTest {
         );
 
         try (Transaction tx = db.beginTx()) {
-            Relationship newRelationship = db.getNodeById(1).getSingleRelationship(withName("R4"), OUTGOING);
+            Relationship newRelationship = getNodeById(1).getSingleRelationship(withName("R4"), OUTGOING);
             assertNotNull(newRelationship);
             assertEquals("Eight", newRelationship.getEndNode().getProperty(NAME));
             assertEquals(true, newRelationship.getProperty("new"));
@@ -1489,7 +1489,7 @@ public class LazyTransactionDataComprehensiveTest {
                         Map<String, Object> previousProps = new OtherNodeNameIncludingRelationshipPropertiesExtractor().extractProperties(previous, previous.getStartNode());
                         assertEquals(3, previousProps.size());
                         assertEquals("One", previousProps.get("otherNodeName"));
-                        assertEquals(3, previousProps.get(TIME));
+                        assertEquals(3L, previousProps.get(TIME));
                         assertEquals("cool", previousProps.get(TAG));
 
                         Map<String, Object> currentProps = new OtherNodeNameIncludingRelationshipPropertiesExtractor().extractProperties(current, current.getStartNode());
@@ -1509,7 +1509,7 @@ public class LazyTransactionDataComprehensiveTest {
                         @Override
                         protected void doInTx(GraphDatabaseService database) {
                             //change that should not be picked up as a change
-                            Node four = database.getNodeById(4);
+                            Node four = getNodeById(4);
                             four.setProperty(NAME, "Three");
                             four.setProperty(NAME, "Four");
                         }
@@ -1562,7 +1562,7 @@ public class LazyTransactionDataComprehensiveTest {
         final Holder<Node> deletedNode = new Holder<>();
 
         try (Transaction tx = db.beginTx()) {
-            deletedNode.set(db.getNodeById(2));
+            deletedNode.set(getNodeById(2));
             tx.success();
         }
 
@@ -1690,34 +1690,40 @@ public class LazyTransactionDataComprehensiveTest {
         db = new TestGraphDatabaseFactory().newImpermanentDatabase();
         registerShutdownHook(db);
 
-        new TestDataBuilder(db)
-                .node(label("TestLabel"))
-                .node(label("One")).setProp(NAME, "One").setProp(COUNT, 1).setProp(TAGS, new String[]{"one", "two"})
+        db.execute("CREATE " +
+                "(zero:TestLabel), " +
+                "(one:One {name:'One', count:1, tags:['one', 'two']}), " +
+                "(two:Two {name:'Two', size: 2}), " +
+                "(two)<-[:R1 {time:1}]-(one), " +
+                "(two)<-[:R2]-(two), " +
+                "(three:Three {name:'Three', place:'London'}), " +
+                "(three)<-[:R2 {time:2}]-(two), " +
+                "(three)-[:R3 {time:3, tag:'cool'}]->(one), " +
+                "(three)<-[:R3]-(one), " +
+                "(four:Four {name:'Four'}), " +
+                "(four)<-[:R1 {time:1}]-(three), " +
+                "(four)<-[:WHATEVER]-(one), " +
+                "(five:SomeLabel {name:'Five'}), " +
+                "(five)<-[:R4]-(four), " +
+                "(tbr:ToBeRemoved {name:'Six'}), " +
+                "(tbr)<-[:R4]-(five)");
 
-                .node().setProp(NAME, "Two").setProp("size", 2L)
-                .relationshipFrom(1, "R1").setProp(TIME, 1)
-                .relationshipFrom(2, "R2")
-
-                .node().setProp(NAME, "Three").setProp(PLACE, "London")
-                .relationshipFrom(2, "R2").setProp(TIME, 2)
-                .relationshipTo(1, "R3").setProp(TIME, 3).setProp(TAG, "cool")
-                .relationshipFrom(1, "R3")
-
-                .node().setProp(NAME, "Four")
-                .relationshipFrom(3, "R1").setProp(TIME, 1)
-                .relationshipFrom(1, "WHATEVER")
-
-                .node(label("SomeLabel")).setProp(NAME, "Five")
-                .relationshipFrom(4, R4)
-                .node(label("ToBeRemoved")).setProp(NAME, "Six")
-                .relationshipFrom(5, R4);
+        try (Transaction tx = db.beginTx()) {
+            ids.put(0L, db.findNodes(Label.label("TestLabel")).next().getId());
+            ids.put(1L, db.findNodes(Label.label("One")).next().getId());
+            ids.put(2L, db.findNodes(Label.label("Two")).next().getId());
+            ids.put(3L, db.findNodes(Label.label("Three")).next().getId());
+            ids.put(4L, db.findNodes(Label.label("Four")).next().getId());
+            ids.put(5L, db.findNodes(Label.label("SomeLabel")).next().getId());
+            ids.put(6L, db.findNodes(Label.label("ToBeRemoved")).next().getId());
+        }
     }
 
     private class TestGraphMutation extends VoidReturningCallback {
 
         @Override
         public void doInTx(GraphDatabaseService database) {
-            Node one = database.getNodeById(1);
+            Node one = getNodeById(1);
             one.setProperty(NAME, "NewOne");
             one.removeProperty(COUNT);
             one.setProperty(TAGS, new String[]{"one"});
@@ -1725,15 +1731,16 @@ public class LazyTransactionDataComprehensiveTest {
             one.removeLabel(label("One"));
             one.addLabel(label("NewOne"));
 
-            Node two = database.getNodeById(2);
+            Node two = getNodeById(2);
             deleteNodeAndRelationships(two);
 
-            Node three = database.getNodeById(3);
+            Node three = getNodeById(3);
             three.setProperty(TAGS, "one");
             three.setProperty(PLACE, "Rome");
             three.setProperty(PLACE, "London");
 
             Node seven = database.createNode(label("SomeLabel"));
+            ids.put(7L, seven.getId());
             seven.setProperty(NAME, "Seven");
             seven.setProperty("size", 3L);
             seven.setProperty("size", 4L);
@@ -1750,23 +1757,27 @@ public class LazyTransactionDataComprehensiveTest {
             one.createRelationshipTo(three, R1);
 
             //change that should not be picked up as a change
-            Node four = database.getNodeById(4);
+            Node four = getNodeById(4);
             four.setProperty(NAME, "Three");
             four.setProperty(NAME, "Four");
 
-            Node five = database.getNodeById(5);
+            Node five = getNodeById(5);
             five.addLabel(label("NewLabel"));
 
-            Node six = database.getNodeById(6);
+            Node six = getNodeById(6);
             six.removeLabel(label("ToBeRemoved"));
 
             //this should not be picked up as a change
-            Node zero = database.getNodeById(0);
+            Node zero = getNodeById(0);
             zero.removeLabel(label("TestLabel"));
             zero.addLabel(label("Temp"));
             zero.removeLabel(label("Temp"));
             zero.addLabel(label("TestLabel"));
         }
+    }
+
+    private Node getNodeById(long id) {
+        return db.getNodeById(ids.get(id));
     }
 
     /**
@@ -1778,6 +1789,20 @@ public class LazyTransactionDataComprehensiveTest {
      */
     private static <T extends PropertyContainer> Map<Long, T> toMap(Collection<T> propertyContainers) {
         return propertyContainersToMap(propertyContainers);
+    }
+
+    private  <T extends PropertyContainer> Map<Long, Change<T>> changesToMap(Collection<Change<T>> changes) {
+        Map<Long, Change<T>> result = new HashMap<>();
+
+        for (Change<T> change : changes) {
+            long id = id(change.getPrevious());
+            if (id != id(change.getCurrent())) {
+                throw new IllegalArgumentException("IDs of the Property Containers in Change do not match!");
+            }
+            result.put(ids.get(id), change);
+        }
+
+        return result;
     }
 
     private static <K, V> V getSingleValue(Map<K, V> map) {
