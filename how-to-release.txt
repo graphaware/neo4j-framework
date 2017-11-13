@@ -23,6 +23,7 @@ List of modules to upgrade:
         reco
         reco-meetup
         neo4j-to-elasticsearch
+        nlp
         graphaware-starter
         audit
         schema
