@@ -79,7 +79,10 @@ public final class TopologyListenerAdapter {
      */
     public void unregister() {
         this.topologyChangeEventListeners.clear();
-        this.topologyListener.unregister();
+
+        if (topologyListener != null) {
+            this.topologyListener.unregister();
+        }
     }
 
     /**
