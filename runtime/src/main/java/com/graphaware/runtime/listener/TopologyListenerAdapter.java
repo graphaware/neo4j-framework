@@ -35,15 +35,11 @@ public final class TopologyListenerAdapter {
 
     List<TopologyChangeEventListener> topologyChangeEventListeners = new ArrayList<>();
 
-    private DependencyResolver dependencyResolver;
-
-    private OperationalMode operationalMode;
-
     private TopologyListener topologyListener;
 
     public TopologyListenerAdapter(final GraphDatabaseAPI api) {
-        operationalMode = new InstanceRoleUtils(api).getOperationalMode();
-        dependencyResolver = api.getDependencyResolver();
+        OperationalMode operationalMode = new InstanceRoleUtils(api).getOperationalMode();
+        DependencyResolver dependencyResolver = api.getDependencyResolver();
 
         // HA
         if (operationalMode.equals(OperationalMode.ha)) {
@@ -55,7 +51,9 @@ public final class TopologyListenerAdapter {
             topologyListener = new CausalClusterListener(dependencyResolver, this);
         }
 
-        topologyListener.register();
+        if (topologyListener != null) {
+            topologyListener.register();
+        }
     }
 
     /**

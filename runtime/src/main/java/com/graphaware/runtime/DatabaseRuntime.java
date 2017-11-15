@@ -66,7 +66,7 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
         try {
             this.topologyListenerAdapter = new TopologyListenerAdapter((GraphDatabaseAPI) database);
         } catch (Exception exception) {
-            LOG.warn("Topology change adapter is not available on community edition");
+            LOG.warn("Failed to register topology listener", exception);
         }
     }
 
