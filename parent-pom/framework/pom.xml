@@ -40,6 +40,7 @@
         <module>../../writer</module>
         <module>../../writer-api</module>
         <module>../../build</module>
+        <module>../../lifecycle</module>
 
         <!--examples-->
         <module>../../examples/node-counter</module>
@@ -76,7 +77,7 @@
         <system>Travis CI</system>
     </ciManagement>
 
-    <inceptionYear>2013-2016</inceptionYear>
+    <inceptionYear>2013-2018</inceptionYear>
 
     <issueManagement>
         <system>GitHub</system>
