@@ -14,40 +14,27 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.lifecycle.strategy;
+package com.graphaware.lifecycle.event.strategy;
 
-import com.graphaware.common.serialize.Serializer;
-import com.graphaware.common.serialize.SingletonSerializer;
-import com.graphaware.lifecycle.event.LifecycleEvent;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 /**
  * {@link LifecycleEventStrategy} that deletes the expired {@link Node} and a all its {@link Relationship}s.
  */
-public final class DeleteNodeAndRelationships extends LifecycleEventStrategy<Node> {
+public final class DeleteNodeAndRelationships implements LifecycleEventStrategy<Node> {
 
-	static {
-		Serializer.register(DeleteNodeAndRelationships.class, new SingletonSerializer());
-	}
-
-	private static final DeleteNodeAndRelationships INSTANCE = new DeleteNodeAndRelationships();
-
-	public static DeleteNodeAndRelationships getInstance() {
-		return INSTANCE;
-	}
-
-	private DeleteNodeAndRelationships() { }
+	public static final String CONFIG_KEY = "force";
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public boolean applyIfNeeded(Node node, LifecycleEvent event) {
-		for (Relationship r : node.getRelationships()) {
+	public boolean applyIfNeeded(Node entity) {
+		for (Relationship r : entity.getRelationships()) {
 			r.delete();
 		}
-		node.delete();
+		entity.delete();
 		return true;
 	}
 }

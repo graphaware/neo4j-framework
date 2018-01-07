@@ -16,7 +16,7 @@
 
 package com.graphaware.lifecycle.indexer;
 
-import com.graphaware.lifecycle.event.scheduled.ScheduledEvent;
+import com.graphaware.lifecycle.event.ScheduledEvent;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.index.IndexHits;
@@ -33,7 +33,7 @@ public interface LifecycleIndexer {
 	 * @param event
 	 * @param node to index.
 	 */
-	void indexNode(ScheduledEvent event, Node node);
+	void indexNode(ScheduledEvent<Node> event, Node node);
 
 	/**
 	 * Add a given relationship with any relevant ttl/lifecycle property to the index corresponding to the
@@ -43,7 +43,7 @@ public interface LifecycleIndexer {
 	 * @param event
 	 * @param relationship to index.
 	 */
-	void indexRelationship(ScheduledEvent event, Relationship relationship);
+	void indexRelationship(ScheduledEvent<Relationship> event, Relationship relationship);
 
 	/**
 	 * Finds all indexed nodes that are eligible for the specified lifecycle event at the specified time.
@@ -51,7 +51,7 @@ public interface LifecycleIndexer {
 	 * @param timestamp The timestamp to query for, given as milliseconds since epoch.
 	 * @return Iterable of all nodes expiring before timestamp.
 	 */
-	IndexHits<Node> nodesEligibleFor(ScheduledEvent event, long timestamp);
+	IndexHits<Node> nodesEligibleFor(ScheduledEvent<Node> event, long timestamp);
 
 	/**
 	 * Finds all indexed relationships that are eligible for the specified lifecycle event at the specified time.
@@ -59,20 +59,20 @@ public interface LifecycleIndexer {
 	 * @param timestamp The timestamp to query for, given as milliseconds since epoch.
 	 * @return Iterable of all relationships expiring before timestamp.
 	 */
-	IndexHits<Relationship> relationshipsEligibleFor(ScheduledEvent event, long timestamp);
+	IndexHits<Relationship> relationshipsEligibleFor(ScheduledEvent<Relationship> event, long timestamp);
 
 	/**
 	 * Removes node from the specified event index. If node is not in the index, it does nothing.
 	 *
 	 * @param node Node to remove from index.
 	 */
-	void removeNode(ScheduledEvent event, Node node);
+	void removeNode(ScheduledEvent<Node> event, Node node);
 
 	/**
 	 * Removes relationship from the specified index. If relationship is not in the index, it does nothing.
 	 *
 	 * @param relationship Relationship to remove from index.
 	 */
-	void removeRelationship(ScheduledEvent event, Relationship relationship);
+	void removeRelationship(ScheduledEvent<Relationship> event, Relationship relationship);
 
 }

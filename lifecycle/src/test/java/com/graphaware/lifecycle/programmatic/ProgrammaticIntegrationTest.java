@@ -14,13 +14,15 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.lifecycle.indexer.expire;
+package com.graphaware.lifecycle.programmatic;
 
 import com.graphaware.common.util.IterableUtils;
 import com.graphaware.lifecycle.LifecyleModule;
-import com.graphaware.lifecycle.strategy.DeleteNodeAndRelationships;
-import com.graphaware.lifecycle.config.LifecycleConfiguration;
-import com.graphaware.lifecycle.strategy.DeleteOrphanedNodeOnly;
+import com.graphaware.lifecycle.event.NodeExpiryEvent;
+import com.graphaware.lifecycle.event.RelationshipExpiryEvent;
+import com.graphaware.lifecycle.event.strategy.DeleteNodeAndRelationships;
+import com.graphaware.lifecycle.LifecycleConfiguration;
+import com.graphaware.lifecycle.event.strategy.DeleteOrphanedNodeOnly;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.runtime.config.FluentRuntimeConfiguration;
@@ -31,6 +33,9 @@ import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.Iterables;
 
+import static com.graphaware.lifecycle.event.NodeExpiryEvent.*;
+import static com.graphaware.lifecycle.event.NodeExpiryEvent.EXPIRY_OFFSET;
+import static com.graphaware.lifecycle.event.RelationshipExpiryEvent.*;
 import static com.graphaware.test.unit.GraphUnit.assertEmpty;
 import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 import static com.graphaware.test.util.TestUtils.waitFor;
@@ -40,9 +45,12 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 
 	private static final long SECOND = 1_000;
 
+
 	@Test
 	public void shouldExpireNodesWhenExpiryDateReached() {
-		bootstrap(LifecycleConfiguration.defaultConfiguration().withNodeExpirationProperty("expire"));
+		bootstrap(LifecycleConfiguration.defaultConfiguration()
+				.withConfig(NODE_EXPIRATION_PROPERTY, "expire")
+				.scanForEvents());
 
 		long now = System.currentTimeMillis();
 		long twoSecondsFromNow = now + 2 * SECOND;
@@ -63,7 +71,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 
 	@Test
 	public void shouldExpireNodesWhenTtlReached() {
-		bootstrap(LifecycleConfiguration.defaultConfiguration().withNodeTtlProperty("ttl"));
+		bootstrap(LifecycleConfiguration.defaultConfiguration()
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.scanForEvents());
 
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy', ttl:2000}), (s2:State {name:'Windy', ttl:3000})");
 
@@ -82,7 +92,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 
 	@Test
 	public void shouldExpireRelationshipsWhenExpiryDateReached() {
-		bootstrap(LifecycleConfiguration.defaultConfiguration().withRelationshipExpirationProperty("expire"));
+		bootstrap(LifecycleConfiguration.defaultConfiguration()
+				.withConfig(RELATIONSHIP_EXPIRATION_PROPERTY, "expire")
+				.scanForEvents());
 
 		long now = System.currentTimeMillis();
 		long twoSecondsFromNow = now + 2 * SECOND;
@@ -103,7 +115,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 
 	@Test
 	public void shouldExpireRelationshipsWhenTtlDateReached() {
-		bootstrap(LifecycleConfiguration.defaultConfiguration().withRelationshipTtlProperty("ttl"));
+		bootstrap(LifecycleConfiguration.defaultConfiguration()
+				.withConfig(RELATIONSHIP_TTL_PROPERTY, "ttl")
+				.scanForEvents());
 
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy'})-[:THEN {ttl:2000}]->(s2:State {name:'Windy'})-[:THEN {ttl:3000}]->(s1)");
 
@@ -122,7 +136,10 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 
 	@Test
 	public void shouldHaveEmptyIndexWhenEverythingHasExpired() {
-		bootstrap(LifecycleConfiguration.defaultConfiguration().withNodeTtlProperty("ttl").withRelationshipTtlProperty("ttl"));
+		bootstrap(LifecycleConfiguration.defaultConfiguration()
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.withConfig(RELATIONSHIP_TTL_PROPERTY, "ttl")
+				.scanForEvents());
 
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy', ttl:1000})-[:THEN {ttl:1000}]->(s2:State {name:'Windy',ttl:1000})-[:THEN {ttl:1000}]->(s1)");
 
@@ -145,7 +162,10 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 
 	@Test
 	public void shouldHaveEmptyIndexWhenEverythingHasBeenManuallyWiped() {
-		bootstrap(LifecycleConfiguration.defaultConfiguration().withNodeTtlProperty("ttl").withRelationshipTtlProperty("ttl"));
+		bootstrap(LifecycleConfiguration.defaultConfiguration()
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.withConfig(RELATIONSHIP_TTL_PROPERTY, "ttl")
+				.scanForEvents());
 
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy', ttl:10000})-[:THEN {ttl:10000}]->(s2:State {name:'Windy',ttl:10000})-[:THEN {ttl:10000}]->(s1)");
 
@@ -169,9 +189,10 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 	@Test
 	public void shouldForceDeleteRelationshipsWhenConfiguredToDoSo() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeTtlProperty("ttl")
-				.withRelationshipTtlProperty("ttl")
-				.withNodeExpirationStrategy(DeleteNodeAndRelationships.getInstance()));
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.withConfig(RELATIONSHIP_TTL_PROPERTY, "ttl")
+				.withConfig(NODE_EXPIRATION_STRATEGY, DeleteNodeAndRelationships.CONFIG_KEY)
+				.scanForEvents());
 
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy', ttl:1000})-[:THEN {ttl:5000}]->(s2:State {name:'Windy',ttl:1000})-[:THEN]->(s1)");
 
@@ -183,9 +204,10 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 	@Test
 	public void shouldWaitForAllRelationshipsToExpireWhenConfiguredToDoSo() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeTtlProperty("ttl")
-				.withRelationshipTtlProperty("ttl")
-				.withNodeExpirationStrategy(DeleteOrphanedNodeOnly.getInstance()));
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.withConfig(RELATIONSHIP_TTL_PROPERTY, "ttl")
+				.withConfig(NODE_EXPIRATION_STRATEGY, DeleteOrphanedNodeOnly.CONFIG_KEY)
+				.scanForEvents());
 
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy', ttl:1000})-[:THEN {ttl:3000}]->(s2:State {name:'Windy',ttl:1000})-[:THEN {ttl:2000}]->(s1)");
 
@@ -201,9 +223,10 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 	@Test
 	public void shouldWaitForAllRelationshipsToBeDeletedWhenConfiguredToDoSo() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeTtlProperty("ttl")
-				.withRelationshipTtlProperty("ttl")
-				.withNodeExpirationStrategy(DeleteOrphanedNodeOnly.getInstance()));
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.withConfig(RELATIONSHIP_TTL_PROPERTY, "ttl")
+				.withConfig(NODE_EXPIRATION_STRATEGY, DeleteOrphanedNodeOnly.CONFIG_KEY)
+				.scanForEvents());
 
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy', ttl:1000})-[:THEN]->(s2:State {name:'Windy',ttl:1000})-[:THEN]->(s1)");
 
@@ -221,8 +244,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 	@Test
 	public void shouldBeAbleToUpdateNodesAndRelsWithTtl() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeTtlProperty("ttl")
-				.withRelationshipTtlProperty("ttl"));
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.withConfig(RELATIONSHIP_TTL_PROPERTY, "ttl")
+				.scanForEvents());
 
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy'})-[:THEN]->(s2:State {name:'Windy'})-[:THEN]->(s1)");
 
@@ -236,8 +260,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 	@Test
 	public void removedTtlShouldMeanNoExpiration() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeTtlProperty("ttl")
-				.withRelationshipTtlProperty("ttl"));
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.withConfig(RELATIONSHIP_TTL_PROPERTY, "ttl")
+				.scanForEvents());
 
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy', ttl:2000})-[:THEN {ttl:2000}]->(s2:State {name:'Windy',ttl:2000})");
 
@@ -251,8 +276,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 	@Test
 	public void shouldBeAbleToUpdateNodesAndRelsWithExpiryDate() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeExpirationProperty("expire")
-				.withRelationshipExpirationProperty("expire"));
+				.withConfig(NODE_EXPIRATION_PROPERTY, "expire")
+				.withConfig(RELATIONSHIP_EXPIRATION_PROPERTY, "expire")
+				.scanForEvents());
 
 		long now = System.currentTimeMillis();
 		long nowAndABit = now + 500;
@@ -269,8 +295,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 	@Test
 	public void removedExpiryDateMeanNoExpiration() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeExpirationProperty("expire")
-				.withRelationshipExpirationProperty("expire"));
+				.withConfig(NODE_EXPIRATION_PROPERTY, "expire")
+				.withConfig(RELATIONSHIP_EXPIRATION_PROPERTY, "expire")
+				.scanForEvents());
 
 		long now = System.currentTimeMillis();
 		long twoSecondsFromNow = now + 2 * SECOND;
@@ -287,8 +314,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 	@Test
 	public void shouldBeAbleToUpdateTtl() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeTtlProperty("ttl")
-				.withRelationshipTtlProperty("ttl"));
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.withConfig(RELATIONSHIP_TTL_PROPERTY, "ttl")
+				.scanForEvents());
 
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy', ttl:1000})-[:THEN {ttl:1000}]->(s2:State {name:'Windy', ttl:1000})");
 
@@ -306,8 +334,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 	@Test
 	public void shouldBeAbleToUpdateExpiryDate() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeExpirationProperty("expire")
-				.withRelationshipExpirationProperty("expire"));
+				.withConfig(NODE_EXPIRATION_PROPERTY, "expire")
+				.withConfig(RELATIONSHIP_EXPIRATION_PROPERTY, "expire")
+				.scanForEvents());
 
 		long now = System.currentTimeMillis();
 		long nowAndABit = now + 500;
@@ -329,8 +358,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 	@Test
 	public void shouldBeAbleToUpdateNodeWithoutChangingExpiry() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeTtlProperty("ttl")
-				.withRelationshipTtlProperty("ttl"));
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.withConfig(RELATIONSHIP_TTL_PROPERTY, "ttl")
+				.scanForEvents());
 
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy', ttl:2000})-[:THEN {ttl:2000}]->(s2:State {name:'Windy',ttl:2000})");
 
@@ -344,8 +374,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 	@Test
 	public void laterExpiryShouldTakePrecedence() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeTtlProperty("ttl")
-				.withNodeExpirationProperty("expire"));
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.withConfig(NODE_EXPIRATION_PROPERTY, "expire")
+				.scanForEvents());
 
 		long now = System.currentTimeMillis();
 		long nowAndThreeSeconds = now + 3 * SECOND;
@@ -364,8 +395,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 	@Test
 	public void laterExpiryShouldTakePrecedence2() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeTtlProperty("ttl")
-				.withNodeExpirationProperty("expire"));
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.withConfig(NODE_EXPIRATION_PROPERTY, "expire")
+				.scanForEvents());
 
 		long now = System.currentTimeMillis();
 		long nowAndOneSecond = now + SECOND;
@@ -383,7 +415,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 
 	@Test
 	public void wrongExpiryDateShouldHaveNoEffect() {
-		bootstrap(LifecycleConfiguration.defaultConfiguration().withNodeExpirationProperty("expire"));
+		bootstrap(LifecycleConfiguration.defaultConfiguration()
+				.withConfig(NODE_EXPIRATION_PROPERTY, "expire")
+				.scanForEvents());
 
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy', ttl:'wrong', expire:'wrong'})");
 
@@ -394,7 +428,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 
 	@Test
 	public void wrongTtlDateShouldHaveNoEffect() {
-		bootstrap(LifecycleConfiguration.defaultConfiguration().withNodeTtlProperty("ttl"));
+		bootstrap(LifecycleConfiguration.defaultConfiguration()
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.scanForEvents());
 
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy', ttl:'wrong', expire:'wrong'})");
 
@@ -405,7 +441,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 
 	@Test
 	public void negativeTtlShouldBeExpiredImmediately() {
-		bootstrap(LifecycleConfiguration.defaultConfiguration().withNodeExpirationProperty("expire"));
+		bootstrap(LifecycleConfiguration.defaultConfiguration()
+				.withConfig(NODE_EXPIRATION_PROPERTY, "expire")
+				.scanForEvents());
 
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy', expire:0})");
 
@@ -416,7 +454,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 
 	@Test
 	public void expiryDateInThePastShouldBeExpiredImmediately() {
-		bootstrap(LifecycleConfiguration.defaultConfiguration().withNodeTtlProperty("ttl"));
+		bootstrap(LifecycleConfiguration.defaultConfiguration()
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.scanForEvents());
 
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy', ttl:'-20'})");
 
@@ -428,8 +468,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 	@Test
 	public void shouldBeAbleToApplyAnOffsetToExpiryDates() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeExpirationProperty("lastActive")
-				.withExpiryOffset(10_000));
+				.withConfig(NODE_EXPIRATION_PROPERTY, "lastActive")
+				.withConfig(EXPIRY_OFFSET, "10000")
+				.scanForEvents());
 
 		long now = System.currentTimeMillis();
 		getDatabase().execute(String.format("CREATE (s1:State {name:'Cloudy', lastActive:'%s'})", now));
@@ -449,8 +490,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy', ttl:1000})-[:THEN {ttl:1000}]->(s2:State {name:'Windy',ttl:1000})");
 
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeTtlProperty("ttl")
-				.withRelationshipTtlProperty("ttl"));
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.withConfig(RELATIONSHIP_TTL_PROPERTY, "ttl")
+				.scanForEvents());
 
 		waitFor(1100);
 
@@ -462,8 +504,9 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 		getDatabase().execute("CREATE (s1:State {name:'Cloudy', expire:123})-[:THEN {expire:123}]->(s2:State {name:'Windy',expire:123})");
 
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeTtlProperty("expire")
-				.withRelationshipTtlProperty("expire"));
+				.withConfig(NODE_EXPIRATION_PROPERTY, "expire")
+				.withConfig(RELATIONSHIP_EXPIRATION_PROPERTY, "expire")
+				.scanForEvents());
 
 		waitFor(1100);
 
@@ -472,7 +515,10 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 
 	@Test
 	public void shouldExpireAllNodesInOneGo() {
-		bootstrap(LifecycleConfiguration.defaultConfiguration().withNodeExpirationProperty("expire").withMaxNoExpirations(100));
+		bootstrap(LifecycleConfiguration.defaultConfiguration()
+				.withConfig(NODE_EXPIRATION_PROPERTY, "expire")
+				.withBatchSize(100)
+				.scanForEvents());
 
 		long now = System.currentTimeMillis();
 		long twoSecondsFromNow = now + 2 * SECOND;
@@ -495,7 +541,10 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 
 	@Test
 	public void shouldExpireAllNodesOneByOne() {
-		bootstrap(LifecycleConfiguration.defaultConfiguration().withNodeExpirationProperty("expire").withMaxNoExpirations(1));
+		bootstrap(LifecycleConfiguration.defaultConfiguration()
+				.withConfig(NODE_EXPIRATION_PROPERTY, "expire")
+				.withBatchSize(1)
+				.scanForEvents());
 
 		long now = System.currentTimeMillis();
 		long twoSecondsFromNow = now + 2 * SECOND;
@@ -517,48 +566,48 @@ public class ProgrammaticIntegrationTest extends EmbeddedDatabaseIntegrationTest
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void shouldFailToStartWithInvalidConfig() {
-		bootstrap(LifecycleConfiguration.defaultConfiguration());
-	}
-
-	@Test(expected = IllegalStateException.class)
 	public void shouldFailToStartWithInvalidConfig2() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeExpirationIndex(null)
-				.withRelationshipExpirationIndex(null)
-				.withNodeTtlProperty("ttl")
-				.withRelationshipTtlProperty("ttl"));
+				.withConfig(NODE_EXPIRATION_INDEX, null)
+				.withConfig(RELATIONSHIP_EXPIRATION_INDEX, null)
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.withConfig(RELATIONSHIP_TTL_PROPERTY, "ttl")
+				.register(NodeExpiryEvent.class)
+				.register(RelationshipExpiryEvent.class));
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void shouldFailToStartWithInvalidConfig3() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeTtlProperty("ttl")
-				.withRelationshipTtlProperty("ttl")
-				.withNodeExpirationProperty("ttl")
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.withConfig(RELATIONSHIP_TTL_PROPERTY, "ttl")
+				.withConfig(NODE_EXPIRATION_PROPERTY, "ttl")
+				.scanForEvents()
 		);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void shouldFailToStartWithInvalidConfig4() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withNodeTtlProperty("ttl")
-				.withRelationshipTtlProperty("ttl")
-				.withRelationshipExpirationProperty("ttl")
+				.withConfig(NODE_TTL_PROPERTY, "ttl")
+				.withConfig(RELATIONSHIP_TTL_PROPERTY, "ttl")
+				.withConfig(RELATIONSHIP_EXPIRATION_PROPERTY, "ttl")
+				.scanForEvents()
 		);
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void shouldFailToStartWithInvalidConfig5() {
 		bootstrap(LifecycleConfiguration.defaultConfiguration()
-				.withMaxNoExpirations(-1)
+				.withBatchSize(-1)
 		);
 	}
 
 	private void bootstrap(LifecycleConfiguration config) {
 		GraphAwareRuntime runtime = createRuntime();
-		runtime.registerModule(new LifecyleModule("EXP", getDatabase(), config, config.scheduledEvents(),
-				config.commitEvents(), config.getMaxNoExpirations()));
+		runtime.registerModule(new LifecyleModule("LM", getDatabase(), config, config.getNodeScheduledEvents(),
+				config.getRelationshipScheduledEvents(), config.getNodeCommitEvents(),
+				config.getRelationshipCommitEvents(), config.getBatchSize()));
 
 		runtime.start();
 		runtime.waitUntilStarted();

@@ -16,34 +16,40 @@
 
 package com.graphaware.lifecycle.event;
 
-import java.util.Map;
-
+import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.Entity;
 
-public interface LifecycleEvent {
+public interface ScheduledEvent<E extends Entity> extends LifecycleEvent {
 
 	/**
-	 * Indicates whether the event applies to Nodes or Relationships. It is not currently supported for an event to
-	 * apply to all entity types.
-	 * @return Must be either Node.class or Relationship.class
+	 * {@inheritDoc}
 	 */
-	Class<? extends Entity> appliesTo();
+	Class<E> appliesTo();
 
 	/**
-	 * Configure the event prior to use. This method is invoked on startup by the module using either neo4j.conf
-	 * or properties specified programmatically.
-	 * @param config
+	 * Evaluates the date, if any, on which this scheduled event will be executed for a given Property Container.
 	 *
-	 * TODO: Support fine-grained injection of type-safe config, eg Spring @Value annotation.
+	 * @param entity to evaluate.
+	 * @return execution date.
 	 */
-	void configure(Map<String, String> config);
+	Long effectiveDate(E entity);
 
 	/**
-	 * The event name. The returned value must be unique among all lifecycle events that are registered with the
-	 * module.
+	 * Evaluate necessity of, and execute expiry of an Entity.
+	 *
+	 * @param entity to expire
 	 */
-	default String name() {
-		return this.getClass().getSimpleName();
-	}
+	boolean applyIfNeeded(E entity);
+
+	/**
+	 * The index name for this scheduled event. Must not be null.
+	 */
+	String indexName();
+
+	/**
+	 * Given transaction data for a changed node, evaluate if the index should be updated.
+	 */
+	boolean shouldIndexChanged(E entity, ImprovedTransactionData td);
 
 }
+

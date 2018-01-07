@@ -14,34 +14,22 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.lifecycle.strategy;
+package com.graphaware.lifecycle.event.strategy;
 
-import java.util.Map;
-
-import com.graphaware.lifecycle.event.LifecycleEvent;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 /**
- * A strategy for applying lifecycle events to a {@link PropertyContainer}s.
+ * A strategy for applying lifecycle events to a {@link Entity}s.
  *
- * @param <P> type of container this strategy is for.
+ * @param <E> type of container this strategy is for.
  */
-public abstract class LifecycleEventStrategy<P extends PropertyContainer> {
-
-	private Map<String, String> config;
-
-	public Map<String, String> getConfig() {
-		return config;
-	}
-
-	public void setConfig(Map<String, String> config) { this.config = config; }
+public interface LifecycleEventStrategy<E extends Entity> {
 
 	/**
-	 * Evaluate necessity of, and execute expiry of a container, for the given event.
+	 * Evaluate necessity of, and execute expiry of an Entity.
 	 *
-	 * @param pc to expire
-	 * @param event type of event to apply for
+	 * @param entity to expire
 	 */
-	public abstract boolean applyIfNeeded(P pc, LifecycleEvent event);
+	boolean applyIfNeeded(E entity);
 
 }

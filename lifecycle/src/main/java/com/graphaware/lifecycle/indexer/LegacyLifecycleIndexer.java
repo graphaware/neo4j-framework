@@ -16,7 +16,7 @@
 
 package com.graphaware.lifecycle.indexer;
 
-import com.graphaware.lifecycle.event.scheduled.ScheduledEvent;
+import com.graphaware.lifecycle.event.ScheduledEvent;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -38,11 +38,11 @@ public class LegacyLifecycleIndexer implements LifecycleIndexer {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void indexNode(ScheduledEvent event, Node node) {
+	public void indexNode(ScheduledEvent<Node> event, Node node) {
 
 		Long effectiveDate = event.effectiveDate(node);
 		if (effectiveDate != null) {
-			database.index().forNodes(event.nodeIndex())
+			database.index().forNodes(event.indexName())
 					.add(node, event.name(), new ValueContext(effectiveDate).indexNumeric());
 		}
 	}
@@ -51,11 +51,11 @@ public class LegacyLifecycleIndexer implements LifecycleIndexer {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void indexRelationship(ScheduledEvent event, Relationship relationship) {
+	public void indexRelationship(ScheduledEvent<Relationship> event, Relationship relationship) {
 
 		Long effectiveDate = event.effectiveDate(relationship);
 		if (effectiveDate != null) {
-			database.index().forRelationships(event.relationshipIndex())
+			database.index().forRelationships(event.indexName())
 					.add(relationship, event.name(), new ValueContext(effectiveDate).indexNumeric());
 		}
 	}
@@ -64,8 +64,8 @@ public class LegacyLifecycleIndexer implements LifecycleIndexer {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public IndexHits<Node> nodesEligibleFor(ScheduledEvent event, long timestamp) {
-		String indexName = event.nodeIndex();
+	public IndexHits<Node> nodesEligibleFor(ScheduledEvent<Node> event, long timestamp) {
+		String indexName = event.indexName();
 		if (indexName == null) {
 			return null;
 		}
@@ -85,8 +85,8 @@ public class LegacyLifecycleIndexer implements LifecycleIndexer {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public IndexHits<Relationship> relationshipsEligibleFor(ScheduledEvent event, long timestamp) {
-		String indexName = event.relationshipIndex();
+	public IndexHits<Relationship> relationshipsEligibleFor(ScheduledEvent<Relationship> event, long timestamp) {
+		String indexName = event.indexName();
 		if (indexName == null) {
 			return null;
 		}
@@ -106,9 +106,9 @@ public class LegacyLifecycleIndexer implements LifecycleIndexer {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void removeNode(ScheduledEvent event, Node node) {
+	public void removeNode(ScheduledEvent<Node> event, Node node) {
 		try (Transaction tx = database.beginTx()) {
-			Index<Node> index = database.index().forNodes(event.nodeIndex());
+			Index<Node> index = database.index().forNodes(event.indexName());
 			index.remove(node, event.name());
 			tx.success();
 		}
@@ -118,9 +118,9 @@ public class LegacyLifecycleIndexer implements LifecycleIndexer {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void removeRelationship(ScheduledEvent event, Relationship relationship) {
+	public void removeRelationship(ScheduledEvent<Relationship> event, Relationship relationship) {
 		try (Transaction tx = database.beginTx()) {
-			Index<Relationship> index = database.index().forRelationships(event.relationshipIndex());
+			Index<Relationship> index = database.index().forRelationships(event.indexName());
 			index.remove(relationship, event.name());
 			tx.success();
 		}

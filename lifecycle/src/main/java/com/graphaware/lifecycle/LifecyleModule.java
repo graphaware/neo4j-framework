@@ -22,11 +22,10 @@ import java.util.stream.Stream;
 
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.util.Change;
-import com.graphaware.lifecycle.indexer.LifecycleIndexer;
-import com.graphaware.lifecycle.config.LifecycleConfiguration;
-import com.graphaware.lifecycle.event.commit.CommitEvent;
-import com.graphaware.lifecycle.event.scheduled.ScheduledEvent;
+import com.graphaware.lifecycle.event.CommitEvent;
+import com.graphaware.lifecycle.event.ScheduledEvent;
 import com.graphaware.lifecycle.indexer.LegacyLifecycleIndexer;
+import com.graphaware.lifecycle.indexer.LifecycleIndexer;
 import com.graphaware.runtime.config.BaseTxAndTimerDrivenModuleConfiguration;
 import com.graphaware.runtime.metadata.EmptyContext;
 import com.graphaware.runtime.metadata.TimerDrivenModuleContext;
@@ -36,7 +35,6 @@ import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
-import com.graphaware.tx.executor.batch.UnitOfWork;
 import com.graphaware.tx.executor.input.AllNodes;
 import com.graphaware.tx.executor.input.AllRelationships;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -55,30 +53,36 @@ public class LifecyleModule extends BaseTxDrivenModule<Void> implements TimerDri
 
 	private final LifecycleIndexer lifecycleIndexer;
 	private final LifecycleConfiguration config;
-	private final List<ScheduledEvent> scheduledEvents;
-	private final List<CommitEvent> commitEvents;
+	private final List<ScheduledEvent<Node>> nodeScheduledEvents;
+	private final List<ScheduledEvent<Relationship>> relationshipScheduledEvents;
+	private final List<CommitEvent<Node>> nodeCommitEvents;
+	private final List<CommitEvent<Relationship>> relationshipCommitEvents;
 	private final int batchSize;
 
 
 	public LifecyleModule(String moduleId,
 	                      GraphDatabaseService database,
 	                      LifecycleConfiguration config,
-	                      List<ScheduledEvent> scheduledEvents,
-	                      List<CommitEvent> commitEvents,
+	                      List<ScheduledEvent<Node>> nodeScheduledEvents,
+	                      List<ScheduledEvent<Relationship>> relationshipScheduledEvents,
+	                      List<CommitEvent<Node>> nodeCommitEvents,
+	                      List<CommitEvent<Relationship>> relationshipCommitEvents,
 	                      int batchSize) {
 		super(moduleId);
 
 		this.lifecycleIndexer = new LegacyLifecycleIndexer(database);
 		this.config = config;
-		this.scheduledEvents = scheduledEvents;
-		this.commitEvents = commitEvents;
+		this.nodeScheduledEvents = nodeScheduledEvents;
+		this.relationshipScheduledEvents = relationshipScheduledEvents;
+		this.nodeCommitEvents = nodeCommitEvents;
+		this.relationshipCommitEvents = relationshipCommitEvents;
 		this.batchSize = batchSize;
 
-		scheduledEvents.forEach(ScheduledEvent::validate);
-		commitEvents.forEach(CommitEvent::validate);
-
-		if (scheduledEvents.size() == 0 && commitEvents.size() == 0) {
-			throw new IllegalStateException("Configuration contains no lifecycle events.");
+		if (nodeScheduledEvents.stream().noneMatch(it -> it.indexName() != null)
+				&& relationshipScheduledEvents.stream().noneMatch(it -> it.indexName() != null)
+				&& nodeCommitEvents.size() == 0
+				&& relationshipCommitEvents.size() == 0) {
+			throw new IllegalStateException("Configuration contains no valid lifecycle events.");
 		}
 	}
 
@@ -96,27 +100,17 @@ public class LifecyleModule extends BaseTxDrivenModule<Void> implements TimerDri
 	public void initialize(GraphDatabaseService database) {
 		int batchSize = 1000;
 
-		scheduledEvents.forEach(lifecycleEvent -> {
-			if (lifecycleEvent.relationshipIndex() != null) {
-				LOG.info("Looking at all relationships to see if they have an expiry date or TTL...");
-
-				new IterableInputBatchTransactionExecutor<>(database, batchSize, new AllRelationships(database, batchSize), new UnitOfWork<Relationship>() {
-					@Override
-					public void execute(GraphDatabaseService database, Relationship r, int batchNumber, int stepNumber) {
-						lifecycleIndexer.indexRelationship(lifecycleEvent, r);
-					}
-				}).execute();
+		relationshipScheduledEvents.forEach(event -> {
+			if (event.indexName() != null) {
+				new IterableInputBatchTransactionExecutor<>(database, batchSize, new AllRelationships(database, batchSize),
+						(database12, r, batchNumber, stepNumber) -> lifecycleIndexer.indexRelationship(event, r)).execute();
 			}
+		});
 
-			if (lifecycleEvent.nodeIndex() != null) {
-				LOG.info("Looking at all nodes to see if they have an expiry date or TTL...");
-
-				new IterableInputBatchTransactionExecutor<>(database, batchSize, new AllNodes(database, batchSize), new UnitOfWork<Node>() {
-					@Override
-					public void execute(GraphDatabaseService database, Node n, int batchNumber, int stepNumber) {
-						lifecycleIndexer.indexNode(lifecycleEvent, n);
-					}
-				}).execute();
+		nodeScheduledEvents.forEach(event -> {
+			if (event.indexName() != null) {
+				new IterableInputBatchTransactionExecutor<>(database, batchSize, new AllNodes(database, batchSize),
+						(database1, n, batchNumber, stepNumber) -> lifecycleIndexer.indexNode(event, n)).execute();
 			}
 		});
 	}
@@ -144,45 +138,35 @@ public class LifecyleModule extends BaseTxDrivenModule<Void> implements TimerDri
 	public TimerDrivenModuleContext doSomeWork(TimerDrivenModuleContext timerDrivenModuleContext, GraphDatabaseService graphDatabaseService) {
 		long now = System.currentTimeMillis();
 
-		scheduledEvents.forEach(lifecycleEvent -> {
-			applyToRelationships(lifecycleEvent, now);
-			applyToNodes(lifecycleEvent, now);
-		});
+		relationshipScheduledEvents.forEach(lifecycleEvent -> applyToRelationships(lifecycleEvent, now));
+		nodeScheduledEvents.forEach(lifecycleEvent -> applyToNodes(lifecycleEvent, now));
 
 		return new EmptyContext();
 	}
 
 	private void applyCommitEvents(ImprovedTransactionData td) {
-		commitEvents.forEach(commitEvent -> {
 
-			Stream<Node> nodes = Stream.concat(
-					td.getAllCreatedNodes().stream(),
-					td.getAllChangedNodes().stream().map(Change::getCurrent));
-			nodes.forEach(node -> {
-				if (commitEvent.applicableToNode(node)) {
-					commitEvent.nodeStrategy().applyIfNeeded(node, commitEvent);
-				}
-			});
+		nodeCommitEvents.forEach(commitEvent -> Stream.concat(
+				td.getAllCreatedNodes().stream(),
+				td.getAllChangedNodes().stream().map(Change::getCurrent))
+				.forEach(commitEvent::applyIfNeeded));
 
-			Stream<Relationship> rels = Stream.concat(
+		relationshipCommitEvents.forEach(commitEvent -> {
+			Stream.concat(
 					td.getAllCreatedRelationships().stream(),
-					td.getAllChangedRelationships().stream().map(Change::getCurrent));
-			rels.forEach(rel -> {
-				if (commitEvent.applicableToRelationship(rel)) {
-					commitEvent.relationshipStrategy().applyIfNeeded(rel, commitEvent);
-				}
-			});
+					td.getAllChangedRelationships().stream().map(Change::getCurrent))
+					.forEach(commitEvent::applyIfNeeded);
 		});
 	}
 
 
-	private void applyToRelationships(ScheduledEvent event, long now) {
+	private void applyToRelationships(ScheduledEvent<Relationship> event, long now) {
 		int applied = 0;
 		IndexHits<Relationship> eligibleRelationships = lifecycleIndexer.relationshipsEligibleFor(event, now);
 		if (eligibleRelationships != null) {
 			for (Relationship relationship : eligibleRelationships) {
 				if (applied < batchSize) {
-					boolean didApply = event.relationshipStrategy().applyIfNeeded(relationship, event);
+					boolean didApply = event.applyIfNeeded(relationship);
 					if (didApply) {
 						lifecycleIndexer.removeRelationship(event, relationship);
 					}
@@ -194,13 +178,13 @@ public class LifecyleModule extends BaseTxDrivenModule<Void> implements TimerDri
 		}
 	}
 
-	private void applyToNodes(ScheduledEvent event, long now) {
+	private void applyToNodes(ScheduledEvent<Node> event, long now) {
 		int applied = 0;
 		IndexHits<Node> eligibleNodes = lifecycleIndexer.nodesEligibleFor(event, now);
 		if (eligibleNodes != null) {
 			for (Node node : eligibleNodes) {
 				if (applied < batchSize) {
-					boolean didApply = event.nodeStrategy().applyIfNeeded(node, event);
+					boolean didApply = event.applyIfNeeded(node);
 					if (didApply) {
 						lifecycleIndexer.removeNode(event, node);
 					}
@@ -215,13 +199,13 @@ public class LifecyleModule extends BaseTxDrivenModule<Void> implements TimerDri
 
 	private void indexNewNodes(ImprovedTransactionData td) {
 		for (Node node : td.getAllCreatedNodes()) {
-			scheduledEvents.forEach(event -> lifecycleIndexer.indexNode(event, node));
+			nodeScheduledEvents.forEach(event -> lifecycleIndexer.indexNode(event, node));
 		}
 	}
 
 	private void indexNewRelationships(ImprovedTransactionData td) {
 		for (Relationship relationship : td.getAllCreatedRelationships()) {
-			scheduledEvents.forEach(event -> lifecycleIndexer.indexRelationship(event, relationship));
+			relationshipScheduledEvents.forEach(event -> lifecycleIndexer.indexRelationship(event, relationship));
 		}
 	}
 
@@ -230,7 +214,7 @@ public class LifecyleModule extends BaseTxDrivenModule<Void> implements TimerDri
 		for (Change<Node> change : td.getAllChangedNodes()) {
 			Node current = change.getCurrent();
 
-			scheduledEvents.forEach(event -> {
+			nodeScheduledEvents.forEach(event -> {
 				if (event.shouldIndexChanged(current, td)) {
 					lifecycleIndexer.removeNode(event, change.getPrevious());
 					lifecycleIndexer.indexNode(event, current);
@@ -243,7 +227,7 @@ public class LifecyleModule extends BaseTxDrivenModule<Void> implements TimerDri
 		for (Change<Relationship> change : td.getAllChangedRelationships()) {
 			Relationship current = change.getCurrent();
 
-			scheduledEvents.forEach(event -> {
+			relationshipScheduledEvents.forEach(event -> {
 				if (event.shouldIndexChanged(current, td)) {
 					lifecycleIndexer.removeRelationship(event, change.getPrevious());
 					lifecycleIndexer.indexRelationship(event, current);

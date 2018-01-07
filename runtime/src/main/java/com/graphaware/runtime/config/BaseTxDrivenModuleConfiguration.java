@@ -62,6 +62,8 @@ public abstract class BaseTxDrivenModuleConfiguration<T extends BaseTxDrivenModu
      */
     protected abstract T newInstance(InclusionPolicies inclusionPolicies, long initializeUntil);
 
+
+
     /**
      * {@inheritDoc}
      */
