@@ -57,6 +57,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-common</artifactId>
+            <type>test-jar</type>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
