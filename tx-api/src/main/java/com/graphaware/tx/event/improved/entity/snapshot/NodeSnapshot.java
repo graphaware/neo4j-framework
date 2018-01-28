@@ -14,11 +14,11 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.propertycontainer.snapshot;
+package com.graphaware.tx.event.improved.entity.snapshot;
 
 import com.graphaware.common.util.IterableUtils;
 import com.graphaware.common.wrapper.NodeWrapper;
-import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
+import com.graphaware.tx.event.improved.data.EntityTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.Iterables;
@@ -26,9 +26,9 @@ import org.neo4j.logging.Log;
 import com.graphaware.common.log.LoggerFactory;
 
 /**
- * A {@link PropertyContainerSnapshot} representing a {@link org.neo4j.graphdb.Node}.
+ * A {@link EntitySnapshot} representing a {@link org.neo4j.graphdb.Node}.
  */
-public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Node, NodeWrapper {
+public class NodeSnapshot extends EntitySnapshot<Node> implements Node, NodeWrapper {
     private static final Log LOG = LoggerFactory.getLogger(NodeSnapshot.class);
 
     /**
@@ -45,7 +45,7 @@ public class NodeSnapshot extends PropertyContainerSnapshot<Node> implements Nod
      * {@inheritDoc}
      */
     @Override
-    protected PropertyContainerTransactionData<Node> transactionData() {
+    protected EntityTransactionData<Node> transactionData() {
         return transactionDataContainer.getNodeTransactionData();
     }
 

@@ -69,8 +69,8 @@ public class LongIdJsonRelationship extends JsonRelationship<Long> {
      * {@inheritDoc}
      */
     @Override
-    public Relationship producePropertyContainer(GraphDatabaseService database) {
-        return producePropertyContainer(database, TrivialRelationshipIdTransformer.getInstance(), TrivialNodeIdTransformer.getInstance());
+    public Relationship produceEntity(GraphDatabaseService database) {
+        return produceEntity(database, TrivialRelationshipIdTransformer.getInstance(), TrivialNodeIdTransformer.getInstance());
     }
 }
 

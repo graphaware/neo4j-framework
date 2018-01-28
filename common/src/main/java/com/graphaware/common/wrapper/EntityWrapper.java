@@ -16,12 +16,12 @@
 
 package com.graphaware.common.wrapper;
 
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 /**
- * A {@link Wrapper} for {@link org.neo4j.graphdb.PropertyContainer}s.
+ * A {@link Wrapper} for {@link org.neo4j.graphdb.Entity}s.
  *
- * @param <T> type of the wrapped property container.
+ * @param <T> type of the wrapped entity.
  */
-public interface PropertyContainerWrapper<T extends PropertyContainer> extends PropertyContainer, Wrapper<T> {
+public interface EntityWrapper<T extends Entity> extends Entity, Wrapper<T> {
 }

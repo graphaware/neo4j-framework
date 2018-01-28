@@ -18,7 +18,7 @@ package com.graphaware.common.description.property;
 
 import com.graphaware.common.description.predicate.Predicate;
 import com.graphaware.common.description.predicate.Predicates;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 import java.util.Map;
 
@@ -29,12 +29,12 @@ import java.util.Map;
 public class LiteralPropertiesDescription extends BaseDetachedPropertiesDescription {
 
     /**
-     * Construct a new properties description as the most specific description of the given property container.
+     * Construct a new properties description as the most specific description of the given entity.
      *
-     * @param propertyContainer to construct the most specific properties description from.
+     * @param entity to construct the most specific properties description from.
      */
-    public LiteralPropertiesDescription(PropertyContainer propertyContainer) {
-        super(propertyContainer);
+    public LiteralPropertiesDescription(Entity entity) {
+        super(entity);
     }
 
     /**

@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.*;
-import static com.graphaware.common.util.PropertyContainerUtils.*;
+import static com.graphaware.common.util.EntityUtils.*;
 import static com.graphaware.tx.event.improved.LazyTransactionDataComprehensiveTest.RelationshipTypes.*;
 import static com.graphaware.tx.event.improved.PropertiesAssert.assertProperties;
 import static org.junit.Assert.*;
@@ -1783,21 +1783,21 @@ public class LazyTransactionDataComprehensiveTest {
     /**
      * just for this test so the lines aren't that long
      *
-     * @param propertyContainers
+     * @param entities
      * @param <T>
      * @return
      */
-    private static <T extends PropertyContainer> Map<Long, T> toMap(Collection<T> propertyContainers) {
-        return propertyContainersToMap(propertyContainers);
+    private static <T extends Entity> Map<Long, T> toMap(Collection<T> entities) {
+        return entitiesToMap(entities);
     }
 
-    private  <T extends PropertyContainer> Map<Long, Change<T>> changesToMap(Collection<Change<T>> changes) {
+    private  <T extends Entity> Map<Long, Change<T>> changesToMap(Collection<Change<T>> changes) {
         Map<Long, Change<T>> result = new HashMap<>();
 
         for (Change<T> change : changes) {
-            long id = id(change.getPrevious());
-            if (id != id(change.getCurrent())) {
-                throw new IllegalArgumentException("IDs of the Property Containers in Change do not match!");
+            long id = change.getPrevious().getId();
+            if (id != change.getCurrent().getId()) {
+                throw new IllegalArgumentException("IDs of the Entities in Change do not match!");
             }
             result.put(ids.get(id), change);
         }

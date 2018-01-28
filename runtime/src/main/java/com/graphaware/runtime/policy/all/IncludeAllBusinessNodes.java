@@ -16,7 +16,7 @@
 
 package com.graphaware.runtime.policy.all;
 
-import com.graphaware.common.policy.inclusion.BasePropertyContainerInclusionPolicy;
+import com.graphaware.common.policy.inclusion.BaseEntityInclusionPolicy;
 import com.graphaware.common.policy.inclusion.NodeInclusionPolicy;
 import com.graphaware.common.serialize.Serializer;
 import com.graphaware.common.serialize.SingletonSerializer;
@@ -29,7 +29,7 @@ import org.neo4j.graphdb.Node;
  * Policy that includes all business / application level nodes, but exclude any
  * {@link com.graphaware.runtime.GraphAwareRuntime} internal nodes. Singleton.
  */
-public final class IncludeAllBusinessNodes extends BasePropertyContainerInclusionPolicy<Node> implements NodeInclusionPolicy {
+public final class IncludeAllBusinessNodes extends BaseEntityInclusionPolicy<Node> implements NodeInclusionPolicy {
 
     static {
         Serializer.register(IncludeAllBusinessNodes.class, new SingletonSerializer());

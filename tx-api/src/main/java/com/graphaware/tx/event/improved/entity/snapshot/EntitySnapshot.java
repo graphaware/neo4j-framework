@@ -14,13 +14,13 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.propertycontainer.snapshot;
+package com.graphaware.tx.event.improved.entity.snapshot;
 
-import com.graphaware.common.wrapper.BasePropertyContainerWrapper;
-import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
+import com.graphaware.common.wrapper.BaseEntityWrapper;
+import com.graphaware.tx.event.improved.data.EntityTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 import org.neo4j.logging.Log;
 import com.graphaware.common.log.LoggerFactory;
 
@@ -28,16 +28,16 @@ import java.util.Collection;
 import java.util.HashSet;
 
 /**
- * A decorator of a {@link org.neo4j.graphdb.PropertyContainer} that represents a snapshot of a {@link org.neo4j.graphdb.PropertyContainer} before a
- * transaction has started. It consults {@link com.graphaware.tx.event.improved.data.PropertyContainerTransactionData} wrapped in {@link com.graphaware.tx.event.improved.data.TransactionDataContainer},
+ * A decorator of a {@link org.neo4j.graphdb.Entity} that represents a snapshot of a {@link org.neo4j.graphdb.Entity} before a
+ * transaction has started. It consults {@link com.graphaware.tx.event.improved.data.EntityTransactionData} wrapped in {@link com.graphaware.tx.event.improved.data.TransactionDataContainer},
  * before returning information about contained properties in order to provide these as they were before the transactions started.
- * Mutations are preformed as expected but only in the case that the mutated {@link org.neo4j.graphdb.PropertyContainer} has not been deleted
+ * Mutations are preformed as expected but only in the case that the mutated {@link org.neo4j.graphdb.Entity} has not been deleted
  * in the transaction. If it has been deleted, an exception is thrown upon mutation.
  *
- * @param <T> type of the wrapped property container.
+ * @param <T> type of the wrapped entity.
  */
-public abstract class PropertyContainerSnapshot<T extends PropertyContainer> extends BasePropertyContainerWrapper<T> implements PropertyContainer {
-    private static final Log LOG = LoggerFactory.getLogger(PropertyContainerSnapshot.class);
+public abstract class EntitySnapshot<T extends Entity> extends BaseEntityWrapper<T> implements Entity {
+    private static final Log LOG = LoggerFactory.getLogger(EntitySnapshot.class);
 
     protected final T wrapped;
     protected final TransactionDataContainer transactionDataContainer;
@@ -45,10 +45,10 @@ public abstract class PropertyContainerSnapshot<T extends PropertyContainer> ext
     /**
      * Construct a new snapshot.
      *
-     * @param wrapped                  property container.
+     * @param wrapped                  entity.
      * @param transactionDataContainer transaction data container.
      */
-    protected PropertyContainerSnapshot(T wrapped, TransactionDataContainer transactionDataContainer) {
+    protected EntitySnapshot(T wrapped, TransactionDataContainer transactionDataContainer) {
         this.wrapped = wrapped;
         this.transactionDataContainer = transactionDataContainer;
     }
@@ -66,7 +66,7 @@ public abstract class PropertyContainerSnapshot<T extends PropertyContainer> ext
      *
      * @return transaction data.
      */
-    protected abstract PropertyContainerTransactionData<T> transactionData();
+    protected abstract EntityTransactionData<T> transactionData();
 
     /**
      * {@inheritDoc}
@@ -74,7 +74,7 @@ public abstract class PropertyContainerSnapshot<T extends PropertyContainer> ext
     @Override
     public boolean hasProperty(String key) {
         if (transactionData().hasBeenDeleted(wrapped)) {
-            return transactionData().propertiesOfDeletedContainer(wrapped).containsKey(key);
+            return transactionData().propertiesOfDeletedEntity(wrapped).containsKey(key);
         }
 
         if (transactionData().hasBeenChanged(wrapped)) {
@@ -87,9 +87,9 @@ public abstract class PropertyContainerSnapshot<T extends PropertyContainer> ext
         }
 
         //at this point, we know that either of the following is the case:
-        //- the container has not been changed by the tx
-        //- the container has been changed and the property we're looking for has not
-        //- the container has been changed and the property we're looking for has been changed
+        //- the entity has not been changed by the tx
+        //- the entity has been changed and the property we're looking for has not
+        //- the entity has been changed and the property we're looking for has been changed
         // In either case, we can find out whether it was there by delegating to the wrapped one (its current version).
 
         return super.hasProperty(key);
@@ -105,7 +105,7 @@ public abstract class PropertyContainerSnapshot<T extends PropertyContainer> ext
         }
 
         if (transactionData().hasBeenDeleted(wrapped)) {
-            return transactionData().propertiesOfDeletedContainer(wrapped).get(key);
+            return transactionData().propertiesOfDeletedEntity(wrapped).get(key);
         }
 
         if (transactionData().hasBeenChanged(wrapped)) {
@@ -140,13 +140,13 @@ public abstract class PropertyContainerSnapshot<T extends PropertyContainer> ext
     }
 
     /**
-     * Check whether this property container has not been deleted and can thus be mutated.
-     * In case the container can be mutated, nothing happens. In the opposite case, an {@link IllegalStateException} exception is thrown.
+     * Check whether this entity has not been deleted and can thus be mutated.
+     * In case the entity can be mutated, nothing happens. In the opposite case, an {@link IllegalStateException} exception is thrown.
      */
     protected void checkCanBeMutated() {
         if (transactionData().hasBeenDeleted(wrapped)) {
-            LOG.error("Deleted property container " + wrapped + " should not be mutated.");
-            throw new IllegalStateException("Deleted property container " + wrapped + " should not be mutated.");
+            LOG.error("Deleted entity " + wrapped + " should not be mutated.");
+            throw new IllegalStateException("Deleted entity " + wrapped + " should not be mutated.");
         }
     }
 
@@ -156,7 +156,7 @@ public abstract class PropertyContainerSnapshot<T extends PropertyContainer> ext
     @Override
     public Iterable<String> getPropertyKeys() {
         if (transactionData().hasBeenDeleted(wrapped)) {
-            return transactionData().propertiesOfDeletedContainer(wrapped).keySet();
+            return transactionData().propertiesOfDeletedEntity(wrapped).keySet();
         }
 
         if (!transactionData().hasBeenChanged(wrapped)) {

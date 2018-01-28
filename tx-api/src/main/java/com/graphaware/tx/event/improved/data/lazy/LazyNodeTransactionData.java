@@ -18,22 +18,21 @@ package com.graphaware.tx.event.improved.data.lazy;
 
 import com.graphaware.tx.event.improved.data.NodeTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
-import com.graphaware.tx.event.improved.propertycontainer.snapshot.NodeSnapshot;
+import com.graphaware.tx.event.improved.entity.snapshot.NodeSnapshot;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.event.LabelEntry;
 import org.neo4j.graphdb.event.PropertyEntry;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.logging.Log;
-import org.slf4j.Logger;
 import com.graphaware.common.log.LoggerFactory;
 
 import java.util.*;
 
 /**
- * {@link LazyPropertyContainerTransactionData} for {@link org.neo4j.graphdb.Node}s.
+ * {@link LazyEntityTransactionData} for {@link org.neo4j.graphdb.Node}s.
  */
-public class LazyNodeTransactionData extends LazyPropertyContainerTransactionData<Node> implements NodeTransactionData {
+public class LazyNodeTransactionData extends LazyEntityTransactionData<Node> implements NodeTransactionData {
     private static final Log LOG = LoggerFactory.getLogger(LazyNodeTransactionData.class);
 
     private final TransactionData transactionData;
@@ -47,7 +46,7 @@ public class LazyNodeTransactionData extends LazyPropertyContainerTransactionDat
      * Construct node transaction data from Neo4j {@link org.neo4j.graphdb.event.TransactionData}.
      *
      * @param transactionData          provided by Neo4j.
-     * @param transactionDataContainer containing {@link com.graphaware.tx.event.improved.data.PropertyContainerTransactionData}..
+     * @param transactionDataContainer containing {@link com.graphaware.tx.event.improved.data.EntityTransactionData}..
      */
     public LazyNodeTransactionData(TransactionData transactionData, TransactionDataContainer transactionDataContainer) {
         this.transactionData = transactionData;

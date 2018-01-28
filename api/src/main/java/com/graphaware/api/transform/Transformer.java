@@ -16,21 +16,21 @@
 
 package com.graphaware.api.transform;
 
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 /**
- * A transformer of a {@link PropertyContainer}.
+ * A transformer of a {@link Entity}.
  *
  * @param <R> type of the object this transformer transforms to.
- * @param <P> type of the property container this transformer transforms from.
+ * @param <P> type of the entity this transformer transforms from.
  */
-public interface Transformer<R, P extends PropertyContainer> {
+public interface Transformer<R, P extends Entity> {
 
     /**
-     * Transforms the given property container.
+     * Transforms the given entity.
      *
      * @param p to transform. Must not be <code>null</code>.
-     * @return transformed container. Never <code>null</code>.
+     * @return transformed entity. Never <code>null</code>.
      */
     R transform(P p);
 }

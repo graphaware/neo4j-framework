@@ -18,7 +18,7 @@ package com.graphaware.test.unit;
 
 import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
-import com.graphaware.common.util.PropertyContainerUtils;
+import com.graphaware.common.util.EntityUtils;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.Iterators;
 import org.neo4j.logging.Log;
@@ -30,7 +30,7 @@ import java.io.File;
 import java.util.*;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static com.graphaware.common.util.PropertyContainerUtils.*;
+import static com.graphaware.common.util.EntityUtils.*;
 import static org.junit.Assert.fail;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.helpers.collection.Iterables.count;
@@ -463,14 +463,14 @@ public final class GraphUnit {
             System.out.println("Nodes:");
             for (Node node : database.getAllNodes()) {
                 if (isNodeIncluded(node, inclusionPolicies)) {
-                    System.out.println(PropertyContainerUtils.nodeToString(node));
+                    System.out.println(EntityUtils.nodeToString(node));
                 }
             }
 
             System.out.println("Relationships:");
             for (Relationship rel : database.getAllRelationships()) {
                 if (isRelationshipIncluded(rel, inclusionPolicies)) {
-                    System.out.println(PropertyContainerUtils.relationshipToString(rel));
+                    System.out.println(EntityUtils.relationshipToString(rel));
                 }
             }
             tx.success();
@@ -748,25 +748,25 @@ public final class GraphUnit {
         return relationship1.isType(relationship2.getType());
     }
 
-    private static boolean haveSameProperties(PropertyContainer pc1, PropertyContainer pc2, InclusionPolicies inclusionPolicies) {
-        int pc1KeyCount = 0, pc2KeyCount = 0;
-        for (String key : pc1.getPropertyKeys()) {
-            if (isPropertyIncluded(pc1, key, inclusionPolicies)) {
-                pc1KeyCount++;
-                if (!pc2.hasProperty(key)) {
+    private static boolean haveSameProperties(Entity entity1, Entity entity2, InclusionPolicies inclusionPolicies) {
+        int entity1KeyCount = 0, entity2KeyCount = 0;
+        for (String key : entity1.getPropertyKeys()) {
+            if (isPropertyIncluded(entity1, key, inclusionPolicies)) {
+                entity1KeyCount++;
+                if (!entity2.hasProperty(key)) {
                     return false;
                 }
-                if (!valueToString(pc1.getProperty(key)).equals(valueToString(pc2.getProperty(key)))) {
+                if (!valueToString(entity1.getProperty(key)).equals(valueToString(entity2.getProperty(key)))) {
                     return false;
                 }
             }
         }
-        for (String key : pc2.getPropertyKeys()) {
-            if (isPropertyIncluded(pc2, key, inclusionPolicies)) {
-                pc2KeyCount++;
+        for (String key : entity2.getPropertyKeys()) {
+            if (isPropertyIncluded(entity2, key, inclusionPolicies)) {
+                entity2KeyCount++;
             }
         }
-        return pc1KeyCount == pc2KeyCount;
+        return entity1KeyCount == entity2KeyCount;
     }
 
     private static boolean isNodeIncluded(Node node, InclusionPolicies inclusionPolicies) {
@@ -777,16 +777,16 @@ public final class GraphUnit {
         return inclusionPolicies.getRelationshipInclusionPolicy().include(rel);
     }
 
-    private static boolean isPropertyIncluded(PropertyContainer propertyContainer, String propertyKey, InclusionPolicies inclusionPolicies) {
-        if (propertyContainer instanceof Node) {
-            return inclusionPolicies.getNodePropertyInclusionPolicy().include(propertyKey, (Node) propertyContainer);
+    private static boolean isPropertyIncluded(Entity entity, String propertyKey, InclusionPolicies inclusionPolicies) {
+        if (entity instanceof Node) {
+            return inclusionPolicies.getNodePropertyInclusionPolicy().include(propertyKey, (Node) entity);
         }
 
-        if (propertyContainer instanceof Relationship) {
-            return inclusionPolicies.getRelationshipPropertyInclusionPolicy().include(propertyKey, (Relationship) propertyContainer);
+        if (entity instanceof Relationship) {
+            return inclusionPolicies.getRelationshipPropertyInclusionPolicy().include(propertyKey, (Relationship) entity);
         }
 
-        throw new IllegalStateException("Property container is not a Node or Relationship!");
+        throw new IllegalStateException("Entity is not a Node or Relationship!");
     }
 
     private static GraphDatabaseService createTemporaryDb() {

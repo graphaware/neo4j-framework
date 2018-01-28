@@ -16,16 +16,16 @@
 
 package com.graphaware.common.representation;
 
-import com.graphaware.common.expression.PropertyContainerExpressions;
+import com.graphaware.common.expression.EntityExpressions;
 
-public abstract class Property<T extends PropertyContainerExpressions> {
+public abstract class Property<T extends EntityExpressions> {
 
     private final String key;
-    protected final T propertyContainer;
+    protected final T entity;
 
-    protected Property(String key, T propertyContainer) {
+    protected Property(String key, T entity) {
         this.key = key;
-        this.propertyContainer = propertyContainer;
+        this.entity = entity;
     }
 
     public String getKey() {

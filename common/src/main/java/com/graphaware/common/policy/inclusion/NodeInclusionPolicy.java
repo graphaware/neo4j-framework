@@ -20,8 +20,8 @@ package com.graphaware.common.policy.inclusion;
 import org.neo4j.graphdb.Node;
 
 /**
- * {@link PropertyContainerInclusionPolicy} for {@link Node}s.
+ * {@link EntityInclusionPolicy} for {@link Node}s.
  */
-public interface NodeInclusionPolicy extends PropertyContainerInclusionPolicy<Node> {
+public interface NodeInclusionPolicy extends EntityInclusionPolicy<Node> {
     //todo good toString method on incl policies
 }

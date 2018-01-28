@@ -21,9 +21,9 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 /**
- * {@link PropertyContainerInclusionPolicy} for {@link Relationship}s.
+ * {@link EntityInclusionPolicy} for {@link Relationship}s.
  */
-public interface RelationshipInclusionPolicy extends PropertyContainerInclusionPolicy<Relationship> {
+public interface RelationshipInclusionPolicy extends EntityInclusionPolicy<Relationship> {
 
     /**
      * Include the given relationships from the given node's point of view?

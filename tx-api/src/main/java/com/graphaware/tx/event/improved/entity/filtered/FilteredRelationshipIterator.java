@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.propertycontainer.filtered;
+package com.graphaware.tx.event.improved.entity.filtered;
 
 import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.common.policy.inclusion.RelationshipInclusionPolicy;

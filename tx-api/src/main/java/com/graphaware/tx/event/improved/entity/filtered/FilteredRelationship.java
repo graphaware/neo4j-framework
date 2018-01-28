@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.propertycontainer.filtered;
+package com.graphaware.tx.event.improved.entity.filtered;
 
 import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
@@ -23,9 +23,9 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 /**
- * {@link FilteredPropertyContainer} which is a {@link org.neo4j.graphdb.Relationship}.
+ * {@link FilteredEntity} which is a {@link org.neo4j.graphdb.Relationship}.
  */
-public class FilteredRelationship extends FilteredPropertyContainer<Relationship> implements Relationship, RelationshipWrapper {
+public class FilteredRelationship extends FilteredEntity<Relationship> implements Relationship, RelationshipWrapper {
 
     /**
      * Create a new filtering relationship decorator.
@@ -43,14 +43,6 @@ public class FilteredRelationship extends FilteredPropertyContainer<Relationship
     @Override
     protected PropertyInclusionPolicy<Relationship> getPropertyInclusionPolicy() {
         return policies.getRelationshipPropertyInclusionPolicy();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getId() {
-        return wrapped.getId();
     }
 
     /**

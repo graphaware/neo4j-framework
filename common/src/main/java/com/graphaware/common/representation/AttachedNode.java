@@ -10,39 +10,39 @@ import java.util.List;
 import static org.neo4j.graphdb.Direction.valueOf;
 import static org.neo4j.graphdb.RelationshipType.withName;
 
-public class AttachedNode extends AttachedPropertyContainer<Node> implements AttachedNodeExpressions {
+public class AttachedNode extends AttachedEntity<Node> implements AttachedNodeExpressions {
 
     public AttachedNode(Node node) {
         super(node);
     }
 
     public int getDegree() {
-        return propertyContainer.getDegree();
+        return entity.getDegree();
     }
 
     @Override
     public int getDegree(String typeOrDirection) {
         try {
-            return propertyContainer.getDegree(valueOf(typeOrDirection.toUpperCase()));
+            return entity.getDegree(valueOf(typeOrDirection.toUpperCase()));
         } catch (IllegalArgumentException e) {
-            return propertyContainer.getDegree(withName(typeOrDirection));
+            return entity.getDegree(withName(typeOrDirection));
         }
     }
 
     @Override
     public int getDegree(String type, String direction) {
-        return propertyContainer.getDegree(withName(type), valueOf(direction.toUpperCase()));
+        return entity.getDegree(withName(type), valueOf(direction.toUpperCase()));
     }
 
     @Override
     public boolean hasLabel(String label) {
-        return propertyContainer.hasLabel(Label.label(label));
+        return entity.hasLabel(Label.label(label));
     }
 
     @Override
     public String[] getLabels() {
         List<String> labels = new LinkedList<>();
-        for (Label label : propertyContainer.getLabels()) {
+        for (Label label : entity.getLabels()) {
             labels.add(label.name());
         }
         return labels.toArray(new String[labels.size()]);

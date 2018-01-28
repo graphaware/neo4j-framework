@@ -18,12 +18,12 @@ package com.graphaware.common.policy.inclusion.none;
 
 
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 /**
  * {@link PropertyInclusionPolicy} that excludes all properties.
  */
-public abstract class IncludeNoProperties<T extends PropertyContainer> implements PropertyInclusionPolicy<T> {
+public abstract class IncludeNoProperties<T extends Entity> implements PropertyInclusionPolicy<T> {
 
     protected IncludeNoProperties() {
     }
@@ -32,7 +32,7 @@ public abstract class IncludeNoProperties<T extends PropertyContainer> implement
      * {@inheritDoc}
      */
     @Override
-    public final boolean include(String key, T propertyContainer) {
+    public final boolean include(String key, T entity) {
         return false;
     }
 }

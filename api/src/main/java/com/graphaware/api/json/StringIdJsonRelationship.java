@@ -49,8 +49,8 @@ public class StringIdJsonRelationship extends JsonRelationship<String> {
     }
 
     @Override
-    public Relationship producePropertyContainer(GraphDatabaseService database) {
-        throw new UnsupportedOperationException("Please use producePropertyContainer(GraphDatabaseService database, RelationshipIdTransformer<ID> relationshipIdTransformer, NodeIdTransformer<ID> nodeIdTransformer)");
+    public Relationship produceEntity(GraphDatabaseService database) {
+        throw new UnsupportedOperationException("Please use produceEntity(GraphDatabaseService database, RelationshipIdTransformer<ID> relationshipIdTransformer, NodeIdTransformer<ID> nodeIdTransformer)");
     }
 
     @JsonIgnore

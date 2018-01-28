@@ -24,7 +24,7 @@ import org.neo4j.graphdb.Relationship;
 /**
  * {@link RelationshipInclusionPolicy} that ignores all relationships. Singleton.
  */
-public final class IncludeNoRelationships extends IncludeNoPropertyContainers<Relationship> implements RelationshipInclusionPolicy {
+public final class IncludeNoRelationships extends IncludeNoEntities<Relationship> implements RelationshipInclusionPolicy {
 
     private static final RelationshipInclusionPolicy INSTANCE = new IncludeNoRelationships();
 

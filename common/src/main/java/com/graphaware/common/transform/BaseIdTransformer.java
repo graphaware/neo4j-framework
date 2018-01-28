@@ -16,17 +16,16 @@
 
 package com.graphaware.common.transform;
 
-import com.graphaware.common.representation.DetachedPropertyContainer;
-import com.graphaware.common.transform.IdTransformer;
-import org.neo4j.graphdb.PropertyContainer;
+import com.graphaware.common.representation.DetachedEntity;
+import org.neo4j.graphdb.Entity;
 
 /**
  * Abstract base-class for {@link IdTransformer} implementations.
  *
  * @param <ID> custom ID type.
- * @param <P>  property container type.
+ * @param <E>  entity type.
  */
-public abstract class BaseIdTransformer<ID, P extends PropertyContainer> implements IdTransformer<ID, P> {
+public abstract class BaseIdTransformer<ID, E extends Entity> implements IdTransformer<ID, E> {
 
     /**
      * {@inheritDoc}
@@ -34,7 +33,7 @@ public abstract class BaseIdTransformer<ID, P extends PropertyContainer> impleme
     @Override
     public final long toGraphId(ID id) {
         if (id == null) {
-            return DetachedPropertyContainer.NEW;
+            return DetachedEntity.NEW;
         }
 
         return toExistingGraphId(id);

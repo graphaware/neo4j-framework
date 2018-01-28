@@ -22,9 +22,9 @@ import org.neo4j.graphdb.Node;
 import java.util.Set;
 
 /**
- * {@link PropertyContainerTransactionData} for {@link org.neo4j.graphdb.Node}s.
+ * {@link EntityTransactionData} for {@link org.neo4j.graphdb.Node}s.
  */
-public interface NodeTransactionData extends PropertyContainerTransactionData<Node> {
+public interface NodeTransactionData extends EntityTransactionData<Node> {
 
     /**
      * Check whether a label has been assigned in the transaction.

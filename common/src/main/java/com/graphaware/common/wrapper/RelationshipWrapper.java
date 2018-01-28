@@ -21,5 +21,5 @@ import org.neo4j.graphdb.Relationship;
 /**
  * A {@link Wrapper} for {@link org.neo4j.graphdb.Relationship}
  */
-public interface RelationshipWrapper extends Relationship, PropertyContainerWrapper<Relationship> {
+public interface RelationshipWrapper extends Relationship, EntityWrapper<Relationship> {
 }

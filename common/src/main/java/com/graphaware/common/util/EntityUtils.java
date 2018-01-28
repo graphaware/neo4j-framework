@@ -21,7 +21,7 @@ import com.graphaware.common.policy.inclusion.all.IncludeAll;
 import org.apache.commons.lang3.StringUtils;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 import org.neo4j.graphdb.Relationship;
 
 import java.util.*;
@@ -30,60 +30,39 @@ import static com.graphaware.common.util.ArrayUtils.isPrimitiveOrStringArray;
 import static com.graphaware.common.util.ArrayUtils.primitiveOrStringArrayToString;
 
 /**
- * Utility methods for dealing with {@link org.neo4j.graphdb.PropertyContainer}s.
+ * Utility methods for dealing with {@link org.neo4j.graphdb.Entity}s.
  */
-public final class PropertyContainerUtils {
+public final class EntityUtils {
 
     /**
-     * Convert a collection of {@link org.neo4j.graphdb.PropertyContainer}s to a map of {@link org.neo4j.graphdb.PropertyContainer}s keyed by their ID.
+     * Convert a collection of {@link org.neo4j.graphdb.Entity}s to a map of {@link org.neo4j.graphdb.Entity}s keyed by their ID.
      *
-     * @param propertyContainers to convert.
-     * @param <T>                type of the {@link org.neo4j.graphdb.PropertyContainer}.
-     * @return map keyed by {@link org.neo4j.graphdb.PropertyContainer} ID with the actual {@link org.neo4j.graphdb.PropertyContainer}s as values.
+     * @param entities to convert.
+     * @param <T>                type of the {@link org.neo4j.graphdb.Entity}.
+     * @return map keyed by {@link org.neo4j.graphdb.Entity} ID with the actual {@link org.neo4j.graphdb.Entity}s as values.
      */
-    public static <T extends PropertyContainer> Map<Long, T> propertyContainersToMap(Collection<T> propertyContainers) {
+    public static <T extends Entity> Map<Long, T> entitiesToMap(Collection<T> entities) {
         Map<Long, T> result = new HashMap<>();
 
-        for (T propertyContainer : propertyContainers) {
-            result.put(id(propertyContainer), propertyContainer);
+        for (T entity : entities) {
+            result.put(entity.getId(), entity);
         }
 
         return result;
     }
 
     /**
-     * Get ID from a {@link org.neo4j.graphdb.PropertyContainer}.
+     * Get IDs from an {@link Iterable} of {@link org.neo4j.graphdb.Entity}s.
      *
-     * @param propertyContainer to get ID from. Must be a {@link org.neo4j.graphdb.Node} or {@link org.neo4j.graphdb.Relationship}. Must not be <code>null</code>.
-     * @return ID
-     * @throws IllegalStateException in case the propertyContainer is not a {@link org.neo4j.graphdb.Node} or a {@link org.neo4j.graphdb.Relationship}.
-     */
-    public static long id(PropertyContainer propertyContainer) {
-        Objects.requireNonNull(propertyContainer);
-
-        if (Node.class.isAssignableFrom(propertyContainer.getClass())) {
-            return ((Node) propertyContainer).getId();
-        }
-
-        if (Relationship.class.isAssignableFrom(propertyContainer.getClass())) {
-            return ((Relationship) propertyContainer).getId();
-        }
-
-        throw new IllegalStateException("Unknown Property Container: " + propertyContainer.getClass().getName());
-    }
-
-    /**
-     * Get IDs from an {@link Iterable} of {@link org.neo4j.graphdb.PropertyContainer}s.
-     *
-     * @param propertyContainers to get ID from. Must be an {@link Iterable} of {@link org.neo4j.graphdb.Node}s or {@link org.neo4j.graphdb.Relationship}s.
+     * @param entities to get ID from. Must be an {@link Iterable} of {@link org.neo4j.graphdb.Node}s or {@link org.neo4j.graphdb.Relationship}s.
      * @return IDs
-     * @throws IllegalStateException in case one of the propertyContainers is not a {@link org.neo4j.graphdb.Node} or a {@link org.neo4j.graphdb.Relationship}.
+     * @throws IllegalStateException in case one of the entities is not a {@link org.neo4j.graphdb.Node} or a {@link org.neo4j.graphdb.Relationship}.
      */
-    public static Long[] ids(Iterable<? extends PropertyContainer> propertyContainers) {
+    public static Long[] ids(Iterable<? extends Entity> entities) {
         List<Long> result = new LinkedList<>();
 
-        for (PropertyContainer pc : propertyContainers) {
-            result.add(id(pc));
+        for (Entity entity : entities) {
+            result.add(entity.getId());
         }
 
         return result.toArray(new Long[result.size()]);
@@ -107,31 +86,31 @@ public final class PropertyContainerUtils {
     }
 
     /**
-     * Convert all properties from a {@link org.neo4j.graphdb.PropertyContainer} to a {@link java.util.Map}, where the key is the
+     * Convert all properties from a {@link org.neo4j.graphdb.Entity} to a {@link java.util.Map}, where the key is the
      * property key and value is the property value. Keys must not be <code>null</code>
      * or empty. <code>Null</code> values are fine.
      *
-     * @param propertyContainer to convert properties from.
+     * @param Entity to convert properties from.
      * @return converted properties.
      */
-    public static Map<String, Object> propertiesToMap(PropertyContainer propertyContainer) {
-        return propertiesToMap(propertyContainer, new IncludeAll<String>());
+    public static Map<String, Object> propertiesToMap(Entity Entity) {
+        return propertiesToMap(Entity, new IncludeAll<String>());
     }
 
     /**
-     * Convert selected properties from a {@link org.neo4j.graphdb.PropertyContainer} to a {@link java.util.Map}, where the key is the
+     * Convert selected properties from a {@link org.neo4j.graphdb.Entity} to a {@link java.util.Map}, where the key is the
      * property key and value is the property value. Keys must not be <code>null</code>
      * or empty. <code>Null</code> values are fine.
      *
-     * @param propertyContainer         to convert properties from.
+     * @param Entity         to convert properties from.
      * @param propertyInclusionPolicy policy to select which properties to include. Decides based on the property key.
      * @return converted properties.
      */
-    public static Map<String, Object> propertiesToMap(PropertyContainer propertyContainer, ObjectInclusionPolicy<String> propertyInclusionPolicy) {
+    public static Map<String, Object> propertiesToMap(Entity Entity, ObjectInclusionPolicy<String> propertyInclusionPolicy) {
         Map<String, Object> result = new HashMap<>();
-        for (String key : propertyContainer.getPropertyKeys()) {
+        for (String key : Entity.getPropertyKeys()) {
             if (propertyInclusionPolicy.include(key)) {
-                result.put(key, propertyContainer.getProperty(key));
+                result.put(key, Entity.getProperty(key));
             }
         }
         return result;
@@ -209,20 +188,20 @@ public final class PropertyContainerUtils {
     }
 
     /**
-     * Convert a {@link PropertyContainer} to a human-readable String.
+     * Convert a {@link Entity} to a human-readable String.
      *
-     * @param propertyContainer to convert.
-     * @return propertyContainer as String.
+     * @param Entity to convert.
+     * @return entity as String.
      */
-    public static String propertiesToString(PropertyContainer propertyContainer) {
-        if (!propertyContainer.getPropertyKeys().iterator().hasNext()) {
+    public static String propertiesToString(Entity Entity) {
+        if (!Entity.getPropertyKeys().iterator().hasNext()) {
             return "";
         }
 
         StringBuilder string = new StringBuilder("{");
 
         List<String> propertyKeys = new LinkedList<>();
-        for (String key : propertyContainer.getPropertyKeys()) {
+        for (String key : Entity.getPropertyKeys()) {
             propertyKeys.add(key);
         }
         Collections.sort(propertyKeys);
@@ -233,7 +212,7 @@ public final class PropertyContainerUtils {
                 string.append(", ");
             }
             first = false;
-            string.append(key).append(": ").append(valueToString(propertyContainer.getProperty(key)));
+            string.append(key).append(": ").append(valueToString(Entity.getProperty(key)));
         }
 
         string.append("}");
@@ -242,87 +221,87 @@ public final class PropertyContainerUtils {
     }
 
     /**
-     * Get a property from the given property container as int.
+     * Get a property from the given entity as int.
      *
-     * @param propertyContainer to get property from.
+     * @param Entity to get property from.
      * @param key               key of the property.
      * @return value.
      * @throws ClassCastException if value isn't a number.
      * @throws org.neo4j.graphdb.NotFoundException
      *                            if the property doesn't exist.
      */
-    public static int getInt(PropertyContainer propertyContainer, String key) {
-        return getInt(propertyContainer.toString(), key, propertyContainer.getProperty(key));
+    public static int getInt(Entity Entity, String key) {
+        return getInt(Entity.toString(), key, Entity.getProperty(key));
     }
 
     /**
-     * Get a property from the given property container as int.
+     * Get a property from the given entity as int.
      *
-     * @param propertyContainer to get property from.
+     * @param Entity to get property from.
      * @param key               key of the property.
      * @param defaultValue      value returned if property does not exist.
      * @return value.
      * @throws ClassCastException if value isn't a number.
      */
-    public static int getInt(PropertyContainer propertyContainer, String key, int defaultValue) {
-        return getInt(propertyContainer.toString(), key, propertyContainer.getProperty(key, defaultValue));
+    public static int getInt(Entity Entity, String key, int defaultValue) {
+        return getInt(Entity.toString(), key, Entity.getProperty(key, defaultValue));
     }
 
     /**
-     * Get a property from the given property container as long.
+     * Get a property from the given entity as long.
      *
-     * @param propertyContainer to get property from.
+     * @param Entity to get property from.
      * @param key               key of the property.
      * @return value.
      * @throws ClassCastException if value isn't a number.
      * @throws org.neo4j.graphdb.NotFoundException
      *                            if the property doesn't exist.
      */
-    public static long getLong(PropertyContainer propertyContainer, String key) {
-        return getLong(propertyContainer.toString(), key, propertyContainer.getProperty(key));
+    public static long getLong(Entity Entity, String key) {
+        return getLong(Entity.toString(), key, Entity.getProperty(key));
     }
 
     /**
-     * Get a property from the given property container as long.
+     * Get a property from the given entity as long.
      *
-     * @param propertyContainer to get property from.
+     * @param Entity to get property from.
      * @param key               key of the property.
      * @param defaultValue      value returned if property does not exist.
      * @return value.
      * @throws ClassCastException if value isn't a number.
      */
-    public static long getLong(PropertyContainer propertyContainer, String key, long defaultValue) {
-        return getLong(propertyContainer.toString(), key, propertyContainer.getProperty(key, defaultValue));
+    public static long getLong(Entity Entity, String key, long defaultValue) {
+        return getLong(Entity.toString(), key, Entity.getProperty(key, defaultValue));
     }
 
     /**
-     * Get a property from the given property container as float.
+     * Get a property from the given entity as float.
      *
-     * @param propertyContainer to get property from.
+     * @param Entity to get property from.
      * @param key               key of the property.
      * @return value.
      * @throws ClassCastException if value isn't a number.
      * @throws org.neo4j.graphdb.NotFoundException
      *                            if the property doesn't exist.
      */
-    public static float getFloat(PropertyContainer propertyContainer, String key) {
-        return getFloat(propertyContainer.toString(), key, propertyContainer.getProperty(key));
+    public static float getFloat(Entity Entity, String key) {
+        return getFloat(Entity.toString(), key, Entity.getProperty(key));
     }
 
     /**
-     * Get a property from the given property container as float.
+     * Get a property from the given entity as float.
      *
-     * @param propertyContainer to get property from.
+     * @param Entity to get property from.
      * @param key               key of the property.
      * @param defaultValue      value returned if property does not exist.
      * @return value.
      * @throws ClassCastException if value isn't a number.
      */
-    public static float getFloat(PropertyContainer propertyContainer, String key, float defaultValue) {
-        return getFloat(propertyContainer.toString(), key, propertyContainer.getProperty(key, defaultValue));
+    public static float getFloat(Entity Entity, String key, float defaultValue) {
+        return getFloat(Entity.toString(), key, Entity.getProperty(key, defaultValue));
     }
 
-    private static int getInt(String pc, String key, Object value) {
+    private static int getInt(String entity, String key, Object value) {
         if (value instanceof Byte) {
             return ((Byte) value).intValue();
         }
@@ -335,10 +314,10 @@ public final class PropertyContainerUtils {
             return ((Long) value).intValue();
         }
 
-        throw new ClassCastException(value + " is not a number! (" + pc + ", key=" + key + ")");
+        throw new ClassCastException(value + " is not a number! (" + entity + ", key=" + key + ")");
     }
 
-    private static long getLong(String pc, String key, Object value) {
+    private static long getLong(String entity, String key, Object value) {
         if (value instanceof Byte) {
             return ((Byte) value).longValue();
         }
@@ -351,10 +330,10 @@ public final class PropertyContainerUtils {
             return (Long) value;
         }
 
-        throw new ClassCastException(value + " is not a number! (" + pc + ", key=" + key + ")");
+        throw new ClassCastException(value + " is not a number! (" + entity + ", key=" + key + ")");
     }
 
-    private static float getFloat(String pc, String key, Object value) {
+    private static float getFloat(String entity, String key, Object value) {
         if (value instanceof Byte) {
             return ((Byte) value).floatValue();
         }
@@ -376,9 +355,9 @@ public final class PropertyContainerUtils {
             return (Float) value;
         }
 
-        throw new ClassCastException(value + " is not a number! (" + pc + ", key=" + key + ")");
+        throw new ClassCastException(value + " is not a number! (" + entity + ", key=" + key + ")");
     }
 
-    private PropertyContainerUtils() {
+    private EntityUtils() {
     }
 }

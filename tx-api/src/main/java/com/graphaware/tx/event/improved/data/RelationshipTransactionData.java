@@ -24,9 +24,9 @@ import org.neo4j.graphdb.RelationshipType;
 import java.util.Collection;
 
 /**
- * {@link PropertyContainerTransactionData} for {@link org.neo4j.graphdb.Relationship}s.
+ * {@link EntityTransactionData} for {@link org.neo4j.graphdb.Relationship}s.
  */
-public interface RelationshipTransactionData extends PropertyContainerTransactionData<Relationship> {
+public interface RelationshipTransactionData extends EntityTransactionData<Relationship> {
 
     /**
      * Get all relationships for the given node and of the given types, which have been created in the transaction.

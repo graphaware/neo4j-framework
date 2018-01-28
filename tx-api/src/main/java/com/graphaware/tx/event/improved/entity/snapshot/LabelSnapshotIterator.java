@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.propertycontainer.snapshot;
+package com.graphaware.tx.event.improved.entity.snapshot;
 
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.neo4j.graphdb.Label;
@@ -25,7 +25,7 @@ import org.neo4j.helpers.collection.PrefetchingIterator;
 import java.util.Iterator;
 
 /**
- * {@link com.graphaware.tx.event.improved.propertycontainer.snapshot.NodeSnapshot}'s {@link org.neo4j.graphdb.Label} iterator.
+ * {@link com.graphaware.tx.event.improved.entity.snapshot.NodeSnapshot}'s {@link org.neo4j.graphdb.Label} iterator.
  */
 public class LabelSnapshotIterator extends PrefetchingIterator<Label> implements Iterator<Label>, Iterable<Label> {
 

@@ -17,16 +17,16 @@
 package com.graphaware.common.policy.inclusion;
 
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 import org.neo4j.helpers.collection.FilteringIterable;
 
 /**
- * Base class for {@link PropertyContainerInclusionPolicy} implementations that implement the {@link #getAll(GraphDatabaseService)}
+ * Base class for {@link EntityInclusionPolicy} implementations that implement the {@link #getAll(GraphDatabaseService)}
  * method in a naive way.
  *
  * @param <T>
  */
-public abstract class BasePropertyContainerInclusionPolicy<T extends PropertyContainer> implements PropertyContainerInclusionPolicy<T> {
+public abstract class BaseEntityInclusionPolicy<T extends Entity> implements EntityInclusionPolicy<T> {
 
     /**
      * {@inheritDoc}
@@ -38,11 +38,11 @@ public abstract class BasePropertyContainerInclusionPolicy<T extends PropertyCon
     }
 
     /**
-     * Simply get all possible {@link PropertyContainer}s from the database, not worrying whether they are included by
+     * Simply get all possible {@link Entity}s from the database, not worrying whether they are included by
      * this policy or not.
      *
-     * @param database to get property contrainers from.
-     * @return all property containers.
+     * @param database to get entities from.
+     * @return all entities.
      */
     protected abstract Iterable<T> doGetAll(GraphDatabaseService database);
 }

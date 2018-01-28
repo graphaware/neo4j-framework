@@ -3,7 +3,7 @@ package com.graphaware.common.expression;
 import java.util.Arrays;
 import java.util.HashSet;
 
-public interface DetachedNodeExpressions extends PropertyContainerExpressions {
+public interface DetachedNodeExpressions extends EntityExpressions {
 
     String[] getLabels();
 

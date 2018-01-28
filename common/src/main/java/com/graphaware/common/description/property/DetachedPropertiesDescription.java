@@ -20,7 +20,7 @@ import com.graphaware.common.description.predicate.Predicate;
 
 /**
  * A {@link PropertiesDescription} that must be detached from the database, i.e. store its own data internally rather
- * than referring to an underlying {@link org.neo4j.graphdb.PropertyContainer}. It is immutable; once instantiated,
+ * than referring to an underlying {@link org.neo4j.graphdb.Entity}. It is immutable; once instantiated,
  * new instances with different {@link Predicate}s can be constructed using the {@link #with(String, Predicate)} method.
  */
 public interface DetachedPropertiesDescription extends PropertiesDescription {

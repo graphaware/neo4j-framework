@@ -17,20 +17,20 @@
 package com.graphaware.tx.event.improved.data.filtered;
 
 import com.graphaware.common.policy.inclusion.InclusionPolicies;
-import com.graphaware.common.policy.inclusion.PropertyContainerInclusionPolicy;
+import com.graphaware.common.policy.inclusion.EntityInclusionPolicy;
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
 import com.graphaware.common.util.Change;
 import com.graphaware.tx.event.improved.data.NodeTransactionData;
-import com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode;
+import com.graphaware.tx.event.improved.entity.filtered.FilteredNode;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 
 import java.util.Set;
 
 /**
- * {@link FilteredPropertyContainerTransactionData} for {@link org.neo4j.graphdb.Node}s.
+ * {@link FilteredEntityTransactionData} for {@link org.neo4j.graphdb.Node}s.
  */
-public class FilteredNodeTransactionData extends FilteredPropertyContainerTransactionData<Node> implements NodeTransactionData {
+public class FilteredNodeTransactionData extends FilteredEntityTransactionData<Node> implements NodeTransactionData {
 
     private final NodeTransactionData wrapped;
 
@@ -65,7 +65,7 @@ public class FilteredNodeTransactionData extends FilteredPropertyContainerTransa
      * {@inheritDoc}
      */
     @Override
-    protected PropertyContainerInclusionPolicy<Node> getPropertyContainerInclusionPolicy() {
+    protected EntityInclusionPolicy<Node> getEntityInclusionPolicy() {
         return policies.getNodeInclusionPolicy();
     }
 

@@ -16,10 +16,10 @@
 
 package com.graphaware.common.representation;
 
-import com.graphaware.common.expression.PropertyContainerExpressions;
-import com.graphaware.common.util.PropertyContainerUtils;
+import com.graphaware.common.expression.EntityExpressions;
+import com.graphaware.common.util.EntityUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 import org.neo4j.graphdb.Transaction;
 
 import java.io.Serializable;
@@ -31,11 +31,11 @@ import java.util.Map;
 import static org.springframework.util.Assert.notNull;
 
 /**
- * Representation of a Neo4j property container.
+ * Representation of a Neo4j entity.
  *
- * @param <T> type of the {@link PropertyContainer} this class represents.
+ * @param <T> type of the {@link Entity} this class represents.
  */
-public abstract class DetachedPropertyContainer<ID, T extends PropertyContainer> implements Serializable, PropertyContainerExpressions {
+public abstract class DetachedEntity<ID, T extends Entity> implements Serializable, EntityExpressions {
     public static final long NEW = -1;
 
     private long graphId = NEW;
@@ -45,64 +45,64 @@ public abstract class DetachedPropertyContainer<ID, T extends PropertyContainer>
     /**
      * No-arg constructor (for Jackson et al).
      */
-    protected DetachedPropertyContainer() {
+    protected DetachedEntity() {
     }
 
     protected abstract ID getId();
 
     /**
-     * Construct a new representation from a property container.
+     * Construct a new representation from a entity.
      *
-     * @param pc         to construct a representation from. Must not be <code>null</code>.
+     * @param entity         to construct a representation from. Must not be <code>null</code>.
      * @param properties keys of properties to be included in the representation.
      *                   Can be <code>null</code>, which represents all. Empty array represents none.
      */
-    protected DetachedPropertyContainer(T pc, String[] properties) {
-        this(PropertyContainerUtils.id(pc));
+    protected DetachedEntity(T entity, String[] properties) {
+        this(entity.getId());
 
         initPropsIfNeeded();
         if (properties != null) {
             for (String property : properties) {
-                if (pc.hasProperty(property)) {
-                    putProperty(property, pc.getProperty(property));
+                if (entity.hasProperty(property)) {
+                    putProperty(property, entity.getProperty(property));
                 }
             }
         } else {
-            for (String property : pc.getPropertyKeys()) {
-                putProperty(property, pc.getProperty(property));
+            for (String property : entity.getPropertyKeys()) {
+                putProperty(property, entity.getProperty(property));
             }
         }
     }
 
     /**
-     * Construct a representation of a property container from its internal Neo4j ID.
+     * Construct a representation of a entity from its internal Neo4j ID.
      *
      * @param graphId ID.
      */
-    protected DetachedPropertyContainer(long graphId) {
+    protected DetachedEntity(long graphId) {
         this.graphId = graphId;
     }
 
     /**
-     * Construct a new representation of a property container from a map of properties.
+     * Construct a new representation of a entity from a map of properties.
      *
-     * @param properties of the new container. Must not be <code>null</code>, but can be empty.
+     * @param properties of the new entity. Must not be <code>null</code>, but can be empty.
      */
-    protected DetachedPropertyContainer(Map<String, Object> properties) {
-        notNull(properties);
+    protected DetachedEntity(Map<String, Object> properties) {
+        notNull(properties, "Properties must not be null");
         setProperties(properties);
     }
 
     /**
-     * Construct a new representation of a property container from its internal Neo4j ID and a map of properties.
+     * Construct a new representation of a entity from its internal Neo4j ID and a map of properties.
      * <p>
      * Note that this constructor is only intended for testing.
      *
      * @param graphId    ID.
-     * @param properties of the new container. Must not be <code>null</code>, but can be empty.
+     * @param properties of the new entity. Must not be <code>null</code>, but can be empty.
      */
-    protected DetachedPropertyContainer(long graphId, Map<String, Object> properties) {
-        notNull(properties);
+    protected DetachedEntity(long graphId, Map<String, Object> properties) {
+        notNull(properties, "Properties must not be null");
         this.graphId = graphId;
         setProperties(properties);
     }
@@ -125,13 +125,13 @@ public abstract class DetachedPropertyContainer<ID, T extends PropertyContainer>
     }
 
     /**
-     * Produce a {@link PropertyContainer} from this representation. This means either fetch the container from the
+     * Produce a {@link Entity} from this representation. This means either fetch the entity from the
      * given database (iff id is set), or create it.
      *
-     * @param database to create/fetch container in.
-     * @return container.
+     * @param database to create/fetch entity in.
+     * @return entity.
      */
-    public T producePropertyContainer(GraphDatabaseService database) {
+    public T produceEntity(GraphDatabaseService database) {
         T result;
 
         try (Transaction tx = database.beginTx()) {
@@ -152,28 +152,28 @@ public abstract class DetachedPropertyContainer<ID, T extends PropertyContainer>
     }
 
     /**
-     * Create a new property container from this representation in the given database.
+     * Create a new entity from this representation in the given database.
      *
-     * @param database to create the container in.
-     * @return container.
+     * @param database to create the entity in.
+     * @return entity.
      */
     protected abstract T create(GraphDatabaseService database);
 
     /**
-     * Fetch a property container from the given database.
+     * Fetch a entity from the given database.
      *
      * @param database to fetch in.
-     * @return container.
+     * @return entity.
      */
     protected abstract T fetch(GraphDatabaseService database);
 
     /**
-     * Populate this instance of a container representation with data from the given {@link PropertyContainer}.
+     * Populate this instance of a entity representation with data from the given {@link Entity}.
      *
      * @param t to populate from.
      */
     protected void populate(T t) {
-        setGraphId(PropertyContainerUtils.id(t));
+        setGraphId(t.getId());
         if (properties != null) {
             for (Map.Entry<String, Object> entry : properties.entrySet()) {
                 t.setProperty(entry.getKey(), entry.getValue());
@@ -182,7 +182,7 @@ public abstract class DetachedPropertyContainer<ID, T extends PropertyContainer>
     }
 
     /**
-     * Check that this instance of property container representation can be created in the db.
+     * Check that this instance of entity representation can be created in the db.
      *
      * @throws IllegalStateException if not possible to create.
      */
@@ -191,13 +191,13 @@ public abstract class DetachedPropertyContainer<ID, T extends PropertyContainer>
     }
 
     /**
-     * Check that this instance of property container representation can be fetched from the db.
+     * Check that this instance of entity representation can be fetched from the db.
      *
      * @throws IllegalStateException if not possible to fetch.
      */
     protected void checkCanFetch() {
         if (getProperties() != null) {
-            throw new IllegalStateException("Must not specify properties for existing property container!");
+            throw new IllegalStateException("Must not specify properties for existing entity!");
         }
     }
 
@@ -224,7 +224,7 @@ public abstract class DetachedPropertyContainer<ID, T extends PropertyContainer>
      * @param properties Must not be <code>null</code>, but can be empty.
      */
     public void setProperties(Map<String, Object> properties) {
-        notNull(properties);
+        notNull(properties, "Properties must not be null");
         initPropsIfNeeded();
         this.properties.putAll(properties);
     }
@@ -255,7 +255,7 @@ public abstract class DetachedPropertyContainer<ID, T extends PropertyContainer>
             return false;
         }
 
-        DetachedPropertyContainer<?, ?> that = (DetachedPropertyContainer<?, ?>) o;
+        DetachedEntity<?, ?> that = (DetachedEntity<?, ?>) o;
 
         if (graphId != that.graphId) {
             return false;

@@ -16,9 +16,9 @@
 
 package com.graphaware.writer.thirdparty;
 
-import com.graphaware.common.representation.DetachedPropertyContainer;
+import com.graphaware.common.representation.DetachedEntity;
 import com.graphaware.common.util.Change;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 import static org.springframework.util.Assert.notNull;
 
@@ -26,20 +26,20 @@ import static org.springframework.util.Assert.notNull;
  * {@link BaseWriteOperation} representing an update operation.
  *
  * @param <R> type of the details object.
- * @param <T> type of the {@link PropertyContainer} that the operation was performed on.
+ * @param <T> type of the {@link Entity} that the operation was performed on.
  */
-public abstract class Update<ID, R extends DetachedPropertyContainer<ID, T>, T extends PropertyContainer> extends BaseWriteOperation<Change<R>> {
+public abstract class Update<ID, R extends DetachedEntity<ID, T>, T extends Entity> extends BaseWriteOperation<Change<R>> {
 
     /**
      * Create the operation.
      *
-     * @param previous representation of the previous state of the updated {@link PropertyContainer}. Must not be <code>null</code>.
-     * @param current representation of the current state of the updated {@link PropertyContainer}. Must not be <code>null</code>.
+     * @param previous representation of the previous state of the updated {@link Entity}. Must not be <code>null</code>.
+     * @param current representation of the current state of the updated {@link Entity}. Must not be <code>null</code>.
      */
     protected Update(R previous, R current) {
         super(new Change<>(previous, current));
 
-        notNull(previous);
-        notNull(current);
+        notNull(previous, "Previous entity must not be null");
+        notNull(current, "Current entity must not be null");
     }
 }

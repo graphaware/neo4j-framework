@@ -17,7 +17,7 @@
 package com.graphaware.common.description.property;
 
 import com.graphaware.common.description.predicate.Predicate;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 import java.util.Map;
 
@@ -30,12 +30,12 @@ import static com.graphaware.common.description.predicate.Predicates.any;
 public class WildcardPropertiesDescription extends BaseDetachedPropertiesDescription {
 
     /**
-     * Construct a new properties description as the most specific description of the given property container.
+     * Construct a new properties description as the most specific description of the given entity.
      *
-     * @param propertyContainer to construct the most specific properties description from.
+     * @param entity to construct the most specific properties description from.
      */
-    public WildcardPropertiesDescription(PropertyContainer propertyContainer) {
-        super(propertyContainer);
+    public WildcardPropertiesDescription(Entity entity) {
+        super(entity);
     }
 
     /**

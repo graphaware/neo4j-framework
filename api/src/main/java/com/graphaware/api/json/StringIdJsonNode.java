@@ -43,7 +43,7 @@ public class StringIdJsonNode extends JsonNode<String> {
     }
 
     @Override
-    public Node producePropertyContainer(GraphDatabaseService database) {
-        throw new UnsupportedOperationException("Please use producePropertyContainer(GraphDatabaseService database, NodeIdTransformer<ID> transformer)");
+    public Node produceEntity(GraphDatabaseService database) {
+        throw new UnsupportedOperationException("Please use produceEntity(GraphDatabaseService database, NodeIdTransformer<ID> transformer)");
     }
 }

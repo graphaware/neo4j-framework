@@ -28,9 +28,9 @@ import java.util.Map;
 import static org.springframework.util.Assert.notNull;
 
 /**
- * {@link DetachedPropertyContainer} for a {@link Node}.
+ * {@link DetachedEntity} for a {@link Node}.
  */
-public abstract class DetachedNode<ID> extends DetachedPropertyContainer<ID, Node> implements DetachedNodeExpressions {
+public abstract class DetachedNode<ID> extends DetachedEntity<ID, Node> implements DetachedNodeExpressions {
 
     private String[] labels;
 

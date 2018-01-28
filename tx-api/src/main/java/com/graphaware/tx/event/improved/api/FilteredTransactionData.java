@@ -38,7 +38,7 @@ import com.graphaware.tx.event.improved.data.filtered.FilteredRelationshipTransa
  * {@link #getAllCreatedNodes()} can return 5 nodes, but {@link #hasBeenCreated(org.neo4j.graphdb.Node)}  can
  * return true for more of them, as it ignores the filtering.
  * <p/>
- * When traversing the graph using an object returned by this API (such as {@link com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode}),
+ * When traversing the graph using an object returned by this API (such as {@link com.graphaware.tx.event.improved.entity.filtered.FilteredNode}),
  * nodes, properties, and relationships not included by the {@link InclusionPolicies} will be excluded. The only exception
  * to this are relationship start and end nodes - they are returned even if they would normally be filtered out. This is
  * a design decision in order to honor the requirement that relationships must have start and end node.

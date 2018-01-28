@@ -16,21 +16,21 @@
 
 package com.graphaware.common.policy.inclusion;
 
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 /**
- * {@link InclusionPolicy} deciding whether to include properties of some {@link PropertyContainer} or not.
+ * {@link InclusionPolicy} deciding whether to include properties of some {@link Entity} or not.
  *
- * @param <T> type of the property container.
+ * @param <T> type of the entity.
  */
-public interface PropertyInclusionPolicy<T extends PropertyContainer> extends InclusionPolicy {
+public interface PropertyInclusionPolicy<T extends Entity> extends InclusionPolicy {
 
     /**
-     * Should a property with the given key of the given property container be included?
+     * Should a property with the given key of the given entity be included?
      *
      * @param key               of the property.
-     * @param propertyContainer containing the property.
+     * @param entity containing the property.
      * @return true iff the property should be included.
      */
-    boolean include(String key, T propertyContainer);
+    boolean include(String key, T entity);
 }

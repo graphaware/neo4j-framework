@@ -65,9 +65,9 @@ public class SerializableRelationship<ID> extends DetachedRelationship<ID, Seria
     public SerializableRelationship(Relationship relationship, String[] properties, RelationshipIdTransformer<ID> relationshipIdTransformer, NodeIdTransformer<ID> nodeIdTransformer) {
         super(relationship, properties, nodeIdTransformer);
 
-        setId(relationshipIdTransformer.fromContainer(relationship));
-        setStartNodeId(nodeIdTransformer.fromContainer(relationship.getStartNode()));
-        setEndNodeId(nodeIdTransformer.fromContainer(relationship.getEndNode()));
+        setId(relationshipIdTransformer.fromEntity(relationship));
+        setStartNodeId(nodeIdTransformer.fromEntity(relationship.getStartNode()));
+        setEndNodeId(nodeIdTransformer.fromEntity(relationship.getEndNode()));
     }
 
     /**
@@ -102,13 +102,13 @@ public class SerializableRelationship<ID> extends DetachedRelationship<ID, Seria
      * @param database                  to create/fetch relationship in.
      * @param relationshipIdTransformer ID transformer for relationship IDs.
      * @param nodeIdTransformer         ID transformer for node IDs.
-     * @return container.
+     * @return relationship.
      */
-    public Relationship producePropertyContainer(GraphDatabaseService database, RelationshipIdTransformer<ID> relationshipIdTransformer, NodeIdTransformer<ID> nodeIdTransformer) {
+    public Relationship produceEntity(GraphDatabaseService database, RelationshipIdTransformer<ID> relationshipIdTransformer, NodeIdTransformer<ID> nodeIdTransformer) {
         setGraphId(relationshipIdTransformer.toGraphId(id));
         setStartNodeGraphId(nodeIdTransformer.toGraphId(startNodeId));
         setEndNodeGraphId(nodeIdTransformer.toGraphId(endNodeId));
-        return super.producePropertyContainer(database);
+        return super.produceEntity(database);
     }
 
     public ID getId() {

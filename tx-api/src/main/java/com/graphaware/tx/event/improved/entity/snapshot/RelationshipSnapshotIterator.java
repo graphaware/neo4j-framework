@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.propertycontainer.snapshot;
+package com.graphaware.tx.event.improved.entity.snapshot;
 
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.neo4j.graphdb.Direction;

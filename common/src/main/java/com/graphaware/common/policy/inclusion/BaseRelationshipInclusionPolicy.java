@@ -23,7 +23,7 @@ import org.neo4j.graphdb.Relationship;
  * Base class for {@link RelationshipInclusionPolicy} implementations. Implements the {@link #getAll(GraphDatabaseService)} method
  * in the most naive way possible.
  */
-public abstract class BaseRelationshipInclusionPolicy extends BasePropertyContainerInclusionPolicy<Relationship> implements RelationshipInclusionPolicy {
+public abstract class BaseRelationshipInclusionPolicy extends BaseEntityInclusionPolicy<Relationship> implements RelationshipInclusionPolicy {
 
     /**
      * {@inheritDoc}

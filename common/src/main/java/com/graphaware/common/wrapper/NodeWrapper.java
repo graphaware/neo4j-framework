@@ -21,5 +21,5 @@ import org.neo4j.graphdb.Node;
 /**
  * A {@link Wrapper} for {@link org.neo4j.graphdb.Node}
  */
-public interface NodeWrapper extends Node, PropertyContainerWrapper<Node> {
+public interface NodeWrapper extends Node, EntityWrapper<Node> {
 }

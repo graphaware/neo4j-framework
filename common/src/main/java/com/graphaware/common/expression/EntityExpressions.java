@@ -2,7 +2,7 @@ package com.graphaware.common.expression;
 
 import java.util.Map;
 
-public interface PropertyContainerExpressions {
+public interface EntityExpressions {
 
     Map<String, Object> getProperties();
 

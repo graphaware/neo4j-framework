@@ -17,28 +17,28 @@
 package com.graphaware.common.description.property;
 
 import com.graphaware.common.description.predicate.Predicate;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
 
 /**
- * The most specific {@link PropertiesDescription} of a {@link PropertyContainer} that lazily consults the underlying
- * {@link PropertyContainer} and returns only predicates of type {@link com.graphaware.common.description.predicate.EqualTo}.
- * For keys that don't have a corresponding property defined on the {@link PropertyContainer},
+ * The most specific {@link PropertiesDescription} of a {@link Entity} that lazily consults the underlying
+ * {@link Entity} and returns only predicates of type {@link com.graphaware.common.description.predicate.EqualTo}.
+ * For keys that don't have a corresponding property defined on the {@link Entity},
  * {@link com.graphaware.common.description.predicate.Undefined} is returned.
  */
 public class LazyPropertiesDescription extends BasePropertiesDescription implements PropertiesDescription {
 
-    private final PropertyContainer propertyContainer;
+    private final Entity entity;
 
     /**
-     * Construct a new properties description as the most specific description of the given property container.
+     * Construct a new properties description as the most specific description of the given entity.
      *
-     * @param propertyContainer to construct the most specific properties description from.
+     * @param entity to construct the most specific properties description from.
      */
-    public LazyPropertiesDescription(PropertyContainer propertyContainer) {
-        this.propertyContainer = propertyContainer;
+    public LazyPropertiesDescription(Entity entity) {
+        this.entity = entity;
     }
 
     /**
@@ -46,7 +46,7 @@ public class LazyPropertiesDescription extends BasePropertiesDescription impleme
      */
     @Override
     public Predicate get(String key) {
-        Object value = propertyContainer.getProperty(key, null);
+        Object value = entity.getProperty(key, null);
 
         if (value == null) {
             return undefined();
@@ -60,7 +60,7 @@ public class LazyPropertiesDescription extends BasePropertiesDescription impleme
      */
     @Override
     public Iterable<String> getKeys() {
-        return propertyContainer.getPropertyKeys();
+        return entity.getPropertyKeys();
     }
 
     /**
@@ -73,7 +73,7 @@ public class LazyPropertiesDescription extends BasePropertiesDescription impleme
 
         LazyPropertiesDescription that = (LazyPropertiesDescription) o;
 
-        if (!propertyContainer.equals(that.propertyContainer)) return false;
+        if (!entity.equals(that.entity)) return false;
 
         return true;
     }
@@ -83,6 +83,6 @@ public class LazyPropertiesDescription extends BasePropertiesDescription impleme
      */
     @Override
     public int hashCode() {
-        return propertyContainer.hashCode();
+        return entity.hashCode();
     }
 }

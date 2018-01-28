@@ -25,8 +25,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static com.graphaware.common.util.PropertyContainerUtils.nodeToString;
-import static com.graphaware.common.util.PropertyContainerUtils.relationshipToString;
+import static com.graphaware.common.util.EntityUtils.nodeToString;
+import static com.graphaware.common.util.EntityUtils.relationshipToString;
 
 /**
  * Base-class for {@link com.graphaware.tx.event.improved.api.ImprovedTransactionData} implementations that delegates all work to

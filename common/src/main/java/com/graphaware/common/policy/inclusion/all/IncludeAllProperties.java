@@ -17,12 +17,12 @@
 package com.graphaware.common.policy.inclusion.all;
 
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 /**
  * Base-class for {@link PropertyInclusionPolicy}s that includes all properties.
  */
-public abstract class IncludeAllProperties<T extends PropertyContainer> implements PropertyInclusionPolicy<T> {
+public abstract class IncludeAllProperties<T extends Entity> implements PropertyInclusionPolicy<T> {
 
     protected IncludeAllProperties() {
     }

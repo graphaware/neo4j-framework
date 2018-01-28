@@ -17,16 +17,15 @@
 package com.graphaware.common.wrapper;
 
 import org.neo4j.graphdb.*;
-import org.neo4j.graphdb.traversal.Traverser;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Base class for custom {@link org.neo4j.graphdb.PropertyContainer} implementations.
+ * Base class for custom {@link org.neo4j.graphdb.Entity} implementations.
  */
-public abstract class BasePropertyContainer implements PropertyContainer {
+public abstract class BaseEntity implements Entity {
 
     //Typically no need to override:
 

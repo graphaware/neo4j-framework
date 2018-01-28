@@ -17,11 +17,11 @@
 package com.graphaware.tx.event.improved.data.filtered;
 
 import com.graphaware.common.policy.inclusion.InclusionPolicies;
-import com.graphaware.common.policy.inclusion.PropertyContainerInclusionPolicy;
+import com.graphaware.common.policy.inclusion.EntityInclusionPolicy;
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
-import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
+import com.graphaware.tx.event.improved.data.EntityTransactionData;
 import com.graphaware.tx.event.improved.data.RelationshipTransactionData;
-import com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredRelationship;
+import com.graphaware.tx.event.improved.entity.filtered.FilteredRelationship;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -30,9 +30,9 @@ import org.neo4j.graphdb.RelationshipType;
 import java.util.Collection;
 
 /**
- * {@link FilteredPropertyContainerTransactionData} for {@link org.neo4j.graphdb.Relationship}s.
+ * {@link FilteredEntityTransactionData} for {@link org.neo4j.graphdb.Relationship}s.
  */
-public class FilteredRelationshipTransactionData extends FilteredPropertyContainerTransactionData<Relationship> implements RelationshipTransactionData {
+public class FilteredRelationshipTransactionData extends FilteredEntityTransactionData<Relationship> implements RelationshipTransactionData {
 
     private final RelationshipTransactionData wrapped;
 
@@ -51,7 +51,7 @@ public class FilteredRelationshipTransactionData extends FilteredPropertyContain
      * {@inheritDoc}
      */
     @Override
-    protected PropertyContainerTransactionData<Relationship> getWrapped() {
+    protected EntityTransactionData<Relationship> getWrapped() {
         return wrapped;
     }
 
@@ -68,7 +68,7 @@ public class FilteredRelationshipTransactionData extends FilteredPropertyContain
      */
     @Override
     public Collection<Relationship> getCreated(Node node, RelationshipType... types) {
-        return filterPropertyContainers(wrapped.getCreated(node, types));
+        return filterEntities(wrapped.getCreated(node, types));
     }
 
     /**
@@ -76,7 +76,7 @@ public class FilteredRelationshipTransactionData extends FilteredPropertyContain
      */
     @Override
     public Collection<Relationship> getCreated(Node node, Direction direction, RelationshipType... types) {
-        return filterPropertyContainers(wrapped.getCreated(node, direction, types));
+        return filterEntities(wrapped.getCreated(node, direction, types));
     }
 
     /**
@@ -84,7 +84,7 @@ public class FilteredRelationshipTransactionData extends FilteredPropertyContain
      */
     @Override
     public Collection<Relationship> getDeleted(Node node, RelationshipType... types) {
-        return filterPropertyContainers(wrapped.getDeleted(node, types));
+        return filterEntities(wrapped.getDeleted(node, types));
     }
 
     /**
@@ -92,14 +92,14 @@ public class FilteredRelationshipTransactionData extends FilteredPropertyContain
      */
     @Override
     public Collection<Relationship> getDeleted(Node node, Direction direction, RelationshipType... types) {
-        return filterPropertyContainers(wrapped.getDeleted(node, direction, types));
+        return filterEntities(wrapped.getDeleted(node, direction, types));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected PropertyContainerInclusionPolicy<Relationship> getPropertyContainerInclusionPolicy() {
+    protected EntityInclusionPolicy<Relationship> getEntityInclusionPolicy() {
         return policies.getRelationshipInclusionPolicy();
     }
 

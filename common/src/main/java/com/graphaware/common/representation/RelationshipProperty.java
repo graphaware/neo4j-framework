@@ -20,8 +20,8 @@ import com.graphaware.common.expression.DetachedRelationshipExpressions;
 
 public abstract class RelationshipProperty<T extends DetachedRelationshipExpressions> extends Property<T> {
 
-    protected RelationshipProperty(String key, T propertyContainer) {
-        super(key, propertyContainer);
+    protected RelationshipProperty(String key, T entity) {
+        super(key, entity);
     }
 
     public abstract T getRelationship();

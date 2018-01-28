@@ -18,11 +18,10 @@ package com.graphaware.tx.event.improved.data.lazy;
 
 
 import com.graphaware.common.util.Change;
-import com.graphaware.tx.event.improved.data.PropertyContainerTransactionData;
-import org.neo4j.graphdb.PropertyContainer;
+import com.graphaware.tx.event.improved.data.EntityTransactionData;
+import org.neo4j.graphdb.Entity;
 import org.neo4j.graphdb.event.PropertyEntry;
 import org.neo4j.logging.Log;
-import org.slf4j.Logger;
 import com.graphaware.common.log.LoggerFactory;
 
 import java.util.Collection;
@@ -30,16 +29,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.graphaware.common.util.PropertyContainerUtils.id;
-
 /**
- * {@link com.graphaware.tx.event.improved.data.PropertyContainerTransactionData} that lazily initializes its internal structures (indexed transaction data)
+ * {@link com.graphaware.tx.event.improved.data.EntityTransactionData} that lazily initializes its internal structures (indexed transaction data)
  * as they are needed by callers to prevent unnecessary overheads.
  *
- * @param <T> type of the property container.
+ * @param <T> type of the entity.
  */
-public abstract class LazyPropertyContainerTransactionData<T extends PropertyContainer> implements PropertyContainerTransactionData<T> {
-    private static final Log LOG = LoggerFactory.getLogger(LazyPropertyContainerTransactionData.class);
+public abstract class LazyEntityTransactionData<T extends Entity> implements EntityTransactionData<T> {
+    private static final Log LOG = LoggerFactory.getLogger(LazyEntityTransactionData.class);
 
     private Map<Long, T> created = null;
     private Map<Long, T> deleted = null;
@@ -58,12 +55,12 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
      */
     private Map<Long, Map<String, Change<Object>>> changedProperties = null;
     /**
-     * <ID, <key, old value>> of properties of deleted property containers
+     * <ID, <key, old value>> of properties of deleted entities
      */
-    private Map<Long, Map<String, Object>> deletedContainersProperties = null;
+    private Map<Long, Map<String, Object>> deletedEntityProperties = null;
 
     /**
-     * Create an old snapshot of an original property container.
+     * Create an old snapshot of an original entity.
      *
      * @param original to create a snapshot from.
      * @return the snapshot.
@@ -71,7 +68,7 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
     protected abstract T oldSnapshot(T original);
 
     /**
-     * Create a new snapshot of an original property container.
+     * Create a new snapshot of an original entity.
      *
      * @param original to create a snapshot from.
      * @return the snapshot.
@@ -82,9 +79,9 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
      * {@inheritDoc}
      */
     @Override
-    public boolean hasBeenCreated(T container) {
+    public boolean hasBeenCreated(T entity) {
         initializeCreated();
-        return created.containsKey(id(container));
+        return created.containsKey(entity.getId());
     }
 
     /**
@@ -102,15 +99,15 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
             created = new HashMap<>();
 
             for (T created : created()) {
-                this.created.put(id(created), newSnapshot(created));
+                this.created.put(created.getId(), newSnapshot(created));
             }
         }
     }
 
     /**
-     * Get all property containers created in the transaction from the Neo4j API.
+     * Get all entities created in the transaction from the Neo4j API.
      *
-     * @return created property containers.
+     * @return created entities.
      */
     protected abstract Iterable<T> created();
 
@@ -118,23 +115,23 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
      * {@inheritDoc}
      */
     @Override
-    public boolean hasBeenDeleted(T container) {
+    public boolean hasBeenDeleted(T entity) {
         initializeDeleted();
-        return deleted.containsKey(id(container));
+        return deleted.containsKey(entity.getId());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public T getDeleted(T container) {
+    public T getDeleted(T entity) {
         initializeDeleted();
 
-        if (!hasBeenDeleted(container)) {
-            throw new IllegalArgumentException(container + " has not been deleted!");
+        if (!hasBeenDeleted(entity)) {
+            throw new IllegalArgumentException(entity + " has not been deleted!");
         }
 
-        return deleted.get(id(container));
+        return deleted.get(entity.getId());
     }
 
     /**
@@ -152,15 +149,15 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
             deleted = new HashMap<>();
 
             for (T deleted : deleted()) {
-                this.deleted.put(id(deleted), oldSnapshot(deleted));
+                this.deleted.put(deleted.getId(), oldSnapshot(deleted));
             }
         }
     }
 
     /**
-     * Get all property containers deleted in the transaction from the Neo4j API.
+     * Get all entities deleted in the transaction from the Neo4j API.
      *
-     * @return created property containers.
+     * @return created entities.
      */
     protected abstract Iterable<T> deleted();
 
@@ -168,23 +165,23 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
      * {@inheritDoc}
      */
     @Override
-    public boolean hasBeenChanged(T container) {
+    public boolean hasBeenChanged(T entity) {
         initializeChanged();
-        return changedContainsKey(container);
+        return changedContainsKey(entity);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Change<T> getChanged(T container) {
+    public Change<T> getChanged(T entity) {
         initializeChanged();
 
-        if (!hasBeenChanged(container)) {
-            throw new IllegalArgumentException(container + " has not been changed!");
+        if (!hasBeenChanged(entity)) {
+            throw new IllegalArgumentException(entity + " has not been changed!");
         }
 
-        return changed.get(id(container));
+        return changed.get(entity.getId());
     }
 
     /**
@@ -232,12 +229,12 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
     protected void registerChange(T candidate) {
         if (!changedContainsKey(candidate)) {
             Change<T> change = createChangeObject(candidate);
-            changed.put(id(candidate), change);
+            changed.put(candidate.getId(), change);
         }
     }
 
     protected boolean changedContainsKey(T candidate) {
-        return changed.containsKey(id(candidate));
+        return changed.containsKey(candidate.getId());
     }
 
     protected Change<T> createChangeObject(T candidate) {
@@ -262,140 +259,140 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
      * {@inheritDoc}
      */
     @Override
-    public boolean hasPropertyBeenCreated(T container, String key) {
+    public boolean hasPropertyBeenCreated(T entity, String key) {
         initializeProperties();
 
-        if (!hasBeenChanged(container)) {
-            LOG.warn(container + " has not been changed but the caller thinks it should have created properties.");
+        if (!hasBeenChanged(entity)) {
+            LOG.warn(entity + " has not been changed but the caller thinks it should have created properties.");
             return false;
         }
 
-        if (!createdProperties.containsKey(id(container))) {
+        if (!createdProperties.containsKey(entity.getId())) {
             return false;
         }
 
-        return createdProperties.get(id(container)).containsKey(key);
+        return createdProperties.get(entity.getId()).containsKey(key);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Object> createdProperties(T container) {
+    public Map<String, Object> createdProperties(T entity) {
         initializeProperties();
 
-        if (!hasBeenChanged(container)) {
-            LOG.warn(container + " has not been changed but the caller thinks it should have created properties.");
+        if (!hasBeenChanged(entity)) {
+            LOG.warn(entity + " has not been changed but the caller thinks it should have created properties.");
             return Collections.emptyMap();
         }
 
-        if (!createdProperties.containsKey(id(container))) {
+        if (!createdProperties.containsKey(entity.getId())) {
             return Collections.emptyMap();
         }
 
-        return Collections.unmodifiableMap(createdProperties.get(id(container)));
+        return Collections.unmodifiableMap(createdProperties.get(entity.getId()));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean hasPropertyBeenDeleted(T container, String key) {
+    public boolean hasPropertyBeenDeleted(T entity, String key) {
         initializeProperties();
 
-        if (!hasBeenChanged(container)) {
-            LOG.warn(container + " has not been changed but the caller thinks it should have deleted properties.");
+        if (!hasBeenChanged(entity)) {
+            LOG.warn(entity + " has not been changed but the caller thinks it should have deleted properties.");
             return false;
         }
 
-        if (!deletedProperties.containsKey(id(container))) {
+        if (!deletedProperties.containsKey(entity.getId())) {
             return false;
         }
 
-        return deletedProperties.get(id(container)).containsKey(key);
+        return deletedProperties.get(entity.getId()).containsKey(key);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Object> deletedProperties(T container) {
+    public Map<String, Object> deletedProperties(T entity) {
         initializeProperties();
 
-        if (!hasBeenChanged(container)) {
-            LOG.warn(container + " has not been changed but the caller thinks it should have deleted properties.");
+        if (!hasBeenChanged(entity)) {
+            LOG.warn(entity + " has not been changed but the caller thinks it should have deleted properties.");
             return Collections.emptyMap();
         }
 
-        if (!deletedProperties.containsKey(id(container))) {
+        if (!deletedProperties.containsKey(entity.getId())) {
             return Collections.emptyMap();
         }
 
-        return Collections.unmodifiableMap(deletedProperties.get(id(container)));
+        return Collections.unmodifiableMap(deletedProperties.get(entity.getId()));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Object> propertiesOfDeletedContainer(T container) {
+    public Map<String, Object> propertiesOfDeletedEntity(T entity) {
         initializeProperties();
 
-        if (!hasBeenDeleted(container)) {
-            LOG.error(container + " has not been deleted but the caller thinks it has! This is a bug.");
-            throw new IllegalStateException(container + " has not been deleted but the caller thinks it has! This is a bug.");
+        if (!hasBeenDeleted(entity)) {
+            LOG.error(entity + " has not been deleted but the caller thinks it has! This is a bug.");
+            throw new IllegalStateException(entity + " has not been deleted but the caller thinks it has! This is a bug.");
         }
 
-        if (!deletedContainersProperties.containsKey(id(container))) {
+        if (!deletedEntityProperties.containsKey(entity.getId())) {
             return Collections.emptyMap();
         }
 
-        return Collections.unmodifiableMap(deletedContainersProperties.get(id(container)));
+        return Collections.unmodifiableMap(deletedEntityProperties.get(entity.getId()));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean hasPropertyBeenChanged(T container, String key) {
+    public boolean hasPropertyBeenChanged(T entity, String key) {
         initializeProperties();
 
-        if (!hasBeenChanged(container)) {
-            LOG.warn(container + " has not been changed but the caller thinks it should have changed properties.");
+        if (!hasBeenChanged(entity)) {
+            LOG.warn(entity + " has not been changed but the caller thinks it should have changed properties.");
             return false;
         }
 
-        if (!changedProperties.containsKey(id(container))) {
+        if (!changedProperties.containsKey(entity.getId())) {
             return false;
         }
 
-        return changedProperties.get(id(container)).containsKey(key);
+        return changedProperties.get(entity.getId()).containsKey(key);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Change<Object>> changedProperties(T container) {
+    public Map<String, Change<Object>> changedProperties(T entity) {
         initializeProperties();
 
-        if (!hasBeenChanged(container)) {
-            LOG.warn(container + " has not been changed but the caller thinks it should have changed properties.");
+        if (!hasBeenChanged(entity)) {
+            LOG.warn(entity + " has not been changed but the caller thinks it should have changed properties.");
             return Collections.emptyMap();
         }
 
-        if (!changedProperties.containsKey(id(container))) {
+        if (!changedProperties.containsKey(entity.getId())) {
             return Collections.emptyMap();
         }
 
-        return Collections.unmodifiableMap(changedProperties.get(id(container)));
+        return Collections.unmodifiableMap(changedProperties.get(entity.getId()));
     }
 
     private void initializeProperties() {
         if (createdProperties != null) {
             assert changedProperties != null;
             assert deletedProperties != null;
-            assert deletedContainersProperties != null;
+            assert deletedEntityProperties != null;
 
             return;
         }
@@ -407,12 +404,12 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
         createdProperties = new HashMap<>();
         deletedProperties = new HashMap<>();
         changedProperties = new HashMap<>();
-        deletedContainersProperties = new HashMap<>();
+        deletedEntityProperties = new HashMap<>();
 
         for (PropertyEntry<T> propertyEntry : assignedProperties()) {
-            T container = propertyEntry.entity();
+            T entity = propertyEntry.entity();
 
-            if (hasBeenCreated(container)) {
+            if (hasBeenCreated(entity)) {
                 continue;
             }
 
@@ -421,40 +418,40 @@ public abstract class LazyPropertyContainerTransactionData<T extends PropertyCon
             }
 
             if (propertyEntry.previouslyCommitedValue() == null) {
-                if (!createdProperties.containsKey(id(container))) {
-                    createdProperties.put(id(container), new HashMap<String, Object>());
+                if (!createdProperties.containsKey(entity.getId())) {
+                    createdProperties.put(entity.getId(), new HashMap<String, Object>());
                 }
-                createdProperties.get(id(container)).put(propertyEntry.key(), propertyEntry.value());
+                createdProperties.get(entity.getId()).put(propertyEntry.key(), propertyEntry.value());
             } else {
-                if (!changedProperties.containsKey(id(container))) {
-                    changedProperties.put(id(container), new HashMap<String, Change<Object>>());
+                if (!changedProperties.containsKey(entity.getId())) {
+                    changedProperties.put(entity.getId(), new HashMap<String, Change<Object>>());
                 }
-                changedProperties.get(id(container)).put(propertyEntry.key(), new Change<>(propertyEntry.previouslyCommitedValue(), propertyEntry.value()));
+                changedProperties.get(entity.getId()).put(propertyEntry.key(), new Change<>(propertyEntry.previouslyCommitedValue(), propertyEntry.value()));
             }
         }
 
         for (PropertyEntry<T> propertyEntry : removedProperties()) {
-            T container = propertyEntry.entity();
+            T entity = propertyEntry.entity();
 
-            if (deleted.containsKey(id(container))) {
-                if (!deletedContainersProperties.containsKey(id(container))) {
-                    deletedContainersProperties.put(id(container), new HashMap<String, Object>());
+            if (deleted.containsKey(entity.getId())) {
+                if (!deletedEntityProperties.containsKey(entity.getId())) {
+                    deletedEntityProperties.put(entity.getId(), new HashMap<String, Object>());
                 }
-                deletedContainersProperties.get(id(container)).put(propertyEntry.key(), propertyEntry.previouslyCommitedValue());
+                deletedEntityProperties.get(entity.getId()).put(propertyEntry.key(), propertyEntry.previouslyCommitedValue());
                 continue;
             }
 
-            if (!changedContainsKey(container)) {
-                throw new IllegalStateException(container + " seems to have not been deleted or changed, this is a bug");
+            if (!changedContainsKey(entity)) {
+                throw new IllegalStateException(entity + " seems to have not been deleted or changed, this is a bug");
             }
 
-            assert changedContainsKey(container);
+            assert changedContainsKey(entity);
 
-            if (!deletedProperties.containsKey(id(container))) {
-                deletedProperties.put(id(container), new HashMap<String, Object>());
+            if (!deletedProperties.containsKey(entity.getId())) {
+                deletedProperties.put(entity.getId(), new HashMap<String, Object>());
             }
 
-            deletedProperties.get(id(container)).put(propertyEntry.key(), propertyEntry.previouslyCommitedValue());
+            deletedProperties.get(entity.getId()).put(propertyEntry.key(), propertyEntry.previouslyCommitedValue());
         }
     }
 

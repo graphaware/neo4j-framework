@@ -30,7 +30,7 @@ import java.util.List;
  * Abstract base class for {@link RelationshipInclusionPolicy} implementations with fluent interface,
  * intended to be used programmatically.
  */
-public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationships<T>> extends IncludePropertyContainers<T, Relationship> implements RelationshipInclusionPolicy {
+public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationships<T>> extends IncludeEntities<T, Relationship> implements RelationshipInclusionPolicy {
 
     private final Direction direction;
     private final String[] relationshipTypes;

@@ -1,6 +1,6 @@
 package com.graphaware.common.expression;
 
-public interface DetachedRelationshipExpressions extends PropertyContainerExpressions {
+public interface DetachedRelationshipExpressions extends EntityExpressions {
 
     String getType();
 

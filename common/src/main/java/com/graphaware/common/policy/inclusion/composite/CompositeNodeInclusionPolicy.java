@@ -21,9 +21,9 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 
 /**
- * {@link CompositePropertyContainerInclusionPolicy} for {@link Node}s.
+ * {@link CompositeEntityInclusionPolicy} for {@link Node}s.
  */
-public final class CompositeNodeInclusionPolicy extends CompositePropertyContainerInclusionPolicy<Node, NodeInclusionPolicy> implements NodeInclusionPolicy {
+public final class CompositeNodeInclusionPolicy extends CompositeEntityInclusionPolicy<Node, NodeInclusionPolicy> implements NodeInclusionPolicy {
 
     public static CompositeNodeInclusionPolicy of(NodeInclusionPolicy... policies) {
         return new CompositeNodeInclusionPolicy(policies);

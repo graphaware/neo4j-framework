@@ -2,12 +2,12 @@ package com.graphaware.common.representation;
 
 public class AttachedRelationshipProperty extends RelationshipProperty<AttachedRelationship> {
 
-    public AttachedRelationshipProperty(String key, AttachedRelationship propertyContainer) {
-        super(key, propertyContainer);
+    public AttachedRelationshipProperty(String key, AttachedRelationship entity) {
+        super(key, entity);
     }
 
     @Override
     public AttachedRelationship getRelationship() {
-        return propertyContainer;
+        return entity;
     }
 }

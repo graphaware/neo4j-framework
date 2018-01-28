@@ -22,14 +22,19 @@ import org.neo4j.helpers.collection.IterableWrapper;
 import static org.neo4j.graphdb.Direction.BOTH;
 
 /**
- * Base class for {@link PropertyContainerWrapper} implementations.
+ * Base class for {@link EntityWrapper} implementations.
  */
-public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> extends BasePropertyContainer implements PropertyContainerWrapper<T> {
+public abstract class BaseEntityWrapper<T extends Entity> extends BaseEntity implements EntityWrapper<T> {
 
     /**
      * @return this.
      */
     protected abstract T self();
+
+    @Override
+    public long getId() {
+        return getWrapped().getId();
+    }
 
     //Typically overridden:
 
@@ -253,21 +258,6 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
     //Typically no need to override:
 
     /**
-     * @see org.neo4j.graphdb.Node#getId()}  and {@link org.neo4j.graphdb.Relationship#getId().
-     */
-    public long getId() {
-        if (getWrapped() instanceof Node) {
-            return getWrappedNode().getId();
-        }
-
-        if (getWrapped() instanceof Relationship) {
-            return getWrappedRelationship().getId();
-        }
-
-        throw new IllegalStateException(this + " is not a Node or Relationship");
-    }
-
-    /**
      * @see org.neo4j.graphdb.Node#delete()}  and {@link org.neo4j.graphdb.Relationship#delete().
      */
     public void delete() {
@@ -304,7 +294,7 @@ public abstract class BasePropertyContainerWrapper<T extends PropertyContainer> 
             return false;
         }
 
-        BasePropertyContainerWrapper that = (BasePropertyContainerWrapper) o;
+        BaseEntityWrapper that = (BaseEntityWrapper) o;
 
         if (!getWrapped().equals(that.getWrapped())) {
             return false;

@@ -17,7 +17,7 @@
 package com.graphaware.tx.event.improved;
 
 import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.helpers.collection.MapUtil;
 
@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 
 public final class PropertiesAssert {
 
-    public static void assertProperties(PropertyContainer actual, Object... keyValueKeyValue) {
+    public static void assertProperties(Entity actual, Object... keyValueKeyValue) {
         Map<String, Object> expected = MapUtil.map(keyValueKeyValue);
 
         assertEquals(expected.size(), Iterables.count(actual.getPropertyKeys()));

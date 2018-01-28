@@ -18,7 +18,7 @@ package com.graphaware.runtime.policy.all;
 
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 /**
  * Base-class for all {@link PropertyInclusionPolicy}
@@ -26,27 +26,27 @@ import org.neo4j.graphdb.PropertyContainer;
  * properties (up to subclasses to decide which ones), but exclude any
  * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link com.graphaware.runtime.module.TxDrivenModule} internal properties.
  */
-public abstract class IncludeAllBusinessProperties<T extends PropertyContainer> implements PropertyInclusionPolicy<T> {
+public abstract class IncludeAllBusinessProperties<T extends Entity> implements PropertyInclusionPolicy<T> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean include(String key, T propertyContainer) {
+    public boolean include(String key, T entity) {
         if (key.startsWith(RuntimeConfiguration.GA_PREFIX)) {
             return false;
         }
 
-        return doInclude(key, propertyContainer);
+        return doInclude(key, entity);
     }
 
     /**
-     * Should a property with the given key of the given property container be included for the purposes of transaction
+     * Should a property with the given key of the given entity be included for the purposes of transaction
      * data analysis.
      *
      * @param key               of the property.
-     * @param propertyContainer containing the property.
+     * @param entity containing the property.
      * @return true iff the property should be included.
      */
-    protected abstract boolean doInclude(String key, T propertyContainer);
+    protected abstract boolean doInclude(String key, T entity);
 }

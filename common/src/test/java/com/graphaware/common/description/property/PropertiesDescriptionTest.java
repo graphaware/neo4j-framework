@@ -21,7 +21,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
@@ -32,7 +32,7 @@ public abstract class PropertiesDescriptionTest {
     private GraphDatabaseService database;
     private Transaction tx;
 
-    protected PropertyContainer propertyContainer;
+    protected Entity entity;
 
     @Before
     public void setUp() {
@@ -48,7 +48,7 @@ public abstract class PropertiesDescriptionTest {
         }
 
         tx = database.beginTx();
-        propertyContainer = database.getNodeById(0);
+        entity = database.getNodeById(0);
     }
 
     @After
@@ -58,15 +58,15 @@ public abstract class PropertiesDescriptionTest {
     }
 
     protected LazyPropertiesDescription lazy() {
-        return new LazyPropertiesDescription(propertyContainer);
+        return new LazyPropertiesDescription(entity);
     }
 
     protected LiteralPropertiesDescription literal() {
-        return new LiteralPropertiesDescription(propertyContainer);
+        return new LiteralPropertiesDescription(entity);
     }
 
     protected WildcardPropertiesDescription wildcard() {
-        return new WildcardPropertiesDescription(propertyContainer);
+        return new WildcardPropertiesDescription(entity);
     }
 
     protected LiteralPropertiesDescription literal(Object... stringOrPredicate) {

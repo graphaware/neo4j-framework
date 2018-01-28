@@ -23,7 +23,7 @@ import org.neo4j.graphdb.Node;
  * Base class for {@link NodeInclusionPolicy} implementations. Implements the {@link #getAll(GraphDatabaseService)} method
  * in the most naive way possible.
  */
-public abstract class BaseNodeInclusionPolicy extends BasePropertyContainerInclusionPolicy<Node> implements NodeInclusionPolicy {
+public abstract class BaseNodeInclusionPolicy extends BaseEntityInclusionPolicy<Node> implements NodeInclusionPolicy {
 
     /**
      * {@inheritDoc}

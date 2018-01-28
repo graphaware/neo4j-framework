@@ -17,16 +17,16 @@
 package com.graphaware.common.policy.inclusion.composite;
 
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 import java.util.Arrays;
 
 /**
  * {@link PropertyInclusionPolicy} composed of multiple other policies. All contained policies must "vote"
- * <code>true</code> to {@link #include(String, org.neo4j.graphdb.PropertyContainer)} in order for this policy to
+ * <code>true</code> to {@link #include(String, org.neo4j.graphdb.Entity)} in order for this policy to
  * return <code>true</code>.
  */
-public abstract class CompositePropertyInclusionPolicy<T extends PropertyContainer> implements PropertyInclusionPolicy<T> {
+public abstract class CompositePropertyInclusionPolicy<T extends Entity> implements PropertyInclusionPolicy<T> {
 
     private final PropertyInclusionPolicy<T>[] policies;
 

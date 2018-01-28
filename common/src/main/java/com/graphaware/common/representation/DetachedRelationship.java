@@ -28,9 +28,9 @@ import static org.neo4j.graphdb.RelationshipType.withName;
 import static org.springframework.util.Assert.hasLength;
 
 /**
- * {@link DetachedPropertyContainer} for a {@link Relationship}.
+ * {@link DetachedEntity} for a {@link Relationship}.
  */
-public abstract class DetachedRelationship<ID, N extends DetachedNode<ID>> extends DetachedPropertyContainer<ID, Relationship> implements DetachedRelationshipExpressions {
+public abstract class DetachedRelationship<ID, N extends DetachedNode<ID>> extends DetachedEntity<ID, Relationship> implements DetachedRelationshipExpressions {
 
     private long startNodeGraphId = NEW;
     private long endNodeGraphId = NEW;

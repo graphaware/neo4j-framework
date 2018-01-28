@@ -18,13 +18,13 @@ package com.graphaware.common.policy.inclusion.fluent;
 
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
 import org.apache.commons.lang3.StringUtils;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 /**
  * Abstract base class for {@link PropertyInclusionPolicy} implementations with fluent interface,
  * intended to be used programmatically.
  */
-public abstract class BaseIncludeProperties<T extends BaseIncludeProperties<T, P>, P extends PropertyContainer> implements PropertyInclusionPolicy<P> {
+public abstract class BaseIncludeProperties<T extends BaseIncludeProperties<T, E>, E extends Entity> implements PropertyInclusionPolicy<E> {
 
     private final String key;
 
@@ -67,7 +67,7 @@ public abstract class BaseIncludeProperties<T extends BaseIncludeProperties<T, P
      * {@inheritDoc}
      */
     @Override
-    public boolean include(String key, P propertyContainer) {
+    public boolean include(String key, E Entity) {
         return this.key == null || this.key.equals(key);
     }
 

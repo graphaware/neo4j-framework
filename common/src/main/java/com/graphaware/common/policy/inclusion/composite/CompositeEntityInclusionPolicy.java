@@ -16,22 +16,22 @@
 
 package com.graphaware.common.policy.inclusion.composite;
 
-import com.graphaware.common.policy.inclusion.BasePropertyContainerInclusionPolicy;
-import com.graphaware.common.policy.inclusion.PropertyContainerInclusionPolicy;
-import org.neo4j.graphdb.PropertyContainer;
+import com.graphaware.common.policy.inclusion.BaseEntityInclusionPolicy;
+import com.graphaware.common.policy.inclusion.EntityInclusionPolicy;
+import org.neo4j.graphdb.Entity;
 
 import java.util.Arrays;
 
 /**
- * {@link PropertyContainerInclusionPolicy} composed of multiple other policies.
- * All contained policies must "vote" <code>true</code> to {@link #include(org.neo4j.graphdb.PropertyContainer)} in
+ * {@link EntityInclusionPolicy} composed of multiple other policies.
+ * All contained policies must "vote" <code>true</code> to {@link #include(org.neo4j.graphdb.Entity)} in
  * order for this policy to return <code>true</code>.
  */
-public abstract class CompositePropertyContainerInclusionPolicy<P extends PropertyContainer, T extends PropertyContainerInclusionPolicy<P>> extends BasePropertyContainerInclusionPolicy<P> implements PropertyContainerInclusionPolicy<P> {
+public abstract class CompositeEntityInclusionPolicy<E extends Entity, T extends EntityInclusionPolicy<E>> extends BaseEntityInclusionPolicy<E> implements EntityInclusionPolicy<E> {
 
     protected final T[] policies;
 
-    protected CompositePropertyContainerInclusionPolicy(T[] policies) {
+    protected CompositeEntityInclusionPolicy(T[] policies) {
         if (policies == null || policies.length < 1) {
             throw new IllegalArgumentException("There must be at least one wrapped policy in composite policy");
         }
@@ -42,7 +42,7 @@ public abstract class CompositePropertyContainerInclusionPolicy<P extends Proper
      * {@inheritDoc}
      */
     @Override
-    public boolean include(P object) {
+    public boolean include(E object) {
         for (T policy : policies) {
             if (!policy.include(object)) {
                 return false;
@@ -60,7 +60,7 @@ public abstract class CompositePropertyContainerInclusionPolicy<P extends Proper
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        CompositePropertyContainerInclusionPolicy that = (CompositePropertyContainerInclusionPolicy) o;
+        CompositeEntityInclusionPolicy that = (CompositeEntityInclusionPolicy) o;
 
         if (!Arrays.equals(policies, that.policies)) return false;
 

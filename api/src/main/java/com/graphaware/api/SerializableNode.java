@@ -59,7 +59,7 @@ public class SerializableNode<ID> extends DetachedNode<ID> {
      */
     public SerializableNode(Node node, String[] properties, NodeIdTransformer<ID> transformer) {
         super(node, properties);
-        setId(transformer.fromContainer(node));
+        setId(transformer.fromEntity(node));
     }
 
     /**
@@ -91,9 +91,9 @@ public class SerializableNode<ID> extends DetachedNode<ID> {
      * @param transformer ID transformer.
      * @return node.
      */
-    public Node producePropertyContainer(GraphDatabaseService database, NodeIdTransformer<ID> transformer) {
+    public Node produceEntity(GraphDatabaseService database, NodeIdTransformer<ID> transformer) {
         setGraphId(transformer.toGraphId(id));
-        return super.producePropertyContainer(database);
+        return super.produceEntity(database);
     }
 
     public ID getId() {

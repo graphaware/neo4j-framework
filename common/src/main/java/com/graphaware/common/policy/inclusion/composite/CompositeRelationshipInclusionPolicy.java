@@ -22,9 +22,9 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 /**
- * {@link CompositePropertyContainerInclusionPolicy} for {@link Relationship}s.
+ * {@link CompositeEntityInclusionPolicy} for {@link Relationship}s.
  */
-public final class CompositeRelationshipInclusionPolicy extends CompositePropertyContainerInclusionPolicy<Relationship, RelationshipInclusionPolicy> implements RelationshipInclusionPolicy {
+public final class CompositeRelationshipInclusionPolicy extends CompositeEntityInclusionPolicy<Relationship, RelationshipInclusionPolicy> implements RelationshipInclusionPolicy {
 
     public static CompositeRelationshipInclusionPolicy of(RelationshipInclusionPolicy... policies) {
         return new CompositeRelationshipInclusionPolicy(policies);

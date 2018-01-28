@@ -20,8 +20,8 @@ import com.graphaware.common.expression.DetachedNodeExpressions;
 
 public abstract class NodeProperty<T extends DetachedNodeExpressions> extends Property<T> {
 
-    protected NodeProperty(String key, T propertyContainer) {
-        super(key, propertyContainer);
+    protected NodeProperty(String key, T entity) {
+        super(key, entity);
     }
 
     public abstract T getNode();

@@ -26,7 +26,7 @@ import org.neo4j.graphdb.Node;
  * Abstract base class for {@link NodeInclusionPolicy} implementations with fluent interface,
  * intended to be used programmatically.
  */
-public abstract class BaseIncludeNodes<T extends BaseIncludeNodes<T>> extends IncludePropertyContainers<T, Node> implements NodeInclusionPolicy {
+public abstract class BaseIncludeNodes<T extends BaseIncludeNodes<T>> extends IncludeEntities<T, Node> implements NodeInclusionPolicy {
 
     private final String label;
 

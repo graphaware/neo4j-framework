@@ -28,9 +28,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- *  Unit test for {@link CompositePropertyContainerInclusionPolicy}.
+ *  Unit test for {@link CompositeEntityInclusionPolicy}.
  */
-public class CompositePropertyContainerInclusionPolicyTest {
+public class CompositeEntityInclusionPolicyTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotConstructEmptyCompositePolicy() {

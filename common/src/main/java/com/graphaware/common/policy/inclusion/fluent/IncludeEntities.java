@@ -19,27 +19,27 @@ package com.graphaware.common.policy.inclusion.fluent;
 import com.graphaware.common.description.predicate.Predicate;
 import com.graphaware.common.description.property.DetachedPropertiesDescription;
 import com.graphaware.common.description.property.LiteralPropertiesDescription;
-import com.graphaware.common.policy.inclusion.BasePropertyContainerInclusionPolicy;
-import com.graphaware.common.policy.inclusion.PropertyContainerInclusionPolicy;
-import org.neo4j.graphdb.PropertyContainer;
+import com.graphaware.common.policy.inclusion.BaseEntityInclusionPolicy;
+import com.graphaware.common.policy.inclusion.EntityInclusionPolicy;
+import org.neo4j.graphdb.Entity;
 
 /**
- * An abstract base-class for {@link PropertyContainerInclusionPolicy} implementations that are based on property
- * value {@link Predicate}s. In other words, the implementations can be used to specify, which {@link PropertyContainer}s
+ * An abstract base-class for {@link EntityInclusionPolicy} implementations that are based on property
+ * value {@link Predicate}s. In other words, the implementations can be used to specify, which {@link Entity}s
  * to include based on the presence and/or value of their properties.
  */
-public abstract class IncludePropertyContainers<C extends IncludePropertyContainers<?, T>, T extends PropertyContainer> extends BasePropertyContainerInclusionPolicy<T> implements PropertyContainerInclusionPolicy<T> {
+public abstract class IncludeEntities<C extends IncludeEntities<?, T>, T extends Entity> extends BaseEntityInclusionPolicy<T> implements EntityInclusionPolicy<T> {
 
     private final DetachedPropertiesDescription propertiesDescription;
 
     /**
      * Construct a new policy.
      *
-     * @param propertiesDescription description of properties an included {@link PropertyContainer} must fulfill.
-     *                              More precisely, a {@link LiteralPropertiesDescription} of the {@link PropertyContainer}
+     * @param propertiesDescription description of properties an included {@link Entity} must fulfill.
+     *                              More precisely, a {@link LiteralPropertiesDescription} of the {@link Entity}
      *                              must be more specific than the given properties description.
      */
-    protected IncludePropertyContainers(DetachedPropertiesDescription propertiesDescription) {
+    protected IncludeEntities(DetachedPropertiesDescription propertiesDescription) {
         this.propertiesDescription = propertiesDescription;
     }
 
@@ -75,8 +75,8 @@ public abstract class IncludePropertyContainers<C extends IncludePropertyContain
      * {@inheritDoc}
      */
     @Override
-    public boolean include(T propertyContainer) {
-        return new LiteralPropertiesDescription(propertyContainer).isMoreSpecificThan(propertiesDescription);
+    public boolean include(T entity) {
+        return new LiteralPropertiesDescription(entity).isMoreSpecificThan(propertiesDescription);
     }
 
     /**
@@ -87,7 +87,7 @@ public abstract class IncludePropertyContainers<C extends IncludePropertyContain
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        IncludePropertyContainers that = (IncludePropertyContainers) o;
+        IncludeEntities that = (IncludeEntities) o;
 
         if (!propertiesDescription.equals(that.propertiesDescription)) return false;
 

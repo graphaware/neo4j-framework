@@ -65,7 +65,7 @@ public class LongIdJsonNode extends JsonNode<Long> {
      * {@inheritDoc}
      */
     @Override
-    public Node producePropertyContainer(GraphDatabaseService database) {
-        return producePropertyContainer(database, TrivialNodeIdTransformer.getInstance());
+    public Node produceEntity(GraphDatabaseService database) {
+        return produceEntity(database, TrivialNodeIdTransformer.getInstance());
     }
 }
