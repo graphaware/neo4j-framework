@@ -29,6 +29,7 @@
     <modules>
         <module>parent-pom/framework</module>
         <module>parent-pom/module</module>
+        <module>graphaware-apoc-dependency-test</module>
     </modules>
 
     <licenses>
