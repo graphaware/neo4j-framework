@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -18,13 +18,13 @@ package com.graphaware.common.policy.inclusion.fluent;
 
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
 import org.apache.commons.lang3.StringUtils;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 /**
  * Abstract base class for {@link PropertyInclusionPolicy} implementations with fluent interface,
  * intended to be used programmatically.
  */
-public abstract class BaseIncludeProperties<T extends BaseIncludeProperties<T, P>, P extends PropertyContainer> implements PropertyInclusionPolicy<P> {
+public abstract class BaseIncludeProperties<T extends BaseIncludeProperties<T, E>, E extends Entity> implements PropertyInclusionPolicy<E> {
 
     private final String key;
 
@@ -67,7 +67,7 @@ public abstract class BaseIncludeProperties<T extends BaseIncludeProperties<T, P
      * {@inheritDoc}
      */
     @Override
-    public boolean include(String key, P propertyContainer) {
+    public boolean include(String key, E Entity) {
         return this.key == null || this.key.equals(key);
     }
 

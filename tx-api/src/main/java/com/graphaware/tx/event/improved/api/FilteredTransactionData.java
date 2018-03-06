@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -38,7 +38,7 @@ import com.graphaware.tx.event.improved.data.filtered.FilteredRelationshipTransa
  * {@link #getAllCreatedNodes()} can return 5 nodes, but {@link #hasBeenCreated(org.neo4j.graphdb.Node)}  can
  * return true for more of them, as it ignores the filtering.
  * <p/>
- * When traversing the graph using an object returned by this API (such as {@link com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode}),
+ * When traversing the graph using an object returned by this API (such as {@link com.graphaware.tx.event.improved.entity.filtered.FilteredNode}),
  * nodes, properties, and relationships not included by the {@link InclusionPolicies} will be excluded. The only exception
  * to this are relationship start and end nodes - they are returned even if they would normally be filtered out. This is
  * a design decision in order to honor the requirement that relationships must have start and end node.

@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -17,20 +17,20 @@
 package com.graphaware.tx.event.improved.data.filtered;
 
 import com.graphaware.common.policy.inclusion.InclusionPolicies;
-import com.graphaware.common.policy.inclusion.PropertyContainerInclusionPolicy;
+import com.graphaware.common.policy.inclusion.EntityInclusionPolicy;
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
 import com.graphaware.common.util.Change;
 import com.graphaware.tx.event.improved.data.NodeTransactionData;
-import com.graphaware.tx.event.improved.propertycontainer.filtered.FilteredNode;
+import com.graphaware.tx.event.improved.entity.filtered.FilteredNode;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 
 import java.util.Set;
 
 /**
- * {@link FilteredPropertyContainerTransactionData} for {@link org.neo4j.graphdb.Node}s.
+ * {@link FilteredEntityTransactionData} for {@link org.neo4j.graphdb.Node}s.
  */
-public class FilteredNodeTransactionData extends FilteredPropertyContainerTransactionData<Node> implements NodeTransactionData {
+public class FilteredNodeTransactionData extends FilteredEntityTransactionData<Node> implements NodeTransactionData {
 
     private final NodeTransactionData wrapped;
 
@@ -65,7 +65,7 @@ public class FilteredNodeTransactionData extends FilteredPropertyContainerTransa
      * {@inheritDoc}
      */
     @Override
-    protected PropertyContainerInclusionPolicy<Node> getPropertyContainerInclusionPolicy() {
+    protected EntityInclusionPolicy<Node> getEntityInclusionPolicy() {
         return policies.getNodeInclusionPolicy();
     }
 

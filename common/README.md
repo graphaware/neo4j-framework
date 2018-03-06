@@ -16,7 +16,7 @@ Add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>common</artifactId>
-    <version>3.3.0.51</version>
+    <version>3.3.3.52</version>
 </dependency>
 ```
 
@@ -43,10 +43,10 @@ Besides some frameworky internal code, the following functionality is provided b
     * Get a single item from an `Iterable`, throw an exception if there isn't exactly one
     * Get a single item from an `Iterable` or null, throw an exception if there is more than one
 
-* Property Containers (see [`PropertyContainerUtils`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/common/util/PropertyContainerUtils.html))
-    * Convert a `PropertyContainer` to a Map of properties
+* Entities (see [`EntityUtils`](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/common/util/EntityUtils.html))
+    * Convert a `Entity` to a Map of properties
     * Delete nodes with all their relationships automatically, avoiding a `org.neo4j.kernel.impl.nioneo.store.ConstraintViolationException: Node record Node[xxx] still has relationships`, using `DeleteUtils.deleteNodeAndRelationships(node);`
-    * Get IDs of property containers
+    * Get IDs of entities
     * Convert Nodes and Relationships to a human-readable String representation
     * Get a number-valued property without knowing whether it is stored as byte, int, or long
 
@@ -86,7 +86,7 @@ com.graphaware.module.reco.node=hasLabel('Person')
 ```
 
 The following expressions can be used:
-* For all Property Containers (Nodes and Relationships):
+* For all Entities (Nodes and Relationships):
     * `true` - include all
     * `false` - include none
     * `hasProperty('propertyName')` - returns boolean. Example: `hasProperty('name')`
@@ -105,7 +105,7 @@ The following expressions can be used:
     * `isOutgoing()` - returns boolean. Example: `isOutgoing()`
     * `isIncoming()` - returns boolean. Example: `isIncoming()`
     * `otherNode` - returns Node. Example: `otherNode.hasProperty('name')`
-* For all Property Container Properties:
+* For all Entity Properties:
     * `key` - returns String. Example: `key != 'name'`
 
 Of course, the expressions can be combined with logical operators, for instance:

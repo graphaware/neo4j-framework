@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -14,19 +14,19 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.propertycontainer.filtered;
+package com.graphaware.tx.event.improved.entity.filtered;
 
 import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
-import com.graphaware.common.wrapper.BasePropertyContainerWrapper;
-import org.neo4j.graphdb.PropertyContainer;
+import com.graphaware.common.wrapper.BaseEntityWrapper;
+import org.neo4j.graphdb.Entity;
 
 /**
- * A {@link org.neo4j.graphdb.PropertyContainer} decorator that transparently filters out properties and (where relevant) other containers
+ * A {@link org.neo4j.graphdb.Entity} decorator that transparently filters out properties and (where relevant) other entities
  * according to the provided {@link InclusionPolicies}. Mutating operations are passed through to the decorated
- * {@link org.neo4j.graphdb.PropertyContainer} without modifications.
+ * {@link org.neo4j.graphdb.Entity} without modifications.
  */
-public abstract class FilteredPropertyContainer<T extends PropertyContainer> extends BasePropertyContainerWrapper<T> {
+public abstract class FilteredEntity<T extends Entity> extends BaseEntityWrapper<T> {
 
     protected final T wrapped;
     protected final InclusionPolicies policies;
@@ -34,10 +34,10 @@ public abstract class FilteredPropertyContainer<T extends PropertyContainer> ext
     /**
      * Create a new filtering decorator.
      *
-     * @param wrapped    decorated property container.
+     * @param wrapped    decorated entity.
      * @param policies for filtering.
      */
-    protected FilteredPropertyContainer(T wrapped, InclusionPolicies policies) {
+    protected FilteredEntity(T wrapped, InclusionPolicies policies) {
         this.wrapped = wrapped;
         this.policies = policies;
     }

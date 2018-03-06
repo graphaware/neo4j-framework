@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -22,9 +22,9 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
 /**
- * {@link CompositePropertyContainerInclusionPolicy} for {@link Relationship}s.
+ * {@link CompositeEntityInclusionPolicy} for {@link Relationship}s.
  */
-public final class CompositeRelationshipInclusionPolicy extends CompositePropertyContainerInclusionPolicy<Relationship, RelationshipInclusionPolicy> implements RelationshipInclusionPolicy {
+public final class CompositeRelationshipInclusionPolicy extends CompositeEntityInclusionPolicy<Relationship, RelationshipInclusionPolicy> implements RelationshipInclusionPolicy {
 
     public static CompositeRelationshipInclusionPolicy of(RelationshipInclusionPolicy... policies) {
         return new CompositeRelationshipInclusionPolicy(policies);

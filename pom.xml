@@ -1,10 +1,10 @@
 <!--
-  ~ Copyright (c) 2013-2017 GraphAware
+  ~ Copyright (c) 2013-2018 GraphAware
   ~
   ~ This file is part of the GraphAware Framework.
   ~
-  ~ GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
-  ~ the GNU General Public License as published by the Free Software Foundation, either
+  ~ GraphAware Framework is free software: you can redistribute it and/or modify it under
+  ~ the terms of the GNU General Public License as published by the Free Software Foundation, either
   ~ version 3 of the License, or (at your option) any later version.
   ~
   ~ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -19,7 +19,7 @@
 
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>graphaware-parent</artifactId>
-    <version>3.3.0.52-SNAPSHOT</version>
+    <version>3.3.3.53-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>GraphAware Neo4j Framework Parent POM</name>
@@ -29,6 +29,7 @@
     <modules>
         <module>parent-pom/framework</module>
         <module>parent-pom/module</module>
+        <module>graphaware-apoc-dependency-test</module>
     </modules>
 
     <licenses>
@@ -241,10 +242,10 @@
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.3.7.RELEASE</spring.version>
-        <neo4j.version>3.4.0-alpha06</neo4j.version>
+        <neo4j.version>3.4.0-alpha09</neo4j.version>
         <logback.version>1.1.2</logback.version>
-        <maven.plugin.surefire>2.12.4</maven.plugin.surefire>
+        <spring.version>4.3.13.RELEASE</spring.version>
+        <maven.plugin.surefire>2.20.1</maven.plugin.surefire>
     </properties>
 
     <dependencyManagement>
@@ -255,63 +256,63 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>api</artifactId>
-                <version>3.3.0.52-SNAPSHOT</version>
+                <version>3.3.3.53-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>common</artifactId>
-                <version>3.3.0.52-SNAPSHOT</version>
+                <version>3.3.3.53-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime</artifactId>
-                <version>3.3.0.52-SNAPSHOT</version>
+                <version>3.3.3.53-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime-api</artifactId>
-                <version>3.3.0.52-SNAPSHOT</version>
+                <version>3.3.3.53-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer</artifactId>
-                <version>3.3.0.52-SNAPSHOT</version>
+                <version>3.3.3.53-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer-api</artifactId>
-                <version>3.3.0.52-SNAPSHOT</version>
+                <version>3.3.3.53-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>server</artifactId>
-                <version>3.3.0.52-SNAPSHOT</version>
+                <version>3.3.3.53-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tests</artifactId>
-                <version>3.3.0.52-SNAPSHOT</version>
+                <version>3.3.3.53-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-api</artifactId>
-                <version>3.3.0.52-SNAPSHOT</version>
+                <version>3.3.3.53-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-executor</artifactId>
-                <version>3.3.0.52-SNAPSHOT</version>
+                <version>3.3.3.53-SNAPSHOT</version>
             </dependency>
 
             <!-- Neo4j -->
@@ -480,7 +481,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.10</version>
+                <version>1.9</version>
             </dependency>
 
             <!-- Serialization -->
@@ -494,19 +495,19 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.6.5</version>
+                <version>2.9.0</version>
             </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>2.6.5</version>
+                <version>2.9.0</version>
             </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.6.5</version>
+                <version>2.9.0</version>
             </dependency>
 
             <!-- Spring -->

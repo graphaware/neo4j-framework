@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -30,7 +30,7 @@ import java.util.List;
  * Abstract base class for {@link RelationshipInclusionPolicy} implementations with fluent interface,
  * intended to be used programmatically.
  */
-public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationships<T>> extends IncludePropertyContainers<T, Relationship> implements RelationshipInclusionPolicy {
+public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationships<T>> extends IncludeEntities<T, Relationship> implements RelationshipInclusionPolicy {
 
     private final Direction direction;
     private final String[] relationshipTypes;

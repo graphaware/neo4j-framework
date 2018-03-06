@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -19,7 +19,7 @@ package com.graphaware.tx.event.improved.data.lazy;
 import com.graphaware.common.util.Change;
 import com.graphaware.tx.event.improved.data.RelationshipTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
-import com.graphaware.tx.event.improved.propertycontainer.snapshot.RelationshipSnapshot;
+import com.graphaware.tx.event.improved.entity.snapshot.RelationshipSnapshot;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -35,9 +35,9 @@ import static com.graphaware.common.util.DirectionUtils.matches;
 import static org.neo4j.graphdb.Direction.BOTH;
 
 /**
- * {@link LazyPropertyContainerTransactionData} for {@link org.neo4j.graphdb.Relationship}s.
+ * {@link LazyEntityTransactionData} for {@link org.neo4j.graphdb.Relationship}s.
  */
-public class LazyRelationshipTransactionData extends LazyPropertyContainerTransactionData<Relationship> implements RelationshipTransactionData {
+public class LazyRelationshipTransactionData extends LazyEntityTransactionData<Relationship> implements RelationshipTransactionData {
 
     private final TransactionData transactionData;
     private final TransactionDataContainer transactionDataContainer;
@@ -46,7 +46,7 @@ public class LazyRelationshipTransactionData extends LazyPropertyContainerTransa
      * Construct relationship transaction data from Neo4j {@link org.neo4j.graphdb.event.TransactionData}.
      *
      * @param transactionData          provided by Neo4j.
-     * @param transactionDataContainer containing {@link com.graphaware.tx.event.improved.data.PropertyContainerTransactionData}.
+     * @param transactionDataContainer containing {@link com.graphaware.tx.event.improved.data.EntityTransactionData}.
      */
     public LazyRelationshipTransactionData(TransactionData transactionData, TransactionDataContainer transactionDataContainer) {
         this.transactionData = transactionData;

@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -29,8 +29,8 @@ import org.neo4j.logging.Log;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.graphaware.common.util.PropertyContainerUtils.nodeToString;
-import static com.graphaware.common.util.PropertyContainerUtils.relationshipToString;
+import static com.graphaware.common.util.EntityUtils.nodeToString;
+import static com.graphaware.common.util.EntityUtils.relationshipToString;
 
 /**
  * Example of a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler} that uses GraphAware {@link ImprovedTransactionData}

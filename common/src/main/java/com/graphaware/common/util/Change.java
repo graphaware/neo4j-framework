@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -16,13 +16,11 @@
 
 package com.graphaware.common.util;
 
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.graphaware.common.util.PropertyContainerUtils.id;
 
 /**
  * Change in the state of an object, encapsulating the old (previous) and the new (current).
@@ -89,22 +87,22 @@ public class Change<T> {
     }
 
     /**
-     * Convert a collection of {@link Change}s of {@link org.neo4j.graphdb.PropertyContainer} to a map of {@link Change}s keyed by the
-     * {@link org.neo4j.graphdb.PropertyContainer} ID.
+     * Convert a collection of {@link Change}s of {@link org.neo4j.graphdb.Entity} to a map of {@link Change}s keyed by the
+     * {@link org.neo4j.graphdb.Entity} ID.
      *
      * @param changes to convert.
-     * @param <T>     type of the {@link org.neo4j.graphdb.PropertyContainer}.
-     * @return map keyed by {@link org.neo4j.graphdb.PropertyContainer} ID with the actual {@link Change}s as values.
-     * @throws IllegalArgumentException in case the two {@link org.neo4j.graphdb.PropertyContainer}s contained in a {@link Change} do not
+     * @param <T>     type of the {@link org.neo4j.graphdb.Entity}.
+     * @return map keyed by {@link org.neo4j.graphdb.Entity} ID with the actual {@link Change}s as values.
+     * @throws IllegalArgumentException in case the two {@link org.neo4j.graphdb.Entity}s contained in a {@link Change} do not
      *                                  have the same IDs.
      */
-    public static <T extends PropertyContainer> Map<Long, Change<T>> changesToMap(Collection<Change<T>> changes) {
+    public static <T extends Entity> Map<Long, Change<T>> changesToMap(Collection<Change<T>> changes) {
         Map<Long, Change<T>> result = new HashMap<>();
 
         for (Change<T> change : changes) {
-            long id = id(change.getPrevious());
-            if (id != id(change.getCurrent())) {
-                throw new IllegalArgumentException("IDs of the Property Containers in Change do not match!");
+            long id = change.getPrevious().getId();
+            if (id != change.getCurrent().getId()) {
+                throw new IllegalArgumentException("IDs of the Entities in Change do not match!");
             }
             result.put(id, change);
         }

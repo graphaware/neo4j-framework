@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -18,7 +18,7 @@ package com.graphaware.common.description.property;
 
 import com.graphaware.common.description.predicate.Predicate;
 import com.graphaware.common.description.predicate.Predicates;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 import java.util.Map;
 
@@ -29,12 +29,12 @@ import java.util.Map;
 public class LiteralPropertiesDescription extends BaseDetachedPropertiesDescription {
 
     /**
-     * Construct a new properties description as the most specific description of the given property container.
+     * Construct a new properties description as the most specific description of the given entity.
      *
-     * @param propertyContainer to construct the most specific properties description from.
+     * @param entity to construct the most specific properties description from.
      */
-    public LiteralPropertiesDescription(PropertyContainer propertyContainer) {
-        super(propertyContainer);
+    public LiteralPropertiesDescription(Entity entity) {
+        super(entity);
     }
 
     /**

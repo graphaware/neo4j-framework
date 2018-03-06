@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.common.util.IterableUtils.countNodes;
-import static com.graphaware.common.util.PropertyContainerUtils.*;
+import static com.graphaware.common.util.EntityUtils.*;
 import static com.graphaware.tx.event.improved.LazyTransactionDataComprehensiveTest.*;
 import static com.graphaware.tx.event.improved.PropertiesAssert.assertProperties;
 import static org.junit.Assert.*;
@@ -200,7 +200,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
 
-                        Map<Long, Relationship> created = propertyContainersToMap(transactionData.getAllCreatedRelationships());
+                        Map<Long, Relationship> created = entitiesToMap(transactionData.getAllCreatedRelationships());
                         assertEquals(2, created.size());
 
                         long r1Id = getNodeById(5).getSingleRelationship(withName("R2"), OUTGOING).getId();
@@ -232,7 +232,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
 
-                        Map<Long, Relationship> created = propertyContainersToMap(transactionData.getAllCreatedRelationships());
+                        Map<Long, Relationship> created = entitiesToMap(transactionData.getAllCreatedRelationships());
 
                         long r2Id = getNodeById(1).getSingleRelationship(withName("R1"), OUTGOING).getId();
                         Relationship r2 = created.get(r2Id);
@@ -410,10 +410,10 @@ public class FilteredLazyTransactionDataIntegrationTest {
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
 
-                        Map<Long, Relationship> deleted = propertyContainersToMap(transactionData.getAllDeletedRelationships());
+                        Map<Long, Relationship> deleted = entitiesToMap(transactionData.getAllDeletedRelationships());
                         assertEquals(3, deleted.size());
 
-                        long r1Id = propertyContainersToMap(transactionData.getAllDeletedNodes()).get(2L).getSingleRelationship(withName("R1"), INCOMING).getId();
+                        long r1Id = entitiesToMap(transactionData.getAllDeletedNodes()).get(2L).getSingleRelationship(withName("R1"), INCOMING).getId();
                         Relationship r1 = deleted.get(r1Id);
                         try {
                             r1.getProperty("time");
@@ -423,11 +423,11 @@ public class FilteredLazyTransactionDataIntegrationTest {
                         }
                         assertProperties(r1);
 
-                        long r2Id = propertyContainersToMap(transactionData.getAllDeletedNodes()).get(2L).getSingleRelationship(withName("R2"), INCOMING).getId();
+                        long r2Id = entitiesToMap(transactionData.getAllDeletedNodes()).get(2L).getSingleRelationship(withName("R2"), INCOMING).getId();
                         Relationship r2 = deleted.get(r2Id);
                         assertProperties(r2);
 
-                        Iterator<Relationship> relationships = propertyContainersToMap(transactionData.getAllDeletedNodes()).get(2L).getRelationships(withName("R2"), OUTGOING).iterator();
+                        Iterator<Relationship> relationships = entitiesToMap(transactionData.getAllDeletedNodes()).get(2L).getRelationships(withName("R2"), OUTGOING).iterator();
                         long r3Id = relationships.next().getId();
                         if (r3Id == r2Id) {
                             r3Id = relationships.next().getId();
@@ -630,7 +630,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
 
-                        Map<Long, Node> createdNodes = propertyContainersToMap(transactionData.getAllCreatedNodes());
+                        Map<Long, Node> createdNodes = entitiesToMap(transactionData.getAllCreatedNodes());
                         assertEquals(1, createdNodes.size());
 
                         Node createdNode = createdNodes.get(ids.get(5L));
@@ -652,7 +652,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
 
-                        Map<Long, Node> createdNodes = propertyContainersToMap(transactionData.getAllCreatedNodes());
+                        Map<Long, Node> createdNodes = entitiesToMap(transactionData.getAllCreatedNodes());
                         Node createdNode = createdNodes.get(ids.get(5L));
 
                         assertEquals("one", createdNode.getSingleRelationship(withName("R2"), OUTGOING).getEndNode().getProperty("tags"));
@@ -826,7 +826,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
 
-                        Map<Long, Node> deletedNodes = propertyContainersToMap(transactionData.getAllDeletedNodes());
+                        Map<Long, Node> deletedNodes = entitiesToMap(transactionData.getAllDeletedNodes());
                         assertEquals(1, deletedNodes.size());
 
                         Node deleted = deletedNodes.get(2L);
@@ -852,7 +852,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
 
-                        Map<Long, Node> deletedNodes = propertyContainersToMap(transactionData.getAllDeletedNodes());
+                        Map<Long, Node> deletedNodes = entitiesToMap(transactionData.getAllDeletedNodes());
                         Node deleted = deletedNodes.get(2L);
 
                         Node one = transactionData.getDeleted(deleted).getSingleRelationship(withName("R1"), INCOMING).getStartNode();
@@ -875,7 +875,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
                         assertTrue(transactionData.mutationsOccurred());
 
-                        Map<Long, Node> deletedNodes = propertyContainersToMap(transactionData.getAllDeletedNodes());
+                        Map<Long, Node> deletedNodes = entitiesToMap(transactionData.getAllDeletedNodes());
                         Node deleted = deletedNodes.get(2L);
 
                         Node one = transactionData.getDeleted(deleted).getSingleRelationship(withName("R1"), INCOMING).getStartNode();
@@ -1035,7 +1035,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                             return;
                         }
 
-                        Map<Long, Relationship> created = propertyContainersToMap(transactionData.getAllCreatedRelationships());
+                        Map<Long, Relationship> created = entitiesToMap(transactionData.getAllCreatedRelationships());
 
                         long r1Id = getNodeById(5).getSingleRelationship(withName("R2"), OUTGOING).getId();
                         Relationship r1 = created.get(r1Id);
@@ -1065,7 +1065,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                             return;
                         }
 
-                        Map<Long, Node> createdNodes = propertyContainersToMap(transactionData.getAllCreatedNodes());
+                        Map<Long, Node> createdNodes = entitiesToMap(transactionData.getAllCreatedNodes());
                         Node createdNode = createdNodes.get(ids.get(5L));
 
                         createdNode.setProperty("name", "NewFive");
@@ -1153,9 +1153,9 @@ public class FilteredLazyTransactionDataIntegrationTest {
                 new BeforeCommitCallback() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        Map<Long, Relationship> deleted = propertyContainersToMap(transactionData.getAllDeletedRelationships());
+                        Map<Long, Relationship> deleted = entitiesToMap(transactionData.getAllDeletedRelationships());
 
-                        long r1Id = propertyContainersToMap(transactionData.getAllDeletedNodes()).get(2L).getSingleRelationship(withName("R1"), INCOMING).getId();
+                        long r1Id = entitiesToMap(transactionData.getAllDeletedNodes()).get(2L).getSingleRelationship(withName("R1"), INCOMING).getId();
                         Relationship r1 = deleted.get(r1Id);
 
                         try {
@@ -1178,7 +1178,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                 new BeforeCommitCallback() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        Map<Long, Node> deletedNodes = propertyContainersToMap(transactionData.getAllDeletedNodes());
+                        Map<Long, Node> deletedNodes = entitiesToMap(transactionData.getAllDeletedNodes());
 
                         Node deleted = deletedNodes.get(2L);
 
@@ -1202,7 +1202,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                 new BeforeCommitCallback() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        Map<Long, Node> deletedNodes = propertyContainersToMap(transactionData.getAllDeletedNodes());
+                        Map<Long, Node> deletedNodes = entitiesToMap(transactionData.getAllDeletedNodes());
 
                         Node deleted = deletedNodes.get(2L);
 
@@ -1219,7 +1219,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                 new BeforeCommitCallback() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        Map<Long, Node> deletedNodes = propertyContainersToMap(transactionData.getAllDeletedNodes());
+                        Map<Long, Node> deletedNodes = entitiesToMap(transactionData.getAllDeletedNodes());
 
                         Node deleted = deletedNodes.get(2L);
 
@@ -1315,7 +1315,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                 new BeforeCommitCallback() {
                     @Override
                     public void doBeforeCommit(ImprovedTransactionData transactionData) {
-                        Map<Long, Node> deletedNodes = propertyContainersToMap(transactionData.getAllDeletedNodes());
+                        Map<Long, Node> deletedNodes = entitiesToMap(transactionData.getAllDeletedNodes());
                         Node deleted = deletedNodes.get(2L);
                         deleteNodeAndRelationships(deleted);
                     }
@@ -1472,7 +1472,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                     },
                     new NodePropertyInclusionPolicy() {
                         @Override
-                        public boolean include(String key, Node propertyContainer) {
+                        public boolean include(String key, Node Entity) {
                             return !"place".equals(key) && !key.startsWith(INTERNAL_PREFIX);
                         }
                     },
@@ -1484,7 +1484,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
                     }
                     , new RelationshipPropertyInclusionPolicy() {
                 @Override
-                public boolean include(String key, Relationship propertyContainer) {
+                public boolean include(String key, Relationship Entity) {
                     return !"time".equals(key) && !key.startsWith(INTERNAL_PREFIX);
                 }
             }
@@ -1670,13 +1670,13 @@ public class FilteredLazyTransactionDataIntegrationTest {
         return database.getNodeById(ids.get(id));
     }
 
-    private  <T extends PropertyContainer> Map<Long, Change<T>> changesToMap(Collection<Change<T>> changes) {
+    private  <T extends Entity> Map<Long, Change<T>> changesToMap(Collection<Change<T>> changes) {
         Map<Long, Change<T>> result = new HashMap<>();
 
         for (Change<T> change : changes) {
-            long id = id(change.getPrevious());
-            if (id != id(change.getCurrent())) {
-                throw new IllegalArgumentException("IDs of the Property Containers in Change do not match!");
+            long id = change.getPrevious().getId();
+            if (id != change.getCurrent().getId()) {
+                throw new IllegalArgumentException("IDs of the Entities in Change do not match!");
             }
             result.put(ids.get(id), change);
         }

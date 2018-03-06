@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -17,16 +17,16 @@
 package com.graphaware.common.policy.inclusion.composite;
 
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 import java.util.Arrays;
 
 /**
  * {@link PropertyInclusionPolicy} composed of multiple other policies. All contained policies must "vote"
- * <code>true</code> to {@link #include(String, org.neo4j.graphdb.PropertyContainer)} in order for this policy to
+ * <code>true</code> to {@link #include(String, org.neo4j.graphdb.Entity)} in order for this policy to
  * return <code>true</code>.
  */
-public abstract class CompositePropertyInclusionPolicy<T extends PropertyContainer> implements PropertyInclusionPolicy<T> {
+public abstract class CompositePropertyInclusionPolicy<T extends Entity> implements PropertyInclusionPolicy<T> {
 
     private final PropertyInclusionPolicy<T>[] policies;
 

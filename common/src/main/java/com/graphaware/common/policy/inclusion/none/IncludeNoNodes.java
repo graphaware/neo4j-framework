@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -22,7 +22,7 @@ import org.neo4j.graphdb.Node;
 /**
  * {@link NodeInclusionPolicy} that ignores all nodes. Singleton.
  */
-public final class IncludeNoNodes extends IncludeNoPropertyContainers<Node> implements NodeInclusionPolicy {
+public final class IncludeNoNodes extends IncludeNoEntities<Node> implements NodeInclusionPolicy {
 
     private static final NodeInclusionPolicy INSTANCE = new IncludeNoNodes();
 

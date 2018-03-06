@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -16,17 +16,16 @@
 
 package com.graphaware.common.transform;
 
-import com.graphaware.common.representation.DetachedPropertyContainer;
-import com.graphaware.common.transform.IdTransformer;
-import org.neo4j.graphdb.PropertyContainer;
+import com.graphaware.common.representation.DetachedEntity;
+import org.neo4j.graphdb.Entity;
 
 /**
  * Abstract base-class for {@link IdTransformer} implementations.
  *
  * @param <ID> custom ID type.
- * @param <P>  property container type.
+ * @param <E>  entity type.
  */
-public abstract class BaseIdTransformer<ID, P extends PropertyContainer> implements IdTransformer<ID, P> {
+public abstract class BaseIdTransformer<ID, E extends Entity> implements IdTransformer<ID, E> {
 
     /**
      * {@inheritDoc}
@@ -34,7 +33,7 @@ public abstract class BaseIdTransformer<ID, P extends PropertyContainer> impleme
     @Override
     public final long toGraphId(ID id) {
         if (id == null) {
-            return DetachedPropertyContainer.NEW;
+            return DetachedEntity.NEW;
         }
 
         return toExistingGraphId(id);

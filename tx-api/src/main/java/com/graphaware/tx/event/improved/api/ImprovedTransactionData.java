@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -30,56 +30,56 @@ import java.util.Set;
  * i.e. before or after a transaction commit, this API improves the {@link org.neo4j.graphdb.event.TransactionData} API
  * in a number of ways.
  * <p/>
- * It categorizes {@link org.neo4j.graphdb.PropertyContainer}s, i.e. {@link org.neo4j.graphdb.Node}s  and {@link org.neo4j.graphdb.Relationship}s into:
+ * It categorizes {@link org.neo4j.graphdb.Entity}s, i.e. {@link org.neo4j.graphdb.Node}s  and {@link org.neo4j.graphdb.Relationship}s into:
  * <ul>
  * <li>created in this transaction</li>
  * <li>deleted in this transaction</li>
  * <li>changed in this transaction, i.e those with at least one property created, deleted, or changed</li>
  * <li>untouched by this transaction</li>
  * </ul>
- * Users can find out, whether a {@link org.neo4j.graphdb.PropertyContainer} has been created, deleted, or changed in
- * this transaction and obtain all the created, deleted, and changed {@link org.neo4j.graphdb.PropertyContainer}s.
+ * Users can find out, whether a {@link org.neo4j.graphdb.Entity} has been created, deleted, or changed in
+ * this transaction and obtain all the created, deleted, and changed {@link org.neo4j.graphdb.Entity}s.
  * <p/>
  * Properties that have been created, deleted, and changed in the transaction are grouped by the <b>changed</b>
- * {@link org.neo4j.graphdb.PropertyContainer} they belong to. Users can find out, which properties have been created,
- * deleted, and changed for a given <b>changed</b> {@link org.neo4j.graphdb.PropertyContainer} and check, whether
- * a given property for a given <b>changed</b> {@link org.neo4j.graphdb.PropertyContainer} has been created, deleted,
+ * {@link org.neo4j.graphdb.Entity} they belong to. Users can find out, which properties have been created,
+ * deleted, and changed for a given <b>changed</b> {@link org.neo4j.graphdb.Entity} and check, whether
+ * a given property for a given <b>changed</b> {@link org.neo4j.graphdb.Entity} has been created, deleted,
  * or changed.
  * <p/>
- * Properties of created {@link org.neo4j.graphdb.PropertyContainer}s are available through the actual created
- * {@link org.neo4j.graphdb.PropertyContainer}. Properties of deleted {@link org.neo4j.graphdb.PropertyContainer}s
- * (as they were before the transaction started) are available through the snapshot of the deleted {@link org.neo4j.graphdb.PropertyContainer},
+ * Properties of created {@link org.neo4j.graphdb.Entity}s are available through the actual created
+ * {@link org.neo4j.graphdb.Entity}. Properties of deleted {@link org.neo4j.graphdb.Entity}s
+ * (as they were before the transaction started) are available through the snapshot of the deleted {@link org.neo4j.graphdb.Entity},
  * obtained by calling {@link #getDeleted(org.neo4j.graphdb.Node)} or {@link #getDeleted(org.neo4j.graphdb.Relationship)}.
- * Properties of created and deleted containers will not be returned by {@link #changedProperties(org.neo4j.graphdb.Node)} and {@link #changedProperties(org.neo4j.graphdb.Relationship)}
- * as these only return changed properties of changed {@link org.neo4j.graphdb.PropertyContainer}s.
+ * Properties of created and deleted entities will not be returned by {@link #changedProperties(org.neo4j.graphdb.Node)} and {@link #changedProperties(org.neo4j.graphdb.Relationship)}
+ * as these only return changed properties of changed {@link org.neo4j.graphdb.Entity}s.
  * <p/>
- * Changed {@link org.neo4j.graphdb.PropertyContainer}s and properties are wrapped in a {@link Change} object which holds
+ * Changed {@link org.neo4j.graphdb.Entity}s and properties are wrapped in a {@link Change} object which holds
  * the previous state of the object before the transaction started, and the current state of the object (when the transaction
  * commits).
  * <p/>
- * All created {@link org.neo4j.graphdb.PropertyContainer}s + properties and current versions of changed {@link org.neo4j.graphdb.PropertyContainer}s
+ * All created {@link org.neo4j.graphdb.Entity}s + properties and current versions of changed {@link org.neo4j.graphdb.Entity}s
  * + properties can be accessed by native Neo4j API and the traversal API as one would expect. For example, one can
  * traverse the graph starting from a newly created node, using a mixture of newly created and already existing
  * relationships. In other words, one can traverse the graph as if the transaction has already been committed. This is
  * similar to using {@link org.neo4j.graphdb.event.TransactionData}.
  * <p/>
  * A major difference between this API and {@link org.neo4j.graphdb.event.TransactionData}, however, is what one can do
- * with the returned information about deleted {@link org.neo4j.graphdb.PropertyContainer}s + properties and the previous
+ * with the returned information about deleted {@link org.neo4j.graphdb.Entity}s + properties and the previous
  * versions thereof. With this API, one can traverse a <b>snapshot</b> of the graph as it was before the transaction started.
  * As opposed to the {@link org.neo4j.graphdb.event.TransactionData} API, this will not result in exceptions being thrown.
  * <p/>
  * For example, one can start traversing the graph from a deleted {@link org.neo4j.graphdb.Node}, or the previous version of a changed
  * {@link org.neo4j.graphdb.Node}. Such traversal will only traverse {@link org.neo4j.graphdb.Relationship}s that existed before the transaction started and
- * will return properties and their values as they were before the transaction started. This is achieved using {@link com.graphaware.tx.event.improved.propertycontainer.snapshot.NodeSnapshot}
- * and {@link com.graphaware.tx.event.improved.propertycontainer.snapshot.RelationshipSnapshot} decorators.
+ * will return properties and their values as they were before the transaction started. This is achieved using {@link com.graphaware.tx.event.improved.entity.snapshot.NodeSnapshot}
+ * and {@link com.graphaware.tx.event.improved.entity.snapshot.RelationshipSnapshot} decorators.
  * <p/>
  * One can even perform additional mutating operations on the previous version (snapshot) of the graph, provided that the
- * mutated objects have been changed in the transaction (as opposed to deleted). Mutating deleted {@link org.neo4j.graphdb.PropertyContainer}s
+ * mutated objects have been changed in the transaction (as opposed to deleted). Mutating deleted {@link org.neo4j.graphdb.Entity}s
  * and properties does not make any sense and will cause exceptions.
  * <p/>
- * To summarize, this API gives access to two versions of the same graph. Through created {@link org.neo4j.graphdb.PropertyContainer}s
+ * To summarize, this API gives access to two versions of the same graph. Through created {@link org.neo4j.graphdb.Entity}s
  * and/or their current versions, one can traverse the current version of the graph as it will be after the transaction
- * commits. Through deleted and/or previous versions of {@link org.neo4j.graphdb.PropertyContainer}s, one can traverse
+ * commits. Through deleted and/or previous versions of {@link org.neo4j.graphdb.Entity}s, one can traverse
  * the previous snapshot of the graph, as it was before the transaction started.
  */
 public interface ImprovedTransactionData extends TransactionDataWrapper {

@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -17,16 +17,15 @@
 package com.graphaware.common.wrapper;
 
 import org.neo4j.graphdb.*;
-import org.neo4j.graphdb.traversal.Traverser;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Base class for custom {@link org.neo4j.graphdb.PropertyContainer} implementations.
+ * Base class for custom {@link org.neo4j.graphdb.Entity} implementations.
  */
-public abstract class BasePropertyContainer implements PropertyContainer {
+public abstract class BaseEntity implements Entity {
 
     //Typically no need to override:
 

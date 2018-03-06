@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -30,16 +30,16 @@ import java.util.Collections;
 import java.util.Map;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static com.graphaware.common.util.PropertyContainerUtils.*;
+import static com.graphaware.common.util.EntityUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.RelationshipType.*;
 
 /**
- * Unit test for {@link com.graphaware.common.util.PropertyContainerUtils}.
+ * Unit test for {@link EntityUtils}.
  */
-public class PropertyContainerUtilsTest {
+public class EntityUtilsTest {
 
     private GraphDatabaseService database;
 
@@ -61,27 +61,13 @@ public class PropertyContainerUtilsTest {
     }
 
     @Test
-    public void shouldConvertContainersToMap() {
+    public void shouldConvertEntitiesToMap() {
         try (Transaction tx = database.beginTx()) {
-            Map<Long, Node> nodeMap = propertyContainersToMap(Iterables.asList(database.getAllNodes()));
+            Map<Long, Node> nodeMap = entitiesToMap(Iterables.asList(database.getAllNodes()));
             assertEquals(0, nodeMap.get(0L).getId());
             assertEquals(1, nodeMap.get(1L).getId());
             assertEquals(2, nodeMap.get(2L).getId());
             assertEquals(3, nodeMap.size());
-        }
-    }
-
-    @Test
-    public void shouldFindNodeId() {
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(1L, id(database.getNodeById(1)));
-        }
-    }
-
-    @Test
-    public void shouldFindRelationshipId() {
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(0L, id(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
         }
     }
 
@@ -97,12 +83,6 @@ public class PropertyContainerUtilsTest {
         try (Transaction tx = database.beginTx()) {
             assertEquals("[0]", Arrays.toString((ids(database.getAllRelationships()))));
         }
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void shouldThrowExceptionForUnknownContainers() {
-        PropertyContainer mockPropertyContainer = Mockito.mock(PropertyContainer.class);
-        id(mockPropertyContainer);
     }
 
     @Test

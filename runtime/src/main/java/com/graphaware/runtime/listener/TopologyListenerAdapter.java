@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -35,15 +35,11 @@ public final class TopologyListenerAdapter {
 
     List<TopologyChangeEventListener> topologyChangeEventListeners = new ArrayList<>();
 
-    private DependencyResolver dependencyResolver;
-
-    private OperationalMode operationalMode;
-
     private TopologyListener topologyListener;
 
     public TopologyListenerAdapter(final GraphDatabaseAPI api) {
-        operationalMode = new InstanceRoleUtils(api).getOperationalMode();
-        dependencyResolver = api.getDependencyResolver();
+        OperationalMode operationalMode = new InstanceRoleUtils(api).getOperationalMode();
+        DependencyResolver dependencyResolver = api.getDependencyResolver();
 
         // HA
         if (operationalMode.equals(OperationalMode.ha)) {
@@ -55,7 +51,9 @@ public final class TopologyListenerAdapter {
             topologyListener = new CausalClusterListener(dependencyResolver, this);
         }
 
-        topologyListener.register();
+        if (topologyListener != null) {
+            topologyListener.register();
+        }
     }
 
     /**
@@ -81,7 +79,10 @@ public final class TopologyListenerAdapter {
      */
     public void unregister() {
         this.topologyChangeEventListeners.clear();
-        this.topologyListener.unregister();
+
+        if (topologyListener != null) {
+            this.topologyListener.unregister();
+        }
     }
 
     /**

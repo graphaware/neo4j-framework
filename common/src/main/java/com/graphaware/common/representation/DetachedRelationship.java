@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -28,9 +28,9 @@ import static org.neo4j.graphdb.RelationshipType.withName;
 import static org.springframework.util.Assert.hasLength;
 
 /**
- * {@link DetachedPropertyContainer} for a {@link Relationship}.
+ * {@link DetachedEntity} for a {@link Relationship}.
  */
-public abstract class DetachedRelationship<ID, N extends DetachedNode<ID>> extends DetachedPropertyContainer<ID, Relationship> implements DetachedRelationshipExpressions {
+public abstract class DetachedRelationship<ID, N extends DetachedNode<ID>> extends DetachedEntity<ID, Relationship> implements DetachedRelationshipExpressions {
 
     private long startNodeGraphId = NEW;
     private long endNodeGraphId = NEW;

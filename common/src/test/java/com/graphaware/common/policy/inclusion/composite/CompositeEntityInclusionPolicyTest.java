@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -28,9 +28,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
- *  Unit test for {@link CompositePropertyContainerInclusionPolicy}.
+ *  Unit test for {@link CompositeEntityInclusionPolicy}.
  */
-public class CompositePropertyContainerInclusionPolicyTest {
+public class CompositeEntityInclusionPolicyTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotConstructEmptyCompositePolicy() {

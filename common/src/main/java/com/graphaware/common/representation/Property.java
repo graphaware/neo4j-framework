@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -16,16 +16,16 @@
 
 package com.graphaware.common.representation;
 
-import com.graphaware.common.expression.PropertyContainerExpressions;
+import com.graphaware.common.expression.EntityExpressions;
 
-public abstract class Property<T extends PropertyContainerExpressions> {
+public abstract class Property<T extends EntityExpressions> {
 
     private final String key;
-    protected final T propertyContainer;
+    protected final T entity;
 
-    protected Property(String key, T propertyContainer) {
+    protected Property(String key, T entity) {
         this.key = key;
-        this.propertyContainer = propertyContainer;
+        this.entity = entity;
     }
 
     public String getKey() {

@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -14,7 +14,7 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.event.improved.propertycontainer.snapshot;
+package com.graphaware.tx.event.improved.entity.snapshot;
 
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.neo4j.graphdb.Label;
@@ -25,7 +25,7 @@ import org.neo4j.helpers.collection.PrefetchingIterator;
 import java.util.Iterator;
 
 /**
- * {@link com.graphaware.tx.event.improved.propertycontainer.snapshot.NodeSnapshot}'s {@link org.neo4j.graphdb.Label} iterator.
+ * {@link com.graphaware.tx.event.improved.entity.snapshot.NodeSnapshot}'s {@link org.neo4j.graphdb.Label} iterator.
  */
 public class LabelSnapshotIterator extends PrefetchingIterator<Label> implements Iterator<Label>, Iterable<Label> {
 

@@ -1,10 +1,10 @@
 <!--
-  ~ Copyright (c) 2013-2017 GraphAware
+  ~ Copyright (c) 2013-2018 GraphAware
   ~
   ~ This file is part of the GraphAware Framework.
   ~
-  ~ GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
-  ~ the GNU General Public License as published by the Free Software Foundation, either
+  ~ GraphAware Framework is free software: you can redistribute it and/or modify it under
+  ~ the terms of the GNU General Public License as published by the Free Software Foundation, either
   ~ version 3 of the License, or (at your option) any later version.
   ~
   ~ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -19,7 +19,7 @@
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>build</artifactId>
-        <version>3.3.0.52-SNAPSHOT</version>
+        <version>3.3.3.53-SNAPSHOT</version>
     </parent>
     <artifactId>graphaware-framework-server</artifactId>
     <packaging>pom</packaging>
@@ -38,23 +38,30 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4.1</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <relocations>
+                        <relocation>
+                            <pattern>org.objectweb.asm</pattern>
+                            <shadedPattern>ga.relocation.org.objectweb.asm</shadedPattern>
+                            <includes>
+                                <include>org.objectweb.asm.**</include>
+                            </includes>
+                        </relocation>
+                    </relocations>
+                    <!-- This is module has packaging type pom, otherwise finalName could have been used -->
+                    <outputFile>${project.build.directory}/graphaware-server-all-${project.version}.jar</outputFile>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>shade</goal>
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <finalName>graphaware-server-all-${project.version}</finalName>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <appendAssemblyId>false</appendAssemblyId>
-                </configuration>
             </plugin>
         </plugins>
     </build>

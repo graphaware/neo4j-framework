@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -17,7 +17,7 @@
 package com.graphaware.tx.event.improved;
 
 import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.helpers.collection.MapUtil;
 
@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
 
 public final class PropertiesAssert {
 
-    public static void assertProperties(PropertyContainer actual, Object... keyValueKeyValue) {
+    public static void assertProperties(Entity actual, Object... keyValueKeyValue) {
         Map<String, Object> expected = MapUtil.map(keyValueKeyValue);
 
         assertEquals(expected.size(), Iterables.count(actual.getPropertyKeys()));

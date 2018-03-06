@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -18,12 +18,12 @@ package com.graphaware.common.policy.inclusion.none;
 
 
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
-import org.neo4j.graphdb.PropertyContainer;
+import org.neo4j.graphdb.Entity;
 
 /**
  * {@link PropertyInclusionPolicy} that excludes all properties.
  */
-public abstract class IncludeNoProperties<T extends PropertyContainer> implements PropertyInclusionPolicy<T> {
+public abstract class IncludeNoProperties<T extends Entity> implements PropertyInclusionPolicy<T> {
 
     protected IncludeNoProperties() {
     }
@@ -32,7 +32,7 @@ public abstract class IncludeNoProperties<T extends PropertyContainer> implement
      * {@inheritDoc}
      */
     @Override
-    public final boolean include(String key, T propertyContainer) {
+    public final boolean include(String key, T entity) {
         return false;
     }
 }

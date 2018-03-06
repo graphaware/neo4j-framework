@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.graphaware.api.SerializationSpecification;
 import com.graphaware.common.transform.NodeIdTransformer;
 import com.graphaware.common.transform.RelationshipIdTransformer;
-import com.graphaware.common.representation.DetachedPropertyContainer;
+import com.graphaware.common.representation.DetachedEntity;
 import com.graphaware.test.unit.GraphUnit;
 import org.json.JSONException;
 import org.junit.After;
@@ -108,7 +108,7 @@ public class LongIdJsonRelationshipTest {
     public void shouldCorrectlyDeserialiseRelationships() throws IOException, JSONException {
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"id\":0}", LongIdJsonRelationship.class);
-            Relationship rel = jsonRel.producePropertyContainer(database);
+            Relationship rel = jsonRel.produceEntity(database);
 
             assertEquals(0, rel.getId());
             assertEquals(rel, database.getRelationshipById(0));
@@ -118,7 +118,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0);
-            Relationship rel = jsonRel.producePropertyContainer(database);
+            Relationship rel = jsonRel.produceEntity(database);
 
             assertEquals(0, rel.getId());
             assertEquals(rel, database.getRelationshipById(0));
@@ -128,7 +128,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(1000);
-            Relationship rel = jsonRel.producePropertyContainer(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
+            Relationship rel = jsonRel.produceEntity(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
 
             assertEquals(1, rel.getId());
             assertEquals(rel, database.getRelationshipById(1));
@@ -140,7 +140,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"startNodeId\":0, \"endNodeId\":1, \"properties\":{\"k1\":\"v1\",\"k2\":2},\"type\":\"R\"}", LongIdJsonRelationship.class);
-            Relationship rel = jsonRel.producePropertyContainer(database);
+            Relationship rel = jsonRel.produceEntity(database);
 
             assertEquals(++i, rel.getId());
             JSONAssert.assertEquals("{\"id\":" + i + ",\"properties\":{\"k1\":\"v1\",\"k2\":2},\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(rel)), true);
@@ -150,7 +150,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"startNodeId\":0, \"endNodeId\":1, \"properties\":{},\"type\":\"R\"}", LongIdJsonRelationship.class);
-            Relationship rel = jsonRel.producePropertyContainer(database);
+            Relationship rel = jsonRel.produceEntity(database);
 
             assertEquals(++i, rel.getId());
             JSONAssert.assertEquals("{\"id\":" + i + ",\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\",\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonRelationship(rel)), true);
@@ -160,7 +160,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"startNodeId\":0, \"endNodeId\":1,\"type\":\"R\"}", LongIdJsonRelationship.class);
-            Relationship rel = jsonRel.producePropertyContainer(database);
+            Relationship rel = jsonRel.produceEntity(database);
 
             assertEquals(++i, rel.getId());
             JSONAssert.assertEquals("{\"id\":" + i + ",\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\",\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonRelationship(rel)), true);
@@ -170,7 +170,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 1, "R", Collections.singletonMap("k1", "v1"));
-            Relationship rel = jsonRel.producePropertyContainer(database);
+            Relationship rel = jsonRel.produceEntity(database);
 
             assertEquals(++i, rel.getId());
             JSONAssert.assertEquals("{\"id\":" + i + ",\"properties\":{\"k1\":\"v1\"},\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(rel)), true);
@@ -180,7 +180,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"id\":0, \"properties\":{\"k1\":\"v1\",\"k2\":2}}", LongIdJsonRelationship.class);
-            jsonRel.producePropertyContainer(database);
+            jsonRel.produceEntity(database);
 
             tx.success();
             fail();
@@ -190,7 +190,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"id\":0, \"type\":\"R\"}", LongIdJsonRelationship.class);
-            jsonRel.producePropertyContainer(database);
+            jsonRel.produceEntity(database);
 
             tx.success();
             fail();
@@ -200,7 +200,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"id\":0, \"startNodeId\":1}", LongIdJsonRelationship.class);
-            jsonRel.producePropertyContainer(database);
+            jsonRel.produceEntity(database);
 
             tx.success();
             fail();
@@ -210,7 +210,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"id\":0, \"endNodeId\":0}", LongIdJsonRelationship.class);
-            jsonRel.producePropertyContainer(database);
+            jsonRel.produceEntity(database);
 
             tx.success();
             fail();
@@ -220,7 +220,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"endNodeId\":1, \"properties\":{},\"type\":\"R\"}", LongIdJsonRelationship.class);
-            jsonRel.producePropertyContainer(database);
+            jsonRel.produceEntity(database);
 
             tx.success();
             fail();
@@ -230,7 +230,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"startNodeId\":0, \"properties\":{},\"type\":\"R\"}", LongIdJsonRelationship.class);
-            jsonRel.producePropertyContainer(database);
+            jsonRel.produceEntity(database);
 
             tx.success();
             fail();
@@ -240,7 +240,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"startNodeId\":0, \"endNodeId\":1, \"properties\":{}}", LongIdJsonRelationship.class);
-            jsonRel.producePropertyContainer(database);
+            jsonRel.produceEntity(database);
 
             tx.success();
             fail();
@@ -250,7 +250,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"startNodeId\":x, \"endNodeId\":1, \"properties\":{},\"type\":\"R\"}", LongIdJsonRelationship.class);
-            jsonRel.producePropertyContainer(database);
+            jsonRel.produceEntity(database);
 
             tx.success();
             fail();
@@ -260,7 +260,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"startNodeId\":0, \"endNodeId\":1, \"properties\":{},\"type\":\"\"}", LongIdJsonRelationship.class);
-            jsonRel.producePropertyContainer(database);
+            jsonRel.produceEntity(database);
 
             tx.success();
             fail();
@@ -270,7 +270,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"startNodeId\":0, \"endNodeId\":1, \"properties\":{},\"type\":null}", LongIdJsonRelationship.class);
-            jsonRel.producePropertyContainer(database);
+            jsonRel.produceEntity(database);
 
             tx.success();
             fail();
@@ -280,7 +280,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = mapper.readValue("{\"startNodeId\":0, \"endNodeId\":x, \"properties\":{},\"type\":\"R\"}", LongIdJsonRelationship.class);
-            jsonRel.producePropertyContainer(database);
+            jsonRel.produceEntity(database);
 
             tx.success();
             fail();
@@ -290,10 +290,10 @@ public class LongIdJsonRelationshipTest {
     }
 
     @Test
-    public void shouldCorrectlyProducePropertyContainer() {
+    public void shouldCorrectlyProduceEntity() {
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship rel = new LongIdJsonRelationship(database.getRelationshipById(1), new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
-            rel.producePropertyContainer(database);
+            rel.produceEntity(database);
             tx.success();
         } catch (IllegalStateException e) {
             //ok
@@ -301,7 +301,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship rel = new LongIdJsonRelationship(database.getRelationshipById(1), new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
-            rel.producePropertyContainer(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
+            rel.produceEntity(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
             tx.success();
         } catch (IllegalStateException e) {
             //ok
@@ -309,7 +309,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship rel = new LongIdJsonRelationship(database.getRelationshipById(1));
-            rel.producePropertyContainer(database);
+            rel.produceEntity(database);
             tx.success();
         } catch (IllegalStateException e) {
             //ok
@@ -317,7 +317,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship rel = new LongIdJsonRelationship(database.getRelationshipById(1));
-            rel.producePropertyContainer(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
+            rel.produceEntity(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
             tx.success();
         } catch (IllegalStateException e) {
             //ok
@@ -325,7 +325,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship rel = new LongIdJsonRelationship(database.getRelationshipById(0), new String[0], new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
-            rel.producePropertyContainer(database);
+            rel.produceEntity(database);
             tx.success();
         } catch (IllegalStateException e) {
             //ok
@@ -333,7 +333,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship rel = new LongIdJsonRelationship(database.getRelationshipById(0), new String[0], new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
-            rel.producePropertyContainer(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
+            rel.produceEntity(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
             tx.success();
         } catch (IllegalStateException e) {
             //ok
@@ -341,7 +341,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0);
-            Relationship r = jsonRel.producePropertyContainer(database);
+            Relationship r = jsonRel.produceEntity(database);
             assertEquals(r, database.getRelationshipById(0));
 
             tx.success();
@@ -349,7 +349,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(1000);
-            Relationship r = jsonRel.producePropertyContainer(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
+            Relationship r = jsonRel.produceEntity(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
             assertEquals(r, database.getRelationshipById(1));
 
             tx.success();
@@ -357,7 +357,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 0, 0, "test", Collections.emptyMap());
-            jsonRel.producePropertyContainer(database);
+            jsonRel.produceEntity(database);
             tx.success();
         } catch (IllegalStateException e) {
             //ok
@@ -365,7 +365,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 0, 0, "test", Collections.emptyMap());
-            jsonRel.producePropertyContainer(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
+            jsonRel.produceEntity(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
             tx.success();
         } catch (IllegalStateException e) {
             //ok
@@ -373,7 +373,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 1000, "TEST", Collections.singletonMap("k", "v"));
-            Relationship r = jsonRel.producePropertyContainer(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
+            Relationship r = jsonRel.produceEntity(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
             assertEquals(20, r.getId());
 
             tx.success();
@@ -381,7 +381,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 1, "TEST", Collections.singletonMap("k", "v"));
-            Relationship r = jsonRel.producePropertyContainer(database);
+            Relationship r = jsonRel.produceEntity(database);
             assertEquals(2, r.getId());
 
             tx.success();
@@ -401,15 +401,15 @@ public class LongIdJsonRelationshipTest {
         @Override
         public long toGraphId(Long id) {
             if (id == null) {
-                return DetachedPropertyContainer.NEW;
+                return DetachedEntity.NEW;
             }
 
             return id / 1000;
         }
 
         @Override
-        public Long fromContainer(Node pc) {
-            return pc.getId() * 1000;
+        public Long fromEntity(Node entity) {
+            return entity.getId() * 1000;
         }
     }
 
@@ -418,15 +418,15 @@ public class LongIdJsonRelationshipTest {
         @Override
         public long toGraphId(Long id) {
             if (id == null) {
-                return DetachedPropertyContainer.NEW;
+                return DetachedEntity.NEW;
             }
 
             return id / 1000;
         }
 
         @Override
-        public Long fromContainer(Relationship pc) {
-            return pc.getId() * 1000;
+        public Long fromEntity(Relationship entity) {
+            return entity.getId() * 1000;
         }
     }
 }

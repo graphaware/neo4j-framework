@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013-2017 GraphAware
+ * Copyright (c) 2013-2018 GraphAware
  *
  * This file is part of the GraphAware Framework.
  *
- * GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of
- * the GNU General Public License as published by the Free Software Foundation, either
+ * GraphAware Framework is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software Foundation, either
  * version 3 of the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -59,7 +59,7 @@ public class SerializableNode<ID> extends DetachedNode<ID> {
      */
     public SerializableNode(Node node, String[] properties, NodeIdTransformer<ID> transformer) {
         super(node, properties);
-        setId(transformer.fromContainer(node));
+        setId(transformer.fromEntity(node));
     }
 
     /**
@@ -91,9 +91,9 @@ public class SerializableNode<ID> extends DetachedNode<ID> {
      * @param transformer ID transformer.
      * @return node.
      */
-    public Node producePropertyContainer(GraphDatabaseService database, NodeIdTransformer<ID> transformer) {
+    public Node produceEntity(GraphDatabaseService database, NodeIdTransformer<ID> transformer) {
         setGraphId(transformer.toGraphId(id));
-        return super.producePropertyContainer(database);
+        return super.produceEntity(database);
     }
 
     public ID getId() {

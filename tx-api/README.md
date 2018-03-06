@@ -27,7 +27,7 @@ Add the following snippet to your pom.xml:
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>tx-api</artifactId>
-    <version>3.3.0.51</version>
+    <version>3.3.3.52</version>
 </dependency>
 ```
 
@@ -218,38 +218,38 @@ database.registerTransactionEventHandler(new FriendshipStrengthCounter(database)
 
 Note: have a look at [`ImprovedTransactionData` Javadoc](http://graphaware.com/site/framework/latest/apidocs/com/graphaware/tx/event/improved/api/ImprovedTransactionData.html).
 
-The API categorizes `PropertyContainer`s, i.e. `Node`s and `Relationship`s into:
+The API categorizes `Entity`s, i.e. `Node`s and `Relationship`s into:
 
 * created in this transaction
 * deleted in this transaction
 * changed in this transaction, i.e those with at least one property created, deleted, or changed. Nodes with assigned and removed labels also fall into this category.
 * untouched by this transaction
 
-Users can find out, whether a `PropertyContainer` has been created, deleted, or changed in this transaction and obtain
-all the created, deleted, and changed PropertyContainers.
+Users can find out, whether a `Entity` has been created, deleted, or changed in this transaction and obtain
+all the created, deleted, and changed Entities.
 
-Properties that have been created, deleted, and changed in the transaction are categorized by the changed `PropertyContainer`
+Properties that have been created, deleted, and changed in the transaction are categorized by the changed `Entity`
  they belong to. Users can find out, which properties have been created, deleted, and changed for a given changed
- `PropertyContainer` and check, whether a given property for a given changed `PropertyContainer` has been created,
+ `Entity` and check, whether a given property for a given changed `Entity` has been created,
  deleted, or changed.
 
-Properties of created `PropertyContainer`s are available through the actual created `PropertyContainer`.
-Properties of deleted `PropertyContainer`s (as they were before the transaction started) are available through the
-snapshot of the deleted `PropertyContainer`, obtained by calling `getDeleted(org.neo4j.graphdb.Node)` or
-`getDeleted(org.neo4j.graphdb.Relationship)`. Properties of created and deleted containers will not be returned by
+Properties of created `Entity`s are available through the actual created `Entity`.
+Properties of deleted `Entity`s (as they were before the transaction started) are available through the
+snapshot of the deleted `Entity`, obtained by calling `getDeleted(org.neo4j.graphdb.Node)` or
+`getDeleted(org.neo4j.graphdb.Relationship)`. Properties of created and deleted entities will not be returned by
 `changedProperties(org.neo4j.graphdb.Node)` and `changedProperties(org.neo4j.graphdb.Relationship)` as these only return
-changed properties of changed `PropertyContainer`s.
+changed properties of changed `Entity`s.
 
-Changed `PropertyContainer`s and properties are wrapped in a `Change` object which holds the previous state of the
+Changed `Entity`s and properties are wrapped in a `Change` object which holds the previous state of the
 object before the transaction started, and the current state of the object (when the transaction commits).
 
-All created `PropertyContainer`s and properties and current versions of changed `PropertyContainer`s and properties can
+All created `Entity`s and properties and current versions of changed `Entity`s and properties can
 be accessed by native Neo4j API and the traversal API as one would expect. For example, one can traverse the graph starting
  from a newly created node, using a mixture of newly created and already existing relationships. In other words, one can
   traverse the graph as if the transaction has already been committed. This is similar to using TransactionData.
 
 A major difference between this API and `TransactionData`, however, is what one can do with the returned information
-about deleted `PropertyContainer`s and properties and the previous versions thereof. With this API, one can traverse a
+about deleted `Entity`s and properties and the previous versions thereof. With this API, one can traverse a
 _snapshot_ of the graph as it was before the transaction started. As opposed to the `TransactionData` API, this will not
 result in exceptions being thrown.
 
@@ -259,12 +259,12 @@ and their values as they were before the transaction started. This is achieved u
  decorators.
 
 One can even perform additional mutating operations on the previous version (snapshot) of the graph, provided that the
-mutated objects have been changed in the transaction (as opposed to deleted). Mutating deleted `PropertyContainer`s and
+mutated objects have been changed in the transaction (as opposed to deleted). Mutating deleted `Entity`s and
 properties does not make any sense and will cause exceptions.
 
-To summarize, this API gives access to two versions of the same graph. Through created `PropertyContainer`s and/or their
+To summarize, this API gives access to two versions of the same graph. Through created `Entity`s and/or their
  current versions, one can traverse the current version of the graph as it will be after the transaction commits.
- Through deleted and/or previous versions of `PropertyContainer`s, one can traverse the previous snapshot of the graph,
+ Through deleted and/or previous versions of `Entity`s, one can traverse the previous snapshot of the graph,
  as it was before the transaction started.
 
 License
