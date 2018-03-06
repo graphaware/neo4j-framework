@@ -48,7 +48,7 @@ public class RuntimeKernelExtensionFactory extends KernelExtensionFactory<Runtim
      * {@inheritDoc}
      */
     @Override
-    public Lifecycle newInstance(KernelContext context, Dependencies dependencies) throws Throwable {
+    public Lifecycle newInstance(KernelContext context, Dependencies dependencies) {
         return new RuntimeKernelExtension(dependencies.getConfig(), dependencies.getDatabase());
     }
 }

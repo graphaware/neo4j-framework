@@ -47,7 +47,7 @@ public final class LoggerFactory extends KernelExtensionFactory<LoggerFactory.De
     }
 
     @Override
-    public Lifecycle newInstance(@SuppressWarnings("unused") KernelContext context, final Dependencies dependencies) throws Throwable {
+    public Lifecycle newInstance(@SuppressWarnings("unused") KernelContext context, final Dependencies dependencies) {
         return new LifecycleAdapter() {
             @Override
             public void init() throws Throwable {
