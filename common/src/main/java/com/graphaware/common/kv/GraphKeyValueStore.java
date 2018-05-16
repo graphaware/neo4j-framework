@@ -17,9 +17,8 @@
 package com.graphaware.common.kv;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.kernel.impl.core.EmbeddedProxySPI;
 import org.neo4j.kernel.impl.core.GraphProperties;
-import org.neo4j.kernel.impl.core.NodeManager;
-import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
 /**
  * {@link com.graphaware.common.kv.KeyValueStore} backed by {@link org.neo4j.graphdb.GraphDatabaseService}.
@@ -29,7 +28,7 @@ public class GraphKeyValueStore implements KeyValueStore {
     private final GraphProperties properties;
 
     public GraphKeyValueStore(GraphDatabaseService database) {
-        properties = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(NodeManager.class).newGraphProperties();
+        properties = ((EmbeddedProxySPI) database).newGraphPropertiesProxy();
     }
 
     @Override

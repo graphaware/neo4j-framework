@@ -26,7 +26,7 @@ import com.graphaware.server.foundation.context.WebContextCreator;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.SessionManager;
+import org.eclipse.jetty.server.SessionIdManager;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerList;
@@ -75,23 +75,21 @@ public class GraphAwareBootstrappingFilter implements Filter {
         }
 
         StatsCollector statsCollector = createStatsCollector();
-        
-		bootstrapGraphAware(filterConfig, statsCollector);
+
+        bootstrapGraphAware(filterConfig, statsCollector);
 
         statsCollector.frameworkStart("all");
     }
-    
+
     private StatsCollector createStatsCollector() {
-    	
         String disable = neoServer.getConfig().getRaw().get("com.graphaware.runtime.stats.disable");
         String disabled = neoServer.getConfig().getRaw().get("com.graphaware.runtime.stats.disabled");
-    	
+
         if (Boolean.parseBoolean(disable) || Boolean.parseBoolean(disabled)) {
-        	LOG.info("Google Analytics disabled");
+            LOG.info("Google Analytics disabled");
             return NullStatsCollector.getInstance();
-        }else
-        {
-        	LOG.info("Google Analytics enabled");
+        } else {
+            LOG.info("Google Analytics enabled");
         }
 
         return new GoogleAnalyticsStatsCollector(neoServer.getDatabase().getGraph());
@@ -113,7 +111,7 @@ public class GraphAwareBootstrappingFilter implements Filter {
     private void bootstrapGraphAware(FilterConfig filterConfig, StatsCollector statsCollector) {
         HandlerList handlerList = findHandlerList(filterConfig);
 
-        SessionManager sessionManager = findSessionManager(handlerList);
+        SessionIdManager sessionManager = findSessionManager(handlerList);
 
         rootContext = getRootContextCreator().createContext(neoServer, statsCollector);
 
@@ -123,17 +121,17 @@ public class GraphAwareBootstrappingFilter implements Filter {
     private HandlerList findHandlerList(FilterConfig filterConfig) {
         Server server = ((ContextHandler.Context) filterConfig.getServletContext()).getContextHandler().getServer();
 
-        if (server.getHandler().getClass().equals(RequestLogHandler.class)) {
+        if (RequestLogHandler.class.isAssignableFrom(server.getHandler().getClass())) {
             return (HandlerList) ((RequestLogHandler) server.getHandler()).getHandler();
         }
 
         return (HandlerList) server.getHandler();
     }
 
-    private SessionManager findSessionManager(HandlerCollection handlerList) {
+    private SessionIdManager findSessionManager(HandlerCollection handlerList) {
         for (Handler h : handlerList.getHandlers()) {
             if (h instanceof ServletContextHandler) {
-                return ((ServletContextHandler) h).getSessionHandler().getSessionManager();
+                return ((ServletContextHandler) h).getSessionHandler().getSessionIdManager();
             }
         }
 
@@ -144,11 +142,11 @@ public class GraphAwareBootstrappingFilter implements Filter {
         return new FoundationRootContextCreator();
     }
 
-    protected void addGraphAwareHandlers(HandlerCollection handlerList, SessionManager sessionManager, ApplicationContext rootContext, Config config) {
+    protected void addGraphAwareHandlers(HandlerCollection handlerList, SessionIdManager sessionManager, ApplicationContext rootContext, Config config) {
         prependHandler(handlerList, createGraphAwareHandler(sessionManager, rootContext));
     }
 
-    private ServletContextHandler createGraphAwareHandler(SessionManager sessionManager, ApplicationContext rootContext) {
+    private ServletContextHandler createGraphAwareHandler(SessionIdManager sessionManager, ApplicationContext rootContext) {
         ServletContextHandler handler = createNewHandler(sessionManager, getContextPath(neoServer.getConfig()));
 
         addSpringToHandler(handler, getGraphAwareContextCreator(), rootContext, neoServer.getConfig());
@@ -157,15 +155,15 @@ public class GraphAwareBootstrappingFilter implements Filter {
         return handler;
     }
 
-    protected final ServletContextHandler createNewHandler(SessionManager sessionManager, String contextPath) {
+    protected final ServletContextHandler createNewHandler(SessionIdManager sessionManager, String contextPath) {
         ServletContextHandler handler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         configureNewHandler(sessionManager, contextPath, handler);
         return handler;
     }
 
-    protected final void configureNewHandler(SessionManager sessionManager, String contextPath, ServletContextHandler handler) {
+    protected final void configureNewHandler(SessionIdManager sessionManager, String contextPath, ServletContextHandler handler) {
         handler.setContextPath(contextPath);
-        handler.getSessionHandler().setSessionManager(sessionManager);
+        handler.getSessionHandler().setSessionIdManager(sessionManager);
         handler.setServer(webServer.getJetty());
     }
 
