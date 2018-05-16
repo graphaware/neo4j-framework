@@ -18,7 +18,9 @@ package com.graphaware.runtime.listener;
 
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.runtime.config.util.InstanceRoleUtils;
+import org.neo4j.causalclustering.core.CausalClusteringSettings;
 import org.neo4j.graphdb.DependencyResolver;
+import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.impl.factory.OperationalMode;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 import org.neo4j.logging.Log;
@@ -37,7 +39,7 @@ public final class TopologyListenerAdapter {
 
     private TopologyListener topologyListener;
 
-    public TopologyListenerAdapter(final GraphDatabaseAPI api) {
+    public TopologyListenerAdapter(final GraphDatabaseAPI api, final Config config) {
         OperationalMode operationalMode = new InstanceRoleUtils(api).getOperationalMode();
         DependencyResolver dependencyResolver = api.getDependencyResolver();
 
@@ -48,7 +50,7 @@ public final class TopologyListenerAdapter {
 
         // Core
         if (operationalMode.equals(OperationalMode.core)) {
-            topologyListener = new CausalClusterListener(dependencyResolver, this);
+            topologyListener = new CausalClusterListener(dependencyResolver, this, config.get( CausalClusteringSettings.database ));
         }
 
         if (topologyListener != null) {

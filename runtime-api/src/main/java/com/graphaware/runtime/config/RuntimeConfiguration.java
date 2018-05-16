@@ -19,6 +19,7 @@ package com.graphaware.runtime.config;
 import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.runtime.write.WritingConfig;
+import org.neo4j.kernel.configuration.Config;
 
 /**
  * {@link com.graphaware.runtime.GraphAwareRuntime} configuration.
@@ -68,4 +69,9 @@ public interface RuntimeConfiguration {
      * @return statistics collector.
      */
     StatsCollector getStatsCollector();
+
+    /**
+     * @return Neo4j kernel config.
+     */
+    Config kernelConfig();
 }

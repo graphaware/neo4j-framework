@@ -30,14 +30,17 @@ public class CausalClusterListener implements CoreTopologyService.Listener, Topo
 
     private final TopologyListenerAdapter adapter;
 
-    public CausalClusterListener(DependencyResolver dependencyResolver, TopologyListenerAdapter adapter) {
+    private final String dbName;
+
+    public CausalClusterListener(DependencyResolver dependencyResolver, TopologyListenerAdapter adapter, String dbName) {
         this.dependencyResolver = dependencyResolver;
         this.adapter = adapter;
+        this.dbName = dbName;
     }
 
     @Override
     public void register() {
-        dependencyResolver.resolveDependency(CoreTopologyService.class).addCoreTopologyListener(this);
+        dependencyResolver.resolveDependency(CoreTopologyService.class).addLocalCoreTopologyListener(this);
     }
 
     @Override
@@ -64,5 +67,10 @@ public class CausalClusterListener implements CoreTopologyService.Listener, Topo
     public void onCoreTopologyChange(CoreTopology coreTopology) {
         LOG.info(String.format("onCoreTopologyChange %s", coreTopology));
         adapter.fireEvent(topologyChangeEventFromCausalCluster(coreTopology));
+    }
+
+    @Override
+    public String dbName() {
+        return dbName;
     }
 }

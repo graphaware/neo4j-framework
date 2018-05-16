@@ -124,7 +124,7 @@ public final class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfi
      * @param config The {@link Config} containing the settings used to configure the runtime
      */
     public Neo4jConfigBasedRuntimeConfiguration(GraphDatabaseService database, Config config) {
-        super(createTimingStrategy(config), createWritingConfig(config), createStatsCollector(database, config));
+        super(config, createTimingStrategy(config), createWritingConfig(config), createStatsCollector(database, config));
     }
 
     private static TimingStrategy createTimingStrategy(Config config) {

@@ -22,6 +22,7 @@ import com.graphaware.test.integration.cluster.HighAvailabilityClusterDatabasesI
 import org.junit.Before;
 import org.junit.Test;
 import org.neo4j.cluster.InstanceId;
+import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.ha.HighlyAvailableGraphDatabase;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 import org.neo4j.logging.Log;
@@ -51,7 +52,7 @@ public class TopologyListenerAdapterTest extends HighAvailabilityClusterDatabase
 
     @Test
     public void testRegisterListener() {
-        TopologyListenerAdapter adapter = new TopologyListenerAdapter((GraphDatabaseAPI) getMasterDatabase());
+        TopologyListenerAdapter adapter = new TopologyListenerAdapter((GraphDatabaseAPI) getMasterDatabase(), Config.defaults());
         adapter.registerListener((TopologyChangeEvent topologyChangeEvent) -> {
         });
 
@@ -60,7 +61,7 @@ public class TopologyListenerAdapterTest extends HighAvailabilityClusterDatabase
 
     @Test
     public void testUnregisterListener() {
-        TopologyListenerAdapter adapter = new TopologyListenerAdapter((GraphDatabaseAPI) getMasterDatabase());
+        TopologyListenerAdapter adapter = new TopologyListenerAdapter((GraphDatabaseAPI) getMasterDatabase(), Config.defaults());
         TopologyChangeEventListener listener = (TopologyChangeEvent topologyChangeEvent) -> {
         };
         adapter.registerListener(listener);
@@ -73,7 +74,7 @@ public class TopologyListenerAdapterTest extends HighAvailabilityClusterDatabase
 
     @Test
     public void testIfUnregisterShouldNotFireEvents() {
-        TopologyListenerAdapter adapter = new TopologyListenerAdapter((GraphDatabaseAPI) getMasterDatabase());
+        TopologyListenerAdapter adapter = new TopologyListenerAdapter((GraphDatabaseAPI) getMasterDatabase(), Config.defaults());
         TopologyChangeEventListener listener = (TopologyChangeEvent topologyChangeEvent) -> {
             LOG.info("This should never fail");
             fail();
@@ -94,7 +95,7 @@ public class TopologyListenerAdapterTest extends HighAvailabilityClusterDatabase
 
     @Test
     public void testJoinClusterEvent() {
-        TopologyListenerAdapter adapter = new TopologyListenerAdapter((GraphDatabaseAPI) getMasterDatabase());
+        TopologyListenerAdapter adapter = new TopologyListenerAdapter((GraphDatabaseAPI) getMasterDatabase(), Config.defaults());
         adapter.registerListener((TopologyChangeEvent topologyChangeEvent) -> {
             assertEquals(instanceId.toString(), topologyChangeEvent.getInstanceId());
             assertEquals(TopologyChangeEvent.EventType.CLUSTER_JOIN, topologyChangeEvent.getEventType());
@@ -110,7 +111,7 @@ public class TopologyListenerAdapterTest extends HighAvailabilityClusterDatabase
 
     @Test
     public void testLeaveClusterEvent() {
-        TopologyListenerAdapter adapter = new TopologyListenerAdapter((GraphDatabaseAPI) getMasterDatabase());
+        TopologyListenerAdapter adapter = new TopologyListenerAdapter((GraphDatabaseAPI) getMasterDatabase(), Config.defaults());
         adapter.registerListener((TopologyChangeEvent topologyChangeEvent) -> {
             assertEquals(instanceId.toString(), topologyChangeEvent.getInstanceId());
             assertEquals(TopologyChangeEvent.EventType.CLUSTER_LEAVE, topologyChangeEvent.getEventType());
@@ -126,7 +127,7 @@ public class TopologyListenerAdapterTest extends HighAvailabilityClusterDatabase
 
     @Test
     public void testElectionEvent() {
-        TopologyListenerAdapter adapter = new TopologyListenerAdapter((GraphDatabaseAPI) getMasterDatabase());
+        TopologyListenerAdapter adapter = new TopologyListenerAdapter((GraphDatabaseAPI) getMasterDatabase(), Config.defaults());
         adapter.registerListener((TopologyChangeEvent topologyChangeEvent) -> {
             assertEquals(instanceId.toString(), topologyChangeEvent.getInstanceId());
             assertEquals(TopologyChangeEvent.EventType.ELECTION, topologyChangeEvent.getEventType());

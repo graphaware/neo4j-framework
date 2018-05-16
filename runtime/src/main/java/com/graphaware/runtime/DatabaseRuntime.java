@@ -64,7 +64,7 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
         // Register to topology change events
         // In Community Edition this raises a ClassNotFoundException
         try {
-            this.topologyListenerAdapter = new TopologyListenerAdapter((GraphDatabaseAPI) database);
+            this.topologyListenerAdapter = new TopologyListenerAdapter((GraphDatabaseAPI) database, configuration.kernelConfig());
         } catch (Exception exception) {
             LOG.warn("Failed to register topology listener", exception);
         }

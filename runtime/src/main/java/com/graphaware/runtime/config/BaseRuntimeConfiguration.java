@@ -19,17 +19,20 @@ package com.graphaware.runtime.config;
 import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.runtime.write.WritingConfig;
+import org.neo4j.kernel.configuration.Config;
 
 /**
  * Base-class for {@link RuntimeConfiguration} implementations.
  */
 public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
 
+    private final Config config;
     private final TimingStrategy timingStrategy;
     private final WritingConfig writingConfig;
     private final StatsCollector statsCollector;
 
-    protected BaseRuntimeConfiguration(TimingStrategy timingStrategy, WritingConfig writingConfig, StatsCollector statsCollector) {
+    protected BaseRuntimeConfiguration(Config config, TimingStrategy timingStrategy, WritingConfig writingConfig, StatsCollector statsCollector) {
+        this.config = config;
         this.timingStrategy = timingStrategy;
         this.writingConfig = writingConfig;
         this.statsCollector = statsCollector;
@@ -57,6 +60,14 @@ public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
     @Override
     public StatsCollector getStatsCollector() {
         return statsCollector;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Config kernelConfig() {
+        return config;
     }
 
     /**
