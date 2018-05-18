@@ -79,6 +79,6 @@ public class EnterpriseTxParticipationIntegrationTest extends GraphAwareIntegrat
         //Commit transaction over transactional endpoint
         httpClient.post(commitUrl, HttpStatus.SC_OK);
 
-//        httpClient.post(baseUrl() + "/resttest/assertSameGraph", "{\"cypher\": \"CREATE (m:Person {name:'Michal'})-[:TEST]->(d:Person {name:'Daniela'})\"}", HttpStatus.SC_OK);
+        httpClient.post(baseUrl() + "/resttest/assertSameGraph", "{\"cypher\": \"CREATE (m:Person {name:'Michal'})-[:TEST]->(d:Person {name:'Daniela'})\"}", HttpStatus.SC_OK);
     }
 }

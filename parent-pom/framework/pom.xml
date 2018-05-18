@@ -89,12 +89,12 @@
 
             <!-- for integration testing -->
 
-            <!--<dependency>-->
-                <!--<groupId>com.graphaware.neo4j</groupId>-->
-                <!--<artifactId>resttest</artifactId>-->
-                <!--<version>3.3.0.51.18</version>-->
-                <!--<scope>test</scope>-->
-            <!--</dependency>-->
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>resttest</artifactId>
+                <version>3.4.0.52.18</version>
+                <scope>test</scope>
+            </dependency>
 
         </dependencies>
 
