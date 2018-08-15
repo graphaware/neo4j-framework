@@ -21,7 +21,7 @@ package com.graphaware.common.ping;
  */
 public interface StatsCollector {
 
-    String VERSION = "3.4.3.52";
+    String VERSION = "3.4.5.52";
 
     /**
      * Report framework start (server mode).

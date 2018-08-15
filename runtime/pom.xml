@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>framework-parent</artifactId>
-        <version>3.4.3.53-SNAPSHOT</version>
+        <version>3.4.5.52-SNAPSHOT</version>
         <relativePath>../parent-pom/framework/pom.xml</relativePath>
     </parent>
 
@@ -66,12 +66,12 @@
             <artifactId>spring-context</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>uuid</artifactId>
-            <version>3.4.3.52.17</version>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.graphaware.neo4j</groupId>-->
+            <!--<artifactId>uuid</artifactId>-->
+            <!--<version>3.4.5.52.17</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-common</artifactId>
