@@ -28,7 +28,7 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.neo4j.shell.ShellSettings;
+
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.neo4j.test.rule.RepeatRule;
 
@@ -66,7 +66,7 @@ public class OtherRuntimeTests {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -91,7 +91,7 @@ public class OtherRuntimeTests {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -119,7 +119,7 @@ public class OtherRuntimeTests {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -140,7 +140,7 @@ public class OtherRuntimeTests {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -160,7 +160,7 @@ public class OtherRuntimeTests {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -180,7 +180,7 @@ public class OtherRuntimeTests {
         GraphDatabaseService database = new GraphDatabaseFactory()
                 .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot())
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -201,7 +201,7 @@ public class OtherRuntimeTests {
         GraphDatabaseService database = new GraphDatabaseFactory()
                 .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot())
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 

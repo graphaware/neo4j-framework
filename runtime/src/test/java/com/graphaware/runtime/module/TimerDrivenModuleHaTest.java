@@ -34,7 +34,7 @@ import org.neo4j.cluster.ClusterSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.HighlyAvailableGraphDatabaseFactory;
 import org.neo4j.kernel.ha.HaSettings;
-import org.neo4j.shell.ShellSettings;
+
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.io.File;
@@ -84,7 +84,7 @@ public class TimerDrivenModuleHaTest {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+
                 .newGraphDatabase();
 
         registerShutdownHook(database);
@@ -143,7 +143,7 @@ public class TimerDrivenModuleHaTest {
         GraphDatabaseService database = new HighlyAvailableGraphDatabaseFactory()
                 .newEmbeddedDatabaseBuilder(new File("target/data/" + id + "/" + System.currentTimeMillis()))
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+
                 .setConfig(ClusterSettings.server_id, id)
                 .setConfig(HaSettings.ha_server, "localhost:600" + id)
                 .setConfig(HaSettings.slave_only, Boolean.toString(slave))

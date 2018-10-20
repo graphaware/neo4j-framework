@@ -29,7 +29,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.MapUtil;
-import org.neo4j.shell.ShellSettings;
+
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Collection;
@@ -49,7 +49,7 @@ public class ThirdPartyIntegrationModuleTest {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+
                 .newGraphDatabase();
 
         registerShutdownHook(database);

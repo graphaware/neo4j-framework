@@ -21,8 +21,8 @@ import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
 import com.graphaware.common.util.EntityUtils;
 import org.neo4j.graphdb.*;
 import org.neo4j.helpers.collection.Iterators;
+import org.neo4j.kernel.configuration.Settings;
 import org.neo4j.logging.Log;
-import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import com.graphaware.common.log.LoggerFactory;
 
@@ -793,7 +793,6 @@ public final class GraphUnit {
         GraphDatabaseService result = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder(PATH)
                 .setConfig("online_backup_enabled", FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 
         registerShutdownHook(result);

@@ -32,7 +32,6 @@ import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Uniqueness;
-import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.*;
@@ -118,7 +117,6 @@ public class FilteredLazyTransactionDataIntegrationTest {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 
         try (Transaction tx = database.beginTx()) {
@@ -146,7 +144,6 @@ public class FilteredLazyTransactionDataIntegrationTest {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 
         try (Transaction tx = database.beginTx()) {
@@ -1522,7 +1519,6 @@ public class FilteredLazyTransactionDataIntegrationTest {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 
         registerShutdownHook(database);
@@ -1596,7 +1592,6 @@ public class FilteredLazyTransactionDataIntegrationTest {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
                 .newGraphDatabase();
 
         registerShutdownHook(database);
