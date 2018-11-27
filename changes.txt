@@ -1,3 +1,6 @@
+3.5.0.53:
+    - Upgrade to Neo4j 3.5.0
+    - Update repositories for Neo4j EE artifacts
 3.4.9.52:
     - Upgrade to Neo4j 3.4.9
 
