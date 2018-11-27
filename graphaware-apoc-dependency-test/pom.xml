@@ -27,7 +27,7 @@
         <dependency>
             <groupId>org.neo4j.procedure</groupId>
             <artifactId>apoc</artifactId>
-            <version>3.4.0.1</version>
+            <version>3.5.0.1</version>
         </dependency>
     </dependencies>
 
