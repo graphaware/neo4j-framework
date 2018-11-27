@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.neo4j.graphdb.DependencyResolver;
-import org.neo4j.kernel.impl.transaction.TransactionCounters;
+import org.neo4j.kernel.impl.transaction.stats.TransactionCounters;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
 import static org.hamcrest.CoreMatchers.equalTo;

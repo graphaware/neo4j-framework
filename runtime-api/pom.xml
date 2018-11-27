@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>framework-parent</artifactId>
-        <version>3.4.9.53-SNAPSHOT</version>
+        <version>3.5.0.53-RC01</version>
         <relativePath>../parent-pom/framework/pom.xml</relativePath>
     </parent>
 
@@ -40,6 +40,13 @@
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>writer-api</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-kernel</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

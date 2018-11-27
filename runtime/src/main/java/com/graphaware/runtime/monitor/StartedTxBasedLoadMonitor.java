@@ -17,7 +17,7 @@
 package com.graphaware.runtime.monitor;
 
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.impl.transaction.TransactionCounters;
+import org.neo4j.kernel.impl.transaction.stats.TransactionCounters;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
 /**

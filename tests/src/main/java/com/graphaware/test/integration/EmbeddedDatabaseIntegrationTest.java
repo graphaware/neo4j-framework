@@ -18,7 +18,6 @@ package com.graphaware.test.integration;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
-import org.neo4j.shell.ShellSettings;
 import org.neo4j.test.TestGraphDatabaseFactory;
 import org.springframework.core.io.ClassPathResource;
 
@@ -66,8 +65,7 @@ public abstract class EmbeddedDatabaseIntegrationTest extends DatabaseIntegratio
     protected GraphDatabaseBuilder createGraphDatabaseBuilder() {
         return new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder(new File("target/test-data/impermanent-db-" + System.currentTimeMillis()))
-                .setConfig("online_backup_enabled", FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE);
+                .setConfig("online_backup_enabled", FALSE);
     }
 
     /**

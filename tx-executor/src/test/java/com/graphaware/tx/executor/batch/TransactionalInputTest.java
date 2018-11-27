@@ -18,7 +18,6 @@ package com.graphaware.tx.executor.batch;
 
 import com.graphaware.test.data.CypherPopulator;
 import com.graphaware.test.data.DatabasePopulator;
-import com.graphaware.test.integration.DatabaseIntegrationTest;
 import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import com.graphaware.tx.executor.input.TransactionalInput;
 import com.graphaware.tx.executor.single.TransactionCallback;
@@ -26,9 +25,8 @@ import org.junit.Test;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.helpers.collection.Iterables;
 import org.neo4j.helpers.collection.Iterators;
-import org.neo4j.kernel.impl.transaction.TransactionCounters;
+import org.neo4j.kernel.impl.transaction.stats.TransactionCounters;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
 import java.util.HashSet;

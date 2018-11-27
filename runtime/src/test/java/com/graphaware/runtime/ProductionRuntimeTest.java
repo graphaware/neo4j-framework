@@ -37,7 +37,7 @@ import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.helpers.collection.Iterables;
-import org.neo4j.shell.ShellSettings;
+
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.concurrent.Callable;
@@ -76,7 +76,7 @@ public class ProductionRuntimeTest {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+
                 .newGraphDatabase();
 
         registerShutdownHook(database);

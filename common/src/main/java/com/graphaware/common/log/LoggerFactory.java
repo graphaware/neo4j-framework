@@ -17,13 +17,13 @@
 package com.graphaware.common.log;
 
 import org.neo4j.kernel.extension.KernelExtensionFactory;
-import org.neo4j.kernel.impl.logging.LogService;
 import org.neo4j.kernel.impl.spi.KernelContext;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 import org.neo4j.kernel.lifecycle.LifecycleAdapter;
 import org.neo4j.logging.FormattedLogProvider;
 import org.neo4j.logging.Log;
 import org.neo4j.logging.LogProvider;
+import org.neo4j.logging.internal.LogService;
 
 /**
  * To be used by the Framework and all modules for logging. Call {@link #getLogger(Class)} to obtain Neo4j's own

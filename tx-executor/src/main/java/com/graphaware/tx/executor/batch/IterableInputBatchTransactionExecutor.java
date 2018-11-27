@@ -21,7 +21,6 @@ import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.input.TransactionalInput;
 import com.graphaware.tx.executor.single.KeepCalmAndCarryOn;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
-import com.graphaware.tx.executor.single.TransactionCallback;
 import com.graphaware.tx.executor.single.TransactionExecutor;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.logging.Log;

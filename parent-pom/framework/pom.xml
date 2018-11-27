@@ -18,13 +18,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>framework-parent</artifactId>
-    <version>3.4.9.53-SNAPSHOT</version>
+    <version>3.5.0.53-RC01</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>graphaware-parent</artifactId>
-        <version>3.4.9.53-SNAPSHOT</version>
+        <version>3.5.0.53-RC01</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -89,12 +89,12 @@
 
             <!-- for integration testing -->
 
-            <dependency>
-                <groupId>com.graphaware.neo4j</groupId>
-                <artifactId>resttest</artifactId>
-                <version>3.4.8.52.18</version>
-                <scope>test</scope>
-            </dependency>
+            <!--<dependency>-->
+                <!--<groupId>com.graphaware.neo4j</groupId>-->
+                <!--<artifactId>resttest</artifactId>-->
+                <!--<version>3.5.0.53.19-SNAPSHOT</version>-->
+                <!--<scope>test</scope>-->
+            <!--</dependency>-->
 
         </dependencies>
 
@@ -110,19 +110,18 @@
         </dependency>
 
         <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-primitive-collections</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.neo4j</groupId>
+            <groupId>com.neo4j</groupId>
             <artifactId>neo4j-cypher-slotted-runtime</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-kernel</artifactId>
-            <type>test-jar</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.neo4j.community</groupId>
+            <artifactId>it-test-support</artifactId>
         </dependency>
 
         <dependency>

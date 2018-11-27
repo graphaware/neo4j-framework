@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>framework-parent</artifactId>
-        <version>3.4.9.53-SNAPSHOT</version>
+        <version>3.5.0.53-RC01</version>
         <relativePath>../parent-pom/framework/pom.xml</relativePath>
     </parent>
 
@@ -52,7 +52,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.neo4j.app</groupId>
+            <groupId>com.neo4j.app</groupId>
             <artifactId>neo4j-server-enterprise</artifactId>
         </dependency>
 
@@ -82,10 +82,10 @@
             <artifactId>tests</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>resttest</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.graphaware.neo4j</groupId>-->
+            <!--<artifactId>resttest</artifactId>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>

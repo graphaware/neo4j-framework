@@ -25,7 +25,7 @@ import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.shell.ShellSettings;
+
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
@@ -49,7 +49,7 @@ public class RandomRelationshipSelectorTest {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
                 .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-                .setConfig(ShellSettings.remote_shell_enabled, FALSE)
+
                 .newGraphDatabase();
 
         registerShutdownHook(database);

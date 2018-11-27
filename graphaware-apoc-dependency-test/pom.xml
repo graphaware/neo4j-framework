@@ -9,7 +9,7 @@
 
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>graphaware-apoc-dependency-test</artifactId>
-    <version>3.4.9.53-SNAPSHOT</version>
+    <version>3.5.0.53-RC01</version>
     <packaging>pom</packaging>
     <name>GraphAware Framework and APOC dependency conflict test</name>
     <properties>
@@ -27,7 +27,17 @@
         <dependency>
             <groupId>org.neo4j.procedure</groupId>
             <artifactId>apoc</artifactId>
-            <version>3.4.0.1</version>
+            <version>3.5.0.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-text</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
