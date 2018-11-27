@@ -250,7 +250,7 @@
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>3.5.0-rc01</neo4j.version>
+        <neo4j.version>3.5.0</neo4j.version>
         <logback.version>1.1.2</logback.version>
         <spring.version>4.3.13.RELEASE</spring.version>
         <maven.plugin.surefire>2.20.1</maven.plugin.surefire>
