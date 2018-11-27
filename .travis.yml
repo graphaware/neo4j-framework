@@ -9,5 +9,8 @@ branches:
     - 3.4
     - 3.5
 
+script:
+  - cp .travis.settings.xml $HOME/.m2/settings.xml && mvn clean install
+
 after_success:
   - cp .travis.settings.xml $HOME/.m2/settings.xml && mvn deploy --settings $HOME/.m2/settings.xml
