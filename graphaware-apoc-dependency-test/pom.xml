@@ -22,6 +22,12 @@
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>server</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.neo4j</groupId>
+                    <artifactId>neo4j-lucene-upgrade</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
