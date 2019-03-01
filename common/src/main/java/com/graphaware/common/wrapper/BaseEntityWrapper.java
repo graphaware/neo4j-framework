@@ -258,7 +258,8 @@ public abstract class BaseEntityWrapper<T extends Entity> extends BaseEntity imp
     //Typically no need to override:
 
     /**
-     * @see org.neo4j.graphdb.Node#delete()}  and {@link org.neo4j.graphdb.Relationship#delete().
+     * @see org.neo4j.graphdb.Node#delete()
+     * @see org.neo4j.graphdb.Relationship#delete()
      */
     public void delete() {
         if (getWrapped() instanceof Node) {
