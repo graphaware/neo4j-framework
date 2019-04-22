@@ -17,8 +17,11 @@
 package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.common.log.LoggerFactory;
+import com.graphaware.common.policy.role.InstanceRole;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.config.Neo4jConfigBasedRuntimeConfiguration;
+import com.graphaware.runtime.config.util.InstanceRoleUtils;
+import com.graphaware.runtime.config.util.ClusterRuntimeUtils;
 import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
@@ -79,13 +82,16 @@ public class RuntimeKernelExtension implements Lifecycle {
     public static final Setting<Boolean> RUNTIME_ENABLED = setting("com.graphaware.runtime.enabled", BOOLEAN, "false");
     public static final String MODULE_CONFIG_KEY = "com.graphaware.module"; //.ID.Order = fully qualified class name of bootstrapper
     private static final Pattern MODULE_ENABLED_KEY = Pattern.compile("com\\.graphaware\\.module\\.([a-zA-Z0-9]{1,})\\.([0-9]{1,})");
+    private static final long SINGLE_MODE_WAIT_TIME = 5 * 60 * 1000;
 
     private final Config config;
     private final GraphDatabaseService database;
+    private final InstanceRoleUtils instanceRoleUtils;
 
     public RuntimeKernelExtension(Config config, GraphDatabaseService database) {
         this.config = config;
         this.database = database;
+        this.instanceRoleUtils = new InstanceRoleUtils(database);
     }
 
     /**
@@ -113,7 +119,7 @@ public class RuntimeKernelExtension implements Lifecycle {
         registerModules(runtime);
 
         new Thread(() -> {
-            if (database.isAvailable(5 * 60 * 1000)) {
+            if (databaseIsAvailable()) {
                 runtime.start();
                 LOG.info("GraphAware Runtime automatically started.");
             } else {
@@ -177,6 +183,16 @@ public class RuntimeKernelExtension implements Lifecycle {
         }
 
         return moduleConfig;
+    }
+
+    private boolean databaseIsAvailable() {
+        if (instanceRoleUtils.getInstanceRole().equals(InstanceRole.SINGLE)) {
+            return database.isAvailable(SINGLE_MODE_WAIT_TIME);
+        } else {
+            ClusterRuntimeUtils clusterRuntimeUtils = new ClusterRuntimeUtils(database);
+
+            return clusterRuntimeUtils.waitClusterIsFormed(SINGLE_MODE_WAIT_TIME);
+        }
     }
 
     /**
