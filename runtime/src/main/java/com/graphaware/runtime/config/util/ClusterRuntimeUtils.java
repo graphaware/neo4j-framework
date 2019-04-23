@@ -17,6 +17,12 @@ public class ClusterRuntimeUtils {
         this.database = database;
     }
 
+    /**
+     * In the case of a causal cluster, we have to wait the LEADER Member becomes writable. The states a LEADER Member will have during the start lifecycle are FOLLOWER, CANDIDATE, LEADER.
+     *
+     * @param timeout
+     * @return
+     */
     public boolean waitClusterIsFormed(long timeout) {
         boolean ready = getLeader();
 
@@ -42,13 +48,11 @@ public class ClusterRuntimeUtils {
     private boolean getLeader() {
         try {
             getRaftMachine().getLeader();
-
-            return true;
         } catch (NoLeaderFoundException e) {
-            LOG.debug("No leader found");
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     private RaftMachine getRaftMachine() {

@@ -36,6 +36,8 @@ import java.util.stream.IntStream;
 import com.graphaware.common.log.LoggerFactory;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.neo4j.causalclustering.discovery.DiscoveryServiceFactory;
+import org.neo4j.causalclustering.discovery.HazelcastDiscoveryServiceFactory;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.facade.GraphDatabaseDependencies;
 import org.neo4j.graphdb.facade.GraphDatabaseFacadeFactory;
@@ -128,8 +130,8 @@ public abstract class ClusterDatabasesIntegrationTest {
         storeDir.deleteOnExit(); // it doesn't work very well
         
         GraphDatabaseService database = (GraphDatabaseService) instanceClass
-                .getConstructor(File.class, Config.class, GraphDatabaseFacadeFactory.Dependencies.class)
-                .newInstance(storeDir, config, dependencies);
+                .getConstructor(File.class, Config.class, GraphDatabaseFacadeFactory.Dependencies.class, DiscoveryServiceFactory.class)
+                .newInstance(storeDir, config, dependencies, null);
 
         LOG.info("An instance of class " + instanceClass.getSimpleName() + " has been created");
         // Too verbose, we leave it at debug level
