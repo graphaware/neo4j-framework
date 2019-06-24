@@ -69,10 +69,12 @@
             <groupId>org.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
         </dependency>
+<!--
         <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-kernel</artifactId>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
+-->
     </dependencies>
 </project>
