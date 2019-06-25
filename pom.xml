@@ -347,13 +347,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.neo4j</groupId>
-                <artifactId>neo4j-cypher-slotted-runtime</artifactId>
-                <version>${neo4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>org.neo4j</groupId>
                 <artifactId>neo4j-test</artifactId>
                 <version>${neo4j.version}</version>
