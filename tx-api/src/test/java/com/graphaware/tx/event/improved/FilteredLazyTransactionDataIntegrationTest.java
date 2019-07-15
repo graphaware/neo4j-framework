@@ -25,7 +25,6 @@ import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import com.graphaware.tx.executor.single.*;
 import org.junit.After;
 import org.junit.Test;
-import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
@@ -116,7 +115,6 @@ public class FilteredLazyTransactionDataIntegrationTest {
     public void changeOfLabelShouldBePickedUp() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .newGraphDatabase();
 
         try (Transaction tx = database.beginTx()) {
@@ -143,7 +141,6 @@ public class FilteredLazyTransactionDataIntegrationTest {
     public void removedLabelShouldBePickedUp() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .newGraphDatabase();
 
         try (Transaction tx = database.beginTx()) {
@@ -1518,7 +1515,6 @@ public class FilteredLazyTransactionDataIntegrationTest {
     private void createTestDatabase() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .newGraphDatabase();
 
         registerShutdownHook(database);
@@ -1591,7 +1587,6 @@ public class FilteredLazyTransactionDataIntegrationTest {
     private void createTestDatabaseForInternalTest() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .newGraphDatabase();
 
         registerShutdownHook(database);

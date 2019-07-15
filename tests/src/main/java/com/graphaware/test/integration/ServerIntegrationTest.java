@@ -22,7 +22,6 @@ import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.helpers.HostnamePort;
 import org.neo4j.helpers.ListenSocketAddress;
 import org.neo4j.server.NeoServer;
-import org.neo4j.server.enterprise.helpers.EnterpriseServerBuilder;
 import org.neo4j.server.helpers.CommunityServerBuilder;
 import org.springframework.core.io.ClassPathResource;
 

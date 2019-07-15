@@ -44,20 +44,8 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.neo4j.app</groupId>
-            <artifactId>neo4j-server-enterprise</artifactId>
-            <type>test-jar</type>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.neo4j.app</groupId>
             <artifactId>neo4j-server</artifactId>
-            <type>test-jar</type>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.neo4j</groupId>
-            <artifactId>neo4j-com</artifactId>
             <type>test-jar</type>
             <scope>compile</scope>
         </dependency>
