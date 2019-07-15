@@ -90,14 +90,6 @@
             </snapshots>
         </repository>
         <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>neo4j-enterprise</id>
-            <name>Neo4j Enterprise Artifacts</name>
-            <url>https://neo4j.bintray.com/enterprise</url>
-        </repository>
-        <repository>
             <id>neo4j-snapshot-repository</id>
             <name>Neo4j Maven 2 snapshot repository</name>
             <url>http://m2.neo4j.org/content/repositories/snapshots</url>
@@ -334,27 +326,6 @@
 
             <dependency>
                 <groupId>org.neo4j</groupId>
-                <artifactId>neo4j-enterprise</artifactId>
-                <version>${neo4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.neo4j</groupId>
-                <artifactId>neo4j-enterprise-cypher</artifactId>
-                <version>${neo4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.neo4j</groupId>
-                <artifactId>neo4j-cypher-slotted-runtime</artifactId>
-                <version>${neo4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.neo4j</groupId>
                 <artifactId>neo4j-test</artifactId>
                 <version>${neo4j.version}</version>
                 <type>test-jar</type>
@@ -413,45 +384,8 @@
             </dependency>
 
             <dependency>
-                <groupId>com.neo4j.app</groupId>
-                <artifactId>neo4j-server-enterprise</artifactId>
-                <version>${neo4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.neo4j</groupId>
-                <artifactId>neo4j-causal-clustering</artifactId>
-                <version>${neo4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.neo4j</groupId>
-                <artifactId>neo4j-ha</artifactId>
-                <version>${neo4j.version}</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>org.neo4j.app</groupId>
                 <artifactId>neo4j-server</artifactId>
-                <version>${neo4j.version}</version>
-                <type>test-jar</type>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.neo4j.app</groupId>
-                <artifactId>neo4j-server-enterprise</artifactId>
-                <version>${neo4j.version}</version>
-                <type>test-jar</type>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.neo4j</groupId>
-                <artifactId>neo4j-com</artifactId>
                 <version>${neo4j.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>

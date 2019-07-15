@@ -18,8 +18,8 @@ package com.graphaware.runtime;
 
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.listener.TopologyChangeEventListener;
-import com.graphaware.runtime.listener.TopologyListenerAdapter;
+//import com.graphaware.runtime.listener.TopologyChangeEventListener;
+//import com.graphaware.runtime.listener.TopologyListenerAdapter;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.module.TxDrivenModule;
@@ -43,7 +43,6 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
     private final GraphDatabaseService database;
     private final TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager;
     private final Neo4jWriter writer;
-    private TopologyListenerAdapter topologyListenerAdapter;
 
     /**
      * Construct a new runtime. Protected, please use {@link com.graphaware.runtime.GraphAwareRuntimeFactory}.
@@ -61,13 +60,13 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
         database.registerTransactionEventHandler(this);
         database.registerKernelEventHandler(this);
 
-        // Register to topology change events
-        // In Community Edition this raises a ClassNotFoundException
-        try {
-            this.topologyListenerAdapter = new TopologyListenerAdapter((GraphDatabaseAPI) database, configuration.kernelConfig());
-        } catch (Exception exception) {
-            LOG.warn("Failed to register topology listener", exception);
-        }
+//        // Register to topology change events
+//        // In Community Edition this raises a ClassNotFoundException
+//        try {
+//            this.topologyListenerAdapter = new TopologyListenerAdapter((GraphDatabaseAPI) database, configuration.kernelConfig());
+//        } catch (Exception exception) {
+//            LOG.warn("Failed to register topology listener", exception);
+//        }
     }
 
 
@@ -88,10 +87,10 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
             txDrivenModuleManager.registerModule((TxDrivenModule) module);
         }
 
-        // If the module is a TopologyChangeEventListener then we should register this module as a listener
-        if (this.topologyListenerAdapter != null && module instanceof TopologyChangeEventListener) {
-            this.topologyListenerAdapter.registerListener((TopologyChangeEventListener) module);
-        }
+//        // If the module is a TopologyChangeEventListener then we should register this module as a listener
+//        if (this.topologyListenerAdapter != null && module instanceof TopologyChangeEventListener) {
+//            this.topologyListenerAdapter.registerListener((TopologyChangeEventListener) module);
+//        }
     }
 
     /**
@@ -102,11 +101,11 @@ public class DatabaseRuntime extends TxDrivenRuntime<TxDrivenModule> {
         super.afterShutdown();
         afterShutdown(database);
 
-        // Remove all listeners and un-register adapter
-        if (this.topologyListenerAdapter != null) {
-            this.topologyListenerAdapter.unregister();
-            this.topologyListenerAdapter = null;
-        }
+//        // Remove all listeners and un-register adapter
+//        if (this.topologyListenerAdapter != null) {
+//            this.topologyListenerAdapter.unregister();
+//            this.topologyListenerAdapter = null;
+//        }
     }
 
     /**
