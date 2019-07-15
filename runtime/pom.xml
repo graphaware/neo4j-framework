@@ -77,10 +77,22 @@
             <artifactId>neo4j-common</artifactId>
             <type>test-jar</type>
         </dependency>
-        <dependency>
-            <groupId>com.neo4j</groupId>
-            <artifactId>neo4j-ha</artifactId>
-        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

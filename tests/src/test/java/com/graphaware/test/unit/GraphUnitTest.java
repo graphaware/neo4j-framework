@@ -21,7 +21,6 @@ import com.graphaware.common.policy.inclusion.none.IncludeNoNodes;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
@@ -43,7 +42,6 @@ public class GraphUnitTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
                 .newGraphDatabase();
 
         registerShutdownHook(database);

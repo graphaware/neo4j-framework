@@ -42,7 +42,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <finalName>graphaware-embedded-all-${project.version}</finalName>
+                    <finalName>graphaware-embedded-community-all-${project.version}</finalName>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>

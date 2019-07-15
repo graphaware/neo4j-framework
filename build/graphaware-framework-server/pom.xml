@@ -52,7 +52,7 @@
                         </relocation>
                     </relocations>
                     <!-- This is module has packaging type pom, otherwise finalName could have been used -->
-                    <outputFile>${project.build.directory}/graphaware-server-all-${project.version}.jar</outputFile>
+                    <outputFile>${project.build.directory}/graphaware-server-community-all-${project.version}.jar</outputFile>
                 </configuration>
                 <executions>
                     <execution>
