@@ -28,10 +28,12 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.FileSystems;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 public final class ClassPathProcedureUtils {
 
@@ -80,7 +82,8 @@ public final class ClassPathProcedureUtils {
                 File file = fileIterator.next();
                 try {
                     String path = file.getAbsolutePath();
-                    Class<?> candidate = Class.forName(path.substring(directory.getAbsolutePath().length() + 1, path.length() - 6).replaceAll("\\/", "."));
+                    Class<?> candidate = Class.forName(path.substring(directory.getAbsolutePath().length() + 1, path.length() - 6)
+                            .replaceAll(Pattern.quote(FileSystems.getDefault().getSeparator()), "."));
 
                     for (Method m : candidate.getDeclaredMethods()) {
                         if (m.isAnnotationPresent(Procedure.class) || m.isAnnotationPresent(UserFunction.class)) {

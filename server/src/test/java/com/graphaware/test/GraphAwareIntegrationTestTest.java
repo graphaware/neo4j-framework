@@ -37,12 +37,12 @@ public class GraphAwareIntegrationTestTest extends GraphAwareIntegrationTest {
     @Test
     public void shouldRegisterProcedureOnClasspath() {
         Assert.assertEquals(
-                "+---------+\n" +
-                "| string  |\n" +
-                "+---------+\n" +
-                "| \"hello\" |\n" +
-                "+---------+\n" +
-                "1 row\n",
+                "+---------+" + System.lineSeparator() +
+                "| string  |" + System.lineSeparator() +
+                "+---------+" + System.lineSeparator() +
+                "| \"hello\" |" + System.lineSeparator() +
+                "+---------+" + System.lineSeparator() +
+                "1 row" + System.lineSeparator(),
                 getDatabase().execute("CALL ga.hello()").resultAsString());
     }
 }
