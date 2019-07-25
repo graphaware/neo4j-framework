@@ -24,7 +24,6 @@ import com.graphaware.writer.thirdparty.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Transaction;
@@ -48,8 +47,6 @@ public class ThirdPartyIntegrationModuleTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-
                 .newGraphDatabase();
 
         registerShutdownHook(database);

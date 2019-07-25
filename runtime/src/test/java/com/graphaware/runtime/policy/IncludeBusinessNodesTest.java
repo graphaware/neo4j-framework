@@ -22,7 +22,6 @@ import com.graphaware.runtime.policy.all.IncludeAllBusinessNodes;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
@@ -38,7 +37,6 @@ import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.neo4j.graphdb.Label.label;
-import static org.neo4j.kernel.configuration.Settings.FALSE;
 
 /**
  * Test for {@link CompositeNodeInclusionPolicy} with {@link IncludeAllBusinessNodes} and a programmatically configured {@link IncludeNodes}

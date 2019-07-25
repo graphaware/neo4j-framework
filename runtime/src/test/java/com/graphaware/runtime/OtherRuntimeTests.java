@@ -22,7 +22,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
@@ -65,8 +64,6 @@ public class OtherRuntimeTests {
     public void makeSureDeadlockDoesNotOccur() throws InterruptedException {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -90,8 +87,6 @@ public class OtherRuntimeTests {
     public void makeSureDeadlockDoesNotOccur1() throws InterruptedException {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -118,8 +113,6 @@ public class OtherRuntimeTests {
     public void makeSureDeadlockDoesNotOccur2() {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -139,8 +132,6 @@ public class OtherRuntimeTests {
     public void makeSureDeadlockDoesNotOccur3() {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -159,8 +150,6 @@ public class OtherRuntimeTests {
     public void makeSureDeadlockDoesNotOccur4() {
         GraphDatabaseService database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -179,8 +168,6 @@ public class OtherRuntimeTests {
     public void makeSureDeadlockDoesNotOccur5() {
         GraphDatabaseService database = new GraphDatabaseFactory()
                 .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot())
-                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 
@@ -200,8 +187,6 @@ public class OtherRuntimeTests {
     public void makeSureDeadlockDoesNotOccur6() throws InterruptedException {
         GraphDatabaseService database = new GraphDatabaseFactory()
                 .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot())
-                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-
                 .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
                 .newGraphDatabase();
 

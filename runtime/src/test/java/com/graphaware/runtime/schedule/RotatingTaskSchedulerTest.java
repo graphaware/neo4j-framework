@@ -50,22 +50,10 @@ public class RotatingTaskSchedulerTest extends EmbeddedDatabaseIntegrationTest{
 	}
 	
 	@Test
-	public void testHasCorrectRole_MASTER_ONLY() {
+	public void shouldIgnoreRole() {
 		assertTrue(rotatingTaskScheduler.hasCorrectRole(MockTimerModuleContext.buildModule(MasterOnly.getInstance())));
-	}
-
-	@Test
-	public void testHasCorrectRole_SLAVES_ONLY() {
-		assertFalse(rotatingTaskScheduler.hasCorrectRole(MockTimerModuleContext.buildModule(SlavesOnly.getInstance())));
-	}
-
-	@Test
-	public void testHasCorrectRole_ANY() {
+		assertTrue(rotatingTaskScheduler.hasCorrectRole(MockTimerModuleContext.buildModule(SlavesOnly.getInstance())));
 		assertTrue(rotatingTaskScheduler.hasCorrectRole(MockTimerModuleContext.buildModule(AnyRole.getInstance())));
-	}
-
-	@Test
-	public void testHasCorrectRole_WRITEABLE() {
 		assertTrue(rotatingTaskScheduler.hasCorrectRole(MockTimerModuleContext.buildModule(WritableRole.getInstance())));
 	}
 }

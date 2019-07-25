@@ -32,7 +32,6 @@ import org.neo4j.logging.Log;
 
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.util.Pair;
-import com.graphaware.runtime.config.util.InstanceRoleUtils;
 import com.graphaware.runtime.metadata.DefaultTimerDrivenModuleMetadata;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.metadata.TimerDrivenModuleContext;
@@ -55,8 +54,6 @@ public class RotatingTaskScheduler implements TaskScheduler {
 
     private final ScheduledExecutorService worker = Executors.newSingleThreadScheduledExecutor();
     
-    private final InstanceRoleUtils instanceRoleUtils;
-
     /**
      * Construct a new task scheduler.
      *
@@ -68,8 +65,6 @@ public class RotatingTaskScheduler implements TaskScheduler {
         this.database = database;
         this.repository = repository;
         this.timingStrategy = timingStrategy;
-        
-        this.instanceRoleUtils = new InstanceRoleUtils(database);
     }
 
     /**
@@ -207,10 +202,10 @@ public class RotatingTaskScheduler implements TaskScheduler {
      * Check if the given module has the correct role (e.g. master or slave) to run.
      *
      * @param module to check for.
-     * @return <code>true</code> iff can run.
+     * @return <code>true</code> iff can run. Always <code>true</code> in Community Edition.
      */
     protected boolean hasCorrectRole(TimerDrivenModule<?> module) {
-        return module.getConfiguration().getInstanceRolePolicy().comply(instanceRoleUtils.getInstanceRole());
+        return true;
 	}
 
     /**

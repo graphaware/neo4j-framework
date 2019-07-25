@@ -33,7 +33,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.helpers.collection.Iterables;
@@ -49,7 +48,6 @@ import static com.graphaware.runtime.config.FluentRuntimeConfiguration.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
-import static org.neo4j.kernel.configuration.Settings.FALSE;
 
 /**
  * Unit test for {@link ProductionRuntime}.
@@ -75,8 +73,6 @@ public class ProductionRuntimeTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-
                 .newGraphDatabase();
 
         registerShutdownHook(database);
@@ -304,9 +300,6 @@ public class ProductionRuntimeTest {
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule3, atLeastOnce()).getId();
-        verify(mockModule1, atLeastOnce()).getConfiguration();
-        verify(mockModule2, atLeastOnce()).getConfiguration();
-        verify(mockModule3, atLeastOnce()).getConfiguration();
         verify(mockModule1, times(2)).doSomeWork(null, database);
         verify(mockModule2, times(2)).doSomeWork(null, database);
         verify(mockModule3).doSomeWork(null, database);
@@ -378,9 +371,6 @@ public class ProductionRuntimeTest {
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule3, atLeastOnce()).getId();
-        verify(mockModule1, atLeastOnce()).getConfiguration();
-        verify(mockModule2, atLeastOnce()).getConfiguration();
-        verify(mockModule3, atLeastOnce()).getConfiguration();
         verify(mockModule1, times(3)).doSomeWork(null, database);
         verify(mockModule2).doSomeWork(context1, database);
         verify(mockModule2).doSomeWork(context2, database);
@@ -414,8 +404,6 @@ public class ProductionRuntimeTest {
 
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
-        verify(mockModule1, atLeastOnce()).getConfiguration();
-        verify(mockModule2, atLeastOnce()).getConfiguration();
 
         verifyNoMoreInteractions(mockModule1, mockModule2);
     }
@@ -441,7 +429,6 @@ public class ProductionRuntimeTest {
         Thread.sleep(INITIAL_DELAY + 2 * DELAY - 100);
 
         verify(mockModule, atLeastOnce()).getId();
-        verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule).doSomeWork(null, database);
         verify(mockModule).doSomeWork(firstContext, database);
 
@@ -471,7 +458,6 @@ public class ProductionRuntimeTest {
         Thread.sleep(INITIAL_DELAY + DELAY - 100);
 
         verify(mockModule, atLeastOnce()).getId();
-        verify(mockModule, atLeastOnce()).getConfiguration();
         verify(mockModule).doSomeWork(lastContext, database);
         verifyNoMoreInteractions(mockModule);
     }
@@ -512,8 +498,6 @@ public class ProductionRuntimeTest {
 
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
-        verify(mockModule1, atLeastOnce()).getConfiguration();
-        verify(mockModule2, atLeastOnce()).getConfiguration();
         verify(mockModule1).doSomeWork(null, database);
         verify(mockModule2).doSomeWork(null, database);
         verifyNoMoreInteractions(mockModule1, mockModule2);
