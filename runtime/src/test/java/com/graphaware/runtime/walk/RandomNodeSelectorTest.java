@@ -24,7 +24,6 @@ import com.graphaware.tx.executor.input.AllNodes;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.neo4j.backup.OnlineBackupSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
@@ -34,7 +33,6 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.*;
-import static org.neo4j.kernel.configuration.Settings.*;
 
 /**
  * Unit test for {@link RandomNodeSelector}.
@@ -47,8 +45,6 @@ public class RandomNodeSelectorTest {
     public void setUp() {
         database = new TestGraphDatabaseFactory()
                 .newImpermanentDatabaseBuilder()
-                .setConfig(OnlineBackupSettings.online_backup_enabled, FALSE)
-
                 .newGraphDatabase();
 
         registerShutdownHook(database);

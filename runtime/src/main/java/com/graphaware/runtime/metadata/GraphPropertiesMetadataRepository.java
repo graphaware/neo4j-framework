@@ -21,7 +21,6 @@ import com.graphaware.common.kv.GraphKeyValueStore;
 import com.graphaware.common.kv.KeyValueStore;
 import com.graphaware.common.serialize.Serializer;
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.config.util.InstanceRoleUtils;
 import com.graphaware.runtime.module.RuntimeModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
@@ -42,7 +41,6 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
     private final GraphDatabaseService database;
     private final KeyValueStore keyValueStore;
     private final String propertyPrefix;
-    private final InstanceRoleUtils instanceRoleUtils;
 
     /**
      * Create a new repository.
@@ -55,7 +53,6 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
         this.database = database;
         this.propertyPrefix = configuration.createPrefix(propertyPrefix);
         this.keyValueStore = new GraphKeyValueStore(database);
-        this.instanceRoleUtils = new InstanceRoleUtils(database);
     }
 
     /**
@@ -103,14 +100,10 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
      */
     @Override
     public <M extends ModuleMetadata> void persistModuleMetadata(String moduleId, M metadata) {
-    	if(instanceRoleUtils.getInstanceRole().isWritable()){
-
-    		try (Transaction tx = database.beginTx()) {
-    			keyValueStore.set(moduleKey(moduleId), Serializer.toByteArray(metadata));
-    			tx.success();
-    		}
-    		
-    	}
+        try (Transaction tx = database.beginTx()) {
+            keyValueStore.set(moduleKey(moduleId), Serializer.toByteArray(metadata));
+            tx.success();
+        }
     }
 
     /**
@@ -126,14 +119,10 @@ public class GraphPropertiesMetadataRepository implements ModuleMetadataReposito
      */
     @Override
     public void removeModuleMetadata(String moduleId) {
-		if (instanceRoleUtils.getInstanceRole().isWritable()) {
-			
-			try (Transaction tx = database.beginTx()) {
-				keyValueStore.remove(moduleKey(moduleId));
-				tx.success();
-			}
-			
-		}
+        try (Transaction tx = database.beginTx()) {
+            keyValueStore.remove(moduleKey(moduleId));
+            tx.success();
+        }
     }
 
     /**
