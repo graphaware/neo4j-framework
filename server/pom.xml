@@ -93,12 +93,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.neo4j.client</groupId>
-            <artifactId>neo4j-browser</artifactId>
-            <version>3.2.20</version>
-        </dependency>
-
     </dependencies>
 
 </project>
