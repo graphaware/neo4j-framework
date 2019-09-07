@@ -1,3 +1,6 @@
+3.5.7.54:
+    - Upgrade to Neo4j 3.5.7
+
 3.5.6.54:
     - Fix issue where inappropriate file separator was used, causing failures on Windows
 

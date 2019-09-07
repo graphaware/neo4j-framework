@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>framework-parent</artifactId>
-        <version>3.5.6.55-SNAPSHOT</version>
+        <version>3.5.7.54-SNAPSHOT</version>
         <relativePath>../parent-pom/framework/pom.xml</relativePath>
     </parent>
 
@@ -135,6 +135,11 @@
             <groupId>org.neo4j.community</groupId>
             <artifactId>it-test-support</artifactId>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j.client</groupId>
+            <artifactId>neo4j-browser</artifactId>
+            <version>3.2.20</version>
         </dependency>
 
     </dependencies>
