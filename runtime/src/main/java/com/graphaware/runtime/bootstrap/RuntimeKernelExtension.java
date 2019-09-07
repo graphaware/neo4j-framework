@@ -18,6 +18,7 @@ package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.runtime.config.Neo4jConfigBasedRuntimeConfiguration;
 import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -80,8 +81,8 @@ public class RuntimeKernelExtension implements Lifecycle {
     public static final String MODULE_CONFIG_KEY = "com.graphaware.module"; //.ID.Order = fully qualified class name of bootstrapper
     private static final Pattern MODULE_ENABLED_KEY = Pattern.compile("com\\.graphaware\\.module\\.([a-zA-Z0-9]{1,})\\.([0-9]{1,})");
 
-    private final Config config;
-    private final GraphDatabaseService database;
+    protected final Config config;
+    protected final GraphDatabaseService database;
 
     public RuntimeKernelExtension(Config config, GraphDatabaseService database) {
         this.config = config;
@@ -108,7 +109,7 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         LOG.info("GraphAware Runtime enabled, bootstrapping...");
 
-        final GraphAwareRuntime runtime = createRuntime(database, new Neo4jConfigBasedRuntimeConfiguration(database, config));
+        final GraphAwareRuntime runtime = createRuntime();
 
         registerModules(runtime);
 
@@ -122,6 +123,10 @@ public class RuntimeKernelExtension implements Lifecycle {
         }, "GraphAware Starter").start();
 
         LOG.info("GraphAware Runtime bootstrapped, starting the Runtime...");
+    }
+
+    protected GraphAwareRuntime createRuntime() {
+        return GraphAwareRuntimeFactory.createRuntime(database, new Neo4jConfigBasedRuntimeConfiguration(database, config));
     }
 
     private void registerModules(GraphAwareRuntime runtime) {
