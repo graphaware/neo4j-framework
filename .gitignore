@@ -16,3 +16,4 @@ server/data/
 neo4j-home/
 conf/ssl/
 metrics/
+.java-version
