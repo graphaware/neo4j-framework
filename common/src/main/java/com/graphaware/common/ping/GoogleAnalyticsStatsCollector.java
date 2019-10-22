@@ -17,6 +17,7 @@
 package com.graphaware.common.ping;
 
 import com.graphaware.common.log.LoggerFactory;
+import com.graphaware.common.util.VersionReader;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -43,9 +44,11 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
     private final GraphDatabaseService database;
     private static ScheduledExecutorService executor;
     private String storeId = UNKNOWN;
+    private final String version;
 
     public GoogleAnalyticsStatsCollector(GraphDatabaseService database) {
         this.database = database;
+        this.version = VersionReader.getVersion();
     }
 
     private String findStoreIdIfNeeded() {
@@ -129,7 +132,7 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
     }
 
     private String constructBody(String storeId, String appId) {
-        return "v=1&tid=" + TID + "&cid=" + storeId + "&t=event&ea=" + appId + "&ec=Run&el=" + VERSION;
+        return "v=1&tid=" + TID + "&cid=" + storeId + "&t=event&ea=" + appId + "&ec=Run&el=" + version;
     }
 
     /**
