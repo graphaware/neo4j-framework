@@ -6,6 +6,7 @@ stages:
   - test # TBD later, instead of travis
   - deploy
   - postDeploy
+  - triggers
 
 bumpVersion:
   extends: .frameworkVersionBump
@@ -47,9 +48,22 @@ uploadArtifact:
     variables:
       - $VERSION
 
+#Delay triggers by 30 minutes - maven central needs some time to process the artifacts
+delay30mins:
+  stage: postDeploy
+  when: delayed
+  start_in: 30 minutes
+  script:
+    - echo "Delaying"
+  only:
+    refs:
+      - master
+    variables:
+      - $VERSION
+
 #trigger template
 .trigger:
-  stage: postDeploy
+  stage: triggers
   variables:
     PARENT_VERSION: $VERSION
   only:
@@ -58,10 +72,10 @@ uploadArtifact:
     variables:
       - $VERSION
 
-triggerThird:
+triggerUUID:
   extends: .trigger
   trigger: GraphAware/neo4j-plugins/neo4j-uuid
 
-triggerAudit:
+triggerRestTest:
   extends: .trigger
   trigger: GraphAware/neo4j-plugins/neo4j-resttest
