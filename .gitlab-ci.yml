@@ -1,0 +1,67 @@
+include:
+  - project: graphaware/devops/gitlab-ci-templates
+    file: gitlab-ci-templates.yml
+
+stages:
+  - test # TBD later, instead of travis
+  - deploy
+  - postDeploy
+
+bumpVersion:
+  extends: .frameworkVersionBump
+  stage: deploy
+  script:
+    - NEW_VERSION="${VERSION%.*}.$((${VERSION##*.}+1))-SNAPSHOT"
+    - CUSTOM_SPACE='    ' #otherwise bash joins spaces into one
+    - CHANGELOG_MSG="${CHANGELOG_MSG:-${VERSION}:\n${CUSTOM_SPACE}- Upgrade to Neo4j ${VERSION%.*}}\n"
+    - echo -e "$CHANGELOG_MSG\n$(cat changes.txt)" > changes.txt # add the message into changes.txt, -e enable special characters (\n)
+    - git commit -a -m "Release with new neo4j version"  #You can add edition of a file to pom using ant-plugin. You can connect it to the goals of the maven release plugin. But this plugin won't commit anything else but POMs!!!
+    - mvn release:clean release:prepare
+      $MAVEN_CLI_OPTS
+      -DreleaseVersion=$VERSION
+      -DdevelopmentVersion=$NEW_VERSION
+      -Dtag="Version-${VERSION}"
+      -DskipTests=true
+      -Darguments=-DskipTests
+    - mvn release:perform
+      $MAVEN_CLI_OPTS
+      -DskipTests=true
+      -Darguments=-DskipTests
+  only:
+    refs:
+      - master
+    variables:
+      - $VERSION
+
+uploadArtifact:
+  extends: .uploadToS3
+  stage: postDeploy
+  dependencies:
+    - bumpVersion
+  variables:
+    FROM: target/checkout/build/graphaware-framework-server/target/graphaware-server-all-$VERSION.jar
+    TO: $AWS_PATH/graphaware-server-all-$VERSION.jar
+  only:
+    refs:
+      - master
+    variables:
+      - $VERSION
+
+#trigger template
+.trigger:
+  stage: postDeploy
+  variables:
+    PARENT_VERSION: $VERSION
+  only:
+    refs:
+      - master
+    variables:
+      - $VERSION
+
+#triggerThird:
+#  extends: .trigger
+#  trigger: GraphAware/release-testing/Michal-third
+#
+#triggerAudit:
+#  extends: .trigger
+#  trigger: GraphAware/release-testing/Neo4j-audit
