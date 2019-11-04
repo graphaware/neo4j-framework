@@ -58,10 +58,10 @@ uploadArtifact:
     variables:
       - $VERSION
 
-#triggerThird:
-#  extends: .trigger
-#  trigger: GraphAware/release-testing/Michal-third
-#
-#triggerAudit:
-#  extends: .trigger
-#  trigger: GraphAware/release-testing/Neo4j-audit
+triggerThird:
+  extends: .trigger
+  trigger: GraphAware/neo4j-plugins/neo4j-uuid
+
+triggerAudit:
+  extends: .trigger
+  trigger: GraphAware/neo4j-plugins/neo4j-resttest
