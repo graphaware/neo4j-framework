@@ -79,3 +79,29 @@ triggerUUID:
 triggerRestTest:
   extends: .trigger
   trigger: GraphAware/neo4j-plugins/neo4j-resttest
+
+triggerExpire:
+  extends: .trigger
+  trigger: GraphAware/neo4j-plugins/neo4j-expire
+
+triggerRecommendation:
+  extends: .trigger
+  trigger: GraphAware/neo4j-plugins/neo4j-reco
+
+triggerTriggers:
+  extends: .trigger
+  trigger: GraphAware/neo4j-plugins/neo4j-triggers
+
+triggerTimetree:
+  extends: .trigger
+  trigger: GraphAware/neo4j-plugins/neo4j-timetree
+
+triggerGAstarter:
+  extends: .trigger
+  trigger: GraphAware/neo4j-plugins/graphaware-starter
+
+triggerRecommendationsMeetup:
+  extends: .trigger
+  trigger: GraphAware/neo4j-plugins/recommendations-meetup
+
+#neo4j-to-elasticsearch is launched from UUID as it depends on it
