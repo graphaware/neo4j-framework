@@ -41,12 +41,6 @@
             <artifactId>writer-api</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-kernel</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
     </dependencies>
 
 </project>
