@@ -45,24 +45,6 @@
         <url>http://graphaware.com</url>
     </organization>
 
-    <developers>
-        <developer>
-            <id>bachmanm</id>
-            <name>Michal Bachman</name>
-            <email>framework@graphaware.com</email>
-        </developer>
-        <developer>
-            <id>luannem</id>
-            <name>Luanne Misquitta</name>
-            <email>luanne@graphaware.com</email>
-        </developer>
-        <developer>
-            <id>atg</id>
-            <name>Adam George</name>
-            <email>adam@graphaware.com</email>
-        </developer>
-    </developers>
-
     <scm>
         <connection>scm:git:git@github.com:graphaware/neo4j-framework.git</connection>
         <developerConnection>scm:git:git@gitlab.com:graphaware/neo4j-plugins/neo4j-framework.git</developerConnection>
@@ -166,70 +148,6 @@
                 </plugins>
             </build>
         </profile>
-		<profile>
-			<id>default</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<version>${maven.plugin.surefire}</version>
-						<configuration>
-							<includes>
-								<include>**/*Test.java</include>
-							</includes>
-							<excludes>
-								<exclude>**/*TestHighAvailability.java</exclude>
-								<exclude>**/*TestCausalCluster.java</exclude>
-							</excludes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>        
-        <!-- 
-        Run only the integration tests for High Availability Cluster
-         -->
-        <profile>
-			<id>ha-test</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<version>${maven.plugin.surefire}</version>
-						<configuration>
-							<includes>
-								<include>**/*TestHighAvailability.java</include>
-							</includes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-        <!-- 
-        Run only the integration tests for Causal Cluster
-         -->
-		<profile>
-			<id>cc-test</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<version>${maven.plugin.surefire}</version>
-						<configuration>
-							<includes>
-								<include>**/*TestCausalCluster.java</include>
-							</includes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>	        
     </profiles>
 
     <properties>
@@ -511,12 +429,6 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-expression</artifactId>
                 <version>${spring.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.transaction</groupId>
-                <artifactId>javax.transaction-api</artifactId>
-                <version>1.2</version>
             </dependency>
 
             <!-- Guava -->
