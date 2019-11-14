@@ -186,7 +186,7 @@ public class RuntimeKernelExtension implements Lifecycle {
         return moduleConfig;
     }
 
-    private boolean isOnEnterprise() {
+    protected boolean isOnEnterprise() {
         try {
             Class.forName("org.neo4j.kernel.impl.enterprise.EnterpriseEditionModule");
             return true;
