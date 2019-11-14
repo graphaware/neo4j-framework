@@ -12,6 +12,14 @@ etc.
 
 See the <a href="http://graphaware.com/neo4j/2014/05/28/graph-aware-neo4j-framework.html" target="_blank">announcement on our blog</a>.
 
+## Community vs Enterprise
+
+This open-source (GPL) version of the GraphAware Framework is compatible with Neo4j Community Edition only. 
+It *will not work* with Neo4j Enterprise Edition, which is a proprietary and commercial software product.
+
+GraphAware offers an Enterprise version of the GraphAware Framework to licensed users of Neo4j Enterprise Edition.
+Please [mailto:info@graphaware.com](get in touch) to receive access.
+
 ## Features Overview
 
 On a high level, there are two key pieces of functionality:
