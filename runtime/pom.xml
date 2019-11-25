@@ -85,12 +85,12 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
 
-                <configuration>
-                    <excludes>META-INF/**</excludes>
-                </configuration>
 
                 <executions>
                     <execution>
+                        <configuration>
+                            <excludes>META-INF/**</excludes>
+                        </configuration>
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
