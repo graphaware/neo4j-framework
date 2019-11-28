@@ -98,4 +98,8 @@ public interface GraphAwareRuntime {
      * @return writer associated with this runtime.
      */
     Neo4jWriter getDatabaseWriter();
+
+    public void setClusterRuntimeUtils(Object clusterRuntimeUtils);
+
+    void restart();
 }

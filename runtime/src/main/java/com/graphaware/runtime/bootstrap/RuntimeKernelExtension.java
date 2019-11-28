@@ -87,6 +87,7 @@ public class RuntimeKernelExtension implements Lifecycle {
     private final Config config;
     private final GraphDatabaseService database;
     private final InstanceRoleUtils instanceRoleUtils;
+    private ClusterRuntimeUtils clusterRuntimeUtils;
 
     public RuntimeKernelExtension(Config config, GraphDatabaseService database) {
         this.config = config;
@@ -119,15 +120,12 @@ public class RuntimeKernelExtension implements Lifecycle {
         registerModules(runtime);
 
         new Thread(() -> {
-            if (databaseIsAvailable()) {
+            waitForDbToStart(runtime, () -> {
                 runtime.start();
-                LOG.info("GraphAware Runtime automatically started.");
-            } else {
-                LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within 5 minutes.");
-            }
+            });
         }, "GraphAware Starter").start();
 
-        LOG.info("GraphAware Runtime bootstrapped, starting the Runtime...");
+        LOG.info("GraphAware Runtime bootstrapped");
     }
 
     private void registerModules(GraphAwareRuntime runtime) {
@@ -185,13 +183,21 @@ public class RuntimeKernelExtension implements Lifecycle {
         return moduleConfig;
     }
 
-    private boolean databaseIsAvailable() {
+    private void waitForDbToStart(GraphAwareRuntime runtime, Runnable startAction) {
         if (instanceRoleUtils.getInstanceRole().equals(InstanceRole.SINGLE)) {
-            return database.isAvailable(SINGLE_MODE_WAIT_TIME);
+            new Thread(() -> {
+                LOG.info("Single mode, waiting for database available");
+                boolean available = database.isAvailable(SINGLE_MODE_WAIT_TIME);
+                if (available) {
+                    LOG.info("Database available, starting the Runtime");
+                    startAction.run();
+                    LOG.info("GraphAware Runtime automatically started.");
+                } else {
+                    LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within 5 minutes.");
+                }
+            }).start();
         } else {
-            ClusterRuntimeUtils clusterRuntimeUtils = new ClusterRuntimeUtils(database);
-
-            return clusterRuntimeUtils.waitClusterIsFormed(SINGLE_MODE_WAIT_TIME);
+            clusterRuntimeUtils = new ClusterRuntimeUtils(database, runtime, startAction);
         }
     }
 

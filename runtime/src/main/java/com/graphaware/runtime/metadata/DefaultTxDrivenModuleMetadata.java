@@ -54,7 +54,7 @@ public class DefaultTxDrivenModuleMetadata implements TxDrivenModuleMetadata {
      * {@inheritDoc}
      */
     public boolean needsInitialization() {
-        return needsInitialization;
+        return true;
     }
 
     /**

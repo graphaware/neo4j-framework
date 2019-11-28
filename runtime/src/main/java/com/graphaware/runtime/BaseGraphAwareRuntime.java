@@ -18,6 +18,7 @@ package com.graphaware.runtime;
 
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.runtime.config.RuntimeConfiguration;
+import com.graphaware.runtime.config.util.ClusterRuntimeUtils;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.event.ErrorState;
@@ -45,6 +46,12 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
     private final RuntimeConfiguration configuration;
 
     private volatile State state = State.NONE;
+
+    private volatile ClusterRuntimeUtils clusterRuntimeUtils = null;
+
+    public void setClusterRuntimeUtils(Object clusterRuntimeUtils) {
+        this.clusterRuntimeUtils = (ClusterRuntimeUtils) clusterRuntimeUtils;
+    }
 
     private enum State {
         NONE,
@@ -224,6 +231,9 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
             }
 
             try {
+                if (clusterRuntimeUtils != null) {
+                    clusterRuntimeUtils.waitClusterIsFormed();
+                }
                 attempts++;
                 if (attempts > 100 && State.REGISTERED.equals(state)) {
                     throw new IllegalStateException("Runtime has not been started!");
@@ -248,6 +258,12 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
         stopWriter();
         afterShutdown();
         LOG.info("GraphAware Runtime shut down.");
+    }
+
+    @Override
+    public final void restart() {
+        beforeShutdown();
+        state = State.REGISTERED;
     }
 
     /**
