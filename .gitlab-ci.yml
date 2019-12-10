@@ -28,6 +28,7 @@ bumpVersion:
       $MAVEN_CLI_OPTS
       -DskipTests=true
       -Darguments=-DskipTests
+    - echo $RELEASE_VERSION > .versionVar.tmp
   only:
     refs:
       - master
