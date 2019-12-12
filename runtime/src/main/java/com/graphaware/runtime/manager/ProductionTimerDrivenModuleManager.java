@@ -33,7 +33,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerDrivenModuleMetadata, TimerDrivenModule> implements TimerDrivenModuleManager {
 
     private final GraphDatabaseService database;
-    private final TaskScheduler taskScheduler;
+    private final TimingStrategy timingStrategy;
+    private volatile TaskScheduler taskScheduler;
 
     /**
      * Constructs a new {@link ProductionTimerDrivenModuleManager} based on the given arguments.
@@ -45,7 +46,7 @@ public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerD
     public ProductionTimerDrivenModuleManager(GraphDatabaseService database, ModuleMetadataRepository metadataRepository, TimingStrategy timingStrategy, StatsCollector statsCollector) {
         super(metadataRepository, statsCollector);
         this.database = database;
-        taskScheduler = new RotatingTaskScheduler(database, metadataRepository, timingStrategy);
+        this.timingStrategy = timingStrategy;
     }
 
     /**
@@ -61,6 +62,9 @@ public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerD
      */
     @Override
     protected TimerDrivenModuleMetadata acknowledgeMetadata(TimerDrivenModule module, TimerDrivenModuleMetadata metadata) {
+        if (taskScheduler == null) {
+            taskScheduler = new RotatingTaskScheduler(database, metadataRepository, timingStrategy);
+        }
         taskScheduler.registerModuleAndContext(module, metadata.lastContext());
         return metadata;
     }
@@ -81,6 +85,9 @@ public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerD
     @Override
     public void shutdownModules() {
         super.shutdownModules();
-        taskScheduler.stop();
+        if (taskScheduler != null) {
+            taskScheduler.stop();
+            taskScheduler = null;
+        }
     }
 }
