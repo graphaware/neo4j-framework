@@ -75,7 +75,9 @@ public class ProductionTimerDrivenModuleManager extends BaseModuleManager<TimerD
     @Override
     public void startModules() {
         super.startModules();
-
+        if (taskScheduler == null) {
+            taskScheduler = new RotatingTaskScheduler(database, metadataRepository, timingStrategy);
+        }
         taskScheduler.start();
     }
 
