@@ -22,7 +22,7 @@
         <version>3.5.12.56-SNAPSHOT</version>
     </parent>
     <artifactId>graphaware-framework-server</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <name>GraphAware Framework Server Build</name>
     <description>Technical Maven Module for Building the Framework for Standalone Use</description>
@@ -52,7 +52,8 @@
                         </relocation>
                     </relocations>
                     <!-- This is module has packaging type pom, otherwise finalName could have been used -->
-                    <outputFile>${project.build.directory}/graphaware-server-all-${project.version}.jar</outputFile>
+                    <!--<outputFile>${project.build.directory}/graphaware-server-all-${project.version}.jar</outputFile>-->
+                    <shadedArtifactAttached>false</shadedArtifactAttached>
                 </configuration>
                 <executions>
                     <execution>

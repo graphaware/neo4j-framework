@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
   ~ Copyright (c) 2013-2019 GraphAware
   ~
@@ -12,9 +13,7 @@
   ~ See the GNU General Public License for more details. You should have received a copy of
   ~ the GNU General Public License along with this program.  If not, see
   ~ <http://www.gnu.org/licenses />.
-  -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.graphaware.neo4j</groupId>
@@ -30,7 +29,8 @@
         <module>parent-pom/framework</module>
         <module>parent-pom/module</module>
         <module>graphaware-apoc-dependency-test</module>
-    </modules>
+    <module>it-tests</module>
+  </modules>
 
     <licenses>
         <license>
@@ -505,6 +505,13 @@
                 <groupId>org.skyscreamer</groupId>
                 <artifactId>jsonassert</artifactId>
                 <version>1.3.0</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers</artifactId>
+                <version>1.12.2</version>
                 <scope>test</scope>
             </dependency>
 
