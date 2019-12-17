@@ -18,6 +18,7 @@ package com.graphaware.runtime;
 
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.runtime.config.RuntimeConfiguration;
+import com.graphaware.runtime.config.util.InstanceRoleUtils;
 import com.graphaware.runtime.config.util.ClusterRuntimeUtils;
 import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -235,7 +236,7 @@ public abstract class BaseGraphAwareRuntime implements GraphAwareRuntime, Kernel
                     clusterRuntimeUtils.waitClusterIsFormed();
                 }
                 attempts++;
-                if (attempts > 100 && State.REGISTERED.equals(state)) {
+                if (attempts > 10_000 && State.REGISTERED.equals(state)) {
                     throw new IllegalStateException("Runtime has not been started!");
                 }
                 TimeUnit.MILLISECONDS.sleep(10);

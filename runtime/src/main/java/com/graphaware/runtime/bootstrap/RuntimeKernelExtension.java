@@ -19,7 +19,9 @@ package com.graphaware.runtime.bootstrap;
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.policy.role.InstanceRole;
 import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.bootstrap.cc.ClusterBootstrap;
 import com.graphaware.runtime.config.Neo4jConfigBasedRuntimeConfiguration;
+import com.graphaware.runtime.config.util.InstanceRoleUtils;
 import com.graphaware.runtime.config.util.InstanceRoleUtils;
 import com.graphaware.runtime.config.util.ClusterRuntimeUtils;
 import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
@@ -30,12 +32,17 @@ import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 import org.neo4j.logging.Log;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.graphaware.runtime.GraphAwareRuntimeFactory.createRuntime;
-import static org.neo4j.kernel.configuration.Settings.*;
+import static org.neo4j.kernel.configuration.Settings.BOOLEAN;
+import static org.neo4j.kernel.configuration.Settings.setting;
 
 /**
  * Neo4j kernel extension that automatically creates a {@link GraphAwareRuntime} and registers
@@ -89,6 +96,8 @@ public class RuntimeKernelExtension implements Lifecycle {
     private final InstanceRoleUtils instanceRoleUtils;
     private ClusterRuntimeUtils clusterRuntimeUtils;
 
+    private ClusterBootstrap clusterBootstrap;
+
     public RuntimeKernelExtension(Config config, GraphDatabaseService database) {
         this.config = config;
         this.database = database;
@@ -119,11 +128,32 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         registerModules(runtime);
 
-        new Thread(() -> {
-            waitForDbToStart(runtime, () -> {
-                runtime.start();
-            });
-        }, "GraphAware Starter").start();
+        clusterBootstrap = new ClusterBootstrap(database, runtime);
+
+
+/*        final InstanceRoleUtils roleUtils = new InstanceRoleUtils(database);
+        final InstanceRole instanceRole = roleUtils.getInstanceRole();
+        switch (instanceRole) {
+            // CAUSAL CLUSTER
+            case FOLLOWER:
+            case CANDIDATE:
+            case LEADER:
+            case READ_REPLICA:
+                LOG.info("Create ClusterBootstrap");
+                clusterBootstrap = new ClusterBootstrap(database, runtime);
+                break;
+
+            case SINGLE:
+                new Thread(() -> {
+                    waitForDbToStart(runtime, () -> {
+                        runtime.start();
+
+                    });
+                }, "GraphAware Starter").start();
+
+            default:
+                LOG.warn("Unsupported instance role %s", instanceRole);
+        }*/
 
         LOG.info("GraphAware Runtime bootstrapped");
     }

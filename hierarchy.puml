@@ -1,0 +1,15 @@
+@startuml
+
+interface GraphAwareRuntime
+
+abstract class BaseGraphAwareRuntime implements GraphAwareRuntime
+abstract class TxDrivenRuntime extends BaseGraphAwareRuntime
+class DatabaseRuntime extends TxDrivenRuntime
+class ProductionRuntime extends DatabaseRuntime
+
+
+class RuntimeKernelExtension implements Lifecycle
+class GraphDatabaseService
+RuntimeKernelExtension *-- GraphDatabaseService
+
+@enduml

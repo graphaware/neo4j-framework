@@ -26,18 +26,41 @@
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>graphaware-framework-server</artifactId>
             <version>3.5.13.56-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers</artifactId>
+            <scope>compile</scope> <!-- This is a test module-->
         </dependency>
 
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>3.13.2</version>
+            <scope>compile</scope> <!-- This is a test module -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.neo4j.driver</groupId>
+            <artifactId>neo4j-java-driver</artifactId>
+            <version>1.7.5</version>
+            <scope>compile</scope> <!-- This is a test module -->
+        </dependency>
+
+        <dependency>
+            <groupId>com.graphaware.neo4j.example</groupId>
+            <artifactId>friendship-strength-counter-module</artifactId>
+            <version>3.5.13.56-SNAPSHOT</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -50,7 +73,7 @@
                 <executions>
                     <execution>
                         <id>copy</id>
-                        <phase>package</phase>
+                        <phase>pre-integration-test</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
@@ -61,6 +84,14 @@
                                     <artifactId>graphaware-framework-server</artifactId>
                                     <!--                                    <version>[ version ]</version>&lt;!&ndash;&ndash;&gt;-->
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>com.graphaware.neo4j.example</groupId>
+                                    <artifactId>friendship-strength-counter-module</artifactId>
+                                </artifactItem>
+<!--                                <artifactItem>
+                                    <groupId>com.graphaware.neo4j</groupId>
+                                    <artifactId>it-test</artifactId>
+                                </artifactItem>-->
                             </artifactItems>
                             <outputDirectory>target/plugins</outputDirectory>
                         </configuration>
