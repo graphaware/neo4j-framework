@@ -19,6 +19,7 @@ package com.graphaware.common.ping;
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.util.VersionReader;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -31,11 +32,16 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.neo4j.ext.udc.UdcSettings;
 import org.neo4j.graphdb.DependencyResolver.SelectionStrategy;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.io.os.OsBeanUtil;
+import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.impl.factory.Edition;
 import org.neo4j.kernel.impl.factory.GraphDatabaseFacade;
 import org.neo4j.kernel.impl.factory.OperationalMode;
+import org.neo4j.kernel.impl.store.id.IdGeneratorFactory;
+import org.neo4j.kernel.impl.store.id.IdType;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 import org.neo4j.logging.Log;
 import org.neo4j.udc.UsageData;
@@ -57,15 +63,23 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
     private String storeId = UNKNOWN;
     private final String version;
     private UsageData usageData;
+    private IdGeneratorFactory idGeneratorFactory;
+    private Config config;
 
     public GoogleAnalyticsStatsCollector(GraphDatabaseService database) {
         if (database instanceof GraphDatabaseFacade) {
             GraphDatabaseFacade graphDatabaseFacade = (GraphDatabaseFacade) database;
             usageData = graphDatabaseFacade.getDependencyResolver().resolveDependency(UsageData.class, SelectionStrategy.FIRST);
+            idGeneratorFactory = graphDatabaseFacade.getDependencyResolver().resolveDependency(IdGeneratorFactory.class, SelectionStrategy.FIRST);
         }
 
         this.database = database;
         this.version = VersionReader.getVersion();
+    }
+
+    public GoogleAnalyticsStatsCollector(GraphDatabaseService database, Config config) {
+        this(database);
+        this.config = config;
     }
 
     private String findStoreIdIfNeeded() {
@@ -150,8 +164,9 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
 
     private String constructBody(String storeId, String appId) {
         String usageDataInfo = constructUsageDataInfo();
+        String otherInfo = collectOtherInfo();
         return "v=1&tid=" + TID + "&cid=" + storeId + "&t=event&ea=" + appId + "&ec=Run&el=" + version
-              + usageDataInfo;
+              + usageDataInfo + otherInfo;
 
     }
 
@@ -182,6 +197,35 @@ public class GoogleAnalyticsStatsCollector implements StatsCollector {
             return "";
         }
     }
+
+    private String collectOtherInfo() {
+        String udcSource = config.get(UdcSettings.udc_source);
+        String udcRegistrationKey = config.get(UdcSettings.udc_registration_key);
+        String os = System.getProperties().getProperty( "os.name");
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        long totalMemory = OsBeanUtil.getTotalPhysicalMemory();
+        long heapSize = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed();
+        long nodeIdsInUse = getNumberOfIdsInUse(IdType.NODE);
+        long propertyIdsInUse = getNumberOfIdsInUse(IdType.PROPERTY);
+        long relationshipIdsInUse = getNumberOfIdsInUse(IdType.RELATIONSHIP);
+        long labelIdsInUse = getNumberOfIdsInUse(IdType.LABEL_TOKEN);
+
+        return "&cd8=" + udcSource
+              + "&cd9=" + udcRegistrationKey
+              + "&cd10=" + os
+              + "&cd11=" + availableProcessors
+              + "&cd12=" + totalMemory
+              + "&cd13=" + heapSize
+              + "&cd14=" + nodeIdsInUse
+              + "&cd15=" + propertyIdsInUse
+              + "&cd16=" + relationshipIdsInUse
+              + "&cd17=" + labelIdsInUse;
+    }
+
+    private long getNumberOfIdsInUse(IdType type) {
+        return idGeneratorFactory.get(type).getNumberOfIdsInUse();
+    }
+
 
     /**
      * {@inheritDoc}

@@ -92,7 +92,7 @@ public class GraphAwareBootstrappingFilter implements Filter {
             LOG.info("Google Analytics enabled");
         }
 
-        return new GoogleAnalyticsStatsCollector(neoServer.getDatabase().getGraph());
+        return new GoogleAnalyticsStatsCollector(neoServer.getDatabase().getGraph(), neoServer.getConfig());
     }
 
     @Override
