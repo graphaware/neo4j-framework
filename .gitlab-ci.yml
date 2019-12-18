@@ -9,7 +9,7 @@ stages:
   - postDeploy
   - triggers
 
-bumpVersion:
+frameworkVersionBump:
   script:
     - NEW_VERSION="${VERSION%.*}.$((${VERSION##*.}+1))-SNAPSHOT"
     - CUSTOM_SPACE='    ' #otherwise bash joins spaces into one
