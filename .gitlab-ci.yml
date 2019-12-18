@@ -71,11 +71,6 @@ triggerRecommendation:
   trigger:
     project: GraphAware/neo4j-plugins/neo4j-reco
 
-triggerTriggers:
-  extends: .trigger
-  trigger:
-    project: GraphAware/neo4j-plugins/neo4j-triggers
-
 triggerTimetree:
   extends: .trigger
   trigger:
@@ -92,3 +87,4 @@ triggerRecommendationsMeetup:
     project: GraphAware/neo4j-plugins/recommendations-meetup
 
 #neo4j-to-elasticsearch is launched from UUID as it depends on it
+#neo4j-triggers is launched from UUID as it depends on it
