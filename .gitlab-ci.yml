@@ -15,7 +15,7 @@ bumpVersion:
     - CUSTOM_SPACE='    ' #otherwise bash joins spaces into one
     - CHANGELOG_MSG="${CHANGELOG_MSG:-${VERSION}:\n${CUSTOM_SPACE}- Upgrade to Neo4j ${VERSION%.*}}\n"
     - echo -e "$CHANGELOG_MSG\n$(cat changes.txt)" > changes.txt # add the message into changes.txt, -e enable special characters (\n)
-    - git commit -a -m "Release with new neo4j version"  #You can add edition of a file to pom using ant-plugin. You can connect it to the goals of the maven release plugin. But this plugin won't commit anything else but POMs!!!
+    - git commit -a -m "[maven-release-plugin] Release with new neo4j version"  #You can add edition of a file to pom using ant-plugin. You can connect it to the goals of the maven release plugin. But this plugin won't commit anything else but POMs!!!
     - mvn release:clean release:prepare
       $MAVEN_CLI_OPTS
       -DreleaseVersion=$VERSION
