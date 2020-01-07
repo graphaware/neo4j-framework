@@ -1,5 +1,7 @@
 package com.graphaware.neo4j.it;
 
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.LogContainerCmd;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
@@ -12,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.output.FrameConsumerResultCallback;
+import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.HttpWaitStrategy;
 import org.testcontainers.utility.DockerLoggerFactory;
@@ -29,6 +33,8 @@ import java.util.function.Consumer;
 import static com.google.common.collect.Lists.newArrayList;
 import static java.time.Duration.ofSeconds;
 import static java.util.Objects.requireNonNull;
+import static org.testcontainers.containers.output.OutputFrame.OutputType.STDERR;
+import static org.testcontainers.containers.output.OutputFrame.OutputType.STDOUT;
 
 public class ContainerizedCausalCluster {
 
@@ -37,6 +43,7 @@ public class ContainerizedCausalCluster {
     private static final int BOLT_PORT = 7687;
     private static final int HTTPS_PORT = 7473;
     private static final int HTTP_PORT = 7474;
+    private static final int DEBUG_PORT = 5005;
 
     private final String baseFolder;
     private final Consumer<GenericContainer<?>> containerSetup;
@@ -68,11 +75,10 @@ public class ContainerizedCausalCluster {
     private GenericContainer<?> neo4jContainer(int number, Network network) {
         String name = "core" + number;
 
-        GenericContainer<?> container = new GenericContainer<>("neo4j:3.5.12-enterprise")
+        GenericContainer<?> container = new GenericContainer<>("neo4j:3.5.13-enterprise")
                 .withNetworkAliases(name)
                 .withNetworkMode("bridge")
                 .withNetwork(network)
-//                .withExposedPorts(HTTPS_PORT, HTTP_PORT, BOLT_PORT)
 //                .withFileSystemBind(baseFolder + name + "/data", "/data")
 //                .withFileSystemBind(baseFolder + name + "/logs", "/logs")
                 .withFileSystemBind(baseFolder + "plugins", "/plugins")
@@ -84,7 +90,14 @@ public class ContainerizedCausalCluster {
 
 //                .withEnv("NEO4J_causal__clustering_leader__election__timeout", "1s") // Should speedup elections
 //                .withEnv("NEO4J_causal__clustering_handshake__timeout", "5s") // Should speedup elections
-                .withEnv("NEO4J_dbms__jvm__additional", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005")
+
+                /*
+                port 5005 is not exposed in this image by default, there is some bug in the testcontainers library which prevents this to be exposed using the portBinding (see below)
+                You can use custom image, see the Dockerfile in resources folder
+                Build with
+                $ docker build . --tag neo4j:3.5.13-enterprise-custom
+                 */
+//                .withEnv("NEO4J_dbms_jvm_additional", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005")
                 .withEnv("NEO4J_causal__clustering_minimum__core__cluster__size__at__formation", "3")
                 .withEnv("NEO4J_causal__clustering_minimum__core__cluster__size__at__runtime", "3")
                 .withEnv("NEO4J_causal__clustering_initial__discovery__members", "core1:5000,core2:5000,core3:5000");
@@ -98,10 +111,12 @@ public class ContainerizedCausalCluster {
         final int http = HTTP_PORT + 10_000 * number;
         int https = HTTPS_PORT + 10_000 * number;
         int bolt = BOLT_PORT + 10_000 * number;
+        int debug = DEBUG_PORT + 10_000 * number;
         List<String> bindings = newArrayList(
                 http + ":" + HTTP_PORT,
                 https + ":" + HTTPS_PORT,
-                bolt + ":" + BOLT_PORT
+                bolt + ":" + BOLT_PORT,
+                debug + ":" + DEBUG_PORT
                 );
 
         container.setPortBindings(bindings);
@@ -137,7 +152,7 @@ public class ContainerizedCausalCluster {
     }
 
     private void awaitCoreStartup(GenericContainer<?> container, Duration timeout) {
-        long start = System.currentTimeMillis();
+        /*long start = System.currentTimeMillis();
         while (true) {
             String logs = container.getLogs();
 
@@ -153,11 +168,11 @@ public class ContainerizedCausalCluster {
             } catch (InterruptedException e) {
                 throw new RuntimeException("Interupted while waiting for core to come up", e);
             }
-        }
+        }*/
 
-       /*new HttpWaitStrategy()
+       new HttpWaitStrategy()
                .forPort(HTTP_PORT)
-               .waitUntilReady(container);*/
+               .waitUntilReady(container);
 
         // This expects 1 network, testcontainers can't do more than 1 currently
         String ip = container.getContainerInfo().getNetworkSettings().getNetworks().values().iterator().next().getIpAddress();
@@ -251,7 +266,7 @@ public class ContainerizedCausalCluster {
         for (int i = 1; i < cores.size(); i++) {
             GenericContainer<?> core = cores.get(i);
             core.getDockerClient().restartContainerCmd(core.getContainerId()).exec();
-            LogUtils.followOutput(core.getDockerClient(), core.getContainerId(), new Slf4jLogConsumer(DockerLoggerFactory.getLogger("core" + i)));
+            followOutput(core.getDockerClient(), core.getContainerId(), new Slf4jLogConsumer(DockerLoggerFactory.getLogger("core" + i)));
         }
 
         for (int i = 1; i < cores.size(); i++) {
@@ -259,5 +274,31 @@ public class ContainerizedCausalCluster {
         }
         final int leader = leader();
         log.info("Cluster restarted, leader={}", leader);
+    }
+
+    public void restartCore(int number) {
+        int leader = leader();
+        log.info("Restarting core={}, current leader={}", number, leader);
+
+        final GenericContainer<?> core = cores.get(number);
+        core.getDockerClient().restartContainerCmd(core.getContainerId()).exec();
+        followOutput(core.getDockerClient(), core.getContainerId(), new Slf4jLogConsumer(DockerLoggerFactory.getLogger("core" + number)));
+
+        awaitCoreStartup(core, Duration.ofSeconds(120));
+        leader = leader();
+        log.info("Restarted core={}, current leader={}", number, leader);
+    }
+
+    private static void followOutput(DockerClient dockerClient, String containerId, Consumer<OutputFrame> consumer) {
+        OutputFrame.OutputType[] types = {STDOUT, STDOUT};
+        final LogContainerCmd cmd = dockerClient.logContainerCmd(containerId).withFollowStream(true)
+                .withSince((int) TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()));
+        final FrameConsumerResultCallback callback = new FrameConsumerResultCallback();
+        for (OutputFrame.OutputType type : types) {
+            callback.addConsumer(type, consumer);
+            if (type == STDOUT) cmd.withStdOut(true);
+            if (type == STDERR) cmd.withStdErr(true);
+        }
+        cmd.exec(callback);
     }
 }

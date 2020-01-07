@@ -1,0 +1,39 @@
+@startuml
+
+Neo4j -> BaseGraphAwareRuntime : start()
+BaseGraphAwareRuntime -> ProductionRuntime : startModules()
+ProductionRuntime -> TxDrivenRuntime : startModules()
+TxDrivenRuntime -> BaseGraphAwareRuntime : startModules()
+BaseGraphAwareRuntime -> ProductionRuntime : loadMetadata()
+
+ProductionRuntime -> TxDrivenRuntime : loadMetadata()
+TxDrivenRuntime -> BaseModuleManager : loadMetadata()
+BaseModuleManager -> BaseModuleManager : loadMetadata(T module)
+BaseModuleManager -> ModuleMetadataRepository : getModuleMetadata(module)
+BaseModuleManager -> BaseTxDrivenModuleManager : handleNoMetadata(module)
+BaseTxDrivenModuleManager -> BaseTxDrivenModuleManager : initializeIfAllowed(module)
+'maybe more detail here
+BaseTxDrivenModuleManager -> ProductionTxDrivenModuleManager : initialize(module)
+ProductionTxDrivenModuleManager -> TxDrivenModule : initialize(database)
+
+BaseModuleManager -> BaseTxDrivenModuleManager : handleCorruptMetadata(module)
+BaseTxDrivenModuleManager -> BaseTxDrivenModuleManager : reinitializeIfAllowed(module)
+'maybe more detail here
+BaseTxDrivenModuleManager -> ProductionTxDrivenModuleManager : reinitialize(module)
+ProductionTxDrivenModuleManager -> TxDrivenModule : reinitialize(database)
+
+BaseModuleManager -> BaseTxDrivenModuleManager : createFreshMetadata(module)
+
+BaseModuleManager -> BaseTxDrivenModuleManager : acknowledgeMetadata(module, metadata)
+BaseTxDrivenModuleManager -> TxDrivenModuleMetadata : needsInitialization()
+BaseTxDrivenModuleManager -> BaseTxDrivenModuleManager : reinitializeIfAllowed(module, metadata)
+BaseTxDrivenModuleManager -> BaseTxDrivenModuleManager : createFreshMetadata(module, metadata)
+
+BaseModuleManager -> BaseModuleManager : persistMetadata(module, metadata)
+BaseModuleManager -> ModuleMetadataRepository : persistModuleMetadata(module, metadata)
+
+ProductionRuntime -> TimerDriverModuleManager : loadMetadata()
+' similar chain to above, different ModuleManager
+
+
+@enduml

@@ -130,6 +130,11 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         clusterBootstrap = new ClusterBootstrap(database, runtime);
 
+        new Thread(() -> {
+            waitForDbToStart(runtime, () -> {
+                runtime.start();
+            });
+        }, "GraphAware Starter").start();
 
 /*        final InstanceRoleUtils roleUtils = new InstanceRoleUtils(database);
         final InstanceRole instanceRole = roleUtils.getInstanceRole();
