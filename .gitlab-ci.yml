@@ -28,11 +28,25 @@ frameworkVersionBump:
       - master
     variables:
       - $VERSION
+  artifacts: #used for s3 upload
+    paths:
+      - api/target
+      - build/graphaware-framework-server/target
+    only:
+      refs:
+        - master
+      variables:
+        - $VERSION
 
-uploadToS3:
-  before_script:
-    - FROM="target/checkout/build/graphaware-framework-server/target/graphaware-server-all-$VERSION.jar"
-    - TO="$AWS_PATH/graphaware-server-all-$VERSION.jar"
+  uploadToS3:
+    before_script:
+      - FROM="build/graphaware-framework-server/target/graphaware-server-all-$VERSION.jar"
+      - TO="$AWS_PATH/graphaware-server-all-$VERSION.jar"
+    only:
+      refs:
+        - master
+      variables:
+        - $VERSION
 
 publishJavaDoc:
   extends: .publishJavaDoc
