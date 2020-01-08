@@ -34,6 +34,18 @@ uploadToS3:
     - FROM="target/checkout/build/graphaware-framework-server/target/graphaware-server-all-$VERSION.jar"
     - TO="$AWS_PATH/graphaware-server-all-$VERSION.jar"
 
+publishJavaDoc:
+  extends: .publishJavaDoc
+  variables:
+    FROM: api/target/apidocs
+    TO: framework
+  before_script: []
+  only:
+    refs:
+      - master
+    variables:
+      - $VERSION
+
 #Delay triggers by 30 minutes - maven central needs some time to process the artifacts
 delay30mins:
   extends: .delay30mins
