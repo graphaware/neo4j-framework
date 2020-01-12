@@ -50,9 +50,9 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * Unit test for {@link ProductionRuntime}.
+ * Unit test for {@link CommunityRuntime}.
  */
-public class ProductionRuntimeTest {
+public class CommunityRuntimeTest {
 
     private static final int DELAY = 200;
     private static final int INITIAL_DELAY = 1000;
