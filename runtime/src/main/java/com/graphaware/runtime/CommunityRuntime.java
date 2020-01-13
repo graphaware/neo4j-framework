@@ -97,14 +97,6 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
         database.registerTransactionEventHandler(this);
         database.registerKernelEventHandler(this);
 
-//        // Register to topology change events
-//        // In Community Edition this raises a ClassNotFoundException
-//        try {
-//            this.topologyListenerAdapter = new TopologyListenerAdapter((GraphDatabaseAPI) database, configuration.kernelConfig());
-//        } catch (Exception exception) {
-//            LOG.warn("Failed to register topology listener", exception);
-//        }
-
         RuntimeRegistry.registerRuntime(database, this);
     }
 
@@ -112,7 +104,7 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      * {@inheritDoc}
      */
     @Override
-    public final synchronized void registerModule(RuntimeModule module) {
+    public synchronized void registerModule(RuntimeModule module) {
         if (!State.REGISTERED.equals(state)) {
             LOG.error("Modules must be registered before GraphAware Runtime is started!");
             throw new IllegalStateException("Modules must be registered before GraphAware Runtime is started!");
@@ -126,11 +118,6 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
         if (module instanceof TxDrivenModule) {
             txDrivenModuleManager.registerModule((TxDrivenModule) module);
         }
-
-//        // If the module is a TopologyChangeEventListener then we should register this module as a listener
-//        if (this.topologyListenerAdapter != null && module instanceof TopologyChangeEventListener) {
-//            this.topologyListenerAdapter.registerListener((TopologyChangeEventListener) module);
-//        }
 
         if (module instanceof TimerDrivenModule) {
             timerDrivenModuleManager.registerModule((TimerDrivenModule) module);
@@ -160,12 +147,17 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
         state = State.STARTING;
 
         startStatsCollector();
-        startModules();
-        startWriter();
+
+        doStart();
 
         state = State.STARTED;
         LOG.info("GraphAware started.");
         STARTING.set(false);
+    }
+
+    protected void doStart() {
+        startModules();
+        startWriter();
     }
 
     /**
@@ -302,24 +294,22 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      * {@inheritDoc}
      */
     @Override
-    public final void beforeShutdown() {
+    public void beforeShutdown() {
         LOG.info("Shutting down GraphAware Runtime... ");
 
         state = State.SHUTDOWN;
 
-        txDrivenModuleManager.shutdownModules();
-        timerDrivenModuleManager.shutdownModules();
-        getDatabaseWriter().stop();
+        doStop();
 
         RuntimeRegistry.removeRuntime(database);
 
-//        // Remove all listeners and un-register adapter
-//        if (this.topologyListenerAdapter != null) {
-//            this.topologyListenerAdapter.unregister();
-//            this.topologyListenerAdapter = null;
-//        }
-
         LOG.info("GraphAware Runtime shut down.");
+    }
+
+    protected void doStop() {
+        txDrivenModuleManager.shutdownModules();
+        timerDrivenModuleManager.shutdownModules();
+        getDatabaseWriter().stop();
     }
 
     /**
