@@ -45,33 +45,6 @@ public class GraphUnitTest extends EmbeddedDatabaseIntegrationTest {
     }
 
     @Test
-    public void clearGraphWithRuntimeShouldDeleteAllNodesAndRelsButNotGraphProps() {
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(getDatabase());
-        runtime.registerModule(new TestRuntimeModule("test", Collections.singletonMap("test", "test")));
-        runtime.start();
-
-        try (Transaction tx = getDatabase().beginTx()) {
-            String cypher = "CREATE " +
-                    "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
-                    "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
-
-            populateDatabase(cypher);
-            tx.success();
-        }
-
-        try (Transaction tx = getDatabase().beginTx()) {
-            clearGraph(getDatabase(), InclusionPoliciesFactory.allBusiness());
-            tx.success();
-        }
-
-        try (Transaction tx = getDatabase().beginTx()) {
-            assertEquals(0, count(getDatabase().getAllNodes()));
-            assertTrue(new GraphKeyValueStore(getDatabase()).hasKey("_GA_TX_MODULE_test"));
-            tx.success();
-        }
-    }
-
-    @Test
     public void equalGraphsWithRuntimeShouldPassSameGraphTestBusinessStrategies() {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(getDatabase());
         runtime.start();

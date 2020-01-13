@@ -22,6 +22,7 @@ import com.graphaware.runtime.manager.ProductionTimerDrivenModuleManager;
 import com.graphaware.runtime.manager.ProductionTxDrivenModuleManager;
 import com.graphaware.runtime.manager.TimerDrivenModuleManager;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
+import com.graphaware.runtime.metadata.DummyModuleMetadataRepository;
 import com.graphaware.runtime.metadata.GraphPropertiesMetadataRepository;
 import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.module.TxDrivenModule;
@@ -60,8 +61,8 @@ public final class GraphAwareRuntimeFactory {
      * @return runtime.
      */
     public static GraphAwareRuntime createRuntime(GraphDatabaseService database, RuntimeConfiguration configuration) {
-        ModuleMetadataRepository timerRepo = new GraphPropertiesMetadataRepository(database, configuration, TIMER_MODULES_PROPERTY_PREFIX);
-        ModuleMetadataRepository txRepo = new GraphPropertiesMetadataRepository(database, configuration, TX_MODULES_PROPERTY_PREFIX);
+        ModuleMetadataRepository timerRepo = new DummyModuleMetadataRepository();
+        ModuleMetadataRepository txRepo = new DummyModuleMetadataRepository();
 
         TimerDrivenModuleManager timerDrivenModuleManager = new ProductionTimerDrivenModuleManager(database, timerRepo, configuration.getTimingStrategy(), configuration.getStatsCollector());
         TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new ProductionTxDrivenModuleManager(database, txRepo, configuration.getStatsCollector());
