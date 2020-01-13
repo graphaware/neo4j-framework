@@ -22,7 +22,7 @@
         <version>3.5.14.56-SNAPSHOT</version>
     </parent>
     <artifactId>graphaware-framework-server</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <name>GraphAware Framework Server Build</name>
     <description>Technical Maven Module for Building the Framework for Standalone Use</description>

@@ -226,6 +226,13 @@
                 <version>3.5.14.56-SNAPSHOT</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>uuid</artifactId>
+                <version>3.5.14.55.19</version>
+                <scope>test</scope>
+            </dependency>
+
             <!-- Neo4j -->
 
             <dependency>

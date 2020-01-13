@@ -69,7 +69,6 @@
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>uuid</artifactId>
-            <version>3.5.11.54.19</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -84,13 +83,8 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-
-
                 <executions>
                     <execution>
-                        <configuration>
-                            <excludes>META-INF/**</excludes>
-                        </configuration>
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
