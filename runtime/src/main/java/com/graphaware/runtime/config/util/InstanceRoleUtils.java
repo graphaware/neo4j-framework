@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime.config.util;
 
+import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.policy.role.InstanceRole;
 import org.neo4j.causalclustering.core.consensus.RaftMachine;
 import org.neo4j.causalclustering.core.consensus.roles.Role;
@@ -24,6 +25,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.ha.cluster.member.ClusterMembers;
 import org.neo4j.kernel.impl.factory.OperationalMode;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
+import org.neo4j.logging.Log;
 import org.neo4j.udc.UsageData;
 import org.neo4j.udc.UsageDataKey;
 
@@ -32,7 +34,7 @@ import org.neo4j.udc.UsageDataKey;
  */
 public class InstanceRoleUtils {
 
-//	private static final Log LOG = LoggerFactory.getLogger(InstanceRoleUtils.class);
+	private static final Log LOG = LoggerFactory.getLogger(InstanceRoleUtils.class);
 
 	/**
 	 * The database instance
@@ -85,6 +87,8 @@ public class InstanceRoleUtils {
 		default:
 			res = InstanceRole.SINGLE;
 		}
+
+		LOG.info("Running as " + res.name());
 		return res;
 	}
 

@@ -136,16 +136,17 @@ public abstract class BaseTxDrivenModuleManager<T extends TxDrivenModule> extend
     }
 
     private boolean allowedToInitialize(T module, String logMessage) {
-        if (instanceRoleUtils.getInstanceRole().isReadOnly()) {
-            LOG.info("Instance not writable. Will NOT " + logMessage + ".");
-            return false;
-        }
-
         long initUntil = module.getConfiguration().initializeUntil();
         long now = System.currentTimeMillis();
 
         if (initUntil > now) {
-            LOG.info("InitializeUntil set to " + initUntil + " and it is " + now + ". Will " + logMessage + ".");
+            LOG.info("InitializeUntil set to " + initUntil + " and it is " + now + ". Will try to " + logMessage + ".");
+
+            if (instanceRoleUtils.getInstanceRole().isReadOnly()) {
+                LOG.info("Instance not writable. Will NOT " + logMessage + ".");
+                return false;
+            }
+
             return true;
         } else {
             LOG.info("InitializeUntil set to " + initUntil + " and it is " + now + ". Will NOT " + logMessage + ".");
