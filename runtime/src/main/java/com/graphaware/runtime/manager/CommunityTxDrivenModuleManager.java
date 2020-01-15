@@ -36,9 +36,9 @@ import java.util.Map;
 /**
  * {@link BaseModuleManager} for {@link TxDrivenModule}s.
  */
-public class ProductionTxDrivenModuleManager<T extends TxDrivenModule> extends BaseModuleManager<TxDrivenModuleMetadata, T> implements TxDrivenModuleManager<T> {
+public class CommunityTxDrivenModuleManager<T extends TxDrivenModule> extends BaseModuleManager<TxDrivenModuleMetadata, T> implements TxDrivenModuleManager<T> {
 
-    private static final Log LOG = LoggerFactory.getLogger(ProductionTxDrivenModuleManager.class);
+    private static final Log LOG = LoggerFactory.getLogger(CommunityTxDrivenModuleManager.class);
 
     private final GraphDatabaseService database;
 
@@ -49,7 +49,7 @@ public class ProductionTxDrivenModuleManager<T extends TxDrivenModule> extends B
      * @param metadataRepository repository for storing module metadata.
      * @param statsCollector     stats collector.
      */
-    public ProductionTxDrivenModuleManager(GraphDatabaseService database, ModuleMetadataRepository metadataRepository, StatsCollector statsCollector) {
+    public CommunityTxDrivenModuleManager(GraphDatabaseService database, ModuleMetadataRepository metadataRepository, StatsCollector statsCollector) {
         super(metadataRepository, statsCollector);
         this.database = database;
     }

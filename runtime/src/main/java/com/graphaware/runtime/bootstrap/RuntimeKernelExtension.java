@@ -80,6 +80,8 @@ public class RuntimeKernelExtension implements Lifecycle {
     public static final Setting<Boolean> RUNTIME_ENABLED = setting("com.graphaware.runtime.enabled", BOOLEAN, "false");
     public static final String MODULE_CONFIG_KEY = "com.graphaware.module"; //.ID.Order = fully qualified class name of bootstrapper
     private static final Pattern MODULE_ENABLED_KEY = Pattern.compile("com\\.graphaware\\.module\\.([a-zA-Z0-9]{1,})\\.([0-9]{1,})");
+    private static final int WAIT_MINUTES = 5;
+    private static final int WAIT_MS = WAIT_MINUTES * 60 * 1000;
 
     protected final Config config;
     protected final GraphDatabaseService database;
@@ -93,7 +95,7 @@ public class RuntimeKernelExtension implements Lifecycle {
      * {@inheritDoc}
      */
     @Override
-    public void init() throws Throwable {
+    public void init() {
         if (isOnEnterprise()) {
             throw new RuntimeException("GraphAware Framework Community Edition is not supported on Neo4j Enterprise. Please email info@graphaware.com to get access to GraphAware Framework Enterprise Edition instead.");
         }
@@ -103,7 +105,7 @@ public class RuntimeKernelExtension implements Lifecycle {
      * {@inheritDoc}
      */
     @Override
-    public void start() throws Throwable {
+    public void start() {
         if (!config.get(RUNTIME_ENABLED)) {
             LOG.info("GraphAware Runtime disabled.");
             return;
@@ -116,15 +118,19 @@ public class RuntimeKernelExtension implements Lifecycle {
         registerModules(runtime);
 
         new Thread(() -> {
-            if (database.isAvailable(5 * 60 * 1000)) {
+            if (databaseIsAvailable()) {
                 runtime.start();
                 LOG.info("GraphAware Runtime automatically started.");
             } else {
-                LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within 5 minutes.");
+                LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within " + WAIT_MINUTES + " minutes.");
             }
         }, "GraphAware Starter").start();
 
         LOG.info("GraphAware Runtime bootstrapped, starting the Runtime...");
+    }
+
+    protected boolean databaseIsAvailable() {
+        return database.isAvailable(WAIT_MS);
     }
 
     protected GraphAwareRuntime createRuntime() {
@@ -190,7 +196,7 @@ public class RuntimeKernelExtension implements Lifecycle {
         try {
             Class.forName("org.neo4j.kernel.impl.enterprise.EnterpriseEditionModule");
             return true;
-        } catch(Exception e) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -199,7 +205,7 @@ public class RuntimeKernelExtension implements Lifecycle {
      * {@inheritDoc}
      */
     @Override
-    public void stop() throws Throwable {
+    public void stop() {
         //do nothing
     }
 
@@ -207,7 +213,7 @@ public class RuntimeKernelExtension implements Lifecycle {
      * {@inheritDoc}
      */
     @Override
-    public void shutdown() throws Throwable {
+    public void shutdown() {
         //do nothing
     }
 }

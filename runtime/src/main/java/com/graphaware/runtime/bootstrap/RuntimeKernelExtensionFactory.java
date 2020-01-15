@@ -28,7 +28,6 @@ import org.neo4j.logging.internal.LogService;
 /**
  * {@link KernelExtensionFactory} that initializes the {@link RuntimeKernelExtension}.
  */
-@Service.Implementation(KernelExtensionFactory.class)
 public class RuntimeKernelExtensionFactory extends KernelExtensionFactory<RuntimeKernelExtensionFactory.Dependencies> {
 
     public interface Dependencies {

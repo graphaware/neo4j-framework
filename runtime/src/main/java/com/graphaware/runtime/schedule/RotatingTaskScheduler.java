@@ -85,7 +85,7 @@ public class RotatingTaskScheduler implements TaskScheduler {
      */
     @Override
     public void start() {
-        if (moduleContexts.isEmpty()) {
+        if (!shouldStart()) {
             LOG.info("There are no timer-driven runtime modules. Not scheduling any tasks.");
             return;
         }
@@ -95,6 +95,10 @@ public class RotatingTaskScheduler implements TaskScheduler {
         timingStrategy.initialize(database);
 
         scheduleNextTask(NEVER_RUN);
+    }
+
+    protected boolean shouldStart() {
+        return !moduleContexts.isEmpty();
     }
 
     /**

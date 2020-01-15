@@ -146,18 +146,17 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
         LOG.info("Starting GraphAware...");
         state = State.STARTING;
 
-        startStatsCollector();
+        beforeStart();
 
-        doStart();
+        startStatsCollector();
+        handleModuleMetadata();
+
+        startModules();
+        startWriter();
 
         state = State.STARTED;
         LOG.info("GraphAware started.");
         STARTING.set(false);
-    }
-
-    protected void doStart() {
-        startModules();
-        startWriter();
     }
 
     /**
@@ -168,9 +167,9 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
     }
 
     /**
-     * Perform the actual start of the runtime, being certain that it is the right time to do so.
+     * Load and verify metadata, perform initialization if needed.
      */
-    private void startModules() {
+    protected void handleModuleMetadata() {
         LOG.info("Loading module metadata...");
 
         Set<String> moduleIds = new HashSet<>();
@@ -181,7 +180,12 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
         timerDrivenModuleManager.cleanupMetadata(moduleIds);
 
         LOG.info("Module metadata loaded.");
+    }
 
+    /**
+     * Start the modules.
+     */
+    private void startModules() {
         txDrivenModuleManager.startModules();
         timerDrivenModuleManager.startModules();
     }
@@ -191,6 +195,13 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      */
     private void startWriter() {
         getDatabaseWriter().start();
+    }
+
+    /**
+     * Start whatever subclasses want to start.
+     */
+    protected void beforeStart() {
+
     }
 
     /**
