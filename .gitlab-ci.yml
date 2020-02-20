@@ -32,21 +32,16 @@ frameworkVersionBump:
     paths:
       - api/target
       - build/graphaware-framework-server/target
-    only:
-      refs:
-        - master
-      variables:
-        - $VERSION
 
-  uploadToS3:
-    before_script:
-      - FROM="build/graphaware-framework-server/target/graphaware-server-all-$VERSION.jar"
-      - TO="$AWS_PATH/graphaware-server-all-$VERSION.jar"
-    only:
-      refs:
-        - master
-      variables:
-        - $VERSION
+uploadToS3:
+  before_script:
+    - FROM="build/graphaware-framework-server/target/graphaware-server-all-$VERSION.jar"
+    - TO="$AWS_PATH/graphaware-server-all-$VERSION.jar"
+  only:
+    refs:
+      - master
+    variables:
+      - $VERSION
 
 publishJavaDoc:
   extends: .publishJavaDoc
