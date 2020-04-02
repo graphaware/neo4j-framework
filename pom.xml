@@ -52,6 +52,13 @@
         <tag>HEAD</tag>
     </scm>
 
+    <developers>
+        <developer>
+            <id>ga</id>
+            <name>GraphAware</name>
+        </developer>
+    </developers>
+
     <repositories>
         <repository>
             <id>central</id>

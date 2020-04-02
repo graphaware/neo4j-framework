@@ -22,7 +22,7 @@
         <version>3.5.14.56-SNAPSHOT</version>
     </parent>
     <artifactId>graphaware-framework-embedded</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
 
     <name>GraphAware Framework Build</name>
     <description>Technical Maven Module for Building the Framework for Embedded Use</description>
@@ -51,5 +51,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
