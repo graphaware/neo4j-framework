@@ -18,7 +18,7 @@ This open-source (GPL) version of the GraphAware Framework is compatible with Ne
 It *will not work* with Neo4j Enterprise Edition, which is a proprietary and commercial software product.
 
 GraphAware offers an Enterprise version of the GraphAware Framework to licensed users of Neo4j Enterprise Edition.
-Please [mailto:info@graphaware.com](get in touch) to receive access.
+Please [get in touch](mailto:info@graphaware.com) to receive access.
 
 ## Features Overview
 
