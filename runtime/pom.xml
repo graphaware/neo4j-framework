@@ -83,11 +83,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/META-INF/services/**</exclude>
-                    </excludes>
-                </configuration>
                 <executions>
                     <execution>
                         <goals>
