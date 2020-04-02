@@ -210,6 +210,6 @@ public final class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfi
             return NullStatsCollector.getInstance();
         }
 
-        return new GoogleAnalyticsStatsCollector(database);
+        return new GoogleAnalyticsStatsCollector(database, config);
     }
 }
