@@ -19,8 +19,12 @@ package com.graphaware.example;
 import com.graphaware.test.integration.GraphAwareIntegrationTest;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
+import org.neo4j.driver.Result;
+import org.neo4j.driver.Session;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -38,16 +42,24 @@ public class FriendshipStrengthModuleServerIntegrationTest extends GraphAwareInt
 
     @Test
     public void totalFriendshipStrengthOnEmptyDatabaseShouldBeZero() {
-        assertEquals("0", httpClient.get(baseUrl() + "/friendship/strength", HttpStatus.SC_OK));
+        try (Session session = driver.session()) {
+            Result result = session.run("MATCH (n:FriendshipCounter) RETURN n.totalFriendshipStrength");
+            assertFalse(result.hasNext());
+        }
     }
 
     @Test
     public void totalFriendshipStrengthShouldBeCorrectlyCalculated() {
-        httpClient.executeCypher(baseNeoUrl(),
-                "CREATE " +
-                        "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
-                        "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
+        try (Session session = driver.session()) {
+            session.run("CREATE " +
+                    "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
+                    "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
+        }
 
-        assertEquals("3", httpClient.get(baseUrl() + "/friendship/strength", HttpStatus.SC_OK));
+        try (Session session = driver.session()) {
+            Result result = session.run("MATCH (n:FriendshipCounter) RETURN n.totalFriendshipStrength");
+            assertTrue(result.hasNext());
+            assertEquals(3L, result.next().get(0).asNumber());
+        }
     }
 }

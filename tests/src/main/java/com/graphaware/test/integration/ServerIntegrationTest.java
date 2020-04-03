@@ -17,14 +17,21 @@
 package com.graphaware.test.integration;
 
 import com.graphaware.test.util.TestHttpClient;
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.helpers.HostnamePort;
 import org.neo4j.helpers.ListenSocketAddress;
+import org.neo4j.kernel.configuration.ConnectorPortRegister;
+import org.neo4j.logging.FormattedLogProvider;
+import org.neo4j.logging.LogProvider;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.helpers.CommunityServerBuilder;
 import org.springframework.core.io.ClassPathResource;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
@@ -55,24 +62,21 @@ import java.util.Properties;
  */
 public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
 
-    private static final int DEFAULT_NEO_PORT = 7575;
-
     private NeoServer server;
-
-    protected TestHttpClient httpClient;
+    protected Driver driver;
 
     @Override
     public void setUp() throws Exception {
         if (autoStart()) {
             startServer(); //super.setUp() called there!
         }
-        httpClient = createHttpClient();
+        driver = createDriver();
     }
 
     @Override
     public void tearDown() throws Exception {
-        if (httpClient != null) {
-            httpClient.close();
+        if (driver != null) {
+            driver.close();
         }
         stopServer();
         super.tearDown();
@@ -86,13 +90,8 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
         return server.getDatabase().getGraph();
     }
 
-    /**
-     * Creates a {@link TestHttpClient}. Override for configuring the client.
-     *
-     * @return test client.
-     */
-    protected TestHttpClient createHttpClient() {
-        return new TestHttpClient();
+    private Driver createDriver() {
+        return GraphDatabase.driver(baseNeoUrl(), AuthTokens.none());
     }
 
     /**
@@ -134,7 +133,7 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
      * @return server builder.
      */
     protected CommunityServerBuilder createServerBuilder() {
-        return CommunityServerBuilder.server();
+        return CommunityServerBuilder.server(FormattedLogProvider.toOutputStream(System.out));
     }
 
     /**
@@ -147,11 +146,7 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
      * @param builder to populate.
      */
     protected CommunityServerBuilder configure(CommunityServerBuilder builder) throws IOException {
-        builder = builder.onAddress(new ListenSocketAddress("localhost", neoServerPort()));
-
-        for (Map.Entry<String, String> mapping : thirdPartyJaxRsPackageMappings().entrySet()) {
-            builder = builder.withThirdPartyJaxRsPackage(mapping.getKey(), mapping.getValue());
-        }
+        builder = builder.onRandomPorts();
 
         builder = builder.withProperty(GraphDatabaseSettings.auth_enabled.name(), Boolean.toString(authEnabled()));
 
@@ -171,19 +166,6 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
     }
 
     /**
-     * Provide information for registering unmanaged extensions.
-     * <p>
-     * This method is only called iff {@link #configFile()} returns <code>null</code>.
-     *
-     * @return map where the key is the package in which a set of extensions live and value is the mount point of those
-     * extensions, i.e., a URL under which they will be exposed relative to the server address
-     * (typically http://localhost:7575 for tests).
-     */
-    protected Map<String, String> thirdPartyJaxRsPackageMappings() {
-        return Collections.emptyMap();
-    }
-
-    /**
      * Provide additional server configuration.
      * <p>
      * This method is only called iff {@link #configFile()} returns <code>null</code>.
@@ -192,15 +174,6 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
      */
     protected Map<String, String> additionalServerConfiguration() {
         return Collections.emptyMap();
-    }
-
-    /**
-     * Provide the port number on which the server will run.
-     *
-     * @return port number.
-     */
-    protected int neoServerPort() {
-        return DEFAULT_NEO_PORT;
     }
 
     /**
@@ -218,7 +191,7 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
      * @return base URL.
      */
     protected String baseNeoUrl() {
-        return "http://localhost:" + neoServerPort();
+        return "bolt://" + this.server.getDatabase().getGraph().getDependencyResolver().resolveDependency(ConnectorPortRegister.class).getLocalAddress("bolt");
     }
 
     private void doStartServer() throws IOException {

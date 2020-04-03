@@ -47,13 +47,6 @@
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
-                <artifactId>api</artifactId>
-                <version>3.5.14.59-SNAPSHOT</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.graphaware.neo4j</groupId>
                 <version>3.5.14.59-SNAPSHOT</version>
                 <artifactId>common</artifactId>
                 <scope>provided</scope>
@@ -89,13 +82,6 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer-api</artifactId>
-                <version>3.5.14.59-SNAPSHOT</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.graphaware.neo4j</groupId>
-                <artifactId>server</artifactId>
                 <version>3.5.14.59-SNAPSHOT</version>
                 <scope>provided</scope>
             </dependency>
