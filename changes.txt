@@ -1,3 +1,6 @@
+3.5.19.58:
+    - Upgrade to Neo4j 3.5.19
+
 3.5.14.58:
     - remove all Neo4j EE dependencies
 

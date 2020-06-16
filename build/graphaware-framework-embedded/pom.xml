@@ -19,7 +19,7 @@
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>build</artifactId>
-        <version>3.5.14.59-SNAPSHOT</version>
+        <version>3.5.19.58-SNAPSHOT</version>
     </parent>
     <artifactId>graphaware-framework-embedded</artifactId>
     <packaging>pom</packaging>

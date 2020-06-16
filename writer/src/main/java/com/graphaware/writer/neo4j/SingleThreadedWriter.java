@@ -21,8 +21,6 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.logging.Log;
 import com.graphaware.common.log.LoggerFactory;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.concurrent.*;
 
 import static java.util.concurrent.Executors.callable;
@@ -64,7 +62,6 @@ public abstract class SingleThreadedWriter extends QueueBackedScheduledService<R
     /**
      * {@inheritDoc}
      */
-    @PostConstruct
     public void start() {
         super.start();
     }
@@ -72,7 +69,6 @@ public abstract class SingleThreadedWriter extends QueueBackedScheduledService<R
     /**
      * {@inheritDoc}
      */
-    @PreDestroy
     public void stop() {
         super.stop();
     }

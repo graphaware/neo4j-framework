@@ -14,12 +14,13 @@
   ~ <http://www.gnu.org/licenses />.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>graphaware-parent</artifactId>
-    <version>3.5.14.59-SNAPSHOT</version>
+    <version>3.5.19.58-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>GraphAware Neo4j Framework Parent POM</name>
@@ -75,6 +76,10 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
+        </repository>
+        <repository>
+            <id>eaio.com</id>
+            <url>https://repo.eaio.com/maven2</url>
         </repository>
     </repositories>
 
@@ -141,26 +146,12 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>intellij-javadoc-fix</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9</version>
-                        <configuration>
-                            <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>3.5.14</neo4j.version>
+        <neo4j.version>3.5.19</neo4j.version>
         <logback.version>1.1.2</logback.version>
         <spring.version>4.3.13.RELEASE</spring.version>
         <maven.plugin.surefire>2.20.1</maven.plugin.surefire>
@@ -174,71 +165,71 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>api</artifactId>
-                <version>3.5.14.59-SNAPSHOT</version>
+                <version>3.5.19.58-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>common</artifactId>
-                <version>3.5.14.59-SNAPSHOT</version>
+                <version>3.5.19.58-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime</artifactId>
-                <version>3.5.14.59-SNAPSHOT</version>
+                <version>3.5.19.58-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime-api</artifactId>
-                <version>3.5.14.59-SNAPSHOT</version>
+                <version>3.5.19.58-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer</artifactId>
-                <version>3.5.14.59-SNAPSHOT</version>
+                <version>3.5.19.58-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer-api</artifactId>
-                <version>3.5.14.59-SNAPSHOT</version>
+                <version>3.5.19.58-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>server</artifactId>
-                <version>3.5.14.59-SNAPSHOT</version>
+                <version>3.5.19.58-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tests</artifactId>
-                <version>3.5.14.59-SNAPSHOT</version>
+                <version>3.5.19.58-SNAPSHOT</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-api</artifactId>
-                <version>3.5.14.59-SNAPSHOT</version>
+                <version>3.5.19.58-SNAPSHOT</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-executor</artifactId>
-                <version>3.5.14.59-SNAPSHOT</version>
+                <version>3.5.19.58-SNAPSHOT</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.graphaware.neo4j</groupId>
-                <artifactId>uuid</artifactId>
-                <version>3.5.14.55.19</version>
-                <scope>test</scope>
-            </dependency>
+            <!--            <dependency>-->
+            <!--                <groupId>com.graphaware.neo4j</groupId>-->
+            <!--                <artifactId>uuid</artifactId>-->
+            <!--                <version>3.5.19.55.19</version>-->
+            <!--                <scope>test</scope>-->
+            <!--            </dependency>-->
 
             <!-- Neo4j -->
 
@@ -366,7 +357,13 @@
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
-                <version>4.5.1</version>
+                <version>4.5.12</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-codec</groupId>
+                        <artifactId>commons-codec</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -384,7 +381,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.9</version>
+                <version>1.14</version>
             </dependency>
 
             <!-- Serialization -->
@@ -398,19 +395,19 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.9.0</version>
+                <version>2.9.10</version>
             </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>2.9.0</version>
+                <version>2.9.10</version>
             </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.9.0</version>
+                <version>2.9.10.4</version>
             </dependency>
 
             <!-- Spring -->
@@ -456,7 +453,7 @@
             <dependency>
                 <groupId>com.eaio.uuid</groupId>
                 <artifactId>uuid</artifactId>
-                <version>3.2</version>
+                <version>3.5</version>
             </dependency>
 
         </dependencies>
