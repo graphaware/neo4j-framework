@@ -96,7 +96,7 @@ public class RuntimeKernelExtension implements Lifecycle {
      */
     @Override
     public void init() {
-        if (isOnEnterprise()) {
+        if (isOnEnterprise() && !hasEnterpriseFramework()) {
             throw new RuntimeException("GraphAware Framework Community Edition is not supported on Neo4j Enterprise. Please email info@graphaware.com to get access to GraphAware Framework Enterprise Edition instead.");
         }
     }
@@ -106,6 +106,10 @@ public class RuntimeKernelExtension implements Lifecycle {
      */
     @Override
     public void start() {
+        if (hasEnterpriseFramework()) {
+            return;
+        }
+
         if (!config.get(RUNTIME_ENABLED)) {
             LOG.info("GraphAware Runtime disabled.");
             return;
@@ -195,6 +199,15 @@ public class RuntimeKernelExtension implements Lifecycle {
     protected boolean isOnEnterprise() {
         try {
             Class.forName("org.neo4j.kernel.impl.enterprise.EnterpriseEditionModule");
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean hasEnterpriseFramework() {
+        try {
+            Class.forName("com.graphaware.runtime.bootstrap.EnterpriseRuntimeKernelExtension");
             return true;
         } catch (Exception e) {
             return false;
