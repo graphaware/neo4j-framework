@@ -54,11 +54,6 @@ public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
         registerAllProceduresAndFunctions(procedures);
     }
 
-    @Override
-    protected Map<String, String> thirdPartyJaxRsPackageMappings() {
-        return Collections.singletonMap("com.graphaware.server", "/graphaware");
-    }
-
     public String baseUrl() {
         return baseNeoUrl() + "/graphaware";
     }

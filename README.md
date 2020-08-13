@@ -7,8 +7,7 @@ GraphAware Neo4j Framework
 <a href="http://graphaware.com/site/framework/latest/apidocs/" target="_blank">Javadoc</a>
 
 GraphAware Framework speeds up development with <a href="http://neo4j.org" target="_blank">Neo4j</a> by providing a
-platform for building useful generic as well as domain-specific functionality, analytical capabilities, (iterative) graph algorithms,
-etc.
+platform for building useful transaction-driven behaviour.
 
 See the <a href="http://graphaware.com/neo4j/2014/05/28/graph-aware-neo4j-framework.html" target="_blank">announcement on our blog</a>.
 
@@ -17,7 +16,7 @@ See the <a href="http://graphaware.com/neo4j/2014/05/28/graph-aware-neo4j-framew
 This open-source (GPL) version of the GraphAware Framework is compatible with Neo4j Community Edition (GPL) only. 
 It *will not work* with Neo4j Enterprise Edition, which is a proprietary and commercial software product of Neo4j, Inc..
 
-GraphAware offers an Enterprise version of the GraphAware Framework to licensed users of Neo4j Enterprise Edition.
+GraphAware offers a paid Enterprise version of the GraphAware Framework to licensed users of Neo4j Enterprise Edition.
 Please [get in touch](mailto:info@graphaware.com) to receive access.
 
 ## Features Overview
@@ -59,7 +58,6 @@ When using Neo4j in the <a href="http://docs.neo4j.org/chunked/stable/server-ins
 deploying the GraphAware Framework (and any code using it) is a matter of :
 * [downloading](#download) the appropriate .jar files
 * copying them into the _plugins_ directory in your Neo4j installation (if you installed using .dmg installer, this will be in `/Applications/Neo4j [Community|Enterprise] Edition.app/Contents/Resources/app/plugins/`)
-* adding `dbms.unmanaged_extension_classes=com.graphaware.server=/graphaware` to `neo4j.conf`
 * restarting the server
 
 The framework and modules are then used via calls to their REST APIs, if they provide any.

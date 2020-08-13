@@ -29,10 +29,7 @@
     <url>http://graphaware.com</url>
 
     <dependencies>
-        <dependency>
-            <groupId>com.graphaware.neo4j</groupId>
-            <artifactId>server</artifactId>
-        </dependency>
+
     </dependencies>
 
     <build>

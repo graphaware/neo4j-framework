@@ -16,14 +16,16 @@
 
 package com.graphaware.example;
 
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.Iterables;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.neo4j.kernel.internal.GraphDatabaseAPI;
+import org.neo4j.procedure.Context;
+import org.neo4j.procedure.Mode;
+import org.neo4j.procedure.Procedure;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.stream.Stream;
 
 /**
  * Sample REST API for counting all nodes in the database.
@@ -32,16 +34,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("count")
 public class NodeCountApi {
 
-    private final GraphDatabaseService database;
+    @Context
+    public GraphDatabaseAPI database;
 
-    @Autowired
-    public NodeCountApi(GraphDatabaseService database) {
-        this.database = database;
-    }
-
-    @RequestMapping(method = RequestMethod.GET)
-    @ResponseBody
-    public long count() {
+    @Procedure(mode = Mode.READ, name = "ga.example.nodeCount")
+    public Stream<Output> count() {
         long count;
 
         try (Transaction tx = database.beginTx()) {
@@ -49,6 +46,14 @@ public class NodeCountApi {
             tx.success();
         }
 
-        return count;
+        return Stream.of(new Output(count));
+    }
+
+    public class Output {
+        public Long out;
+
+        public Output(Long out) {
+            this.out = out;
+        }
     }
 }
