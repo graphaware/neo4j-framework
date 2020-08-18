@@ -61,11 +61,6 @@
         </dependency>
 
         <!-- Test -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <scope>test</scope>
-        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>com.graphaware.neo4j</groupId>-->
 <!--            <artifactId>uuid</artifactId>-->
