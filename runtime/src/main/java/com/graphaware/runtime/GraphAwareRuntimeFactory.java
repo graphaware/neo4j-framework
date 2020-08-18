@@ -23,8 +23,6 @@ import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.TxDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 
-import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROPERTY_PREFIX;
-
 /**
  * Factory producing {@link GraphAwareRuntime}. This should be the only way a runtime is created.
  */

@@ -32,19 +32,6 @@ public interface RuntimeConfiguration {
     String GA_PREFIX = "_GA_";
 
     /**
-     * Prefix for property keys of properties storing {@link com.graphaware.runtime.metadata.ModuleMetadata}.
-     */
-    String TX_MODULES_PROPERTY_PREFIX = "TX_MODULE";
-
-    /**
-     * Create prefix a component should use for internal data it reads/writes (nodes, relationships, properties).
-     *
-     * @param id of the component/module.
-     * @return prefix of the form <code>{@link #GA_PREFIX} + id + "_"</code>.
-     */
-    String createPrefix(String id);
-
-    /**
      * Retrieves the {@link WritingConfig} used for configuring a {@link com.graphaware.writer.neo4j.Neo4jWriter}.
      *
      * @return The {@link WritingConfig}, may not be null.

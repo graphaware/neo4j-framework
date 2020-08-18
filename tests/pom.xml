@@ -107,14 +107,6 @@
             <artifactId>spring-context</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-kernel</artifactId>
             <scope>compile</scope>

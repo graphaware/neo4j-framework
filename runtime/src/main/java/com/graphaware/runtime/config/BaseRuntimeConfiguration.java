@@ -63,14 +63,6 @@ public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
      * {@inheritDoc}
      */
     @Override
-    public String createPrefix(String id) {
-        return GA_PREFIX + id + "_";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
