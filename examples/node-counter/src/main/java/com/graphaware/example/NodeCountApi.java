@@ -22,16 +22,14 @@ import org.neo4j.kernel.internal.GraphDatabaseAPI;
 import org.neo4j.procedure.Context;
 import org.neo4j.procedure.Mode;
 import org.neo4j.procedure.Procedure;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.stereotype.Component;
 
 import java.util.stream.Stream;
 
 /**
  * Sample REST API for counting all nodes in the database.
  */
-@Controller
-@RequestMapping("count")
+@Component
 public class NodeCountApi {
 
     @Context
