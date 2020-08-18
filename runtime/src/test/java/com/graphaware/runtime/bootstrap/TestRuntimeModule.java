@@ -18,7 +18,6 @@ package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
-import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.runtime.module.BaseTxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.*;
@@ -35,7 +34,6 @@ public class TestRuntimeModule extends BaseTxDrivenModule<Void> {
     public static final List<TestRuntimeModule> TEST_RUNTIME_MODULES = new ArrayList<>();
 
     private final Map<String, String> config;
-    private boolean initialized = false;
 
     public TestRuntimeModule(String moduleId, Map<String, String> config) {
         super(moduleId);
@@ -52,34 +50,8 @@ public class TestRuntimeModule extends BaseTxDrivenModule<Void> {
         return config;
     }
 
-    public boolean isInitialized() {
-        return initialized;
-    }
-
-
-    @Override
-    public void initialize(GraphDatabaseService database) {
-        try (Transaction tx = database.beginTx()){
-            Node n1 = database.createNode(Label.label("test"));
-            Node n2 = database.createNode();
-            n1.createRelationshipTo(n2, RelationshipType.withName("TEST"));
-            n1.getRelationships().iterator().next().getType();
-            Thread.sleep(200); //takes some time to initialize
-            tx.success();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        initialized = true;
-    }
-
-    @Override
-    public void reinitialize(GraphDatabaseService database, TxDrivenModuleMetadata oldMetadata) {
-        throw new UnsupportedOperationException();
-    }
-
     @Override
     public void shutdown() {
-        initialized = false;
     }
 
     @Override

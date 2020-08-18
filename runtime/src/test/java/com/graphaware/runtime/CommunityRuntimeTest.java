@@ -16,12 +16,12 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.common.kv.GraphKeyValueStore;
-import com.graphaware.common.kv.KeyValueStore;
 import com.graphaware.common.policy.inclusion.InclusionPolicies;
-import com.graphaware.runtime.config.*;
-import com.graphaware.runtime.metadata.*;
-import com.graphaware.runtime.module.*;
+import com.graphaware.runtime.config.FluentTxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
+import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
+import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.runtime.write.WritingConfig;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.writer.neo4j.BaseNeo4jWriter;
@@ -29,11 +29,9 @@ import com.graphaware.writer.neo4j.Neo4jWriter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.KernelEventHandler;
 import org.neo4j.helpers.collection.Iterables;
-
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.concurrent.Callable;
@@ -41,7 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.runtime.GraphAwareRuntimeFactory.createRuntime;
-import static com.graphaware.runtime.config.FluentRuntimeConfiguration.*;
+import static com.graphaware.runtime.config.FluentRuntimeConfiguration.defaultConfiguration;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -51,14 +49,9 @@ import static org.mockito.Mockito.*;
  */
 public class CommunityRuntimeTest {
 
-    private static final int DELAY = 200;
-    private static final int INITIAL_DELAY = 1000;
-    
     private static final String MOCK = "MOCK";
 
     private GraphDatabaseService database;
-    private ModuleMetadataRepository txRepo;
-    private KeyValueStore keyValueStore;
 
     @Before
     public void setUp() {
@@ -67,9 +60,6 @@ public class CommunityRuntimeTest {
                 .newGraphDatabase();
 
         registerShutdownHook(database);
-
-        txRepo = new GraphPropertiesMetadataRepository(database, defaultConfiguration(database), TX_MODULES_PROPERTY_PREFIX);
-        keyValueStore = new GraphKeyValueStore(database);
     }
 
     @After
@@ -228,12 +218,8 @@ public class CommunityRuntimeTest {
 
         runtime.start();
 
-        verify(mockModule1).initialize(database);
-        verify(mockModule2).initialize(database);
         verify(mockModule1).start(database);
         verify(mockModule2).start(database);
-        verify(mockModule1, atLeastOnce()).getConfiguration();
-        verify(mockModule2, atLeastOnce()).getConfiguration();
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule1, mockModule2);
@@ -290,227 +276,6 @@ public class CommunityRuntimeTest {
         runtime.getModule("non-existing", TxDrivenModule.class);
     }
 
-    @Test
-    public void moduleRegisteredForTheFirstTimeShouldBeInitialized() {
-        final TxDrivenModule mockModule = mockTxModule();
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
-        runtime.registerModule(mockModule);
-
-        runtime.start();
-
-        verify(mockModule).initialize(database);
-        verify(mockModule).start(database);
-        verify(mockModule, atLeastOnce()).getConfiguration();
-        verify(mockModule, atLeastOnce()).getId();
-        verifyNoMoreInteractions(mockModule);
-
-        try (Transaction tx = database.beginTx()) {
-            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
-            assertEquals(NullTxDrivenModuleConfiguration.getInstance(), moduleMetadata.getConfig());
-            assertFalse(moduleMetadata.needsInitialization());
-            assertEquals(-1, moduleMetadata.problemTimestamp());
-        }
-    }
-
-    @Test
-    public void moduleRegisteredForTheFirstTimeShouldBeInitializedWhenAllowed() {
-        FluentTxDrivenModuleConfiguration configuration = FluentTxDrivenModuleConfiguration.defaultConfiguration().withInitializeUntil(System.currentTimeMillis() + 2000);
-
-        final TxDrivenModule mockModule = mockTxModule(configuration);
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
-        runtime.registerModule(mockModule);
-
-        runtime.start();
-
-        verify(mockModule).initialize(database);
-        verify(mockModule).start(database);
-        verify(mockModule, atLeastOnce()).getConfiguration();
-        verify(mockModule, atLeastOnce()).getId();
-        verifyNoMoreInteractions(mockModule);
-
-        try (Transaction tx = database.beginTx()) {
-            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
-            assertEquals(configuration, moduleMetadata.getConfig());
-            assertFalse(moduleMetadata.needsInitialization());
-            assertEquals(-1, moduleMetadata.problemTimestamp());
-        }
-    }
-
-    @Test
-    public void moduleRegisteredForTheFirstTimeShouldNotBeInitializedWhenNotAllowed() {
-        FluentTxDrivenModuleConfiguration configuration = FluentTxDrivenModuleConfiguration.defaultConfiguration().withInitializeUntil(System.currentTimeMillis() - 1);
-
-        final TxDrivenModule mockModule = mockTxModule(configuration);
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
-        runtime.registerModule(mockModule);
-
-        runtime.start();
-
-        verify(mockModule).start(database);
-        verify(mockModule, atLeastOnce()).getConfiguration();
-        verify(mockModule, atLeastOnce()).getId();
-        verifyNoMoreInteractions(mockModule);
-
-        try (Transaction tx = database.beginTx()) {
-            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
-            assertEquals(configuration, moduleMetadata.getConfig());
-            assertFalse(moduleMetadata.needsInitialization());
-            assertEquals(-1, moduleMetadata.problemTimestamp());
-        }
-    }
-
-    @Test
-    public void moduleAlreadyRegisteredShouldNotBeInitialized() {
-        final TxDrivenModule mockModule = mockTxModule();
-
-        try (Transaction tx = database.beginTx()) {
-            txRepo.persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()));
-            tx.success();
-        }
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
-        runtime.registerModule(mockModule);
-
-        runtime.start();
-
-        verify(mockModule).start(database);
-        verify(mockModule, atLeastOnce()).getId();
-        verify(mockModule, atLeastOnce()).getConfiguration();
-        verifyNoMoreInteractions(mockModule);
-
-        try (Transaction tx = database.beginTx()) {
-            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
-            assertEquals(NullTxDrivenModuleConfiguration.getInstance(), moduleMetadata.getConfig());
-            assertFalse(moduleMetadata.needsInitialization());
-            assertEquals(-1, moduleMetadata.problemTimestamp());
-        }
-    }
-
-    @Test
-    public void changedModuleShouldBeReInitialized() {
-        final TxDrivenModule mockModule = mockTxModule();
-
-        DefaultTxDrivenModuleMetadata oldMetadata = new DefaultTxDrivenModuleMetadata(FluentTxDrivenModuleConfiguration.defaultConfiguration().with(InclusionPolicies.none()));
-
-        try (Transaction tx = database.beginTx()) {
-            txRepo.persistModuleMetadata(mockModule, oldMetadata);
-            tx.success();
-        }
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
-        runtime.registerModule(mockModule);
-
-        runtime.start();
-
-        verify(mockModule).reinitialize(database, oldMetadata);
-        verify(mockModule).start(database);
-        verify(mockModule, atLeastOnce()).getConfiguration();
-        verify(mockModule, atLeastOnce()).getId();
-        verifyNoMoreInteractions(mockModule);
-
-        try (Transaction tx = database.beginTx()) {
-            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
-            assertEquals(NullTxDrivenModuleConfiguration.getInstance(), moduleMetadata.getConfig());
-            assertFalse(moduleMetadata.needsInitialization());
-            assertEquals(-1, moduleMetadata.problemTimestamp());
-        }
-    }
-
-    @Test
-    public void changedModuleShouldNotBeReInitializedWhenNotAllowed() {
-        FluentTxDrivenModuleConfiguration configuration = FluentTxDrivenModuleConfiguration.defaultConfiguration().withInitializeUntil(System.currentTimeMillis() - 1);
-
-        final TxDrivenModule mockModule = mockTxModule(configuration);
-
-        DefaultTxDrivenModuleMetadata oldMetadata = new DefaultTxDrivenModuleMetadata(FluentTxDrivenModuleConfiguration.defaultConfiguration().with(InclusionPolicies.none()));
-
-        try (Transaction tx = database.beginTx()) {
-            txRepo.persistModuleMetadata(mockModule, oldMetadata);
-            tx.success();
-        }
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
-        runtime.registerModule(mockModule);
-
-        runtime.start();
-
-        verify(mockModule).start(database);
-        verify(mockModule, atLeastOnce()).getConfiguration();
-        verify(mockModule, atLeastOnce()).getId();
-        verifyNoMoreInteractions(mockModule);
-
-        try (Transaction tx = database.beginTx()) {
-            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
-            assertEquals(configuration, moduleMetadata.getConfig());
-            assertFalse(moduleMetadata.needsInitialization());
-            assertEquals(-1, moduleMetadata.problemTimestamp());
-        }
-    }
-
-    @Test
-    public void forcedModuleShouldBeReInitialized() {
-        final TxDrivenModule mockModule = mockTxModule();
-
-        DefaultTxDrivenModuleMetadata metadata = new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()).markedNeedingInitialization();
-
-        try (Transaction tx = database.beginTx()) {
-            txRepo.persistModuleMetadata(mockModule, metadata);
-            tx.success();
-        }
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
-        runtime.registerModule(mockModule);
-
-        runtime.start();
-
-        verify(mockModule).reinitialize(database, metadata);
-        verify(mockModule).start(database);
-        verify(mockModule, atLeastOnce()).getConfiguration();
-        verify(mockModule, atLeastOnce()).getId();
-        verifyNoMoreInteractions(mockModule);
-
-        try (Transaction tx = database.beginTx()) {
-            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
-            assertEquals(NullTxDrivenModuleConfiguration.getInstance(), moduleMetadata.getConfig());
-            assertFalse(moduleMetadata.needsInitialization());
-            assertEquals(-1, moduleMetadata.problemTimestamp());
-        }
-    }
-
-    @Test
-    public void forcedModuleShouldNotBeReInitializedWhenNotAllowed() {
-        FluentTxDrivenModuleConfiguration configuration = FluentTxDrivenModuleConfiguration.defaultConfiguration().withInitializeUntil(System.currentTimeMillis() - 1);
-
-        final TxDrivenModule mockModule = mockTxModule(configuration);
-
-        DefaultTxDrivenModuleMetadata metadata = new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()).markedNeedingInitialization();
-
-        try (Transaction tx = database.beginTx()) {
-            txRepo.persistModuleMetadata(mockModule, metadata);
-            tx.success();
-        }
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
-        runtime.registerModule(mockModule);
-
-        runtime.start();
-
-        verify(mockModule).start(database);
-        verify(mockModule, atLeastOnce()).getConfiguration();
-        verify(mockModule, atLeastOnce()).getId();
-        verifyNoMoreInteractions(mockModule);
-
-        try (Transaction tx = database.beginTx()) {
-            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
-            assertEquals(configuration, moduleMetadata.getConfig());
-            assertFalse(moduleMetadata.needsInitialization());
-            assertEquals(-1, moduleMetadata.problemTimestamp());
-        }
-    }
-
     @Test(expected = IllegalStateException.class)
     public void shouldNotBeAbleToRegisterTheSameModuleTwice() {
         final TxDrivenModule mockModule = mockTxModule();
@@ -533,114 +298,6 @@ public class CommunityRuntimeTest {
     }
 
     @Test
-    public void unusedModulesShouldBeRemoved() {
-        final TxDrivenModule mockModule = mockTxModule();
-        final TxDrivenModule unusedModule = mockTxModule("UNUSED");
-
-        try (Transaction tx = database.beginTx()) {
-            txRepo.persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()));
-            txRepo.persistModuleMetadata(unusedModule, new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()));
-            tx.success();
-        }
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
-        runtime.registerModule(mockModule);
-
-        runtime.start();
-
-        verify(mockModule).start(database);
-        verify(mockModule, atLeastOnce()).getId();
-        verify(mockModule, atLeastOnce()).getConfiguration();
-        verifyNoMoreInteractions(mockModule);
-
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(1, txRepo.getAllModuleIds().size());
-        }
-    }
-
-    @Test
-    public void usedCorruptModulesShouldBeReInitialized() {
-        final TxDrivenModule mockModule = mockTxModule();
-
-        try (Transaction tx = database.beginTx()) {
-            keyValueStore.set(GA_PREFIX + TX_MODULES_PROPERTY_PREFIX + "_" + MOCK, "CORRUPT");
-            tx.success();
-        }
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
-        runtime.registerModule(mockModule);
-
-        runtime.start();
-
-        verify(mockModule).start(database);
-        verify(mockModule, atLeastOnce()).getId();
-        verify(mockModule, atLeastOnce()).getConfiguration();
-        verify(mockModule).reinitialize(database, null);
-        verifyNoMoreInteractions(mockModule);
-
-        try (Transaction tx = database.beginTx()) {
-            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
-            assertEquals(NullTxDrivenModuleConfiguration.getInstance(), moduleMetadata.getConfig());
-            assertFalse(moduleMetadata.needsInitialization());
-            assertEquals(-1, moduleMetadata.problemTimestamp());
-        }
-    }
-
-    @Test
-    public void usedCorruptModulesShouldBeInitialized2() {
-        final TxDrivenModule mockModule = mockTxModule();
-
-        try (Transaction tx = database.beginTx()) {
-            keyValueStore.set(GA_PREFIX + TX_MODULES_PROPERTY_PREFIX + "_" + MOCK, new byte[]{2, 3, 4});
-            tx.success();
-        }
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
-        runtime.registerModule(mockModule);
-
-        runtime.start();
-
-        verify(mockModule).start(database);
-        verify(mockModule, atLeastOnce()).getId();
-        verify(mockModule, atLeastOnce()).getConfiguration();
-        verify(mockModule).reinitialize(database, null);
-        verifyNoMoreInteractions(mockModule);
-
-        try (Transaction tx = database.beginTx()) {
-            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
-            assertEquals(NullTxDrivenModuleConfiguration.getInstance(), moduleMetadata.getConfig());
-            assertFalse(moduleMetadata.needsInitialization());
-            assertEquals(-1, moduleMetadata.problemTimestamp());
-        }
-    }
-
-    @Test
-    public void unusedCorruptModulesShouldBeRemoved() {
-        final TxDrivenModule mockModule = mockTxModule();
-
-        try (Transaction tx = database.beginTx()) {
-            txRepo.persistModuleMetadata(mockModule, new DefaultTxDrivenModuleMetadata(NullTxDrivenModuleConfiguration.getInstance()));
-            keyValueStore.set(GA_PREFIX + TX_MODULES_PROPERTY_PREFIX + "_UNUSED", "CORRUPT");
-            keyValueStore.set(GA_PREFIX + TX_MODULES_PROPERTY_PREFIX + "_UNUSED2", new byte[]{1, 2, 3});
-            tx.success();
-        }
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
-        runtime.registerModule(mockModule);
-
-        runtime.start();
-
-        verify(mockModule).start(database);
-        verify(mockModule, atLeastOnce()).getId();
-        verify(mockModule, atLeastOnce()).getConfiguration();
-        verifyNoMoreInteractions(mockModule);
-
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(1, txRepo.getAllModuleIds().size());
-        }
-    }
-
-    @Test
     public void allRegisteredInterestedModulesShouldBeDelegatedTo() {
         TxDrivenModule mockModule1 = mockTxModule(MOCK + "1");
         TxDrivenModule mockModule2 = mockTxModule(MOCK + "2");
@@ -653,12 +310,6 @@ public class CommunityRuntimeTest {
 
         runtime.start();
 
-        verify(mockModule1).initialize(database);
-        verify(mockModule2).initialize(database);
-        verify(mockModule3).initialize(database);
-        verify(mockModule1, atLeastOnce()).getConfiguration();
-        verify(mockModule2, atLeastOnce()).getConfiguration();
-        verify(mockModule3, atLeastOnce()).getConfiguration();
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule3, atLeastOnce()).getId();
@@ -685,75 +336,6 @@ public class CommunityRuntimeTest {
 
         //no interaction with module3, it is not interested!
         verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
-    }
-
-    @Test
-    public void moduleThrowingInitExceptionShouldBeMarkedForReinitialization() {
-        final TxDrivenModule mockModule = mockTxModule();
-        when(mockModule.getConfiguration()).thenReturn(NullTxDrivenModuleConfiguration.getInstance());
-        Mockito.doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
-        runtime.registerModule(mockModule);
-
-        runtime.start();
-
-        try (Transaction tx = database.beginTx()) {
-            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
-            assertEquals(NullTxDrivenModuleConfiguration.getInstance(), moduleMetadata.getConfig());
-            assertFalse(moduleMetadata.needsInitialization());
-            assertEquals(-1, moduleMetadata.problemTimestamp());
-        }
-
-        try (Transaction tx = database.beginTx()) {
-            database.createNode(new Label[]{});
-            tx.success();
-        }
-
-        try (Transaction tx = database.beginTx()) {
-            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
-            assertEquals(NullTxDrivenModuleConfiguration.getInstance(), moduleMetadata.getConfig());
-            assertTrue(moduleMetadata.needsInitialization());
-            assertTrue(moduleMetadata.problemTimestamp() > System.currentTimeMillis() - 1000);
-        }
-    }
-
-    @Test
-    public void moduleThrowingInitExceptionShouldBeMarkedForReinitializationOnlyTheFirstTime() throws InterruptedException {
-        final TxDrivenModule mockModule = mockTxModule();
-        when(mockModule.getConfiguration()).thenReturn(NullTxDrivenModuleConfiguration.getInstance());
-        doThrow(new NeedsInitializationException()).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
-        runtime.registerModule(mockModule);
-
-        runtime.start();
-
-        try (Transaction tx = database.beginTx()) {
-            database.createNode(new Label[]{});
-            tx.success();
-        }
-
-        long firstFailureTimestamp;
-        try (Transaction tx = database.beginTx()) {
-            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
-            firstFailureTimestamp = moduleMetadata.problemTimestamp();
-        }
-
-        Thread.sleep(1);
-
-        try (Transaction tx = database.beginTx()) {
-            database.createNode(new Label[]{});
-            tx.success();
-        }
-
-        long secondFailureTimestamp;
-        try (Transaction tx = database.beginTx()) {
-            TxDrivenModuleMetadata moduleMetadata = txRepo.getModuleMetadata(mockModule);
-            secondFailureTimestamp = moduleMetadata.problemTimestamp();
-        }
-
-        assertEquals(firstFailureTimestamp, secondFailureTimestamp);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -800,13 +382,9 @@ public class CommunityRuntimeTest {
 
         runtime.start();
 
-        verify(mockModule1).initialize(database);
-        verify(mockModule2).initialize(database);
         verify(mockModule1).start(database);
         verify(mockModule2).start(database);
 
-        verify(mockModule1, atLeastOnce()).getConfiguration();
-        verify(mockModule2, atLeastOnce()).getConfiguration();
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule1, mockModule2);
@@ -823,7 +401,6 @@ public class CommunityRuntimeTest {
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule1, atLeastOnce()).getConfiguration();
-        verify(mockModule2, atLeastOnce()).getConfiguration();
         verifyNoMoreInteractions(mockModule1, mockModule2);
     }
 
@@ -842,17 +419,10 @@ public class CommunityRuntimeTest {
 
         runtime.start();
 
-        verify(mockModule1).initialize(database);
-        verify(mockModule2).initialize(database);
-        verify(mockModule3).initialize(database);
-
         verify(mockModule1).start(database);
         verify(mockModule2).start(database);
         verify(mockModule3).start(database);
 
-        verify(mockModule1, atLeastOnce()).getConfiguration();
-        verify(mockModule2, atLeastOnce()).getConfiguration();
-        verify(mockModule3, atLeastOnce()).getConfiguration();
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule3, atLeastOnce()).getId();
@@ -953,14 +523,6 @@ public class CommunityRuntimeTest {
         when(mockModule.getId()).thenReturn(id);
         when(mockModule.getConfiguration()).thenReturn( NullTxDrivenModuleConfiguration.getInstance());
         when(mockModule.beforeCommit(any(ImprovedTransactionData.class))).thenReturn("TEST_" + id);
-        return mockModule;
-    }
-
-    private <T extends TxDrivenModule> T mockTimerModule(String id, Class<T> cls) {
-        T mockModule = mock(cls);
-        when(mockModule.getId()).thenReturn(id);
-        when(mockModule.getConfiguration()).thenReturn(NullTxDrivenModuleConfiguration.getInstance());
-
         return mockModule;
     }
 

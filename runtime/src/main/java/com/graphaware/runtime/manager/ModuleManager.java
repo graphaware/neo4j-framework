@@ -64,21 +64,6 @@ public interface ModuleManager<T extends RuntimeModule> {
     <M extends RuntimeModule> M getModule(Class<M> clazz);
 
     /**
-     * Load module metadata from wherever they are stored in between database restarts and do whatever is necessary
-     * to do with this metadata before the modules can be used.
-     *
-     * @return IDs of all modules registered with this manager.
-     */
-    Set<String> loadMetadata();
-
-    /**
-     * Perform cleanup metadata written by modules that are no longer present.
-     *
-     * @param usedModules IDs of all modules that are known to be used by the runtime during the current run.
-     */
-    void cleanupMetadata(Set<String> usedModules);
-
-    /**
      * Perform work needed to make modules start doing their job. Called exactly once each time the database is started.
      */
     void startModules();

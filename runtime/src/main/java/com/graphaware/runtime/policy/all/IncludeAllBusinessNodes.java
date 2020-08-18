@@ -18,8 +18,6 @@ package com.graphaware.runtime.policy.all;
 
 import com.graphaware.common.policy.inclusion.BaseEntityInclusionPolicy;
 import com.graphaware.common.policy.inclusion.NodeInclusionPolicy;
-import com.graphaware.common.serialize.Serializer;
-import com.graphaware.common.serialize.SingletonSerializer;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -30,10 +28,6 @@ import org.neo4j.graphdb.Node;
  * {@link com.graphaware.runtime.GraphAwareRuntime} internal nodes. Singleton.
  */
 public final class IncludeAllBusinessNodes extends BaseEntityInclusionPolicy<Node> implements NodeInclusionPolicy {
-
-    static {
-        Serializer.register(IncludeAllBusinessNodes.class, new SingletonSerializer());
-    }
 
     private static final NodeInclusionPolicy INSTANCE = new IncludeAllBusinessNodes();
 

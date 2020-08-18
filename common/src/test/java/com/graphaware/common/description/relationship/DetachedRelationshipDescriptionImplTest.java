@@ -16,7 +16,6 @@
 
 package com.graphaware.common.description.relationship;
 
-import com.graphaware.common.serialize.Serializer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -94,54 +93,5 @@ public class DetachedRelationshipDescriptionImplTest {
         assertTrue(literal("TEST", INCOMING).isMutuallyExclusive(literal("TEST", OUTGOING)));
         assertFalse(literal("TEST", OUTGOING).with("k1", equalTo("v1")).isMutuallyExclusive(literal("TEST", OUTGOING).with("k1", equalTo("v1"))));
         assertTrue(literal("TEST2", OUTGOING).with("k1", equalTo("v1")).isMutuallyExclusive(literal("TEST", OUTGOING).with("k1", equalTo("v1"))));
-    }
-
-    @Test
-    public void verifySerialization() {
-        try (Transaction tx = database.beginTx()) {
-            RelationshipDescription description = literal(database.getRelationshipById(0), database.getNodeById(0));
-
-            String serialized = Serializer.toString(description, "testPrefix");
-            RelationshipDescription deserialized = Serializer.fromString(serialized, "testPrefix");
-
-            assertEquals(deserialized, description);
-        }
-    }
-
-    @Test
-    public void verifySerialization2() {
-        try (Transaction tx = database.beginTx()) {
-            RelationshipDescription description = literal(database.getRelationshipById(0), database.getNodeById(0))
-                    .with("k1", equalTo("v1"))
-                    .with("k2", equalTo("v2"))
-                    .with("k3", equalTo("v3"))
-                    .with("k4", equalTo("v4"))
-                    .with("k5", equalTo("v5"))
-                    .with("k6", equalTo("v6"))
-                    .with("k7", equalTo(new String[]{"test1", "test2", "some very long string that should hopefully be long enough, very very very loooooooong string"}))
-                    .with("k8", equalTo(new String[]{"test1", "test2", "some very long string that should hopefully be long enough, very very very loooooooong string"}))
-                    .with("k10", equalTo(new String[]{"test1", "test2", "some very long string that should hopefully be long enough, very very very loooooooong string"}))
-                    .with("k11", equalTo(new String[]{"test1", "test2", "some very long string that should hopefully be long enough, very very very loooooooong string"}))
-                    .with("k12", equalTo(new String[]{"test1", "test2", "some very long string that should hopefully be long enough, very very very loooooooong string"}))
-                    .with("k13", equalTo(new String[]{"test1", "test2", "some very long string that should hopefully be long enough, very very very loooooooong string"}));
-
-            String serialized = Serializer.toString(description, "testPrefix");
-            RelationshipDescription deserialized = Serializer.fromString(serialized, "testPrefix");
-
-            assertEquals(deserialized, description);
-        }
-    }
-
-    @Test
-    public void verifySerialization3() {
-        try (Transaction tx = database.beginTx()) {
-            RelationshipDescription description1 = literal(database.getRelationshipById(0), database.getNodeById(0));
-            String serialized1 = Serializer.toString(description1, "testPrefix");
-
-            RelationshipDescription description2 = literal("TEST", OUTGOING).with("k", equalTo(new int[]{2, 3, 4}));
-            String serialized2 = Serializer.toString(description2, "testPrefix");
-
-            assertEquals(serialized1, serialized2);
-        }
     }
 }

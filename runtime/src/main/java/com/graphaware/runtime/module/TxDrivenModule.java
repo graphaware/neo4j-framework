@@ -17,7 +17,6 @@
 package com.graphaware.runtime.module;
 
 import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
-import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -35,7 +34,7 @@ public interface TxDrivenModule<T> extends RuntimeModule {
      * looking at {@link #getConfiguration()} that the module isn't interested in this transaction, this method will
      * not be called.
      * <p/>
-     * Note that in case this method throws {@link RuntimeException} (including {@link NeedsInitializationException}),
+     * Note that in case this method throws {@link RuntimeException},
      * {@link #afterCommit(Object)} will be called with a <code>null</code> argument.
      * <p/>
      * Note that in case this method throws {@link DeliberateTransactionRollbackException}, {@link #afterRollback(Object)}
@@ -43,9 +42,6 @@ public interface TxDrivenModule<T> extends RuntimeModule {
      *
      * @param transactionData data about the soon-to-be-committed transaction. It is already filtered based on {@link #getConfiguration()}.
      * @return a state object (or <code>null</code>) that will be passed on to {@link #afterCommit(Object)} of this object. Only return <code>null</code> if you do nothing in {@link #afterCommit(Object)}.
-     * @throws NeedsInitializationException           if it detects data is out of sync. {@link #initialize(org.neo4j.graphdb.GraphDatabaseService)}  will be called next
-     *                                                time the {@link com.graphaware.runtime.GraphAwareRuntime} is started. Until then, the module
-     *                                                should perform on best-effort basis.
      * @throws DeliberateTransactionRollbackException if the module wants to prevent the transaction from committing.
      */
     T beforeCommit(ImprovedTransactionData transactionData) throws DeliberateTransactionRollbackException;
@@ -87,30 +83,4 @@ public interface TxDrivenModule<T> extends RuntimeModule {
      * @param database to start this module against.
      */
     void start(GraphDatabaseService database);
-
-    /**
-     * Initialize this module. This method must bring the module to a state equivalent to a state of the same module that
-     * has been registered at all times since the database was empty. It can perform global-graph operations to achieve
-     * this. It must manage its own transactions.
-     * <p/>
-     * For example, a module that performs some in-graph caching needs to write information into the graph so that when
-     * the method returns, the graph is in the same state as it would be if the module has been running all the time
-     * since the graph was empty.
-     * <p/>
-     *
-     * @param database to initialize this module for.
-     */
-    void initialize(GraphDatabaseService database);
-
-    /**
-     * Re-initialize this module. This method must remove all metadata written to the graph by this module and bring the
-     * module to a state equivalent to a state of the same module that has been registered at all times since the
-     * database was empty. It can perform global-graph operations to achieve this. It must manage its own transactions.
-     *
-     * @param database    to re-initialize this module for.
-     * @param oldMetadata metadata stored for this module from its previous run. Can be <code>null</code> in case metadata
-     *                    was corrupt or there was no metadata.
-     */
-    void reinitialize(GraphDatabaseService database, TxDrivenModuleMetadata oldMetadata);
-
 }

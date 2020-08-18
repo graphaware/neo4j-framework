@@ -122,12 +122,9 @@ public class BootstrapIntegrationTest {
         }
 
         assertEquals(1, TEST_RUNTIME_MODULES.size());
-        assertTrue(TEST_RUNTIME_MODULES.get(0).isInitialized());
         assertEquals("configValue", TEST_RUNTIME_MODULES.get(0).getConfig().get("configKey"));
 
         database.shutdown();
-
-        assertFalse(TEST_RUNTIME_MODULES.get(0).isInitialized());
     }
 
     @Test
@@ -142,12 +139,9 @@ public class BootstrapIntegrationTest {
         Thread.sleep(1000);
 
         assertEquals(1, TEST_RUNTIME_MODULES.size());
-        assertTrue(TEST_RUNTIME_MODULES.get(0).isInitialized());
         assertEquals("configValue", TEST_RUNTIME_MODULES.get(0).getConfig().get("configKey"));
 
         database.shutdown();
-
-        assertFalse(TEST_RUNTIME_MODULES.get(0).isInitialized());
     }
 
     @Test
@@ -182,12 +176,9 @@ public class BootstrapIntegrationTest {
         }
 
         assertEquals(1, TEST_RUNTIME_MODULES.size());
-        assertTrue(TEST_RUNTIME_MODULES.get(0).isInitialized());
         assertEquals("configValue", TEST_RUNTIME_MODULES.get(0).getConfig().get("configKey"));
 
         database.shutdown();
-
-        assertFalse(TEST_RUNTIME_MODULES.get(0).isInitialized());
     }
 
     @Test

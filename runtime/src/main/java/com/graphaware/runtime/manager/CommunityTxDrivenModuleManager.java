@@ -18,25 +18,20 @@ package com.graphaware.runtime.manager;
 
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.ping.StatsCollector;
-import com.graphaware.runtime.metadata.DefaultTxDrivenModuleMetadata;
-import com.graphaware.runtime.metadata.ModuleMetadataRepository;
-import com.graphaware.runtime.metadata.TxDrivenModuleMetadata;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
-import com.graphaware.runtime.module.NeedsInitializationException;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.logging.Log;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * {@link BaseModuleManager} for {@link TxDrivenModule}s.
  */
-public class CommunityTxDrivenModuleManager<T extends TxDrivenModule> extends BaseModuleManager<TxDrivenModuleMetadata, T> implements TxDrivenModuleManager<T> {
+public class CommunityTxDrivenModuleManager<T extends TxDrivenModule> extends BaseModuleManager<T> implements TxDrivenModuleManager<T> {
 
     private static final Log LOG = LoggerFactory.getLogger(CommunityTxDrivenModuleManager.class);
 
@@ -46,60 +41,14 @@ public class CommunityTxDrivenModuleManager<T extends TxDrivenModule> extends Ba
      * Construct a new manager.
      *
      * @param database           database.
-     * @param metadataRepository repository for storing module metadata.
      * @param statsCollector     stats collector.
      */
-    public CommunityTxDrivenModuleManager(GraphDatabaseService database, ModuleMetadataRepository metadataRepository, StatsCollector statsCollector) {
-        super(metadataRepository, statsCollector);
+    public CommunityTxDrivenModuleManager(GraphDatabaseService database, StatsCollector statsCollector) {
+        super(statsCollector);
         this.database = database;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void handleCorruptMetadata(T module) {
-        LOG.info("Module " + module.getId() + " seems to have corrupted metadata, will try to re-initialize...");
-        reinitializeIfAllowed(module, null);
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void handleNoMetadata(T module) {
-        LOG.info("Module " + module.getId() + " seems to have been registered for the first time, will try to initialize...");
-        initializeIfAllowed(module);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected TxDrivenModuleMetadata createFreshMetadata(T module) {
-        return new DefaultTxDrivenModuleMetadata(module.getConfiguration());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected TxDrivenModuleMetadata acknowledgeMetadata(T module, TxDrivenModuleMetadata metadata) {
-        if (metadata.needsInitialization()) {
-            LOG.info("Module " + module.getId() + " has been marked for re-initialization on " + new Date(metadata.problemTimestamp()).toString() + ". Will try to re-initialize...");
-            reinitializeIfAllowed(module, metadata);
-            return createFreshMetadata(module);
-        }
-
-        if (!metadata.getConfig().equals(module.getConfiguration())) {
-            LOG.info("Module " + module.getId() + " seems to have changed configuration since last run, will try to re-initialize...");
-            reinitializeIfAllowed(module, metadata);
-            return createFreshMetadata(module);
-        }
-
-        LOG.info("Module " + module.getId() + " has not changed configuration since last run, already initialized.");
-        return metadata;
-    }
 
     /**
      * {@inheritDoc}
@@ -115,30 +64,7 @@ public class CommunityTxDrivenModuleManager<T extends TxDrivenModule> extends Ba
         LOG.info("Transaction-driven modules started.");
     }
 
-    private void initializeIfAllowed(T module) {
-        if (allowedToInitialize(module, "initialize")) {
-            initialize(module);
-        }
-    }
 
-    private void reinitializeIfAllowed(T module, TxDrivenModuleMetadata metadata) {
-        if (allowedToInitialize(module, "re-initialize")) {
-            reinitialize(module, metadata);
-        }
-    }
-
-    protected boolean allowedToInitialize(T module, String logMessage) {
-        long initUntil = module.getConfiguration().initializeUntil();
-        long now = System.currentTimeMillis();
-
-        if (initUntil > now) {
-            LOG.info("InitializeUntil set to " + initUntil + " and it is " + now + ". Will " + logMessage + ".");
-            return true;
-        } else {
-            LOG.info("InitializeUntil set to " + initUntil + " and it is " + now + ". Will NOT " + logMessage + ".");
-            return false;
-        }
-    }
 
     /**
      * Start module. This means preparing for doing the actual work. Call in a single-thread exactly once on each module
@@ -148,42 +74,6 @@ public class CommunityTxDrivenModuleManager<T extends TxDrivenModule> extends Ba
      */
     protected void start(TxDrivenModule module) {
         module.start(database);
-    }
-
-
-    /**
-     * Initialize module. This means doing any work necessary for a module that has been registered for the first time
-     * on an existing database, or that has been previously registered with different configuration.
-     * <p>
-     * For example, a module that performs some in-graph caching needs to write information into the graph so that when
-     * the method returns, the graph is in the same state as it would be if the module has been running all the time
-     * since the graph was empty.
-     * <p>
-     * Note that for many modules, it might not be necessary to do anything.
-     *
-     * @param module to initialize.
-     */
-    protected void initialize(TxDrivenModule module) {
-        module.initialize(database);
-    }
-
-    /**
-     * Re-initialize module. This means cleaning up all data this module might have ever written to the graph and
-     * doing any work necessary for a module that has been registered for the first time
-     * on an existing database, or that has been previously registered with different configuration.
-     * <p>
-     * For example, a module that performs some in-graph caching needs to write information into the graph so that when
-     * the method returns, the graph is in the same state as it would be if the module has been running all the time
-     * since the graph was empty.
-     * <p>
-     * Note that for many modules, it might not be necessary to do anything.
-     *
-     * @param module      to initialize.
-     * @param oldMetadata metadata stored for this module from its previous run. Can be <code>null</code> in case metadata
-     *                    was corrupt or there was no metadata.
-     */
-    protected void reinitialize(TxDrivenModule module, TxDrivenModuleMetadata oldMetadata) {
-        module.reinitialize(database, oldMetadata);
     }
 
     /**
@@ -204,11 +94,7 @@ public class CommunityTxDrivenModuleManager<T extends TxDrivenModule> extends Ba
 
             try {
                 state = module.beforeCommit(filteredTransactionData);
-            } catch (NeedsInitializationException e) {
-                LOG.warn("Module " + module.getId() + " seems to have a problem and will be re-initialized next time the database is started. ");
-                TxDrivenModuleMetadata moduleMetadata = metadataRepository.getModuleMetadata(module);
-                metadataRepository.persistModuleMetadata(module, moduleMetadata.markedNeedingInitialization());
-            } catch (DeliberateTransactionRollbackException e) {
+            }  catch (DeliberateTransactionRollbackException e) {
                 LOG.debug("Module " + module.getId() + " threw an exception indicating that the transaction should be rolled back.", e);
                 return handleException(result, module, state, e);
             } catch (RuntimeException e) {

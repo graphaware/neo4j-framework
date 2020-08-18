@@ -73,30 +73,6 @@ public class FriendshipStrengthModule extends BaseTxDrivenModule<Void> {
      * {@inheritDoc}
      */
     @Override
-    public void initialize(GraphDatabaseService database) {
-        try (Transaction tx = database.beginTx()) {
-            for (Node counter : Iterators.asResourceIterable(database.findNodes(FriendshipCounter))) {
-                counter.delete();
-            }
-            tx.success();
-        }
-
-        new IterableInputBatchTransactionExecutor<>(
-                database, 10000,
-                new TransactionalInput<>(database, 10000, new TransactionCallback<Iterable<Relationship>>() {
-                    @Override
-                    public Iterable<Relationship> doInTransaction(GraphDatabaseService database) throws Exception {
-                        return database.getAllRelationships();
-                    }
-                }),
-                (db, relationship, batchNumber, stepNumber) -> counter.handleCreatedFriendships(Collections.singleton(relationship))
-        ).execute();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Void beforeCommit(ImprovedTransactionData transactionData) {
         if (transactionData.mutationsOccurred()) {
             counter.handleCreatedFriendships(transactionData.getAllCreatedRelationships());

@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * {@link GraphAwareRuntime} intended for Community production use.
  * <p>
- * Supports both {@link TimerDrivenModule} and {@link TxDrivenModule} {@link RuntimeModule}s.
+ * Supports {@link TxDrivenModule} {@link RuntimeModule}s.
  * <p>
  * To use this {@link GraphAwareRuntime}, construct it using {@link GraphAwareRuntimeFactory}.
  */
@@ -139,7 +139,6 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
         beforeStart();
 
         startStatsCollector();
-        handleModuleMetadata();
 
         startModules();
         startWriter();
@@ -154,20 +153,6 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      */
     private void startStatsCollector() {
         configuration.getStatsCollector().runtimeStart();
-    }
-
-    /**
-     * Load and verify metadata, perform initialization if needed.
-     */
-    protected void handleModuleMetadata() {
-        LOG.info("Loading module metadata...");
-
-        Set<String> moduleIds = new HashSet<>();
-        moduleIds.addAll(txDrivenModuleManager.loadMetadata());
-
-        txDrivenModuleManager.cleanupMetadata(moduleIds);
-
-        LOG.info("Module metadata loaded.");
     }
 
     /**

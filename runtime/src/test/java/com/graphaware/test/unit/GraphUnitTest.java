@@ -16,12 +16,10 @@
 
 package com.graphaware.test.unit;
 
-import com.graphaware.common.kv.GraphKeyValueStore;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.runtime.bootstrap.TestRuntimeModule;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
-import com.graphaware.test.integration.DatabaseIntegrationTest;
 import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
@@ -66,7 +64,6 @@ public class GraphUnitTest extends EmbeddedDatabaseIntegrationTest {
 
         try (Transaction tx = getDatabase().beginTx()) {
             assertEquals(0, count(getDatabase().getAllNodes()));
-            assertTrue(new GraphKeyValueStore(getDatabase()).hasKey("_GA_TX_MODULE_test"));
             tx.success();
         }
     }

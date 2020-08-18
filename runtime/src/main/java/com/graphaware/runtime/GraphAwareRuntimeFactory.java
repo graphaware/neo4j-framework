@@ -20,8 +20,6 @@ import com.graphaware.runtime.config.FluentRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.CommunityTxDrivenModuleManager;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
-import com.graphaware.runtime.metadata.GraphPropertiesMetadataRepository;
-import com.graphaware.runtime.metadata.ModuleMetadataRepository;
 import com.graphaware.runtime.module.TxDrivenModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -50,9 +48,7 @@ public final class GraphAwareRuntimeFactory {
      * @return runtime.
      */
     public static GraphAwareRuntime createRuntime(GraphDatabaseService database, RuntimeConfiguration configuration) {
-        ModuleMetadataRepository txRepo = new GraphPropertiesMetadataRepository(database, configuration, TX_MODULES_PROPERTY_PREFIX);
-
-        TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new CommunityTxDrivenModuleManager<>(database, txRepo, configuration.getStatsCollector());
+        TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new CommunityTxDrivenModuleManager<>(database, configuration.getStatsCollector());
 
         return new CommunityRuntime(configuration, database, txDrivenModuleManager, configuration.getWritingConfig().produceWriter(database));
     }

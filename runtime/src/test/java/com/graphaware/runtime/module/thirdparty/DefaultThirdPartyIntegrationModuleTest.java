@@ -116,7 +116,7 @@ public class DefaultThirdPartyIntegrationModuleTest {
                 new GraphDetachedNode(michalId, new String[]{"Person"}, MapUtil.map("name", "Michal", "age", 31L)))));
 
         assertTrue(writeOperations.get(0).contains(new RelationshipCreated<>(
-                new GraphDetachedRelationship(1L, danielaId, gaId, "WORKS_FOR", Collections.<String, Object>emptyMap())
+                new GraphDetachedRelationship(21L, danielaId, gaId, "WORKS_FOR", Collections.<String, Object>emptyMap())
         )));
 
         assertTrue(writeOperations.get(1).contains(new NodeDeleted<>(
