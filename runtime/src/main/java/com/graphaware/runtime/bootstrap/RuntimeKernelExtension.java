@@ -68,8 +68,6 @@ import static org.neo4j.kernel.configuration.Settings.*;
  * com.graphaware.module.MyModuleID.threshold=20
  * </pre>
  * <p/>
- * The runtime has a capability of delegating to {@link com.graphaware.runtime.module.TimerDrivenModule}s on a scheduled
- * basis. For configuration of the timing, please see {@link Neo4jConfigBasedRuntimeConfiguration}.
  *
  * @see com.graphaware.runtime.module.RuntimeModuleBootstrapper
  * @see Neo4jConfigBasedRuntimeConfiguration

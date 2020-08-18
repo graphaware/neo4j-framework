@@ -26,71 +26,8 @@ import org.neo4j.kernel.configuration.Config;
 
 import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
 import com.graphaware.common.ping.NullStatsCollector;
-import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
-import com.graphaware.runtime.schedule.FixedDelayTimingStrategy;
-import com.graphaware.runtime.schedule.TimingStrategy;
 
 public class Neo4jConfigBasedRuntimeConfigurationTest {
-
-    @Test
-    public void shouldUseValuesSpecifiedInConfig() {
-        Map<String, String> parameterMap = new HashMap<>();
-        parameterMap.put("com.graphaware.runtime.timing.strategy", "adaptive");
-        parameterMap.put("com.graphaware.runtime.timing.delay", "50");
-        parameterMap.put("com.graphaware.runtime.timing.maxDelay", "100");
-        parameterMap.put("com.graphaware.runtime.timing.minDelay", "10");
-        parameterMap.put("com.graphaware.runtime.timing.busyThreshold", "94");
-        parameterMap.put("com.graphaware.runtime.timing.maxSamples", "201");
-        parameterMap.put("com.graphaware.runtime.timing.maxTime", "2001");
-        Config config = Config.defaults(parameterMap);
-
-        TimingStrategy expected = AdaptiveTimingStrategy
-                .defaultConfiguration()
-                .withBusyThreshold(94)
-                .withDefaultDelayMillis(50)
-                .withMinimumDelayMillis(10)
-                .withMaximumDelayMillis(100)
-                .withMaxSamples(201)
-                .withMaxTime(2001);
-
-        assertEquals(expected, new Neo4jConfigBasedRuntimeConfiguration(null, config).getTimingStrategy());
-    }
-
-    @Test
-    public void shouldUseValuesSpecifiedInConfig2() {
-        Map<String, String> parameterMap = new HashMap<>();
-        parameterMap.put("com.graphaware.runtime.timing.strategy", "fixed");
-        parameterMap.put("com.graphaware.runtime.timing.initialDelay", "100");
-        parameterMap.put("com.graphaware.runtime.timing.delay", "50");
-        Config config = Config.defaults(parameterMap);
-
-        TimingStrategy expected = FixedDelayTimingStrategy
-                .getInstance()
-                .withDelay(50)
-                .withInitialDelay(100);
-
-        assertEquals(expected, new Neo4jConfigBasedRuntimeConfiguration(null, config).getTimingStrategy());
-    }
-
-    @Test
-    public void shouldFallBackToValueDefaultConfigurationIfValueIsNotFoundInConfig() {
-        Map<String, String> parameterMap = new HashMap<>();
-        Config config = Config.defaults(parameterMap);
-
-        TimingStrategy expected = AdaptiveTimingStrategy
-                .defaultConfiguration();
-
-        assertEquals(expected, new Neo4jConfigBasedRuntimeConfiguration(null, config).getTimingStrategy());
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void shouldFailWithUnknownStrategy() {
-        Map<String, String> parameterMap = new HashMap<>();
-        parameterMap.put("com.graphaware.runtime.timing.strategy", "unknown");
-        Config config = Config.defaults(parameterMap);
-
-        new Neo4jConfigBasedRuntimeConfiguration(null, config).getTimingStrategy();
-    }
     
     @Test
     public void shouldDisableGoogleAnalytics() {

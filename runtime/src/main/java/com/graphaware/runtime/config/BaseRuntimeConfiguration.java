@@ -17,7 +17,6 @@
 package com.graphaware.runtime.config;
 
 import com.graphaware.common.ping.StatsCollector;
-import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.runtime.write.WritingConfig;
 import org.neo4j.kernel.configuration.Config;
 
@@ -27,23 +26,13 @@ import org.neo4j.kernel.configuration.Config;
 public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
 
     private final Config config;
-    private final TimingStrategy timingStrategy;
     private final WritingConfig writingConfig;
     private final StatsCollector statsCollector;
 
-    protected BaseRuntimeConfiguration(Config config, TimingStrategy timingStrategy, WritingConfig writingConfig, StatsCollector statsCollector) {
+    protected BaseRuntimeConfiguration(Config config, WritingConfig writingConfig, StatsCollector statsCollector) {
         this.config = config;
-        this.timingStrategy = timingStrategy;
         this.writingConfig = writingConfig;
         this.statsCollector = statsCollector;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TimingStrategy getTimingStrategy() {
-        return timingStrategy;
     }
 
     /**
@@ -89,7 +78,6 @@ public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
         BaseRuntimeConfiguration that = (BaseRuntimeConfiguration) o;
 
         if (!writingConfig.equals(that.writingConfig)) return false;
-        if (!timingStrategy.equals(that.timingStrategy)) return false;
         if (!statsCollector.equals(that.statsCollector)) return false;
 
         return true;
@@ -100,8 +88,7 @@ public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
      */
     @Override
     public int hashCode() {
-        int result = timingStrategy.hashCode();
-        result = 31 * result + writingConfig.hashCode();
+        int result = writingConfig.hashCode();
         result = 31 * result + statsCollector.hashCode();
         return result;
     }

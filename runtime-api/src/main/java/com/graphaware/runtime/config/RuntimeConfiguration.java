@@ -17,7 +17,6 @@
 package com.graphaware.runtime.config;
 
 import com.graphaware.common.ping.StatsCollector;
-import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.runtime.write.WritingConfig;
 import org.neo4j.kernel.configuration.Config;
 
@@ -38,25 +37,12 @@ public interface RuntimeConfiguration {
     String TX_MODULES_PROPERTY_PREFIX = "TX_MODULE";
 
     /**
-     * Prefix for property keys of properties storing {@link com.graphaware.runtime.metadata.ModuleMetadata}.
-     */
-    String TIMER_MODULES_PROPERTY_PREFIX = "TIMER_MODULE";
-
-
-    /**
      * Create prefix a component should use for internal data it reads/writes (nodes, relationships, properties).
      *
      * @param id of the component/module.
      * @return prefix of the form <code>{@link #GA_PREFIX} + id + "_"</code>.
      */
     String createPrefix(String id);
-
-    /**
-     * Retrieves the {@link TimingStrategy} used for scheduling of work for {@link com.graphaware.runtime.module.ModuleMetadata}s.
-     *
-     * @return The {@link TimingStrategy}, which may not be <code>null</code>.
-     */
-    TimingStrategy getTimingStrategy();
 
     /**
      * Retrieves the {@link WritingConfig} used for configuring a {@link com.graphaware.writer.neo4j.Neo4jWriter}.

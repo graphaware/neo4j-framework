@@ -18,8 +18,6 @@ package com.graphaware.runtime.config;
 
 import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
 import com.graphaware.common.ping.StatsCollector;
-import com.graphaware.runtime.schedule.AdaptiveTimingStrategy;
-import com.graphaware.runtime.schedule.TimingStrategy;
 import com.graphaware.runtime.write.FluentWritingConfig;
 import com.graphaware.runtime.write.WritingConfig;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -37,11 +35,11 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      * @return The {@link FluentRuntimeConfiguration} instance.
      */
     public static FluentRuntimeConfiguration defaultConfiguration(GraphDatabaseService database) {
-        return new FluentRuntimeConfiguration(Config.defaults(), AdaptiveTimingStrategy.defaultConfiguration(), FluentWritingConfig.defaultConfiguration(), new GoogleAnalyticsStatsCollector(database));
+        return new FluentRuntimeConfiguration(Config.defaults(), FluentWritingConfig.defaultConfiguration(), new GoogleAnalyticsStatsCollector(database));
     }
 
-    private FluentRuntimeConfiguration(Config config, TimingStrategy timingStrategy, WritingConfig writingConfig, StatsCollector statsCollector) {
-        super(config, timingStrategy, writingConfig, statsCollector);
+    private FluentRuntimeConfiguration(Config config, WritingConfig writingConfig, StatsCollector statsCollector) {
+        super(config, writingConfig, statsCollector);
     }
 
     /**
@@ -51,17 +49,7 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      * @return new instance.
      */
     public FluentRuntimeConfiguration withConfig(Config config) {
-        return new FluentRuntimeConfiguration(config, getTimingStrategy(), getWritingConfig(), getStatsCollector());
-    }
-
-    /**
-     * Create an instance with different {@link TimingStrategy}.
-     *
-     * @param timingStrategy of the new instance.
-     * @return new instance.
-     */
-    public FluentRuntimeConfiguration withTimingStrategy(TimingStrategy timingStrategy) {
-        return new FluentRuntimeConfiguration(kernelConfig(), timingStrategy, getWritingConfig(), getStatsCollector());
+        return new FluentRuntimeConfiguration(config, getWritingConfig(), getStatsCollector());
     }
 
     /**
@@ -71,7 +59,7 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      * @return new instance.
      */
     public FluentRuntimeConfiguration withWritingConfig(WritingConfig writingConfig) {
-        return new FluentRuntimeConfiguration(kernelConfig(), getTimingStrategy(), writingConfig, getStatsCollector());
+        return new FluentRuntimeConfiguration(kernelConfig(), writingConfig, getStatsCollector());
     }
 
     /**
@@ -81,6 +69,6 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      * @return new instance.
      */
     public FluentRuntimeConfiguration withStatsCollector(StatsCollector statsCollector) {
-        return new FluentRuntimeConfiguration(kernelConfig(), getTimingStrategy(), getWritingConfig(), statsCollector);
+        return new FluentRuntimeConfiguration(kernelConfig(), getWritingConfig(), statsCollector);
     }
 }

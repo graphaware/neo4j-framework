@@ -18,10 +18,8 @@ package com.graphaware.runtime;
 
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.manager.TimerDrivenModuleManager;
 import com.graphaware.runtime.manager.TxDrivenModuleManager;
 import com.graphaware.runtime.module.RuntimeModule;
-import com.graphaware.runtime.module.TimerDrivenModule;
 import com.graphaware.runtime.module.TxDrivenModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
@@ -66,7 +64,6 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
     private final RuntimeConfiguration configuration;
     private final GraphDatabaseService database;
     private final TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager;
-    private final TimerDrivenModuleManager timerDrivenModuleManager;
     private final Neo4jWriter writer;
 
     /**
@@ -75,10 +72,9 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      * @param configuration            config.
      * @param database                 on which the runtime operates.
      * @param txDrivenModuleManager    manager for transaction-driven modules.
-     * @param timerDrivenModuleManager manager for timer-driven modules.
      * @param writer                   to use when writing to the database.
      */
-    protected CommunityRuntime(RuntimeConfiguration configuration, GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager, Neo4jWriter writer) {
+    protected CommunityRuntime(RuntimeConfiguration configuration, GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, Neo4jWriter writer) {
         if (!State.NONE.equals(state)) {
             throw new IllegalStateException("Only one instance of the GraphAware Runtime should ever be instantiated and started.");
         }
@@ -91,7 +87,6 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
         this.configuration = configuration;
         this.database = database;
         this.txDrivenModuleManager = txDrivenModuleManager;
-        this.timerDrivenModuleManager = timerDrivenModuleManager;
         this.writer = writer;
 
         database.registerTransactionEventHandler(this);
@@ -113,14 +108,9 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
         LOG.info("Registering module " + module.getId() + " with GraphAware Runtime.");
 
         txDrivenModuleManager.checkNotAlreadyRegistered(module);
-        timerDrivenModuleManager.checkNotAlreadyRegistered(module);
 
         if (module instanceof TxDrivenModule) {
             txDrivenModuleManager.registerModule((TxDrivenModule) module);
-        }
-
-        if (module instanceof TimerDrivenModule) {
-            timerDrivenModuleManager.registerModule((TimerDrivenModule) module);
         }
     }
 
@@ -174,10 +164,8 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
 
         Set<String> moduleIds = new HashSet<>();
         moduleIds.addAll(txDrivenModuleManager.loadMetadata());
-        moduleIds.addAll(timerDrivenModuleManager.loadMetadata());
 
         txDrivenModuleManager.cleanupMetadata(moduleIds);
-        timerDrivenModuleManager.cleanupMetadata(moduleIds);
 
         LOG.info("Module metadata loaded.");
     }
@@ -187,7 +175,6 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      */
     private void startModules() {
         txDrivenModuleManager.startModules();
-        timerDrivenModuleManager.startModules();
     }
 
     /**
@@ -319,7 +306,6 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
 
     protected void doStop() {
         txDrivenModuleManager.shutdownModules();
-        timerDrivenModuleManager.shutdownModules();
         getDatabaseWriter().stop();
     }
 
@@ -334,12 +320,6 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
             return module;
         }
 
-        module = timerDrivenModuleManager.getModule(moduleId, clazz);
-
-        if (module != null) {
-            return module;
-        }
-
         throw new NotFoundException("No module of type " + clazz.getName() + " with ID " + moduleId + " has been registered");
     }
 
@@ -349,17 +329,12 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
     @Override
     public <M extends RuntimeModule> M getModule(Class<M> clazz) throws NotFoundException {
         M txResult = txDrivenModuleManager.getModule(clazz);
-        M timerResult = timerDrivenModuleManager.getModule(clazz);
 
-        if (txResult != null && timerResult != null && timerResult != txResult) {
-            throw new IllegalStateException("More than one module of type " + clazz + " has been registered");
-        }
-
-        if (txResult == null && timerResult == null) {
+        if (txResult == null) {
             throw new NotFoundException("No module of type " + clazz.getName() + " has been registered");
         }
 
-        return txResult == null ? timerResult : txResult;
+        return txResult;
     }
 
     /**

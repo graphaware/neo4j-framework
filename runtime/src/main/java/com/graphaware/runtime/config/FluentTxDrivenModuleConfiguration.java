@@ -20,7 +20,7 @@ import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
 
 /**
- * {@link TimerDrivenModuleConfiguration} with fluent interface.
+ * {@link TxDrivenModuleConfiguration} with fluent interface.
  * Intended for users of Neo4j in embedded mode for programmatic configuration.
  */
 public final class FluentTxDrivenModuleConfiguration extends BaseTxDrivenModuleConfiguration<FluentTxDrivenModuleConfiguration> {
