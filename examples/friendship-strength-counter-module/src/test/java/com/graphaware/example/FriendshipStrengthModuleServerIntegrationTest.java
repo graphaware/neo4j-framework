@@ -17,7 +17,6 @@
 package com.graphaware.example;
 
 import com.graphaware.test.integration.GraphAwareIntegrationTest;
-import org.apache.http.HttpStatus;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -43,10 +42,10 @@ public class FriendshipStrengthModuleServerIntegrationTest extends GraphAwareInt
 
     @Test
     public void totalFriendshipStrengthShouldBeCorrectlyCalculated() {
-        httpClient.executeCypher(baseNeoUrl(),
-                "CREATE " +
-                        "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
-                        "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
+//        httpClient.executeCypher(baseNeoUrl(),
+//                "CREATE " +
+//                        "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
+//                        "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
 
        // assertEquals("3", httpClient.get(baseUrl() + "/friendship/strength", HttpStatus.SC_OK));
     }

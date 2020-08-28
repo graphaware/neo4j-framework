@@ -16,9 +16,6 @@
 
 package com.graphaware.runtime.config;
 
-import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
-import com.graphaware.common.ping.NullStatsCollector;
-import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.config.function.StringToDatabaseWriterType;
 import com.graphaware.runtime.write.DatabaseWriterType;
 import com.graphaware.runtime.write.FluentWritingConfig;
@@ -59,12 +56,6 @@ import static org.neo4j.kernel.configuration.Settings.*;
  *     com.graphaware.runtime.db.writer.batchSize=1000
  * </pre>
  * results in a {@link BatchWriter} being constructed with the configured queue and batch sizes.
- * <p>
- * For {@link StatsCollector}, {@link GoogleAnalyticsStatsCollector} is used by default. For disabling statistics reporting, use
- * <pre>
- *     com.graphaware.runtime.stats.disable=true
- * </pre>
- * With this setting in place, {@link NullStatsCollector} will be used.
  */
 public final class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfiguration {
 
@@ -73,16 +64,13 @@ public final class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfi
     private static final Setting<Integer> WRITER_QUEUE_SIZE = setting("com.graphaware.runtime.db.writer.queueSize", INTEGER, (String) null);
     private static final Setting<Integer> WRITER_BATCH_SIZE = setting("com.graphaware.runtime.db.writer.batchSize", INTEGER, (String) null);
 
-    //stats
-    private static final Setting<Boolean> STATS_DISABLE_SETTING = setting("com.graphaware.runtime.stats.disabled", BOOLEAN, "false");
-
     /**
      * Constructs a new {@link Neo4jConfigBasedRuntimeConfiguration} based on the given Neo4j {@link Config}.
      *
      * @param config The {@link Config} containing the settings used to configure the runtime
      */
     public Neo4jConfigBasedRuntimeConfiguration(GraphDatabaseService database, Config config) {
-        super(config, createWritingConfig(config), createStatsCollector(database, config));
+        super(config, createWritingConfig(config));
     }
 
     private static WritingConfig createWritingConfig(Config config) {
@@ -103,13 +91,5 @@ public final class Neo4jConfigBasedRuntimeConfiguration extends BaseRuntimeConfi
         }
 
         return result;
-    }
-
-    private static StatsCollector createStatsCollector(GraphDatabaseService database, Config config) {
-        if (config.get(STATS_DISABLE_SETTING)) {
-            return NullStatsCollector.getInstance();
-        }
-
-        return new GoogleAnalyticsStatsCollector(database, config);
     }
 }

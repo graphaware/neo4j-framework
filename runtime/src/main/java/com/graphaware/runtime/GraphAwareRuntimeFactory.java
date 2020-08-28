@@ -45,7 +45,7 @@ public final class GraphAwareRuntimeFactory {
      * @return runtime.
      */
     public static GraphAwareRuntime createRuntime(GraphDatabaseService database, RuntimeConfiguration configuration) {
-        ModuleManager moduleManager = new CommunityModuleManager(database, configuration.getStatsCollector());
+        ModuleManager moduleManager = new CommunityModuleManager(database);
 
         return new CommunityRuntime(configuration, database, moduleManager, configuration.getWritingConfig().produceWriter(database));
     }

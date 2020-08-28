@@ -16,10 +16,8 @@
 
 package com.graphaware.test.integration;
 
-import com.graphaware.test.util.TestHttpClient;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
-import org.neo4j.helpers.HostnamePort;
 import org.neo4j.helpers.ListenSocketAddress;
 import org.neo4j.server.NeoServer;
 import org.neo4j.server.helpers.CommunityServerBuilder;
@@ -59,21 +57,15 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
 
     private NeoServer server;
 
-    protected TestHttpClient httpClient;
-
     @Override
     public void setUp() throws Exception {
         if (autoStart()) {
             startServer(); //super.setUp() called there!
         }
-        httpClient = createHttpClient();
     }
 
     @Override
     public void tearDown() throws Exception {
-        if (httpClient != null) {
-            httpClient.close();
-        }
         stopServer();
         super.tearDown();
     }
@@ -84,15 +76,6 @@ public abstract class ServerIntegrationTest extends DatabaseIntegrationTest {
     @Override
     protected final GraphDatabaseService createDatabase() {
         return server.getDatabase().getGraph();
-    }
-
-    /**
-     * Creates a {@link TestHttpClient}. Override for configuring the client.
-     *
-     * @return test client.
-     */
-    protected TestHttpClient createHttpClient() {
-        return new TestHttpClient();
     }
 
     /**

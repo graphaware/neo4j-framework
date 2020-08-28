@@ -17,7 +17,6 @@
 package com.graphaware.runtime.manager;
 
 import com.graphaware.common.log.LoggerFactory;
-import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.module.Module;
 import org.neo4j.logging.Log;
 
@@ -32,13 +31,11 @@ public abstract class BaseModuleManager implements ModuleManager {
     private static final Log LOG = LoggerFactory.getLogger(BaseModuleManager.class);
 
     protected final Map<String, Module> modules = new LinkedHashMap<>();
-    private final StatsCollector statsCollector;
 
     /**
      * Construct a new manager.
      */
-    protected BaseModuleManager(StatsCollector statsCollector) {
-        this.statsCollector = statsCollector;
+    protected BaseModuleManager() {
     }
 
     /**
@@ -108,9 +105,7 @@ public abstract class BaseModuleManager implements ModuleManager {
      */
     @Override
     public void startModules() {
-        for (Module<?> module : modules.values()) {
-            statsCollector.moduleStart(module.getClass().getCanonicalName());
-        }
+
     }
 
     /**

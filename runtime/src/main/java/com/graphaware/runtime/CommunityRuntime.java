@@ -133,21 +133,12 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
 
         beforeStart();
 
-        startStatsCollector();
-
         startModules();
         startWriter();
 
         state = State.STARTED;
         LOG.info("GraphAware started.");
         STARTING.set(false);
-    }
-
-    /**
-     * Start stats collector.
-     */
-    private void startStatsCollector() {
-        configuration.getStatsCollector().runtimeStart();
     }
 
     /**

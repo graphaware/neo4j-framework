@@ -17,7 +17,6 @@
 package com.graphaware.runtime.manager;
 
 import com.graphaware.common.log.LoggerFactory;
-import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.Module;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
@@ -41,10 +40,9 @@ public class CommunityModuleManager extends BaseModuleManager implements ModuleM
      * Construct a new manager.
      *
      * @param database           database.
-     * @param statsCollector     stats collector.
      */
-    public CommunityModuleManager(GraphDatabaseService database, StatsCollector statsCollector) {
-        super(statsCollector);
+    public CommunityModuleManager(GraphDatabaseService database) {
+        super();
         this.database = database;
     }
 

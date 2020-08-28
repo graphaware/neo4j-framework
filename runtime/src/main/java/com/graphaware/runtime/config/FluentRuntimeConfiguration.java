@@ -16,8 +16,6 @@
 
 package com.graphaware.runtime.config;
 
-import com.graphaware.common.ping.GoogleAnalyticsStatsCollector;
-import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.write.FluentWritingConfig;
 import com.graphaware.runtime.write.WritingConfig;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -35,11 +33,11 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      * @return The {@link FluentRuntimeConfiguration} instance.
      */
     public static FluentRuntimeConfiguration defaultConfiguration(GraphDatabaseService database) {
-        return new FluentRuntimeConfiguration(Config.defaults(), FluentWritingConfig.defaultConfiguration(), new GoogleAnalyticsStatsCollector(database));
+        return new FluentRuntimeConfiguration(Config.defaults(), FluentWritingConfig.defaultConfiguration());
     }
 
-    private FluentRuntimeConfiguration(Config config, WritingConfig writingConfig, StatsCollector statsCollector) {
-        super(config, writingConfig, statsCollector);
+    private FluentRuntimeConfiguration(Config config, WritingConfig writingConfig) {
+        super(config, writingConfig);
     }
 
     /**
@@ -49,7 +47,7 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      * @return new instance.
      */
     public FluentRuntimeConfiguration withConfig(Config config) {
-        return new FluentRuntimeConfiguration(config, getWritingConfig(), getStatsCollector());
+        return new FluentRuntimeConfiguration(config, getWritingConfig());
     }
 
     /**
@@ -59,16 +57,6 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      * @return new instance.
      */
     public FluentRuntimeConfiguration withWritingConfig(WritingConfig writingConfig) {
-        return new FluentRuntimeConfiguration(kernelConfig(), writingConfig, getStatsCollector());
-    }
-
-    /**
-     * Create an instance with different {@link StatsCollector}.
-     *
-     * @param statsCollector of the new instance.
-     * @return new instance.
-     */
-    public FluentRuntimeConfiguration withStatsCollector(StatsCollector statsCollector) {
-        return new FluentRuntimeConfiguration(kernelConfig(), getWritingConfig(), statsCollector);
+        return new FluentRuntimeConfiguration(kernelConfig(), writingConfig);
     }
 }

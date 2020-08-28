@@ -16,7 +16,6 @@
 
 package com.graphaware.runtime.config;
 
-import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.write.WritingConfig;
 import org.neo4j.kernel.configuration.Config;
 
@@ -27,12 +26,10 @@ public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
 
     private final Config config;
     private final WritingConfig writingConfig;
-    private final StatsCollector statsCollector;
 
-    protected BaseRuntimeConfiguration(Config config, WritingConfig writingConfig, StatsCollector statsCollector) {
+    protected BaseRuntimeConfiguration(Config config, WritingConfig writingConfig) {
         this.config = config;
         this.writingConfig = writingConfig;
-        this.statsCollector = statsCollector;
     }
 
     /**
@@ -41,14 +38,6 @@ public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
     @Override
     public WritingConfig getWritingConfig() {
         return writingConfig;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public StatsCollector getStatsCollector() {
-        return statsCollector;
     }
 
     /**
@@ -70,7 +59,6 @@ public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
         BaseRuntimeConfiguration that = (BaseRuntimeConfiguration) o;
 
         if (!writingConfig.equals(that.writingConfig)) return false;
-        if (!statsCollector.equals(that.statsCollector)) return false;
 
         return true;
     }
@@ -81,7 +69,6 @@ public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
     @Override
     public int hashCode() {
         int result = writingConfig.hashCode();
-        result = 31 * result + statsCollector.hashCode();
         return result;
     }
 }

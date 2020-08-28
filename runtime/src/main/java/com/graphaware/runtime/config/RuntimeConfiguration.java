@@ -16,7 +16,6 @@
 
 package com.graphaware.runtime.config;
 
-import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.write.WritingConfig;
 import org.neo4j.kernel.configuration.Config;
 
@@ -37,11 +36,6 @@ public interface RuntimeConfiguration {
      * @return The {@link WritingConfig}, may not be null.
      */
     WritingConfig getWritingConfig();
-
-    /**
-     * @return statistics collector.
-     */
-    StatsCollector getStatsCollector();
 
     /**
      * @return Neo4j kernel config.
