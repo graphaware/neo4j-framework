@@ -54,11 +54,6 @@ add the following snippet to your pom.xml:
 ```xml
 <dependency>
     <groupId>com.graphaware.neo4j</groupId>
-    <artifactId>runtime-api</artifactId>
-    <version>3.4.8.52</version>
-</dependency>
-<dependency>
-    <groupId>com.graphaware.neo4j</groupId>
     <artifactId>runtime</artifactId>
     <version>3.4.8.52</version>
 </dependency>
@@ -141,12 +136,6 @@ To start from scratch, you will need the following dependencies in your pom.xml
     <dependency>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>common</artifactId>
-        <version>3.4.8.52</version>
-        <scope>provided</scope>
-    </dependency>
-    <dependency>
-        <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>runtime-api</artifactId>
         <version>3.4.8.52</version>
         <scope>provided</scope>
     </dependency>
