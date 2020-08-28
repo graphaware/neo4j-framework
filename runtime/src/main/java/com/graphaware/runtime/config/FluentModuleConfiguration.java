@@ -20,42 +20,41 @@ import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
 
 /**
- * {@link TxDrivenModuleConfiguration} with fluent interface.
+ * {@link RuntimeModuleConfiguration} with fluent interface.
  * Intended for users of Neo4j in embedded mode for programmatic configuration.
  */
-public final class FluentTxDrivenModuleConfiguration extends BaseTxDrivenModuleConfiguration<FluentTxDrivenModuleConfiguration> {
+public final class FluentModuleConfiguration extends BaseModuleConfiguration<FluentModuleConfiguration> {
 
     /**
      * Creates an instance with default values, i.e., with {@link com.graphaware.runtime.policy.InclusionPoliciesFactory#allBusiness()}.
      *
-     * @return The {@link FluentTxDrivenModuleConfiguration} instance.
+     * @return The {@link FluentModuleConfiguration} instance.
      */
-    public static FluentTxDrivenModuleConfiguration defaultConfiguration() {
-        return new FluentTxDrivenModuleConfiguration();
+    public static FluentModuleConfiguration defaultConfiguration() {
+        return new FluentModuleConfiguration();
     }
 
     /**
      * Create a new configuration with {@link com.graphaware.runtime.policy.InclusionPoliciesFactory#allBusiness()}.
      */
-    private FluentTxDrivenModuleConfiguration() {
-        super(InclusionPoliciesFactory.allBusiness(), ALWAYS);
+    private FluentModuleConfiguration() {
+        super(InclusionPoliciesFactory.allBusiness());
     }
 
     /**
      * Create a new configuration.
      *
      * @param inclusionPolicies of the configuration.
-     * @param initializeUntil   of the new configuration.
      */
-    private FluentTxDrivenModuleConfiguration(InclusionPolicies inclusionPolicies, long initializeUntil) {
-        super(inclusionPolicies, initializeUntil);
+    private FluentModuleConfiguration(InclusionPolicies inclusionPolicies) {
+        super(inclusionPolicies);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected FluentTxDrivenModuleConfiguration newInstance(InclusionPolicies inclusionPolicies, long initializeUntil) {
-        return new FluentTxDrivenModuleConfiguration(inclusionPolicies, initializeUntil);
+    protected FluentModuleConfiguration newInstance(InclusionPolicies inclusionPolicies) {
+        return new FluentModuleConfiguration(inclusionPolicies);
     }
 }

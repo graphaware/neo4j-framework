@@ -17,7 +17,7 @@
 package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
-import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.runtime.module.RuntimeModule;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
 
@@ -34,7 +34,7 @@ public class TestModuleBootstrapper implements RuntimeModuleBootstrapper {
     public static final Setting<String> MODULE_CONFIG = setting("com.graphaware.module.test.configKey", STRING, "configValue");
 
     @Override
-    public TxDrivenModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
+    public RuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
         return new TestRuntimeModule(moduleId, config);
     }
 }

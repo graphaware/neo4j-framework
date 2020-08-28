@@ -27,11 +27,11 @@ import java.util.Map;
 /**
  * Base-class for {@link ModuleManager} implementations.
  */
-public abstract class BaseModuleManager<T extends RuntimeModule> implements ModuleManager<T> {
+public abstract class BaseModuleManager implements ModuleManager {
 
     private static final Log LOG = LoggerFactory.getLogger(BaseModuleManager.class);
 
-    protected final Map<String, T> modules = new LinkedHashMap<>();
+    protected final Map<String, RuntimeModule> modules = new LinkedHashMap<>();
     private final StatsCollector statsCollector;
 
     /**
@@ -45,7 +45,7 @@ public abstract class BaseModuleManager<T extends RuntimeModule> implements Modu
      * {@inheritDoc}
      */
     @Override
-    public final void registerModule(T module) {
+    public final void registerModule(RuntimeModule module) {
         modules.put(module.getId(), module);
     }
 
@@ -53,12 +53,12 @@ public abstract class BaseModuleManager<T extends RuntimeModule> implements Modu
      * {@inheritDoc}
      */
     @Override
-    public <M extends RuntimeModule> M getModule(String moduleId, Class<M> clazz) {
+    public <M extends RuntimeModule<?>> M getModule(String moduleId, Class<M> clazz) {
         if (!modules.containsKey(moduleId)) {
             return null;
         }
 
-        T module = modules.get(moduleId);
+        RuntimeModule module = modules.get(moduleId);
         if (!clazz.isAssignableFrom(module.getClass())) {
             LOG.warn("Module " + moduleId + " is not a " + clazz.getName());
             return null;
@@ -71,9 +71,9 @@ public abstract class BaseModuleManager<T extends RuntimeModule> implements Modu
      * {@inheritDoc}
      */
     @Override
-    public <M extends RuntimeModule> M getModule(Class<M> clazz) {
+    public <M extends RuntimeModule<?>> M getModule(Class<M> clazz) {
         M result = null;
-        for (T module : modules.values()) {
+        for (RuntimeModule module : modules.values()) {
             if (clazz.isAssignableFrom(module.getClass())) {
                 if (result != null) {
                     throw new IllegalStateException("More than one module of type " + clazz + " has been registered");
@@ -92,7 +92,7 @@ public abstract class BaseModuleManager<T extends RuntimeModule> implements Modu
      * @throws IllegalStateException in case the module is already registered.
      */
     public void checkNotAlreadyRegistered(RuntimeModule module) {
-        if (modules.values().contains(module)) {
+        if (modules.containsValue(module)) {
             LOG.error("Module " + module.getId() + " cannot be registered more than once!");
             throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
         }
@@ -108,7 +108,7 @@ public abstract class BaseModuleManager<T extends RuntimeModule> implements Modu
      */
     @Override
     public void startModules() {
-        for (T module : modules.values()) {
+        for (RuntimeModule<?> module : modules.values()) {
             statsCollector.moduleStart(module.getClass().getCanonicalName());
         }
     }
@@ -118,7 +118,7 @@ public abstract class BaseModuleManager<T extends RuntimeModule> implements Modu
      */
     @Override
     public void shutdownModules() {
-        for (T module : modules.values()) {
+        for (RuntimeModule<?> module : modules.values()) {
             LOG.info("Shutting down module " + module.getId());
             module.shutdown();
         }

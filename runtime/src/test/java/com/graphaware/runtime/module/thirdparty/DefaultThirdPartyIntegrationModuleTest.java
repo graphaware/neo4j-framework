@@ -20,7 +20,7 @@ import com.graphaware.common.representation.GraphDetachedNode;
 import com.graphaware.common.representation.GraphDetachedRelationship;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
-import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.writer.thirdparty.*;
 import org.junit.After;
 import org.junit.Before;
@@ -39,7 +39,6 @@ import java.util.List;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.neo4j.kernel.configuration.Settings.FALSE;
 
 /**
  * Integration test for {@link WriterBasedThirdPartyIntegrationModule}
@@ -65,7 +64,7 @@ public class DefaultThirdPartyIntegrationModuleTest {
     @Test
     public void modificationsShouldBeCorrectlyBuilt() throws InterruptedException {
         RememberingWriter writer = new RememberingWriter();
-        TxDrivenModule module = new DefaultThirdPartyIntegrationModule("test", writer);
+        RuntimeModule module = new DefaultThirdPartyIntegrationModule("test", writer);
 
         database.execute("CREATE (p:Person {name:'Michal', age:30})-[:WORKS_FOR {since:2013, role:'MD'}]->(c:Company {name:'GraphAware', est: 2013})");
         database.execute("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Adam'})-[:WORKS_FOR {since:2014}]->(ga)");

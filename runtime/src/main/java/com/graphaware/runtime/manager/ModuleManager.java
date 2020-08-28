@@ -17,15 +17,15 @@
 package com.graphaware.runtime.manager;
 
 import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
  * A manager of {@link RuntimeModule}s, which takes care of their lifecycle.
- *
- * @param <T> type of module this manager can manage.
  */
-public interface ModuleManager<T extends RuntimeModule> {
+public interface ModuleManager {
 
     /**
      * Check that the given module isn't already registered with the manager.
@@ -33,7 +33,7 @@ public interface ModuleManager<T extends RuntimeModule> {
      * @param module to check.
      * @throws IllegalStateException in case the module is already registered.
      */
-    void checkNotAlreadyRegistered(RuntimeModule module);
+    void checkNotAlreadyRegistered(RuntimeModule<?> module);
 
     /**
      * Register a module with this manager.
@@ -41,7 +41,7 @@ public interface ModuleManager<T extends RuntimeModule> {
      * @param module to register.
      * @throws IllegalStateException in case the module is already registered.
      */
-    void registerModule(T module);
+    void registerModule(RuntimeModule<?> module);
 
     /**
      * Get a module registered with the manager.
@@ -51,7 +51,7 @@ public interface ModuleManager<T extends RuntimeModule> {
      * @param <M>      type of the class above.
      * @return module, <code>null</code> if no such module exists.
      */
-    <M extends RuntimeModule> M getModule(String moduleId, Class<M> clazz);
+    <M extends RuntimeModule<?>> M getModule(String moduleId, Class<M> clazz);
 
     /**
      * Get a module registered with the manager.
@@ -61,7 +61,7 @@ public interface ModuleManager<T extends RuntimeModule> {
      * @return module. <code>null</code> if no such module exists.
      * @throws IllegalStateException if more than one module of the same type has been registered.
      */
-    <M extends RuntimeModule> M getModule(Class<M> clazz);
+    <M extends RuntimeModule<?>> M getModule(Class<M> clazz);
 
     /**
      * Perform work needed to make modules start doing their job. Called exactly once each time the database is started.
@@ -72,4 +72,26 @@ public interface ModuleManager<T extends RuntimeModule> {
      * Bring all modules to an orderly shutdown, when the database is stopped.
      */
     void shutdownModules();
+
+    /**
+     * Delegate work to modules before a transaction is committed.
+     *
+     * @param transactionData about-to-be-committed transaction data.
+     * @return map of objects (states) returned by the modules, keyed by {@link RuntimeModule#getId()}.
+     */
+    Map<String, Object> beforeCommit(TransactionDataContainer transactionData);
+
+    /**
+     * Delegate work to modules after a transaction is committed.
+     *
+     * @param states returned by {@link #beforeCommit(com.graphaware.tx.event.improved.data.TransactionDataContainer)}.
+     */
+    void afterCommit(Map<String, Object> states);
+
+    /**
+     * Delegate work to modules after a transaction is rolled back.
+     *
+     * @param states returned by {@link #beforeCommit(com.graphaware.tx.event.improved.data.TransactionDataContainer)}.
+     */
+    void afterRollback(Map<String, Object> states);
 }

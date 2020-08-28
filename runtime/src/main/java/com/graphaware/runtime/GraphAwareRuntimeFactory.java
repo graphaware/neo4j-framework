@@ -18,9 +18,8 @@ package com.graphaware.runtime;
 
 import com.graphaware.runtime.config.FluentRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.manager.CommunityTxDrivenModuleManager;
-import com.graphaware.runtime.manager.TxDrivenModuleManager;
-import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.runtime.manager.CommunityModuleManager;
+import com.graphaware.runtime.manager.ModuleManager;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
@@ -46,9 +45,9 @@ public final class GraphAwareRuntimeFactory {
      * @return runtime.
      */
     public static GraphAwareRuntime createRuntime(GraphDatabaseService database, RuntimeConfiguration configuration) {
-        TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new CommunityTxDrivenModuleManager<>(database, configuration.getStatsCollector());
+        ModuleManager moduleManager = new CommunityModuleManager(database, configuration.getStatsCollector());
 
-        return new CommunityRuntime(configuration, database, txDrivenModuleManager, configuration.getWritingConfig().produceWriter(database));
+        return new CommunityRuntime(configuration, database, moduleManager, configuration.getWritingConfig().produceWriter(database));
     }
 
     private GraphAwareRuntimeFactory() {

@@ -16,13 +16,20 @@
 
 package com.graphaware.runtime.module;
 
+import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
+import com.graphaware.runtime.config.RuntimeModuleConfiguration;
+import org.neo4j.graphdb.GraphDatabaseService;
+
 import static org.springframework.util.Assert.hasLength;
 
 /**
- * Base class for {@link com.graphaware.runtime.module.RuntimeModule} implementations.
+ * Base class for {@link RuntimeModule} implementations.
  *
+ * @param <T> The type of a state object that the module can use to
+ *            pass information from the {@link #beforeCommit(com.graphaware.tx.event.improved.api.ImprovedTransactionData)}
+ *            method to the {@link #afterCommit(Object)} method.
  */
-public abstract class BaseRuntimeModule implements RuntimeModule {
+public abstract class BaseRuntimeModule<T> implements RuntimeModule<T> {
 
     private final String moduleId;
 
@@ -43,5 +50,48 @@ public abstract class BaseRuntimeModule implements RuntimeModule {
     @Override
     public String getId() {
         return moduleId;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public RuntimeModuleConfiguration getConfiguration() {
+        return NullRuntimeModuleConfiguration.getInstance();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void start(GraphDatabaseService database) {
+        //to be overridden
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note that the implementation in this base class doesn't do anything and can be safely overridden without calling super.
+     * </p>
+     */
+    @Override
+    public void shutdown() {
+        //to be overridden
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void afterCommit(T state) {
+        //allow subclasses to override
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void afterRollback(T state) {
+        //allow subclasses to override
     }
 }

@@ -17,29 +17,28 @@
 package com.graphaware.runtime.config;
 
 import com.graphaware.common.policy.inclusion.InclusionPolicies;
+import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
 
 /**
- * {@link TxDrivenModuleConfiguration} for {@link com.graphaware.runtime.module.TxDrivenModule}s with no configuration. Singleton.
+ * {@link RuntimeModuleConfiguration} for {@link RuntimeModule}s with no configuration. Singleton.
  */
-public final class NullTxDrivenModuleConfiguration implements TxDrivenModuleConfiguration {
+public final class NullRuntimeModuleConfiguration implements RuntimeModuleConfiguration {
 
-    private static final TxDrivenModuleConfiguration INSTANCE = new NullTxDrivenModuleConfiguration();
+    private static final RuntimeModuleConfiguration INSTANCE = new NullRuntimeModuleConfiguration();
     private final InclusionPolicies inclusionPolicies;
-    private final long initializeUntil;
 
     /**
      * Get instance of this singleton configuration.
      *
      * @return instance.
      */
-    public static TxDrivenModuleConfiguration getInstance() {
+    public static RuntimeModuleConfiguration getInstance() {
         return INSTANCE;
     }
 
-    private NullTxDrivenModuleConfiguration() {
+    private NullRuntimeModuleConfiguration() {
         inclusionPolicies = InclusionPoliciesFactory.allBusiness();
-        initializeUntil = ALWAYS;
     }
 
     /**
@@ -48,13 +47,5 @@ public final class NullTxDrivenModuleConfiguration implements TxDrivenModuleConf
     @Override
     public InclusionPolicies getInclusionPolicies() {
         return inclusionPolicies;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long initializeUntil() {
-        return initializeUntil;
     }
 }

@@ -16,20 +16,20 @@
 
 package com.graphaware.runtime.bootstrap;
 
-import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
-import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
-import com.graphaware.runtime.module.BaseTxDrivenModule;
+import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
+import com.graphaware.runtime.config.RuntimeModuleConfiguration;
+import com.graphaware.runtime.module.BaseRuntimeModule;
+import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import org.neo4j.graphdb.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * {@link com.graphaware.runtime.module.TxDrivenModule} that can tell whether it has been initialized for testing.
+ * {@link RuntimeModule} that can tell whether it has been initialized for testing.
  */
-public class TestRuntimeModule extends BaseTxDrivenModule<Void> {
+public class TestRuntimeModule extends BaseRuntimeModule<Void> {
 
     public static final List<TestRuntimeModule> TEST_RUNTIME_MODULES = new ArrayList<>();
 
@@ -42,8 +42,8 @@ public class TestRuntimeModule extends BaseTxDrivenModule<Void> {
     }
 
     @Override
-    public TxDrivenModuleConfiguration getConfiguration() {
-        return NullTxDrivenModuleConfiguration.getInstance();
+    public RuntimeModuleConfiguration getConfiguration() {
+        return NullRuntimeModuleConfiguration.getInstance();
     }
 
     public Map<String, String> getConfig() {

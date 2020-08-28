@@ -67,13 +67,6 @@
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
-                <artifactId>runtime-api</artifactId>
-                <version>3.5.19.58-SNAPSHOT</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer</artifactId>
                 <version>3.5.19.58-SNAPSHOT</version>
                 <scope>provided</scope>

@@ -14,23 +14,22 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.runtime.module;
+package com.graphaware.runtime.config;
+
+import com.graphaware.common.policy.inclusion.InclusionPolicies;
+import com.graphaware.runtime.module.RuntimeModule;
 
 /**
- * A module performing some useful work on the graph in the background, being delegated to by {@link com.graphaware.runtime.GraphAwareRuntime}.
+ * Encapsulates all configuration of a single {@link RuntimeModule}. Modules that need
+ * no configuration should use {@link NullRuntimeModuleConfiguration}. Otherwise, start with
+ * {@link FluentModuleConfiguration}.
  */
-public interface RuntimeModule {
+public interface RuntimeModuleConfiguration {
 
     /**
-     * Get a human-readable (ideally short) ID of this module. This ID must be unique across all {@link RuntimeModule}s
-     * used in a single {@link com.graphaware.runtime.GraphAwareRuntime} instance.
+     * Get the inclusion policies used by this module. If unsure, return {@link com.graphaware.runtime.policy.InclusionPoliciesFactory#allBusiness()}.
      *
-     * @return short ID of this module.
+     * @return policies.
      */
-    String getId();
-
-    /**
-     * Perform cleanup if needed before database shutdown.
-     */
-    void shutdown();
+    InclusionPolicies getInclusionPolicies();
 }

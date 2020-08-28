@@ -16,18 +16,27 @@
 
 package com.graphaware.runtime.module;
 
-import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
+import com.graphaware.runtime.config.RuntimeModuleConfiguration;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
- * A {@link RuntimeModule} module performing some useful work based on about-to-be-committed transaction data.
+ * A Runtime module performing some useful work based on about-to-be-committed transaction data.
  *
  * @param <T> The type of a state object that the module can use to
  *            pass information from the {@link #beforeCommit(com.graphaware.tx.event.improved.api.ImprovedTransactionData)}
  *            method to the {@link #afterCommit(Object)} method.
  */
-public interface TxDrivenModule<T> extends RuntimeModule {
+public interface RuntimeModule<T> {
+
+    /**
+     * Get a human-readable (ideally short) ID of this module. This ID must be unique across all {@link RuntimeModule}s
+     * used in a single {@link com.graphaware.runtime.GraphAwareRuntime} instance.
+     *
+     * @return short ID of this module.
+     */
+    String getId();
 
     /**
      * Perform the core business logic of this module before a transaction commits. If the framework determines by
@@ -68,12 +77,12 @@ public interface TxDrivenModule<T> extends RuntimeModule {
 
     /**
      * Return the configuration of this module. Each module must encapsulate its entire configuration in an instance of
-     * a {@link com.graphaware.runtime.config.TxDrivenModuleConfiguration} implementation. Use {@link com.graphaware.runtime.config.NullTxDrivenModuleConfiguration}
+     * a {@link RuntimeModuleConfiguration} implementation. Use {@link NullRuntimeModuleConfiguration}
      * if this module needs no configuration.
      *
      * @return module configuration.
      */
-    TxDrivenModuleConfiguration getConfiguration();
+    RuntimeModuleConfiguration getConfiguration();
 
     /**
      * Start the module. This method must bring the module to a usable state, i.e. after it returns, the module must be
@@ -83,4 +92,9 @@ public interface TxDrivenModule<T> extends RuntimeModule {
      * @param database to start this module against.
      */
     void start(GraphDatabaseService database);
+
+    /**
+     * Perform cleanup if needed before database shutdown.
+     */
+    void shutdown();
 }

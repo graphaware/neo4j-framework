@@ -19,7 +19,7 @@ package com.graphaware.runtime.manager;
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
-import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -29,11 +29,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * {@link BaseModuleManager} for {@link TxDrivenModule}s.
+ * {@link BaseModuleManager} for {@link RuntimeModule}s.
  */
-public class CommunityTxDrivenModuleManager<T extends TxDrivenModule> extends BaseModuleManager<T> implements TxDrivenModuleManager<T> {
+public class CommunityModuleManager extends BaseModuleManager implements ModuleManager {
 
-    private static final Log LOG = LoggerFactory.getLogger(CommunityTxDrivenModuleManager.class);
+    private static final Log LOG = LoggerFactory.getLogger(CommunityModuleManager.class);
 
     private final GraphDatabaseService database;
 
@@ -43,12 +43,10 @@ public class CommunityTxDrivenModuleManager<T extends TxDrivenModule> extends Ba
      * @param database           database.
      * @param statsCollector     stats collector.
      */
-    public CommunityTxDrivenModuleManager(GraphDatabaseService database, StatsCollector statsCollector) {
+    public CommunityModuleManager(GraphDatabaseService database, StatsCollector statsCollector) {
         super(statsCollector);
         this.database = database;
     }
-
-
 
     /**
      * {@inheritDoc}
@@ -58,13 +56,11 @@ public class CommunityTxDrivenModuleManager<T extends TxDrivenModule> extends Ba
         super.startModules();
 
         LOG.info("Starting transaction-driven modules...");
-        for (T module : modules.values()) {
+        for (RuntimeModule<?> module : modules.values()) {
             start(module);
         }
         LOG.info("Transaction-driven modules started.");
     }
-
-
 
     /**
      * Start module. This means preparing for doing the actual work. Call in a single-thread exactly once on each module
@@ -72,7 +68,7 @@ public class CommunityTxDrivenModuleManager<T extends TxDrivenModule> extends Ba
      *
      * @param module to be started.
      */
-    protected void start(TxDrivenModule module) {
+    protected void start(RuntimeModule<?> module) {
         module.start(database);
     }
 
@@ -83,7 +79,7 @@ public class CommunityTxDrivenModuleManager<T extends TxDrivenModule> extends Ba
     public Map<String, Object> beforeCommit(TransactionDataContainer transactionData) {
         Map<String, Object> result = new HashMap<>();
 
-        for (T module : modules.values()) {
+        for (RuntimeModule<?> module : modules.values()) {
             FilteredTransactionData filteredTransactionData = new FilteredTransactionData(transactionData, module.getConfiguration().getInclusionPolicies());
 
             if (!filteredTransactionData.mutationsOccurred()) {
@@ -108,7 +104,7 @@ public class CommunityTxDrivenModuleManager<T extends TxDrivenModule> extends Ba
         return result;
     }
 
-    private Map<String, Object> handleException(Map<String, Object> result, T module, Object state, RuntimeException e) {
+    private Map<String, Object> handleException(Map<String, Object> result, RuntimeModule<?> module, Object state, RuntimeException e) {
         result.put(module.getId(), state);      //just so the module gets afterRollback called as well
         afterRollback(result); //remove this when https://github.com/neo4j/neo4j/issues/2660 is resolved (todo this is fixed in 3.3)
         throw e;               //will cause rollback
@@ -119,7 +115,7 @@ public class CommunityTxDrivenModuleManager<T extends TxDrivenModule> extends Ba
      */
     @Override
     public void afterCommit(Map<String, Object> states) {
-        for (T module : modules.values()) {
+        for (RuntimeModule module : modules.values()) {
             if (!states.containsKey(module.getId())) {
                 return; //perhaps module wasn't interested, or threw RuntimeException
             }
@@ -133,7 +129,7 @@ public class CommunityTxDrivenModuleManager<T extends TxDrivenModule> extends Ba
      */
     @Override
     public void afterRollback(Map<String, Object> states) {
-        for (T module : modules.values()) {
+        for (RuntimeModule module : modules.values()) {
             if (!states.containsKey(module.getId())) {
                 return; //rollback happened before this module had a go
             }

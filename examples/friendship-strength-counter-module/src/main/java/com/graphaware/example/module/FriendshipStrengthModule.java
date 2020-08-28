@@ -17,31 +17,23 @@
 package com.graphaware.example.module;
 
 import com.graphaware.common.policy.inclusion.RelationshipInclusionPolicy;
-import com.graphaware.runtime.config.FluentTxDrivenModuleConfiguration;
-import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
-import com.graphaware.runtime.module.BaseTxDrivenModule;
+import com.graphaware.runtime.config.FluentModuleConfiguration;
+import com.graphaware.runtime.config.RuntimeModuleConfiguration;
+import com.graphaware.runtime.module.BaseRuntimeModule;
+import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
-import com.graphaware.tx.executor.input.TransactionalInput;
-import com.graphaware.tx.executor.single.TransactionCallback;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.helpers.collection.Iterators;
 
-import java.util.Collections;
-
-import static com.graphaware.example.module.Labels.FriendshipCounter;
 import static com.graphaware.example.module.Relationships.FRIEND_OF;
 
 /**
- * {@link com.graphaware.runtime.module.TxDrivenModule} that counts the total friendship strength in the database
+ * {@link RuntimeModule} that counts the total friendship strength in the database
  * and keeps it up to date.
  */
-public class FriendshipStrengthModule extends BaseTxDrivenModule<Void> {
+public class FriendshipStrengthModule extends BaseRuntimeModule<Void> {
 
-    private final TxDrivenModuleConfiguration configuration;
+    private final RuntimeModuleConfiguration configuration;
     private final FriendshipStrengthCounter counter;
 
     public FriendshipStrengthModule(String moduleId, GraphDatabaseService database) {
@@ -49,7 +41,7 @@ public class FriendshipStrengthModule extends BaseTxDrivenModule<Void> {
         this.counter = new FriendshipStrengthCounter(database);
 
         //only take into account relationships with FRIEND_OF type:
-        configuration = FluentTxDrivenModuleConfiguration
+        configuration = FluentModuleConfiguration
                 .defaultConfiguration()
                 .with(
                         new RelationshipInclusionPolicy.Adapter() {
@@ -65,7 +57,7 @@ public class FriendshipStrengthModule extends BaseTxDrivenModule<Void> {
      * {@inheritDoc}
      */
     @Override
-    public TxDrivenModuleConfiguration getConfiguration() {
+    public RuntimeModuleConfiguration getConfiguration() {
         return configuration;
     }
 

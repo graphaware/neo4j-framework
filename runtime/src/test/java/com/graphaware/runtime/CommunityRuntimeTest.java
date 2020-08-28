@@ -17,11 +17,11 @@
 package com.graphaware.runtime;
 
 import com.graphaware.common.policy.inclusion.InclusionPolicies;
-import com.graphaware.runtime.config.FluentTxDrivenModuleConfiguration;
-import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
-import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.FluentModuleConfiguration;
+import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
+import com.graphaware.runtime.config.RuntimeModuleConfiguration;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
-import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.runtime.module.RuntimeModule;
 import com.graphaware.runtime.write.WritingConfig;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.writer.neo4j.BaseNeo4jWriter;
@@ -148,7 +148,7 @@ public class CommunityRuntimeTest {
 
     @Test
     public void moduleThrowingExceptionShouldRollbackTransaction() {
-        TxDrivenModule mockModule = mockTxModule(MOCK);
+        RuntimeModule mockModule = mockTxModule(MOCK);
         doThrow(new DeliberateTransactionRollbackException("Deliberate testing exception")).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
         GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
@@ -171,7 +171,7 @@ public class CommunityRuntimeTest {
 
     @Test
     public void moduleThrowingRuntimeExceptionShouldRollbackTransaction() {
-        TxDrivenModule mockModule = mockTxModule(MOCK);
+        RuntimeModule mockModule = mockTxModule(MOCK);
         doThrow(new RuntimeException("Deliberate testing exception")).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
         GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
@@ -209,8 +209,8 @@ public class CommunityRuntimeTest {
             tx.success();
         }
 
-        TxDrivenModule mockModule1 = mockTxModule(MOCK + "1");
-        TxDrivenModule mockModule2 = mockTxModule(MOCK + "2");
+        RuntimeModule mockModule1 = mockTxModule(MOCK + "1");
+        RuntimeModule mockModule2 = mockTxModule(MOCK + "2");
 
         GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
         runtime.registerModule(mockModule1);
@@ -273,12 +273,12 @@ public class CommunityRuntimeTest {
     @Test(expected = NotFoundException.class)
     public void shouldThrowExceptionWhenAskedForNonExistingModule() {
         GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
-        runtime.getModule("non-existing", TxDrivenModule.class);
+        runtime.getModule("non-existing", RuntimeModule.class);
     }
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotBeAbleToRegisterTheSameModuleTwice() {
-        final TxDrivenModule mockModule = mockTxModule();
+        final RuntimeModule mockModule = mockTxModule();
 
         GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
         runtime.registerModule(mockModule);
@@ -287,8 +287,8 @@ public class CommunityRuntimeTest {
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotBeAbleToRegisterModuleWithTheSameIdTwice() {
-        final TxDrivenModule mockModule1 = mockTxModule();
-        final TxDrivenModule mockModule2 = mockTxModule();
+        final RuntimeModule mockModule1 = mockTxModule();
+        final RuntimeModule mockModule2 = mockTxModule();
         when(mockModule1.getId()).thenReturn("ID");
         when(mockModule2.getId()).thenReturn("ID");
 
@@ -299,9 +299,9 @@ public class CommunityRuntimeTest {
 
     @Test
     public void allRegisteredInterestedModulesShouldBeDelegatedTo() {
-        TxDrivenModule mockModule1 = mockTxModule(MOCK + "1");
-        TxDrivenModule mockModule2 = mockTxModule(MOCK + "2");
-        TxDrivenModule mockModule3 = mockTxModule(MOCK + "3", FluentTxDrivenModuleConfiguration.defaultConfiguration().with(InclusionPolicies.none()));
+        RuntimeModule mockModule1 = mockTxModule(MOCK + "1");
+        RuntimeModule mockModule2 = mockTxModule(MOCK + "2");
+        RuntimeModule mockModule3 = mockTxModule(MOCK + "3", FluentModuleConfiguration.defaultConfiguration().with(InclusionPolicies.none()));
 
         GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
         runtime.registerModule(mockModule1);
@@ -340,7 +340,7 @@ public class CommunityRuntimeTest {
 
     @Test(expected = IllegalStateException.class)
     public void modulesCannotBeRegisteredAfterStart() {
-        final TxDrivenModule mockModule = mockTxModule();
+        final RuntimeModule mockModule = mockTxModule();
 
         GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
         runtime.start();
@@ -358,7 +358,7 @@ public class CommunityRuntimeTest {
 
     @Test
     public void shutdownShouldBeCalledBeforeShutdown() {
-        TxDrivenModule mockModule = mockTxModule();
+        RuntimeModule mockModule = mockTxModule();
 
         GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
         runtime.registerModule(mockModule);
@@ -371,10 +371,10 @@ public class CommunityRuntimeTest {
 
     @Test
     public void whenOneModuleThrowsAnExceptionThenOtherModulesShouldNotBeDelegatedTo() {
-        TxDrivenModule mockModule1 = mockTxModule(MOCK + "1");
+        RuntimeModule mockModule1 = mockTxModule(MOCK + "1");
         doThrow(new RuntimeException()).when(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
 
-        TxDrivenModule mockModule2 = mockTxModule(MOCK + "2");
+        RuntimeModule mockModule2 = mockTxModule(MOCK + "2");
 
         GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
         runtime.registerModule(mockModule1);
@@ -406,9 +406,9 @@ public class CommunityRuntimeTest {
 
     @Test
     public void whenOneModuleForcesRollbackThenModulesBeforeItShouldBeAware() {
-        TxDrivenModule mockModule1 = mockTxModule(MOCK + "1");
-        TxDrivenModule mockModule2 = mockTxModule(MOCK + "2");
-        TxDrivenModule mockModule3 = mockTxModule(MOCK + "3");
+        RuntimeModule mockModule1 = mockTxModule(MOCK + "1");
+        RuntimeModule mockModule2 = mockTxModule(MOCK + "2");
+        RuntimeModule mockModule3 = mockTxModule(MOCK + "3");
 
         doThrow(new DeliberateTransactionRollbackException()).when(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
 
@@ -498,43 +498,43 @@ public class CommunityRuntimeTest {
         assertFalse(started.get());
     }
 
-    private TxDrivenModule mockTxModule() {
+    private RuntimeModule mockTxModule() {
         return mockTxModule(MOCK);
     }
 
-    private TxDrivenModule mockTxModule(String id) {
-        return mockTxModule(id, NullTxDrivenModuleConfiguration.getInstance());
+    private RuntimeModule mockTxModule(String id) {
+        return mockTxModule(id, NullRuntimeModuleConfiguration.getInstance());
     }
 
-    private TxDrivenModule mockTxModule(TxDrivenModuleConfiguration configuration) {
+    private RuntimeModule mockTxModule(RuntimeModuleConfiguration configuration) {
         return mockTxModule(MOCK, configuration);
     }
 
-    private TxDrivenModule mockTxModule(String id, TxDrivenModuleConfiguration configuration) {
-        TxDrivenModule mockModule = mock(TxDrivenModule.class);
+    private RuntimeModule mockTxModule(String id, RuntimeModuleConfiguration configuration) {
+        RuntimeModule mockModule = mock(RuntimeModule.class);
         when(mockModule.getId()).thenReturn(id);
         when(mockModule.getConfiguration()).thenReturn(configuration);
         when(mockModule.beforeCommit(any(ImprovedTransactionData.class))).thenReturn("TEST_" + id);
         return mockModule;
     }
 
-    private <T extends TxDrivenModule> T mockTxModule(String id, Class<T> cls) {
+    private <T extends RuntimeModule> T mockTxModule(String id, Class<T> cls) {
         T mockModule = mock(cls);
         when(mockModule.getId()).thenReturn(id);
-        when(mockModule.getConfiguration()).thenReturn( NullTxDrivenModuleConfiguration.getInstance());
+        when(mockModule.getConfiguration()).thenReturn( NullRuntimeModuleConfiguration.getInstance());
         when(mockModule.beforeCommit(any(ImprovedTransactionData.class))).thenReturn("TEST_" + id);
         return mockModule;
     }
 
-    interface M1 extends TxDrivenModule {
+    interface M1 extends RuntimeModule {
 
     }
 
-    interface M2 extends TxDrivenModule {
+    interface M2 extends RuntimeModule {
 
     }
 
-    interface M7 extends TxDrivenModule {
+    interface M7 extends RuntimeModule {
 
     }
 }

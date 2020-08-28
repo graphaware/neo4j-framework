@@ -18,8 +18,8 @@ package com.graphaware.runtime.module;
 
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.policy.inclusion.*;
-import com.graphaware.runtime.config.BaseTxDrivenModuleConfiguration;
-import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.BaseModuleConfiguration;
+import com.graphaware.runtime.config.RuntimeModuleConfiguration;
 import com.graphaware.runtime.config.function.StringToNodeInclusionPolicy;
 import com.graphaware.runtime.config.function.StringToNodePropertyInclusionPolicy;
 import com.graphaware.runtime.config.function.StringToRelationshipInclusionPolicy;
@@ -30,11 +30,11 @@ import org.neo4j.logging.Log;
 import java.util.Map;
 
 /**
- * Abstract base-class for {@link RuntimeModuleBootstrapper} implementations for {@link TxDrivenModule}s.
+ * Abstract base-class for {@link RuntimeModuleBootstrapper} implementations for {@link RuntimeModule}s.
  *
- * @param <C> type of {@link TxDrivenModuleConfiguration} used to configure the module.
+ * @param <C> type of {@link RuntimeModuleConfiguration} used to configure the module.
  */
-public abstract class BaseRuntimeModuleBootstrapper<C extends BaseTxDrivenModuleConfiguration<C>> implements RuntimeModuleBootstrapper {
+public abstract class BaseRuntimeModuleBootstrapper<C extends BaseModuleConfiguration<C>> implements RuntimeModuleBootstrapper {
 
     private static final Log LOG = LoggerFactory.getLogger(BaseRuntimeModuleBootstrapper.class);
 
@@ -59,20 +59,9 @@ public abstract class BaseRuntimeModuleBootstrapper<C extends BaseTxDrivenModule
     public RuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
         C configuration = defaultConfiguration();
 
-        configuration = configureInitialization(moduleId, config, configuration);
-
         configuration = configureInclusionPolicies(config, configuration);
 
         return doBootstrapModule(moduleId, config, database, configuration);
-    }
-
-    protected C configureInitialization(String moduleId, Map<String, String> config, C configuration) {
-        if (configExists(config, INITIALIZE_UNTIL)) {
-            configuration = configuration.withInitializeUntil(Long.valueOf(config.get(INITIALIZE_UNTIL)));
-            logInitUntil(moduleId, configuration);
-        }
-
-        return configuration;
     }
 
     protected C configureInclusionPolicies(Map<String, String> config, C configuration) {
@@ -124,23 +113,5 @@ public abstract class BaseRuntimeModuleBootstrapper<C extends BaseTxDrivenModule
      */
     protected final boolean configExists(Map<String, String> config, String key) {
         return config.get(key) != null && config.get(key).length() > 0;
-    }
-
-    private void logInitUntil(String moduleId, C configuration) {
-        LOG.info(moduleId + " (re-)initialize until set to %s", initUntilAsString(configuration));
-        if (configuration.initializeUntil() != TxDrivenModuleConfiguration.ALWAYS && configuration.initializeUntil() != TxDrivenModuleConfiguration.NEVER) {
-            long now = System.currentTimeMillis();
-            LOG.info("That's " + Math.abs(now - configuration.initializeUntil()) + " ms in the " + (now > configuration.initializeUntil() ? "past" : "future"));
-        }
-    }
-
-    private String initUntilAsString(C configuration) {
-        if (configuration.initializeUntil() == TxDrivenModuleConfiguration.NEVER) {
-            return "NEVER";
-        }
-        if (configuration.initializeUntil() == TxDrivenModuleConfiguration.ALWAYS) {
-            return "ALWAYS";
-        }
-        return String.valueOf(configuration.initializeUntil());
     }
 }
