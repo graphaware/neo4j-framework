@@ -222,14 +222,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.neo4j</groupId>
-                <artifactId>neo4j-test</artifactId>
-                <version>${neo4j.version}</version>
-                <type>test-jar</type>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>org.neo4j.community</groupId>
                 <artifactId>it-test-support</artifactId>
                 <scope>test</scope>
@@ -241,14 +233,6 @@
                 <artifactId>neo4j-kernel</artifactId>
                 <version>${neo4j.version}</version>
                 <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.neo4j</groupId>
-                <artifactId>neo4j-kernel</artifactId>
-                <version>${neo4j.version}</version>
-                <type>test-jar</type>
-                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -460,7 +444,7 @@
                 <configuration>
                     <aggregate>true</aggregate>
                     <links>
-                        <link>http://neo4j.com/docs/${neo4j.version}/javadocs/</link>
+                        <link>https://neo4j.com/docs/java-reference/3.5/javadocs/</link>
                     </links>
                 </configuration>
                 <executions>
