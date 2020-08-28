@@ -53,8 +53,4 @@ public abstract class GraphAwareIntegrationTest extends ServerIntegrationTest {
 
         registerAllProceduresAndFunctions(procedures);
     }
-
-    public String baseUrl() {
-        return baseNeoUrl() + "/graphaware";
-    }
 }
