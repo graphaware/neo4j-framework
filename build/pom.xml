@@ -21,36 +21,51 @@
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>framework-parent</artifactId>
         <version>3.5.19.58-SNAPSHOT</version>
-        <relativePath>../parent-pom/framework/pom.xml</relativePath>
     </parent>
 
-    <artifactId>build</artifactId>
+    <artifactId>graphaware-framework-community</artifactId>
     <packaging>pom</packaging>
 
-    <name>GraphAware Build</name>
-    <description>Technical Maven Module for Building the Framework</description>
+    <name>GraphAware Framework Server Build</name>
+    <description>Technical Maven Module for Building the Framework for Standalone Use</description>
     <url>http://graphaware.com</url>
-
-    <modules>
-        <module>graphaware-framework-embedded</module>
-        <module>graphaware-framework-server</module>
-    </modules>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.graphaware.neo4j</groupId>
-                <artifactId>runtime</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>runtime</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <relocations>
+                        <relocation>
+                            <pattern>org.objectweb.asm</pattern>
+                            <shadedPattern>ga.relocation.org.objectweb.asm</shadedPattern>
+                            <includes>
+                                <include>org.objectweb.asm.**</include>
+                            </includes>
+                        </relocation>
+                    </relocations>
+                    <!-- This is module has packaging type pom, otherwise finalName could have been used -->
+                    <outputFile>${project.build.directory}/graphaware-server-community-${project.version}.jar</outputFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
