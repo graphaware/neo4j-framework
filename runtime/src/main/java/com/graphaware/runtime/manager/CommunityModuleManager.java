@@ -19,7 +19,7 @@ package com.graphaware.runtime.manager;
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.ping.StatsCollector;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
-import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.runtime.module.Module;
 import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * {@link BaseModuleManager} for {@link RuntimeModule}s.
+ * {@link BaseModuleManager} for {@link Module}s.
  */
 public class CommunityModuleManager extends BaseModuleManager implements ModuleManager {
 
@@ -56,7 +56,7 @@ public class CommunityModuleManager extends BaseModuleManager implements ModuleM
         super.startModules();
 
         LOG.info("Starting transaction-driven modules...");
-        for (RuntimeModule<?> module : modules.values()) {
+        for (Module<?> module : modules.values()) {
             start(module);
         }
         LOG.info("Transaction-driven modules started.");
@@ -68,7 +68,7 @@ public class CommunityModuleManager extends BaseModuleManager implements ModuleM
      *
      * @param module to be started.
      */
-    protected void start(RuntimeModule<?> module) {
+    protected void start(Module<?> module) {
         module.start(database);
     }
 
@@ -79,7 +79,7 @@ public class CommunityModuleManager extends BaseModuleManager implements ModuleM
     public Map<String, Object> beforeCommit(TransactionDataContainer transactionData) {
         Map<String, Object> result = new HashMap<>();
 
-        for (RuntimeModule<?> module : modules.values()) {
+        for (Module<?> module : modules.values()) {
             FilteredTransactionData filteredTransactionData = new FilteredTransactionData(transactionData, module.getConfiguration().getInclusionPolicies());
 
             if (!filteredTransactionData.mutationsOccurred()) {
@@ -104,7 +104,7 @@ public class CommunityModuleManager extends BaseModuleManager implements ModuleM
         return result;
     }
 
-    private Map<String, Object> handleException(Map<String, Object> result, RuntimeModule<?> module, Object state, RuntimeException e) {
+    private Map<String, Object> handleException(Map<String, Object> result, Module<?> module, Object state, RuntimeException e) {
         result.put(module.getId(), state);      //just so the module gets afterRollback called as well
         afterRollback(result); //remove this when https://github.com/neo4j/neo4j/issues/2660 is resolved (todo this is fixed in 3.3)
         throw e;               //will cause rollback
@@ -115,7 +115,7 @@ public class CommunityModuleManager extends BaseModuleManager implements ModuleM
      */
     @Override
     public void afterCommit(Map<String, Object> states) {
-        for (RuntimeModule module : modules.values()) {
+        for (Module module : modules.values()) {
             if (!states.containsKey(module.getId())) {
                 return; //perhaps module wasn't interested, or threw RuntimeException
             }
@@ -129,7 +129,7 @@ public class CommunityModuleManager extends BaseModuleManager implements ModuleM
      */
     @Override
     public void afterRollback(Map<String, Object> states) {
-        for (RuntimeModule module : modules.values()) {
+        for (Module module : modules.values()) {
             if (!states.containsKey(module.getId())) {
                 return; //rollback happened before this module had a go
             }

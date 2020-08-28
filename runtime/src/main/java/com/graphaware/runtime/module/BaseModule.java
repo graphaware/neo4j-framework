@@ -16,20 +16,20 @@
 
 package com.graphaware.runtime.module;
 
-import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
-import com.graphaware.runtime.config.RuntimeModuleConfiguration;
+import com.graphaware.runtime.config.NullModuleConfiguration;
+import com.graphaware.runtime.config.ModuleConfiguration;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import static org.springframework.util.Assert.hasLength;
 
 /**
- * Base class for {@link RuntimeModule} implementations.
+ * Base class for {@link Module} implementations.
  *
  * @param <T> The type of a state object that the module can use to
  *            pass information from the {@link #beforeCommit(com.graphaware.tx.event.improved.api.ImprovedTransactionData)}
  *            method to the {@link #afterCommit(Object)} method.
  */
-public abstract class BaseRuntimeModule<T> implements RuntimeModule<T> {
+public abstract class BaseModule<T> implements Module<T> {
 
     private final String moduleId;
 
@@ -38,7 +38,7 @@ public abstract class BaseRuntimeModule<T> implements RuntimeModule<T> {
      *
      * @param moduleId ID of this module. Must not be <code>null</code> or empty.
      */
-    protected BaseRuntimeModule(String moduleId) {
+    protected BaseModule(String moduleId) {
         hasLength(moduleId);
 
         this.moduleId = moduleId;
@@ -56,8 +56,8 @@ public abstract class BaseRuntimeModule<T> implements RuntimeModule<T> {
      * {@inheritDoc}
      */
     @Override
-    public RuntimeModuleConfiguration getConfiguration() {
-        return NullRuntimeModuleConfiguration.getInstance();
+    public ModuleConfiguration getConfiguration() {
+        return NullModuleConfiguration.getInstance();
     }
 
     /**

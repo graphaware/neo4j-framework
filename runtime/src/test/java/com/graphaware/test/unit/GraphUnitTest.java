@@ -18,7 +18,7 @@ package com.graphaware.test.unit;
 
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
-import com.graphaware.runtime.bootstrap.TestRuntimeModule;
+import com.graphaware.runtime.bootstrap.TestModule;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
 import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class GraphUnitTest extends EmbeddedDatabaseIntegrationTest {
     @Test
     public void clearGraphWithRuntimeShouldDeleteAllNodesAndRelsButNotGraphProps() {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(getDatabase());
-        runtime.registerModule(new TestRuntimeModule("test", Collections.singletonMap("test", "test")));
+        runtime.registerModule(new TestModule("test", Collections.singletonMap("test", "test")));
         runtime.start();
 
         try (Transaction tx = getDatabase().beginTx()) {

@@ -19,13 +19,13 @@ package com.graphaware.runtime.policy.all;
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
 import com.graphaware.common.policy.inclusion.RelationshipPropertyInclusionPolicy;
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.runtime.module.Module;
 import org.neo4j.graphdb.Relationship;
 
 /**
  * {@link org.neo4j.graphdb.Node} {@link PropertyInclusionPolicy} that includes arbitrary business / application level
  * properties (up to subclasses to decide which ones), but excludes any
- * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link RuntimeModule} internal properties.
+ * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link Module} internal properties.
  */
 public final class IncludeAllBusinessRelationshipProperties implements RelationshipPropertyInclusionPolicy {
 

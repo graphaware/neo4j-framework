@@ -16,10 +16,10 @@
 
 package com.graphaware.runtime.bootstrap;
 
-import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
-import com.graphaware.runtime.config.RuntimeModuleConfiguration;
-import com.graphaware.runtime.module.BaseRuntimeModule;
-import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.runtime.config.NullModuleConfiguration;
+import com.graphaware.runtime.config.ModuleConfiguration;
+import com.graphaware.runtime.module.BaseModule;
+import com.graphaware.runtime.module.Module;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 
 import java.util.ArrayList;
@@ -27,23 +27,23 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * {@link RuntimeModule} that can tell whether it has been initialized for testing.
+ * {@link Module} that can tell whether it has been initialized for testing.
  */
-public class TestRuntimeModule extends BaseRuntimeModule<Void> {
+public class TestModule extends BaseModule<Void> {
 
-    public static final List<TestRuntimeModule> TEST_RUNTIME_MODULES = new ArrayList<>();
+    public static final List<TestModule> TEST_RUNTIME_MODULES = new ArrayList<>();
 
     private final Map<String, String> config;
 
-    public TestRuntimeModule(String moduleId, Map<String, String> config) {
+    public TestModule(String moduleId, Map<String, String> config) {
         super(moduleId);
         this.config = config;
         TEST_RUNTIME_MODULES.add(this);
     }
 
     @Override
-    public RuntimeModuleConfiguration getConfiguration() {
-        return NullRuntimeModuleConfiguration.getInstance();
+    public ModuleConfiguration getConfiguration() {
+        return NullModuleConfiguration.getInstance();
     }
 
     public Map<String, String> getConfig() {

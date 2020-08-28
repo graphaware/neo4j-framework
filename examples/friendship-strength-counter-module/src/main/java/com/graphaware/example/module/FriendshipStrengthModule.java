@@ -18,9 +18,9 @@ package com.graphaware.example.module;
 
 import com.graphaware.common.policy.inclusion.RelationshipInclusionPolicy;
 import com.graphaware.runtime.config.FluentModuleConfiguration;
-import com.graphaware.runtime.config.RuntimeModuleConfiguration;
-import com.graphaware.runtime.module.BaseRuntimeModule;
-import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.runtime.config.ModuleConfiguration;
+import com.graphaware.runtime.module.BaseModule;
+import com.graphaware.runtime.module.Module;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
@@ -28,12 +28,12 @@ import org.neo4j.graphdb.Relationship;
 import static com.graphaware.example.module.Relationships.FRIEND_OF;
 
 /**
- * {@link RuntimeModule} that counts the total friendship strength in the database
+ * {@link Module} that counts the total friendship strength in the database
  * and keeps it up to date.
  */
-public class FriendshipStrengthModule extends BaseRuntimeModule<Void> {
+public class FriendshipStrengthModule extends BaseModule<Void> {
 
-    private final RuntimeModuleConfiguration configuration;
+    private final ModuleConfiguration configuration;
     private final FriendshipStrengthCounter counter;
 
     public FriendshipStrengthModule(String moduleId, GraphDatabaseService database) {
@@ -57,7 +57,7 @@ public class FriendshipStrengthModule extends BaseRuntimeModule<Void> {
      * {@inheritDoc}
      */
     @Override
-    public RuntimeModuleConfiguration getConfiguration() {
+    public ModuleConfiguration getConfiguration() {
         return configuration;
     }
 

@@ -21,9 +21,9 @@ import com.graphaware.common.policy.inclusion.*;
 import static org.springframework.util.Assert.notNull;
 
 /**
- * Base-class for {@link RuntimeModuleConfiguration} implementations.
+ * Base-class for {@link ModuleConfiguration} implementations.
  */
-public abstract class BaseModuleConfiguration<T extends BaseModuleConfiguration<T>> implements RuntimeModuleConfiguration {
+public abstract class BaseModuleConfiguration<T extends BaseModuleConfiguration<T>> implements ModuleConfiguration {
 
     private final InclusionPolicies inclusionPolicies;
 
@@ -38,7 +38,7 @@ public abstract class BaseModuleConfiguration<T extends BaseModuleConfiguration<
     }
 
     /**
-     * Create a new instance of this {@link RuntimeModuleConfiguration} with different inclusion policies.
+     * Create a new instance of this {@link ModuleConfiguration} with different inclusion policies.
      *
      * @param inclusionPolicies of the new instance.
      * @return new instance.
@@ -54,7 +54,7 @@ public abstract class BaseModuleConfiguration<T extends BaseModuleConfiguration<
     }
 
     /**
-     * Create a new instance of this {@link RuntimeModuleConfiguration} with different node inclusion policy.
+     * Create a new instance of this {@link ModuleConfiguration} with different node inclusion policy.
      *
      * @param nodeInclusionPolicy of the new instance.
      * @return new instance.
@@ -64,7 +64,7 @@ public abstract class BaseModuleConfiguration<T extends BaseModuleConfiguration<
     }
 
     /**
-     * Create a new instance of this {@link RuntimeModuleConfiguration} with different node property inclusion policy.
+     * Create a new instance of this {@link ModuleConfiguration} with different node property inclusion policy.
      *
      * @param nodePropertyInclusionPolicy of the new instance.
      * @return new instance.
@@ -74,7 +74,7 @@ public abstract class BaseModuleConfiguration<T extends BaseModuleConfiguration<
     }
 
     /**
-     * Create a new instance of this {@link RuntimeModuleConfiguration} with different relationship inclusion policy.
+     * Create a new instance of this {@link ModuleConfiguration} with different relationship inclusion policy.
      *
      * @param relationshipInclusionPolicy of the new instance.
      * @return new instance.
@@ -84,7 +84,7 @@ public abstract class BaseModuleConfiguration<T extends BaseModuleConfiguration<
     }
 
     /**
-     * Create a new instance of this {@link RuntimeModuleConfiguration} with different relationship property inclusion policy.
+     * Create a new instance of this {@link ModuleConfiguration} with different relationship property inclusion policy.
      *
      * @param relationshipPropertyInclusionPolicy of the new instance.
      * @return new instance.
@@ -94,7 +94,7 @@ public abstract class BaseModuleConfiguration<T extends BaseModuleConfiguration<
     }
 
     /**
-     * Create a new instance of {@link RuntimeModuleConfiguration} with different {@link InclusionPolicies}.
+     * Create a new instance of {@link ModuleConfiguration} with different {@link InclusionPolicies}.
      *
      * @param inclusionPolicies of the new instance.
      * @return new instance.

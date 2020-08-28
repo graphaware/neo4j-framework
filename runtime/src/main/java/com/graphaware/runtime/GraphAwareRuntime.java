@@ -17,12 +17,12 @@
 package com.graphaware.runtime;
 
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.runtime.module.Module;
 import com.graphaware.writer.neo4j.Neo4jWriter;
 import org.neo4j.graphdb.NotFoundException;
 
 /**
- * Runtime that delegates to registered {@link com.graphaware.runtime.module.RuntimeModule}s to perform useful work.
+ * Runtime that delegates to registered {@link Module}s to perform useful work.
  * There must be exactly one instance of this runtime for a single {@link org.neo4j.graphdb.GraphDatabaseService}.
  * <p>
  * After all desired modules have been registered, {@link #start()} can be called in order to initialize the runtime and
@@ -32,7 +32,7 @@ import org.neo4j.graphdb.NotFoundException;
  * transaction received from callers. In such case, all other transaction will be blocked until the runtime and all its
  * modules have been initialized.
  * <p>
- * Every new {@link com.graphaware.runtime.module.RuntimeModule} whose configuration has changed since the last run will
+ * Every new {@link Module} whose configuration has changed since the last run will
  * be forced to (re-)initialize, which can lead to very long
  * startup times, as (re-)initialization could be a global graph operation. Re-initialization will also be automatically
  * performed for all modules, for which it has been detected that something is out-of-sync
@@ -43,12 +43,12 @@ import org.neo4j.graphdb.NotFoundException;
 public interface GraphAwareRuntime {
 
     /**
-     * Register a {@link com.graphaware.runtime.module.RuntimeModule}. Note that modules are delegated to in the order
+     * Register a {@link Module}. Note that modules are delegated to in the order
      * they are registered. Must be called before the Runtime is started.
      *
      * @param module to register.
      */
-    void registerModule(RuntimeModule module);
+    void registerModule(Module module);
 
     /**
      * Start the Runtime. Must be called before anything gets written into the database, but will be called automatically
@@ -71,7 +71,7 @@ public interface GraphAwareRuntime {
      * @return module.
      * @throws NotFoundException in case no such module has been registered.
      */
-    <T extends RuntimeModule> T getModule(String moduleId, Class<T> clazz) throws NotFoundException;
+    <T extends Module> T getModule(String moduleId, Class<T> clazz) throws NotFoundException;
 
     /**
      * Get a module registered with the runtime.
@@ -82,7 +82,7 @@ public interface GraphAwareRuntime {
      * @throws NotFoundException     in case no such module has been registered.
      * @throws IllegalStateException in case more than one such module has been registered.
      */
-    <T extends RuntimeModule> T getModule(Class<T> clazz) throws NotFoundException;
+    <T extends Module> T getModule(Class<T> clazz) throws NotFoundException;
 
     /**
      * Get the configuration of this runtime.

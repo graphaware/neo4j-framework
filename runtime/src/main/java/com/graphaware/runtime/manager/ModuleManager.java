@@ -16,14 +16,13 @@
 
 package com.graphaware.runtime.manager;
 
-import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.runtime.module.Module;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
- * A manager of {@link RuntimeModule}s, which takes care of their lifecycle.
+ * A manager of {@link Module}s, which takes care of their lifecycle.
  */
 public interface ModuleManager {
 
@@ -33,7 +32,7 @@ public interface ModuleManager {
      * @param module to check.
      * @throws IllegalStateException in case the module is already registered.
      */
-    void checkNotAlreadyRegistered(RuntimeModule<?> module);
+    void checkNotAlreadyRegistered(Module<?> module);
 
     /**
      * Register a module with this manager.
@@ -41,7 +40,7 @@ public interface ModuleManager {
      * @param module to register.
      * @throws IllegalStateException in case the module is already registered.
      */
-    void registerModule(RuntimeModule<?> module);
+    void registerModule(Module<?> module);
 
     /**
      * Get a module registered with the manager.
@@ -51,7 +50,7 @@ public interface ModuleManager {
      * @param <M>      type of the class above.
      * @return module, <code>null</code> if no such module exists.
      */
-    <M extends RuntimeModule<?>> M getModule(String moduleId, Class<M> clazz);
+    <M extends Module<?>> M getModule(String moduleId, Class<M> clazz);
 
     /**
      * Get a module registered with the manager.
@@ -61,7 +60,7 @@ public interface ModuleManager {
      * @return module. <code>null</code> if no such module exists.
      * @throws IllegalStateException if more than one module of the same type has been registered.
      */
-    <M extends RuntimeModule<?>> M getModule(Class<M> clazz);
+    <M extends Module<?>> M getModule(Class<M> clazz);
 
     /**
      * Perform work needed to make modules start doing their job. Called exactly once each time the database is started.
@@ -77,7 +76,7 @@ public interface ModuleManager {
      * Delegate work to modules before a transaction is committed.
      *
      * @param transactionData about-to-be-committed transaction data.
-     * @return map of objects (states) returned by the modules, keyed by {@link RuntimeModule#getId()}.
+     * @return map of objects (states) returned by the modules, keyed by {@link Module#getId()}.
      */
     Map<String, Object> beforeCommit(TransactionDataContainer transactionData);
 

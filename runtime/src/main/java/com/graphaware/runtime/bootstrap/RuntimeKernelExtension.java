@@ -20,7 +20,8 @@ import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.runtime.config.Neo4jConfigBasedRuntimeConfiguration;
-import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
+import com.graphaware.runtime.module.Module;
+import com.graphaware.runtime.module.ModuleBootstrapper;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
 import org.neo4j.helpers.collection.Pair;
@@ -37,7 +38,7 @@ import static org.neo4j.kernel.configuration.Settings.*;
 
 /**
  * Neo4j kernel extension that automatically creates a {@link GraphAwareRuntime} and registers
- * {@link com.graphaware.runtime.module.RuntimeModule}s with it.
+ * {@link Module}s with it.
  * <p/>
  * The mechanism of this extension works as follows. Of course, the GraphAware Framework .jar file must be present on
  * classpath (embedded mode), or in the "plugins" directory (server mode).
@@ -49,15 +50,15 @@ import static org.neo4j.kernel.configuration.Settings.*;
  * <p/>
  * Modules are registered similarly. For each module that should be registered, there must be an entry in the configuration
  * passed to the database. The key of the entry should be "com.graphaware.module.X.Y", where X becomes the ID
- * of the module ({@link com.graphaware.runtime.module.RuntimeModule#getId()}) and Y becomes the order in which the
+ * of the module ({@link Module#getId()}) and Y becomes the order in which the
  * module gets registered with respect to other modules. The value of the configuration entry must be a fully qualified
- * class name of a {@link com.graphaware.runtime.module.RuntimeModuleBootstrapper} present on the classpath or as a .jar
+ * class name of a {@link ModuleBootstrapper} present on the classpath or as a .jar
  * file in the "plugins" directory. Of course, third party modules can be registered as well.
  * <p/>
  * Custom configuration to the modules can be also passed via database configuration in the form of
  * "com.graphaware.module.X.A = B", where X is the module ID, A is the configuration key, and B is the configuration value.
  * <p/>
- * For instance, if you develop a {@link com.graphaware.runtime.module.RuntimeModule} that is bootstrapped by
+ * For instance, if you develop a {@link Module} that is bootstrapped by
  * <code>com.mycompany.mymodule.MyBootstrapper</code> and want to register it as the first module of the runtime with MyModuleID as
  * the module ID, with an extra configuration called "threshold" equal to 20, then there should be the two following
  * configuration entries passed to the database:
@@ -69,7 +70,7 @@ import static org.neo4j.kernel.configuration.Settings.*;
  * </pre>
  * <p/>
  *
- * @see com.graphaware.runtime.module.RuntimeModuleBootstrapper
+ * @see ModuleBootstrapper
  * @see Neo4jConfigBasedRuntimeConfiguration
  */
 public class RuntimeKernelExtension implements Lifecycle {
@@ -154,7 +155,7 @@ public class RuntimeKernelExtension implements Lifecycle {
             lastOrder = order;
 
             try {
-                RuntimeModuleBootstrapper bootstrapper = (RuntimeModuleBootstrapper) Class.forName(bootstrapperPair.other().other()).newInstance();
+                ModuleBootstrapper bootstrapper = (ModuleBootstrapper) Class.forName(bootstrapperPair.other().other()).newInstance();
                 runtime.registerModule(bootstrapper.bootstrapModule(bootstrapperPair.other().first(), findModuleConfig(bootstrapperPair.other().first()), database));
             } catch (Exception e) {
                 LOG.error("Unable to bootstrap module " + bootstrapperPair.first(), e);

@@ -16,8 +16,8 @@
 
 package com.graphaware.runtime.module;
 
-import com.graphaware.runtime.config.NullRuntimeModuleConfiguration;
-import com.graphaware.runtime.config.RuntimeModuleConfiguration;
+import com.graphaware.runtime.config.NullModuleConfiguration;
+import com.graphaware.runtime.config.ModuleConfiguration;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -28,10 +28,10 @@ import org.neo4j.graphdb.GraphDatabaseService;
  *            pass information from the {@link #beforeCommit(com.graphaware.tx.event.improved.api.ImprovedTransactionData)}
  *            method to the {@link #afterCommit(Object)} method.
  */
-public interface RuntimeModule<T> {
+public interface Module<T> {
 
     /**
-     * Get a human-readable (ideally short) ID of this module. This ID must be unique across all {@link RuntimeModule}s
+     * Get a human-readable (ideally short) ID of this module. This ID must be unique across all {@link Module}s
      * used in a single {@link com.graphaware.runtime.GraphAwareRuntime} instance.
      *
      * @return short ID of this module.
@@ -77,12 +77,12 @@ public interface RuntimeModule<T> {
 
     /**
      * Return the configuration of this module. Each module must encapsulate its entire configuration in an instance of
-     * a {@link RuntimeModuleConfiguration} implementation. Use {@link NullRuntimeModuleConfiguration}
+     * a {@link ModuleConfiguration} implementation. Use {@link NullModuleConfiguration}
      * if this module needs no configuration.
      *
      * @return module configuration.
      */
-    RuntimeModuleConfiguration getConfiguration();
+    ModuleConfiguration getConfiguration();
 
     /**
      * Start the module. This method must bring the module to a usable state, i.e. after it returns, the module must be

@@ -20,7 +20,7 @@ import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
 
 /**
- * {@link RuntimeModuleConfiguration} with fluent interface.
+ * {@link ModuleConfiguration} with fluent interface.
  * Intended for users of Neo4j in embedded mode for programmatic configuration.
  */
 public final class FluentModuleConfiguration extends BaseModuleConfiguration<FluentModuleConfiguration> {

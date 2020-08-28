@@ -14,24 +14,22 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.example.module;
+package com.graphaware.runtime.config;
 
+import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.runtime.module.Module;
-import com.graphaware.runtime.module.ModuleBootstrapper;
-import org.neo4j.graphdb.GraphDatabaseService;
-
-import java.util.Map;
 
 /**
- * {@link ModuleBootstrapper} for {@link FriendshipStrengthModule}.
+ * Encapsulates all configuration of a single {@link Module}. Modules that need
+ * no configuration should use {@link NullModuleConfiguration}. Otherwise, start with
+ * {@link FluentModuleConfiguration}.
  */
-public class FriendshipStrengthModuleBootstrapper implements ModuleBootstrapper {
+public interface ModuleConfiguration {
 
     /**
-     * {@inheritDoc}
+     * Get the inclusion policies used by this module. If unsure, return {@link com.graphaware.runtime.policy.InclusionPoliciesFactory#allBusiness()}.
+     *
+     * @return policies.
      */
-    @Override
-    public Module bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
-        return new FriendshipStrengthModule(moduleId, database);
-    }
+    InclusionPolicies getInclusionPolicies();
 }

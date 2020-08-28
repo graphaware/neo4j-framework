@@ -16,8 +16,8 @@
 
 package com.graphaware.runtime.bootstrap;
 
-import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
-import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.runtime.module.ModuleBootstrapper;
+import com.graphaware.runtime.module.Module;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
 
@@ -26,15 +26,15 @@ import java.util.Map;
 import static org.neo4j.kernel.configuration.Settings.*;
 
 /**
- * {@link com.graphaware.runtime.module.RuntimeModuleBootstrapper} for {@link TestRuntimeModule}.
+ * {@link ModuleBootstrapper} for {@link TestModule}.
  */
-public class TestModuleBootstrapper implements RuntimeModuleBootstrapper {
+public class TestModuleBootstrapper implements ModuleBootstrapper {
 
     public static final Setting<String> MODULE_ENABLED = setting("com.graphaware.module.test.1", STRING, TestModuleBootstrapper.class.getCanonicalName());
     public static final Setting<String> MODULE_CONFIG = setting("com.graphaware.module.test.configKey", STRING, "configValue");
 
     @Override
-    public RuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
-        return new TestRuntimeModule(moduleId, config);
+    public Module bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
+        return new TestModule(moduleId, config);
     }
 }

@@ -19,7 +19,7 @@ package com.graphaware.runtime;
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.ModuleManager;
-import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.runtime.module.Module;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import com.graphaware.writer.neo4j.Neo4jWriter;
@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * {@link GraphAwareRuntime} intended for Community production use.
  * <p>
- * Supports {@link RuntimeModule} {@link RuntimeModule}s.
+ * Supports {@link Module} {@link Module}s.
  * <p>
  * To use this {@link GraphAwareRuntime}, construct it using {@link GraphAwareRuntimeFactory}.
  */
@@ -96,7 +96,7 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      * {@inheritDoc}
      */
     @Override
-    public synchronized void registerModule(RuntimeModule module) {
+    public synchronized void registerModule(Module module) {
         if (!State.REGISTERED.equals(state)) {
             LOG.error("Modules must be registered before GraphAware Runtime is started!");
             throw new IllegalStateException("Modules must be registered before GraphAware Runtime is started!");
@@ -293,7 +293,7 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      * {@inheritDoc}
      */
     @Override
-    public <M extends RuntimeModule> M getModule(String moduleId, Class<M> clazz) throws NotFoundException {
+    public <M extends Module> M getModule(String moduleId, Class<M> clazz) throws NotFoundException {
         M module = runtimeModuleManager.getModule(moduleId, clazz);
 
         if (module != null) {
@@ -307,7 +307,7 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      * {@inheritDoc}
      */
     @Override
-    public <M extends RuntimeModule> M getModule(Class<M> clazz) throws NotFoundException {
+    public <M extends Module> M getModule(Class<M> clazz) throws NotFoundException {
         M txResult = runtimeModuleManager.getModule(clazz);
 
         if (txResult == null) {

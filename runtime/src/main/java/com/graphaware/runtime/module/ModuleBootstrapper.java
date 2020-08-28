@@ -21,7 +21,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import java.util.Map;
 
 /**
- * Component that automatically bootstraps a {@link RuntimeModule} based on config parameters passed to Neo4j.
+ * Component that automatically bootstraps a {@link Module} based on config parameters passed to Neo4j.
  * <p>
  * Implementations can expect that if there is the following entry in neo4j.conf
  * <p>
@@ -34,12 +34,12 @@ import java.util.Map;
  * com.graphaware.module.x.a = b
  * <p>
  * a map with a's as keys and b's as values will be passed as the second parameter (config) to the {@link #bootstrapModule(String, java.util.Map, org.neo4j.graphdb.GraphDatabaseService)}
- * method. {@link RuntimeModuleBootstrapper} implementations should document, which key-value configurations
+ * method. {@link ModuleBootstrapper} implementations should document, which key-value configurations
  * they expect.
  *
  * @see com.graphaware.runtime.bootstrap.RuntimeKernelExtension
  */
-public interface RuntimeModuleBootstrapper {
+public interface ModuleBootstrapper {
 
     /**
      * Create a new instance of a module.
@@ -49,5 +49,5 @@ public interface RuntimeModuleBootstrapper {
      * @param database which the module will run on.
      * @return fully configured runtime module.
      */
-    RuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database);
+    Module bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database);
 }

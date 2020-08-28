@@ -20,7 +20,7 @@ import com.graphaware.common.representation.GraphDetachedNode;
 import com.graphaware.common.representation.GraphDetachedRelationship;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
-import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.runtime.module.Module;
 import com.graphaware.writer.thirdparty.*;
 import org.junit.After;
 import org.junit.Before;
@@ -64,7 +64,7 @@ public class DefaultThirdPartyIntegrationModuleTest {
     @Test
     public void modificationsShouldBeCorrectlyBuilt() throws InterruptedException {
         RememberingWriter writer = new RememberingWriter();
-        RuntimeModule module = new DefaultThirdPartyIntegrationModule("test", writer);
+        Module module = new DefaultThirdPartyIntegrationModule("test", writer);
 
         database.execute("CREATE (p:Person {name:'Michal', age:30})-[:WORKS_FOR {since:2013, role:'MD'}]->(c:Company {name:'GraphAware', est: 2013})");
         database.execute("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Adam'})-[:WORKS_FOR {since:2014}]->(ga)");

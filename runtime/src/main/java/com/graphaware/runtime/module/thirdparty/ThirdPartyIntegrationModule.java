@@ -18,7 +18,7 @@ package com.graphaware.runtime.module.thirdparty;
 
 import com.graphaware.common.representation.DetachedNode;
 import com.graphaware.common.representation.DetachedRelationship;
-import com.graphaware.runtime.module.BaseRuntimeModule;
+import com.graphaware.runtime.module.BaseModule;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.writer.thirdparty.*;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  * The collection of {@link WriteOperation}s is passed into the {@link #afterCommit(Object)} method after the transaction
  * has successfully committed. The {@link #afterCommit(Object)} should be overridden by sub-classes.
  */
-public abstract class ThirdPartyIntegrationModule<ID> extends BaseRuntimeModule<Collection<WriteOperation<?>>> {
+public abstract class ThirdPartyIntegrationModule<ID> extends BaseModule<Collection<WriteOperation<?>>> {
 
     /**
      * Construct a new module.

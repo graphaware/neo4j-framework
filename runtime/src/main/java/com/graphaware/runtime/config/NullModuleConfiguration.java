@@ -17,19 +17,35 @@
 package com.graphaware.runtime.config;
 
 import com.graphaware.common.policy.inclusion.InclusionPolicies;
-import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.runtime.module.Module;
+import com.graphaware.runtime.policy.InclusionPoliciesFactory;
 
 /**
- * Encapsulates all configuration of a single {@link RuntimeModule}. Modules that need
- * no configuration should use {@link NullRuntimeModuleConfiguration}. Otherwise, start with
- * {@link FluentModuleConfiguration}.
+ * {@link ModuleConfiguration} for {@link Module}s with no configuration. Singleton.
  */
-public interface RuntimeModuleConfiguration {
+public final class NullModuleConfiguration implements ModuleConfiguration {
+
+    private static final ModuleConfiguration INSTANCE = new NullModuleConfiguration();
+    private final InclusionPolicies inclusionPolicies;
 
     /**
-     * Get the inclusion policies used by this module. If unsure, return {@link com.graphaware.runtime.policy.InclusionPoliciesFactory#allBusiness()}.
+     * Get instance of this singleton configuration.
      *
-     * @return policies.
+     * @return instance.
      */
-    InclusionPolicies getInclusionPolicies();
+    public static ModuleConfiguration getInstance() {
+        return INSTANCE;
+    }
+
+    private NullModuleConfiguration() {
+        inclusionPolicies = InclusionPoliciesFactory.allBusiness();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public InclusionPolicies getInclusionPolicies() {
+        return inclusionPolicies;
+    }
 }

@@ -18,7 +18,7 @@ package com.graphaware.runtime.manager;
 
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.ping.StatsCollector;
-import com.graphaware.runtime.module.RuntimeModule;
+import com.graphaware.runtime.module.Module;
 import org.neo4j.logging.Log;
 
 import java.util.LinkedHashMap;
@@ -31,7 +31,7 @@ public abstract class BaseModuleManager implements ModuleManager {
 
     private static final Log LOG = LoggerFactory.getLogger(BaseModuleManager.class);
 
-    protected final Map<String, RuntimeModule> modules = new LinkedHashMap<>();
+    protected final Map<String, Module> modules = new LinkedHashMap<>();
     private final StatsCollector statsCollector;
 
     /**
@@ -45,7 +45,7 @@ public abstract class BaseModuleManager implements ModuleManager {
      * {@inheritDoc}
      */
     @Override
-    public final void registerModule(RuntimeModule module) {
+    public final void registerModule(Module module) {
         modules.put(module.getId(), module);
     }
 
@@ -53,12 +53,12 @@ public abstract class BaseModuleManager implements ModuleManager {
      * {@inheritDoc}
      */
     @Override
-    public <M extends RuntimeModule<?>> M getModule(String moduleId, Class<M> clazz) {
+    public <M extends Module<?>> M getModule(String moduleId, Class<M> clazz) {
         if (!modules.containsKey(moduleId)) {
             return null;
         }
 
-        RuntimeModule module = modules.get(moduleId);
+        Module module = modules.get(moduleId);
         if (!clazz.isAssignableFrom(module.getClass())) {
             LOG.warn("Module " + moduleId + " is not a " + clazz.getName());
             return null;
@@ -71,9 +71,9 @@ public abstract class BaseModuleManager implements ModuleManager {
      * {@inheritDoc}
      */
     @Override
-    public <M extends RuntimeModule<?>> M getModule(Class<M> clazz) {
+    public <M extends Module<?>> M getModule(Class<M> clazz) {
         M result = null;
-        for (RuntimeModule module : modules.values()) {
+        for (Module module : modules.values()) {
             if (clazz.isAssignableFrom(module.getClass())) {
                 if (result != null) {
                     throw new IllegalStateException("More than one module of type " + clazz + " has been registered");
@@ -91,7 +91,7 @@ public abstract class BaseModuleManager implements ModuleManager {
      * @param module to check.
      * @throws IllegalStateException in case the module is already registered.
      */
-    public void checkNotAlreadyRegistered(RuntimeModule module) {
+    public void checkNotAlreadyRegistered(Module module) {
         if (modules.containsValue(module)) {
             LOG.error("Module " + module.getId() + " cannot be registered more than once!");
             throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
@@ -108,7 +108,7 @@ public abstract class BaseModuleManager implements ModuleManager {
      */
     @Override
     public void startModules() {
-        for (RuntimeModule<?> module : modules.values()) {
+        for (Module<?> module : modules.values()) {
             statsCollector.moduleStart(module.getClass().getCanonicalName());
         }
     }
@@ -118,7 +118,7 @@ public abstract class BaseModuleManager implements ModuleManager {
      */
     @Override
     public void shutdownModules() {
-        for (RuntimeModule<?> module : modules.values()) {
+        for (Module<?> module : modules.values()) {
             LOG.info("Shutting down module " + module.getId());
             module.shutdown();
         }

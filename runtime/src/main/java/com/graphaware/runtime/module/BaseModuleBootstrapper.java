@@ -19,7 +19,7 @@ package com.graphaware.runtime.module;
 import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.policy.inclusion.*;
 import com.graphaware.runtime.config.BaseModuleConfiguration;
-import com.graphaware.runtime.config.RuntimeModuleConfiguration;
+import com.graphaware.runtime.config.ModuleConfiguration;
 import com.graphaware.runtime.config.function.StringToNodeInclusionPolicy;
 import com.graphaware.runtime.config.function.StringToNodePropertyInclusionPolicy;
 import com.graphaware.runtime.config.function.StringToRelationshipInclusionPolicy;
@@ -30,13 +30,13 @@ import org.neo4j.logging.Log;
 import java.util.Map;
 
 /**
- * Abstract base-class for {@link RuntimeModuleBootstrapper} implementations for {@link RuntimeModule}s.
+ * Abstract base-class for {@link ModuleBootstrapper} implementations for {@link Module}s.
  *
- * @param <C> type of {@link RuntimeModuleConfiguration} used to configure the module.
+ * @param <C> type of {@link ModuleConfiguration} used to configure the module.
  */
-public abstract class BaseRuntimeModuleBootstrapper<C extends BaseModuleConfiguration<C>> implements RuntimeModuleBootstrapper {
+public abstract class BaseModuleBootstrapper<C extends BaseModuleConfiguration<C>> implements ModuleBootstrapper {
 
-    private static final Log LOG = LoggerFactory.getLogger(BaseRuntimeModuleBootstrapper.class);
+    private static final Log LOG = LoggerFactory.getLogger(BaseModuleBootstrapper.class);
 
     protected static final String INITIALIZE_UNTIL = "initializeUntil";
 
@@ -56,7 +56,7 @@ public abstract class BaseRuntimeModuleBootstrapper<C extends BaseModuleConfigur
      * {@inheritDoc}
      */
     @Override
-    public RuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
+    public Module bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
         C configuration = defaultConfiguration();
 
         configuration = configureInclusionPolicies(config, configuration);
@@ -102,7 +102,7 @@ public abstract class BaseRuntimeModuleBootstrapper<C extends BaseModuleConfigur
      * @param configuration pre-populated with configuration common for all modules, such as "initializeUntil" and all {@link InclusionPolicies}.
      * @return fully configured runtime module.
      */
-    protected abstract RuntimeModule doBootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database, C configuration);
+    protected abstract Module doBootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database, C configuration);
 
     /**
      * Check if a configuration has been specified.

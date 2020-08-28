@@ -32,7 +32,7 @@ import java.util.Set;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
-import static com.graphaware.runtime.bootstrap.TestRuntimeModule.TEST_RUNTIME_MODULES;
+import static com.graphaware.runtime.bootstrap.TestModule.TEST_RUNTIME_MODULES;
 import static org.junit.Assert.*;
 
 /**

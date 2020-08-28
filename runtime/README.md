@@ -248,8 +248,8 @@ GraphAware Runtime Modules can be registered in server mode only if there is an 
 It is simple to create one:
 
 ```java
-/**
- * {@link com.graphaware.runtime.module.RuntimeModuleBootstrapper} for {@link FriendshipStrengthModule}.
+import com.graphaware.runtime.module.ModuleBootstrapper; /**
+ * {@link ModuleBootstrapper} for {@link FriendshipStrengthModule}.
  */
 public class FriendshipStrengthModuleBootstrapper implements RuntimeModuleBootstrapper {
 
