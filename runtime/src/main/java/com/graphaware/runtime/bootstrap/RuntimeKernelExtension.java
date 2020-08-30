@@ -105,10 +105,6 @@ public class RuntimeKernelExtension implements Lifecycle {
      */
     @Override
     public void start() {
-        if (hasEnterpriseFramework()) {
-            return;
-        }
-
         if (!config.get(RUNTIME_ENABLED)) {
             LOG.info("GraphAware Runtime disabled.");
             return;
