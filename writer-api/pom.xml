@@ -19,9 +19,8 @@
 
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>framework-parent</artifactId>
+        <artifactId>graphaware-parent</artifactId>
         <version>3.5.19.58-SNAPSHOT</version>
-        <relativePath>../parent-pom/framework/pom.xml</relativePath>
     </parent>
 
     <artifactId>writer-api</artifactId>

@@ -18,10 +18,12 @@ package com.graphaware.test.integration;
 
 import org.apache.commons.io.FileUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.harness.TestServerBuilder;
 import org.neo4j.kernel.impl.factory.GraphDatabaseFacade;
 import org.neo4j.kernel.impl.proc.Procedures;
 import org.neo4j.procedure.Procedure;
 import org.neo4j.procedure.UserFunction;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,13 +31,23 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileSystems;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
-public final class ClassPathProcedureUtils {
+public final class IntegrationTestUtils {
+
+    public static TestServerBuilder applyConfig(TestServerBuilder builder, String fileName) {
+        Properties properties = new Properties();
+        try {
+            properties.load(new ClassPathResource(fileName).getInputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        for (String key : properties.stringPropertyNames()) {
+            builder = builder.withConfig(key, properties.getProperty(key));
+        }
+        return builder;
+    }
 
     public static void registerAllProceduresAndFunctions(GraphDatabaseService database) throws Exception {
         registerAllProceduresAndFunctions(((GraphDatabaseFacade) database).getDependencyResolver().resolveDependency(Procedures.class));
@@ -57,7 +69,7 @@ public final class ClassPathProcedureUtils {
         Enumeration<URL> urls;
 
         try {
-            urls = ClassPathProcedureUtils.class.getClassLoader().getResources("");
+            urls = IntegrationTestUtils.class.getClassLoader().getResources("");
         } catch (IOException e) {
             throw new RuntimeException();
         }
@@ -100,6 +112,6 @@ public final class ClassPathProcedureUtils {
         return classes;
     }
 
-    private ClassPathProcedureUtils() {
+    private IntegrationTestUtils() {
     }
 }

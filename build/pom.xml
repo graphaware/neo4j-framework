@@ -19,22 +19,21 @@
 
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>framework-parent</artifactId>
+        <artifactId>graphaware-parent</artifactId>
         <version>3.5.19.58-SNAPSHOT</version>
     </parent>
 
-    <artifactId>graphaware-framework-community</artifactId>
+    <artifactId>build</artifactId>
     <packaging>pom</packaging>
 
-    <name>GraphAware Framework Server Build</name>
-    <description>Technical Maven Module for Building the Framework for Standalone Use</description>
+    <name>GraphAware Framework Community Build</name>
+    <description>Technical Maven Module for Building the GraphAware Framework Community Edition</description>
     <url>http://graphaware.com</url>
 
     <dependencies>
         <dependency>
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>runtime</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
@@ -45,15 +44,6 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <relocations>
-                        <relocation>
-                            <pattern>org.objectweb.asm</pattern>
-                            <shadedPattern>ga.relocation.org.objectweb.asm</shadedPattern>
-                            <includes>
-                                <include>org.objectweb.asm.**</include>
-                            </includes>
-                        </relocation>
-                    </relocations>
                     <!-- This is module has packaging type pom, otherwise finalName could have been used -->
                     <outputFile>${project.build.directory}/graphaware-server-community-${project.version}.jar</outputFile>
                 </configuration>

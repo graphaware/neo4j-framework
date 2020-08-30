@@ -19,9 +19,8 @@
 
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>framework-parent</artifactId>
+        <artifactId>graphaware-parent</artifactId>
         <version>3.5.19.58-SNAPSHOT</version>
-        <relativePath>../parent-pom/framework/pom.xml</relativePath>
     </parent>
 
     <artifactId>runtime</artifactId>
@@ -60,22 +59,5 @@
 <!--        </dependency>-->
 
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

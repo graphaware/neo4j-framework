@@ -28,9 +28,24 @@
     <url>http://graphaware.com/products</url>
 
     <modules>
-        <module>parent-pom/framework</module>
-        <module>parent-pom/module</module>
+        <module>common</module>
+        <module>runtime</module>
+        <module>tests</module>
+        <module>tx-api</module>
+        <module>tx-executor</module>
+        <module>writer</module>
+        <module>writer-api</module>
+        <module>build</module>
+
+        <module>module-parent</module>
         <module>graphaware-apoc-dependency-test</module>
+
+        <!--examples-->
+        <module>examples/node-counter</module>
+        <module>examples/friendship-strength-counter</module>
+        <module>examples/change-logger</module>
+        <module>examples/friendship-strength-counter-module</module>
+        <module>examples/performance-testing</module>
     </modules>
 
     <licenses>
@@ -52,6 +67,21 @@
         <url>git@github.com:graphaware/neo4j-framework.git</url>
         <tag>HEAD</tag>
     </scm>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <neo4j.version>3.5.19</neo4j.version>
+        <spring.version>5.2.8.RELEASE</spring.version>
+        <uuid.version>3.2</uuid.version>
+        <jackson.version>2.9.10</jackson.version>
+        <maven.plugin.surefire>2.22.2</maven.plugin.surefire>
+        <junit.version>5.4.2</junit.version>
+        <mockito.version>1.10.19</mockito.version>
+        <jsonassert.version>1.5.0</jsonassert.version>
+        <guava.version>21.0</guava.version>
+        <fw.version>3.5.19.58-SNAPSHOT</fw.version>
+    </properties>
 
     <developers>
         <developer>
@@ -148,14 +178,6 @@
         </profile>
     </profiles>
 
-    <properties>
-        <java.version>1.8</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>3.5.19</neo4j.version>
-        <spring.version>5.2.8.RELEASE</spring.version>
-        <maven.plugin.surefire>2.22.2</maven.plugin.surefire>
-    </properties>
-
     <dependencyManagement>
         <dependencies>
 
@@ -164,44 +186,44 @@
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>common</artifactId>
-                <version>3.5.19.58-SNAPSHOT</version>
+                <version>${fw.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime</artifactId>
-                <version>3.5.19.58-SNAPSHOT</version>
+                <version>${fw.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer</artifactId>
-                <version>3.5.19.58-SNAPSHOT</version>
+                <version>${fw.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer-api</artifactId>
-                <version>3.5.19.58-SNAPSHOT</version>
+                <version>${fw.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tests</artifactId>
-                <version>3.5.19.58-SNAPSHOT</version>
+                <version>${fw.version}</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-api</artifactId>
-                <version>3.5.19.58-SNAPSHOT</version>
+                <version>${fw.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-executor</artifactId>
-                <version>3.5.19.58-SNAPSHOT</version>
+                <version>${fw.version}</version>
             </dependency>
 
             <!--            <dependency>-->
@@ -232,32 +254,32 @@
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
-                <version>5.4.2</version>
+                <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-api</artifactId>
-                <version>5.4.2</version>
+                <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-params</artifactId>
-                <version>5.4.2</version>
+                <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-all</artifactId>
-                <version>1.10.19</version>
+                <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>org.skyscreamer</groupId>
                 <artifactId>jsonassert</artifactId>
-                <version>1.5.0</version>
+                <version>${jsonassert.version}</version>
                 <scope>test</scope>
             </dependency>
 
@@ -266,19 +288,19 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.9.10</version>
+                <version>${jackson.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>2.9.10</version>
+                <version>${jackson.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.9.10.4</version>
+                <version>${jackson.version}.4</version>
             </dependency>
 
             <!-- Spring -->
@@ -292,14 +314,14 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>21.0</version>
+                <version>${guava.version}</version>
             </dependency>
 
             <!-- UUID -->
             <dependency>
                 <groupId>com.eaio.uuid</groupId>
                 <artifactId>uuid</artifactId>
-                <version>3.5</version>
+                <version>${uuid.version}</version>
             </dependency>
 
         </dependencies>
@@ -307,7 +329,16 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j</artifactId>
+        </dependency>
+
         <!-- Testing -->
+        <dependency>
+            <groupId>org.neo4j.test</groupId>
+            <artifactId>neo4j-harness</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>

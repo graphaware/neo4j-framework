@@ -24,16 +24,10 @@ import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.harness.ServerControls;
 import org.neo4j.harness.TestServerBuilder;
 import org.neo4j.harness.TestServerBuilders;
-import org.neo4j.helpers.ListenSocketAddress;
-import org.neo4j.kernel.impl.factory.GraphDatabaseFacade;
 import org.neo4j.kernel.impl.proc.Procedures;
-import org.neo4j.server.helpers.CommunityServerBuilder;
-import org.springframework.core.io.ClassPathResource;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * Base class for all kinds of Neo4j integration tests.
@@ -132,19 +126,11 @@ public abstract class DatabaseIntegrationTest {
      *
      * @param builder to populate.
      */
-    protected TestServerBuilder configure(TestServerBuilder builder) throws IOException {
-        for (Map.Entry<String, String> mapping : thirdPartyJaxRsPackageMappings().entrySet()) {
-            builder = builder.withExtension(mapping.getKey(), mapping.getValue());
-        }
-
+    protected TestServerBuilder configure(TestServerBuilder builder) {
         builder = builder.withConfig(GraphDatabaseSettings.auth_enabled.name(), Boolean.toString(authEnabled()));
 
         if (configFile() != null) {
-            Properties properties = new Properties();
-            properties.load(new ClassPathResource(configFile()).getInputStream());
-            for (String key : properties.stringPropertyNames()) {
-                builder = builder.withConfig(key, properties.getProperty(key));
-            }
+            IntegrationTestUtils.applyConfig(builder, configFile());
         }
 
         for (Map.Entry<String, String> config : additionalServerConfiguration().entrySet()) {
@@ -152,20 +138,6 @@ public abstract class DatabaseIntegrationTest {
         }
 
         return builder;
-    }
-
-
-    /**
-     * Provide information for registering unmanaged extensions.
-     * <p>
-     * This method is only called iff {@link #configFile()} returns <code>null</code>.
-     *
-     * @return map where the key is the package in which a set of extensions live and value is the mount point of those
-     * extensions, i.e., a URL under which they will be exposed relative to the server address
-     * (typically http://localhost:7575 for tests).
-     */
-    protected Map<String, String> thirdPartyJaxRsPackageMappings() {
-        return Collections.emptyMap();
     }
 
     /**

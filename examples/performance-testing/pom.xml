@@ -26,7 +26,7 @@
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>module-parent</artifactId>
         <version>3.5.19.58-SNAPSHOT</version>
-        <relativePath>../../parent-pom/module/pom.xml</relativePath>
+        <relativePath>../../module-parent/pom.xml</relativePath>
     </parent>
 
     <name>GraphAware Neo4j Performance Test Examples</name>

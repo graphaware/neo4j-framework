@@ -25,7 +25,6 @@
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>graphaware-parent</artifactId>
         <version>3.5.19.58-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <name>GraphAware Neo4j Module</name>
@@ -40,106 +39,72 @@
     </licenses>
 
     <dependencyManagement>
-
         <dependencies>
 
             <!-- GraphAware -->
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
-                <version>3.5.19.58-SNAPSHOT</version>
                 <artifactId>common</artifactId>
+                <version>${fw.version}</version>
                 <scope>provided</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.ow2.asm</groupId>
-                        <artifactId>asm</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>runtime</artifactId>
-                <version>3.5.19.58-SNAPSHOT</version>
+                <version>${fw.version}</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer</artifactId>
-                <version>3.5.19.58-SNAPSHOT</version>
+                <version>${fw.version}</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>writer-api</artifactId>
-                <version>3.5.19.58-SNAPSHOT</version>
+                <version>${fw.version}</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-api</artifactId>
-                <version>3.5.19.58-SNAPSHOT</version>
+                <version>${fw.version}</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>tx-executor</artifactId>
-                <version>3.5.19.58-SNAPSHOT</version>
+                <version>${fw.version}</version>
                 <scope>provided</scope>
             </dependency>
-
-            <!-- Commons -->
-
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-collections4</artifactId>
-                <version>4.1</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>commons-io</groupId>
-                <artifactId>commons-io</artifactId>
-                <version>2.4</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-math3</artifactId>
-                <version>3.5</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <!-- Serialization -->
 
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
-                <version>2.6.5</version>
+                <version>${jackson.version}</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>2.6.5</version>
+                <version>${jackson.version}</version>
                 <scope>provided</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.6.5</version>
+                <version>${jackson.version}</version>
                 <scope>provided</scope>
             </dependency>
-
-            <!-- Spring -->
 
             <dependency>
                 <groupId>org.springframework</groupId>
@@ -148,26 +113,17 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- Guava -->
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>21.0</version>
+                <version>${guava.version}</version>
                 <scope>provided</scope>
             </dependency>
 
-            <!-- UUID -->
             <dependency>
                 <groupId>com.eaio.uuid</groupId>
                 <artifactId>uuid</artifactId>
-                <version>3.2</version>
-                <scope>provided</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.neo4j</groupId>
-                <artifactId>server-api</artifactId>
-                <version>${neo4j.version}</version>
+                <version>${uuid.version}</version>
                 <scope>provided</scope>
             </dependency>
 
