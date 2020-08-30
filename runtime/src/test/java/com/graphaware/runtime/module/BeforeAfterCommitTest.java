@@ -18,22 +18,37 @@ package com.graphaware.runtime.module;
 
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.ServerControls;
+import org.neo4j.harness.TestServerBuilders;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BeforeAfterCommitTest {
 
+    private ServerControls controls;
+    private GraphDatabaseService database;
+
+    @BeforeEach
+    public void setUp() {
+        controls = TestServerBuilders.newInProcessBuilder().newServer();
+        database = controls.graph();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        controls.close();
+    }
+
     @Test
     public void afterCommitShouldBeCalled() throws InterruptedException {
-        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-
         BeforeAfterCommitModule module = new BeforeAfterCommitModule("test", null);
 
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
@@ -48,14 +63,10 @@ public class BeforeAfterCommitTest {
 
         assertTrue(module.isAfterCommitCalled());
         assertFalse(module.isAfterRollbackCalled());
-
-        database.shutdown();
     }
 
     @Test
     public void afterRollbackShouldBeCalled() throws InterruptedException {
-        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-
         BeforeAfterCommitModule module = new BeforeAfterCommitModule("test", null);
 
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
@@ -79,7 +90,5 @@ public class BeforeAfterCommitTest {
 
         assertFalse(module.isAfterCommitCalled());
         assertTrue(module.isAfterRollbackCalled());
-
-        database.shutdown();
     }
 }

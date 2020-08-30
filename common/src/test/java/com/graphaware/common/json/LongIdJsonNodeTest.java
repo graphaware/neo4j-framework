@@ -18,32 +18,30 @@ package com.graphaware.common.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.graphaware.common.UnitTest;
+import com.graphaware.common.representation.DetachedEntity;
 import com.graphaware.common.representation.SerializationSpecification;
 import com.graphaware.common.transform.NodeIdTransformer;
-import com.graphaware.common.representation.DetachedEntity;
 import org.json.JSONException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.neo4j.graphdb.*;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.junit.jupiter.api.Test;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.io.IOException;
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class LongIdJsonNodeTest {
+public class LongIdJsonNodeTest extends UnitTest {
 
-    private GraphDatabaseService database;
     private ObjectMapper mapper = new ObjectMapper();
 
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-
+    @Override
+    protected void populate(GraphDatabaseService database) {
         try (Transaction tx = database.beginTx()) {
             Node node1 = database.createNode(Label.label("L1"), Label.label("L2"));
             Node node2 = database.createNode();
@@ -53,11 +51,6 @@ public class LongIdJsonNodeTest {
 
             tx.success();
         }
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
     }
 
     @Test
@@ -185,35 +178,41 @@ public class LongIdJsonNodeTest {
             tx.success();
         }
 
-        try (Transaction tx = database.beginTx()) {
-            LongIdJsonNode jsonNode = mapper.readValue("{\"id\":1, \"properties\":{\"k1\":\"v1\",\"k2\":2}}", LongIdJsonNode.class);
-            jsonNode.produceEntity(database);
+        assertThrows(IllegalStateException.class, () -> {
+            try (Transaction tx = database.beginTx()) {
+                LongIdJsonNode jsonNode = mapper.readValue("{\"id\":1, \"properties\":{\"k1\":\"v1\",\"k2\":2}}", LongIdJsonNode.class);
+                jsonNode.produceEntity(database);
 
-            tx.success();
-            fail();
-        } catch (IllegalStateException e) {
-            //ok
-        }
+                tx.success();
+            }
+        });
 
-        try (Transaction tx = database.beginTx()) {
-            LongIdJsonNode jsonNode = mapper.readValue("{\"id\":10000}", LongIdJsonNode.class);
-            jsonNode.produceEntity(database, new TimesThousandNodeIdTransformer());
+        assertThrows(IllegalStateException.class, () -> {
+            try (Transaction tx = database.beginTx()) {
+                LongIdJsonNode jsonNode = mapper.readValue("{\"id\":10000}", LongIdJsonNode.class);
+                jsonNode.produceEntity(database, new TimesThousandNodeIdTransformer());
 
-            tx.success();
-            fail();
-        } catch (NotFoundException e) {
-            //ok
-        }
+                tx.success();
+            }
+        });
 
-        try (Transaction tx = database.beginTx()) {
-            LongIdJsonNode jsonNode = mapper.readValue("{\"id\":1, \"labels\":[\"L1\",\"L2\"]}", LongIdJsonNode.class);
-            jsonNode.produceEntity(database);
 
-            tx.success();
-            fail();
-        } catch (IllegalStateException e) {
-            //ok
-        }
+        assertThrows(IllegalStateException.class, () -> {
+            try (Transaction tx = database.beginTx()) {
+                LongIdJsonNode jsonNode = mapper.readValue("{\"id\":10000}", LongIdJsonNode.class);
+                jsonNode.produceEntity(database, new TimesThousandNodeIdTransformer());
+
+                tx.success();
+            }
+        });
+        assertThrows(IllegalStateException.class, () -> {
+            try (Transaction tx = database.beginTx()) {
+                LongIdJsonNode jsonNode = mapper.readValue("{\"id\":1, \"labels\":[\"L1\",\"L2\"]}", LongIdJsonNode.class);
+                jsonNode.produceEntity(database);
+
+                tx.success();
+            }
+        });
     }
 
     @Test

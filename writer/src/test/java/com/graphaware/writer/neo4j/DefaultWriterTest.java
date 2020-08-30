@@ -18,20 +18,18 @@ package com.graphaware.writer.neo4j;
 
 import com.graphaware.common.util.IterableUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
-import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.Transaction;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test for {@link TxPerTaskWriter}.
  */
-public class DefaultWriterTest extends EmbeddedDatabaseIntegrationTest {
+public class DefaultWriterTest extends DatabaseIntegrationTest {
 
     private Neo4jWriter writer;
 
@@ -80,23 +78,27 @@ public class DefaultWriterTest extends EmbeddedDatabaseIntegrationTest {
         }
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void runtimeExceptionFromTaskGetsPropagated() {
-        writer.write(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                throw new RuntimeException("Deliberate Testing Exception");
-            }
-        }, "test", 50);
+        assertThrows(RuntimeException.class, () -> {
+            writer.write(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    throw new RuntimeException("Deliberate Testing Exception");
+                }
+            }, "test", 50);
+        });
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void checkedExceptionFromTaskGetsTranslated() {
-        writer.write(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                throw new IOException("Deliberate Testing Exception");
-            }
-        }, "test", 10);
+        assertThrows(RuntimeException.class, () -> {
+            writer.write(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    throw new IOException("Deliberate Testing Exception");
+                }
+            }, "test", 10);
+        });
     }
 }

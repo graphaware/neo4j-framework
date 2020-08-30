@@ -17,11 +17,11 @@
 package com.graphaware.common.policy.inclusion.spel;
 
 import com.graphaware.common.policy.inclusion.RelationshipInclusionPolicy;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.Iterables;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for {@link com.graphaware.common.policy.inclusion.spel.SpelRelationshipInclusionPolicy}.
@@ -88,28 +88,34 @@ public class SpelRelationshipInclusionPolicyTest extends SpelInclusionPolicyTest
         }
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void shouldComplainAboutIncorrectUsage1() {
-        try (Transaction tx = database.beginTx()) {
-            policy5.include(michalLivesIn(), vojta());
-            tx.success();
-        }
+        assertThrows(Exception.class, () -> {
+            try (Transaction tx = database.beginTx()) {
+                policy5.include(michalLivesIn(), vojta());
+                tx.success();
+            }
+        });
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void shouldComplainAboutIncorrectUsage2() {
-        try (Transaction tx = database.beginTx()) {
-            policy3.include(michalLivesIn());
-            tx.success();
-        }
+        assertThrows(Exception.class, () -> {
+            try (Transaction tx = database.beginTx()) {
+                policy3.include(michalLivesIn());
+                tx.success();
+            }
+        });
     }
 
-    @Test(expected = Exception.class)
+    @Test
     public void shouldComplainAboutIncorrectUsage3() {
-        try (Transaction tx = database.beginTx()) {
-            policy5.include(michalLivesIn());
-            tx.success();
-        }
+        assertThrows(Exception.class, () -> {
+            try (Transaction tx = database.beginTx()) {
+                policy5.include(michalLivesIn());
+                tx.success();
+            }
+        });
     }
 
     @Test

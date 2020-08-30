@@ -18,43 +18,40 @@ package com.graphaware.tx.executor.batch;
 
 import com.graphaware.tx.executor.input.AllNodes;
 import com.graphaware.tx.executor.input.AllNodesWithLabel;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.ServerControls;
+import org.neo4j.harness.TestServerBuilders;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.countNodes;
-import static org.junit.Assert.assertEquals;
-import static org.neo4j.kernel.configuration.Settings.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit test for {@link com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor}.
  */
 public class IterableInputBatchTransactionExecutorTest {
 
-    private GraphDatabaseService database;
+    private ServerControls controls;
+    protected GraphDatabaseService database;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
+        controls = TestServerBuilders.newInProcessBuilder().newServer();
+        database = controls.graph();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
-        database.shutdown();
+        controls.close();
     }
 
     @Test

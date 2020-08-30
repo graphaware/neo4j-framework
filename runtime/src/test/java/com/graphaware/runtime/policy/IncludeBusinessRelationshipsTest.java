@@ -18,22 +18,22 @@ package com.graphaware.runtime.policy;
 
 import com.graphaware.common.policy.inclusion.fluent.IncludeRelationships;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessRelationships;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.ServerControls;
+import org.neo4j.harness.TestServerBuilders;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
 import static com.graphaware.common.policy.inclusion.composite.CompositeRelationshipInclusionPolicy.of;
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.RelationshipType.withName;
 
@@ -42,19 +42,19 @@ import static org.neo4j.graphdb.RelationshipType.withName;
  */
 public class IncludeBusinessRelationshipsTest {
 
+    private ServerControls controls;
     private GraphDatabaseService database;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
+        controls = TestServerBuilders.newInProcessBuilder().newServer();
+        database = controls.graph();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
-        database.shutdown();
+        controls.close();
     }
-
     @Test
     public void shouldIncludeCorrectRelationships() {
         try (Transaction tx = database.beginTx()) {

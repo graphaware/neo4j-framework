@@ -16,12 +16,12 @@
 
 package com.graphaware.common.description.predicate;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
 import static com.graphaware.common.description.predicate.Predicates.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for {@link com.graphaware.common.description.predicate.EqualTo}.
@@ -151,47 +151,29 @@ public class EqualToTest {
 
     @Test
     public void shouldComplainWhenProvidedWithIllegalValues() {
-        try {
+        assertThrows(IllegalArgumentException.class, () -> {
             equalTo(null);
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
+        });
 
-        try {
+        assertThrows(IllegalArgumentException.class, () -> {
             equalTo(new Integer[]{});
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
+        });
 
-        try {
+        assertThrows(IllegalArgumentException.class, () -> {
             equalTo(new HashMap<String, String>());
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
+        });
 
-        try {
+        assertThrows(IllegalArgumentException.class, () -> {
             equalTo(2).evaluate(new Byte[]{});
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
+        });
 
-        try {
+        assertThrows(IllegalArgumentException.class, () -> {
             equalTo(2).evaluate(null);
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
+        });
 
-        try {
+        assertThrows(IllegalArgumentException.class, () -> {
             equalTo(2).evaluate(new HashMap<>());
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
+        });
     }
 
     @Test

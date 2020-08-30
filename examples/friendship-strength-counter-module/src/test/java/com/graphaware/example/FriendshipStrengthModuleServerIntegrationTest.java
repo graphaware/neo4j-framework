@@ -16,16 +16,14 @@
 
 package com.graphaware.example;
 
-import com.graphaware.test.integration.GraphAwareIntegrationTest;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import com.graphaware.test.integration.DatabaseIntegrationTest;
+import org.junit.jupiter.api.Test;
 
 
 /**
  * Test for {@link com.graphaware.example.module.FriendshipStrengthCounter}.
  */
-public class FriendshipStrengthModuleServerIntegrationTest extends GraphAwareIntegrationTest {
+public class FriendshipStrengthModuleServerIntegrationTest extends DatabaseIntegrationTest {
 
     /**
      * {@inheritDoc}

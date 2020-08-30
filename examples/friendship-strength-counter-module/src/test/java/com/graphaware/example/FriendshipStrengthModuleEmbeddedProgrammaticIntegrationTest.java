@@ -20,16 +20,13 @@ import com.graphaware.example.module.FriendshipStrengthCounter;
 import com.graphaware.example.module.FriendshipStrengthModule;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.*;
+import org.neo4j.harness.TestServerBuilders;
 
-import org.neo4j.test.TestGraphDatabaseFactory;
-
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static org.junit.Assert.assertEquals;
-import static org.neo4j.kernel.configuration.Settings.FALSE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -39,20 +36,16 @@ public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
 
     private GraphDatabaseService database;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
+        database = TestServerBuilders.newInProcessBuilder().newServer().graph();
 
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
         runtime.registerModule(new FriendshipStrengthModule("FSM", database));
         runtime.start();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         database.shutdown();
     }

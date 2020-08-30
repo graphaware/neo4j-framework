@@ -19,26 +19,29 @@ package com.graphaware.common.json;
 import com.graphaware.common.representation.DetachedEntity;
 import com.graphaware.common.transform.NodeIdTransformer;
 import com.graphaware.test.unit.GraphUnit;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.ServerControls;
+import org.neo4j.harness.TestServerBuilders;
 
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LongIdJsonNodeTest {
 
-    private GraphDatabaseService database;
+    private ServerControls controls;
+    protected GraphDatabaseService database;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        controls = TestServerBuilders.newInProcessBuilder().newServer();
+        database = controls.graph();
 
         try (Transaction tx = database.beginTx()) {
             Node node1 = database.createNode(Label.label("L1"), Label.label("L2"));
@@ -51,9 +54,9 @@ public class LongIdJsonNodeTest {
         }
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
-        database.shutdown();
+        controls.close();
     }
 
     @Test

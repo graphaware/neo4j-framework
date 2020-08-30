@@ -16,33 +16,32 @@
 
 package com.graphaware.common.util;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.ServerControls;
+import org.neo4j.harness.TestServerBuilders;
 
 import java.util.Collections;
 import java.util.Map;
 
 import static com.graphaware.common.util.Change.changesToMap;
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *  Unit test for {@link Change}.
  */
 public class ChangeTest {
 
+    private ServerControls controls;
     private GraphDatabaseService database;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
+        controls = TestServerBuilders.newInProcessBuilder().newServer();
+        database = controls.graph();
 
         database.execute("CREATE " +
                 "(a), " +
@@ -51,9 +50,9 @@ public class ChangeTest {
                 "(c {key:'value'})");
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
-        database.shutdown();
+        controls.close();
     }
 
     @Test
@@ -81,11 +80,13 @@ public class ChangeTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void invalidChangeShouldThrowException() {
-        try (Transaction tx = database.beginTx()) {
-            Change<Node> nodeChange1 = new Change<>(database.getNodeById(0), database.getNodeById(1));
-            changesToMap(Collections.singleton(nodeChange1));
-        }
+        assertThrows(IllegalArgumentException.class, () -> {
+            try (Transaction tx = database.beginTx()) {
+                Change<Node> nodeChange1 = new Change<>(database.getNodeById(0), database.getNodeById(1));
+                changesToMap(Collections.singleton(nodeChange1));
+            }
+        });
     }
 }

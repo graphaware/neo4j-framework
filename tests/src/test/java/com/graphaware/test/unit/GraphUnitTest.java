@@ -18,17 +18,16 @@ package com.graphaware.test.unit;
 
 import com.graphaware.common.policy.inclusion.*;
 import com.graphaware.common.policy.inclusion.none.IncludeNoNodes;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.*;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.ServerControls;
+import org.neo4j.harness.TestServerBuilders;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.test.unit.GraphUnit.*;
-import static org.junit.Assert.*;
-import static org.neo4j.kernel.configuration.Settings.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
@@ -36,20 +35,26 @@ import static org.neo4j.kernel.configuration.Settings.*;
  */
 public class GraphUnitTest {
 
-    private GraphDatabaseService database;
+    private ServerControls controls;
+    protected GraphDatabaseService database;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
+        createDatabase();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
-        database.shutdown();
+        destroyDatabase();
+    }
+
+    protected final void createDatabase() {
+        controls = TestServerBuilders.newInProcessBuilder().newServer();
+        database = controls.graph();
+    }
+
+    protected final void destroyDatabase() {
+        controls.close();
     }
 
     private void populateDatabase(String cypher) {
@@ -114,49 +119,61 @@ public class GraphUnitTest {
         assertSubgraph(database, "CREATE (m:Person {name:'Michal'})");
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void singleNodeGraphsWithDifferentLabelsShouldFailSameGraphTest3() {
         populateDatabase("CREATE (m:Male {name:'Michal'}), (d:Female {name:'Daniela'})");
 
-        assertSameGraph(database, "CREATE (m:Female {name:'Michal'}), (d:Male {name:'Daniela'})");
+        assertThrows(AssertionError.class, () -> {
+            assertSameGraph(database, "CREATE (m:Female {name:'Michal'}), (d:Male {name:'Daniela'})");
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void singleNodeGraphsWithDifferentLabelsShouldFailSubgraphTest2() {
         populateDatabase("CREATE (m:Female {name:'Michal'}), (d:Male {name:'Daniela'})");
 
-        assertSubgraph(database, "CREATE (m:Male {name:'Michal'}), (d:Female {name:'Daniela'})");
+        assertThrows(AssertionError.class, () -> {
+            assertSubgraph(database, "CREATE (m:Male {name:'Michal'}), (d:Female {name:'Daniela'})");
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void singleNodeGraphsWithDifferentLabelsShouldFailSameGraphTest() {
         populateDatabase("CREATE (m:Person:Human {name:'Michal'})");
 
-        assertSameGraph(database, "CREATE (m:Person {name:'Michal'})");
+        assertThrows(AssertionError.class, () -> {
+            assertSameGraph(database, "CREATE (m:Person {name:'Michal'})");
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void singleNodeGraphsWithDifferentLabelsShouldFailSubgraphTest() {
         populateDatabase("CREATE (m:Person:Human {name:'Michal'})");
 
-        assertSubgraph(database, "CREATE (m:Person {name:'Michal'})");
+        assertThrows(AssertionError.class, () -> {
+            assertSubgraph(database, "CREATE (m:Person {name:'Michal'})");
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void singleNodeGraphsWithDifferentLabelsShouldFailSubgraphTest3() {
         populateDatabase("CREATE (m:Person:Human {name:'Michal'})");
 
-        assertSubgraph(database, "CREATE (m:Person:Developer {name:'Michal'})");
+        assertThrows(AssertionError.class, () -> {
+            assertSubgraph(database, "CREATE (m:Person:Developer {name:'Michal'})");
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void singleNodeGraphsWithDifferentLabelsShouldFailSameGraphTest2() {
         populateDatabase("CREATE (m:Person {name:'Michal'})");
 
-        assertSameGraph(database, "CREATE (m:Person:Human {name:'Michal'})");
+        assertThrows(AssertionError.class, () -> {
+            assertSameGraph(database, "CREATE (m:Person:Human {name:'Michal'})");
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void extraRelationshipPropertyShouldFailSameGraphTest() {
         String populateCypher = "CREATE " +
                 "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
@@ -168,10 +185,12 @@ public class GraphUnitTest {
 
         populateDatabase(populateCypher);
 
-        assertSameGraph(database, assertCypher);
+        assertThrows(AssertionError.class, () -> {
+            assertSameGraph(database, assertCypher);
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void extraRelationshipPropertyShouldFailSubgraphTest() {
         String populateCypher = "CREATE " +
                 "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
@@ -183,10 +202,12 @@ public class GraphUnitTest {
 
         populateDatabase(populateCypher);
 
-        assertSubgraph(database, assertCypher);
+        assertThrows(AssertionError.class, () -> {
+            assertSubgraph(database, assertCypher);
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void differentRelTypesShouldFailSameGraphTest() {
         String populateCypher = "CREATE " +
                 "(:Person {name:'Michal'})-[:WORKS_FOR1]->(c:Company {name:'GraphAware'})," +
@@ -198,10 +219,12 @@ public class GraphUnitTest {
 
         populateDatabase(populateCypher);
 
-        assertSameGraph(database, assertCypher);
+        assertThrows(AssertionError.class, () -> {
+            assertSameGraph(database, assertCypher);
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void differentRelTypesShouldFailSubgraphTest() {
         String populateCypher = "CREATE " +
                 "(:Person {name:'Michal'})-[:WORKS_FOR1]->(c:Company {name:'GraphAware'})," +
@@ -213,10 +236,12 @@ public class GraphUnitTest {
 
         populateDatabase(populateCypher);
 
-        assertSubgraph(database, assertCypher);
+        assertThrows(AssertionError.class, () -> {
+            assertSubgraph(database, assertCypher);
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void extraRelationshipPropertyShouldFailSameGraphTest2() {
         String assertCypher = "CREATE " +
                 "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
@@ -228,10 +253,12 @@ public class GraphUnitTest {
 
         populateDatabase(populateCypher);
 
-        assertSameGraph(database, assertCypher);
+        assertThrows(AssertionError.class, () -> {
+            assertSameGraph(database, assertCypher);
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void missingRelationshipShouldFailSameGraphTest() {
         String populateCypher = "CREATE " +
                 "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
@@ -243,10 +270,12 @@ public class GraphUnitTest {
 
         populateDatabase(populateCypher);
 
-        assertSameGraph(database, assertCypher);
+        assertThrows(AssertionError.class, () -> {
+            assertSameGraph(database, assertCypher);
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void missingRelationshipShouldFailSameGraphTest2() {
         String assertCypher = "CREATE " +
                 "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
@@ -258,10 +287,12 @@ public class GraphUnitTest {
 
         populateDatabase(populateCypher);
 
-        assertSameGraph(database, assertCypher);
+        assertThrows(AssertionError.class, () -> {
+            assertSameGraph(database, assertCypher);
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void missingRelationshipInDatabaseShouldFailSubgraphTest() {
         String populateCypher = "CREATE " +
                 "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
@@ -273,7 +304,9 @@ public class GraphUnitTest {
 
         populateDatabase(populateCypher);
 
-        assertSubgraph(database, assertCypher);
+        assertThrows(AssertionError.class, () -> {
+            assertSubgraph(database, assertCypher);
+        });
     }
 
     @Test
@@ -291,7 +324,7 @@ public class GraphUnitTest {
         assertSubgraph(database, assertCypher);
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void missingNodePropertyShouldFailSameGraphTest() {
         String populateCypher = "CREATE " +
                 "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
@@ -303,10 +336,12 @@ public class GraphUnitTest {
 
         populateDatabase(populateCypher);
 
-        assertSameGraph(database, assertCypher);
+        assertThrows(AssertionError.class, () -> {
+            assertSameGraph(database, assertCypher);
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void missingNodePropertyShouldFailSubgraphTest() {
         String populateCypher = "CREATE " +
                 "(:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})," +
@@ -318,7 +353,9 @@ public class GraphUnitTest {
 
         populateDatabase(populateCypher);
 
-        assertSubgraph(database, assertCypher);
+        assertThrows(AssertionError.class, () -> {
+            assertSubgraph(database, assertCypher);
+        });
     }
 
     @Test
@@ -378,7 +415,7 @@ public class GraphUnitTest {
         assertSameGraph(database, cypher);
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void inCorrectSubgraphShouldFailSubgraphTest() {
         String populateCypher = "CREATE " +
                 "(red1 {name:'Red'})-[:REL]->(black1 {name:'Black'})-[:REL]->(green {name:'Green'})," +
@@ -390,10 +427,12 @@ public class GraphUnitTest {
 
         populateDatabase(populateCypher);
 
-        assertSubgraph(database, assertCypher);
+        assertThrows(AssertionError.class, () -> {
+            assertSubgraph(database, assertCypher);
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void inCorrectSubgraphShouldFailSubgraphTest2() {
         String assertCypher = "CREATE " +
                 "(red1 {name:'Red'})-[:REL]->(black1 {name:'Black'})-[:REL]->(green {name:'Green'})," +
@@ -405,10 +444,12 @@ public class GraphUnitTest {
 
         populateDatabase(populateCypher);
 
-        assertSubgraph(database, assertCypher);
+        assertThrows(AssertionError.class, () -> {
+            assertSubgraph(database, assertCypher);
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void notEqualGraphsShouldFailTheSameGraphTest() {
         String populateCypher = "CREATE " +
                 "(red1 {name:'Red'})-[:REL]->(black1 {name:'Black'})-[:REL]->(green {name:'Green'})," +
@@ -420,10 +461,12 @@ public class GraphUnitTest {
 
         populateDatabase(populateCypher);
 
-        assertSameGraph(database, assertCypher);
+        assertThrows(AssertionError.class, () -> {
+            assertSameGraph(database, assertCypher);
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void notEqualGraphsShouldFailTheSameGraphTest2() {
         String assertCypher = "CREATE " +
                 "(red1 {name:'Red'})-[:REL]->(black1 {name:'Black'})-[:REL]->(green {name:'Green'})," +
@@ -435,7 +478,9 @@ public class GraphUnitTest {
 
         populateDatabase(populateCypher);
 
-        assertSameGraph(database, assertCypher);
+        assertThrows(AssertionError.class, () -> {
+            assertSameGraph(database, assertCypher);
+        });
     }
 
     @Test
@@ -462,7 +507,7 @@ public class GraphUnitTest {
         assertSameGraph(database, cypher);
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void mappedRelationshipsShouldNotBeReused() {
         populateDatabase("CREATE" +
                 "(root:TimeTreeRoot)," +
@@ -476,20 +521,22 @@ public class GraphUnitTest {
                 "(month)-[:CHILD]->(day)," +
                 "(month)-[:LAST]->(day)");
 
-        assertSameGraph(database, "CREATE" +
-                "(root:TimeTreeRoot)," +
-                "(root)-[:FIRST]->(year:Year {value:2013})," +
-                "(root)-[:CHILD]->(year)," +
-                "(root)-[:LAST]->(year)," +
-                "(year)-[:CHILD]->(month:Month {value:5})," +
-                "(year)-[:CHILD]->(month)," +
-                "(year)-[:LAST]->(month)," +
-                "(month)-[:FIRST]->(day:Day {value:4})," +
-                "(month)-[:CHILD]->(day)," +
-                "(month)-[:LAST]->(day)");
+        assertThrows(AssertionError.class, () -> {
+            assertSameGraph(database, "CREATE" +
+                    "(root:TimeTreeRoot)," +
+                    "(root)-[:FIRST]->(year:Year {value:2013})," +
+                    "(root)-[:CHILD]->(year)," +
+                    "(root)-[:LAST]->(year)," +
+                    "(year)-[:CHILD]->(month:Month {value:5})," +
+                    "(year)-[:CHILD]->(month)," +
+                    "(year)-[:LAST]->(month)," +
+                    "(month)-[:FIRST]->(day:Day {value:4})," +
+                    "(month)-[:CHILD]->(day)," +
+                    "(month)-[:LAST]->(day)");
+        });
     }
 
-    @Test(expected = AssertionError.class)
+    @Test
     public void mappedRelationshipsShouldNotBeReused2() {
         populateDatabase("CREATE" +
                 "(root:TimeTreeRoot)," +
@@ -503,17 +550,19 @@ public class GraphUnitTest {
                 "(month)-[:CHILD]->(day)," +
                 "(month)-[:LAST]->(day)");
 
-        assertSubgraph(database, "CREATE" +
-                "(root:TimeTreeRoot)," +
-                "(root)-[:FIRST]->(year:Year {value:2013})," +
-                "(root)-[:CHILD]->(year)," +
-                "(root)-[:LAST]->(year)," +
-                "(year)-[:CHILD]->(month:Month {value:5})," +
-                "(year)-[:CHILD]->(month)," +
-                "(year)-[:LAST]->(month)," +
-                "(month)-[:FIRST]->(day:Day {value:4})," +
-                "(month)-[:CHILD]->(day)," +
-                "(month)-[:LAST]->(day)");
+        assertThrows(AssertionError.class, () -> {
+            assertSubgraph(database, "CREATE" +
+                    "(root:TimeTreeRoot)," +
+                    "(root)-[:FIRST]->(year:Year {value:2013})," +
+                    "(root)-[:CHILD]->(year)," +
+                    "(root)-[:LAST]->(year)," +
+                    "(year)-[:CHILD]->(month:Month {value:5})," +
+                    "(year)-[:CHILD]->(month)," +
+                    "(year)-[:LAST]->(month)," +
+                    "(month)-[:FIRST]->(day:Day {value:4})," +
+                    "(month)-[:CHILD]->(day)," +
+                    "(month)-[:LAST]->(day)");
+        });
     }
 
     @Test

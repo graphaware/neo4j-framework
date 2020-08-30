@@ -16,12 +16,12 @@
 
 package com.graphaware.common.description.predicate;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
 import static com.graphaware.common.description.predicate.Predicates.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for {@link com.graphaware.common.description.predicate.LessThan}.
@@ -124,33 +124,21 @@ public class LessThanTest {
 
     @Test
     public void shouldComplainWhenProvidedWithIllegalValues() {
-        try {
+        assertThrows(IllegalArgumentException.class, () -> {
             lessThan(null);
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
+        });
 
-        try {
+        assertThrows(IllegalArgumentException.class, () -> {
             lessThan(2).evaluate(new Byte[]{});
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
+        });
 
-        try {
+        assertThrows(IllegalArgumentException.class, () -> {
             lessThan(2).evaluate(null);
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
+        });
 
-        try {
+        assertThrows(IllegalArgumentException.class, () -> {
             lessThan(2).evaluate(new HashMap<>());
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
+        });
     }
 
     @Test

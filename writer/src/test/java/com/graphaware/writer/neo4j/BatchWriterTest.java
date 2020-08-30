@@ -17,8 +17,8 @@
 package com.graphaware.writer.neo4j;
 
 import com.graphaware.common.util.IterableUtils;
-import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
-import org.junit.Test;
+import com.graphaware.test.integration.DatabaseIntegrationTest;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
 
@@ -27,12 +27,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test for {@link TxPerTaskWriter}.
  */
-public class BatchWriterTest extends EmbeddedDatabaseIntegrationTest {
+public class BatchWriterTest extends DatabaseIntegrationTest {
 
     private Neo4jWriter writer;
 
@@ -141,18 +141,23 @@ public class BatchWriterTest extends EmbeddedDatabaseIntegrationTest {
         }
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void runtimeExceptionFromTaskGetsPropagatedIfWaiting() {
-        writer.write(() -> {
-            throw new RuntimeException("Deliberate Testing Exception");
-        }, "test", 50);
+        assertThrows(RuntimeException.class, () -> {
+            writer.write(() -> {
+                throw new RuntimeException("Deliberate Testing Exception");
+            }, "test", 50);
+        });
+
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void checkedExceptionFromTaskGetsTranslatedIfWaiting() {
-        writer.write(() -> {
-            throw new IOException("Deliberate Testing Exception");
-        }, "test", 20);
+        assertThrows(RuntimeException.class, () -> {
+            writer.write(() -> {
+                throw new IOException("Deliberate Testing Exception");
+            }, "test", 20);
+        });
     }
 
     @Test

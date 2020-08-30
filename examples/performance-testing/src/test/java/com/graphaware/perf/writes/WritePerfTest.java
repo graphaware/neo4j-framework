@@ -16,8 +16,8 @@
 
 package com.graphaware.perf.writes;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Very very simple write perf test
  */
-@Ignore
+@Disabled
 public class WritePerfTest {
 
     @Test

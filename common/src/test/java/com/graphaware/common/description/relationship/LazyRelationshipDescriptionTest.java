@@ -16,44 +16,30 @@
 
 package com.graphaware.common.description.relationship;
 
+import com.graphaware.common.UnitTest;
 import com.graphaware.common.description.property.LazyPropertiesDescription;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.graphdb.RelationshipType.*;
+import static org.neo4j.graphdb.RelationshipType.withName;
 
 /**
  * Unit test for {@link com.graphaware.common.description.relationship.LazyRelationshipDescription}.
  */
-public class LazyRelationshipDescriptionTest {
+public class LazyRelationshipDescriptionTest extends UnitTest {
 
-    private GraphDatabaseService database;
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-
+    @Override
+    protected void populate(GraphDatabaseService database) {
         try (Transaction tx = database.beginTx()) {
             Node root = database.createNode();
             Node one = database.createNode();
             root.createRelationshipTo(one, withName("TEST")).setProperty("k", new int[]{2, 3, 4});
             tx.success();
         }
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
     }
 
     @Test

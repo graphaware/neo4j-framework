@@ -17,55 +17,39 @@
 package com.graphaware.example;
 
 import com.graphaware.example.module.FriendshipStrengthCounter;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
+import com.graphaware.test.integration.DatabaseIntegrationTest;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
  * Test for {@link com.graphaware.example.module.FriendshipStrengthCounter}.
  */
-public class FriendshipStrengthModuleEmbeddedDeclarativeIntegrationTest {
+public class FriendshipStrengthModuleEmbeddedDeclarativeIntegrationTest extends DatabaseIntegrationTest {
 
-    private GraphDatabaseService database;
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .loadPropertiesFromFile(this.getClass().getClassLoader().getResource("neo4j-friendship.conf").getPath())
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
+    @Override
+    protected String configFile() {
+        return "neo4j-friendship.conf";
     }
 
     @Test
     public void totalFriendshipStrengthOnEmptyDatabaseShouldBeZero() {
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(0, new FriendshipStrengthCounter(database).getTotalFriendshipStrength());
+        try (Transaction tx = getDatabase().beginTx()) {
+            assertEquals(0, new FriendshipStrengthCounter(getDatabase()).getTotalFriendshipStrength());
             tx.success();
         }
     }
 
     @Test
     public void totalFriendshipStrengthShouldBeCorrectlyCalculated() {
-        database.execute("CREATE " +
+        getDatabase().execute("CREATE " +
                 "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
                 "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
 
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(3, new FriendshipStrengthCounter(database).getTotalFriendshipStrength());
+        try (Transaction tx = getDatabase().beginTx()) {
+            assertEquals(3, new FriendshipStrengthCounter(getDatabase()).getTotalFriendshipStrength());
             tx.success();
         }
     }

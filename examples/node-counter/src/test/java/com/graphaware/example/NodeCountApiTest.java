@@ -16,16 +16,14 @@
 
 package com.graphaware.example;
 
-import com.graphaware.test.integration.GraphAwareIntegrationTest;
-import org.junit.Test;
+import com.graphaware.test.integration.DatabaseIntegrationTest;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.Transaction;
 
-import static org.junit.Assert.assertEquals;
-
 /**
- * {@link GraphAwareIntegrationTest} for {@link NodeCountApi}.
+ * {@link DatabaseIntegrationTest} for {@link NodeCountApi}.
  */
-public class NodeCountApiTest extends GraphAwareIntegrationTest {
+public class NodeCountApiTest extends DatabaseIntegrationTest {
 
     @Test
     public void emptyDatabaseShouldHaveZeroNodes() {

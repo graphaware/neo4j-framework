@@ -16,9 +16,10 @@
 
 package com.graphaware.common.stopwatch;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class StopwatchTest {
 
@@ -48,16 +49,22 @@ public class StopwatchTest {
         assertEquals(200, e.duration(), 20L);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowExceptionWhenStopButNotStarted() {
         Stopwatch stopwatch = new Stopwatch();
-        stopwatch.stop("e");
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            stopwatch.stop("e");
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowExceptionWhenTryingToStartAlreadyStartedEvent() {
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.start("e");
-        stopwatch.start("e");
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            stopwatch.start("e");
+        });
     }
 }

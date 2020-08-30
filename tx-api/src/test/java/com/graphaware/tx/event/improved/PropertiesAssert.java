@@ -26,7 +26,7 @@ import java.util.Map;
 import static com.graphaware.common.util.ArrayUtils.arrayFriendlyEquals;
 import static com.graphaware.common.util.ArrayUtils.arrayFriendlyMapEquals;
 import static com.graphaware.tx.event.improved.LazyTransactionDataComprehensiveTest.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public final class PropertiesAssert {
 

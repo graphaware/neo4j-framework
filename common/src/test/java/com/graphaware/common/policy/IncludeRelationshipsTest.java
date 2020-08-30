@@ -16,29 +16,27 @@
 
 package com.graphaware.common.policy;
 
+import com.graphaware.common.UnitTest;
 import com.graphaware.common.policy.inclusion.fluent.IncludeRelationships;
-import org.junit.Test;
-import org.neo4j.graphdb.*;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.junit.jupiter.api.Test;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.neo4j.graphdb.Direction.*;
-import static org.neo4j.graphdb.RelationshipType.*;
+import static org.neo4j.graphdb.RelationshipType.withName;
 
 /**
  * Unit test for  {@link com.graphaware.common.policy.inclusion.fluent.IncludeRelationships}.
  */
-public class IncludeRelationshipsTest {
+public class IncludeRelationshipsTest extends UnitTest {
 
     @Test
     public void shouldIncludeCorrectRelationships() {
-        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-
         try (Transaction tx = database.beginTx()) {
             Node n1 = database.createNode();
             Node n2 = database.createNode();
@@ -81,7 +79,5 @@ public class IncludeRelationshipsTest {
 
             tx.success();
         }
-
-        database.shutdown();
     }
 }

@@ -20,8 +20,8 @@ import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.runtime.bootstrap.TestModule;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
-import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
-import org.junit.Test;
+import com.graphaware.test.integration.DatabaseIntegrationTest;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.Transaction;
 
 import java.util.Collections;
@@ -29,14 +29,13 @@ import java.util.Collections;
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 import static com.graphaware.test.unit.GraphUnit.clearGraph;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 /**
  * Test for {@link com.graphaware.test.unit.GraphUnit} when Runtime is present.
  */
-public class GraphUnitTest extends EmbeddedDatabaseIntegrationTest {
+public class GraphUnitTest extends DatabaseIntegrationTest {
 
     private void populateDatabase(String cypher) {
         getDatabase().execute(cypher);

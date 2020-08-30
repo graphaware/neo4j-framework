@@ -16,13 +16,14 @@
 
 package com.graphaware.common.util;
 
+import com.graphaware.common.UnitTest;
 import com.graphaware.common.policy.inclusion.ObjectInclusionPolicy;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.neo4j.graphdb.*;
+import org.junit.jupiter.api.Test;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.NotFoundException;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.Iterables;
-import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,33 +31,23 @@ import java.util.Map;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.EntityUtils.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.graphdb.RelationshipType.*;
+import static org.neo4j.graphdb.RelationshipType.withName;
 
 /**
  * Unit test for {@link EntityUtils}.
  */
-public class EntityUtilsTest {
+public class EntityUtilsTest extends UnitTest {
 
-    private GraphDatabaseService database;
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-
+    @Override
+    protected void populate(GraphDatabaseService database) {
         database.execute("CREATE " +
                 "(a), " +
                 "(b {key:'value'})," +
                 "(b)-[:test]->(a)," +
                 "(c {key:'value'})");
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
     }
 
     @Test
@@ -113,9 +104,8 @@ public class EntityUtilsTest {
 
     @Test
     public void shouldDeleteNodeWithAllRelationships() {
-        database.shutdown();
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
+        destroyDatabase();
+        createDatabase();
 
         database.execute("CREATE " +
                 "(a), " +
@@ -140,19 +130,13 @@ public class EntityUtilsTest {
             assertEquals(expected, getInt(database.getNodeById(1), "test"));
             assertEquals(expected, getInt(database.getNodeById(2), "test"));
 
-            try {
+            assertThrows(ClassCastException.class, () -> {
                 getInt(database.getNodeById(3), "test");
-                fail();
-            } catch (ClassCastException e) {
-                //ok
-            }
+            });
 
-            try {
+            assertThrows(NotFoundException.class, () -> {
                 getInt(database.getNodeById(4), "test");
-                fail();
-            } catch (NotFoundException e) {
-                //ok
-            }
+            });
 
             tx.success();
         }
@@ -169,12 +153,9 @@ public class EntityUtilsTest {
             assertEquals(expected, getInt(database.getNodeById(2), "test", 123));
             assertEquals(expected, getInt(database.getNodeById(4), "test", 123));
 
-            try {
+            assertThrows(ClassCastException.class, () -> {
                 getInt(database.getNodeById(3), "test", 123);
-                fail();
-            } catch (ClassCastException e) {
-                //ok
-            }
+            });
 
             tx.success();
         }
@@ -190,19 +171,13 @@ public class EntityUtilsTest {
             assertEquals(expected, getLong(database.getNodeById(1), "test"));
             assertEquals(expected, getLong(database.getNodeById(2), "test"));
 
-            try {
+            assertThrows(ClassCastException.class, () -> {
                 getLong(database.getNodeById(3), "test");
-                fail();
-            } catch (ClassCastException e) {
-                //ok
-            }
+            });
 
-            try {
+            assertThrows(NotFoundException.class, () -> {
                 getLong(database.getNodeById(4), "test");
-                fail();
-            } catch (NotFoundException e) {
-                //ok
-            }
+            });
 
             tx.success();
         }
@@ -219,12 +194,9 @@ public class EntityUtilsTest {
             assertEquals(expected, getLong(database.getNodeById(2), "test", 123L));
             assertEquals(expected, getLong(database.getNodeById(4), "test", 123L));
 
-            try {
+            assertThrows(ClassCastException.class, () -> {
                 getLong(database.getNodeById(3), "test", 123L);
-                fail();
-            } catch (ClassCastException e) {
-                //ok
-            }
+            });
 
             tx.success();
         }
@@ -241,19 +213,13 @@ public class EntityUtilsTest {
             assertEquals(expected, getFloat(database.getNodeById(2), "test"),0);
             assertEquals(expected, getFloat(database.getNodeById(5), "test"),0);
 
-            try {
+            assertThrows(ClassCastException.class, () -> {
                 getFloat(database.getNodeById(3), "test");
-                fail();
-            } catch (ClassCastException e) {
-                //ok
-            }
+            });
 
-            try {
+            assertThrows(NotFoundException.class, () -> {
                 getFloat(database.getNodeById(4), "test");
-                fail();
-            } catch (NotFoundException e) {
-                //ok
-            }
+            });
 
             tx.success();
         }
@@ -271,21 +237,17 @@ public class EntityUtilsTest {
             assertEquals(expected, getFloat(database.getNodeById(4), "test", 123L),0);
             assertEquals(expected, getFloat(database.getNodeById(5), "test", 123L),0);
 
-            try {
+            assertThrows(ClassCastException.class, () -> {
                 getFloat(database.getNodeById(3), "test", 123L);
-                fail();
-            } catch (ClassCastException e) {
-                //ok
-            }
+            });
 
             tx.success();
         }
     }
 
     private void populateDatabaseWithNumberProperties() {
-        database.shutdown();
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
+        destroyDatabase();
+        createDatabase();
 
         try (Transaction tx = database.beginTx()) {
             database.createNode().setProperty("test", (byte) 123);

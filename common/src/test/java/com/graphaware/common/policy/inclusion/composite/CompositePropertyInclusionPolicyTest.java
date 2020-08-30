@@ -22,29 +22,34 @@ import com.graphaware.common.policy.inclusion.all.IncludeAllNodeProperties;
 import com.graphaware.common.policy.inclusion.all.IncludeAllRelationshipProperties;
 import com.graphaware.common.policy.inclusion.none.IncludeNoNodeProperties;
 import com.graphaware.common.policy.inclusion.none.IncludeNoRelationshipProperties;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *  Unit test for {@link CompositePropertyInclusionPolicy}.
  */
 public class CompositePropertyInclusionPolicyTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotConstructEmptyCompositePolicy() {
-        CompositeNodePropertyInclusionPolicy.of((NodePropertyInclusionPolicy) null);
+        assertThrows(IllegalArgumentException.class, () -> {
+            CompositeNodePropertyInclusionPolicy.of((NodePropertyInclusionPolicy) null);
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotConstructEmptyCompositePolicy2() {
-        CompositeNodePropertyInclusionPolicy.of();
+        assertThrows(IllegalArgumentException.class, () -> {
+            CompositeNodePropertyInclusionPolicy.of();
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotConstructEmptyCompositePolicy3() {
-        CompositeRelationshipPropertyInclusionPolicy.of((RelationshipPropertyInclusionPolicy[]) new RelationshipPropertyInclusionPolicy[0]);
+        assertThrows(IllegalArgumentException.class, () -> {
+            CompositeRelationshipPropertyInclusionPolicy.of((RelationshipPropertyInclusionPolicy[]) new RelationshipPropertyInclusionPolicy[0]);
+        });
     }
 
     @Test

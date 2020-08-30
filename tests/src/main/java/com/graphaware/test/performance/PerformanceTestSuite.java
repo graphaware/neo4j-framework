@@ -16,14 +16,15 @@
 
 package com.graphaware.test.performance;
 
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.logging.Log;
 import com.graphaware.common.log.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -36,7 +37,8 @@ public abstract class PerformanceTestSuite {
 
     private static final Log LOG = LoggerFactory.getLogger(PerformanceTestSuite.class);
 
-    protected TemporaryFolder temporaryFolder;
+    @TempDir
+    protected File temporaryFolder;
     protected GraphDatabaseService database;
 
     /**
@@ -200,20 +202,20 @@ public abstract class PerformanceTestSuite {
      * @return builder.
      */
     protected GraphDatabaseBuilder createGraphDatabaseBuilder() {
-        return new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(temporaryFolder.getRoot());
+        return new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(temporaryFolder);
     }
 
     /**
      * Create a temporary folder.
      */
     private void createTemporaryFolder() {
-        temporaryFolder = new TemporaryFolder();
-        try {
-            temporaryFolder.create();
-            temporaryFolder.getRoot().deleteOnExit();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        temporaryFolder = new TemporaryFolder();
+//        try {
+//            temporaryFolder.create();
+//            temporaryFolder.getRoot().deleteOnExit();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     /**

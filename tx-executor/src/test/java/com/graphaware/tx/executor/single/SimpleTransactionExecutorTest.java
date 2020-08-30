@@ -16,32 +16,30 @@
 
 package com.graphaware.tx.executor.single;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.*;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.ServerControls;
+import org.neo4j.harness.TestServerBuilders;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.countNodes;
-import static org.junit.Assert.assertEquals;
-import static org.neo4j.kernel.configuration.Settings.FALSE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit test for {@link com.graphaware.tx.executor.single.SimpleTransactionExecutor}.
  */
 public class SimpleTransactionExecutorTest {
 
-    private GraphDatabaseService database;
     private TransactionExecutor executor;
+    private ServerControls controls;
+    protected GraphDatabaseService database;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
+        controls = TestServerBuilders.newInProcessBuilder().newServer();
+        database = controls.graph();
 
         try (Transaction tx = database.beginTx()) {
             database.createNode();
@@ -51,9 +49,9 @@ public class SimpleTransactionExecutorTest {
         executor = new SimpleTransactionExecutor(database);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
-        database.shutdown();
+        controls.close();
     }
 
     @Test
@@ -84,13 +82,15 @@ public class SimpleTransactionExecutorTest {
         }
     }
 
-    @Test(expected = ConstraintViolationException.class)
+    @Test
     public void deletingNodeWithRelationshipsShouldThrowException() {
         createNodeAndRelationship();
 
-        executor.executeInTransaction(database -> {
-            database.getNodeById(0).delete();
-            return null;
+        assertThrows(ConstraintViolationException.class, () -> {
+            executor.executeInTransaction(database -> {
+                database.getNodeById(0).delete();
+                return null;
+            });
         });
     }
 

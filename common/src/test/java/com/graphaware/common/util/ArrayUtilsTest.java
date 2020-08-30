@@ -16,13 +16,13 @@
 
 package com.graphaware.common.util;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
 import static com.graphaware.common.util.ArrayUtils.*;
 import static java.util.Collections.singletonMap;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for {@link com.graphaware.common.util.ArrayUtils}.
@@ -158,13 +158,17 @@ public class ArrayUtilsTest {
         assertFalse(arrayFriendlyMapEquals(Collections.<String, Object>singletonMap("key2", new int[]{1, 2}), Collections.<String, Object>singletonMap("key", new int[]{1, 2})));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowExceptionWhenPrintingNonPrimitiveArray() {
-        primitiveOrStringArrayToString(new Object[]{"bla"});
+        assertThrows(IllegalArgumentException.class, () -> {
+            primitiveOrStringArrayToString(new Object[]{"bla"});
+        });
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowExceptionWhenPrintingNonArray() {
-        primitiveOrStringArrayToString("bla");
+        assertThrows(IllegalArgumentException.class, () -> {
+            primitiveOrStringArrayToString("bla");
+        });
     }
 }

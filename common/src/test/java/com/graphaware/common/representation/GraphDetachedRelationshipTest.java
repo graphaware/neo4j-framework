@@ -19,8 +19,8 @@ package com.graphaware.common.representation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -40,6 +40,6 @@ public class GraphDetachedRelationshipTest {
     @Test
     public void relationshipRepresentationIsCorrectlyConvertedFromJson() throws IOException, JSONException {
         String json = "{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"startNodeGraphId\":1,\"endNodeGraphId\":2,\"type\":\"TYPE\"}";
-        Assert.assertEquals(new GraphDetachedRelationship(0, 1, 2, "TYPE", Collections.singletonMap("key", "value")), mapper.readValue(json, GraphDetachedRelationship.class));
+        Assertions.assertEquals(new GraphDetachedRelationship(0, 1, 2, "TYPE", Collections.singletonMap("key", "value")), mapper.readValue(json, GraphDetachedRelationship.class));
     }
 }

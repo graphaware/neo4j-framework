@@ -16,33 +16,25 @@
 
 package com.graphaware.common.util;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import com.graphaware.common.UnitTest;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.DirectionUtils.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.RelationshipType.withName;
 
 /**
  * Unit test for {@link com.graphaware.common.util.DirectionUtils}.
  */
-public class DirectionUtilsTest {
+public class DirectionUtilsTest extends UnitTest {
 
-    private GraphDatabaseService database;
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-
+    @Override
+    protected void populate(GraphDatabaseService database) {
         try (Transaction tx = database.beginTx()) {
             Node node1 = database.createNode();
             Node node2 = database.createNode();
@@ -52,11 +44,6 @@ public class DirectionUtilsTest {
             node3.createRelationshipTo(node3, withName("test"));
             tx.success();
         }
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
     }
 
     @Test
@@ -91,11 +78,13 @@ public class DirectionUtilsTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void invalidResolutionShouldThrowException() {
-        try (Transaction tx = database.beginTx()) {
-            resolveDirection((database.getNodeById(0).getSingleRelationship(withName("test"), OUTGOING)), database.getNodeById(2));
-        }
+        assertThrows(IllegalArgumentException.class, () -> {
+            try (Transaction tx = database.beginTx()) {
+                resolveDirection((database.getNodeById(0).getSingleRelationship(withName("test"), OUTGOING)), database.getNodeById(2));
+            }
+        });
     }
 
     @Test
@@ -135,13 +124,15 @@ public class DirectionUtilsTest {
         assertFalse(matches(OUTGOING, INCOMING));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void verifyIncorrectMatching() {
-        try (Transaction tx = database.beginTx()) {
-            Relationship relationship = database.getNodeById(0).getSingleRelationship(withName("test"), OUTGOING);
+        assertThrows(IllegalArgumentException.class, () -> {
+            try (Transaction tx = database.beginTx()) {
+                Relationship relationship = database.getNodeById(0).getSingleRelationship(withName("test"), OUTGOING);
 
-            matches(relationship, database.getNodeById(2), OUTGOING);
-        }
+                matches(relationship, database.getNodeById(2), OUTGOING);
+            }
+        });
     }
 
     @Test

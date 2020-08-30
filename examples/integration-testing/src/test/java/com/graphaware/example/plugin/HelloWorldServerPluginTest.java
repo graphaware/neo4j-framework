@@ -17,20 +17,19 @@
 package com.graphaware.example.plugin;
 
 import com.graphaware.test.integration.DatabaseIntegrationTest;
-import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import com.graphaware.test.unit.GraphUnit;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * {@link EmbeddedDatabaseIntegrationTest} for {@link HelloWorldServerPlugin}.
+ * {@link DatabaseIntegrationTest} for {@link HelloWorldServerPlugin}.
  *
  * Tests the logic, but not the API.
  */
-public class HelloWorldServerPluginTest extends EmbeddedDatabaseIntegrationTest {
+public class HelloWorldServerPluginTest extends DatabaseIntegrationTest {
 
     @Test
     public void shouldCreateAndReturnNode() {

@@ -16,31 +16,31 @@
 
 package com.graphaware.tx.executor.batch;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.*;
-import org.neo4j.helpers.collection.Iterables;
-import org.neo4j.helpers.collection.Iterators;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.ServerControls;
+import org.neo4j.harness.TestServerBuilders;
 
 import java.util.Iterator;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Ignore
+@Disabled
 public class IndexBug {
 
     private static final int NUMBER_OF_NODES = 10_000;
     private static final int BATCH_SIZE = 1_000;
-    private GraphDatabaseService database;
 
-    @Before
-    public void setUp() throws Exception {
-        database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .newGraphDatabase();
+    private ServerControls controls;
+    protected GraphDatabaseService database;
+
+    @BeforeEach
+    public void setUp() {
+        controls = TestServerBuilders.newInProcessBuilder().newServer();
+        database = controls.graph();
 
         try (Transaction tx = database.beginTx()) {
             for (int i = 0; i < NUMBER_OF_NODES; i++) {
@@ -51,9 +51,9 @@ public class IndexBug {
         }
     }
 
-    @After
-    public void tearDown() throws Exception {
-        database.shutdown();
+    @AfterEach
+    public void tearDown() {
+        controls.close();
     }
 
     @Test

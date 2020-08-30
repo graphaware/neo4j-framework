@@ -18,22 +18,22 @@ package com.graphaware.tx.event.improved;
 
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.ServerControls;
+import org.neo4j.harness.TestServerBuilders;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.neo4j.graphdb.Label.label;
 
 /**
@@ -41,21 +41,30 @@ import static org.neo4j.graphdb.Label.label;
  */
 public class LazyTransactionDataSmokeTest {
 
+    private ServerControls controls;
     private GraphDatabaseService database;
     private CapturingTransactionEventHandler eventHandler;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
+        createDatabase();
 
         eventHandler = new CapturingTransactionEventHandler();
         database.registerTransactionEventHandler(eventHandler);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
-        database.shutdown();
+        destroyDatabase();
+    }
+
+    protected final void createDatabase() {
+        controls = TestServerBuilders.newInProcessBuilder().newServer();
+        database = controls.graph();
+    }
+
+    protected final void destroyDatabase() {
+        controls.close();
     }
 
     @Test

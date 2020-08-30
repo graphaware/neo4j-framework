@@ -20,23 +20,27 @@ import com.graphaware.common.representation.DetachedEntity;
 import com.graphaware.common.transform.NodeIdTransformer;
 import com.graphaware.common.transform.RelationshipIdTransformer;
 import com.graphaware.test.unit.GraphUnit;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.*;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.ServerControls;
+import org.neo4j.harness.TestServerBuilders;
 
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LongIdJsonRelationshipTest {
 
-    private GraphDatabaseService database;
+    private ServerControls controls;
+    protected GraphDatabaseService database;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        controls = TestServerBuilders.newInProcessBuilder().newServer();
+        database = controls.graph();
 
         try (Transaction tx = database.beginTx()) {
             Node node1 = database.createNode(Label.label("L1"), Label.label("L2"));
@@ -57,9 +61,9 @@ public class LongIdJsonRelationshipTest {
         }
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
-        database.shutdown();
+        controls.close();
     }
 
     @Test

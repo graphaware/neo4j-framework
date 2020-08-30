@@ -16,14 +16,10 @@
 
 package com.graphaware.common.policy.inclusion.spel;
 
-import org.junit.After;
-import org.junit.Before;
+import com.graphaware.common.UnitTest;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.test.TestGraphDatabaseFactory;
-
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.getSingle;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.Label.label;
@@ -32,25 +28,15 @@ import static org.neo4j.graphdb.RelationshipType.withName;
 /**
  * Abstract base class for {@link com.graphaware.common.policy.inclusion.spel.SpelInclusionPolicy} implementation unit tests.
  */
-public abstract class SpelInclusionPolicyTest {
+public abstract class SpelInclusionPolicyTest extends UnitTest {
 
-    protected GraphDatabaseService database;
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-
+    @Override
+    protected void populate(GraphDatabaseService database) {
         database.execute("CREATE " +
                 "(m:Employee {name:'Michal'})-[:WORKS_FOR {role:'Director', since:2013}]->(ga:Company {name:'GraphAware', form:'Ltd'})," +
                 "(v:Intern {name:'Vojta', age:25})-[:WORKS_FOR {since:2014, until:2014}]->(ga)," +
                 "(m)-[:LIVES_IN]->(l:Place {name:'London'})<-[:LIVES_IN]-(v)"
         );
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
     }
 
     protected Node michal() {

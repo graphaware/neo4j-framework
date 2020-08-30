@@ -17,8 +17,7 @@
 package com.graphaware.test.data;
 
 import com.graphaware.test.integration.DatabaseIntegrationTest;
-import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -29,7 +28,7 @@ import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 /**
  * Test for {@link com.graphaware.test.data.GraphgenPopulator}.
  */
-public class GraphgenPopulatorTest extends EmbeddedDatabaseIntegrationTest {
+public class GraphgenPopulatorTest extends DatabaseIntegrationTest {
 
     @Test
     public void shouldProduceEmptyDatabaseWhenPopulatorReturnsNull() {

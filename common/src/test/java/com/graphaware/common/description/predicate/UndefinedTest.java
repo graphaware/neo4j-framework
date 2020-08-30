@@ -16,12 +16,12 @@
 
 package com.graphaware.common.description.predicate;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 
 import static com.graphaware.common.description.predicate.Predicates.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for {@link com.graphaware.common.description.predicate.Undefined}.
@@ -57,26 +57,17 @@ public class UndefinedTest {
 
     @Test
     public void shouldComplainWhenProvidedWithIllegalValues() {
-        try {
+        assertThrows(IllegalArgumentException.class, () -> {
             undefined().evaluate(new Byte[]{});
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
+        });
 
-        try {
+        assertThrows(IllegalArgumentException.class, () -> {
             undefined().evaluate(null);
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
+        });
 
-        try {
+        assertThrows(IllegalArgumentException.class, () -> {
             undefined().evaluate(new HashMap<>());
-            fail();
-        } catch (IllegalArgumentException e) {
-            //OK
-        }
+        });
     }
 
     @Test

@@ -16,29 +16,20 @@
 
 package com.graphaware.common.description.property;
 
+import com.graphaware.common.UnitTest;
 import com.graphaware.common.description.TestMapUtils;
-import org.junit.After;
-import org.junit.Before;
+import org.neo4j.graphdb.Entity;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Entity;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
+public abstract class PropertiesDescriptionTest extends UnitTest {
 
-public abstract class PropertiesDescriptionTest {
-
-    private GraphDatabaseService database;
     private Transaction tx;
-
     protected Entity entity;
 
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-
+    @Override
+    protected void populate(GraphDatabaseService database) {
         try (Transaction tx = database.beginTx()) {
             Node root = database.createNode();
             root.setProperty("two", 2);
@@ -49,12 +40,6 @@ public abstract class PropertiesDescriptionTest {
 
         tx = database.beginTx();
         entity = database.getNodeById(0);
-    }
-
-    @After
-    public void tearDown() {
-        tx.close();
-        database.shutdown();
     }
 
     protected LazyPropertiesDescription lazy() {

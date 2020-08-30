@@ -21,25 +21,26 @@ import com.graphaware.test.unit.GraphUnit;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import com.graphaware.tx.executor.single.*;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 import org.neo4j.graphdb.traversal.Evaluators;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.neo4j.graphdb.traversal.Uniqueness;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.ServerControls;
+import org.neo4j.harness.TestServerBuilders;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static com.graphaware.common.util.IterableUtils.*;
 import static com.graphaware.common.util.EntityUtils.*;
+import static com.graphaware.common.util.IterableUtils.*;
 import static com.graphaware.tx.event.improved.LazyTransactionDataComprehensiveTest.RelationshipTypes.*;
 import static com.graphaware.tx.event.improved.PropertiesAssert.assertProperties;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.neo4j.graphdb.Direction.INCOMING;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.Label.label;
@@ -100,10 +101,20 @@ public class LazyTransactionDataComprehensiveTest {
         R1, R2, R3, R4
     }
 
+    private ServerControls controls;
     private GraphDatabaseService db;
     private final Map<Long, Long> ids = new HashMap<>();
 
-    @After
+    protected final void createDatabase() {
+        controls = TestServerBuilders.newInProcessBuilder().newServer();
+        db = controls.graph();
+    }
+
+    protected final void destroyDatabase() {
+        controls.close();
+    }
+
+    @AfterEach
     public void tearDown() {
         db.shutdown();
         ids.clear();
@@ -1217,106 +1228,114 @@ public class LazyTransactionDataComprehensiveTest {
         }
     }
 
-    @Test(expected = TransactionFailureException.class)
+    @Test
     public void shouldNotBeAbleToChangeDeletedRelationshipBeforeCommit() {
         createTestDatabase();
-        mutateGraph(
-                new BeforeCommitCallback.RememberingAdapter() {
-                    @Override
-                    public void doBeforeCommit(ImprovedTransactionData td) {
-                        if (!td.mutationsOccurred()) {
-                            return;
+        assertThrows(TransactionFailureException.class, () -> {
+            mutateGraph(
+                    new BeforeCommitCallback.RememberingAdapter() {
+                        @Override
+                        public void doBeforeCommit(ImprovedTransactionData td) {
+                            if (!td.mutationsOccurred()) {
+                                return;
+                            }
+
+                            Map<Long, Relationship> deleted = toMap(td.getAllDeletedRelationships());
+
+                            long r1Id = toMap(td.getAllDeletedNodes()).get(ids.get(2L)).getSingleRelationship(R1, INCOMING).getId();
+                            Relationship r1 = deleted.get(r1Id);
+
+                            try {
+                                r1.setProperty("irrelevant", "irrelevant");
+                                return;
+                            } catch (IllegalStateException e) {
+                                //OK
+                            }
+
+                            r1.removeProperty("irrelevant");
                         }
-
-                        Map<Long, Relationship> deleted = toMap(td.getAllDeletedRelationships());
-
-                        long r1Id = toMap(td.getAllDeletedNodes()).get(ids.get(2L)).getSingleRelationship(R1, INCOMING).getId();
-                        Relationship r1 = deleted.get(r1Id);
-
-                        try {
-                            r1.setProperty("irrelevant", "irrelevant");
-                            return;
-                        } catch (IllegalStateException e) {
-                            //OK
-                        }
-
-                        r1.removeProperty("irrelevant");
                     }
-                }
-        );
+            );
+        });
     }
 
-    @Test(expected = TransactionFailureException.class)
+    @Test
     public void shouldNotBeAbleToChangeDeletedNodeBeforeCommit() {
         createTestDatabase();
-        mutateGraph(
-                new BeforeCommitCallback.RememberingAdapter() {
-                    @Override
-                    public void doBeforeCommit(ImprovedTransactionData td) {
-                        Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
+        assertThrows(TransactionFailureException.class, () -> {
+            mutateGraph(
+                    new BeforeCommitCallback.RememberingAdapter() {
+                        @Override
+                        public void doBeforeCommit(ImprovedTransactionData td) {
+                            Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
 
-                        Node deleted = deletedNodes.get(ids.get(2L));
+                            Node deleted = deletedNodes.get(ids.get(2L));
 
-                        try {
-                            deleted.setProperty("irrelevant", "irrelevant");
-                            return;
-                        } catch (IllegalStateException e) {
-                            //OK
+                            try {
+                                deleted.setProperty("irrelevant", "irrelevant");
+                                return;
+                            } catch (IllegalStateException e) {
+                                //OK
+                            }
+
+                            try {
+                                deleted.addLabel(label("irrelevant"));
+                                return;
+                            } catch (IllegalStateException e) {
+                                //OK
+                            }
+
+                            try {
+                                deleted.removeLabel(label("irrelevant"));
+                                return;
+                            } catch (IllegalStateException e) {
+                                //OK
+                            }
+
+
+                            deleted.removeProperty("irrelevant");
                         }
-
-                        try {
-                            deleted.addLabel(label("irrelevant"));
-                            return;
-                        } catch (IllegalStateException e) {
-                            //OK
-                        }
-
-                        try {
-                            deleted.removeLabel(label("irrelevant"));
-                            return;
-                        } catch (IllegalStateException e) {
-                            //OK
-                        }
-
-
-                        deleted.removeProperty("irrelevant");
                     }
-                }
-        );
+            );
+        });
     }
 
-    @Test(expected = TransactionFailureException.class)
+    @Test
     public void shouldNotBeAbleToCreateARelationshipFromDeletedNodeBeforeCommit() {
         createTestDatabase();
-        mutateGraph(
-                new BeforeCommitCallback.RememberingAdapter() {
-                    @Override
-                    public void doBeforeCommit(ImprovedTransactionData td) {
-                        Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
+        assertThrows(TransactionFailureException.class, () -> {
+            mutateGraph(
+                    new BeforeCommitCallback.RememberingAdapter() {
+                        @Override
+                        public void doBeforeCommit(ImprovedTransactionData td) {
+                            Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
 
-                        Node deleted = deletedNodes.get(ids.get(2L));
+                            Node deleted = deletedNodes.get(ids.get(2L));
 
-                        deleted.createRelationshipTo(getNodeById(3), withName("illegal"));
+                            deleted.createRelationshipTo(getNodeById(3), withName("illegal"));
+                        }
                     }
-                }
-        );
+            );
+        });
     }
 
-    @Test(expected = TransactionFailureException.class)
+    @Test
     public void shouldNotBeAbleToCreateARelationshipToDeletedNodeBeforeCommit() {
         createTestDatabase();
-        mutateGraph(
-                new BeforeCommitCallback.RememberingAdapter() {
-                    @Override
-                    public void doBeforeCommit(ImprovedTransactionData td) {
-                        Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
+        assertThrows(TransactionFailureException.class, () -> {
+            mutateGraph(
+                    new BeforeCommitCallback.RememberingAdapter() {
+                        @Override
+                        public void doBeforeCommit(ImprovedTransactionData td) {
+                            Map<Long, Node> deletedNodes = toMap(td.getAllDeletedNodes());
 
-                        Node deleted = deletedNodes.get(ids.get(2L));
+                            Node deleted = deletedNodes.get(ids.get(2L));
 
-                        getNodeById(3).createRelationshipTo(deleted, withName("illegal"));
+                            getNodeById(3).createRelationshipTo(deleted, withName("illegal"));
+                        }
                     }
-                }
-        );
+            );
+        });
     }
 
     @Test
@@ -1687,8 +1706,7 @@ public class LazyTransactionDataComprehensiveTest {
     }
 
     private void createTestDatabase() {
-        db = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(db);
+        createDatabase();
 
         db.execute("CREATE " +
                 "(zero:TestLabel), " +

@@ -16,41 +16,28 @@
 
 package com.graphaware.common.util;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import com.graphaware.common.UnitTest;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.*;
-import org.neo4j.test.TestGraphDatabaseFactory;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.RelationshipUtils.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.neo4j.graphdb.Direction.*;
-import static org.neo4j.graphdb.RelationshipType.*;
+import static org.neo4j.graphdb.RelationshipType.withName;
 
 /**
  * Unit test for {@link RelationshipUtils}.
  */
-public class RelationshipUtilsTest {
+public class RelationshipUtilsTest extends UnitTest {
 
-    private GraphDatabaseService database;
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-
+    @Override
+    protected void populate(GraphDatabaseService database) {
         try (Transaction tx = database.beginTx()) {
             Node node1 = database.createNode();
             Node node2 = database.createNode();
             node1.createRelationshipTo(node2, withName("TEST"));
             tx.success();
         }
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
     }
 
     @Test
@@ -68,13 +55,15 @@ public class RelationshipUtilsTest {
         }
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void nonExistingRelationshipShouldBeCorrectlyIdentified2() {
         try (Transaction tx = database.beginTx()) {
             Node node1 = database.getNodeById(0);
             Node node2 = database.getNodeById(1);
 
-            getSingleRelationship(node2, node1, withName("IDONTEXIST"), INCOMING);
+            assertThrows(NotFoundException.class, () -> {
+                getSingleRelationship(node2, node1, withName("IDONTEXIST"), INCOMING);
+            });
 
             tx.success();
         }

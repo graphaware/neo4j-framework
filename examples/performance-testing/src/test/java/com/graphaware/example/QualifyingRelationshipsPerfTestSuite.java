@@ -18,7 +18,7 @@ package com.graphaware.example;
 
 import com.graphaware.test.performance.PerformanceTest;
 import com.graphaware.test.performance.PerformanceTestSuite;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 /**
  * An reference implementation of {@link PerformanceTestSuite} with {@link PerformanceTest}s.
@@ -26,7 +26,7 @@ import org.junit.Ignore;
  * This suite demonstrates how one would measure and quantify, whether it is better to qualify relationships by properties,
  * or by different relationship types. See http://graphaware.com/neo4j/2013/10/24/neo4j-qualifying-relationships.html
  */
-@Ignore //ignored, only run manually, not as part of the build
+@Disabled //ignored, only run manually, not as part of the build
 public class QualifyingRelationshipsPerfTestSuite extends PerformanceTestSuite {
 
     /**

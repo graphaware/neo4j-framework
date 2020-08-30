@@ -18,23 +18,18 @@ package com.graphaware.common.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.graphaware.common.UnitTest;
 import org.json.JSONException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.*;
-import org.neo4j.test.TestGraphDatabaseFactory;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-public class JsonGraphTest {
+public class JsonGraphTest extends UnitTest {
 
-    private GraphDatabaseService database;
     private ObjectMapper mapper = new ObjectMapper();
 
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-
+    @Override
+    protected void populate(GraphDatabaseService database) {
         try (Transaction tx = database.beginTx()) {
             Node node1 = database.createNode(Label.label("L1"), Label.label("L2"));
             Node node2 = database.createNode();
@@ -52,11 +47,6 @@ public class JsonGraphTest {
 
             tx.success();
         }
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
     }
 
     @Test

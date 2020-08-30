@@ -17,14 +17,13 @@
 package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.runtime.RuntimeRegistry;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.config.InvalidSettingException;
-import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
-
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.TestServerBuilder;
+import org.neo4j.harness.TestServerBuilders;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -33,14 +32,14 @@ import java.util.Set;
 import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
 import static com.graphaware.runtime.bootstrap.TestModule.TEST_RUNTIME_MODULES;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Integration test for runtime and module bootstrapping.
  */
 public class BootstrapIntegrationTest {
 
-    @Before
+    @BeforeEach
     public void setUp() {
         TEST_RUNTIME_MODULES.clear();
         RuntimeRegistry.clear();
@@ -48,7 +47,7 @@ public class BootstrapIntegrationTest {
 
     @Test
     public void moduleShouldNotBeInitializedWhenNoConfigProvided() throws InterruptedException {
-        GraphDatabaseService database = builder().newGraphDatabase();
+        GraphDatabaseService database = builder().newServer().graph();
 
         registerShutdownHook(database);
 
@@ -62,25 +61,9 @@ public class BootstrapIntegrationTest {
     @Test
     public void moduleShouldNotBeInitializedWhenRuntimeIsDisabled() throws InterruptedException {
         GraphDatabaseService database = builder()
-                .setConfig(RUNTIME_ENABLED, "false")
-                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-
-        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
-
-        database.shutdown();
-
-        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
-    }
-
-    @Test(expected = InvalidSettingException.class)
-    public void misconfiguredRuntimeShouldFailStartup() throws InterruptedException {
-        GraphDatabaseService database = builder()
-                .setConfig(RUNTIME_ENABLED, "whatever")
-                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .newGraphDatabase();
+                .withConfig(RUNTIME_ENABLED, "false")
+                .withConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .newServer().graph();
 
         registerShutdownHook(database);
 
@@ -92,11 +75,23 @@ public class BootstrapIntegrationTest {
     }
 
     @Test
+    public void misconfiguredRuntimeShouldFailStartup() throws InterruptedException {
+        assertThrows(InvalidSettingException.class, () -> {
+            GraphDatabaseService database = builder()
+                    .withConfig(RUNTIME_ENABLED, "whatever")
+                    .withConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                    .newServer().graph();
+        });
+        
+        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
+    }
+
+    @Test
     public void moduleShouldNotBeInitializedWhenRuntimeIsDisabled3() throws InterruptedException {
         GraphDatabaseService database = builder()
-                .setConfig(RUNTIME_ENABLED, null)
-                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .newGraphDatabase();
+                .withConfig(RUNTIME_ENABLED, null)
+                .withConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .newServer().graph();
 
         registerShutdownHook(database);
 
@@ -110,9 +105,9 @@ public class BootstrapIntegrationTest {
     @Test
     public void moduleShouldBeInitializedWhenRuntimeIsEnabled() throws InterruptedException {
         GraphDatabaseService database = builder()
-                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
-                .newGraphDatabase();
+                .withConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .withConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
+                .newServer().graph();
 
         registerShutdownHook(database);
 
@@ -130,9 +125,9 @@ public class BootstrapIntegrationTest {
     @Test
     public void moduleShouldBeInitializedWhenRuntimeIsEnabledWithoutAnyTransactions() throws InterruptedException {
         GraphDatabaseService database = builder()
-                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
-                .newGraphDatabase();
+                .withConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .withConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
+                .newServer().graph();
 
         registerShutdownHook(database);
 
@@ -147,8 +142,8 @@ public class BootstrapIntegrationTest {
     @Test
     public void moduleShouldBeInitializedWhenModuleIsDisabled() throws InterruptedException {
         GraphDatabaseService database = builder()
-                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, null)
-                .newGraphDatabase();
+                .withConfig(TestModuleBootstrapper.MODULE_ENABLED, null)
+                .newServer().graph();
 
         registerShutdownHook(database);
 
@@ -162,11 +157,11 @@ public class BootstrapIntegrationTest {
     @Test
     public void moduleShouldBeInitializedWhenAnotherModuleIsMisConfigured() throws InterruptedException {
         GraphDatabaseService database = builder()
-                .setConfig("com.graphaware.module.wrong1.enabled", "com.not.existent.Bootstrapper")
-                .setConfig("com.graphaware.module.wrong2.2", "com.not.existent.Bootstrapper")
-                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
-                .newGraphDatabase();
+                .withConfig("com.graphaware.module.wrong1.enabled", "com.not.existent.Bootstrapper")
+                .withConfig("com.graphaware.module.wrong2.2", "com.not.existent.Bootstrapper")
+                .withConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .withConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
+                .newServer().graph();
 
         registerShutdownHook(database);
 
@@ -184,10 +179,10 @@ public class BootstrapIntegrationTest {
     @Test
     public void modulesShouldBeDelegatedToInCorrectOrder() throws InterruptedException {
         GraphDatabaseService database = builder()
-                .setConfig("com.graphaware.module.test1.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .setConfig("com.graphaware.module.test3.3", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .setConfig("com.graphaware.module.test2.2", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .newGraphDatabase();
+                .withConfig("com.graphaware.module.test1.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .withConfig("com.graphaware.module.test3.3", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .withConfig("com.graphaware.module.test2.2", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .newServer().graph();
 
         registerShutdownHook(database);
 
@@ -207,10 +202,10 @@ public class BootstrapIntegrationTest {
     @Test
     public void modulesShouldBeDelegatedToInRandomOrderWhenOrderClashes() throws InterruptedException {
         GraphDatabaseService database = builder()
-                .setConfig("com.graphaware.module.test1.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .setConfig("com.graphaware.module.test3.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .setConfig("com.graphaware.module.test2.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .newGraphDatabase();
+                .withConfig("com.graphaware.module.test1.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .withConfig("com.graphaware.module.test3.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .withConfig("com.graphaware.module.test2.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
+                .newServer().graph();
 
         registerShutdownHook(database);
 
@@ -229,9 +224,7 @@ public class BootstrapIntegrationTest {
         database.shutdown();
     }
 
-    private GraphDatabaseBuilder builder() {
-        return new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig(RUNTIME_ENABLED, "true");
+    private TestServerBuilder builder() {
+       return TestServerBuilders.newInProcessBuilder().withConfig(RUNTIME_ENABLED, "true");
     }
 }

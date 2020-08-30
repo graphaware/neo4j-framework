@@ -18,8 +18,7 @@ package com.graphaware.writer.neo4j;
 
 import com.graphaware.common.util.IterableUtils;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
-import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -30,12 +29,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test for {@link TxPerTaskWriter}.
  */
-public class TxPerTaskWriterTest extends EmbeddedDatabaseIntegrationTest {
+public class TxPerTaskWriterTest extends DatabaseIntegrationTest {
 
     private Neo4jWriter writer;
 
@@ -160,24 +159,28 @@ public class TxPerTaskWriterTest extends EmbeddedDatabaseIntegrationTest {
         }
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void runtimeExceptionFromTaskGetsPropagatedIfWaiting() {
-        writer.write(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                throw new RuntimeException("Deliberate Testing Exception");
-            }
-        }, "test", 50);
+        assertThrows(RuntimeException.class, () -> {
+            writer.write(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    throw new RuntimeException("Deliberate Testing Exception");
+                }
+            }, "test", 50);
+        });
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void checkedExceptionFromTaskGetsTranslatedIfWaiting() {
-        writer.write(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                throw new IOException("Deliberate Testing Exception");
-            }
-        }, "test", 50);
+        assertThrows(RuntimeException.class, () -> {
+            writer.write(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    throw new IOException("Deliberate Testing Exception");
+                }
+            }, "test", 50);
+        });
     }
 
     @Test

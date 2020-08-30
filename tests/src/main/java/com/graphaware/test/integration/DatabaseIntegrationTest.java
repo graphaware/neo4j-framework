@@ -17,11 +17,23 @@
 package com.graphaware.test.integration;
 
 import com.graphaware.test.data.DatabasePopulator;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
+import org.neo4j.harness.ServerControls;
+import org.neo4j.harness.TestServerBuilder;
+import org.neo4j.harness.TestServerBuilders;
+import org.neo4j.helpers.ListenSocketAddress;
 import org.neo4j.kernel.impl.factory.GraphDatabaseFacade;
 import org.neo4j.kernel.impl.proc.Procedures;
+import org.neo4j.server.helpers.CommunityServerBuilder;
+import org.springframework.core.io.ClassPathResource;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Base class for all kinds of Neo4j integration tests.
@@ -34,29 +46,27 @@ import org.neo4j.kernel.impl.proc.Procedures;
  */
 public abstract class DatabaseIntegrationTest {
 
-    private GraphDatabaseService database;
+    private ServerControls database;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        database = createDatabase();
-        populateDatabase(database);
+        TestServerBuilder builder = TestServerBuilders.newInProcessBuilder();
+
+        builder = configure(builder);
 
         if (shouldRegisterProceduresAndFunctions()) {
-            registerProceduresAndFunctions(((GraphDatabaseFacade) database).getDependencyResolver().resolveDependency(Procedures.class));
+            builder = registerProceduresAndFunctions(builder);
         }
+
+        database = builder.newServer();
+
+        populateDatabase(database.graph());
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
-        database.shutdown();
+        database.close();
     }
-
-    /**
-     * Create a database.
-     *
-     * @return database.
-     */
-    protected abstract GraphDatabaseService createDatabase();
 
     /**
      * Get the name of config file used to configure the database.
@@ -91,8 +101,10 @@ public abstract class DatabaseIntegrationTest {
      *
      * @param procedures to register against.
      */
-    protected void registerProceduresAndFunctions(Procedures procedures) throws Exception {
+    protected TestServerBuilder registerProceduresAndFunctions(TestServerBuilder builder) throws Exception {
         //no-op by default
+
+        return builder;
     }
 
     /**
@@ -108,6 +120,71 @@ public abstract class DatabaseIntegrationTest {
      * @return database.
      */
     protected GraphDatabaseService getDatabase() {
-        return database;
+        return database.graph();
+    }
+
+    /**
+     * Populate server configurator with additional configuration. This method should rarely be overridden. In order to
+     * register extensions, provide additional server config (including changing the port on which the server runs),
+     * please override one of the methods below.
+     * <p>
+     * This method is only called iff {@link #configFile()} returns <code>null</code>.
+     *
+     * @param builder to populate.
+     */
+    protected TestServerBuilder configure(TestServerBuilder builder) throws IOException {
+        for (Map.Entry<String, String> mapping : thirdPartyJaxRsPackageMappings().entrySet()) {
+            builder = builder.withExtension(mapping.getKey(), mapping.getValue());
+        }
+
+        builder = builder.withConfig(GraphDatabaseSettings.auth_enabled.name(), Boolean.toString(authEnabled()));
+
+        if (configFile() != null) {
+            Properties properties = new Properties();
+            properties.load(new ClassPathResource(configFile()).getInputStream());
+            for (String key : properties.stringPropertyNames()) {
+                builder = builder.withConfig(key, properties.getProperty(key));
+            }
+        }
+
+        for (Map.Entry<String, String> config : additionalServerConfiguration().entrySet()) {
+            builder = builder.withConfig(config.getKey(), config.getValue());
+        }
+
+        return builder;
+    }
+
+
+    /**
+     * Provide information for registering unmanaged extensions.
+     * <p>
+     * This method is only called iff {@link #configFile()} returns <code>null</code>.
+     *
+     * @return map where the key is the package in which a set of extensions live and value is the mount point of those
+     * extensions, i.e., a URL under which they will be exposed relative to the server address
+     * (typically http://localhost:7575 for tests).
+     */
+    protected Map<String, String> thirdPartyJaxRsPackageMappings() {
+        return Collections.emptyMap();
+    }
+
+    /**
+     * Provide additional server configuration.
+     * <p>
+     * This method is only called iff {@link #configFile()} returns <code>null</code>.
+     *
+     * @return map of configuration key-value pairs.
+     */
+    protected Map<String, String> additionalServerConfiguration() {
+        return Collections.emptyMap();
+    }
+
+    /**
+     * This method is only called iff {@link #configFile()} returns <code>null</code>.
+     *
+     * @return <code>true</code> iff Neo4j's native auth functionality should be enable, <code>false</code> (default) for disabled.
+     */
+    protected boolean authEnabled() {
+        return false;
     }
 }

@@ -18,12 +18,12 @@ package com.graphaware.perf.writes;
 
 import com.graphaware.test.performance.PerformanceTest;
 import com.graphaware.test.performance.PerformanceTestSuite;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 /**
  * Performance test suite for write throughput perf tests.
  */
-@Ignore
+@Disabled
 public class WritePerformanceTestSuite extends PerformanceTestSuite {
 
     @Override

@@ -18,12 +18,12 @@ package com.graphaware.example;
 
 import com.graphaware.test.performance.PerformanceTest;
 import com.graphaware.test.performance.PerformanceTestSuite;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 
 /**
  * Dummy {@link PerformanceTestSuite} for documentation. Runs {@link DummyTestForDocs}.
  */
-@Ignore
+@Disabled
 public class DummyTestSuiteForDocs extends PerformanceTestSuite {
 
     /**

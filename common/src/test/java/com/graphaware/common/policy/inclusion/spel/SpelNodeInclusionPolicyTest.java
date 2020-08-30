@@ -17,11 +17,11 @@
 package com.graphaware.common.policy.inclusion.spel;
 
 import com.graphaware.common.policy.inclusion.NodeInclusionPolicy;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.helpers.collection.Iterables;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for {@link com.graphaware.common.policy.inclusion.spel.SpelNodeInclusionPolicy}.

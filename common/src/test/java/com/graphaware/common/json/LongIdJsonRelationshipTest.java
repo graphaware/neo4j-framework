@@ -18,29 +18,24 @@ package com.graphaware.common.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.graphaware.common.UnitTest;
 import com.graphaware.common.representation.DetachedEntity;
 import com.graphaware.common.representation.SerializationSpecification;
 import com.graphaware.common.transform.NodeIdTransformer;
 import com.graphaware.common.transform.RelationshipIdTransformer;
 import org.json.JSONException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.*;
-import org.neo4j.test.TestGraphDatabaseFactory;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.util.Collections;
 
-public class LongIdJsonRelationshipTest {
+public class LongIdJsonRelationshipTest extends UnitTest {
 
-    private GraphDatabaseService database;
     private ObjectMapper mapper = new ObjectMapper();
 
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-
+    @Override
+    protected void populate(GraphDatabaseService database) {
         try (Transaction tx = database.beginTx()) {
             Node node1 = database.createNode(Label.label("L1"), Label.label("L2"));
             Node node2 = database.createNode();
@@ -58,11 +53,6 @@ public class LongIdJsonRelationshipTest {
 
             tx.success();
         }
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
     }
 
     @Test

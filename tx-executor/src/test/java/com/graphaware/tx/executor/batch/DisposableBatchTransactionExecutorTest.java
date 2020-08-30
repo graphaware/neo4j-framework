@@ -16,12 +16,13 @@
 
 package com.graphaware.tx.executor.batch;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 
 /**
  * Unit tests for {@link com.graphaware.tx.executor.batch.DisposableBatchTransactionExecutor}.

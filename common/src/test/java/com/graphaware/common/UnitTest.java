@@ -14,46 +14,55 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-package com.graphaware.tx.executor.batch;
+package com.graphaware.common;
 
+import com.graphaware.common.util.Change;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.harness.ServerControls;
 import org.neo4j.harness.TestServerBuilders;
 
-import static com.graphaware.common.util.IterableUtils.countNodes;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Collections;
+import java.util.Map;
+
+import static com.graphaware.common.util.Change.changesToMap;
+import static java.util.Arrays.asList;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Unit test for {@link com.graphaware.tx.executor.batch.MultiThreadedBatchTransactionExecutor}.
+ *  Unit test with Neo4j.
  */
-public class MultiThreadedBatchTransactionExecutorTest {
+public abstract class UnitTest {
 
     private ServerControls controls;
     protected GraphDatabaseService database;
 
     @BeforeEach
     public void setUp() {
-        controls = TestServerBuilders.newInProcessBuilder().newServer();
-        database = controls.graph();
+        createDatabase();
+
+        populate(database);
     }
 
     @AfterEach
     public void tearDown() {
-        controls.close();
+        destroyDatabase();
     }
 
-    @Test
-    public void resultShouldBeCorrectWhenExecutedInMultipleThreads() {
-        BatchTransactionExecutor batchExecutor = new MultiThreadedBatchTransactionExecutor(new NoInputBatchTransactionExecutor(database, 100, 40000, CreateNode.getInstance()), 4);
+    protected void populate(GraphDatabaseService database) {
 
-        batchExecutor.execute();
+    }
 
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(40000, countNodes(database));
-        }
+    protected final void createDatabase() {
+        controls = TestServerBuilders.newInProcessBuilder().newServer();
+        database = controls.graph();
+    }
+
+    protected final void destroyDatabase() {
+        controls.close();
     }
 }

@@ -16,48 +16,32 @@
 
 package com.graphaware.example;
 
+import com.graphaware.test.integration.DatabaseIntegrationTest;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
-import org.neo4j.test.TestGraphDatabaseFactory;
-
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.graphdb.RelationshipType.withName;
 import static org.neo4j.graphdb.Label.label;
+import static org.neo4j.graphdb.RelationshipType.withName;
 
 
 /**
  * Demo of {@link ChangeLogger}.
  */
-public class ChangeLoggerDemo {
+public class ChangeLoggerDemo extends DatabaseIntegrationTest {
 
-    private GraphDatabaseService database;
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-        database.registerTransactionEventHandler(new ChangeLogger());
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
+    public void setUp() throws Exception {
+        super.setUp();
+        getDatabase().registerTransactionEventHandler(new ChangeLogger());
     }
 
     @Test
     public void demonstrateLogging() {
-        performMutations(database);
+        performMutations(getDatabase());
     }
 
     private void performMutations(GraphDatabaseService database) {

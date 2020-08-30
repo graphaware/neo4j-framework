@@ -1,9 +1,10 @@
-package com.graphaware.common.ping;
+package com.graphaware.common.util;
 
-import com.graphaware.common.util.VersionReader;
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class VersionReaderTest {
 
