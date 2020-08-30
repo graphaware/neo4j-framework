@@ -16,11 +16,13 @@
 
 package com.graphaware.common.util;
 
-import com.graphaware.common.UnitTest;
 import org.junit.jupiter.api.Test;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.harness.ServerControls;
+import org.neo4j.harness.TestServerBuilders;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,17 +36,35 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit test for {@link com.graphaware.common.util.IterableUtils}.
  */
-public class IterableUtilsTest extends UnitTest {
+public class IterableUtilsTest {
+
+    private ServerControls controls;
+    protected GraphDatabaseService database;
+
+    protected final void createDatabase() {
+        controls = TestServerBuilders.newInProcessBuilder().newServer();
+        database = controls.graph();
+    }
+
+    protected final void destroyDatabase() {
+        controls.close();
+    }
 
     @Test
     public void newDatabaseShouldHaveNoNodes() {
+        createDatabase();
+
         try (Transaction tx = database.beginTx()) {
             assertEquals(0, countNodes(database));
         }
+
+        destroyDatabase();
     }
 
     @Test
     public void afterCreatingANodeDatabaseShouldHaveOneNode() {
+        createDatabase();
+
         try (Transaction tx = database.beginTx()) {
             database.createNode();
             tx.success();
@@ -53,6 +73,8 @@ public class IterableUtilsTest extends UnitTest {
         try (Transaction tx = database.beginTx()) {
             assertEquals(1, countNodes(database));
         }
+
+        destroyDatabase();
     }
 
     @Test
@@ -68,6 +90,8 @@ public class IterableUtilsTest extends UnitTest {
 
     @Test
     public void checkContainsRealIterables() {
+        createDatabase();
+
         Node node;
 
         try (Transaction tx = database.beginTx()) {
@@ -87,10 +111,14 @@ public class IterableUtilsTest extends UnitTest {
         try (Transaction tx = database.beginTx()) {
             assertFalse(contains(database.getAllNodes(), node));
         }
+
+        destroyDatabase();
     }
 
     @Test
     public void testRandom() {
+        createDatabase();
+
         try (Transaction tx = database.beginTx()) {
             database.createNode();
             tx.success();
@@ -103,6 +131,8 @@ public class IterableUtilsTest extends UnitTest {
             assertTrue(asList(0L, 1L).contains(random(database.getAllNodes()).getId()));
             assertTrue(asList(0L, 1L).contains(random(database.getAllNodes()).getId()));
         }
+
+        destroyDatabase();
     }
 
     @Test

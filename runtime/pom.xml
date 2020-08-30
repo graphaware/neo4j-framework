@@ -51,10 +51,6 @@
             <groupId>com.graphaware.neo4j</groupId>
             <artifactId>tx-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-        </dependency>
 
         <!-- Test -->
 <!--        <dependency>-->
@@ -62,11 +58,7 @@
 <!--            <artifactId>uuid</artifactId>-->
 <!--            <scope>test</scope>-->
 <!--        </dependency>-->
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-common</artifactId>
-            <type>test-jar</type>
-        </dependency>
+
     </dependencies>
 
     <build>
@@ -74,6 +66,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <goals>
