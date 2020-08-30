@@ -53,11 +53,16 @@ public class CommunityModuleManager extends BaseModuleManager implements ModuleM
     public void startModules() {
         super.startModules();
 
-        LOG.info("Starting transaction-driven modules...");
+        if (modules.isEmpty()) {
+            LOG.info("No GraphAware Runtime modules registered.");
+            return;
+        }
+
+        LOG.info("Starting GraphAware Runtime modules...");
         for (Module<?> module : modules.values()) {
             start(module);
         }
-        LOG.info("Transaction-driven modules started.");
+        LOG.info("GraphAware Runtime modules started.");
     }
 
     /**

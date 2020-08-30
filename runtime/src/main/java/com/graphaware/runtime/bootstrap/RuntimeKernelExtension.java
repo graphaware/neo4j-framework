@@ -123,13 +123,12 @@ public class RuntimeKernelExtension implements Lifecycle {
         new Thread(() -> {
             if (databaseIsAvailable()) {
                 runtime.start();
-                LOG.info("GraphAware Runtime automatically started.");
             } else {
                 LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within " + WAIT_MINUTES + " minutes.");
             }
         }, "GraphAware Starter").start();
 
-        LOG.info("GraphAware Runtime bootstrapped, starting the Runtime...");
+        LOG.info("GraphAware Runtime bootstrapped.");
     }
 
     protected boolean databaseIsAvailable() {

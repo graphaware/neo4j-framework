@@ -115,20 +115,20 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
     @Override
     public final synchronized void start() {
         if (State.STARTED.equals(state)) {
-            LOG.debug("GraphAware already started");
+            LOG.debug("GraphAware Runtime already started");
             return;
         }
 
         if (State.STARTING.equals(state)) {
-            throw new IllegalStateException("Attempt to start GraphAware from multiple different threads. This is a bug");
+            throw new IllegalStateException("Attempt to start GraphAware Runtime from multiple different threads. This is a bug");
         }
 
         if (!State.REGISTERED.equals(state)) {
-            throw new IllegalStateException("Illegal Runtime state " + state + "! This is a bug");
+            throw new IllegalStateException("Illegal GraphAware Runtime state " + state + "! This is a bug");
         }
 
         STARTING.set(true);
-        LOG.info("Starting GraphAware...");
+        LOG.info("Starting GraphAware Runtime...");
         state = State.STARTING;
 
         beforeStart();
@@ -137,7 +137,7 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
         startWriter();
 
         state = State.STARTED;
-        LOG.info("GraphAware started.");
+        LOG.info("GraphAware Runtime started.");
         STARTING.set(false);
     }
 
