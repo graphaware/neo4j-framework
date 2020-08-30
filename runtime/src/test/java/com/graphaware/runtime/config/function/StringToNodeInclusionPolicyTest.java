@@ -30,7 +30,6 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class StringToNodeInclusionPolicyTest {
 
-
     @Test
     public void shouldConstructPolicyFromAllNodesKeywords() {
         NodeInclusionPolicy policy1 = StringToNodeInclusionPolicy.getInstance().apply("all");

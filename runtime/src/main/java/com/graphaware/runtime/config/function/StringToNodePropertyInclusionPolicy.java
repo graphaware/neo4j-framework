@@ -28,7 +28,7 @@ import com.graphaware.runtime.policy.all.IncludeAllBusinessNodeProperties;
  */
 public final class StringToNodePropertyInclusionPolicy extends StringToInclusionPolicy<NodePropertyInclusionPolicy> {
 
-    private static StringToNodePropertyInclusionPolicy INSTANCE = new StringToNodePropertyInclusionPolicy();
+    private static final StringToNodePropertyInclusionPolicy INSTANCE = new StringToNodePropertyInclusionPolicy();
 
     public static StringToNodePropertyInclusionPolicy getInstance() {
         return INSTANCE;

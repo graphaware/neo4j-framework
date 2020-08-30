@@ -32,8 +32,7 @@ import java.util.Map;
 /**
  * Base class for all kinds of Neo4j integration tests.
  * <p>
- * Allows subclasses to create a database at the beginning of each test by overriding {@link #createDatabase()} and allows
- * them to populate it by overriding {@link #populateDatabase(org.neo4j.graphdb.GraphDatabaseService)},
+ * Allows subclasses to populate a test database by overriding {@link #populateDatabase(org.neo4j.graphdb.GraphDatabaseService)},
  * or by providing a {@link com.graphaware.test.data.DatabasePopulator} by overriding {@link #databasePopulator()}.
  * <p>
  * Shuts the database down at the end of each test.
@@ -84,7 +83,7 @@ public abstract class DatabaseIntegrationTest {
     }
 
     /**
-     * @return <code>iff</code> the {@link #registerProceduresAndFunctions(Procedures)} method should be called during {@link #setUp()}.
+     * @return <code>iff</code> the {@link #registerProceduresAndFunctions(TestServerBuilder)} method should be called during {@link #setUp()}.
      */
     protected boolean shouldRegisterProceduresAndFunctions() {
         return true;
@@ -93,7 +92,7 @@ public abstract class DatabaseIntegrationTest {
     /**
      * Register procedures and functions.
      *
-     * @param procedures to register against.
+     * @param builder to register against.
      */
     protected TestServerBuilder registerProceduresAndFunctions(TestServerBuilder builder) throws Exception {
         //no-op by default

@@ -27,7 +27,6 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventHandler;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 
 /**
  * Only for documentation. If you need to change this class, change the code in README.md as well please.

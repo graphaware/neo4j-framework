@@ -35,7 +35,6 @@ import org.neo4j.harness.TestServerBuilders;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.EntityUtils.*;
 import static com.graphaware.common.util.IterableUtils.*;
 import static com.graphaware.tx.event.improved.LazyTransactionDataComprehensiveTest.RelationshipTypes.*;

@@ -48,9 +48,9 @@ public final class IterableUtils {
      * @param iterable to count items in.
      * @return number of items in the iterable.
      */
-    public static long count(Iterable iterable) {
+    public static long count(Iterable<?> iterable) {
         if (iterable instanceof Collection) {
-            return ((Collection) iterable).size();
+            return ((Collection<?>) iterable).size();
         }
 
         return Iterables.count(iterable);
@@ -66,7 +66,7 @@ public final class IterableUtils {
      */
     public static <T> boolean contains(Iterable<T> iterable, T object) {
         if (iterable instanceof Collection) {
-            return ((Collection) iterable).contains(object);
+            return ((Collection<?>) iterable).contains(object);
         }
 
         for (T t : iterable) {

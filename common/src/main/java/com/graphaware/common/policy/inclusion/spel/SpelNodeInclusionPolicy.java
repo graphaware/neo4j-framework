@@ -52,7 +52,6 @@ public class SpelNodeInclusionPolicy extends SpelInclusionPolicy implements Node
             return () -> database.findNodes(Label.label(labelName));
         }
 
-
         return new FilteringIterable<>(database.getAllNodes(), this::include);
     }
 

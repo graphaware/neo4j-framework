@@ -33,7 +33,6 @@ public abstract class BaseEntityInclusionPolicy<T extends Entity> implements Ent
      */
     @Override
     public Iterable<T> getAll(GraphDatabaseService database) {
-        //Neo suggests replacing this deprecated stuff with another deprecated class - not much we can do
         return new FilteringIterable<>(doGetAll(database), this::include);
     }
 

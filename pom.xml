@@ -41,11 +41,9 @@
         <module>graphaware-apoc-dependency-test</module>
 
         <!--examples-->
-        <module>examples/node-counter</module>
         <module>examples/friendship-strength-counter</module>
         <module>examples/change-logger</module>
         <module>examples/friendship-strength-counter-module</module>
-        <module>examples/performance-testing</module>
     </modules>
 
     <licenses>

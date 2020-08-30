@@ -29,7 +29,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
 import static com.graphaware.runtime.bootstrap.TestModule.TEST_RUNTIME_MODULES;
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,8 +48,6 @@ public class BootstrapIntegrationTest {
     public void moduleShouldNotBeInitializedWhenNoConfigProvided() throws InterruptedException {
         GraphDatabaseService database = builder().newServer().graph();
 
-        registerShutdownHook(database);
-
         assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
         database.shutdown();
@@ -64,8 +61,6 @@ public class BootstrapIntegrationTest {
                 .withConfig(RUNTIME_ENABLED, "false")
                 .withConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newServer().graph();
-
-        registerShutdownHook(database);
 
         assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
@@ -93,8 +88,6 @@ public class BootstrapIntegrationTest {
                 .withConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newServer().graph();
 
-        registerShutdownHook(database);
-
         assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
         database.shutdown();
@@ -108,8 +101,6 @@ public class BootstrapIntegrationTest {
                 .withConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .withConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
                 .newServer().graph();
-
-        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             database.createNode(); //tx just to kick off Runtime init
@@ -129,8 +120,6 @@ public class BootstrapIntegrationTest {
                 .withConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
                 .newServer().graph();
 
-        registerShutdownHook(database);
-
         Thread.sleep(1000);
 
         assertEquals(1, TEST_RUNTIME_MODULES.size());
@@ -144,8 +133,6 @@ public class BootstrapIntegrationTest {
         GraphDatabaseService database = builder()
                 .withConfig(TestModuleBootstrapper.MODULE_ENABLED, null)
                 .newServer().graph();
-
-        registerShutdownHook(database);
 
         assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
@@ -162,8 +149,6 @@ public class BootstrapIntegrationTest {
                 .withConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .withConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
                 .newServer().graph();
-
-        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             database.createNode();
@@ -183,8 +168,6 @@ public class BootstrapIntegrationTest {
                 .withConfig("com.graphaware.module.test3.3", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .withConfig("com.graphaware.module.test2.2", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newServer().graph();
-
-        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             database.createNode();
@@ -206,8 +189,6 @@ public class BootstrapIntegrationTest {
                 .withConfig("com.graphaware.module.test3.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .withConfig("com.graphaware.module.test2.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
                 .newServer().graph();
-
-        registerShutdownHook(database);
 
         try (Transaction tx = database.beginTx()) {
             database.createNode();

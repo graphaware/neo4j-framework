@@ -29,7 +29,7 @@ public final class StringToDatabaseWriterType implements Function<String, Databa
     public static final String SINGLE_THREADED = "single";
     public static final String BATCH = "batch";
 
-    private static StringToDatabaseWriterType INSTANCE = new StringToDatabaseWriterType();
+    private static final StringToDatabaseWriterType INSTANCE = new StringToDatabaseWriterType();
 
     public static StringToDatabaseWriterType getInstance() {
         return INSTANCE;

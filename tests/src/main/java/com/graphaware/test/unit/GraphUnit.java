@@ -21,20 +21,16 @@ import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
 import com.graphaware.common.util.EntityUtils;
 import org.neo4j.graphdb.*;
-import org.neo4j.harness.ServerControls;
 import org.neo4j.harness.TestServerBuilders;
 import org.neo4j.helpers.collection.Iterators;
 import org.neo4j.logging.Log;
 
-import java.io.File;
 import java.util.*;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.EntityUtils.*;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.helpers.collection.Iterables.count;
-import static org.neo4j.kernel.configuration.Settings.FALSE;
 
 /**
  * A set of assertion methods useful for writing tests for Neo4j. Uses the {@link org.junit.Assert} class from JUnit
@@ -47,7 +43,6 @@ import static org.neo4j.kernel.configuration.Settings.FALSE;
 public final class GraphUnit {
 
     private static final Log LOG = LoggerFactory.getLogger(GraphUnit.class);
-    private static final File PATH = new File("target/test-data/graphunit-db");
 
     /**
      * Private constructor - this class is a utility and should not be instantiated.
@@ -790,11 +785,6 @@ public final class GraphUnit {
     }
 
     private static GraphDatabaseService createTemporaryDb() {
-        ServerControls controls = TestServerBuilders.newInProcessBuilder().newServer();
-        GraphDatabaseService result = controls.graph();
-
-        registerShutdownHook(result);
-
-        return result;
+        return TestServerBuilders.newInProcessBuilder().newServer().graph();
     }
 }

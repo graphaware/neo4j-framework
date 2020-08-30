@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 
 /**
  * Only for documentation. If you need to change this class, change the code in README.md as well please.

@@ -61,7 +61,7 @@ public class AttachedNode extends AttachedEntity<Node> implements AttachedNodeEx
         for (Label label : entity.getLabels()) {
             labels.add(label.name());
         }
-        return labels.toArray(new String[labels.size()]);
+        return labels.toArray(new String[0]);
     }
 
 

@@ -16,22 +16,11 @@
 
 package com.graphaware.common;
 
-import com.graphaware.common.util.Change;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
 import org.neo4j.harness.ServerControls;
 import org.neo4j.harness.TestServerBuilders;
-
-import java.util.Collections;
-import java.util.Map;
-
-import static com.graphaware.common.util.Change.changesToMap;
-import static java.util.Arrays.asList;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *  Unit test with Neo4j.
