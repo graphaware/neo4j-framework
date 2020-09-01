@@ -17,6 +17,7 @@
 package com.graphaware.tx.executor.single;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * A {@link TransactionCallback} returning void.
@@ -27,7 +28,7 @@ public abstract class VoidReturningCallback implements TransactionCallback<Void>
      * {@inheritDoc}
      */
     @Override
-    public final Void doInTransaction(GraphDatabaseService database) {
+    public final Void doInTransaction(Transaction database) {
         doInTx(database);
         return null;
     }
@@ -37,5 +38,5 @@ public abstract class VoidReturningCallback implements TransactionCallback<Void>
      *
      * @param database on which to perform work and against which the transaction is running.
      */
-    protected abstract void doInTx(GraphDatabaseService database);
+    protected abstract void doInTx(Transaction database);
 }

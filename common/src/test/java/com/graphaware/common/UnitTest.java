@@ -19,15 +19,16 @@ package com.graphaware.common;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.harness.ServerControls;
-import org.neo4j.harness.TestServerBuilders;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 /**
  *  Unit test with Neo4j.
  */
 public abstract class UnitTest {
 
-    private ServerControls controls;
+    private Neo4j controls;
     protected GraphDatabaseService database;
 
     @BeforeEach
@@ -35,6 +36,12 @@ public abstract class UnitTest {
         createDatabase();
 
         populate(database);
+
+        try (Transaction tx = database.beginTx()) {
+            populate(tx);
+
+            tx.commit();
+        }
     }
 
     @AfterEach
@@ -42,13 +49,17 @@ public abstract class UnitTest {
         destroyDatabase();
     }
 
+    protected void populate(Transaction database) {
+
+    }
+
     protected void populate(GraphDatabaseService database) {
 
     }
 
     protected final void createDatabase() {
-        controls = TestServerBuilders.newInProcessBuilder().newServer();
-        database = controls.graph();
+        controls = Neo4jBuilders.newInProcessBuilder().build();
+        database = controls.defaultDatabaseService();
     }
 
     protected final void destroyDatabase() {

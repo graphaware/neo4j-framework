@@ -21,8 +21,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.harness.ServerControls;
-import org.neo4j.harness.TestServerBuilders;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import static com.graphaware.common.util.IterableUtils.countNodes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,13 +32,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MultiThreadedBatchTransactionExecutorTest {
 
-    private ServerControls controls;
+    private Neo4j controls;
     protected GraphDatabaseService database;
 
     @BeforeEach
     public void setUp() {
-        controls = TestServerBuilders.newInProcessBuilder().newServer();
-        database = controls.graph();
+        controls = Neo4jBuilders.newInProcessBuilder().build();
+        database = controls.defaultDatabaseService();
     }
 
     @AfterEach
@@ -53,7 +53,7 @@ public class MultiThreadedBatchTransactionExecutorTest {
         batchExecutor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(40000, countNodes(database));
+            assertEquals(40000, countNodes(tx));
         }
     }
 }

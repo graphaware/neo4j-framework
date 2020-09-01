@@ -21,7 +21,7 @@ import com.graphaware.common.wrapper.NodeWrapper;
 import com.graphaware.tx.event.improved.data.EntityTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import org.neo4j.graphdb.*;
-import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.internal.helpers.collection.Iterables;
 import org.neo4j.logging.Log;
 import com.graphaware.common.log.LoggerFactory;
 

@@ -35,7 +35,7 @@ final GraphDatabaseService database = ... //get or create a database
 //Creating a node using vanilla Neo4j
 try (Transaction tx = database.beginTx()) {
     database.createNode();
-    tx.success();
+    tx.commit();
 }
 ```
 

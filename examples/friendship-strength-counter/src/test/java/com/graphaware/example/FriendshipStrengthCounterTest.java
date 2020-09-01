@@ -38,7 +38,7 @@ public class FriendshipStrengthCounterTest extends DatabaseIntegrationTest {
     public void setUp() throws Exception {
         super.setUp();
 
-        getDatabase().registerTransactionEventHandler(new FriendshipStrengthCounter(getDatabase()));
+        getNeo4j().databaseManagementService().registerTransactionEventListener(getDatabase().databaseName(), new FriendshipStrengthCounter(getDatabase()));
     }
 
     @Test
@@ -51,9 +51,9 @@ public class FriendshipStrengthCounterTest extends DatabaseIntegrationTest {
         long p1id, p2id;
 
         try (Transaction tx = getDatabase().beginTx()) {
-            Node person1 = getDatabase().createNode();
-            Node person2 = getDatabase().createNode();
-            Node person3 = getDatabase().createNode();
+            Node person1 = tx.createNode();
+            Node person2 = tx.createNode();
+            Node person3 = tx.createNode();
 
             p1id = person1.getId();
             p2id = person2.getId();
@@ -68,14 +68,14 @@ public class FriendshipStrengthCounterTest extends DatabaseIntegrationTest {
             person2.createRelationshipTo(person3, FRIEND_OF).setProperty(STRENGTH, 1L);
             person3.createRelationshipTo(person1, FRIEND_OF).setProperty(STRENGTH, 2L);
 
-            tx.success();
+            tx.commit();
         }
 
         assertEquals(9L, getTotalFriendshipStrength(getDatabase()));
 
         //delete and change some friendships
         try (Transaction tx = getDatabase().beginTx()) {
-            for (Relationship relationship : getDatabase().getNodeById(p1id).getRelationships(FRIEND_OF, Direction.OUTGOING)) {
+            for (Relationship relationship : tx.getNodeById(p1id).getRelationships(Direction.OUTGOING, FRIEND_OF)) {
                 if (relationship.getEndNode().getId() == p2id) {
                     relationship.delete(); //remove 2 from total strength
                 } else {
@@ -83,7 +83,7 @@ public class FriendshipStrengthCounterTest extends DatabaseIntegrationTest {
                 }
             }
 
-            tx.success();
+            tx.commit();
         }
 
         assertEquals(8L, getTotalFriendshipStrength(getDatabase()));
@@ -91,7 +91,7 @@ public class FriendshipStrengthCounterTest extends DatabaseIntegrationTest {
 
     @Test
     public void totalFriendshipStrengthShouldBeCountedUsingCypher() {
-        getDatabase().execute("CREATE " +
+        getDatabase().executeTransactionally("CREATE " +
                 "(p1:Person), (p2:Person), (p3:Person)," +
                 "(p1)-[:FRIEND_OF {strength:3}]->(p2)," +
                 "(p2)-[:FRIEND_OF {strength:1}]->(p1)," +
@@ -99,20 +99,29 @@ public class FriendshipStrengthCounterTest extends DatabaseIntegrationTest {
 
         String query = "MATCH (c:FriendshipCounter) RETURN c.totalFriendshipStrength as result";
 
-        Iterator<Map<String, Object>> execute = getDatabase().execute(query);
+        try (Transaction tx = getDatabase().beginTx()) {
+            Iterator<Map<String, Object>> execute = tx.execute(query);
 
-        while (execute.hasNext()) {
-            Map<String, Object> result = execute.next();
-            assertEquals(6L, result.get("result"));
+            while (execute.hasNext()) {
+                Map<String, Object> result = execute.next();
+                assertEquals(6L, result.get("result"));
+            }
+
+            tx.commit();
         }
 
-        getDatabase().execute("MATCH (p1:Person)-[f:FRIEND_OF {strength:3}]->(p2) DELETE f");
 
-        execute = getDatabase().execute(query);
+        query = "MATCH (p1:Person)-[f:FRIEND_OF {strength:3}]->(p2) DELETE f";
 
-        while (execute.hasNext()) {
-            Map<String, Object> result = execute.next();
-            assertEquals(3L, result.get("result"));
+        try (Transaction tx = getDatabase().beginTx()) {
+            Iterator<Map<String, Object>> execute = tx.execute(query);
+
+            while (execute.hasNext()) {
+                Map<String, Object> result = execute.next();
+                assertEquals(3L, result.get("result"));
+            }
+
+            tx.commit();
         }
     }
 }

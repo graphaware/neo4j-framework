@@ -138,14 +138,14 @@ public abstract class DetachedEntity<ID, T extends Entity> implements Serializab
 
             if (getGraphId() == NEW) {
                 checkCanCreate();
-                result = create(database);
+                result = create(tx);
                 populate(result);
             } else {
                 checkCanFetch();
-                result = fetch(database);
+                result = fetch(tx);
             }
 
-            tx.success();
+            tx.commit();
         }
 
         return result;
@@ -157,7 +157,7 @@ public abstract class DetachedEntity<ID, T extends Entity> implements Serializab
      * @param database to create the entity in.
      * @return entity.
      */
-    protected abstract T create(GraphDatabaseService database);
+    protected abstract T create(Transaction database);
 
     /**
      * Fetch a entity from the given database.
@@ -165,7 +165,7 @@ public abstract class DetachedEntity<ID, T extends Entity> implements Serializab
      * @param database to fetch in.
      * @return entity.
      */
-    protected abstract T fetch(GraphDatabaseService database);
+    protected abstract T fetch(Transaction database);
 
     /**
      * Populate this instance of a entity representation with data from the given {@link Entity}.

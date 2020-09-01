@@ -18,20 +18,20 @@ package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.runtime.module.ModuleBootstrapper;
 import com.graphaware.runtime.module.Module;
+import org.neo4j.configuration.SettingImpl;
+import org.neo4j.configuration.SettingValueParsers;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
 
 import java.util.Map;
-
-import static org.neo4j.kernel.configuration.Settings.*;
 
 /**
  * {@link ModuleBootstrapper} for {@link TestModule}.
  */
 public class TestModuleBootstrapper implements ModuleBootstrapper {
 
-    public static final Setting<String> MODULE_ENABLED = setting("com.graphaware.module.test.1", STRING, TestModuleBootstrapper.class.getCanonicalName());
-    public static final Setting<String> MODULE_CONFIG = setting("com.graphaware.module.test.configKey", STRING, "configValue");
+    public static final Setting<String> MODULE_ENABLED = SettingImpl.newBuilder("com.graphaware.module.test.1", SettingValueParsers.STRING, TestModuleBootstrapper.class.getCanonicalName()).build();
+    public static final Setting<String> MODULE_CONFIG = SettingImpl.newBuilder("com.graphaware.module.test.configKey", SettingValueParsers.STRING, "configValue").build();
 
     @Override
     public Module bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {

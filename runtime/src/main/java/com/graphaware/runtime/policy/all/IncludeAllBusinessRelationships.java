@@ -20,6 +20,7 @@ import com.graphaware.common.policy.inclusion.RelationshipInclusionPolicy;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * Policy that includes all business / application level relationships, but exclude any
@@ -48,7 +49,7 @@ public final class IncludeAllBusinessRelationships extends RelationshipInclusion
      * {@inheritDoc}
      */
     @Override
-    protected Iterable<Relationship> doGetAll(GraphDatabaseService database) {
+    protected Iterable<Relationship> doGetAll(Transaction database) {
         return database.getAllRelationships();
     }
 }

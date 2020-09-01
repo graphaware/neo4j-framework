@@ -37,20 +37,20 @@ public class FriendshipStrengthModuleEmbeddedDeclarativeIntegrationTest extends 
     @Test
     public void totalFriendshipStrengthOnEmptyDatabaseShouldBeZero() {
         try (Transaction tx = getDatabase().beginTx()) {
-            assertEquals(0, new FriendshipStrengthCounter(getDatabase()).getTotalFriendshipStrength());
-            tx.success();
+            assertEquals(0, new FriendshipStrengthCounter().getTotalFriendshipStrength(tx));
+            tx.commit();
         }
     }
 
     @Test
     public void totalFriendshipStrengthShouldBeCorrectlyCalculated() {
-        getDatabase().execute("CREATE " +
+        getDatabase().executeTransactionally("CREATE " +
                 "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
                 "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
 
         try (Transaction tx = getDatabase().beginTx()) {
-            assertEquals(3, new FriendshipStrengthCounter(getDatabase()).getTotalFriendshipStrength());
-            tx.success();
+            assertEquals(3, new FriendshipStrengthCounter().getTotalFriendshipStrength(tx));
+            tx.commit();
         }
     }
 }

@@ -18,7 +18,11 @@ package com.graphaware.common.util;
 
 import com.graphaware.common.UnitTest;
 import org.junit.jupiter.api.Test;
-import org.neo4j.graphdb.*;
+import org.neo4j.graphalgo.BasicEvaluationContext;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.NotFoundException;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 import static com.graphaware.common.util.RelationshipUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,111 +35,108 @@ import static org.neo4j.graphdb.RelationshipType.withName;
 public class RelationshipUtilsTest extends UnitTest {
 
     @Override
-    protected void populate(GraphDatabaseService database) {
-        try (Transaction tx = database.beginTx()) {
-            Node node1 = database.createNode();
-            Node node2 = database.createNode();
-            node1.createRelationshipTo(node2, withName("TEST"));
-            tx.success();
-        }
+    protected void populate(Transaction database) {
+        Node node1 = database.createNode();
+        Node node2 = database.createNode();
+        node1.createRelationshipTo(node2, withName("TEST"));
     }
 
     @Test
     public void nonExistingRelationshipShouldBeCorrectlyIdentified() {
         try (Transaction tx = database.beginTx()) {
-            Node node1 = database.getNodeById(0);
-            Node node2 = database.getNodeById(1);
+            Node node1 = tx.getNodeById(0);
+            Node node2 = tx.getNodeById(1);
 
-            assertTrue(relationshipNotExists(node2, node1, withName("TEST"), OUTGOING));
-            assertTrue(relationshipNotExists(node2, node1, withName("IDONTEXIST"), INCOMING));
-            assertFalse(relationshipNotExists(node2, node1, withName("TEST"), INCOMING));
-            assertFalse(relationshipNotExists(node2, node1, withName("TEST"), BOTH));
+            assertTrue(relationshipNotExists(new BasicEvaluationContext(tx, database), node2, node1, withName("TEST"), OUTGOING));
+            assertTrue(relationshipNotExists(new BasicEvaluationContext(tx, database), node2, node1, withName("IDONTEXIST"), INCOMING));
+            assertFalse(relationshipNotExists(new BasicEvaluationContext(tx, database), node2, node1, withName("TEST"), INCOMING));
+            assertFalse(relationshipNotExists(new BasicEvaluationContext(tx, database), node2, node1, withName("TEST"), BOTH));
 
-            tx.success();
+            tx.commit();
         }
     }
 
     @Test
     public void nonExistingRelationshipShouldBeCorrectlyIdentified2() {
         try (Transaction tx = database.beginTx()) {
-            Node node1 = database.getNodeById(0);
-            Node node2 = database.getNodeById(1);
+            Node node1 = tx.getNodeById(0);
+            Node node2 = tx.getNodeById(1);
 
             assertThrows(NotFoundException.class, () -> {
-                getSingleRelationship(node2, node1, withName("IDONTEXIST"), INCOMING);
+                getSingleRelationship(new BasicEvaluationContext(tx, database), node2, node1, withName("IDONTEXIST"), INCOMING);
             });
 
-            tx.success();
+            tx.commit();
         }
     }
 
     @Test
     public void existingRelationshipShouldNotBeRecreated() {
         try (Transaction tx = database.beginTx()) {
-            Node node1 = database.getNodeById(0);
-            Node node2 = database.getNodeById(1);
+            Node node1 = tx.getNodeById(0);
+            Node node2 = tx.getNodeById(1);
 
-            Relationship r = createRelationshipIfNotExists(node1, node2, withName("TEST"), OUTGOING);
+            Relationship r = createRelationshipIfNotExists(new BasicEvaluationContext(tx, database), node1, node2, withName("TEST"), OUTGOING);
             assertEquals(0, r.getId());
-            assertEquals(1, IterableUtils.count(database.getAllRelationships()));
+            assertEquals(1, IterableUtils.count(tx.getAllRelationships()));
 
-            tx.success();
+            tx.commit();
         }
     }
 
     @Test
     public void nonExistingRelationshipShouldBeCreated() {
         try (Transaction tx = database.beginTx()) {
-            Node node1 = database.getNodeById(0);
-            Node node2 = database.getNodeById(1);
+            Node node1 = tx.getNodeById(0);
+            Node node2 = tx.getNodeById(1);
 
-            Relationship r = createRelationshipIfNotExists(node2, node1, withName("TEST"), OUTGOING);
-            assertEquals(2, IterableUtils.count(database.getAllRelationships()));
+            Relationship r = createRelationshipIfNotExists(new BasicEvaluationContext(tx, database), node2, node1, withName("TEST"), OUTGOING);
+            assertEquals(2, IterableUtils.count(tx.getAllRelationships()));
 
-            assertTrue(relationshipExists(node2, node1, withName("TEST"), OUTGOING));
+            assertTrue(relationshipExists(new BasicEvaluationContext(tx, database), node2, node1, withName("TEST"), OUTGOING));
 
-            tx.success();
+            tx.commit();
         }
     }
 
     @Test
     public void nonExistingRelationshipShouldBeCreated2() {
         try (Transaction tx = database.beginTx()) {
-            Node node1 = database.getNodeById(0);
-            Node node2 = database.getNodeById(1);
+            Node node1 = tx.getNodeById(0);
+            Node node2 = tx.getNodeById(1);
 
-            Relationship r = createRelationshipIfNotExists(node1, node2, withName("TEST"), INCOMING);
-            assertEquals(2, IterableUtils.count(database.getAllRelationships()));
+            Relationship r = createRelationshipIfNotExists(new BasicEvaluationContext(tx, database), node1, node2, withName("TEST"), INCOMING);
+            assertEquals(2, IterableUtils.count(tx.getAllRelationships()));
 
-            assertTrue(relationshipExists(node1, node2, withName("TEST"), INCOMING));
+            assertTrue(relationshipExists(new BasicEvaluationContext(tx, database), node1, node2, withName("TEST"), INCOMING));
 
-            tx.success();
+            tx.commit();
         }
     }
 
     @Test
     public void existingRelationshipShouldBeDeleted() {
         try (Transaction tx = database.beginTx()) {
-            Node node1 = database.getNodeById(0);
-            Node node2 = database.getNodeById(1);
+            Node node1 = tx.getNodeById(0);
+            Node node2 = tx.getNodeById(1);
 
-            deleteRelationshipIfExists(node1, node2, withName("TEST"), OUTGOING);
-            assertEquals(0, IterableUtils.count(database.getAllRelationships()));
+            deleteRelationshipIfExists(new BasicEvaluationContext(tx, database), node1, node2, withName("TEST"), OUTGOING);
+            assertEquals(0, IterableUtils.count(tx.getAllRelationships()));
 
-            tx.success();
+            tx.commit();
         }
     }
 
     @Test
     public void nonExistingRelationshipDeletionShouldDoNothing() {
         try (Transaction tx = database.beginTx()) {
-            Node node1 = database.getNodeById(0);
-            Node node2 = database.getNodeById(1);
+            Node node1 = tx.getNodeById(0);
+            Node node2 = tx.getNodeById(1);
 
-            deleteRelationshipIfExists(node2, node1, withName("TEST"), OUTGOING);
-            assertEquals(1, IterableUtils.count(database.getAllRelationships()));
+            deleteRelationshipIfExists(new BasicEvaluationContext(tx, database), node2, node1, withName("TEST"), OUTGOING);
+            assertEquals(1, IterableUtils.count(tx.getAllRelationships()));
 
-            tx.success();
+            tx.commit();
         }
     }
 }

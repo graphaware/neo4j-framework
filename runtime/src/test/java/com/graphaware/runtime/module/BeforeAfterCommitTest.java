@@ -24,22 +24,22 @@ import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.TransactionData;
-import org.neo4j.graphdb.event.TransactionEventHandler;
-import org.neo4j.harness.ServerControls;
-import org.neo4j.harness.TestServerBuilders;
+import org.neo4j.graphdb.event.TransactionEventListenerAdapter;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BeforeAfterCommitTest {
 
-    private ServerControls controls;
+    private Neo4j controls;
     private GraphDatabaseService database;
 
     @BeforeEach
     public void setUp() {
-        controls = TestServerBuilders.newInProcessBuilder().newServer();
-        database = controls.graph();
+        controls = Neo4jBuilders.newInProcessBuilder().build();
+        database = controls.defaultDatabaseService();
     }
 
     @AfterEach
@@ -51,14 +51,14 @@ public class BeforeAfterCommitTest {
     public void afterCommitShouldBeCalled() throws InterruptedException {
         BeforeAfterCommitModule module = new BeforeAfterCommitModule("test", null);
 
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(controls.databaseManagementService(), database);
         runtime.registerModule(module);
         runtime.start();
         runtime.waitUntilStarted();
 
         try (Transaction tx = database.beginTx()) {
-            database.createNode();
-            tx.success();
+            tx.createNode();
+            tx.commit();
         }
 
         assertTrue(module.isAfterCommitCalled());
@@ -69,21 +69,21 @@ public class BeforeAfterCommitTest {
     public void afterRollbackShouldBeCalled() throws InterruptedException {
         BeforeAfterCommitModule module = new BeforeAfterCommitModule("test", null);
 
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(controls.databaseManagementService(), database);
         runtime.registerModule(module);
         runtime.start();
         runtime.waitUntilStarted();
 
-        database.registerTransactionEventHandler(new TransactionEventHandler.Adapter<Void>() {
+        controls.databaseManagementService().registerTransactionEventListener(database.databaseName(), new TransactionEventListenerAdapter<Void>() {
             @Override
-            public Void beforeCommit(TransactionData data) throws Exception {
+            public Void beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) {
                 throw new RuntimeException("bang");
             }
         });
 
         try (Transaction tx = database.beginTx()) {
-            database.createNode();
-            tx.success();
+            tx.createNode();
+            tx.commit();
         } catch (Exception e) {
             //ok
         }

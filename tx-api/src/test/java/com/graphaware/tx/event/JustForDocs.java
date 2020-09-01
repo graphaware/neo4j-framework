@@ -16,18 +16,6 @@
 
 package com.graphaware.tx.event;
 
-import com.graphaware.common.policy.inclusion.BaseNodeInclusionPolicy;
-import com.graphaware.common.policy.inclusion.InclusionPolicies;
-import com.graphaware.common.policy.inclusion.none.IncludeNoRelationships;
-import com.graphaware.tx.event.improved.api.FilteredTransactionData;
-import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import com.graphaware.tx.event.improved.api.LazyTransactionData;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.event.TransactionData;
-import org.neo4j.graphdb.event.TransactionEventHandler;
-
-
 /**
  * Only for documentation. If you need to change this class, change the code in README.md as well please.
  */
@@ -37,7 +25,7 @@ public class JustForDocs {
 //        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 //        registerShutdownHook(database);
 //
-//        database.registerTransactionEventHandler(new TransactionEventHandler<Object>() {
+//        database.registerTransactionEventListener(new TransactionEventHandler<Object>() {
 //            @Override
 //            public Object beforeCommit(TransactionData data) throws Exception {
 //                ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data);
@@ -63,7 +51,7 @@ public class JustForDocs {
 //        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 //        registerShutdownHook(database);
 //
-//        database.registerTransactionEventHandler(new TransactionEventHandler.Adapter<Object>() {
+//        database.registerTransactionEventListener(new TransactionEventHandler.Adapter<Object>() {
 //            @Override
 //            public Object beforeCommit(TransactionData data) throws Exception {
 //                InclusionPolicies inclusionPolicies = InclusionPolicies.all()

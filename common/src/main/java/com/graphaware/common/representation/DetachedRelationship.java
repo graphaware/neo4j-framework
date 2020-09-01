@@ -21,6 +21,7 @@ import com.graphaware.common.expression.DetachedRelationshipExpressions;
 import com.graphaware.common.transform.NodeIdTransformer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 import java.util.Map;
 
@@ -121,15 +122,15 @@ public abstract class DetachedRelationship<ID, N extends DetachedNode<ID>> exten
      * {@inheritDoc}
      */
     @Override
-    protected Relationship create(GraphDatabaseService database) {
-        return database.getNodeById(startNodeGraphId).createRelationshipTo(database.getNodeById(endNodeGraphId), withName(type));
+    protected Relationship create(Transaction tx) {
+        return tx.getNodeById(startNodeGraphId).createRelationshipTo(tx.getNodeById(endNodeGraphId), withName(type));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Relationship fetch(GraphDatabaseService database) {
+    protected Relationship fetch(Transaction database) {
         return database.getRelationshipById(getGraphId());
     }
 

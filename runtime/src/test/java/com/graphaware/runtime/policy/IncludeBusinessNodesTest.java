@@ -26,8 +26,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.harness.ServerControls;
-import org.neo4j.harness.TestServerBuilders;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
@@ -42,13 +42,13 @@ import static org.neo4j.graphdb.Label.label;
  */
 public class IncludeBusinessNodesTest {
 
-    private ServerControls controls;
+    private Neo4j controls;
     private GraphDatabaseService database;
 
     @BeforeEach
     public void setUp() {
-        controls = TestServerBuilders.newInProcessBuilder().newServer();
-        database = controls.graph();
+        controls = Neo4jBuilders.newInProcessBuilder().build();
+        database = controls.defaultDatabaseService();
     }
 
     @AfterEach
@@ -59,9 +59,9 @@ public class IncludeBusinessNodesTest {
     @Test
     public void shouldIncludeCorrectRelationships() {
         try (Transaction tx = database.beginTx()) {
-            Node n = database.createNode(label("Test"));
+            Node n = tx.createNode(label("Test"));
             n.setProperty("test", "test");
-            Node internal = database.createNode(label(GA_PREFIX + "test"));
+            Node internal = tx.createNode(label(GA_PREFIX + "test"));
 
             assertTrue(of(IncludeAllBusinessNodes.getInstance(), IncludeNodes.all()).include(n));
             assertFalse(of(IncludeAllBusinessNodes.getInstance(), IncludeNodes.all()).include(internal));
@@ -90,7 +90,7 @@ public class IncludeBusinessNodesTest {
                             .all()
                             .with("test", undefined())).include(n));
 
-            tx.success();
+            tx.commit();
         }
     }
 }

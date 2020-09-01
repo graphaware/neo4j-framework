@@ -18,10 +18,11 @@ package com.graphaware.common.policy.inclusion;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Entity;
-import org.neo4j.helpers.collection.FilteringIterable;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.internal.helpers.collection.FilteringIterable;
 
 /**
- * Base class for {@link EntityInclusionPolicy} implementations that implement the {@link #getAll(GraphDatabaseService)}
+ * Base class for {@link EntityInclusionPolicy} implementations that implement the {@link #getAll(Transaction)}
  * method in a naive way.
  *
  * @param <T>
@@ -32,7 +33,7 @@ public abstract class BaseEntityInclusionPolicy<T extends Entity> implements Ent
      * {@inheritDoc}
      */
     @Override
-    public Iterable<T> getAll(GraphDatabaseService database) {
+    public Iterable<T> getAll(Transaction database) {
         return new FilteringIterable<>(doGetAll(database), this::include);
     }
 
@@ -43,5 +44,5 @@ public abstract class BaseEntityInclusionPolicy<T extends Entity> implements Ent
      * @param database to get entities from.
      * @return all entities.
      */
-    protected abstract Iterable<T> doGetAll(GraphDatabaseService database);
+    protected abstract Iterable<T> doGetAll(Transaction database);
 }

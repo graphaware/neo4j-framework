@@ -22,8 +22,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.harness.ServerControls;
-import org.neo4j.harness.TestServerBuilders;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import static com.graphaware.common.util.IterableUtils.countNodes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,13 +33,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class NoInputBatchTransactionExecutorTest {
 
-    private ServerControls controls;
+    private Neo4j controls;
     protected GraphDatabaseService database;
 
     @BeforeEach
     public void setUp() {
-        controls = TestServerBuilders.newInProcessBuilder().newServer();
-        database = controls.graph();
+        controls = Neo4jBuilders.newInProcessBuilder().build();
+        database = controls.defaultDatabaseService();
     }
 
     @AfterEach
@@ -54,7 +54,7 @@ public class NoInputBatchTransactionExecutorTest {
         batchExecutor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(6, countNodes(database));
+            assertEquals(6, countNodes(tx));
         }
     }
 
@@ -65,7 +65,7 @@ public class NoInputBatchTransactionExecutorTest {
         batchExecutor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(6, countNodes(database));
+            assertEquals(6, countNodes(tx));
         }
     }
 
@@ -76,7 +76,7 @@ public class NoInputBatchTransactionExecutorTest {
         batchExecutor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(6, countNodes(database));
+            assertEquals(6, countNodes(tx));
         }
     }
 
@@ -87,7 +87,7 @@ public class NoInputBatchTransactionExecutorTest {
         batchExecutor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(7, countNodes(database));  //1,2,3,7,8,9,10 (batch 4,5,6 is rolled back)
+            assertEquals(7, countNodes(tx));  //1,2,3,7,8,9,10 (batch 4,5,6 is rolled back)
         }
     }
 
@@ -98,7 +98,7 @@ public class NoInputBatchTransactionExecutorTest {
         batchExecutor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(8, countNodes(database));  //1,2,3,5,6,7,9,10
+            assertEquals(8, countNodes(tx));  //1,2,3,5,6,7,9,10
         }
     }
 
@@ -111,12 +111,12 @@ public class NoInputBatchTransactionExecutorTest {
         }
 
         @Override
-        public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
+        public void execute(Transaction tx, NullItem input, int batchNumber, int stepNumber) {
             steps++;
             if (steps % exceptionRate == 0) {
                 throw new RuntimeException("Testing exception");
             } else {
-                database.createNode();
+                tx.createNode();
             }
         }
     }

@@ -17,7 +17,7 @@
 package com.graphaware.common.wrapper;
 
 import org.neo4j.graphdb.*;
-import org.neo4j.helpers.collection.IterableWrapper;
+import org.neo4j.internal.helpers.collection.IterableWrapper;
 
 import static org.neo4j.graphdb.Direction.BOTH;
 
@@ -275,13 +275,13 @@ public abstract class BaseEntityWrapper<T extends Entity> extends BaseEntity imp
         throw new IllegalStateException(this + " is not a Node or Relationship");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GraphDatabaseService getGraphDatabase() {
-        return getWrapped().getGraphDatabase();
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override
+//    public GraphDatabaseService getGraphDatabase() {
+//        return getWrapped().getGraphDatabase();
+//    }
 
     /**
      * {@inheritDoc}

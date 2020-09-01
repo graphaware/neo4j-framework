@@ -22,14 +22,15 @@ import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.TransactionData;
-import org.neo4j.graphdb.event.TransactionEventHandler;
+import org.neo4j.graphdb.event.TransactionEventListener;
+import org.neo4j.graphdb.event.TransactionEventListenerAdapter;
 
 /**
- * Example of a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler} that uses GraphAware {@link ImprovedTransactionData}
+ * Example of a Neo4j {@link TransactionEventListener} that uses GraphAware {@link ImprovedTransactionData}
  * to do its job, which is counting the total strength of all friendships in the database and writing that to a special
  * node created for that purpose.
  */
-public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<Void> {
+public class FriendshipStrengthCounter extends TransactionEventListenerAdapter<Void> {
 
     public static final RelationshipType FRIEND_OF = RelationshipType.withName("FRIEND_OF");
     public static final String STRENGTH = "strength";
@@ -41,8 +42,8 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
     public FriendshipStrengthCounter(GraphDatabaseService database) {
         this.database = database;
         try (Transaction tx = database.beginTx()) {
-            getCounterNode(database); //do this in constructor to prevent multiple threads creating multiple nodes
-            tx.success();
+            getCounterNode(tx); //do this in constructor to prevent multiple threads creating multiple nodes
+            tx.commit();
         }
     }
 
@@ -50,8 +51,8 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
      * {@inheritDoc}
      */
     @Override
-    public Void beforeCommit(TransactionData data) throws Exception {
-        ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data);
+    public Void beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) throws Exception {
+        ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data, transaction);
 
         long delta = 0;
 
@@ -78,12 +79,12 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
         }
 
         if (delta != 0) {
-            Node counter = getCounterNode(database);
+            Node counter = getCounterNode(transaction);
 
             try (Transaction tx = database.beginTx()) {
                 tx.acquireWriteLock(counter);
                 counter.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (long) counter.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L) + delta);
-                tx.success();
+                tx.commit();
             }
         }
 
@@ -93,17 +94,17 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
     /**
      * Get the counter node, where the friendship strength is stored. Create it if it does not exist.
      *
-     * @param database to find the node in.
+     * @param tx to find the node in.
      * @return counter node.
      */
-    private static Node getCounterNode(GraphDatabaseService database) {
-        Node result = IterableUtils.getSingleOrNull(database.findNodes(COUNTER_NODE_LABEL));
+    private static Node getCounterNode(Transaction tx) {
+        Node result = IterableUtils.getSingleOrNull(tx.findNodes(COUNTER_NODE_LABEL));
 
         if (result != null) {
             return result;
         }
 
-        return database.createNode(COUNTER_NODE_LABEL);
+        return tx.createNode(COUNTER_NODE_LABEL);
     }
 
     /**
@@ -116,8 +117,8 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
         long result = 0;
 
         try (Transaction tx = database.beginTx()) {
-            result = (long) getCounterNode(database).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L);
-            tx.success();
+            result = (long) getCounterNode(tx).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L);
+            tx.commit();
         }
 
         return result;

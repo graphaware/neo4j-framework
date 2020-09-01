@@ -165,6 +165,7 @@ public class LazyRelationshipTransactionData extends LazyEntityTransactionData<R
     }
 
     private Relationship bugWorkaround(Relationship relationship) {
-        return relationship.getGraphDatabase().getRelationshipById(relationship.getId());
+        return relationship;
+        //return relationship.getGraphDatabase().getRelationshipById(relationship.getId());
     }
 }

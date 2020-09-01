@@ -17,24 +17,24 @@
 package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.common.log.LoggerFactory;
+import com.graphaware.common.util.Pair;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.runtime.config.Neo4jConfigBasedRuntimeConfiguration;
 import com.graphaware.runtime.module.Module;
 import com.graphaware.runtime.module.ModuleBootstrapper;
+import org.neo4j.configuration.Config;
+import org.neo4j.configuration.SettingImpl;
+import org.neo4j.configuration.SettingValueParsers;
+import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.config.Setting;
-import org.neo4j.helpers.collection.Pair;
-import org.neo4j.kernel.configuration.Config;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 import org.neo4j.logging.Log;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.graphaware.runtime.GraphAwareRuntimeFactory.createRuntime;
-import static org.neo4j.kernel.configuration.Settings.*;
 
 /**
  * Neo4j kernel extension that automatically creates a {@link GraphAwareRuntime} and registers
@@ -76,17 +76,19 @@ import static org.neo4j.kernel.configuration.Settings.*;
 public class RuntimeKernelExtension implements Lifecycle {
     private static final Log LOG = LoggerFactory.getLogger(RuntimeKernelExtension.class);
 
-    public static final Setting<Boolean> RUNTIME_ENABLED = setting("com.graphaware.runtime.enabled", BOOLEAN, "false");
+    public static final Setting<Boolean> RUNTIME_ENABLED = SettingImpl.newBuilder("com.graphaware.runtime.enabled", SettingValueParsers.BOOL, false).build();
     public static final String MODULE_CONFIG_KEY = "com.graphaware.module"; //.ID.Order = fully qualified class name of bootstrapper
     private static final Pattern MODULE_ENABLED_KEY = Pattern.compile("com\\.graphaware\\.module\\.([a-zA-Z0-9]{1,})\\.([0-9]{1,})");
     private static final int WAIT_MINUTES = 5;
     private static final int WAIT_MS = WAIT_MINUTES * 60 * 1000;
 
     protected final Config config;
+    protected final DatabaseManagementService managementService;
     protected final GraphDatabaseService database;
 
-    public RuntimeKernelExtension(Config config, GraphDatabaseService database) {
+    public RuntimeKernelExtension(Config config, DatabaseManagementService managementService, GraphDatabaseService database) {
         this.config = config;
+        this.managementService = managementService;
         this.database = database;
     }
 
@@ -132,7 +134,7 @@ public class RuntimeKernelExtension implements Lifecycle {
     }
 
     protected GraphAwareRuntime createRuntime() {
-        return GraphAwareRuntimeFactory.createRuntime(database, new Neo4jConfigBasedRuntimeConfiguration(database, config));
+        return GraphAwareRuntimeFactory.createRuntime(managementService, database, new Neo4jConfigBasedRuntimeConfiguration(database, config));
     }
 
     private void registerModules(GraphAwareRuntime runtime) {
@@ -141,7 +143,7 @@ public class RuntimeKernelExtension implements Lifecycle {
         int lastOrder = -1;
         for (Pair<Integer, Pair<String, String>> bootstrapperPair : orderedBootstrappers) {
             int order = bootstrapperPair.first();
-            LOG.info("Bootstrapping module with order " + order + ", ID " + bootstrapperPair.other().first() + ", using " + bootstrapperPair.other().other());
+            LOG.info("Bootstrapping module with order " + order + ", ID " + bootstrapperPair.second().first() + ", using " + bootstrapperPair.second().second());
 
             if (lastOrder == order) {
                 LOG.warn("There is more than one module with order " + order + "! Will order clashing modules randomly");
@@ -150,8 +152,8 @@ public class RuntimeKernelExtension implements Lifecycle {
             lastOrder = order;
 
             try {
-                ModuleBootstrapper bootstrapper = (ModuleBootstrapper) Class.forName(bootstrapperPair.other().other()).newInstance();
-                runtime.registerModule(bootstrapper.bootstrapModule(bootstrapperPair.other().first(), findModuleConfig(bootstrapperPair.other().first()), database));
+                ModuleBootstrapper bootstrapper = (ModuleBootstrapper) Class.forName(bootstrapperPair.second().second()).newInstance();
+                runtime.registerModule(bootstrapper.bootstrapModule(bootstrapperPair.second().first(), findModuleConfig(bootstrapperPair.second().first()), database));
             } catch (Exception e) {
                 LOG.error("Unable to bootstrap module " + bootstrapperPair.first(), e);
             }
@@ -161,13 +163,13 @@ public class RuntimeKernelExtension implements Lifecycle {
     private List<Pair<Integer, Pair<String, String>>> findOrderedBootstrappers() {
         List<Pair<Integer, Pair<String, String>>> orderedBootstrappers = new ArrayList<>();
 
-        for (String paramKey : config.getRaw().keySet()) {
-            Matcher matcher = MODULE_ENABLED_KEY.matcher(paramKey);
+        for (Setting<Object> paramKey : config.getValues().keySet()) {
+            Matcher matcher = MODULE_ENABLED_KEY.matcher(paramKey.name());
 
             if (matcher.find()) {
                 String moduleId = matcher.group(1);
                 Integer moduleOrder = Integer.valueOf(matcher.group(2));
-                String bootstrapperClass = config.getRaw(paramKey).orElse("UNKNOWN");
+                String bootstrapperClass = config.get(paramKey) == null ? "UNKNOWN" : config.get(paramKey).toString();
                 orderedBootstrappers.add(Pair.of(moduleOrder, Pair.of(moduleId, bootstrapperClass)));
             }
         }
@@ -181,9 +183,9 @@ public class RuntimeKernelExtension implements Lifecycle {
         Map<String, String> moduleConfig = new HashMap<>();
 
         String moduleConfigKeyPrefix = MODULE_CONFIG_KEY + "." + moduleId + ".";
-        for (String paramKey : config.getRaw().keySet()) {
-            if (paramKey.startsWith(moduleConfigKeyPrefix) || !MODULE_ENABLED_KEY.matcher(paramKey).find()) {
-                moduleConfig.put(paramKey.replace(moduleConfigKeyPrefix, ""), config.getRaw(paramKey).get());
+        for (Setting<Object> paramKey: config.getValues().keySet()) {
+            if (paramKey.name().startsWith(moduleConfigKeyPrefix) || !MODULE_ENABLED_KEY.matcher(paramKey.name()).find()) {
+                moduleConfig.put(paramKey.name().replace(moduleConfigKeyPrefix, ""), config.get(paramKey).toString());
             }
         }
 

@@ -16,8 +16,7 @@
 
 package com.graphaware.runtime.config;
 
-import com.graphaware.runtime.write.WritingConfig;
-import org.neo4j.kernel.configuration.Config;
+import org.neo4j.configuration.Config;
 
 /**
  * {@link com.graphaware.runtime.GraphAwareRuntime} configuration.
@@ -29,13 +28,6 @@ public interface RuntimeConfiguration {
      * that users would have a reason to change it.
      */
     String GA_PREFIX = "_GA_";
-
-    /**
-     * Retrieves the {@link WritingConfig} used for configuring a {@link com.graphaware.writer.neo4j.Neo4jWriter}.
-     *
-     * @return The {@link WritingConfig}, may not be null.
-     */
-    WritingConfig getWritingConfig();
 
     /**
      * @return Neo4j kernel config.

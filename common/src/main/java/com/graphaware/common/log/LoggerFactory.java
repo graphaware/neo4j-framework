@@ -16,8 +16,8 @@
 
 package com.graphaware.common.log;
 
-import org.neo4j.kernel.extension.KernelExtensionFactory;
-import org.neo4j.kernel.impl.spi.KernelContext;
+import org.neo4j.kernel.extension.ExtensionFactory;
+import org.neo4j.kernel.extension.context.ExtensionContext;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 import org.neo4j.kernel.lifecycle.LifecycleAdapter;
 import org.neo4j.logging.FormattedLogProvider;
@@ -30,7 +30,7 @@ import org.neo4j.logging.internal.LogService;
  * {@link Log} object for logging. In case Neo4j isn't running when logging, e.g. in unit tests, logging will be done
  * to System.out.
  */
-public final class LoggerFactory extends KernelExtensionFactory<LoggerFactory.Dependencies> {
+public final class LoggerFactory extends ExtensionFactory<LoggerFactory.Dependencies> {
 
     private static LogProvider LOG_PROVIDER = FormattedLogProvider.toOutputStream(System.out);
 
@@ -47,10 +47,10 @@ public final class LoggerFactory extends KernelExtensionFactory<LoggerFactory.De
     }
 
     @Override
-    public Lifecycle newInstance(@SuppressWarnings("unused") KernelContext context, final Dependencies dependencies) {
+    public Lifecycle newInstance(@SuppressWarnings("unused") ExtensionContext context, final Dependencies dependencies) {
         return new LifecycleAdapter() {
             @Override
-            public void init() throws Throwable {
+            public void init() {
                 LoggerFactory.LOG_PROVIDER = dependencies.logger().getUserLogProvider();
             }
         };

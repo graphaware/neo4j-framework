@@ -18,24 +18,19 @@ package com.graphaware.runtime;
 
 import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.runtime.config.FluentModuleConfiguration;
-import com.graphaware.runtime.config.NullModuleConfiguration;
 import com.graphaware.runtime.config.ModuleConfiguration;
+import com.graphaware.runtime.config.NullModuleConfiguration;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.Module;
-import com.graphaware.runtime.write.WritingConfig;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import com.graphaware.writer.neo4j.BaseNeo4jWriter;
-import com.graphaware.writer.neo4j.Neo4jWriter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.*;
-import org.neo4j.graphdb.event.KernelEventHandler;
-import org.neo4j.harness.ServerControls;
-import org.neo4j.harness.TestServerBuilders;
-import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
+import org.neo4j.internal.helpers.collection.Iterables;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.graphaware.runtime.GraphAwareRuntimeFactory.createRuntime;
@@ -51,13 +46,13 @@ public class CommunityRuntimeTest {
 
     private static final String MOCK = "MOCK";
 
-    private ServerControls controls;
+    private Neo4j controls;
     private GraphDatabaseService database;
 
     @BeforeEach
     public void setUp() {
-        controls = TestServerBuilders.newInProcessBuilder().newServer();
-        database = controls.graph();
+        controls = Neo4jBuilders.newInProcessBuilder().build();
+        database = controls.defaultDatabaseService();
     }
 
     @AfterEach
@@ -67,49 +62,49 @@ public class CommunityRuntimeTest {
 
     @Test
     public void shouldNotBeAllowedToCreateTwoRuntimes() {
-        createRuntime(database);
+        createRuntime(controls.databaseManagementService(), database);
 
         assertThrows(IllegalStateException.class, () -> {
-            createRuntime(database);
+            createRuntime(controls.databaseManagementService(), database);
         });
     }
 
     @Test
     public void nullShouldBeReturnedWhenNoRuntimeHasBeenRegisteredForDatabase() {
-        assertNull(RuntimeRegistry.getRuntime(database));
+        assertNull(RuntimeRegistry.getRuntime(database.databaseName()));
     }
 
     @Test
     public void exceptionShouldBeThrownWhenNoRuntimeHasBeenRegisteredForDatabase() {
         assertThrows(IllegalStateException.class, () -> {
-            assertNull(RuntimeRegistry.getStartedRuntime(database));
+            assertNull(RuntimeRegistry.getStartedRuntime(database.databaseName()));
         });
     }
 
     @Test
     public void exceptionShouldBeThrownWhenRuntimeHasNotBeenStarted() {
-        createRuntime(database);
+        createRuntime(controls.databaseManagementService(), database);
         assertThrows(IllegalStateException.class, () -> {
-            RuntimeRegistry.getStartedRuntime(database);
+            RuntimeRegistry.getStartedRuntime(database.databaseName());
         });
     }
 
     @Test
     public void registeredRuntimeShouldBeRetrieved() {
-        GraphAwareRuntime runtime = createRuntime(database);
-        assertEquals(runtime, RuntimeRegistry.getRuntime(database));
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database);
+        assertEquals(runtime, RuntimeRegistry.getRuntime(database.databaseName()));
     }
 
     @Test
     public void registeredRuntimeShouldBeRetrieved2() {
-        GraphAwareRuntime runtime = createRuntime(database);
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database);
         runtime.start();
-        assertEquals(runtime, RuntimeRegistry.getStartedRuntime(database));
+        assertEquals(runtime, RuntimeRegistry.getStartedRuntime(database.databaseName()));
     }
 
     @Test
     public void shouldFailWaitingForRuntimeThatHasNotBeenStarted() {
-        GraphAwareRuntime runtime = createRuntime(database);
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database);
         assertThrows(IllegalStateException.class, () -> {
             runtime.waitUntilStarted();
         });
@@ -117,7 +112,7 @@ public class CommunityRuntimeTest {
 
     @Test
     public void shouldWaitForRuntimeToStart() throws InterruptedException {
-        final GraphAwareRuntime runtime = createRuntime(database);
+        final GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database);
 
         final AtomicBoolean finished = new AtomicBoolean(false);
         new Thread(new Runnable() {
@@ -136,7 +131,7 @@ public class CommunityRuntimeTest {
 
     @Test
     public void shouldFailWhenStartIsNotCalledInOneSecond() {
-        final GraphAwareRuntime runtime = createRuntime(database);
+        final GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database);
 
         new Thread(new Runnable() {
             @Override
@@ -160,21 +155,21 @@ public class CommunityRuntimeTest {
         Module mockModule = mockTxModule(MOCK);
         doThrow(new DeliberateTransactionRollbackException("Deliberate testing exception")).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database, defaultConfiguration(database));
         runtime.registerModule(mockModule);
         runtime.start();
 
         try (Transaction tx = database.beginTx()) {
-            Node node = database.createNode(new Label[]{});
+            Node node = tx.createNode(new Label[]{});
             node.setProperty("test", "test");
-            tx.success();
+            tx.commit();
         } catch (Exception e) {
             //ok
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(0, Iterables.count(database.getAllNodes()));
-            tx.success();
+            assertEquals(0, Iterables.count(tx.getAllNodes()));
+            tx.commit();
         }
     }
 
@@ -183,27 +178,27 @@ public class CommunityRuntimeTest {
         Module mockModule = mockTxModule(MOCK);
         doThrow(new RuntimeException("Deliberate testing exception")).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database, defaultConfiguration(database));
         runtime.registerModule(mockModule);
         runtime.start();
 
         try (Transaction tx = database.beginTx()) {
-            Node node = database.createNode(new Label[]{});
+            Node node = tx.createNode(new Label[]{});
             node.setProperty("test", "test");
-            tx.success();
+            tx.commit();
         } catch (Exception e) {
             //ok
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(0, Iterables.count(database.getAllNodes()));
-            tx.success();
+            assertEquals(0, Iterables.count(tx.getAllNodes()));
+            tx.commit();
         }
     }
 
     @Test
     public void shouldNotBeAbleToRegisterDifferentModulesWithSameId() {
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database, defaultConfiguration(database));
         runtime.registerModule(mockTxModule());
         assertThrows(IllegalStateException.class, () -> {
             runtime.registerModule(mockTxModule());
@@ -215,15 +210,15 @@ public class CommunityRuntimeTest {
         Node node1;
 
         try (Transaction tx = database.beginTx()) {
-            node1 = database.createNode(new Label[]{});
-            node1.createRelationshipTo(database.createNode(new Label[]{}), RelationshipType.withName("TEST"));
-            tx.success();
+            node1 = tx.createNode(new Label[]{});
+            node1.createRelationshipTo(tx.createNode(new Label[]{}), RelationshipType.withName("TEST"));
+            tx.commit();
         }
 
         Module mockModule1 = mockTxModule(MOCK + "1");
         Module mockModule2 = mockTxModule(MOCK + "2");
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database, defaultConfiguration(database));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
 
@@ -238,7 +233,7 @@ public class CommunityRuntimeTest {
         try {
             try (Transaction tx = database.beginTx()) {
                 node1.delete();
-                tx.success();
+                tx.commit();
             }
             fail();
         } catch (RuntimeException e) {
@@ -262,7 +257,7 @@ public class CommunityRuntimeTest {
         M2 mockM2a = mockTxModule("M2a", M2.class);
         M2 mockM2b = mockTxModule("M2b", M2.class);
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database, defaultConfiguration(database));
         runtime.registerModule(mockM1);
         runtime.registerModule(mockM2a);
         runtime.registerModule(mockM2b);
@@ -283,7 +278,7 @@ public class CommunityRuntimeTest {
 
     @Test
     public void shouldThrowExceptionWhenAskedForNonExistingModule() {
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database, defaultConfiguration(database));
         assertThrows(NotFoundException.class, () -> {
             runtime.getModule("non-existing", Module.class);
         });
@@ -293,7 +288,7 @@ public class CommunityRuntimeTest {
     public void shouldNotBeAbleToRegisterTheSameModuleTwice() {
         final Module mockModule = mockTxModule();
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database, defaultConfiguration(database));
         runtime.registerModule(mockModule);
         assertThrows(IllegalStateException.class, () -> {
             runtime.registerModule(mockModule);
@@ -307,7 +302,7 @@ public class CommunityRuntimeTest {
         when(mockModule1.getId()).thenReturn("ID");
         when(mockModule2.getId()).thenReturn("ID");
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database, defaultConfiguration(database));
         runtime.registerModule(mockModule1);
         assertThrows(IllegalStateException.class, () -> {
             runtime.registerModule(mockModule2);
@@ -320,7 +315,7 @@ public class CommunityRuntimeTest {
         Module mockModule2 = mockTxModule(MOCK + "2");
         Module mockModule3 = mockTxModule(MOCK + "3", FluentModuleConfiguration.defaultConfiguration().with(InclusionPolicies.none()));
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database, defaultConfiguration(database));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
         runtime.registerModule(mockModule3);
@@ -336,8 +331,8 @@ public class CommunityRuntimeTest {
         verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
 
         try (Transaction tx = database.beginTx()) {
-            database.createNode(new Label[]{});
-            tx.success();
+            tx.createNode(new Label[]{});
+            tx.commit();
         }
 
         verify(mockModule1).beforeCommit(any(ImprovedTransactionData.class));
@@ -359,7 +354,7 @@ public class CommunityRuntimeTest {
     public void modulesCannotBeRegisteredAfterStart() {
         final Module mockModule = mockTxModule();
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database, defaultConfiguration(database));
         runtime.start();
         assertThrows(IllegalStateException.class, () -> {
             runtime.registerModule(mockModule);
@@ -368,7 +363,7 @@ public class CommunityRuntimeTest {
 
     @Test
     public void multipleCallsToStartFrameworkHaveNoEffect() {
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database, defaultConfiguration(database));
         runtime.start();
         runtime.start();
         runtime.start();
@@ -379,11 +374,11 @@ public class CommunityRuntimeTest {
     public void shutdownShouldBeCalledBeforeShutdown() {
         Module mockModule = mockTxModule();
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database, defaultConfiguration(database));
         runtime.registerModule(mockModule);
         runtime.start();
 
-        database.shutdown();
+        controls.close();
 
         verify(mockModule).shutdown();
     }
@@ -395,7 +390,7 @@ public class CommunityRuntimeTest {
 
         Module mockModule2 = mockTxModule(MOCK + "2");
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database, defaultConfiguration(database));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
 
@@ -409,8 +404,8 @@ public class CommunityRuntimeTest {
         verifyNoMoreInteractions(mockModule1, mockModule2);
 
         try (Transaction tx = database.beginTx()) {
-            database.createNode(new Label[]{});
-            tx.success();
+            tx.createNode(new Label[]{});
+            tx.commit();
         } catch (RuntimeException e) {
             //ok
         }
@@ -431,7 +426,7 @@ public class CommunityRuntimeTest {
 
         doThrow(new DeliberateTransactionRollbackException()).when(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
 
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(controls.databaseManagementService(), database, defaultConfiguration(database));
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
         runtime.registerModule(mockModule3);
@@ -449,8 +444,8 @@ public class CommunityRuntimeTest {
 
         try {
             try (Transaction tx = database.beginTx()) {
-                database.createNode(new Label[]{});
-                tx.success();
+                tx.createNode(new Label[]{});
+                tx.commit();
             }
             fail();
         } catch (RuntimeException e) {
@@ -471,52 +466,14 @@ public class CommunityRuntimeTest {
 
     @Test
     public void whenRuntimeIsNotStartedExceptionShouldBeThrown() {
-        createRuntime(database, defaultConfiguration(database));
+        createRuntime(controls.databaseManagementService(), database, defaultConfiguration(database));
 
         assertThrows(RuntimeException.class, () -> {
             try (Transaction tx = database.beginTx()) {
-                database.createNode(new Label[]{});
-                tx.success();
+                tx.createNode(new Label[]{});
+                tx.commit();
             }
         });
-    }
-
-    @Test
-    public void shouldStartAndStopDatabaseWriter() {
-        final AtomicBoolean started = new AtomicBoolean(false);
-
-        GraphAwareRuntime runtime = createRuntime(database, defaultConfiguration(database).withWritingConfig(new WritingConfig() {
-            @Override
-            public Neo4jWriter produceWriter(GraphDatabaseService database) {
-                return new BaseNeo4jWriter(database) {
-                    @Override
-                    public void start() {
-                        started.set(true);
-                    }
-
-                    @Override
-                    public void stop() {
-                        started.set(false);
-                    }
-
-                    @Override
-                    public <T> T write(Callable<T> task, String id, int waitMillis) {
-                        return null;
-                    }
-                };
-            }
-        }));
-
-
-        assertFalse(started.get());
-
-        runtime.start();
-
-        assertTrue(started.get());
-
-        ((KernelEventHandler) runtime).beforeShutdown();
-
-        assertFalse(started.get());
     }
 
     private Module mockTxModule() {

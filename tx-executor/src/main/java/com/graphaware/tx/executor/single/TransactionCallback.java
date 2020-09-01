@@ -16,7 +16,7 @@
 
 package com.graphaware.tx.executor.single;
 
-import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * A specification of work to be executed within a transaction.
@@ -32,5 +32,5 @@ public interface TransactionCallback<T> {
      * @return result of the transaction, can be null in case of a failure (or when no result is expected, in which case
      *         the generic type of the implementation should be {@link Void}.
      */
-    T doInTransaction(final GraphDatabaseService database) throws Exception;
+    T doInTransaction(final Transaction database) throws Exception;
 }

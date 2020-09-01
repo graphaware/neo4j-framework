@@ -18,7 +18,6 @@ package com.graphaware.common.description.relationship;
 
 import com.graphaware.common.UnitTest;
 import org.junit.jupiter.api.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
@@ -35,13 +34,10 @@ import static org.neo4j.graphdb.Direction.*;
 public class DetachedRelationshipDescriptionImplTest extends UnitTest {
 
     @Override
-    protected void populate(GraphDatabaseService database) {
-        try (Transaction tx = database.beginTx()) {
-            Node root = database.createNode();
-            Node one = database.createNode();
-            root.createRelationshipTo(one, RelationshipType.withName("TEST")).setProperty("k", new int[]{2, 3, 4});
-            tx.success();
-        }
+    protected void populate(Transaction database) {
+        Node root = database.createNode();
+        Node one = database.createNode();
+        root.createRelationshipTo(one, RelationshipType.withName("TEST")).setProperty("k", new int[]{2, 3, 4});
     }
 
     @Test

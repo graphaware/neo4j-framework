@@ -25,8 +25,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.harness.ServerControls;
-import org.neo4j.harness.TestServerBuilders;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
@@ -42,24 +42,25 @@ import static org.neo4j.graphdb.RelationshipType.withName;
  */
 public class IncludeBusinessRelationshipsTest {
 
-    private ServerControls controls;
+    private Neo4j controls;
     private GraphDatabaseService database;
 
     @BeforeEach
     public void setUp() {
-        controls = TestServerBuilders.newInProcessBuilder().newServer();
-        database = controls.graph();
+        controls = Neo4jBuilders.newInProcessBuilder().build();
+        database = controls.defaultDatabaseService();
     }
 
     @AfterEach
     public void tearDown() {
         controls.close();
     }
+
     @Test
     public void shouldIncludeCorrectRelationships() {
         try (Transaction tx = database.beginTx()) {
-            Node n1 = database.createNode();
-            Node n2 = database.createNode();
+            Node n1 = tx.createNode();
+            Node n2 = tx.createNode();
             Relationship r = n1.createRelationshipTo(n2, withName("TEST"));
             r.setProperty("test", "test");
 
@@ -108,7 +109,7 @@ public class IncludeBusinessRelationshipsTest {
                             .with(BOTH, withName("TEST"))
                             .with("test", undefined())).include(r));
 
-            tx.success();
+            tx.commit();
         }
     }
 }

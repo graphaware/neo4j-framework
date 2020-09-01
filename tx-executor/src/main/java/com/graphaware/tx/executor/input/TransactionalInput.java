@@ -20,7 +20,7 @@ import com.graphaware.tx.executor.batch.BatchTransactionExecutor;
 import com.graphaware.tx.executor.single.TransactionCallback;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.helpers.collection.PrefetchingIterator;
+import org.neo4j.internal.helpers.collection.PrefetchingIterator;
 import org.neo4j.logging.Log;
 import com.graphaware.common.log.LoggerFactory;
 
@@ -34,8 +34,6 @@ import java.util.Objects;
  * @param <T> type of fetched input.
  */
 public class TransactionalInput<T> extends PrefetchingIterator<T> implements Iterable<T>, Iterator<T> {
-    private static final Log LOG = LoggerFactory.getLogger(TransactionalInput.class);
-
     private final GraphDatabaseService database;
     private final TransactionCallback<Iterable<T>> callback;
     private Iterator<T> iterator;
@@ -94,7 +92,7 @@ public class TransactionalInput<T> extends PrefetchingIterator<T> implements Ite
     private void createIteratorIfNeeded() {
         if (iterator == null) {
             try {
-                iterator = callback.doInTransaction(database).iterator();
+                iterator = callback.doInTransaction(tx).iterator();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -113,7 +111,7 @@ public class TransactionalInput<T> extends PrefetchingIterator<T> implements Ite
         }
 
         try {
-            tx.success();
+            tx.commit();
         } finally {
             tx.close();
             tx = null;

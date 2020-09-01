@@ -27,9 +27,9 @@ import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.harness.ServerControls;
-import org.neo4j.harness.TestServerBuilders;
-import org.neo4j.helpers.collection.MapUtil;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
+import org.neo4j.internal.helpers.collection.MapUtil;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -39,13 +39,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ThirdPartyIntegrationModuleTest {
 
-    private ServerControls controls;
+    private Neo4j controls;
     private GraphDatabaseService database;
 
     @BeforeEach
     public void setUp() {
-        controls = TestServerBuilders.newInProcessBuilder().newServer();
-        database = controls.graph();
+        controls = Neo4jBuilders.newInProcessBuilder().build();
+        database = controls.defaultDatabaseService();
     }
 
     @AfterEach
@@ -57,34 +57,34 @@ public class ThirdPartyIntegrationModuleTest {
     public void modificationsShouldBeCorrectlyBuilt() {
         TestThirdPartyModule module = new TestThirdPartyModule("test");
 
-        database.execute("CREATE (p:Person {name:'Michal', age:30})-[:WORKS_FOR {since:2013, role:'MD'}]->(c:Company {name:'GraphAware', est: 2013})");
-        database.execute("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Adam'})-[:WORKS_FOR {since:2014}]->(ga)");
+        database.executeTransactionally("CREATE (p:Person {name:'Michal', age:30})-[:WORKS_FOR {since:2013, role:'MD'}]->(c:Company {name:'GraphAware', est: 2013})");
+        database.executeTransactionally("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Adam'})-[:WORKS_FOR {since:2014}]->(ga)");
 
         long danielaId, michalId, adamId, gaId;
         try (Transaction tx = database.beginTx()) {
-            michalId = database.findNode(Label.label("Person"), "name", "Michal").getId();
-            adamId = database.findNode(Label.label("Person"), "name", "Adam").getId();
-            gaId = database.findNode(Label.label("Company"), "name", "GraphAware").getId();
+            michalId = tx.findNode(Label.label("Person"), "name", "Michal").getId();
+            adamId = tx.findNode(Label.label("Person"), "name", "Adam").getId();
+            gaId = tx.findNode(Label.label("Company"), "name", "GraphAware").getId();
 
-            tx.success();
+            tx.commit();
         }
 
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(controls.databaseManagementService(), database);
         runtime.registerModule(module);
         runtime.start();
         runtime.waitUntilStarted();
 
         try (Transaction tx = database.beginTx()) {
-            database.execute("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Daniela'})-[:WORKS_FOR]->(ga)");
-            database.execute("MATCH (p:Person {name:'Michal'}) SET p.age=31");
-            database.execute("MATCH (p:Person {name:'Adam'})-[r]-() DELETE p,r");
-            database.execute("MATCH (p:Person {name:'Michal'})-[r:WORKS_FOR]->() REMOVE r.role");
-            tx.success();
+            database.executeTransactionally("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Daniela'})-[:WORKS_FOR]->(ga)");
+            database.executeTransactionally("MATCH (p:Person {name:'Michal'}) SET p.age=31");
+            database.executeTransactionally("MATCH (p:Person {name:'Adam'})-[r]-() DELETE p,r");
+            database.executeTransactionally("MATCH (p:Person {name:'Michal'})-[r:WORKS_FOR]->() REMOVE r.role");
+            tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            danielaId = database.findNode(Label.label("Person"), "name", "Daniela").getId();
-            tx.success();
+            danielaId = tx.findNode(Label.label("Person"), "name", "Daniela").getId();
+            tx.commit();
         }
 
         Collection<WriteOperation<?>> writeOperations = module.getWriteOperations();
@@ -119,6 +119,6 @@ public class ThirdPartyIntegrationModuleTest {
             }
         }
 
-        database.shutdown();
+        controls.close();
     }
 }

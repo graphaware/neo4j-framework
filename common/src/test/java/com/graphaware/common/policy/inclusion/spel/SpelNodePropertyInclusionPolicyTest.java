@@ -34,14 +34,14 @@ public class SpelNodePropertyInclusionPolicyTest extends SpelInclusionPolicyTest
         NodePropertyInclusionPolicy policy2 = new SpelNodePropertyInclusionPolicy("node.hasLabel('Employee') && key == 'name'");
 
         try (Transaction tx = database.beginTx()) {
-            assertFalse(policy1.include("name", michal()));
-            assertFalse(policy1.include("name", vojta()));
+            assertFalse(policy1.include("name", michal(tx)));
+            assertFalse(policy1.include("name", vojta(tx)));
 
-            assertTrue(policy2.include("name", michal()));
-            assertFalse(policy2.include("name", vojta()));
-            assertFalse(policy2.include("name", graphaware()));
+            assertTrue(policy2.include("name", michal(tx)));
+            assertFalse(policy2.include("name", vojta(tx)));
+            assertFalse(policy2.include("name", graphaware(tx)));
 
-            tx.success();
+            tx.commit();
         }
     }
 }

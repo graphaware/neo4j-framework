@@ -26,7 +26,7 @@ involves try-catch blocks and looks something like this:
  Transaction tx = database.beginTx();
  try {
      //do something useful, can throw a business exception
-     tx.success();
+     tx.commit();
  } catch (RuntimeException e) {
      //deal with a business exception
      tx.failure();
@@ -40,7 +40,7 @@ involves try-catch blocks and looks something like this:
  ```java
 try (Transaction tx = database.beginTx()) {
     //do something useful, can throw a business exception
-    tx.success();
+    tx.commit();
 }
  ```
 

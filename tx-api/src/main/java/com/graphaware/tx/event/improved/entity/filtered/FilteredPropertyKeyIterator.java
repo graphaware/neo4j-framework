@@ -18,7 +18,7 @@ package com.graphaware.tx.event.improved.entity.filtered;
 
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
 import org.neo4j.graphdb.Entity;
-import org.neo4j.helpers.collection.PrefetchingIterator;
+import org.neo4j.internal.helpers.collection.PrefetchingIterator;
 
 import java.util.Iterator;
 

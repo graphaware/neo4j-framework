@@ -25,9 +25,9 @@ import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.TransactionData;
-import org.neo4j.graphdb.event.TransactionEventHandler;
-import org.neo4j.harness.ServerControls;
-import org.neo4j.harness.TestServerBuilders;
+import org.neo4j.graphdb.event.TransactionEventListenerAdapter;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -41,7 +41,7 @@ import static org.neo4j.graphdb.Label.label;
  */
 public class LazyTransactionDataSmokeTest {
 
-    private ServerControls controls;
+    private Neo4j controls;
     private GraphDatabaseService database;
     private CapturingTransactionEventHandler eventHandler;
 
@@ -50,7 +50,7 @@ public class LazyTransactionDataSmokeTest {
         createDatabase();
 
         eventHandler = new CapturingTransactionEventHandler();
-        database.registerTransactionEventHandler(eventHandler);
+        controls.databaseManagementService().registerTransactionEventListener(controls.defaultDatabaseService().databaseName(), eventHandler);
     }
 
     @AfterEach
@@ -59,8 +59,8 @@ public class LazyTransactionDataSmokeTest {
     }
 
     protected final void createDatabase() {
-        controls = TestServerBuilders.newInProcessBuilder().newServer();
-        database = controls.graph();
+        controls = Neo4jBuilders.newInProcessBuilder().build();
+        database = controls.defaultDatabaseService();
     }
 
     protected final void destroyDatabase() {
@@ -70,9 +70,9 @@ public class LazyTransactionDataSmokeTest {
     @Test
     public void nothingShouldBeReportedWhenNoChangesOccur() {
         try (Transaction tx = database.beginTx()) {
-            database.createNode(label("TestLabel"));
-            database.getNodeById(0).delete();
-            tx.success();
+            tx.createNode(label("TestLabel"));
+            tx.getNodeById(0).delete();
+            tx.commit();
         }
 
         verify(Collections.<String>emptySet());
@@ -210,7 +210,7 @@ public class LazyTransactionDataSmokeTest {
 
 
     private void execute(String cypher) {
-        database.execute(cypher);
+        database.executeTransactionally(cypher);
     }
 
     private void startCapturing() {
@@ -233,13 +233,13 @@ public class LazyTransactionDataSmokeTest {
         assertTrue(actual.containsAll(expected));
     }
 
-    private class CapturingTransactionEventHandler extends TransactionEventHandler.Adapter<Void> {
+    private class CapturingTransactionEventHandler extends TransactionEventListenerAdapter<Void> {
 
         private Set<String> capturedData = new HashSet<>();
 
         @Override
-        public Void beforeCommit(TransactionData data) throws Exception {
-            ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data);
+        public Void beforeCommit(TransactionData data, Transaction tx, GraphDatabaseService database) {
+            ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data, tx);
             capturedData.addAll(improvedTransactionData.mutationsToStrings());
             return null;
         }

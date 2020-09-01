@@ -17,10 +17,9 @@
 package com.graphaware.test.integration;
 
 import org.apache.commons.io.FileUtils;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.harness.TestServerBuilder;
-import org.neo4j.kernel.impl.factory.GraphDatabaseFacade;
-import org.neo4j.kernel.impl.proc.Procedures;
+import org.neo4j.configuration.SettingImpl;
+import org.neo4j.configuration.SettingValueParsers;
+import org.neo4j.harness.Neo4jBuilder;
 import org.neo4j.procedure.Procedure;
 import org.neo4j.procedure.UserFunction;
 import org.springframework.core.io.ClassPathResource;
@@ -36,7 +35,7 @@ import java.util.regex.Pattern;
 
 public final class IntegrationTestUtils {
 
-    public static TestServerBuilder applyConfig(TestServerBuilder builder, String fileName) {
+    public static Neo4jBuilder applyConfig(Neo4jBuilder builder, String fileName) {
         Properties properties = new Properties();
         try {
             properties.load(new ClassPathResource(fileName).getInputStream());
@@ -44,20 +43,18 @@ public final class IntegrationTestUtils {
             throw new RuntimeException(e);
         }
         for (String key : properties.stringPropertyNames()) {
-            builder = builder.withConfig(key, properties.getProperty(key));
+            builder = builder.withConfig(SettingImpl.newBuilder(key, SettingValueParsers.STRING, "").build(), properties.getProperty(key));
         }
         return builder;
     }
 
-    public static void registerAllProceduresAndFunctions(GraphDatabaseService database) throws Exception {
-        registerAllProceduresAndFunctions(((GraphDatabaseFacade) database).getDependencyResolver().resolveDependency(Procedures.class));
-    }
-
-    public static void registerAllProceduresAndFunctions(Procedures procedures) throws Exception {
+    public static Neo4jBuilder registerAllProceduresAndFunctions(Neo4jBuilder builder) {
         for (Class cls : proceduresAndFunctionsOnClassPath()) {
-            procedures.registerProcedure(cls);
-            procedures.registerFunction(cls);
+            builder.withProcedure(cls);
+            builder.withFunction(cls);
         }
+
+        return builder;
     }
 
     /**

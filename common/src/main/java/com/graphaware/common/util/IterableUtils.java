@@ -18,7 +18,8 @@ package com.graphaware.common.util;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.internal.helpers.collection.Iterables;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,7 +39,7 @@ public final class IterableUtils {
      * @param database in which to count nodes.
      * @return all nodes in the database (including root with ID 0, i.e. an brand new database will have 1 node).
      */
-    public static long countNodes(GraphDatabaseService database) {
+    public static long countNodes(Transaction database) {
         return count(database.getAllNodes());
     }
 

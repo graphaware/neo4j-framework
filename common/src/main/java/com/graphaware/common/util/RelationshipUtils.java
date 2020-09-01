@@ -16,6 +16,7 @@
 
 package com.graphaware.common.util;
 
+import org.neo4j.graphalgo.EvaluationContext;
 import org.neo4j.graphdb.*;
 
 import static org.neo4j.graphalgo.GraphAlgoFactory.shortestPath;
@@ -37,8 +38,8 @@ public final class RelationshipUtils {
      *         more than one relationship, one (unspecified which one) will be returned.
      * @throws NotFoundException if there is no such relationship.
      */
-    public static Relationship getSingleRelationship(Node node1, Node node2, RelationshipType type, Direction direction) {
-        Relationship result = getSingleRelationshipOrNull(node1, node2, type, direction);
+    public static Relationship getSingleRelationship(EvaluationContext context, Node node1, Node node2, RelationshipType type, Direction direction) {
+        Relationship result = getSingleRelationshipOrNull(context, node1, node2, type, direction);
 
         if (result == null) {
             throw new NotFoundException("Relationship between " + node1 + " and " + node2 + " of type " + type + " and direction " + direction + " does not exist.");
@@ -57,8 +58,8 @@ public final class RelationshipUtils {
      * @return a single relationship, null if there is no such relationship between the nodes. If there is
      *         more than one relationship, one (unspecified which one) will be returned.
      */
-    public static Relationship getSingleRelationshipOrNull(Node node1, Node node2, RelationshipType type, Direction direction) {
-        Path singlePath = shortestPath(forTypeAndDirection(type, direction), 1, 1).findSinglePath(node1, node2);
+    public static Relationship getSingleRelationshipOrNull(EvaluationContext context, Node node1, Node node2, RelationshipType type, Direction direction) {
+        Path singlePath = shortestPath(context, forTypeAndDirection(type, direction), 1, 1).findSinglePath(node1, node2);
 
         if (singlePath == null) {
             return null;
@@ -76,8 +77,8 @@ public final class RelationshipUtils {
      * @param direction relationship direction from first node's point of view (can be BOTH).
      * @return true iff the specified relationship does not exist.
      */
-    public static boolean relationshipNotExists(Node node1, Node node2, RelationshipType type, Direction direction) {
-        return !relationshipExists(node1, node2, type, direction);
+    public static boolean relationshipNotExists(EvaluationContext context, Node node1, Node node2, RelationshipType type, Direction direction) {
+        return !relationshipExists(context, node1, node2, type, direction);
     }
 
     /**
@@ -89,8 +90,8 @@ public final class RelationshipUtils {
      * @param direction relationship direction from first node's point of view (can be BOTH).
      * @return true iff at least one relationship with the above spec exists.
      */
-    public static boolean relationshipExists(Node node1, Node node2, RelationshipType type, Direction direction) {
-        return getSingleRelationshipOrNull(node1, node2, type, direction) != null;
+    public static boolean relationshipExists(EvaluationContext context, Node node1, Node node2, RelationshipType type, Direction direction) {
+        return getSingleRelationshipOrNull(context, node1, node2, type, direction) != null;
     }
 
     /**
@@ -101,8 +102,8 @@ public final class RelationshipUtils {
      * @param type      relationship type.
      * @param direction relationship direction from first node's point of view (can be BOTH).
      */
-    public static void deleteRelationshipIfExists(Node node1, Node node2, RelationshipType type, Direction direction) {
-        Relationship r = getSingleRelationshipOrNull(node1, node2, type, direction);
+    public static void deleteRelationshipIfExists(EvaluationContext context, Node node1, Node node2, RelationshipType type, Direction direction) {
+        Relationship r = getSingleRelationshipOrNull(context, node1, node2, type, direction);
 
         if (r != null) {
             r.delete();
@@ -118,8 +119,8 @@ public final class RelationshipUtils {
      * @param direction relationship direction from first node's point of view (can be BOTH).
      * @return the new or the existing relationship.
      */
-    public static Relationship createRelationshipIfNotExists(Node node1, Node node2, RelationshipType type, Direction direction) {
-        Relationship existing = getSingleRelationshipOrNull(node1, node2, type, direction);
+    public static Relationship createRelationshipIfNotExists(EvaluationContext context, Node node1, Node node2, RelationshipType type, Direction direction) {
+        Relationship existing = getSingleRelationshipOrNull(context, node1, node2, type, direction);
 
         if (existing == null) {
             if (Direction.INCOMING.equals(direction)) {

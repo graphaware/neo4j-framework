@@ -19,7 +19,6 @@ package com.graphaware.common.description.relationship;
 import com.graphaware.common.UnitTest;
 import com.graphaware.common.description.property.LazyPropertiesDescription;
 import org.junit.jupiter.api.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
@@ -33,25 +32,22 @@ import static org.neo4j.graphdb.RelationshipType.withName;
 public class LazyRelationshipDescriptionTest extends UnitTest {
 
     @Override
-    protected void populate(GraphDatabaseService database) {
-        try (Transaction tx = database.beginTx()) {
-            Node root = database.createNode();
-            Node one = database.createNode();
-            root.createRelationshipTo(one, withName("TEST")).setProperty("k", new int[]{2, 3, 4});
-            tx.success();
-        }
+    protected void populate(Transaction database) {
+        Node root = database.createNode();
+        Node one = database.createNode();
+        root.createRelationshipTo(one, withName("TEST")).setProperty("k", new int[]{2, 3, 4});
     }
 
     @Test
     public void shouldReturnCorrectTypeDirectionAndProps() {
         try (Transaction tx = database.beginTx()) {
             RelationshipDescription relationshipDescription = new LazyRelationshipDescription(
-                    database.getNodeById(0).getSingleRelationship(withName("TEST"), OUTGOING),
-                    database.getNodeById(0));
+                    tx.getNodeById(0).getSingleRelationship(withName("TEST"), OUTGOING),
+                    tx.getNodeById(0));
 
             assertEquals("TEST", relationshipDescription.getType());
             assertEquals(OUTGOING, relationshipDescription.getDirection());
-            assertEquals(new LazyPropertiesDescription(database.getNodeById(0).getSingleRelationship(withName("TEST"), OUTGOING)), relationshipDescription.getPropertiesDescription());
+            assertEquals(new LazyPropertiesDescription(tx.getNodeById(0).getSingleRelationship(withName("TEST"), OUTGOING)), relationshipDescription.getPropertiesDescription());
         }
     }
 }

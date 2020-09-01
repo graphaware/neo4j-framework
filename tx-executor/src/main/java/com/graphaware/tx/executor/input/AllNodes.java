@@ -16,8 +16,10 @@
 
 package com.graphaware.tx.executor.input;
 
+import com.graphaware.tx.executor.single.TransactionCallback;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * {@link TransactionalInput} returning all nodes in the database.
@@ -31,6 +33,6 @@ public final class AllNodes extends TransactionalInput<Node> {
      * @param batchSize how many nodes in a batch.
      */
     public AllNodes(GraphDatabaseService database, int batchSize) {
-        super(database, batchSize, GraphDatabaseService::getAllNodes);
+        super(database, batchSize, Transaction::getAllNodes);
     }
 }

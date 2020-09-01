@@ -24,7 +24,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.*;
-import org.neo4j.harness.TestServerBuilders;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -34,56 +35,56 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
 
-    private GraphDatabaseService database;
+    private Neo4j database;
 
     @BeforeEach
     public void setUp() {
-        database = TestServerBuilders.newInProcessBuilder().newServer().graph();
+        database = Neo4jBuilders.newInProcessBuilder().build();
 
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
-        runtime.registerModule(new FriendshipStrengthModule("FSM", database));
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database.databaseManagementService(), database.defaultDatabaseService());
+        runtime.registerModule(new FriendshipStrengthModule("FSM", database.defaultDatabaseService()));
         runtime.start();
     }
 
     @AfterEach
     public void tearDown() {
-        database.shutdown();
+        database.close();
     }
 
     @Test
     public void totalFriendshipStrengthOnEmptyDatabaseShouldBeZero() {
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(0, new FriendshipStrengthCounter(database).getTotalFriendshipStrength());
-            tx.success();
+        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+            assertEquals(0, new FriendshipStrengthCounter().getTotalFriendshipStrength(tx));
+            tx.commit();
         }
     }
 
     @Test
     public void totalFriendshipStrengthShouldBeCorrectlyCalculated() {
-        database.execute("CREATE " +
+        database.defaultDatabaseService().executeTransactionally("CREATE " +
                 "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
                 "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
 
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(3, new FriendshipStrengthCounter(database).getTotalFriendshipStrength());
-            tx.success();
+        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+            assertEquals(3, new FriendshipStrengthCounter().getTotalFriendshipStrength(tx));
+            tx.commit();
         }
     }
 
     @Test
     public void totalFriendshipStrengthShouldBeCorrectlyCalculated2() {
-        try (Transaction tx = database.beginTx()) {
-            Node p1 = database.createNode(Label.label("Person"));
-            Node p2 = database.createNode(Label.label("Person"));
-            Node p3 = database.createNode(Label.label("Person"));
+        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+            Node p1 = tx.createNode(Label.label("Person"));
+            Node p2 = tx.createNode(Label.label("Person"));
+            Node p3 = tx.createNode(Label.label("Person"));
             p1.createRelationshipTo(p2, RelationshipType.withName("FRIEND_OF")).setProperty("strength", 1L);
             p1.createRelationshipTo(p3, RelationshipType.withName("FRIEND_OF")).setProperty("strength", 2L);
-            tx.success();
+            tx.commit();
         }
 
-        try (Transaction tx = database.beginTx()) {
-            assertEquals(3, new FriendshipStrengthCounter(database).getTotalFriendshipStrength());
-            tx.success();
+        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+            assertEquals(3, new FriendshipStrengthCounter().getTotalFriendshipStrength(tx));
+            tx.commit();
         }
     }
 }

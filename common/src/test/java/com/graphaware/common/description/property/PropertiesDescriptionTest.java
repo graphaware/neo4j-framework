@@ -31,15 +31,15 @@ public abstract class PropertiesDescriptionTest extends UnitTest {
     @Override
     protected void populate(GraphDatabaseService database) {
         try (Transaction tx = database.beginTx()) {
-            Node root = database.createNode();
+            Node root = tx.createNode();
             root.setProperty("two", 2);
             root.setProperty("three", "3");
             root.setProperty("array", new int[]{4, 5});
-            tx.success();
+            tx.commit();
         }
 
-        tx = database.beginTx();
-        entity = database.getNodeById(0);
+        tx = this.database.beginTx();
+        entity = tx.getNodeById(0);
     }
 
     protected LazyPropertiesDescription lazy() {

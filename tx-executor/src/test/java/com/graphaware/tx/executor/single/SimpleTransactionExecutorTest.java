@@ -20,8 +20,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.*;
-import org.neo4j.harness.ServerControls;
-import org.neo4j.harness.TestServerBuilders;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import static com.graphaware.common.util.IterableUtils.countNodes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,17 +33,17 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class SimpleTransactionExecutorTest {
 
     private TransactionExecutor executor;
-    private ServerControls controls;
+    private Neo4j controls;
     protected GraphDatabaseService database;
 
     @BeforeEach
     public void setUp() {
-        controls = TestServerBuilders.newInProcessBuilder().newServer();
-        database = controls.graph();
+        controls = Neo4jBuilders.newInProcessBuilder().build();
+        database = controls.defaultDatabaseService();
 
         try (Transaction tx = database.beginTx()) {
-            database.createNode();
-            tx.success();
+            tx.createNode();
+            tx.commit();
         }
 
         executor = new SimpleTransactionExecutor(database);
@@ -58,13 +58,13 @@ public class SimpleTransactionExecutorTest {
     public void nodeShouldBeSuccessfullyCreatedInTransaction() {
         executor.executeInTransaction(new VoidReturningCallback() {
             @Override
-            public void doInTx(GraphDatabaseService database) {
-                database.createNode();
+            public void doInTx(Transaction tx) {
+                tx.createNode();
             }
         });
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(2, countNodes(database));
+            assertEquals(2, countNodes(tx));
         }
     }
 
@@ -72,13 +72,13 @@ public class SimpleTransactionExecutorTest {
     public void nodeShouldBeSuccessfullyDeletedInTransaction() {
         executor.executeInTransaction(new VoidReturningCallback() {
             @Override
-            protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(0).delete();
+            protected void doInTx(Transaction tx) {
+                tx.getNodeById(0).delete();
             }
         });
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(0, countNodes(database));
+            assertEquals(0, countNodes(tx));
         }
     }
 
@@ -87,8 +87,8 @@ public class SimpleTransactionExecutorTest {
         createNodeAndRelationship();
 
         assertThrows(ConstraintViolationException.class, () -> {
-            executor.executeInTransaction(database -> {
-                database.getNodeById(0).delete();
+            executor.executeInTransaction(tx -> {
+                tx.getNodeById(0).delete();
                 return null;
             });
         });
@@ -99,7 +99,7 @@ public class SimpleTransactionExecutorTest {
         createNodeAndRelationship();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(2, countNodes(database));
+            assertEquals(2, countNodes(tx));
         }
 
         executor.executeInTransaction(db -> {
@@ -108,7 +108,7 @@ public class SimpleTransactionExecutorTest {
         }, KeepCalmAndCarryOn.getInstance());
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(2, countNodes(database));
+            assertEquals(2, countNodes(tx));
         }
     }
 

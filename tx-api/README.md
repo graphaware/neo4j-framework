@@ -41,7 +41,7 @@ To use the API, simply instantiate one of the [`ImprovedTransactionData`](http:/
 ```java
  GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
 
- database.registerTransactionEventHandler(new TransactionEventHandler<Object>() {
+ database.registerTransactionEventListener(new TransactionEventHandler<Object>() {
      @Override
      public Object beforeCommit(TransactionData data) throws Exception {
          ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data);
@@ -71,7 +71,7 @@ are of interest, the example above could be modified as follows:
 
 ```java
 GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-database.registerTransactionEventHandler(new TransactionEventHandler.Adapter<Object>() {
+database.registerTransactionEventListener(new TransactionEventHandler.Adapter<Object>() {
     @Override
     public Object beforeCommit(TransactionData data) throws Exception {
         InclusionPolicies inclusionPolicies = InclusionPolicies.all()
@@ -124,7 +124,7 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
         this.database = database;
         try (Transaction tx = database.beginTx()) {
             getCounterNode(database); //do this in constructor to prevent multiple threads creating multiple nodes
-            tx.success();
+            tx.commit();
         }
     }
 
@@ -165,7 +165,7 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
             try (Transaction tx = database.beginTx()) {
                 tx.acquireWriteLock(counter);
                 counter.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (long) counter.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L) + delta);
-                tx.success();
+                tx.commit();
             }
         }
 
@@ -199,7 +199,7 @@ public class FriendshipStrengthCounter extends TransactionEventHandler.Adapter<V
 
         try (Transaction tx = database.beginTx()) {
             result = (long) getCounterNode(database).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L);
-            tx.success();
+            tx.commit();
         }
 
         return result;
@@ -211,7 +211,7 @@ All that remains is registering this event handler on the database:
 
 ```java
 GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase(); //this will in reality be a real database (i.e. EmbeddedGraphDatabase)
-database.registerTransactionEventHandler(new FriendshipStrengthCounter(database));
+database.registerTransactionEventListener(new FriendshipStrengthCounter(database));
 ```
 
 ### Usage in Detail

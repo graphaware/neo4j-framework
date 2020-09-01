@@ -83,7 +83,7 @@ public class CommunityModuleManager extends BaseModuleManager implements ModuleM
         Map<String, Object> result = new HashMap<>();
 
         for (Module<?> module : modules.values()) {
-            FilteredTransactionData filteredTransactionData = new FilteredTransactionData(transactionData, module.getConfiguration().getInclusionPolicies());
+            FilteredTransactionData filteredTransactionData = new FilteredTransactionData(transactionData, transactionData.getTransaction(), module.getConfiguration().getInclusionPolicies());
 
             if (!filteredTransactionData.mutationsOccurred()) {
                 continue;

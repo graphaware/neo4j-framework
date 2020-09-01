@@ -37,7 +37,7 @@ public class IncludeNodesTest extends UnitTest {
     @Test
     public void shouldIncludeCorrectRelationships() {
         try (Transaction tx = database.beginTx()) {
-            Node n = database.createNode(label("Test"));
+            Node n = tx.createNode(label("Test"));
             n.setProperty("test", "test");
 
             assertTrue(IncludeNodes.all().include(n));
@@ -60,7 +60,7 @@ public class IncludeNodesTest extends UnitTest {
                             .all()
                             .with("test", undefined()).include(n));
 
-            tx.success();
+            tx.commit();
         }
     }
 }

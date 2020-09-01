@@ -19,7 +19,7 @@ package com.graphaware.common.policy.inclusion.spel;
 import com.graphaware.common.policy.inclusion.RelationshipInclusionPolicy;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.internal.helpers.collection.Iterables;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -39,52 +39,52 @@ public class SpelRelationshipInclusionPolicyTest extends SpelInclusionPolicyTest
     @Test
     public void shouldIncludeCorrectRelationships() {
         try (Transaction tx = database.beginTx()) {
-            assertTrue(policy1.include(michalWorksFor()));
-            assertTrue(policy1.include(vojtaWorksFor()));
-            assertFalse(policy1.include(michalLivesIn()));
-            assertFalse(policy1.include(vojtaLivesIn()));
+            assertTrue(policy1.include(michalWorksFor(tx)));
+            assertTrue(policy1.include(vojtaWorksFor(tx)));
+            assertFalse(policy1.include(michalLivesIn(tx)));
+            assertFalse(policy1.include(vojtaLivesIn(tx)));
 
-            assertTrue(policy2.include(michalWorksFor()));
-            assertTrue(policy2.include(vojtaWorksFor()));
-            assertFalse(policy2.include(michalLivesIn()));
-            assertFalse(policy2.include(vojtaLivesIn()));
+            assertTrue(policy2.include(michalWorksFor(tx)));
+            assertTrue(policy2.include(vojtaWorksFor(tx)));
+            assertFalse(policy2.include(michalLivesIn(tx)));
+            assertFalse(policy2.include(vojtaLivesIn(tx)));
 
-            assertTrue(policy7.include(michalWorksFor()));
-            assertTrue(policy7.include(vojtaWorksFor()));
-            assertFalse(policy7.include(michalLivesIn()));
-            assertFalse(policy7.include(vojtaLivesIn()));
+            assertTrue(policy7.include(michalWorksFor(tx)));
+            assertTrue(policy7.include(vojtaWorksFor(tx)));
+            assertFalse(policy7.include(michalLivesIn(tx)));
+            assertFalse(policy7.include(vojtaLivesIn(tx)));
 
-            assertTrue(policy3.include(michalLivesIn(), london()));
-            assertFalse(policy3.include(michalLivesIn(), michal()));
-            assertTrue(policy3.include(vojtaLivesIn(), london()));
-            assertFalse(policy3.include(vojtaLivesIn(), vojta()));
-            assertFalse(policy3.include(michalWorksFor(), michal()));
-            assertFalse(policy3.include(michalWorksFor(), graphaware()));
+            assertTrue(policy3.include(michalLivesIn(tx), london(tx)));
+            assertFalse(policy3.include(michalLivesIn(tx), michal(tx)));
+            assertTrue(policy3.include(vojtaLivesIn(tx), london(tx)));
+            assertFalse(policy3.include(vojtaLivesIn(tx), vojta(tx)));
+            assertFalse(policy3.include(michalWorksFor(tx), michal(tx)));
+            assertFalse(policy3.include(michalWorksFor(tx), graphaware(tx)));
 
-            assertTrue(policy4.include(michalLivesIn(), michal()));
-            assertTrue(policy4.include(michalLivesIn(), london()));
-            assertTrue(policy4.include(michalWorksFor(), michal()));
-            assertTrue(policy4.include(michalWorksFor(), graphaware()));
-            assertFalse(policy4.include(vojtaLivesIn(), london()));
-            assertFalse(policy4.include(vojtaLivesIn(), vojta()));
+            assertTrue(policy4.include(michalLivesIn(tx), michal(tx)));
+            assertTrue(policy4.include(michalLivesIn(tx), london(tx)));
+            assertTrue(policy4.include(michalWorksFor(tx), michal(tx)));
+            assertTrue(policy4.include(michalWorksFor(tx), graphaware(tx)));
+            assertFalse(policy4.include(vojtaLivesIn(tx), london(tx)));
+            assertFalse(policy4.include(vojtaLivesIn(tx), vojta(tx)));
 
-            assertTrue(policy4.include(michalLivesIn()));
-            assertTrue(policy4.include(michalWorksFor()));
-            assertFalse(policy4.include(vojtaLivesIn()));
+            assertTrue(policy4.include(michalLivesIn(tx)));
+            assertTrue(policy4.include(michalWorksFor(tx)));
+            assertFalse(policy4.include(vojtaLivesIn(tx)));
 
-            assertFalse(policy5.include(michalLivesIn(), michal()));
-            assertTrue(policy5.include(michalLivesIn(), london()));
-            assertFalse(policy5.include(michalWorksFor(), michal()));
-            assertTrue(policy5.include(michalWorksFor(), graphaware()));
-            assertFalse(policy5.include(vojtaLivesIn(), london()));
-            assertFalse(policy5.include(vojtaLivesIn(), vojta()));
+            assertFalse(policy5.include(michalLivesIn(tx), michal(tx)));
+            assertTrue(policy5.include(michalLivesIn(tx), london(tx)));
+            assertFalse(policy5.include(michalWorksFor(tx), michal(tx)));
+            assertTrue(policy5.include(michalWorksFor(tx), graphaware(tx)));
+            assertFalse(policy5.include(vojtaLivesIn(tx), london(tx)));
+            assertFalse(policy5.include(vojtaLivesIn(tx), vojta(tx)));
 
-            assertFalse(policy6.include(michalLivesIn()));
-            assertFalse(policy6.include(michalWorksFor()));
-            assertFalse(policy6.include(vojtaLivesIn()));
-            assertTrue(policy6.include(vojtaWorksFor()));
+            assertFalse(policy6.include(michalLivesIn(tx)));
+            assertFalse(policy6.include(michalWorksFor(tx)));
+            assertFalse(policy6.include(vojtaLivesIn(tx)));
+            assertTrue(policy6.include(vojtaWorksFor(tx)));
 
-            tx.success();
+            tx.commit();
         }
     }
 
@@ -92,8 +92,8 @@ public class SpelRelationshipInclusionPolicyTest extends SpelInclusionPolicyTest
     public void shouldComplainAboutIncorrectUsage1() {
         assertThrows(Exception.class, () -> {
             try (Transaction tx = database.beginTx()) {
-                policy5.include(michalLivesIn(), vojta());
-                tx.success();
+                policy5.include(michalLivesIn(tx), vojta(tx));
+                tx.commit();
             }
         });
     }
@@ -102,8 +102,8 @@ public class SpelRelationshipInclusionPolicyTest extends SpelInclusionPolicyTest
     public void shouldComplainAboutIncorrectUsage2() {
         assertThrows(Exception.class, () -> {
             try (Transaction tx = database.beginTx()) {
-                policy3.include(michalLivesIn());
-                tx.success();
+                policy3.include(michalLivesIn(tx));
+                tx.commit();
             }
         });
     }
@@ -112,8 +112,8 @@ public class SpelRelationshipInclusionPolicyTest extends SpelInclusionPolicyTest
     public void shouldComplainAboutIncorrectUsage3() {
         assertThrows(Exception.class, () -> {
             try (Transaction tx = database.beginTx()) {
-                policy5.include(michalLivesIn());
-                tx.success();
+                policy5.include(michalLivesIn(tx));
+                tx.commit();
             }
         });
     }
@@ -121,9 +121,9 @@ public class SpelRelationshipInclusionPolicyTest extends SpelInclusionPolicyTest
     @Test
     public void shouldIncludeAllCorrectRels() {
         try (Transaction tx = database.beginTx()) {
-            assertEquals(1, Iterables.count(policy6.getAll(database)));
-            assertEquals(vojtaWorksFor(), policy6.getAll(database).iterator().next());
-            tx.success();
+            assertEquals(1, Iterables.count(policy6.getAll(tx)));
+            assertEquals(vojtaWorksFor(tx), policy6.getAll(tx).iterator().next());
+            tx.commit();
         }
     }
 }

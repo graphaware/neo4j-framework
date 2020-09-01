@@ -22,8 +22,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.*;
-import org.neo4j.harness.ServerControls;
-import org.neo4j.harness.TestServerBuilders;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.test.unit.GraphUnit.*;
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class GraphUnitTest {
 
-    private ServerControls controls;
+    private Neo4j controls;
     protected GraphDatabaseService database;
 
     @BeforeEach
@@ -49,8 +49,8 @@ public class GraphUnitTest {
     }
 
     protected final void createDatabase() {
-        controls = TestServerBuilders.newInProcessBuilder().newServer();
-        database = controls.graph();
+        controls = Neo4jBuilders.newInProcessBuilder().build();
+        database = controls.defaultDatabaseService();
     }
 
     protected final void destroyDatabase() {
@@ -58,7 +58,7 @@ public class GraphUnitTest {
     }
 
     private void populateDatabase(String cypher) {
-        database.execute(cypher);
+        database.executeTransactionally(cypher);
     }
 
     @Test
@@ -486,8 +486,8 @@ public class GraphUnitTest {
     @Test
     public void equalNumbersWithDifferentTypeShouldBeEqual() {
         try (Transaction tx = database.beginTx()) {
-            database.createNode().setProperty("number", 123);
-            tx.success();
+            tx.createNode().setProperty("number", 123);
+            tx.commit();
         }
 
         String cypher = "CREATE (n {number:123})";
@@ -498,8 +498,8 @@ public class GraphUnitTest {
     @Test
     public void equalArraysWithDifferentTypeShouldBeEqual() {
         try (Transaction tx = database.beginTx()) {
-            database.createNode().setProperty("number", new int[]{123, 124});
-            tx.success();
+            tx.createNode().setProperty("number", new int[]{123, 124});
+            tx.commit();
         }
 
         String cypher = "CREATE (n {number:[123,124]})";
@@ -568,15 +568,15 @@ public class GraphUnitTest {
     @Test
     public void deletedRelationshipWithNewTypeShouldNotInfluenceEquality() { //bug test
         try (Transaction tx = database.beginTx()) {
-            Node node1 = database.createNode();
-            Node node2 = database.createNode();
+            Node node1 = tx.createNode();
+            Node node2 = tx.createNode();
             node1.createRelationshipTo(node2, RelationshipType.withName("ACCIDENT"));
-            tx.success();
+            tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            database.getAllRelationships().iterator().next().delete();
-            tx.success();
+            tx.getAllRelationships().iterator().next().delete();
+            tx.commit();
         }
 
         String cypher = "CREATE (n), (m)";
@@ -587,14 +587,14 @@ public class GraphUnitTest {
     @Test
     public void deletedNewLabelShouldNotInfluenceEquality() { //bug test
         try (Transaction tx = database.beginTx()) {
-            database.createNode(Label.label("Accident"));
-            database.createNode(Label.label("RealLabel"));
-            tx.success();
+            tx.createNode(Label.label("Accident"));
+            tx.createNode(Label.label("RealLabel"));
+            tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            database.getNodeById(0).delete();
-            tx.success();
+            tx.getNodeById(0).delete();
+            tx.commit();
         }
 
         String cypher = "CREATE (n:RealLabel)";
@@ -605,14 +605,14 @@ public class GraphUnitTest {
     @Test
     public void deletedNewPropsShouldNotInfluenceEquality() { //bug test
         try (Transaction tx = database.beginTx()) {
-            database.createNode().setProperty("accident", "dummy");
-            database.createNode();
-            tx.success();
+            tx.createNode().setProperty("accident", "dummy");
+            tx.createNode();
+            tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            database.getNodeById(0).delete();
-            tx.success();
+            tx.getNodeById(0).delete();
+            tx.commit();
         }
 
         String cypher = "CREATE (n)";
@@ -628,17 +628,17 @@ public class GraphUnitTest {
                     "(red2 {name:'Red'})-[:REL]->(black2 {name:'Black'})";
 
             populateDatabase(cypher);
-            tx.success();
+            tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            clearGraph(database);
-            tx.success();
+            clearGraph(tx);
+            tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(0, count(database.getAllNodes()));
-            tx.success();
+            assertEquals(0, count(tx.getAllNodes()));
+            tx.commit();
         }
 
     }
@@ -651,18 +651,18 @@ public class GraphUnitTest {
                     "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
 
             populateDatabase(cypher);
-            tx.success();
+            tx.commit();
         }
 
         InclusionPolicies inclusionPolicies = InclusionPolicies.all().with(new BlueNodeInclusionPolicy());
         try (Transaction tx = database.beginTx()) {
-            clearGraph(database, inclusionPolicies);
-            tx.success();
+            clearGraph(tx, inclusionPolicies);
+            tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(5, count(database.getAllNodes()));
-            tx.success();
+            assertEquals(5, count(tx.getAllNodes()));
+            tx.commit();
         }
 
     }
@@ -676,19 +676,19 @@ public class GraphUnitTest {
                     "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'}), (blue1:Blue)-[:REL2]->(blue2:Blue)";
 
             populateDatabase(cypher);
-            tx.success();
+            tx.commit();
         }
 
         InclusionPolicies inclusionPolicies = InclusionPolicies.all().with(new BlueNodeInclusionPolicy()).with(new Rel2InclusionPolicy());
         try (Transaction tx = database.beginTx()) {
-            clearGraph(database, inclusionPolicies);
-            tx.success();
+            clearGraph(tx, inclusionPolicies);
+            tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(6, count(database.getAllNodes()));
-            assertEquals(4, count(database.getAllRelationships()));
-            tx.success();
+            assertEquals(6, count(tx.getAllNodes()));
+            assertEquals(4, count(tx.getAllRelationships()));
+            tx.commit();
         }
 
     }

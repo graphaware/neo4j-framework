@@ -22,7 +22,8 @@ import com.graphaware.common.representation.AttachedRelationship;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.helpers.collection.FilteringIterable;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.internal.helpers.collection.FilteringIterable;
 
 /**
  * {@link RelationshipInclusionPolicy} based on a SPEL expression. The expression can use methods defined in
@@ -59,7 +60,7 @@ public class SpelRelationshipInclusionPolicy extends SpelInclusionPolicy impleme
      * {@inheritDoc}
      */
     @Override
-    public Iterable<Relationship> getAll(GraphDatabaseService database) {
+    public Iterable<Relationship> getAll(Transaction database) {
         return new FilteringIterable<>(database.getAllRelationships(), this::include);
     }
 }

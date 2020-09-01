@@ -16,31 +16,33 @@
 
 package com.graphaware.runtime.bootstrap;
 
+import org.neo4j.configuration.Config;
+import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.helpers.Service;
-import org.neo4j.kernel.configuration.Config;
+import org.neo4j.kernel.extension.ExtensionFactory;
 import org.neo4j.kernel.extension.ExtensionType;
-import org.neo4j.kernel.extension.KernelExtensionFactory;
-import org.neo4j.kernel.impl.spi.KernelContext;
+import org.neo4j.kernel.extension.context.ExtensionContext;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 import org.neo4j.logging.internal.LogService;
 
 /**
- * {@link KernelExtensionFactory} that initializes the {@link RuntimeKernelExtension}.
+ * {@link ExtensionFactory} that initializes the {@link RuntimeKernelExtension}.
  */
-public class RuntimeKernelExtensionFactory extends KernelExtensionFactory<RuntimeKernelExtensionFactory.Dependencies> {
+public class RuntimeExtensionFactory extends ExtensionFactory<RuntimeExtensionFactory.Dependencies> {
 
     public interface Dependencies {
         Config getConfig();
 
         GraphDatabaseService getDatabase();
 
+        DatabaseManagementService managementService();
+
         LogService getLogging();
     }
 
     public static final String KEY = "GraphAware Runtime";
 
-    public RuntimeKernelExtensionFactory() {
+    public RuntimeExtensionFactory() {
         super(ExtensionType.DATABASE, KEY);
     }
 
@@ -48,7 +50,7 @@ public class RuntimeKernelExtensionFactory extends KernelExtensionFactory<Runtim
      * {@inheritDoc}
      */
     @Override
-    public Lifecycle newInstance(KernelContext context, Dependencies dependencies) {
-        return new RuntimeKernelExtension(dependencies.getConfig(), dependencies.getDatabase());
+    public Lifecycle newInstance(ExtensionContext extensionContext, Dependencies dependencies) {
+        return new RuntimeKernelExtension(dependencies.getConfig(), dependencies.managementService(), dependencies.getDatabase());
     }
 }

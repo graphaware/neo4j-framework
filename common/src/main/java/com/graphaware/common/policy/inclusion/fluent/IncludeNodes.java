@@ -22,6 +22,7 @@ import com.graphaware.common.description.property.WildcardPropertiesDescription;
 import com.graphaware.common.policy.inclusion.NodeInclusionPolicy;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 import java.util.Collections;
 
@@ -71,7 +72,7 @@ public class IncludeNodes extends BaseIncludeNodes<IncludeNodes> {
      * {@inheritDoc}
      */
     @Override
-    protected Iterable<Node> doGetAll(GraphDatabaseService database) {
+    protected Iterable<Node> doGetAll(Transaction database) {
         return database.getAllNodes();
     }
 }

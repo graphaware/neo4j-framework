@@ -20,7 +20,7 @@
 
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>graphaware-parent</artifactId>
-    <version>3.5.19.58-SNAPSHOT</version>
+    <version>4.0.7.58-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>GraphAware Neo4j Framework Parent POM</name>
@@ -67,18 +67,18 @@
     </scm>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>3.5.19</neo4j.version>
+        <neo4j.version>4.0.7</neo4j.version>
         <spring.version>5.2.8.RELEASE</spring.version>
-        <uuid.version>3.2</uuid.version>
+        <uuid.version>3.5</uuid.version>
         <jackson.version>2.9.10</jackson.version>
         <maven.plugin.surefire>2.22.2</maven.plugin.surefire>
-        <junit.version>5.4.2</junit.version>
+        <junit.version>5.5.2</junit.version>
         <mockito.version>1.10.19</mockito.version>
         <jsonassert.version>1.5.0</jsonassert.version>
         <guava.version>21.0</guava.version>
-        <fw.version>3.5.19.58-SNAPSHOT</fw.version>
+        <fw.version>4.0.7.58-SNAPSHOT</fw.version>
     </properties>
 
     <developers>
@@ -167,8 +167,11 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.2.0</version>
                         <configuration>
                             <additionalparam>-Xdoclint:none</additionalparam>
+                            <additionalOptions>-Xdoclint:none</additionalOptions>
+                            <additionalJOption>-Xdoclint:none</additionalJOption>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -251,19 +254,7 @@
 
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-engine</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-api</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-params</artifactId>
+                <artifactId>junit-jupiter</artifactId>
                 <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
@@ -340,17 +331,8 @@
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
+            <artifactId>junit-jupiter</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
@@ -369,6 +351,11 @@
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -420,7 +407,7 @@
                 <configuration>
                     <aggregate>true</aggregate>
                     <links>
-                        <link>https://neo4j.com/docs/java-reference/3.5/javadocs/</link>
+                        <link>https://neo4j.com/docs/java-reference/4.0/javadocs/</link>
                     </links>
                 </configuration>
                 <executions>

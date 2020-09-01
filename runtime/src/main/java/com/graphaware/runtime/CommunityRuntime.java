@@ -22,13 +22,14 @@ import com.graphaware.runtime.manager.ModuleManager;
 import com.graphaware.runtime.module.Module;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
-import com.graphaware.writer.neo4j.Neo4jWriter;
+import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.event.ErrorState;
-import org.neo4j.graphdb.event.KernelEventHandler;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.event.DatabaseEventContext;
+import org.neo4j.graphdb.event.DatabaseEventListener;
 import org.neo4j.graphdb.event.TransactionData;
-import org.neo4j.graphdb.event.TransactionEventHandler;
+import org.neo4j.graphdb.event.TransactionEventListener;
 import org.neo4j.logging.Log;
 
 import java.util.Map;
@@ -42,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * To use this {@link GraphAwareRuntime}, construct it using {@link GraphAwareRuntimeFactory}.
  */
-public class CommunityRuntime implements TransactionEventHandler<Map<String, Object>>, GraphAwareRuntime, KernelEventHandler {
+public class CommunityRuntime implements TransactionEventListener<Map<String, Object>>, GraphAwareRuntime, DatabaseEventListener {
 
     private static final Log LOG = LoggerFactory.getLogger(CommunityRuntime.class);
 
@@ -60,8 +61,8 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
 
     private final RuntimeConfiguration configuration;
     private final GraphDatabaseService database;
+    private final DatabaseManagementService databaseManagementService;
     private final ModuleManager runtimeModuleManager;
-    private final Neo4jWriter writer;
 
     /**
      * Construct a new runtime. Protected, please use {@link GraphAwareRuntimeFactory}.
@@ -69,27 +70,26 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      * @param configuration config.
      * @param database      on which the runtime operates.
      * @param moduleManager manager for transaction-driven modules.
-     * @param writer        to use when writing to the database.
      */
-    protected CommunityRuntime(RuntimeConfiguration configuration, GraphDatabaseService database, ModuleManager moduleManager, Neo4jWriter writer) {
+    protected CommunityRuntime(RuntimeConfiguration configuration, GraphDatabaseService database, DatabaseManagementService databaseManagementService, ModuleManager moduleManager) {
         if (!State.NONE.equals(state)) {
             throw new IllegalStateException("Only one instance of the GraphAware Runtime should ever be instantiated and started.");
         }
 
-        if (RuntimeRegistry.getRuntime(database) != null) {
+        if (RuntimeRegistry.getRuntime(database.databaseName()) != null) {
             throw new IllegalStateException("It is not possible to create multiple runtimes for a single database!");
         }
 
         this.state = State.REGISTERED;
         this.configuration = configuration;
         this.database = database;
+        this.databaseManagementService = databaseManagementService;
         this.runtimeModuleManager = moduleManager;
-        this.writer = writer;
 
-        database.registerTransactionEventHandler(this);
-        database.registerKernelEventHandler(this);
+        databaseManagementService.registerTransactionEventListener(database.databaseName(),this);
+        databaseManagementService.registerDatabaseEventListener(this);
 
-        RuntimeRegistry.registerRuntime(database, this);
+        RuntimeRegistry.registerRuntime(database.databaseName(), this);
     }
 
     /**
@@ -107,6 +107,11 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
         runtimeModuleManager.checkNotAlreadyRegistered(module);
 
         runtimeModuleManager.registerModule(module);
+    }
+
+    @Override
+    public void databaseStart(DatabaseEventContext eventContext) {
+
     }
 
     /**
@@ -134,7 +139,6 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
         beforeStart();
 
         startModules();
-        startWriter();
 
         state = State.STARTED;
         LOG.info("GraphAware Runtime started.");
@@ -146,13 +150,6 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      */
     private void startModules() {
         runtimeModuleManager.startModules();
-    }
-
-    /**
-     * Start the database writer.
-     */
-    private void startWriter() {
-        getDatabaseWriter().start();
     }
 
     /**
@@ -176,8 +173,8 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Object> beforeCommit(TransactionData data) {
-        LazyTransactionData transactionData = new LazyTransactionData(data);
+    public Map<String, Object> beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) throws Exception {
+        LazyTransactionData transactionData = new LazyTransactionData(data, transaction);
 
         if (!isStarted(transactionData)) {
             return null;
@@ -190,24 +187,24 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      * {@inheritDoc}
      */
     @Override
-    public final void afterCommit(TransactionData data, Map<String, Object> states) {
-        if (states == null) {
+    public void afterCommit(TransactionData data, Map<String, Object> state, GraphDatabaseService databaseService) {
+        if (state == null) {
             return;
         }
 
-        runtimeModuleManager.afterCommit(states);
+        runtimeModuleManager.afterCommit(state);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final void afterRollback(TransactionData data, Map<String, Object> states) {
-        if (states == null) {
+    public void afterRollback(TransactionData data, Map<String, Object> state, GraphDatabaseService databaseService) {
+        if (state == null) {
             return;
         }
 
-        runtimeModuleManager.afterRollback(states);
+        runtimeModuleManager.afterRollback(state);
     }
 
     /**
@@ -263,21 +260,20 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      * {@inheritDoc}
      */
     @Override
-    public void beforeShutdown() {
+    public void databaseShutdown(DatabaseEventContext eventContext) {
         LOG.info("Shutting down GraphAware Runtime... ");
 
         state = State.SHUTDOWN;
 
         doStop();
 
-        RuntimeRegistry.removeRuntime(database);
+        RuntimeRegistry.removeRuntime(eventContext.getDatabaseName());
 
         LOG.info("GraphAware Runtime shut down.");
     }
 
     protected void doStop() {
         runtimeModuleManager.shutdownModules();
-        getDatabaseWriter().stop();
     }
 
     /**
@@ -312,24 +308,8 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      * {@inheritDoc}
      */
     @Override
-    public final void kernelPanic(ErrorState error) {
+    public void databasePanic(DatabaseEventContext eventContext) {
         //do nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final Object getResource() {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final ExecutionOrder orderComparedTo(KernelEventHandler other) {
-        return ExecutionOrder.DOESNT_MATTER;
     }
 
     /**
@@ -338,13 +318,5 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
     @Override
     public RuntimeConfiguration getConfiguration() {
         return configuration;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Neo4jWriter getDatabaseWriter() {
-        return writer;
     }
 }

@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit test for {@link com.graphaware.common.description.property.LiteralPropertiesDescription}.
  */
-public class LiteralPropertiesDescriptionTest extends com.graphaware.common.description.property.PropertiesDescriptionTest {
+public class LiteralPropertiesDescriptionTest extends PropertiesDescriptionTest {
 
     @Test
     public void shouldContainCorrectKeys() {

@@ -19,6 +19,7 @@ package com.graphaware.common.policy.inclusion;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Entity;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * {@link ObjectInclusionPolicy} for {@link Entity}s.
@@ -34,5 +35,5 @@ public interface EntityInclusionPolicy<T extends Entity> extends ObjectInclusion
      * @param database to retrieve the {@link Entity}s from.
      * @return all {@link Entity}s matching the policy.
      */
-    Iterable<T> getAll(GraphDatabaseService database);
+    Iterable<T> getAll(Transaction database);
 }

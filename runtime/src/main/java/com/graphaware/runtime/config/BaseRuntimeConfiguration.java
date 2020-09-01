@@ -16,8 +16,7 @@
 
 package com.graphaware.runtime.config;
 
-import com.graphaware.runtime.write.WritingConfig;
-import org.neo4j.kernel.configuration.Config;
+import org.neo4j.configuration.Config;
 
 /**
  * Base-class for {@link RuntimeConfiguration} implementations.
@@ -25,19 +24,9 @@ import org.neo4j.kernel.configuration.Config;
 public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
 
     private final Config config;
-    private final WritingConfig writingConfig;
 
-    protected BaseRuntimeConfiguration(Config config, WritingConfig writingConfig) {
+    protected BaseRuntimeConfiguration(Config config) {
         this.config = config;
-        this.writingConfig = writingConfig;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public WritingConfig getWritingConfig() {
-        return writingConfig;
     }
 
     /**
@@ -53,14 +42,16 @@ public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         BaseRuntimeConfiguration that = (BaseRuntimeConfiguration) o;
 
-        if (!writingConfig.equals(that.writingConfig)) return false;
-
-        return true;
+        return config.equals(that.config);
     }
 
     /**
@@ -68,7 +59,6 @@ public abstract class BaseRuntimeConfiguration implements RuntimeConfiguration {
      */
     @Override
     public int hashCode() {
-        int result = writingConfig.hashCode();
-        return result;
+        return config.hashCode();
     }
 }

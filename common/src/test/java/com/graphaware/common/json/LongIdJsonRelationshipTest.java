@@ -35,8 +35,7 @@ public class LongIdJsonRelationshipTest extends UnitTest {
     private ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    protected void populate(GraphDatabaseService database) {
-        try (Transaction tx = database.beginTx()) {
+    protected void populate(Transaction database) {
             Node node1 = database.createNode(Label.label("L1"), Label.label("L2"));
             Node node2 = database.createNode();
 
@@ -50,16 +49,13 @@ public class LongIdJsonRelationshipTest extends UnitTest {
             Relationship r2 = node1.createRelationshipTo(node2, RelationshipType.withName("R2"));
             r2.setProperty("k1", "v2");
             r2.setProperty("k2", 4);
-
-            tx.success();
-        }
     }
 
     @Test
     public void shouldCorrectlySerialiseRelationships() throws JsonProcessingException, JSONException {
         try (Transaction tx = database.beginTx()) {
-            Relationship r = database.getRelationshipById(0);
-            Relationship r2 = database.getRelationshipById(1);
+            Relationship r = tx.getRelationshipById(0);
+            Relationship r2 = tx.getRelationshipById(1);
 
             JSONAssert.assertEquals("{\"id\":0,\"properties\":{\"k1\":\"v1\",\"k2\":2},\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r, null)), true);
             JSONAssert.assertEquals("{\"id\":0,\"properties\":{\"k1\":\"v1\",\"k2\":2},\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r)), true);

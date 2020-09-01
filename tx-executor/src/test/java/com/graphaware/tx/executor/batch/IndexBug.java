@@ -21,8 +21,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.*;
-import org.neo4j.harness.ServerControls;
-import org.neo4j.harness.TestServerBuilders;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import java.util.Iterator;
 
@@ -34,20 +34,20 @@ public class IndexBug {
     private static final int NUMBER_OF_NODES = 10_000;
     private static final int BATCH_SIZE = 1_000;
 
-    private ServerControls controls;
+    private Neo4j controls;
     protected GraphDatabaseService database;
 
     @BeforeEach
     public void setUp() {
-        controls = TestServerBuilders.newInProcessBuilder().newServer();
-        database = controls.graph();
+        controls = Neo4jBuilders.newInProcessBuilder().build();
+        database = controls.defaultDatabaseService();
 
         try (Transaction tx = database.beginTx()) {
             for (int i = 0; i < NUMBER_OF_NODES; i++) {
-                Node node = database.createNode();
+                Node node = tx.createNode();
                 node.addLabel(Label.label("FirstLabel"));
             }
-            tx.success();
+            tx.commit();
         }
     }
 
@@ -61,8 +61,8 @@ public class IndexBug {
         Iterator<Node> allNodes;
 
         try (Transaction tx = database.beginTx()) {
-            allNodes = database.findNodes(Label.label("FirstLabel"));
-            tx.success();
+            allNodes = tx.findNodes(Label.label("FirstLabel"));
+            tx.commit();
         }
 
         int counter = 0;
@@ -72,13 +72,13 @@ public class IndexBug {
 
         int i = 0;
         try (Transaction tx = database.beginTx()) {
-            ResourceIterator<Node> nodes = database.findNodes(Label.label("SecondLabel"));
+            ResourceIterator<Node> nodes = tx.findNodes(Label.label("SecondLabel"));
             while (nodes.hasNext()) {
                 i++;
                 nodes.next();
             }
 
-            tx.success();
+            tx.commit();
         }
 
         assertEquals(NUMBER_OF_NODES, i);
@@ -98,7 +98,7 @@ public class IndexBug {
                 System.out.println(next.getProperty("test", "nothing"));
                 //next.addLabel(Label.label("SecondLabel"));
             }
-            tx.success();
+            tx.commit();
         }
 
         return result;

@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.Label.label;
@@ -36,7 +37,7 @@ public class ChangeLoggerDemo extends DatabaseIntegrationTest {
 
     public void setUp() throws Exception {
         super.setUp();
-        getDatabase().registerTransactionEventHandler(new ChangeLogger());
+        getNeo4j().databaseManagementService().registerTransactionEventListener(getDatabase().databaseName(), new ChangeLogger());
     }
 
     @Test
@@ -50,7 +51,7 @@ public class ChangeLoggerDemo extends DatabaseIntegrationTest {
         //create nodes
         executor.executeInTransaction(new VoidReturningCallback() {
             @Override
-            protected void doInTx(GraphDatabaseService database) {
+            protected void doInTx(Transaction database) {
                 database.createNode(label("SomeLabel1"));
 
                 Node node1 = database.createNode(label("SomeLabel2"));
@@ -67,9 +68,9 @@ public class ChangeLoggerDemo extends DatabaseIntegrationTest {
         //create relationship
         executor.executeInTransaction(new VoidReturningCallback() {
             @Override
-            protected void doInTx(GraphDatabaseService database) {
-                Node one = database.getNodeById(1);
-                Node two = database.getNodeById(2);
+            protected void doInTx(Transaction tx) {
+                Node one = tx.getNodeById(1);
+                Node two = tx.getNodeById(2);
 
                 Relationship relationship = one.createRelationshipTo(two, withName("TEST"));
                 relationship.setProperty("level", 2);
@@ -81,21 +82,21 @@ public class ChangeLoggerDemo extends DatabaseIntegrationTest {
         //change and delete nodes
         executor.executeInTransaction(new VoidReturningCallback() {
             @Override
-            protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(3).delete();
-                database.getNodeById(1).setProperty("name", "New One");
-                database.getNodeById(1).setProperty("numbers", new int[]{1, 2, 3});
-                database.getNodeById(2).addLabel(label("NewLabel"));
+            protected void doInTx(Transaction tx) {
+                tx.getNodeById(3).delete();
+                tx.getNodeById(1).setProperty("name", "New One");
+                tx.getNodeById(1).setProperty("numbers", new int[]{1, 2, 3});
+                tx.getNodeById(2).addLabel(label("NewLabel"));
             }
         });
 
         //change and delete relationships
         executor.executeInTransaction(new VoidReturningCallback() {
             @Override
-            protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(2).getSingleRelationship(withName("TEST"), OUTGOING).delete();
+            protected void doInTx(Transaction tx) {
+                tx.getNodeById(2).getSingleRelationship(withName("TEST"), OUTGOING).delete();
 
-                database.getNodeById(1).getSingleRelationship(withName("TEST"), OUTGOING).setProperty("level", 3);
+                tx.getNodeById(1).getSingleRelationship(withName("TEST"), OUTGOING).setProperty("level", 3);
             }
         });
     }

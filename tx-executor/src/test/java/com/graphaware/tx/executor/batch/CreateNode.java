@@ -18,6 +18,7 @@ package com.graphaware.tx.executor.batch;
 
 import com.graphaware.tx.executor.NullItem;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * Unit of work that creates an empty node, intended for testing.
@@ -33,7 +34,7 @@ public class CreateNode implements UnitOfWork<NullItem> {
     }
 
     @Override
-    public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
+    public void execute(Transaction database, NullItem input, int batchNumber, int stepNumber) {
         database.createNode();
     }
 }

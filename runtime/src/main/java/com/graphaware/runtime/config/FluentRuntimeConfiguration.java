@@ -16,10 +16,8 @@
 
 package com.graphaware.runtime.config;
 
-import com.graphaware.runtime.write.FluentWritingConfig;
-import com.graphaware.runtime.write.WritingConfig;
+import org.neo4j.configuration.Config;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.configuration.Config;
 
 /**
  * {@link RuntimeConfiguration} for {@link com.graphaware.runtime.GraphAwareRuntime} with fluent interface.
@@ -33,11 +31,11 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      * @return The {@link FluentRuntimeConfiguration} instance.
      */
     public static FluentRuntimeConfiguration defaultConfiguration(GraphDatabaseService database) {
-        return new FluentRuntimeConfiguration(Config.defaults(), FluentWritingConfig.defaultConfiguration());
+        return new FluentRuntimeConfiguration(Config.defaults());
     }
 
-    private FluentRuntimeConfiguration(Config config, WritingConfig writingConfig) {
-        super(config, writingConfig);
+    private FluentRuntimeConfiguration(Config config) {
+        super(config);
     }
 
     /**
@@ -47,16 +45,6 @@ public final class FluentRuntimeConfiguration extends BaseRuntimeConfiguration {
      * @return new instance.
      */
     public FluentRuntimeConfiguration withConfig(Config config) {
-        return new FluentRuntimeConfiguration(config, getWritingConfig());
-    }
-
-    /**
-     * Create an instance with different {@link WritingConfig}.
-     *
-     * @param writingConfig of the new instance.
-     * @return new instance.
-     */
-    public FluentRuntimeConfiguration withWritingConfig(WritingConfig writingConfig) {
-        return new FluentRuntimeConfiguration(kernelConfig(), writingConfig);
+        return new FluentRuntimeConfiguration(config);
     }
 }

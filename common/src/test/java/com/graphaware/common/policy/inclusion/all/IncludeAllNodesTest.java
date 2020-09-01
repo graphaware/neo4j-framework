@@ -33,7 +33,7 @@ public class IncludeAllNodesTest extends UnitTest {
 
     @Override
     protected void populate(GraphDatabaseService database) {
-        database.execute("CREATE " +
+        database.executeTransactionally("CREATE " +
                 "(m:Employee {name:'Michal'})-[:WORKS_FOR {role:'Director', since:2013}]->(ga:Company {name:'GraphAware', form:'Ltd'})," +
                 "(v:Intern {name:'Vojta', age:25})-[:WORKS_FOR {since:2014, until:2014}]->(ga)," +
                 "(m)-[:LIVES_IN]->(l:Place {name:'London'})<-[:LIVES_IN]-(v)"
@@ -43,18 +43,18 @@ public class IncludeAllNodesTest extends UnitTest {
     @Test
     public void shouldIncludeAllNodes() {
         try (Transaction tx = database.beginTx()) {
-            for (Node node : database.getAllNodes()) {
+            for (Node node : tx.getAllNodes()) {
                 assertTrue(IncludeAllNodes.getInstance().include(node));
             }
-            tx.success();
+            tx.commit();
         }
     }
 
     @Test
     public void shouldGetAllNodes() {
         try (Transaction tx = database.beginTx()) {
-            assertEquals(4, IterableUtils.count(IncludeAllNodes.getInstance().getAll(database)));
-            tx.success();
+            assertEquals(4, IterableUtils.count(IncludeAllNodes.getInstance().getAll(tx)));
+            tx.commit();
         }
     }
 }

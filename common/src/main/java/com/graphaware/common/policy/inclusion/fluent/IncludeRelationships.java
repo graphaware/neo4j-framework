@@ -23,6 +23,7 @@ import com.graphaware.common.policy.inclusion.RelationshipInclusionPolicy;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 import java.util.Collections;
 
@@ -73,7 +74,7 @@ public class IncludeRelationships extends BaseIncludeRelationships<IncludeRelati
      * {@inheritDoc}
      */
     @Override
-    protected Iterable<Relationship> doGetAll(GraphDatabaseService database) {
+    protected Iterable<Relationship> doGetAll(Transaction database) {
         return database.getAllRelationships();
     }
 }

@@ -18,9 +18,9 @@ package com.graphaware.example.module;
 
 import com.graphaware.common.util.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 import static com.graphaware.common.util.IterableUtils.getSingleOrNull;
 import static com.graphaware.example.module.Labels.FriendshipCounter;
@@ -35,13 +35,10 @@ import static com.graphaware.example.module.Relationships.FRIEND_OF;
  */
 public class FriendshipStrengthCounter {
 
-    private final GraphDatabaseService database;
-
-    public FriendshipStrengthCounter(GraphDatabaseService database) {
-        this.database = database;
+    public FriendshipStrengthCounter() {
     }
 
-    public void handleCreatedFriendships(Iterable<Relationship> createdRelationships) {
+    public void handleCreatedFriendships(Transaction tx, Iterable<Relationship> createdRelationships) {
         long delta = 0L;
 
         for (Relationship newFriendship : createdRelationships) {
@@ -50,10 +47,10 @@ public class FriendshipStrengthCounter {
             }
         }
 
-        applyDelta(delta);
+        applyDelta(tx, delta);
     }
 
-    public void handleChangedFriendships(Iterable<Change<Relationship>> changedRelationships) {
+    public void handleChangedFriendships(Transaction tx, Iterable<Change<Relationship>> changedRelationships) {
         long delta = 0L;
 
         for (Change<Relationship> changedFriendship : changedRelationships) {
@@ -63,10 +60,10 @@ public class FriendshipStrengthCounter {
             }
         }
 
-        applyDelta(delta);
+        applyDelta(tx, delta);
     }
 
-    public void handleDeletedFriendships(Iterable<Relationship> deletedRelationships) {
+    public void handleDeletedFriendships(Transaction tx, Iterable<Relationship> deletedRelationships) {
         long delta = 0L;
 
         for (Relationship deletedFriendship : deletedRelationships) {
@@ -75,12 +72,12 @@ public class FriendshipStrengthCounter {
             }
         }
 
-        applyDelta(delta);
+        applyDelta(tx, delta);
     }
 
-    private void applyDelta(long delta) {
+    private void applyDelta(Transaction tx, long delta) {
         if (delta != 0L) {
-            Node root = getCounterNode(database);
+            Node root = getCounterNode(tx);
             root.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (long) root.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L) + delta);
         }
     }
@@ -91,7 +88,7 @@ public class FriendshipStrengthCounter {
      * @param database to find the node in.
      * @return counter node.
      */
-    private static Node getCounterNode(GraphDatabaseService database) {
+    private static Node getCounterNode(Transaction database) {
         Node result = getSingleOrNull(database.findNodes(FriendshipCounter));
 
         if (result != null) {
@@ -106,7 +103,7 @@ public class FriendshipStrengthCounter {
      *
      * @return total friendship strength.
      */
-    public long getTotalFriendshipStrength() {
-        return (long) getCounterNode(database).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L);
+    public long getTotalFriendshipStrength(Transaction tx) {
+        return (long) getCounterNode(tx).getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L);
     }
 }

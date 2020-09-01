@@ -32,11 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  */
 public class IncludeNoRelationshipsTest extends UnitTest {
 
-    private GraphDatabaseService database;
-
     @Override
     protected void populate(GraphDatabaseService database) {
-        database.execute("CREATE " +
+        database.executeTransactionally("CREATE " +
                 "(m:Employee {name:'Michal'})-[:WORKS_FOR {role:'Director', since:2013}]->(ga:Company {name:'GraphAware', form:'Ltd'})," +
                 "(v:Intern {name:'Vojta', age:25})-[:WORKS_FOR {since:2014, until:2014}]->(ga)," +
                 "(m)-[:LIVES_IN]->(l:Place {name:'London'})<-[:LIVES_IN]-(v)"
@@ -46,18 +44,18 @@ public class IncludeNoRelationshipsTest extends UnitTest {
     @Test
     public void shouldIncludeNoRels() {
         try (Transaction tx = database.beginTx()) {
-            for (Relationship r : database.getAllRelationships()) {
+            for (Relationship r : tx.getAllRelationships()) {
                 assertFalse(IncludeNoRelationships.getInstance().include(r));
             }
-            tx.success();
+            tx.commit();
         }
     }
 
     @Test
     public void shouldGetNoRels() {
         try (Transaction tx = database.beginTx()) {
-            assertEquals(0, IterableUtils.count(IncludeNoRelationships.getInstance().getAll(database)));
-            tx.success();
+            assertEquals(0, IterableUtils.count(IncludeNoRelationships.getInstance().getAll(tx)));
+            tx.commit();
         }
     }
 }

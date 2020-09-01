@@ -18,8 +18,8 @@ package com.graphaware.tx.event.improved;
 
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Entity;
-import org.neo4j.helpers.collection.Iterables;
-import org.neo4j.helpers.collection.MapUtil;
+import org.neo4j.internal.helpers.collection.Iterables;
+import org.neo4j.internal.helpers.collection.MapUtil;
 
 import java.util.Map;
 

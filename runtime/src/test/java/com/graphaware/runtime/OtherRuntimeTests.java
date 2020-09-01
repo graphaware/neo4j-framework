@@ -18,16 +18,19 @@ package com.graphaware.runtime;
 
 import com.graphaware.runtime.bootstrap.RuntimeKernelExtension;
 import org.junit.jupiter.api.RepeatedTest;
+import org.neo4j.configuration.SettingImpl;
+import org.neo4j.configuration.SettingValueParsers;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.harness.ServerControls;
-import org.neo4j.harness.TestServerBuilders;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import java.time.Duration;
 import java.util.Random;
 
+import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.*;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 /**
@@ -38,17 +41,17 @@ public class OtherRuntimeTests {
     private final Random random = new Random();
 
     @RepeatedTest(10)
-    public void makeSureDeadlockDoesNotOccur() throws InterruptedException {
-        ServerControls controls = TestServerBuilders.newInProcessBuilder().withConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true").newServer();
-        GraphDatabaseService database = controls.graph();
+    public void makeSureDeadlockDoesNotOccur() {
+        Neo4j controls = Neo4jBuilders.newInProcessBuilder().withConfig(RUNTIME_ENABLED, true).build();
+        GraphDatabaseService database = controls.defaultDatabaseService();
 
         assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
                     Thread.sleep(random.nextInt(10));
 
                     try (Transaction tx = database.beginTx()) {
-                        Node node = database.createNode(Label.label("TEST"));
+                        Node node = tx.createNode(Label.label("TEST"));
                         node.setProperty("test", "test");
-                        tx.success();
+                        tx.commit();
                     }
 
                     Thread.sleep(random.nextInt(200));
@@ -59,19 +62,19 @@ public class OtherRuntimeTests {
     }
 
     @RepeatedTest(10)
-    public void makeSureDeadlockDoesNotOccur1() throws InterruptedException {
-        ServerControls controls = TestServerBuilders.newInProcessBuilder().withConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true").newServer();
-        GraphDatabaseService database = controls.graph();
+    public void makeSureDeadlockDoesNotOccur1() {
+        Neo4j controls = Neo4jBuilders.newInProcessBuilder().withConfig(RUNTIME_ENABLED, true).build();
+        GraphDatabaseService database = controls.defaultDatabaseService();
 
         assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
             Thread.sleep(random.nextInt(10));
 
             try (Transaction tx = database.beginTx()) {
-                Node node1 = database.createNode();
+                Node node1 = tx.createNode();
                 node1.setProperty("name", "MB");
                 node1.addLabel(Label.label("Person"));
 
-                tx.success();
+                tx.commit();
             }
 
             Thread.sleep(random.nextInt(200));
@@ -82,14 +85,14 @@ public class OtherRuntimeTests {
 
     @RepeatedTest(10)
     public void makeSureDeadlockDoesNotOccur2() {
-        ServerControls controls = TestServerBuilders.newInProcessBuilder().withConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true").newServer();
-        GraphDatabaseService database = controls.graph();
+        Neo4j controls = Neo4jBuilders.newInProcessBuilder().withConfig(RUNTIME_ENABLED, true).build();
+        GraphDatabaseService database = controls.defaultDatabaseService();
 
         assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
             try (Transaction tx = database.beginTx()) {
-                Node node = database.createNode();
+                Node node = tx.createNode();
                 node.setProperty("test", "test");
-                tx.success();
+                tx.commit();
             }
         });
 
@@ -98,13 +101,13 @@ public class OtherRuntimeTests {
 
     @RepeatedTest(10)
     public void makeSureDeadlockDoesNotOccur3() {
-        ServerControls controls = TestServerBuilders.newInProcessBuilder().withConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true").newServer();
-        GraphDatabaseService database = controls.graph();
+        Neo4j controls = Neo4jBuilders.newInProcessBuilder().withConfig(RUNTIME_ENABLED, true).build();
+        GraphDatabaseService database = controls.defaultDatabaseService();
 
         assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
             try (Transaction tx = database.beginTx()) {
-                database.createNode();
-                tx.success();
+                tx.createNode();
+                tx.commit();
             }
         });
 
@@ -113,13 +116,13 @@ public class OtherRuntimeTests {
 
     @RepeatedTest(10)
     public void makeSureDeadlockDoesNotOccur4() {
-        ServerControls controls = TestServerBuilders.newInProcessBuilder().withConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true").newServer();
-        GraphDatabaseService database = controls.graph();
+        Neo4j controls = Neo4jBuilders.newInProcessBuilder().withConfig(RUNTIME_ENABLED, true).build();
+        GraphDatabaseService database = controls.defaultDatabaseService();
 
         assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
             try (Transaction tx = database.beginTx()) {
-                database.createNode(Label.label("TEST"));
-                tx.success();
+                tx.createNode(Label.label("TEST"));
+                tx.commit();
             }
         });
 
@@ -128,14 +131,14 @@ public class OtherRuntimeTests {
 
     @RepeatedTest(10)
     public void makeSureDeadlockDoesNotOccur5() {
-        ServerControls controls = TestServerBuilders.newInProcessBuilder().withConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true").newServer();
-        GraphDatabaseService database = controls.graph();
+        Neo4j controls = Neo4jBuilders.newInProcessBuilder().withConfig(RUNTIME_ENABLED, true).build();
+        GraphDatabaseService database = controls.defaultDatabaseService();
 
         assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
             try (Transaction tx = database.beginTx()) {
-                Node node = database.createNode(Label.label("TEST"));
+                Node node = tx.createNode(Label.label("TEST"));
                 node.setProperty("test", "test");
-                tx.success();
+                tx.commit();
             }
         });
 
@@ -144,14 +147,14 @@ public class OtherRuntimeTests {
 
     @RepeatedTest(10)
     public void makeSureDeadlockDoesNotOccur6() throws InterruptedException {
-        ServerControls controls = TestServerBuilders.newInProcessBuilder().withConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true").newServer();
-        GraphDatabaseService database = controls.graph();
+        Neo4j controls = Neo4jBuilders.newInProcessBuilder().withConfig(RUNTIME_ENABLED, true).build();
+        GraphDatabaseService database = controls.defaultDatabaseService();
 
         assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
             try (Transaction tx = database.beginTx()) {
-                Node node = database.createNode(Label.label("TEST"));
+                Node node = tx.createNode(Label.label("TEST"));
                 node.setProperty("test", "test");
-                tx.success();
+                tx.commit();
             }
         });
 

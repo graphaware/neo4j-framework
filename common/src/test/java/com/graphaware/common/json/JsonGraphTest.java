@@ -29,24 +29,20 @@ public class JsonGraphTest extends UnitTest {
     private ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    protected void populate(GraphDatabaseService database) {
-        try (Transaction tx = database.beginTx()) {
-            Node node1 = database.createNode(Label.label("L1"), Label.label("L2"));
-            Node node2 = database.createNode();
+    protected void populate(Transaction tx) {
+        Node node1 = tx.createNode(Label.label("L1"), Label.label("L2"));
+        Node node2 = tx.createNode();
 
-            node1.setProperty("k1", "v1");
-            node1.setProperty("k2", 2);
+        node1.setProperty("k1", "v1");
+        node1.setProperty("k2", 2);
 
-            Relationship r = node1.createRelationshipTo(node2, RelationshipType.withName("R"));
-            r.setProperty("k1", "v1");
-            r.setProperty("k2", 2);
+        Relationship r = node1.createRelationshipTo(node2, RelationshipType.withName("R"));
+        r.setProperty("k1", "v1");
+        r.setProperty("k2", 2);
 
-            Relationship r2 = node1.createRelationshipTo(node2, RelationshipType.withName("R2"));
-            r2.setProperty("k1", "v2");
-            r2.setProperty("k2", 4);
-
-            tx.success();
-        }
+        Relationship r2 = node1.createRelationshipTo(node2, RelationshipType.withName("R2"));
+        r2.setProperty("k1", "v2");
+        r2.setProperty("k2", 4);
     }
 
     @Test
@@ -54,11 +50,11 @@ public class JsonGraphTest extends UnitTest {
         Graph g = new Graph();
 
         try (Transaction tx = database.beginTx()) {
-            g.addNode(database.getNodeById(0));
-            g.addNode(database.getNodeById(1));
-            g.addRelationship(database.getRelationshipById(0));
-            g.addRelationship(database.getRelationshipById(1));
-            tx.success();
+            g.addNode(tx.getNodeById(0));
+            g.addNode(tx.getNodeById(1));
+            g.addRelationship(tx.getRelationshipById(0));
+            g.addRelationship(tx.getRelationshipById(1));
+            tx.commit();
         }
 
         JSONAssert.assertEquals("{\"nodes\":" +
@@ -76,11 +72,11 @@ public class JsonGraphTest extends UnitTest {
         Graph g = new Graph();
 
         try (Transaction tx = database.beginTx()) {
-            g.addRelationship(database.getRelationshipById(1));
-            g.addRelationship(database.getRelationshipById(0));
-            g.addNode(database.getNodeById(0));
-            g.addNode(database.getNodeById(1));
-            tx.success();
+            g.addRelationship(tx.getRelationshipById(1));
+            g.addRelationship(tx.getRelationshipById(0));
+            g.addNode(tx.getNodeById(0));
+            g.addNode(tx.getNodeById(1));
+            tx.commit();
         }
 
         JSONAssert.assertEquals("{\"nodes\":" +

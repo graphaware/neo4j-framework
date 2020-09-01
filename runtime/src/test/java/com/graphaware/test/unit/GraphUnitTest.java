@@ -29,7 +29,7 @@ import java.util.Collections;
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 import static com.graphaware.test.unit.GraphUnit.clearGraph;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -38,12 +38,12 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GraphUnitTest extends DatabaseIntegrationTest {
 
     private void populateDatabase(String cypher) {
-        getDatabase().execute(cypher);
+        getDatabase().executeTransactionally(cypher);
     }
 
     @Test
     public void clearGraphWithRuntimeShouldDeleteAllNodesAndRelsButNotGraphProps() {
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(getDatabase());
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(getNeo4j().databaseManagementService(), getDatabase());
         runtime.registerModule(new TestModule("test", Collections.singletonMap("test", "test")));
         runtime.start();
 
@@ -53,23 +53,23 @@ public class GraphUnitTest extends DatabaseIntegrationTest {
                     "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
 
             populateDatabase(cypher);
-            tx.success();
+            tx.commit();
         }
 
         try (Transaction tx = getDatabase().beginTx()) {
-            clearGraph(getDatabase(), InclusionPoliciesFactory.allBusiness());
-            tx.success();
+            clearGraph(tx, InclusionPoliciesFactory.allBusiness());
+            tx.commit();
         }
 
         try (Transaction tx = getDatabase().beginTx()) {
-            assertEquals(0, count(getDatabase().getAllNodes()));
-            tx.success();
+            assertEquals(0, count(tx.getAllNodes()));
+            tx.commit();
         }
     }
 
     @Test
     public void equalGraphsWithRuntimeShouldPassSameGraphTestBusinessStrategies() {
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(getDatabase());
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(getNeo4j().databaseManagementService(), getDatabase());
         runtime.start();
 
         String assertCypher = "CREATE " +

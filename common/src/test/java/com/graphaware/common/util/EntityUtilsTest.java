@@ -23,7 +23,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.internal.helpers.collection.Iterables;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,7 +41,7 @@ import static org.neo4j.graphdb.RelationshipType.withName;
 public class EntityUtilsTest extends UnitTest {
 
     @Override
-    protected void populate(GraphDatabaseService database) {
+    protected void populate(Transaction database) {
         database.execute("CREATE " +
                 "(a), " +
                 "(b {key:'value'})," +
@@ -52,7 +52,7 @@ public class EntityUtilsTest extends UnitTest {
     @Test
     public void shouldConvertEntitiesToMap() {
         try (Transaction tx = database.beginTx()) {
-            Map<Long, Node> nodeMap = entitiesToMap(Iterables.asList(database.getAllNodes()));
+            Map<Long, Node> nodeMap = entitiesToMap(Iterables.asList(tx.getAllNodes()));
             assertEquals(0, nodeMap.get(0L).getId());
             assertEquals(1, nodeMap.get(1L).getId());
             assertEquals(2, nodeMap.get(2L).getId());
@@ -63,14 +63,14 @@ public class EntityUtilsTest extends UnitTest {
     @Test
     public void shouldFindNodeIds() {
         try (Transaction tx = database.beginTx()) {
-            assertEquals("[0, 1, 2]", Arrays.toString(ids(database.getAllNodes())));
+            assertEquals("[0, 1, 2]", Arrays.toString(ids(tx.getAllNodes())));
         }
     }
 
     @Test
     public void shouldFindRelationshipIds() {
         try (Transaction tx = database.beginTx()) {
-            assertEquals("[0]", Arrays.toString((ids(database.getAllRelationships()))));
+            assertEquals("[0]", Arrays.toString((ids(tx.getAllRelationships()))));
         }
     }
 
@@ -88,11 +88,11 @@ public class EntityUtilsTest extends UnitTest {
     @Test
     public void verifyPropertiesToMap() {
         try (Transaction tx = database.beginTx()) {
-            assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
+            assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(tx.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
 
-            assertEquals(Collections.singletonMap("key", (Object) "value"), propertiesToMap(database.getNodeById(2)));
+            assertEquals(Collections.singletonMap("key", (Object) "value"), propertiesToMap(tx.getNodeById(2)));
 
-            assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(database.getNodeById(2), new ObjectInclusionPolicy<String>() {
+            assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(tx.getNodeById(2), new ObjectInclusionPolicy<String>() {
                 @Override
                 public boolean include(String object) {
                     return !"key".equals(object);
@@ -106,7 +106,7 @@ public class EntityUtilsTest extends UnitTest {
         destroyDatabase();
         createDatabase();
 
-        database.execute("CREATE " +
+        database.executeTransactionally("CREATE " +
                 "(a), " +
                 "(b {name:'node1'})," +
                 "(c {name:'node2'})," +
@@ -114,8 +114,8 @@ public class EntityUtilsTest extends UnitTest {
                 "(c)-[:test {key1:'value1'}]->(a)");
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(2, deleteNodeAndRelationships(database.getNodeById(2)));
-            tx.success();
+            assertEquals(2, deleteNodeAndRelationships(tx.getNodeById(2)));
+            tx.commit();
         }
     }
 
@@ -125,19 +125,19 @@ public class EntityUtilsTest extends UnitTest {
         int expected = 123;
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(expected, getInt(database.getNodeById(0), "test"));
-            assertEquals(expected, getInt(database.getNodeById(1), "test"));
-            assertEquals(expected, getInt(database.getNodeById(2), "test"));
+            assertEquals(expected, getInt(tx.getNodeById(0), "test"));
+            assertEquals(expected, getInt(tx.getNodeById(1), "test"));
+            assertEquals(expected, getInt(tx.getNodeById(2), "test"));
 
             assertThrows(ClassCastException.class, () -> {
-                getInt(database.getNodeById(3), "test");
+                getInt(tx.getNodeById(3), "test");
             });
 
             assertThrows(NotFoundException.class, () -> {
-                getInt(database.getNodeById(4), "test");
+                getInt(tx.getNodeById(4), "test");
             });
 
-            tx.success();
+            tx.commit();
         }
     }
 
@@ -147,16 +147,16 @@ public class EntityUtilsTest extends UnitTest {
         int expected = 123;
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(expected, getInt(database.getNodeById(0), "test", 123));
-            assertEquals(expected, getInt(database.getNodeById(1), "test", 123));
-            assertEquals(expected, getInt(database.getNodeById(2), "test", 123));
-            assertEquals(expected, getInt(database.getNodeById(4), "test", 123));
+            assertEquals(expected, getInt(tx.getNodeById(0), "test", 123));
+            assertEquals(expected, getInt(tx.getNodeById(1), "test", 123));
+            assertEquals(expected, getInt(tx.getNodeById(2), "test", 123));
+            assertEquals(expected, getInt(tx.getNodeById(4), "test", 123));
 
             assertThrows(ClassCastException.class, () -> {
-                getInt(database.getNodeById(3), "test", 123);
+                getInt(tx.getNodeById(3), "test", 123);
             });
 
-            tx.success();
+            tx.commit();
         }
     }
 
@@ -166,19 +166,19 @@ public class EntityUtilsTest extends UnitTest {
         long expected = 123L;
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(expected, getLong(database.getNodeById(0), "test"));
-            assertEquals(expected, getLong(database.getNodeById(1), "test"));
-            assertEquals(expected, getLong(database.getNodeById(2), "test"));
+            assertEquals(expected, getLong(tx.getNodeById(0), "test"));
+            assertEquals(expected, getLong(tx.getNodeById(1), "test"));
+            assertEquals(expected, getLong(tx.getNodeById(2), "test"));
 
             assertThrows(ClassCastException.class, () -> {
-                getLong(database.getNodeById(3), "test");
+                getLong(tx.getNodeById(3), "test");
             });
 
             assertThrows(NotFoundException.class, () -> {
-                getLong(database.getNodeById(4), "test");
+                getLong(tx.getNodeById(4), "test");
             });
 
-            tx.success();
+            tx.commit();
         }
     }
 
@@ -188,16 +188,16 @@ public class EntityUtilsTest extends UnitTest {
         long expected = 123L;
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(expected, getLong(database.getNodeById(0), "test", 123L));
-            assertEquals(expected, getLong(database.getNodeById(1), "test", 123L));
-            assertEquals(expected, getLong(database.getNodeById(2), "test", 123L));
-            assertEquals(expected, getLong(database.getNodeById(4), "test", 123L));
+            assertEquals(expected, getLong(tx.getNodeById(0), "test", 123L));
+            assertEquals(expected, getLong(tx.getNodeById(1), "test", 123L));
+            assertEquals(expected, getLong(tx.getNodeById(2), "test", 123L));
+            assertEquals(expected, getLong(tx.getNodeById(4), "test", 123L));
 
             assertThrows(ClassCastException.class, () -> {
-                getLong(database.getNodeById(3), "test", 123L);
+                getLong(tx.getNodeById(3), "test", 123L);
             });
 
-            tx.success();
+            tx.commit();
         }
     }
 
@@ -207,20 +207,20 @@ public class EntityUtilsTest extends UnitTest {
         float expected = 123.0f;
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(expected, getFloat(database.getNodeById(0), "test"),0);
-            assertEquals(expected, getFloat(database.getNodeById(1), "test"),0);
-            assertEquals(expected, getFloat(database.getNodeById(2), "test"),0);
-            assertEquals(expected, getFloat(database.getNodeById(5), "test"),0);
+            assertEquals(expected, getFloat(tx.getNodeById(0), "test"),0);
+            assertEquals(expected, getFloat(tx.getNodeById(1), "test"),0);
+            assertEquals(expected, getFloat(tx.getNodeById(2), "test"),0);
+            assertEquals(expected, getFloat(tx.getNodeById(5), "test"),0);
 
             assertThrows(ClassCastException.class, () -> {
-                getFloat(database.getNodeById(3), "test");
+                getFloat(tx.getNodeById(3), "test");
             });
 
             assertThrows(NotFoundException.class, () -> {
-                getFloat(database.getNodeById(4), "test");
+                getFloat(tx.getNodeById(4), "test");
             });
 
-            tx.success();
+            tx.commit();
         }
     }
 
@@ -230,17 +230,17 @@ public class EntityUtilsTest extends UnitTest {
         long expected = 123L;
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(expected, getFloat(database.getNodeById(0), "test", 123L),0);
-            assertEquals(expected, getFloat(database.getNodeById(1), "test", 123L),0);
-            assertEquals(expected, getFloat(database.getNodeById(2), "test", 123L),0);
-            assertEquals(expected, getFloat(database.getNodeById(4), "test", 123L),0);
-            assertEquals(expected, getFloat(database.getNodeById(5), "test", 123L),0);
+            assertEquals(expected, getFloat(tx.getNodeById(0), "test", 123L),0);
+            assertEquals(expected, getFloat(tx.getNodeById(1), "test", 123L),0);
+            assertEquals(expected, getFloat(tx.getNodeById(2), "test", 123L),0);
+            assertEquals(expected, getFloat(tx.getNodeById(4), "test", 123L),0);
+            assertEquals(expected, getFloat(tx.getNodeById(5), "test", 123L),0);
 
             assertThrows(ClassCastException.class, () -> {
-                getFloat(database.getNodeById(3), "test", 123L);
+                getFloat(tx.getNodeById(3), "test", 123L);
             });
 
-            tx.success();
+            tx.commit();
         }
     }
 
@@ -249,13 +249,13 @@ public class EntityUtilsTest extends UnitTest {
         createDatabase();
 
         try (Transaction tx = database.beginTx()) {
-            database.createNode().setProperty("test", (byte) 123);
-            database.createNode().setProperty("test", 123);
-            database.createNode().setProperty("test", 123L);
-            database.createNode().setProperty("test", "string");
-            database.createNode();
-            database.createNode().setProperty("test", 123.0f);
-            tx.success();
+            tx.createNode().setProperty("test", (byte) 123);
+            tx.createNode().setProperty("test", 123);
+            tx.createNode().setProperty("test", 123L);
+            tx.createNode().setProperty("test", "string");
+            tx.createNode();
+            tx.createNode().setProperty("test", 123.0f);
+            tx.commit();
         }
     }
 }

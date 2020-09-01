@@ -22,11 +22,9 @@ import com.graphaware.test.integration.DatabaseIntegrationTest;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.junit.jupiter.api.Test;
-import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.TransactionData;
-import org.neo4j.graphdb.event.TransactionEventHandler;
+import org.neo4j.graphdb.event.TransactionEventListenerAdapter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -50,16 +48,16 @@ public class AdditionalModificationsIntegrationTest extends DatabaseIntegrationT
 
     @Test
     public void additionalCreatesShouldNotImpactTxData() {
-        getDatabase().registerTransactionEventHandler(new TransactionEventHandler.Adapter<Void>(){
+        getNeo4j().databaseManagementService().registerTransactionEventListener(getNeo4j().defaultDatabaseService().databaseName(), new TransactionEventListenerAdapter<Void>() {
 
             @Override
-            public Void beforeCommit(TransactionData data) throws Exception {
-                ImprovedTransactionData transactionData = new LazyTransactionData(data);
+            public Void beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) throws Exception {
+                ImprovedTransactionData transactionData = new LazyTransactionData(data, transaction);
 
                 assertEquals(1, transactionData.getAllCreatedNodes().size());
 
                 for (Node node : transactionData.getAllCreatedNodes()) {
-                    Node unknownCity = node.getGraphDatabase().createNode(Label.label("City"));
+                    Node unknownCity = transaction.createNode(Label.label("City"));
                     node.createRelationshipTo(unknownCity, RelationshipType.withName("LIVES_IN"));
                 }
 

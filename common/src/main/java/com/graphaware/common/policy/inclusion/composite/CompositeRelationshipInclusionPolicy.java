@@ -20,6 +20,7 @@ import com.graphaware.common.policy.inclusion.RelationshipInclusionPolicy;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * {@link CompositeEntityInclusionPolicy} for {@link Relationship}s.
@@ -49,7 +50,7 @@ public final class CompositeRelationshipInclusionPolicy extends CompositeEntityI
      * {@inheritDoc}
      */
     @Override
-    protected Iterable<Relationship> doGetAll(GraphDatabaseService database) {
+    protected Iterable<Relationship> doGetAll(Transaction database) {
         return database.getAllRelationships();
     }
 }

@@ -14,17 +14,18 @@
   ~ <http://www.gnu.org/licenses />.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>module-parent</artifactId>
-    <version>3.5.19.58-SNAPSHOT</version>
+    <version>4.0.7.58-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>graphaware-parent</artifactId>
-        <version>3.5.19.58-SNAPSHOT</version>
+        <version>4.0.7.58-SNAPSHOT</version>
     </parent>
 
     <name>GraphAware Neo4j Module</name>
@@ -175,12 +176,15 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>3.2.0</version>
                 <configuration>
                     <links>
-                        <link>https://neo4j.com/docs/java-reference/3.5/javadocs/</link>
+                        <link>https://neo4j.com/docs/java-reference/4.0/javadocs/</link>
                         <link>http://graphaware.com/site/framework/latest/apidocs/</link>
                     </links>
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                    <additionalOptions>-Xdoclint:none</additionalOptions>
+                    <additionalJOption>-Xdoclint:none</additionalJOption>
                 </configuration>
                 <executions>
                     <execution>

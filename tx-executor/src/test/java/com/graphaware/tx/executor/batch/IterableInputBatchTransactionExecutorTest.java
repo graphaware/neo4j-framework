@@ -25,8 +25,8 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.harness.ServerControls;
-import org.neo4j.harness.TestServerBuilders;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,13 +40,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class IterableInputBatchTransactionExecutorTest {
 
-    private ServerControls controls;
+    private Neo4j controls;
     protected GraphDatabaseService database;
 
     @BeforeEach
     public void setUp() {
-        controls = TestServerBuilders.newInProcessBuilder().newServer();
-        database = controls.graph();
+        controls = Neo4jBuilders.newInProcessBuilder().build();
+        database = controls.defaultDatabaseService();
     }
 
     @AfterEach
@@ -60,8 +60,8 @@ public class IterableInputBatchTransactionExecutorTest {
 
         BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, 2, nodeNames, new UnitOfWork<String>() {
             @Override
-            public void execute(GraphDatabaseService database, String nodeName, int batchNumber, int stepNumber) {
-                Node node = database.createNode();
+            public void execute(Transaction tx, String nodeName, int batchNumber, int stepNumber) {
+                Node node = tx.createNode();
                 node.setProperty("name", nodeName + batchNumber + stepNumber);
             }
         });
@@ -69,10 +69,10 @@ public class IterableInputBatchTransactionExecutorTest {
         executor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(3, countNodes(database));
-            assertEquals("Name111", database.getNodeById(0).getProperty("name"));
-            assertEquals("Name212", database.getNodeById(1).getProperty("name"));
-            assertEquals("Name321", database.getNodeById(20).getProperty("name"));
+            assertEquals(3, countNodes(tx));
+            assertEquals("Name111", tx.getNodeById(0).getProperty("name"));
+            assertEquals("Name212", tx.getNodeById(1).getProperty("name"));
+            assertEquals("Name321", tx.getNodeById(20).getProperty("name"));
         }
     }
 
@@ -80,16 +80,16 @@ public class IterableInputBatchTransactionExecutorTest {
     public void iterableAcquiredInTransactionShouldBeProcessed() {
         try (Transaction tx = database.beginTx()) {
             for (int i = 0; i < 100; i++) {
-                database.createNode();
+                tx.createNode();
             }
-            tx.success();
+            tx.commit();
         }
 
         BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, 10,
                 new AllNodes(database, 10),
                 new UnitOfWork<Node>() {
                     @Override
-                    public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
+                    public void execute(Transaction tx, Node node, int batchNumber, int stepNumber) {
                         node.setProperty("name", "Name" + batchNumber + stepNumber);
                     }
                 }
@@ -98,12 +98,12 @@ public class IterableInputBatchTransactionExecutorTest {
         executor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals("Name11", database.getNodeById(0).getProperty("name"));
-            assertEquals("Name12", database.getNodeById(1).getProperty("name"));
-            assertEquals("Name13", database.getNodeById(2).getProperty("name"));
-            assertEquals("Name108", database.getNodeById(97).getProperty("name"));
-            assertEquals("Name109", database.getNodeById(98).getProperty("name"));
-            assertEquals("Name1010", database.getNodeById(99).getProperty("name"));
+            assertEquals("Name11", tx.getNodeById(0).getProperty("name"));
+            assertEquals("Name12", tx.getNodeById(1).getProperty("name"));
+            assertEquals("Name13", tx.getNodeById(2).getProperty("name"));
+            assertEquals("Name108", tx.getNodeById(97).getProperty("name"));
+            assertEquals("Name109", tx.getNodeById(98).getProperty("name"));
+            assertEquals("Name1010", tx.getNodeById(99).getProperty("name"));
         }
     }
 
@@ -111,16 +111,16 @@ public class IterableInputBatchTransactionExecutorTest {
     public void iterorAcquiredInTransactionShouldBeProcessed() {
         try (Transaction tx = database.beginTx()) {
             for (int i = 0; i < 100; i++) {
-                database.createNode(Label.label("Test"));
+                tx.createNode(Label.label("Test"));
             }
-            tx.success();
+            tx.commit();
         }
 
         BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, 10,
                 new AllNodesWithLabel(database, 10, Label.label("Test")),
                 new UnitOfWork<Node>() {
                     @Override
-                    public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
+                    public void execute(Transaction tx, Node node, int batchNumber, int stepNumber) {
                         node.setProperty("name", "Name" + batchNumber + stepNumber);
                     }
                 }
@@ -129,12 +129,12 @@ public class IterableInputBatchTransactionExecutorTest {
         executor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals("Name11", database.getNodeById(0).getProperty("name"));
-            assertEquals("Name12", database.getNodeById(1).getProperty("name"));
-            assertEquals("Name13", database.getNodeById(2).getProperty("name"));
-            assertEquals("Name108", database.getNodeById(97).getProperty("name"));
-            assertEquals("Name109", database.getNodeById(98).getProperty("name"));
-            assertEquals("Name1010", database.getNodeById(99).getProperty("name"));
+            assertEquals("Name11", tx.getNodeById(0).getProperty("name"));
+            assertEquals("Name12", tx.getNodeById(1).getProperty("name"));
+            assertEquals("Name13", tx.getNodeById(2).getProperty("name"));
+            assertEquals("Name108", tx.getNodeById(97).getProperty("name"));
+            assertEquals("Name109", tx.getNodeById(98).getProperty("name"));
+            assertEquals("Name1010", tx.getNodeById(99).getProperty("name"));
         }
     }
 
@@ -143,9 +143,9 @@ public class IterableInputBatchTransactionExecutorTest {
         final Label label = Label.label("TEST");
 
         try (Transaction tx = database.beginTx()) {
-            database.createNode(label);
-            database.createNode(label);
-            tx.success();
+            tx.createNode(label);
+            tx.createNode(label);
+            tx.commit();
         }
 
         final AtomicInteger count = new AtomicInteger(0);
@@ -153,7 +153,7 @@ public class IterableInputBatchTransactionExecutorTest {
         new IterableInputBatchTransactionExecutor<>(database, 100, new AllNodesWithLabel(database, 100, label),
                 new UnitOfWork<Node>() {
                     @Override
-                    public void execute(GraphDatabaseService database, Node input, int batchNumber, int stepNumber) {
+                    public void execute(Transaction tx, Node input, int batchNumber, int stepNumber) {
                         count.incrementAndGet();
                     }
                 }

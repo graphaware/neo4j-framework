@@ -19,12 +19,12 @@ package com.graphaware.test.integration;
 import com.graphaware.test.data.DatabasePopulator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.neo4j.configuration.GraphDatabaseSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.factory.GraphDatabaseSettings;
-import org.neo4j.harness.ServerControls;
-import org.neo4j.harness.TestServerBuilder;
-import org.neo4j.harness.TestServerBuilders;
-import org.neo4j.kernel.impl.proc.Procedures;
+import org.neo4j.graphdb.config.Setting;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilder;
+import org.neo4j.harness.Neo4jBuilders;
 
 import java.util.Collections;
 import java.util.Map;
@@ -39,11 +39,11 @@ import java.util.Map;
  */
 public abstract class DatabaseIntegrationTest {
 
-    private ServerControls database;
+    private Neo4j database;
 
     @BeforeEach
     public void setUp() throws Exception {
-        TestServerBuilder builder = TestServerBuilders.newInProcessBuilder();
+        Neo4jBuilder builder = Neo4jBuilders.newInProcessBuilder();
 
         builder = configure(builder);
 
@@ -51,9 +51,9 @@ public abstract class DatabaseIntegrationTest {
             builder = registerProceduresAndFunctions(builder);
         }
 
-        database = builder.newServer();
+        database = builder.build();
 
-        populateDatabase(database.graph());
+        populateDatabase(database.defaultDatabaseService());
     }
 
     @AfterEach
@@ -94,7 +94,7 @@ public abstract class DatabaseIntegrationTest {
      *
      * @param builder to register against.
      */
-    protected TestServerBuilder registerProceduresAndFunctions(TestServerBuilder builder) throws Exception {
+    protected Neo4jBuilder registerProceduresAndFunctions(Neo4jBuilder builder) throws Exception {
         //no-op by default
 
         return builder;
@@ -107,13 +107,17 @@ public abstract class DatabaseIntegrationTest {
         return null;
     }
 
+    protected Neo4j getNeo4j() {
+        return database;
+    }
+
     /**
      * Get the database instantiated for this test.
      *
      * @return database.
      */
     protected GraphDatabaseService getDatabase() {
-        return database.graph();
+        return database.defaultDatabaseService();
     }
 
     /**
@@ -125,14 +129,14 @@ public abstract class DatabaseIntegrationTest {
      *
      * @param builder to populate.
      */
-    protected TestServerBuilder configure(TestServerBuilder builder) {
-        builder = builder.withConfig(GraphDatabaseSettings.auth_enabled.name(), Boolean.toString(authEnabled()));
+    protected Neo4jBuilder configure(Neo4jBuilder builder) {
+        builder = builder.withConfig(GraphDatabaseSettings.auth_enabled, authEnabled());
 
         if (configFile() != null) {
             IntegrationTestUtils.applyConfig(builder, configFile());
         }
 
-        for (Map.Entry<String, String> config : additionalServerConfiguration().entrySet()) {
+        for (Map.Entry<Setting, String> config : additionalServerConfiguration().entrySet()) {
             builder = builder.withConfig(config.getKey(), config.getValue());
         }
 
@@ -146,7 +150,7 @@ public abstract class DatabaseIntegrationTest {
      *
      * @return map of configuration key-value pairs.
      */
-    protected Map<String, String> additionalServerConfiguration() {
+    protected Map<Setting, String> additionalServerConfiguration() {
         return Collections.emptyMap();
     }
 

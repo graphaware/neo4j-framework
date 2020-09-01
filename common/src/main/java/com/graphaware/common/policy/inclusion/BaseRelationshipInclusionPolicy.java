@@ -18,9 +18,10 @@ package com.graphaware.common.policy.inclusion;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 /**
- * Base class for {@link RelationshipInclusionPolicy} implementations. Implements the {@link #getAll(GraphDatabaseService)} method
+ * Base class for {@link RelationshipInclusionPolicy} implementations. Implements the {@link #getAll(Transaction)} method
  * in the most naive way possible.
  */
 public abstract class BaseRelationshipInclusionPolicy extends BaseEntityInclusionPolicy<Relationship> implements RelationshipInclusionPolicy {
@@ -29,7 +30,7 @@ public abstract class BaseRelationshipInclusionPolicy extends BaseEntityInclusio
      * {@inheritDoc}
      */
     @Override
-    protected Iterable<Relationship> doGetAll(GraphDatabaseService database) {
+    protected Iterable<Relationship> doGetAll(Transaction database) {
         return database.getAllRelationships();
     }
 }

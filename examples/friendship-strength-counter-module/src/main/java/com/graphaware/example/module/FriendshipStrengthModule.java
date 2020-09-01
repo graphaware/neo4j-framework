@@ -38,7 +38,7 @@ public class FriendshipStrengthModule extends BaseModule<Void> {
 
     public FriendshipStrengthModule(String moduleId, GraphDatabaseService database) {
         super(moduleId);
-        this.counter = new FriendshipStrengthCounter(database);
+        this.counter = new FriendshipStrengthCounter();
 
         //only take into account relationships with FRIEND_OF type:
         configuration = FluentModuleConfiguration
@@ -67,9 +67,9 @@ public class FriendshipStrengthModule extends BaseModule<Void> {
     @Override
     public Void beforeCommit(ImprovedTransactionData transactionData) {
         if (transactionData.mutationsOccurred()) {
-            counter.handleCreatedFriendships(transactionData.getAllCreatedRelationships());
-            counter.handleChangedFriendships(transactionData.getAllChangedRelationships());
-            counter.handleDeletedFriendships(transactionData.getAllDeletedRelationships());
+            counter.handleCreatedFriendships(transactionData.getTransaction(), transactionData.getAllCreatedRelationships());
+            counter.handleChangedFriendships(transactionData.getTransaction(), transactionData.getAllChangedRelationships());
+            counter.handleDeletedFriendships(transactionData.getTransaction(), transactionData.getAllDeletedRelationships());
         }
 
         return null;

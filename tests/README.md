@@ -84,7 +84,7 @@ public class HelloWorldNodeCreator {
         try (Transaction tx = database.beginTx()) {
             node = database.createNode(Label.label("HelloWorld"));
             node.setProperty("hello", "world");
-            tx.success();
+            tx.commit();
         }
 
         return node;
@@ -115,7 +115,7 @@ public class HelloWorldNodeCreatorTest extends EmbeddedDatabaseIntegrationTest {
 
         try (Transaction tx = getDatabase().beginTx()) {
             assertEquals("world", node.getProperty("hello"));
-            tx.success();
+            tx.commit();
         }
 
         GraphUnit.assertSameGraph(getDatabase(), "CREATE (:HelloWorld {hello:'world'})");
@@ -162,7 +162,7 @@ public class HelloWorldServerPluginTest extends EmbeddedDatabaseIntegrationTest 
 
         try (Transaction tx = getDatabase().beginTx()) {
             assertEquals("world", node.getProperty("hello"));
-            tx.success();
+            tx.commit();
         }
 
         GraphUnit.assertSameGraph(getDatabase(), "CREATE (:HelloWorld {hello:'world'})");
@@ -333,7 +333,7 @@ public class HelloWorldControllerTest extends EmbeddedDatabaseIntegrationTest {
 
         try (Transaction tx = getDatabase().beginTx()) {
             assertEquals("world", getDatabase().getNodeById(nodeId).getProperty("hello"));
-            tx.success();
+            tx.commit();
         }
 
         GraphUnit.assertSameGraph(getDatabase(), "CREATE (:HelloWorld {hello:'world'})");
