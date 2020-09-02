@@ -63,7 +63,7 @@ public class LongIdJsonNodeTest {
     public void shouldCorrectlyProduceEntity() {
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(tx.getNodeById(1));
-            jsonNode.produceEntity(database);
+            jsonNode.produceEntity(tx);
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -71,7 +71,7 @@ public class LongIdJsonNodeTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(tx.getNodeById(1), new TimesThousandNodeIdTransformer());
-            jsonNode.produceEntity(database);
+            jsonNode.produceEntity(tx);
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -79,7 +79,7 @@ public class LongIdJsonNodeTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(tx.getNodeById(1));
-            jsonNode.produceEntity(database, new TimesThousandNodeIdTransformer());
+            jsonNode.produceEntity(tx, new TimesThousandNodeIdTransformer());
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -87,7 +87,7 @@ public class LongIdJsonNodeTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(tx.getNodeById(1), new TimesThousandNodeIdTransformer());
-            jsonNode.produceEntity(database, new TimesThousandNodeIdTransformer());
+            jsonNode.produceEntity(tx, new TimesThousandNodeIdTransformer());
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -95,7 +95,7 @@ public class LongIdJsonNodeTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(tx.getNodeById(1), new String[0]);
-            jsonNode.produceEntity(database, new TimesThousandNodeIdTransformer());
+            jsonNode.produceEntity(tx, new TimesThousandNodeIdTransformer());
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -103,7 +103,7 @@ public class LongIdJsonNodeTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(tx.getNodeById(1), new String[0], new TimesThousandNodeIdTransformer());
-            jsonNode.produceEntity(database, new TimesThousandNodeIdTransformer());
+            jsonNode.produceEntity(tx, new TimesThousandNodeIdTransformer());
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -111,7 +111,7 @@ public class LongIdJsonNodeTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(1);
-            Node node = jsonNode.produceEntity(database);
+            Node node = jsonNode.produceEntity(tx);
             assertEquals(node, tx.getNodeById(1));
 
             tx.commit();
@@ -119,7 +119,7 @@ public class LongIdJsonNodeTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(1000);
-            Node node = jsonNode.produceEntity(database, new TimesThousandNodeIdTransformer());
+            Node node = jsonNode.produceEntity(tx, new TimesThousandNodeIdTransformer());
             assertEquals(node, tx.getNodeById(1));
 
             tx.commit();
@@ -127,7 +127,7 @@ public class LongIdJsonNodeTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(0, new String[]{"test"}, Collections.singletonMap("k", "v"));
-            jsonNode.produceEntity(database);
+            jsonNode.produceEntity(tx);
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -135,7 +135,7 @@ public class LongIdJsonNodeTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(0, new String[]{"test"}, Collections.singletonMap("k", "v"));
-            jsonNode.produceEntity(database, new TimesThousandNodeIdTransformer());
+            jsonNode.produceEntity(tx, new TimesThousandNodeIdTransformer());
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -143,7 +143,7 @@ public class LongIdJsonNodeTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(555, new String[]{"test"}, Collections.singletonMap("k", "v"));
-            jsonNode.produceEntity(database);
+            jsonNode.produceEntity(tx);
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -151,7 +151,7 @@ public class LongIdJsonNodeTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(5000, new String[]{"test"}, Collections.singletonMap("k", "v"));
-            jsonNode.produceEntity(database, new TimesThousandNodeIdTransformer());
+            jsonNode.produceEntity(tx, new TimesThousandNodeIdTransformer());
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -159,7 +159,7 @@ public class LongIdJsonNodeTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(new String[]{"Test"}, Collections.singletonMap("k", "v"));
-            Node n = jsonNode.produceEntity(database, new TimesThousandNodeIdTransformer());
+            Node n = jsonNode.produceEntity(tx, new TimesThousandNodeIdTransformer());
             assertEquals(20, n.getId());
 
             tx.commit();
@@ -167,7 +167,7 @@ public class LongIdJsonNodeTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(new String[]{"Test"}, Collections.singletonMap("k", "v"));
-            Node n = jsonNode.produceEntity(database);
+            Node n = jsonNode.produceEntity(tx);
             assertEquals(2, n.getId());
 
             tx.commit();

@@ -58,7 +58,7 @@ public abstract class UnitTest {
     }
 
     protected final void createDatabase() {
-        controls = Neo4jBuilders.newInProcessBuilder().build();
+        controls = Neo4jBuilders.newInProcessBuilder().withDisabledServer().build();
         database = controls.defaultDatabaseService();
     }
 

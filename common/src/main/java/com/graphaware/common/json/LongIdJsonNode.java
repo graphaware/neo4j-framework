@@ -20,6 +20,7 @@ import com.graphaware.common.transform.NodeIdTransformer;
 import com.graphaware.common.transform.TrivialNodeIdTransformer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 import java.util.Map;
 
@@ -65,7 +66,7 @@ public class LongIdJsonNode extends JsonNode<Long> {
      * {@inheritDoc}
      */
     @Override
-    public Node produceEntity(GraphDatabaseService database) {
-        return produceEntity(database, TrivialNodeIdTransformer.getInstance());
+    public Node produceEntity(Transaction tx) {
+        return produceEntity(tx, TrivialNodeIdTransformer.getInstance());
     }
 }

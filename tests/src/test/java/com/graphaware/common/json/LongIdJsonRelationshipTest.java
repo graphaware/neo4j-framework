@@ -68,7 +68,7 @@ public class LongIdJsonRelationshipTest {
     public void shouldCorrectlyProduceEntity() {
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship rel = new LongIdJsonRelationship(tx.getRelationshipById(1), new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
-            rel.produceEntity(database);
+            rel.produceEntity(tx);
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -76,7 +76,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship rel = new LongIdJsonRelationship(tx.getRelationshipById(1), new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
-            rel.produceEntity(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
+            rel.produceEntity(tx, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -84,7 +84,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship rel = new LongIdJsonRelationship(tx.getRelationshipById(1));
-            rel.produceEntity(database);
+            rel.produceEntity(tx);
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -92,7 +92,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship rel = new LongIdJsonRelationship(tx.getRelationshipById(1));
-            rel.produceEntity(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
+            rel.produceEntity(tx, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -100,7 +100,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship rel = new LongIdJsonRelationship(tx.getRelationshipById(0), new String[0], new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
-            rel.produceEntity(database);
+            rel.produceEntity(tx);
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -108,7 +108,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship rel = new LongIdJsonRelationship(tx.getRelationshipById(0), new String[0], new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
-            rel.produceEntity(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
+            rel.produceEntity(tx, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -116,7 +116,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0);
-            Relationship r = jsonRel.produceEntity(database);
+            Relationship r = jsonRel.produceEntity(tx);
             assertEquals(r, tx.getRelationshipById(0));
 
             tx.commit();
@@ -124,7 +124,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(1000);
-            Relationship r = jsonRel.produceEntity(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
+            Relationship r = jsonRel.produceEntity(tx, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
             assertEquals(r, tx.getRelationshipById(1));
 
             tx.commit();
@@ -132,7 +132,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 0, 0, "test", Collections.emptyMap());
-            jsonRel.produceEntity(database);
+            jsonRel.produceEntity(tx);
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -140,7 +140,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 0, 0, "test", Collections.emptyMap());
-            jsonRel.produceEntity(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
+            jsonRel.produceEntity(tx, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
             tx.commit();
         } catch (IllegalStateException e) {
             //ok
@@ -148,7 +148,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 1000, "TEST", Collections.singletonMap("k", "v"));
-            Relationship r = jsonRel.produceEntity(database, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
+            Relationship r = jsonRel.produceEntity(tx, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
             assertEquals(20, r.getId());
 
             tx.commit();
@@ -156,7 +156,7 @@ public class LongIdJsonRelationshipTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 1, "TEST", Collections.singletonMap("k", "v"));
-            Relationship r = jsonRel.produceEntity(database);
+            Relationship r = jsonRel.produceEntity(tx);
             assertEquals(2, r.getId());
 
             tx.commit();

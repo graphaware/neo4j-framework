@@ -26,6 +26,7 @@ import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Transaction;
 import org.skyscreamer.jsonassert.JSONAssert;
 
@@ -71,8 +72,8 @@ public class LongIdJsonNodeTest extends UnitTest {
             JSONAssert.assertEquals("{\"id\":1000,\"labels\":[],\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonNode(tx.getNodeById(1), new String[0], new TimesThousandNodeIdTransformer())), true);
             JSONAssert.assertEquals("{\"id\":1000,\"labels\":[],\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonNode(tx.getNodeById(1), new TimesThousandNodeIdTransformer())), true);
 
-            JSONAssert.assertEquals("{\"id\":0,\"labels\":[\"L1\",\"L2\"],\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonNode(new LongIdJsonNode(0).produceEntity(database), new String[0])), true);
-            JSONAssert.assertEquals("{\"id\":1,\"labels\":[],\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonNode(new LongIdJsonNode(1000).produceEntity(database, new TimesThousandNodeIdTransformer()))), true);
+            JSONAssert.assertEquals("{\"id\":0,\"labels\":[\"L1\",\"L2\"],\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonNode(new LongIdJsonNode(0).produceEntity(tx), new String[0])), true);
+            JSONAssert.assertEquals("{\"id\":1,\"labels\":[],\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonNode(new LongIdJsonNode(1000).produceEntity(tx, new TimesThousandNodeIdTransformer()))), true);
 
             JSONAssert.assertEquals("{\"id\":1000,\"labels\":[\"L1\"], \"properties\":{\"k\":\"v\"}}", mapper.writeValueAsString(new LongIdJsonNode(1000L, new String[]{"L1"}, Collections.singletonMap("k", "v"))), true);
             JSONAssert.assertEquals("{\"labels\":[\"L1\"], \"properties\":{\"k\":\"v\"}}", mapper.writeValueAsString(new LongIdJsonNode(new String[]{"L1"}, Collections.singletonMap("k", "v"))), true);
@@ -83,7 +84,7 @@ public class LongIdJsonNodeTest extends UnitTest {
     public void shouldCorrectlyDeserialiseNodes() throws IOException, JSONException {
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = mapper.readValue("{\"id\":0}", LongIdJsonNode.class);
-            Node node = jsonNode.produceEntity(database);
+            Node node = jsonNode.produceEntity(tx);
 
             assertEquals(0, node.getId());
             assertEquals(node, tx.getNodeById(0));
@@ -93,7 +94,7 @@ public class LongIdJsonNodeTest extends UnitTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(0);
-            Node node = jsonNode.produceEntity(database);
+            Node node = jsonNode.produceEntity(tx);
 
             assertEquals(0, node.getId());
             assertEquals(node, tx.getNodeById(0));
@@ -103,7 +104,7 @@ public class LongIdJsonNodeTest extends UnitTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(1000);
-            Node node = jsonNode.produceEntity(database, new TimesThousandNodeIdTransformer());
+            Node node = jsonNode.produceEntity(tx, new TimesThousandNodeIdTransformer());
 
             assertEquals(1, node.getId());
             assertEquals(node, tx.getNodeById(1));
@@ -111,21 +112,23 @@ public class LongIdJsonNodeTest extends UnitTest {
             tx.commit();
         }
 
-        int i = 19; //for whatever reason
+        int i = 1;
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = mapper.readValue("{\"properties\":{\"k1\":\"v1\",\"k2\":2},\"labels\":[\"L1\",\"L2\"]}", LongIdJsonNode.class);
-            Node node = jsonNode.produceEntity(database);
+            Node node = jsonNode.produceEntity(tx);
 
             assertEquals(++i, node.getId());
-            JSONAssert.assertEquals("{\"id\":" + i + ",\"properties\":{\"k1\":\"v1\",\"k2\":2},\"labels\":[\"L1\",\"L2\"]}", mapper.writeValueAsString(new LongIdJsonNode(node)), true);
+            System.out.println(node.getId());
+            LongIdJsonNode value = new LongIdJsonNode(node);
+            JSONAssert.assertEquals("{\"id\":" + i + ",\"properties\":{\"k1\":\"v1\",\"k2\":2},\"labels\":[\"L1\",\"L2\"]}", mapper.writeValueAsString(value), true);
 
             tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = mapper.readValue("{\"properties\":{},\"labels\":[]}", LongIdJsonNode.class);
-            Node node = jsonNode.produceEntity(database);
+            Node node = jsonNode.produceEntity(tx);
 
             assertEquals(++i, node.getId());
             JSONAssert.assertEquals("{\"id\":" + i + ",\"labels\":[],\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonNode(node)), true);
@@ -135,7 +138,7 @@ public class LongIdJsonNodeTest extends UnitTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = mapper.readValue("{}", LongIdJsonNode.class);
-            Node node = jsonNode.produceEntity(database);
+            Node node = jsonNode.produceEntity(tx);
 
             assertEquals(++i, node.getId());
             JSONAssert.assertEquals("{\"id\":" + i + ",\"labels\":[],\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonNode(node)), true);
@@ -145,7 +148,7 @@ public class LongIdJsonNodeTest extends UnitTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(DetachedEntity.NEW, new String[]{"L1"}, Collections.singletonMap("k1", "v1"));
-            Node node = jsonNode.produceEntity(database);
+            Node node = jsonNode.produceEntity(tx);
 
             assertEquals(++i, node.getId());
             JSONAssert.assertEquals("{\"id\":" + i + ",\"properties\":{\"k1\":\"v1\"},\"labels\":[\"L1\"]}", mapper.writeValueAsString(new LongIdJsonNode(node)), true);
@@ -155,7 +158,7 @@ public class LongIdJsonNodeTest extends UnitTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(new String[]{"L1"}, Collections.singletonMap("k1", "v1"));
-            Node node = jsonNode.produceEntity(database);
+            Node node = jsonNode.produceEntity(tx);
 
             assertEquals(++i, node.getId());
             JSONAssert.assertEquals("{\"id\":" + i + ",\"properties\":{\"k1\":\"v1\"},\"labels\":[\"L1\"]}", mapper.writeValueAsString(new LongIdJsonNode(node)), true);
@@ -165,7 +168,7 @@ public class LongIdJsonNodeTest extends UnitTest {
 
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = mapper.readValue("{\"id\":" + i * 1000 + "}", LongIdJsonNode.class);
-            Node node = jsonNode.produceEntity(database, new TimesThousandNodeIdTransformer());
+            Node node = jsonNode.produceEntity(tx, new TimesThousandNodeIdTransformer());
 
             assertEquals(i, node.getId());
             JSONAssert.assertEquals("{\"id\":" + i + ",\"properties\":{\"k1\":\"v1\"},\"labels\":[\"L1\"]}", mapper.writeValueAsString(new LongIdJsonNode(node)), true);
@@ -176,34 +179,25 @@ public class LongIdJsonNodeTest extends UnitTest {
         assertThrows(IllegalStateException.class, () -> {
             try (Transaction tx = database.beginTx()) {
                 LongIdJsonNode jsonNode = mapper.readValue("{\"id\":1, \"properties\":{\"k1\":\"v1\",\"k2\":2}}", LongIdJsonNode.class);
-                jsonNode.produceEntity(database);
+                jsonNode.produceEntity(tx);
 
                 tx.commit();
             }
         });
 
-        assertThrows(IllegalStateException.class, () -> {
+        assertThrows(NotFoundException.class, () -> {
             try (Transaction tx = database.beginTx()) {
                 LongIdJsonNode jsonNode = mapper.readValue("{\"id\":10000}", LongIdJsonNode.class);
-                jsonNode.produceEntity(database, new TimesThousandNodeIdTransformer());
+                jsonNode.produceEntity(tx, new TimesThousandNodeIdTransformer());
 
                 tx.commit();
             }
         });
 
-
-        assertThrows(IllegalStateException.class, () -> {
-            try (Transaction tx = database.beginTx()) {
-                LongIdJsonNode jsonNode = mapper.readValue("{\"id\":10000}", LongIdJsonNode.class);
-                jsonNode.produceEntity(database, new TimesThousandNodeIdTransformer());
-
-                tx.commit();
-            }
-        });
         assertThrows(IllegalStateException.class, () -> {
             try (Transaction tx = database.beginTx()) {
                 LongIdJsonNode jsonNode = mapper.readValue("{\"id\":1, \"labels\":[\"L1\",\"L2\"]}", LongIdJsonNode.class);
-                jsonNode.produceEntity(database);
+                jsonNode.produceEntity(tx);
 
                 tx.commit();
             }

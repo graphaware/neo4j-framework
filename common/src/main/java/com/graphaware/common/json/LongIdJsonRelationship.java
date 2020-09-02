@@ -22,6 +22,7 @@ import com.graphaware.common.transform.TrivialNodeIdTransformer;
 import com.graphaware.common.transform.TrivialRelationshipIdTransformer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 import java.util.Map;
 
@@ -69,8 +70,8 @@ public class LongIdJsonRelationship extends JsonRelationship<Long> {
      * {@inheritDoc}
      */
     @Override
-    public Relationship produceEntity(GraphDatabaseService database) {
-        return produceEntity(database, TrivialRelationshipIdTransformer.getInstance(), TrivialNodeIdTransformer.getInstance());
+    public Relationship produceEntity(Transaction tx) {
+        return produceEntity(tx, TrivialRelationshipIdTransformer.getInstance(), TrivialNodeIdTransformer.getInstance());
     }
 }
 

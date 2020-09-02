@@ -20,6 +20,7 @@ import com.graphaware.common.transform.NodeIdTransformer;
 import com.graphaware.common.representation.DetachedNode;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 import java.util.Map;
 
@@ -91,7 +92,7 @@ public class SerializableNode<ID> extends DetachedNode<ID> {
      * @param transformer ID transformer.
      * @return node.
      */
-    public Node produceEntity(GraphDatabaseService database, NodeIdTransformer<ID> transformer) {
+    public Node produceEntity(Transaction database, NodeIdTransformer<ID> transformer) {
         setGraphId(transformer.toGraphId(id));
         return super.produceEntity(database);
     }

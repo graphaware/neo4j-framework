@@ -18,9 +18,8 @@ package com.graphaware.common.representation;
 
 import com.graphaware.common.transform.NodeIdTransformer;
 import com.graphaware.common.transform.RelationshipIdTransformer;
-import com.graphaware.common.representation.DetachedRelationship;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 import java.util.Map;
 
@@ -73,7 +72,7 @@ public class SerializableRelationship<ID> extends DetachedRelationship<ID, Seria
     /**
      * Create a Serializable {@link DetachedRelationship} from own relationship ID.
      *
-     * @param id          of the relationship. Must not be <code>null</code>.
+     * @param id of the relationship. Must not be <code>null</code>.
      */
     public SerializableRelationship(ID id) {
         this.id = id;
@@ -82,11 +81,11 @@ public class SerializableRelationship<ID> extends DetachedRelationship<ID, Seria
     /**
      * Construct Serializable {@link DetachedRelationship} of a relationship.
      *
-     * @param id                custom ID of the relationship. Can be <code>null</code> to represent a new relationship.
-     * @param startNodeId       own start node ID.
-     * @param endNodeId         own end node ID.
-     * @param type              relationship type.
-     * @param properties        relationship properties.
+     * @param id          custom ID of the relationship. Can be <code>null</code> to represent a new relationship.
+     * @param startNodeId own start node ID.
+     * @param endNodeId   own end node ID.
+     * @param type        relationship type.
+     * @param properties  relationship properties.
      */
     public SerializableRelationship(ID id, ID startNodeId, ID endNodeId, String type, Map<String, Object> properties) {
         super(NEW, NEW, NEW, type, properties);
@@ -99,16 +98,16 @@ public class SerializableRelationship<ID> extends DetachedRelationship<ID, Seria
      * Produce a {@link Relationship} from this representation. This means either fetch the relationship from the
      * given database (iff id is set), or create it.
      *
-     * @param database                  to create/fetch relationship in.
+     * @param tx                        to create/fetch relationship in.
      * @param relationshipIdTransformer ID transformer for relationship IDs.
      * @param nodeIdTransformer         ID transformer for node IDs.
      * @return relationship.
      */
-    public Relationship produceEntity(GraphDatabaseService database, RelationshipIdTransformer<ID> relationshipIdTransformer, NodeIdTransformer<ID> nodeIdTransformer) {
+    public Relationship produceEntity(Transaction tx, RelationshipIdTransformer<ID> relationshipIdTransformer, NodeIdTransformer<ID> nodeIdTransformer) {
         setGraphId(relationshipIdTransformer.toGraphId(id));
         setStartNodeGraphId(nodeIdTransformer.toGraphId(startNodeId));
         setEndNodeGraphId(nodeIdTransformer.toGraphId(endNodeId));
-        return super.produceEntity(database);
+        return super.produceEntity(tx);
     }
 
     public ID getId() {

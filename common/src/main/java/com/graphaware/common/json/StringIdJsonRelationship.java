@@ -21,6 +21,7 @@ import com.graphaware.common.transform.NodeIdTransformer;
 import com.graphaware.common.transform.RelationshipIdTransformer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 import java.util.Map;
 
@@ -49,7 +50,7 @@ public class StringIdJsonRelationship extends JsonRelationship<String> {
     }
 
     @Override
-    public Relationship produceEntity(GraphDatabaseService database) {
+    public Relationship produceEntity(Transaction tx) {
         throw new UnsupportedOperationException("Please use produceEntity(GraphDatabaseService database, RelationshipIdTransformer<ID> relationshipIdTransformer, NodeIdTransformer<ID> nodeIdTransformer)");
     }
 

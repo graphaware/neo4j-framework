@@ -19,6 +19,7 @@ package com.graphaware.common.json;
 import com.graphaware.common.transform.NodeIdTransformer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 import java.util.Map;
 
@@ -43,7 +44,7 @@ public class StringIdJsonNode extends JsonNode<String> {
     }
 
     @Override
-    public Node produceEntity(GraphDatabaseService database) {
+    public Node produceEntity(Transaction database) {
         throw new UnsupportedOperationException("Please use produceEntity(GraphDatabaseService database, NodeIdTransformer<ID> transformer)");
     }
 }
