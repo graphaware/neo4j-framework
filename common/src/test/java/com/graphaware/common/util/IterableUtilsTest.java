@@ -16,6 +16,7 @@
 
 package com.graphaware.common.util;
 
+import com.graphaware.common.junit.Neo4jInstances;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -38,11 +39,16 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class IterableUtilsTest {
 
+    private final Neo4jInstances instances = Neo4jInstances.getInstances();
     private Neo4j controls;
     protected GraphDatabaseService database;
 
+    public IterableUtilsTest() {
+        instances.start();
+    }
+
     protected final void createDatabase() {
-        controls = Neo4jBuilders.newInProcessBuilder().build();
+        controls = instances.get();
         database = controls.defaultDatabaseService();
     }
 

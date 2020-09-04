@@ -16,30 +16,45 @@
 
 package com.graphaware.common.util;
 
-import com.graphaware.common.UnitTest;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 
 import static com.graphaware.common.util.DirectionUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.RelationshipType.withName;
 
 /**
  * Unit test for {@link com.graphaware.common.util.DirectionUtils}.
  */
-public class DirectionUtilsTest extends UnitTest {
+@TestInstance(PER_CLASS)
+@ExtendWith(Neo4jExtension.class)
+public class DirectionUtilsTest {
 
-    @Override
-    protected void populate(Transaction database) {
-        Node node1 = database.createNode();
-        Node node2 = database.createNode();
-        node1.createRelationshipTo(node2, withName("test"));
+    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.CLASS)
+    private GraphDatabaseService database;
 
-        Node node3 = database.createNode();
-        node3.createRelationshipTo(node3, withName("test"));
+    @BeforeAll
+    protected void populate() {
+        try (Transaction tx = database.beginTx()) {
+            Node node1 = tx.createNode();
+            Node node2 = tx.createNode();
+            node1.createRelationshipTo(node2, withName("test"));
+
+            Node node3 = tx.createNode();
+            node3.createRelationshipTo(node3, withName("test"));
+
+            tx.commit();
+        }
     }
 
     @Test

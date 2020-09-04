@@ -16,13 +16,13 @@
 
 package com.graphaware.common.util;
 
-import com.graphaware.common.UnitTest;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphalgo.BasicEvaluationContext;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 
 import static com.graphaware.common.util.RelationshipUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,13 +32,21 @@ import static org.neo4j.graphdb.RelationshipType.withName;
 /**
  * Unit test for {@link RelationshipUtils}.
  */
-public class RelationshipUtilsTest extends UnitTest {
+@ExtendWith(Neo4jExtension.class)
+public class RelationshipUtilsTest {
 
-    @Override
-    protected void populate(Transaction database) {
-        Node node1 = database.createNode();
-        Node node2 = database.createNode();
-        node1.createRelationshipTo(node2, withName("TEST"));
+    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.METHOD)
+    private GraphDatabaseService database;
+
+    @BeforeEach
+    protected void populate() {
+        try (Transaction tx = database.beginTx()) {
+            Node node1 = tx.createNode();
+            Node node2 = tx.createNode();
+            node1.createRelationshipTo(node2, withName("TEST"));
+
+            tx.commit();
+        }
     }
 
     @Test
@@ -95,7 +103,7 @@ public class RelationshipUtilsTest extends UnitTest {
 
             assertTrue(relationshipExists(new BasicEvaluationContext(tx, database), node2, node1, withName("TEST"), OUTGOING));
 
-            tx.commit();
+            tx.rollback();
         }
     }
 
@@ -110,7 +118,7 @@ public class RelationshipUtilsTest extends UnitTest {
 
             assertTrue(relationshipExists(new BasicEvaluationContext(tx, database), node1, node2, withName("TEST"), INCOMING));
 
-            tx.commit();
+            tx.rollback();
         }
     }
 

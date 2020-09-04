@@ -18,26 +18,38 @@ package com.graphaware.common.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.graphaware.common.UnitTest;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.common.representation.DetachedEntity;
 import com.graphaware.common.representation.SerializationSpecification;
 import com.graphaware.common.transform.NodeIdTransformer;
 import com.graphaware.common.transform.RelationshipIdTransformer;
 import org.json.JSONException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.util.Collections;
 
-public class LongIdJsonRelationshipTest extends UnitTest {
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+
+@TestInstance(PER_CLASS)
+@ExtendWith(Neo4jExtension.class)
+public class LongIdJsonRelationshipTest {
+
+    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.CLASS)
+    private GraphDatabaseService database;
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    @Override
-    protected void populate(Transaction database) {
-            Node node1 = database.createNode(Label.label("L1"), Label.label("L2"));
-            Node node2 = database.createNode();
+    @BeforeEach
+    protected void populate() {
+        try (Transaction tx = database.beginTx()) {
+            Node node1 = tx.createNode(Label.label("L1"), Label.label("L2"));
+            Node node2 = tx.createNode();
 
             node1.setProperty("k1", "v1");
             node1.setProperty("k2", 2);
@@ -49,6 +61,9 @@ public class LongIdJsonRelationshipTest extends UnitTest {
             Relationship r2 = node1.createRelationshipTo(node2, RelationshipType.withName("R2"));
             r2.setProperty("k1", "v2");
             r2.setProperty("k2", 4);
+
+            tx.commit();
+        }
     }
 
     @Test

@@ -16,9 +16,13 @@
 
 package com.graphaware.common.policy;
 
-import com.graphaware.common.UnitTest;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.common.policy.inclusion.fluent.IncludeRelationships;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
@@ -27,13 +31,19 @@ import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.RelationshipType.withName;
 
 /**
  * Unit test for  {@link com.graphaware.common.policy.inclusion.fluent.IncludeRelationships}.
  */
-public class IncludeRelationshipsTest extends UnitTest {
+@TestInstance(PER_CLASS)
+@ExtendWith(Neo4jExtension.class)
+public class IncludeRelationshipsTest {
+
+    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.CLASS)
+    private GraphDatabaseService database;
 
     @Test
     public void shouldIncludeCorrectRelationships() {

@@ -169,7 +169,6 @@
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>3.2.0</version>
                         <configuration>
-                            <additionalparam>-Xdoclint:none</additionalparam>
                             <additionalOptions>-Xdoclint:none</additionalOptions>
                             <additionalJOption>-Xdoclint:none</additionalJOption>
                         </configuration>
@@ -188,6 +187,14 @@
                 <groupId>com.graphaware.neo4j</groupId>
                 <artifactId>common</artifactId>
                 <version>${fw.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.graphaware.neo4j</groupId>
+                <artifactId>common</artifactId>
+                <version>${fw.version}</version>
+                <scope>test</scope>
+                <classifier>test-jar</classifier>
             </dependency>
 
             <dependency>

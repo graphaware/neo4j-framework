@@ -17,6 +17,8 @@
 package com.graphaware.common.policy.inclusion.spel;
 
 import com.graphaware.common.policy.inclusion.NodeInclusionPolicy;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.internal.helpers.collection.Iterables;
@@ -39,10 +41,8 @@ public class SpelNodeInclusionPolicyTest extends SpelInclusionPolicyTest {
     private NodeInclusionPolicy policy6;
     private NodeInclusionPolicy policy7;
 
-    @Override
+    @BeforeEach
     public void setUp() {
-        super.setUp();
-
         simplePolicy1 = new SpelNodeInclusionPolicy("hasLabel('Employee')");
         simplePolicy2 = new SpelNodeInclusionPolicy("!hasLabel('Employee')");
 

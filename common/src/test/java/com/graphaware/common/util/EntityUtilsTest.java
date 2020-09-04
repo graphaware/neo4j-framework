@@ -16,9 +16,11 @@
 
 package com.graphaware.common.util;
 
-import com.graphaware.common.UnitTest;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.common.policy.inclusion.ObjectInclusionPolicy;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
@@ -38,19 +40,16 @@ import static org.neo4j.graphdb.RelationshipType.withName;
 /**
  * Unit test for {@link EntityUtils}.
  */
-public class EntityUtilsTest extends UnitTest {
+@ExtendWith(Neo4jExtension.class)
+public class EntityUtilsTest {
 
-    @Override
-    protected void populate(Transaction database) {
-        database.execute("CREATE " +
-                "(a), " +
-                "(b {key:'value'})," +
-                "(b)-[:test]->(a)," +
-                "(c {key:'value'})");
-    }
+    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.METHOD)
+    private GraphDatabaseService database;
 
     @Test
     public void shouldConvertEntitiesToMap() {
+        populate();
+
         try (Transaction tx = database.beginTx()) {
             Map<Long, Node> nodeMap = entitiesToMap(Iterables.asList(tx.getAllNodes()));
             assertEquals(0, nodeMap.get(0L).getId());
@@ -61,21 +60,21 @@ public class EntityUtilsTest extends UnitTest {
     }
 
     @Test
-    public void shouldFindNodeIds() {
+    public void shouldFindIds() {
+        populate();
+
+        try (Transaction tx = database.beginTx()) {
+            assertEquals("[0]", Arrays.toString((ids(tx.getAllRelationships()))));
+        }
         try (Transaction tx = database.beginTx()) {
             assertEquals("[0, 1, 2]", Arrays.toString(ids(tx.getAllNodes())));
         }
     }
 
     @Test
-    public void shouldFindRelationshipIds() {
-        try (Transaction tx = database.beginTx()) {
-            assertEquals("[0]", Arrays.toString((ids(tx.getAllRelationships()))));
-        }
-    }
-
-    @Test
     public void verifyValueToString() {
+        populate();
+
         assertEquals("", valueToString(null));
         assertEquals("", valueToString(""));
         assertEquals("T", valueToString("T"));
@@ -87,6 +86,8 @@ public class EntityUtilsTest extends UnitTest {
 
     @Test
     public void verifyPropertiesToMap() {
+        populate();
+
         try (Transaction tx = database.beginTx()) {
             assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(tx.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
 
@@ -103,9 +104,6 @@ public class EntityUtilsTest extends UnitTest {
 
     @Test
     public void shouldDeleteNodeWithAllRelationships() {
-        destroyDatabase();
-        createDatabase();
-
         database.executeTransactionally("CREATE " +
                 "(a), " +
                 "(b {name:'node1'})," +
@@ -245,9 +243,6 @@ public class EntityUtilsTest extends UnitTest {
     }
 
     private void populateDatabaseWithNumberProperties() {
-        destroyDatabase();
-        createDatabase();
-
         try (Transaction tx = database.beginTx()) {
             tx.createNode().setProperty("test", (byte) 123);
             tx.createNode().setProperty("test", 123);
@@ -257,5 +252,13 @@ public class EntityUtilsTest extends UnitTest {
             tx.createNode().setProperty("test", 123.0f);
             tx.commit();
         }
+    }
+
+    private void populate() {
+        database.executeTransactionally("CREATE " +
+                "(a), " +
+                "(b {key:'value'})," +
+                "(b)-[:test]->(a)," +
+                "(c {key:'value'})");
     }
 }

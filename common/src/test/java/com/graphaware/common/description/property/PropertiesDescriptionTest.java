@@ -16,20 +16,31 @@
 
 package com.graphaware.common.description.property;
 
-import com.graphaware.common.UnitTest;
 import com.graphaware.common.description.TestMapUtils;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.Entity;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
-public abstract class PropertiesDescriptionTest extends UnitTest {
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+
+@TestInstance(PER_CLASS)
+@ExtendWith(Neo4jExtension.class)
+public abstract class PropertiesDescriptionTest {
+
+    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.CLASS)
+    private GraphDatabaseService database;
 
     private Transaction tx;
     protected Entity entity;
 
-    @Override
-    protected void populate(GraphDatabaseService database) {
+    @BeforeAll
+    protected void populate() {
         try (Transaction tx = database.beginTx()) {
             Node root = tx.createNode();
             root.setProperty("two", 2);

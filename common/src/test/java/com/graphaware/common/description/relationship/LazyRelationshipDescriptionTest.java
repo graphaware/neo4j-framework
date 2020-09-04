@@ -16,26 +16,42 @@
 
 package com.graphaware.common.description.relationship;
 
-import com.graphaware.common.UnitTest;
 import com.graphaware.common.description.property.LazyPropertiesDescription;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.RelationshipType.withName;
 
 /**
  * Unit test for {@link com.graphaware.common.description.relationship.LazyRelationshipDescription}.
  */
-public class LazyRelationshipDescriptionTest extends UnitTest {
+@TestInstance(PER_CLASS)
+@ExtendWith(Neo4jExtension.class)
+public class LazyRelationshipDescriptionTest {
 
-    @Override
-    protected void populate(Transaction database) {
-        Node root = database.createNode();
-        Node one = database.createNode();
-        root.createRelationshipTo(one, withName("TEST")).setProperty("k", new int[]{2, 3, 4});
+    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.CLASS)
+    private GraphDatabaseService database;
+
+    @BeforeEach
+    private void populate() {
+        try (Transaction tx = database.beginTx()) {
+            Node root = tx.createNode();
+            Node one = tx.createNode();
+            root.createRelationshipTo(one, withName("TEST")).setProperty("k", new int[]{2, 3, 4});
+
+            tx.commit();
+        }
     }
 
     @Test

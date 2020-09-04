@@ -16,45 +16,38 @@
 
 package com.graphaware.test.unit;
 
+import com.graphaware.common.junit.InjectNeo4j;
 import com.graphaware.common.policy.inclusion.*;
 import com.graphaware.common.policy.inclusion.none.IncludeNoNodes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
 import org.neo4j.harness.Neo4j;
 import org.neo4j.harness.Neo4jBuilders;
+import org.neo4j.harness.junit.extension.Neo4jExtension;
 
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.test.unit.GraphUnit.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 
 /**
  * Unit test for {@link com.graphaware.test.unit.GraphUnit}.
  */
+@TestInstance(PER_CLASS)
+@ExtendWith(Neo4jExtension.class)
 public class GraphUnitTest {
 
-    private Neo4j controls;
+    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.CLASS)
     protected GraphDatabaseService database;
-
-    @BeforeEach
-    public void setUp() {
-        createDatabase();
-    }
 
     @AfterEach
     public void tearDown() {
-        destroyDatabase();
-    }
-
-    protected final void createDatabase() {
-        controls = Neo4jBuilders.newInProcessBuilder().build();
-        database = controls.defaultDatabaseService();
-    }
-
-    protected final void destroyDatabase() {
-        controls.close();
+        database.executeTransactionally("MATCH (n) DETACH DELETE n");
     }
 
     private void populateDatabase(String cypher) {

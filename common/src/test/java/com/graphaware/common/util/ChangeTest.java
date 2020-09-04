@@ -16,12 +16,15 @@
 
 package com.graphaware.common.util;
 
-import org.junit.jupiter.api.*;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.InjectNeo4j.Lifecycle;
+import com.graphaware.common.junit.Neo4jExtension;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.harness.Neo4j;
-import org.neo4j.harness.Neo4jBuilders;
 
 import java.util.Collections;
 import java.util.Map;
@@ -33,26 +36,19 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  *  Unit test for {@link Change}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class ChangeTest {
 
-    private Neo4j controls;
+    @InjectNeo4j(lifecycle = Lifecycle.METHOD)
     private GraphDatabaseService database;
 
     @BeforeEach
-    public void setUp() {
-        controls = Neo4jBuilders.newInProcessBuilder().build();
-        database = controls.defaultDatabaseService();
-
+    private void populate() {
         database.executeTransactionally("CREATE " +
                 "(a), " +
                 "(b {key:'value'})," +
                 "(b)-[:test]->(a)," +
                 "(c {key:'value'})");
-    }
-
-    @AfterEach
-    public void tearDown() {
-        controls.close();
     }
 
     @Test

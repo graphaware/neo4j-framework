@@ -18,16 +18,15 @@ package com.graphaware.common.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.graphaware.common.UnitTest;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.common.representation.DetachedEntity;
 import com.graphaware.common.representation.SerializationSpecification;
 import com.graphaware.common.transform.NodeIdTransformer;
 import org.json.JSONException;
-import org.junit.jupiter.api.Test;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.Transaction;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.neo4j.graphdb.*;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.io.IOException;
@@ -35,18 +34,28 @@ import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
-public class LongIdJsonNodeTest extends UnitTest {
+@TestInstance(PER_CLASS)
+@ExtendWith(Neo4jExtension.class)
+public class LongIdJsonNodeTest {
+
+    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.CLASS)
+    private GraphDatabaseService database;
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    @Override
-    protected void populate(Transaction tx) {
-        Node node1 = tx.createNode(Label.label("L1"), Label.label("L2"));
-        Node node2 = tx.createNode();
+    @BeforeEach
+    protected void populate() {
+        try (Transaction tx = database.beginTx()) {
+            Node node1 = tx.createNode(Label.label("L1"), Label.label("L2"));
+            Node node2 = tx.createNode();
 
-        node1.setProperty("k1", "v1");
-        node1.setProperty("k2", 2);
+            node1.setProperty("k1", "v1");
+            node1.setProperty("k2", 2);
+
+            tx.commit();
+        }
     }
 
     @Test
@@ -119,7 +128,6 @@ public class LongIdJsonNodeTest extends UnitTest {
             Node node = jsonNode.produceEntity(tx);
 
             assertEquals(++i, node.getId());
-            System.out.println(node.getId());
             LongIdJsonNode value = new LongIdJsonNode(node);
             JSONAssert.assertEquals("{\"id\":" + i + ",\"properties\":{\"k1\":\"v1\",\"k2\":2},\"labels\":[\"L1\",\"L2\"]}", mapper.writeValueAsString(value), true);
 

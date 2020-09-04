@@ -16,8 +16,14 @@
 
 package com.graphaware.common.description.relationship;
 
-import com.graphaware.common.UnitTest;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.InjectNeo4j.Lifecycle;
+import com.graphaware.common.junit.Neo4jExtension;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Transaction;
@@ -26,18 +32,28 @@ import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.relationship.RelationshipDescriptionFactory.literal;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.neo4j.graphdb.Direction.*;
 
 /**
  * Test for {@link com.graphaware.common.description.relationship.DetachedRelationshipDescriptionImpl}.
  */
-public class DetachedRelationshipDescriptionImplTest extends UnitTest {
+@TestInstance(PER_CLASS)
+@ExtendWith(Neo4jExtension.class)
+public class DetachedRelationshipDescriptionImplTest {
 
-    @Override
-    protected void populate(Transaction database) {
-        Node root = database.createNode();
-        Node one = database.createNode();
-        root.createRelationshipTo(one, RelationshipType.withName("TEST")).setProperty("k", new int[]{2, 3, 4});
+    @InjectNeo4j(lifecycle = Lifecycle.CLASS)
+    private GraphDatabaseService database;
+
+    @BeforeAll
+    protected void populate() {
+        try (Transaction tx = database.beginTx()) {
+            Node root = tx.createNode();
+            Node one = tx.createNode();
+            root.createRelationshipTo(one, RelationshipType.withName("TEST")).setProperty("k", new int[]{2, 3, 4});
+
+            tx.commit();
+        }
     }
 
     @Test
