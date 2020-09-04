@@ -17,7 +17,7 @@ public class Neo4jInstances {
         return INSTANCES;
     }
 
-    private final BlockingQueue<Neo4j> queue = new LinkedBlockingQueue<>(10);
+    private final BlockingQueue<Neo4j> queue = new LinkedBlockingQueue<>(1);
 
     public void start() {
         new Thread(() -> {
