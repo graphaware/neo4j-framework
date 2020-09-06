@@ -160,7 +160,7 @@ public class LongIdJsonNodeTest {
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(new String[]{"Test"}, Collections.singletonMap("k", "v"));
             Node n = jsonNode.produceEntity(tx, new TimesThousandNodeIdTransformer());
-            assertEquals(20, n.getId());
+            assertEquals(2, n.getId());
 
             tx.commit();
         }
@@ -168,7 +168,7 @@ public class LongIdJsonNodeTest {
         try (Transaction tx = database.beginTx()) {
             LongIdJsonNode jsonNode = new LongIdJsonNode(new String[]{"Test"}, Collections.singletonMap("k", "v"));
             Node n = jsonNode.produceEntity(tx);
-            assertEquals(2, n.getId());
+            assertEquals(3, n.getId());
 
             tx.commit();
         }

@@ -149,7 +149,7 @@ public class LongIdJsonRelationshipTest {
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 1000, "TEST", Collections.singletonMap("k", "v"));
             Relationship r = jsonRel.produceEntity(tx, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer());
-            assertEquals(20, r.getId());
+            assertEquals(2, r.getId());
 
             tx.commit();
         }
@@ -157,7 +157,7 @@ public class LongIdJsonRelationshipTest {
         try (Transaction tx = database.beginTx()) {
             LongIdJsonRelationship jsonRel = new LongIdJsonRelationship(0, 1, "TEST", Collections.singletonMap("k", "v"));
             Relationship r = jsonRel.produceEntity(tx);
-            assertEquals(2, r.getId());
+            assertEquals(3, r.getId());
 
             tx.commit();
         }

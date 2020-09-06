@@ -26,6 +26,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
 
+import java.util.function.Consumer;
+
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.test.unit.GraphUnit.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -583,7 +585,7 @@ public class GraphUnitTest {
         }
 
         try (Transaction tx = database.beginTx()) {
-            tx.getNodeById(0).delete();
+            tx.findNodes(Label.label("Accident")).forEachRemaining(node -> node.delete());
             tx.commit();
         }
 
@@ -594,14 +596,19 @@ public class GraphUnitTest {
 
     @Test
     public void deletedNewPropsShouldNotInfluenceEquality() { //bug test
+        long id;
+
         try (Transaction tx = database.beginTx()) {
-            tx.createNode().setProperty("accident", "dummy");
+            Node node = tx.createNode();
+            node.setProperty("accident", "dummy");
+            id = node.getId();
+
             tx.createNode();
             tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            tx.getNodeById(0).delete();
+            tx.getNodeById(id).delete();
             tx.commit();
         }
 
