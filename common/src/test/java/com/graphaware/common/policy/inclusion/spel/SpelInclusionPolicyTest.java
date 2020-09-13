@@ -19,6 +19,7 @@ package com.graphaware.common.policy.inclusion.spel;
 import com.graphaware.common.junit.InjectNeo4j;
 import com.graphaware.common.junit.Neo4jExtension;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -27,7 +28,6 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 
 import static com.graphaware.common.util.IterableUtils.getSingle;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.Label.label;
 import static org.neo4j.graphdb.RelationshipType.withName;
@@ -35,14 +35,13 @@ import static org.neo4j.graphdb.RelationshipType.withName;
 /**
  * Abstract base class for {@link com.graphaware.common.policy.inclusion.spel.SpelInclusionPolicy} implementation unit tests.
  */
-@TestInstance(PER_CLASS)
 @ExtendWith(Neo4jExtension.class)
 public abstract class SpelInclusionPolicyTest {
 
-    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.CLASS)
+    @InjectNeo4j
     protected GraphDatabaseService database;
 
-    @BeforeAll
+    @BeforeEach
     protected void populate() {
         database.executeTransactionally("CREATE " +
                 "(m:Employee {name:'Michal'})-[:WORKS_FOR {role:'Director', since:2013}]->(ga:Company {name:'GraphAware', form:'Ltd'})," +

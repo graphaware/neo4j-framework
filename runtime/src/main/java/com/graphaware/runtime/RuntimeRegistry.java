@@ -71,6 +71,18 @@ public class RuntimeRegistry {
         RUNTIMES.remove(databaseName);
     }
 
+    /**
+     * Unregister a runtime.
+     *
+     * @param databaseName against which the runtime is running.
+     * @param runtime      the runtime.
+     */
+    public static void unregisterRuntime(String databaseName, GraphAwareRuntime runtime) {
+        if (!RUNTIMES.remove(databaseName, runtime)) {
+            throw new IllegalStateException("Given GraphAware Runtime is not registered with the given database");
+        }
+    }
+
     public static void clear() {
         RUNTIMES.clear();
     }

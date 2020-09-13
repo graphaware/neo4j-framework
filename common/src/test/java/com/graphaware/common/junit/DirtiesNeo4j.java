@@ -5,5 +5,5 @@ import java.lang.annotation.*;
 @Inherited
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RecreateNeo4j {
+public @interface DirtiesNeo4j {
 }

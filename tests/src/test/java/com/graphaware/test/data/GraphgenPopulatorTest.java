@@ -16,8 +16,12 @@
 
 package com.graphaware.test.data;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -28,8 +32,12 @@ import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 /**
  * Test for {@link com.graphaware.test.data.GraphgenPopulator}.
  */
-public class GraphgenPopulatorTest extends DatabaseIntegrationTest {
-
+@ExtendWith(Neo4jExtension.class)
+public class GraphgenPopulatorTest {
+    
+    @InjectNeo4j
+    protected GraphDatabaseService database;
+    
     @Test
     public void shouldProduceEmptyDatabaseWhenPopulatorReturnsNull() {
         new GraphgenPopulator() {
@@ -37,9 +45,9 @@ public class GraphgenPopulatorTest extends DatabaseIntegrationTest {
             protected String file() {
                 return null;
             }
-        }.populate(getDatabase());
+        }.populate(database);
 
-        assertEmpty(getDatabase());
+        assertEmpty(database);
     }
 
     @Test
@@ -49,9 +57,9 @@ public class GraphgenPopulatorTest extends DatabaseIntegrationTest {
             protected String file() throws IOException {
                 return new ClassPathResource("graphgen.cyp").getFile().getAbsolutePath();
             }
-        }.populate(getDatabase());
+        }.populate(database);
 
-        assertSameGraph(getDatabase(), "CREATE " +
+        assertSameGraph(database, "CREATE " +
                 "(n1:Person {name: 'Isabell McGlynn'})," +
                 "(n2:Person {name: 'Kelton Kuhn'})," +
                 "(n3:Person {name: 'Chesley Feil'})," +

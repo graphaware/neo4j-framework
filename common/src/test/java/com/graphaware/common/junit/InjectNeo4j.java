@@ -6,11 +6,4 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface InjectNeo4j {
-
-    enum Lifecycle {
-        CLASS,
-        METHOD
-    }
-
-    Lifecycle lifecycle();
 }

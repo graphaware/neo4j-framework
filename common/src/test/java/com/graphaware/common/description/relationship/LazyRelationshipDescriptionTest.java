@@ -19,29 +19,28 @@ package com.graphaware.common.description.relationship;
 import com.graphaware.common.description.property.LazyPropertiesDescription;
 import com.graphaware.common.junit.InjectNeo4j;
 import com.graphaware.common.junit.Neo4jExtension;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.junit.jupiter.api.Assertions.assertEquals
+        ;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.RelationshipType.withName;
 
 /**
  * Unit test for {@link com.graphaware.common.description.relationship.LazyRelationshipDescription}.
  */
-@TestInstance(PER_CLASS)
 @ExtendWith(Neo4jExtension.class)
 public class LazyRelationshipDescriptionTest {
 
-    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.CLASS)
+    @InjectNeo4j
     private GraphDatabaseService database;
+
+    private long a;
 
     @BeforeEach
     private void populate() {
@@ -49,6 +48,8 @@ public class LazyRelationshipDescriptionTest {
             Node root = tx.createNode();
             Node one = tx.createNode();
             root.createRelationshipTo(one, withName("TEST")).setProperty("k", new int[]{2, 3, 4});
+
+            a = root.getId();
 
             tx.commit();
         }
@@ -58,12 +59,12 @@ public class LazyRelationshipDescriptionTest {
     public void shouldReturnCorrectTypeDirectionAndProps() {
         try (Transaction tx = database.beginTx()) {
             RelationshipDescription relationshipDescription = new LazyRelationshipDescription(
-                    tx.getNodeById(0).getSingleRelationship(withName("TEST"), OUTGOING),
-                    tx.getNodeById(0));
+                    tx.getNodeById(a).getSingleRelationship(withName("TEST"), OUTGOING),
+                    tx.getNodeById(a));
 
             assertEquals("TEST", relationshipDescription.getType());
             assertEquals(OUTGOING, relationshipDescription.getDirection());
-            assertEquals(new LazyPropertiesDescription(tx.getNodeById(0).getSingleRelationship(withName("TEST"), OUTGOING)), relationshipDescription.getPropertiesDescription());
+            assertEquals(new LazyPropertiesDescription(tx.getNodeById(a).getSingleRelationship(withName("TEST"), OUTGOING)), relationshipDescription.getPropertiesDescription());
         }
     }
 }

@@ -17,6 +17,7 @@
 package com.graphaware.common.description.property;
 
 import org.junit.jupiter.api.Test;
+import org.neo4j.graphdb.Transaction;
 
 import java.util.Collections;
 import java.util.List;
@@ -33,64 +34,77 @@ public class LiteralPropertiesDescriptionTest extends PropertiesDescriptionTest 
 
     @Test
     public void shouldContainCorrectKeys() {
-        PropertiesDescription description = literal();
+        try (Transaction tx = database.beginTx()) {
+            PropertiesDescription description = literal(tx);
 
-        List<String> keys = toList(description.getKeys());
+            List<String> keys = toList(description.getKeys());
 
-        assertEquals(3, keys.size());
-        assertTrue(keys.contains("two"));
-        assertTrue(keys.contains("three"));
-        assertTrue(keys.contains("array"));
+            assertEquals(3, keys.size());
+            assertTrue(keys.contains("two"));
+            assertTrue(keys.contains("three"));
+            assertTrue(keys.contains("array"));
+        }
     }
 
     @Test
     public void shouldReturnEqualPredicatesForExistingKeys() {
-        PropertiesDescription description = literal();
+        try (Transaction tx = database.beginTx()) {
+            PropertiesDescription description = literal(tx);
 
-        assertEquals(equalTo(2), description.get("two"));
-        assertEquals(equalTo("3"), description.get("three"));
-        assertEquals(equalTo(new int[]{4, 5}), description.get("array"));
+            assertEquals(equalTo(2), description.get("two"));
+            assertEquals(equalTo("3"), description.get("three"));
+            assertEquals(equalTo(new int[]{4, 5}), description.get("array"));
+        }
     }
 
     @Test
     public void shouldReturnUndefinedForNonExistingKeys() {
-        PropertiesDescription description = literal();
+        try (Transaction tx = database.beginTx()) {
+            PropertiesDescription description = literal(tx);
 
-        assertEquals(undefined(), description.get("non-existing"));
+            assertEquals(undefined(), description.get("non-existing"));
+        }
     }
 
     @Test
     public void shouldCorrectlyJudgeMoreGeneral() {
-        assertTrue(literal().isMoreGeneralThan(literal()));
-        assertTrue(literal().isMoreGeneralThan(lazy()));
-        assertTrue(literal().isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}))));
-        assertFalse(literal().isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("4"), "array", equalTo(new int[]{4, 5}))));
-        assertFalse(literal().isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("3"))));
-        assertFalse(literal().isMoreGeneralThan(wildcard("two", equalTo(2), "three", equalTo("3"))));
-        assertFalse(literal().isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}), "four", equalTo(4))));
+
+        try (Transaction tx = database.beginTx()) {
+            assertTrue(literal(tx).isMoreGeneralThan(literal(tx)));
+            assertTrue(literal(tx).isMoreGeneralThan(lazy(tx)));
+            assertTrue(literal(tx).isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}))));
+            assertFalse(literal(tx).isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("4"), "array", equalTo(new int[]{4, 5}))));
+            assertFalse(literal(tx).isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("3"))));
+            assertFalse(literal(tx).isMoreGeneralThan(wildcard("two", equalTo(2), "three", equalTo("3"))));
+            assertFalse(literal(tx).isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}), "four", equalTo(4))));
+        }
     }
 
     @Test
     public void shouldCorrectlyJudgeMoreSpecific() {
-        assertTrue(literal().isMoreSpecificThan(literal()));
-        assertTrue(literal().isMoreSpecificThan(lazy()));
-        assertTrue(literal().isMoreSpecificThan(literal(Collections.emptyMap()).with("two", equalTo(2)).with("three", equalTo("3")).with("array", equalTo(new int[]{4, 5}))));
-        assertFalse(literal().isMoreSpecificThan(literal("two", equalTo(2), "three", equalTo("4"), "array", equalTo(new int[]{4, 5}))));
-        assertFalse(literal().isMoreSpecificThan(literal("two", equalTo(2), "three", equalTo("3"))));
-        assertTrue(literal().isMoreSpecificThan(wildcard("two", equalTo(2), "three", equalTo("3"))));
-        assertFalse(literal().isMoreSpecificThan(wildcard("two", equalTo(2), "three", equalTo("4"))));
-        assertFalse(literal().isMoreSpecificThan(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}), "four", equalTo(4))));
+        try (Transaction tx = database.beginTx()) {
+            assertTrue(literal(tx).isMoreSpecificThan(literal(tx)));
+            assertTrue(literal(tx).isMoreSpecificThan(lazy(tx)));
+            assertTrue(literal(tx).isMoreSpecificThan(literal(Collections.emptyMap()).with("two", equalTo(2)).with("three", equalTo("3")).with("array", equalTo(new int[]{4, 5}))));
+            assertFalse(literal(tx).isMoreSpecificThan(literal("two", equalTo(2), "three", equalTo("4"), "array", equalTo(new int[]{4, 5}))));
+            assertFalse(literal(tx).isMoreSpecificThan(literal("two", equalTo(2), "three", equalTo("3"))));
+            assertTrue(literal(tx).isMoreSpecificThan(wildcard("two", equalTo(2), "three", equalTo("3"))));
+            assertFalse(literal(tx).isMoreSpecificThan(wildcard("two", equalTo(2), "three", equalTo("4"))));
+            assertFalse(literal(tx).isMoreSpecificThan(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}), "four", equalTo(4))));
+        }
     }
 
     @Test
     public void shouldCorrectlyJudgeMutex() {
-        assertFalse(literal().isMutuallyExclusive(literal()));
-        assertFalse(literal().isMutuallyExclusive(lazy()));
-        assertFalse(literal().isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}))));
-        assertTrue(literal().isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("4"), "array", equalTo(new int[]{4, 5}))));
-        assertTrue(literal().isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("3"))));
-        assertFalse(literal().isMutuallyExclusive(wildcard("two", equalTo(2), "three", equalTo("3"))));
-        assertTrue(literal().isMutuallyExclusive(wildcard("two", equalTo(2), "three", equalTo("4"))));
-        assertTrue(literal().isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}), "four", equalTo(4))));
+        try (Transaction tx = database.beginTx()) {
+            assertFalse(literal(tx).isMutuallyExclusive(literal(tx)));
+            assertFalse(literal(tx).isMutuallyExclusive(lazy(tx)));
+            assertFalse(literal(tx).isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}))));
+            assertTrue(literal(tx).isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("4"), "array", equalTo(new int[]{4, 5}))));
+            assertTrue(literal(tx).isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("3"))));
+            assertFalse(literal(tx).isMutuallyExclusive(wildcard("two", equalTo(2), "three", equalTo("3"))));
+            assertTrue(literal(tx).isMutuallyExclusive(wildcard("two", equalTo(2), "three", equalTo("4"))));
+            assertTrue(literal(tx).isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}), "four", equalTo(4))));
+        }
     }
 }

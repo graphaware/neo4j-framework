@@ -38,11 +38,10 @@ import static org.neo4j.graphdb.RelationshipType.withName;
 /**
  * Unit test for  {@link com.graphaware.common.policy.inclusion.fluent.IncludeRelationships}.
  */
-@TestInstance(PER_CLASS)
 @ExtendWith(Neo4jExtension.class)
 public class IncludeRelationshipsTest {
 
-    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.CLASS)
+    @InjectNeo4j
     private GraphDatabaseService database;
 
     @Test

@@ -96,6 +96,19 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
      * {@inheritDoc}
      */
     @Override
+    public void removeSelf() {
+        stop();
+
+        databaseManagementService.unregisterTransactionEventListener(database.databaseName(),this);
+        databaseManagementService.unregisterDatabaseEventListener(this);
+
+        RuntimeRegistry.unregisterRuntime(database.databaseName(), this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public synchronized void registerModule(Module module) {
         if (!State.REGISTERED.equals(state)) {
             LOG.error("Modules must be registered before GraphAware Runtime is started!");
@@ -167,6 +180,24 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         if (!isStarted(null)) {
             throw new IllegalStateException("It appears that the thread starting the runtime called waitUntilStarted() before it's finished its job. This is a bug");
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void stop() {
+        if (State.SHUTDOWN.equals(state)) {
+            return;
+        }
+
+        LOG.info("Stopping GraphAware Runtime... ");
+
+        state = State.SHUTDOWN;
+
+        doStop();
+
+        LOG.info("GraphAware Runtime stopped.");
     }
 
     /**
@@ -263,9 +294,7 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
     public void databaseShutdown(DatabaseEventContext eventContext) {
         LOG.info("Shutting down GraphAware Runtime... ");
 
-        state = State.SHUTDOWN;
-
-        doStop();
+        stop();
 
         RuntimeRegistry.removeRuntime(eventContext.getDatabaseName());
 

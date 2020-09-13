@@ -16,11 +16,15 @@
 
 package com.graphaware.tx.executor.batch;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.test.data.CypherPopulator;
 import com.graphaware.test.data.DatabasePopulator;
-import com.graphaware.test.integration.DatabaseIntegrationTest;
 import com.graphaware.tx.executor.input.TransactionalInput;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.kernel.impl.transaction.stats.TransactionCounters;
@@ -34,11 +38,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Unit test for {@link TransactionalInput}.
  */
-public class TransactionalInputTest extends DatabaseIntegrationTest {
+@ExtendWith(Neo4jExtension.class)
+public class TransactionalInputTest {
 
-    @Override
-    protected DatabasePopulator databasePopulator() {
-        return new CypherPopulator() {
+    @InjectNeo4j
+    protected GraphDatabaseService database;
+
+    @BeforeEach
+    private void populate() {
+        new CypherPopulator() {
             @Override
             protected String[] statementGroups() {
                 return new String[]{
@@ -48,15 +56,15 @@ public class TransactionalInputTest extends DatabaseIntegrationTest {
                         "CREATE (p:Person {name:'Christophe'})"
                 };
             }
-        };
+        }.populate(database);
     }
 
     @Test
     public void shouldReturnItemsInMultipleTransactions() {
-        TransactionCounters monitor = ((GraphDatabaseAPI) getDatabase()).getDependencyResolver().resolveDependency(TransactionCounters.class);
+        TransactionCounters monitor = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(TransactionCounters.class);
         long noTx = monitor.getNumberOfCommittedTransactions();
 
-        TransactionalInput<Node> input = new TransactionalInput<>(getDatabase(), 2, database -> () -> database.findNodes(Label.label("Person")));
+        TransactionalInput<Node> input = new TransactionalInput<>(database, 2, database -> () -> database.findNodes(Label.label("Person")));
 
         Set<Node> nodes = new HashSet<>();
 
@@ -72,10 +80,10 @@ public class TransactionalInputTest extends DatabaseIntegrationTest {
 
     @Test
     public void shouldReturnItemsInMultipleTransactions2() {
-        TransactionCounters monitor = ((GraphDatabaseAPI) getDatabase()).getDependencyResolver().resolveDependency(TransactionCounters.class);
+        TransactionCounters monitor = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(TransactionCounters.class);
         long noTx = monitor.getNumberOfCommittedTransactions();
 
-        TransactionalInput<Node> input = new TransactionalInput<>(getDatabase(), 1, database -> () -> database.findNodes(Label.label("Person")));
+        TransactionalInput<Node> input = new TransactionalInput<>(database, 1, database -> () -> database.findNodes(Label.label("Person")));
 
         Set<Node> nodes = new HashSet<>();
 
@@ -90,10 +98,10 @@ public class TransactionalInputTest extends DatabaseIntegrationTest {
 
     @Test
     public void shouldReturnItemsInMultipleTransactions3() {
-        TransactionCounters monitor = ((GraphDatabaseAPI) getDatabase()).getDependencyResolver().resolveDependency(TransactionCounters.class);
+        TransactionCounters monitor = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(TransactionCounters.class);
         long noTx = monitor.getNumberOfCommittedTransactions();
 
-        TransactionalInput<Node> input = new TransactionalInput<>(getDatabase(), 3, database -> () -> database.findNodes(Label.label("Person")));
+        TransactionalInput<Node> input = new TransactionalInput<>(database, 3, database -> () -> database.findNodes(Label.label("Person")));
 
         Set<Node> nodes = new HashSet<>();
 
@@ -108,10 +116,10 @@ public class TransactionalInputTest extends DatabaseIntegrationTest {
 
     @Test
     public void shouldReturnItemsInMultipleTransactions4() {
-        TransactionCounters monitor = ((GraphDatabaseAPI) getDatabase()).getDependencyResolver().resolveDependency(TransactionCounters.class);
+        TransactionCounters monitor = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(TransactionCounters.class);
         long noTx = monitor.getNumberOfCommittedTransactions();
 
-        TransactionalInput<Node> input = new TransactionalInput<>(getDatabase(), 100, database -> () -> database.findNodes(Label.label("Person")));
+        TransactionalInput<Node> input = new TransactionalInput<>(database, 100, database -> () -> database.findNodes(Label.label("Person")));
 
         Set<Node> nodes = new HashSet<>();
 

@@ -16,19 +16,17 @@
 
 package com.graphaware.runtime.module.thirdparty;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.common.representation.GraphDetachedNode;
 import com.graphaware.common.representation.GraphDetachedRelationship;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.writer.thirdparty.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Transaction;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.neo4j.graphdb.*;
 import org.neo4j.harness.Neo4j;
-import org.neo4j.harness.Neo4jBuilders;
 import org.neo4j.internal.helpers.collection.MapUtil;
 
 import java.util.Collection;
@@ -37,21 +35,14 @@ import java.util.Collections;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(Neo4jExtension.class)
 public class ThirdPartyIntegrationModuleTest {
 
-    private Neo4j controls;
+    @InjectNeo4j
+    private Neo4j neo4j;
+
+    @InjectNeo4j
     private GraphDatabaseService database;
-
-    @BeforeEach
-    public void setUp() {
-        controls = Neo4jBuilders.newInProcessBuilder().build();
-        database = controls.defaultDatabaseService();
-    }
-
-    @AfterEach
-    public void tearDown() {
-        controls.close();
-    }
 
     @Test
     public void modificationsShouldBeCorrectlyBuilt() {
@@ -60,30 +51,38 @@ public class ThirdPartyIntegrationModuleTest {
         database.executeTransactionally("CREATE (p:Person {name:'Michal', age:30})-[:WORKS_FOR {since:2013, role:'MD'}]->(c:Company {name:'GraphAware', est: 2013})");
         database.executeTransactionally("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Adam'})-[:WORKS_FOR {since:2014}]->(ga)");
 
-        long danielaId, michalId, adamId, gaId;
+        long danielaId, michalId, adamId, gaId, dWorksForId, mWorksForId, aWorksForId;
         try (Transaction tx = database.beginTx()) {
             michalId = tx.findNode(Label.label("Person"), "name", "Michal").getId();
-            adamId = tx.findNode(Label.label("Person"), "name", "Adam").getId();
+            Node adam = tx.findNode(Label.label("Person"), "name", "Adam");
+            adamId = adam.getId();
             gaId = tx.findNode(Label.label("Company"), "name", "GraphAware").getId();
+            aWorksForId = adam.getSingleRelationship(RelationshipType.withName("WORKS_FOR"), Direction.OUTGOING).getId();
 
             tx.commit();
         }
 
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(controls.databaseManagementService(), database);
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(module);
         runtime.start();
         runtime.waitUntilStarted();
 
         try (Transaction tx = database.beginTx()) {
-            database.executeTransactionally("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Daniela'})-[:WORKS_FOR]->(ga)");
-            database.executeTransactionally("MATCH (p:Person {name:'Michal'}) SET p.age=31");
-            database.executeTransactionally("MATCH (p:Person {name:'Adam'})-[r]-() DELETE p,r");
-            database.executeTransactionally("MATCH (p:Person {name:'Michal'})-[r:WORKS_FOR]->() REMOVE r.role");
+            tx.execute("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Daniela'})-[:WORKS_FOR]->(ga)");
+            tx.execute("MATCH (p:Person {name:'Michal'}) SET p.age=31");
+            tx.execute("MATCH (p:Person {name:'Adam'})-[r]-() DELETE p,r");
+            tx.execute("MATCH (p:Person {name:'Michal'})-[r:WORKS_FOR]->() REMOVE r.role");
             tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            danielaId = tx.findNode(Label.label("Person"), "name", "Daniela").getId();
+            Node daniela = tx.findNode(Label.label("Person"), "name", "Daniela");
+            dWorksForId = daniela.getSingleRelationship(RelationshipType.withName("WORKS_FOR"), Direction.OUTGOING).getId();
+            danielaId = daniela.getId();
+
+            Node michal = tx.findNode(Label.label("Person"), "name", "Michal");
+            mWorksForId = michal.getSingleRelationship(RelationshipType.withName("WORKS_FOR"), Direction.OUTGOING).getId();
+
             tx.commit();
         }
 
@@ -101,15 +100,15 @@ public class ThirdPartyIntegrationModuleTest {
                 new GraphDetachedNode(adamId, new String[]{"Person"}, MapUtil.map("name", "Adam")))));
 
         assertTrue(writeOperations.contains(new RelationshipCreated<>(
-                new GraphDetachedRelationship(21L, danielaId, gaId, "WORKS_FOR", Collections.<String, Object>emptyMap())
+                new GraphDetachedRelationship(dWorksForId, danielaId, gaId, "WORKS_FOR", Collections.<String, Object>emptyMap())
         )));
 
         assertTrue(writeOperations.contains(new RelationshipUpdated<>(
-                new GraphDetachedRelationship(0L, michalId, gaId, "WORKS_FOR", MapUtil.map("since", 2013L, "role", "MD")),
-                new GraphDetachedRelationship(0L, michalId, gaId, "WORKS_FOR", MapUtil.map("since", 2013L)))));
+                new GraphDetachedRelationship(mWorksForId, michalId, gaId, "WORKS_FOR", MapUtil.map("since", 2013L, "role", "MD")),
+                new GraphDetachedRelationship(mWorksForId, michalId, gaId, "WORKS_FOR", MapUtil.map("since", 2013L)))));
 
         assertTrue(writeOperations.contains(new RelationshipDeleted<>(
-                new GraphDetachedRelationship(20L, adamId, gaId, "WORKS_FOR", MapUtil.map("since", 2014L))
+                new GraphDetachedRelationship(aWorksForId, adamId, gaId, "WORKS_FOR", MapUtil.map("since", 2014L))
         )));
 
         for (WriteOperation<?> operation : writeOperations) {
@@ -119,6 +118,6 @@ public class ThirdPartyIntegrationModuleTest {
             }
         }
 
-        controls.close();
+        runtime.removeSelf();
     }
 }

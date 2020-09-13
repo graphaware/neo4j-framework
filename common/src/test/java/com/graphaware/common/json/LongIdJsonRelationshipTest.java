@@ -27,21 +27,19 @@ import com.graphaware.common.transform.RelationshipIdTransformer;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.util.Collections;
 
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-
-@TestInstance(PER_CLASS)
 @ExtendWith(Neo4jExtension.class)
 public class LongIdJsonRelationshipTest {
 
-    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.CLASS)
+    @InjectNeo4j
     private GraphDatabaseService database;
+
+    private long rId1, rId2, a, b;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -62,6 +60,11 @@ public class LongIdJsonRelationshipTest {
             r2.setProperty("k1", "v2");
             r2.setProperty("k2", 4);
 
+            a = node1.getId();
+            b = node2.getId();
+            rId1 = r.getId();
+            rId2 = r2.getId();
+
             tx.commit();
         }
     }
@@ -69,32 +72,32 @@ public class LongIdJsonRelationshipTest {
     @Test
     public void shouldCorrectlySerialiseRelationships() throws JsonProcessingException, JSONException {
         try (Transaction tx = database.beginTx()) {
-            Relationship r = tx.getRelationshipById(0);
-            Relationship r2 = tx.getRelationshipById(1);
+            Relationship r = tx.getRelationshipById(rId1);
+            Relationship r2 = tx.getRelationshipById(rId2);
 
-            JSONAssert.assertEquals("{\"id\":0,\"properties\":{\"k1\":\"v1\",\"k2\":2},\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r, null)), true);
-            JSONAssert.assertEquals("{\"id\":0,\"properties\":{\"k1\":\"v1\",\"k2\":2},\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r)), true);
+            JSONAssert.assertEquals("{\"id\":" + rId1 + ",\"properties\":{\"k1\":\"v1\",\"k2\":2},\"startNodeId\":" + a + ",\"endNodeId\":" + b + ",\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r, null)), true);
+            JSONAssert.assertEquals("{\"id\":" + rId1 + ",\"properties\":{\"k1\":\"v1\",\"k2\":2},\"startNodeId\":" + a + ",\"endNodeId\":" + b + ",\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r)), true);
 
-            JSONAssert.assertEquals("{\"id\":1000,\"properties\":{\"k1\":\"v2\",\"k2\":4},\"startNodeId\":0,\"endNodeId\":1000,\"type\":\"R2\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r2, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer())), true);
-            JSONAssert.assertEquals("{\"id\":1000,\"properties\":{\"k1\":\"v2\"},\"startNodeId\":0,\"endNodeId\":1000,\"type\":\"R2\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r2, new String[]{"k1"}, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer())), true);
+            JSONAssert.assertEquals("{\"id\":" + rId2 * 1000 + ",\"properties\":{\"k1\":\"v2\",\"k2\":4},\"startNodeId\":" + a * 1000 + ",\"endNodeId\":" + b * 1000 + ",\"type\":\"R2\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r2, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer())), true);
+            JSONAssert.assertEquals("{\"id\":" + rId2 * 1000 + ",\"properties\":{\"k1\":\"v2\"},\"startNodeId\":" + a * 1000 + ",\"endNodeId\":" + b * 1000 + ",\"type\":\"R2\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r2, new String[]{"k1"}, new TimesThousandRelationshipIdTransformer(), new TimesThousandNodeIdTransformer())), true);
 
             JSONAssert.assertEquals("{\"id\":33,\"properties\":{\"a\":\"b\"},\"startNodeId\":44,\"endNodeId\":55,\"type\":\"XX\"}", mapper.writeValueAsString(new LongIdJsonRelationship(33, 44, 55, "XX", Collections.singletonMap("a", "b"))), true);
 
             SerializationSpecification jsonInput1 = new SerializationSpecification();
             jsonInput1.setRelationshipProperties(null);
-            JSONAssert.assertEquals("{\"id\":0,\"properties\":{\"k1\":\"v1\",\"k2\":2},\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r, jsonInput1.getRelationshipProperties())), true);
+            JSONAssert.assertEquals("{\"id\":" + rId1 + ",\"properties\":{\"k1\":\"v1\",\"k2\":2},\"startNodeId\":" + a + ",\"endNodeId\":" + b + ",\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r, jsonInput1.getRelationshipProperties())), true);
 
             SerializationSpecification jsonInput2 = new SerializationSpecification();
             jsonInput2.setRelationshipProperties(new String[]{"k1"});
-            JSONAssert.assertEquals("{\"id\":0,\"properties\":{\"k1\":\"v1\"},\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r, jsonInput2.getRelationshipProperties())), true);
+            JSONAssert.assertEquals("{\"id\":" + rId1 + ",\"properties\":{\"k1\":\"v1\"},\"startNodeId\":" + a + ",\"endNodeId\":" + b + ",\"type\":\"R\"}", mapper.writeValueAsString(new LongIdJsonRelationship(r, jsonInput2.getRelationshipProperties())), true);
 
             SerializationSpecification jsonInput3 = new SerializationSpecification();
             jsonInput3.setRelationshipProperties(new String[]{"k3"});
-            JSONAssert.assertEquals("{\"id\":0,\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\",\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonRelationship(r, jsonInput3.getRelationshipProperties())), true);
+            JSONAssert.assertEquals("{\"id\":" + rId1 + ",\"startNodeId\":" + a + ",\"endNodeId\":" + b + ",\"type\":\"R\",\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonRelationship(r, jsonInput3.getRelationshipProperties())), true);
 
             SerializationSpecification jsonInput4 = new SerializationSpecification();
             jsonInput4.setRelationshipProperties(new String[0]);
-            JSONAssert.assertEquals("{\"id\":0,\"startNodeId\":0,\"endNodeId\":1,\"type\":\"R\",\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonRelationship(r, jsonInput4.getRelationshipProperties())), true);
+            JSONAssert.assertEquals("{\"id\":" + rId1 + ",\"startNodeId\":" + a + ",\"endNodeId\":" + b + ",\"type\":\"R\",\"properties\":{}}", mapper.writeValueAsString(new LongIdJsonRelationship(r, jsonInput4.getRelationshipProperties())), true);
         }
     }
 

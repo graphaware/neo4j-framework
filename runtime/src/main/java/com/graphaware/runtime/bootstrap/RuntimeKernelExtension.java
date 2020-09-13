@@ -23,6 +23,7 @@ import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.runtime.config.Neo4jConfigBasedRuntimeConfiguration;
 import com.graphaware.runtime.module.Module;
 import com.graphaware.runtime.module.ModuleBootstrapper;
+import com.graphaware.runtime.settings.FrameworkSettingsDeclaration;
 import org.neo4j.configuration.Config;
 import org.neo4j.configuration.SettingImpl;
 import org.neo4j.configuration.SettingValueParsers;
@@ -35,6 +36,8 @@ import org.neo4j.logging.Log;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.graphaware.runtime.settings.FrameworkSettingsDeclaration.*;
 
 /**
  * Neo4j kernel extension that automatically creates a {@link GraphAwareRuntime} and registers
@@ -76,7 +79,6 @@ import java.util.regex.Pattern;
 public class RuntimeKernelExtension implements Lifecycle {
     private static final Log LOG = LoggerFactory.getLogger(RuntimeKernelExtension.class);
 
-    public static final Setting<Boolean> RUNTIME_ENABLED = SettingImpl.newBuilder("com.graphaware.runtime.enabled", SettingValueParsers.BOOL, false).build();
     public static final String MODULE_CONFIG_KEY = "com.graphaware.module"; //.ID.Order = fully qualified class name of bootstrapper
     private static final Pattern MODULE_ENABLED_KEY = Pattern.compile("com\\.graphaware\\.module\\.([a-zA-Z0-9]{1,})\\.([0-9]{1,})");
     private static final int WAIT_MINUTES = 5;
@@ -85,6 +87,7 @@ public class RuntimeKernelExtension implements Lifecycle {
     protected final Config config;
     protected final DatabaseManagementService managementService;
     protected final GraphDatabaseService database;
+    protected Map<String, String> gaConfig;
 
     public RuntimeKernelExtension(Config config, DatabaseManagementService managementService, GraphDatabaseService database) {
         this.config = config;
@@ -100,6 +103,8 @@ public class RuntimeKernelExtension implements Lifecycle {
         if (isOnEnterprise() && !hasEnterpriseFramework()) {
             throw new RuntimeException("GraphAware Framework Community Edition is not supported on Neo4j Enterprise. Please email info@graphaware.com to get access to GraphAware Framework Enterprise Edition instead.");
         }
+
+        gaConfig = gaConfig();
     }
 
     /**
@@ -107,7 +112,11 @@ public class RuntimeKernelExtension implements Lifecycle {
      */
     @Override
     public void start() {
-        if (!config.get(RUNTIME_ENABLED)) {
+        if ("system".equals(database.databaseName())) {
+            LOG.info("GraphAware Runtime always disabled on system database.");
+            return;
+        }
+        if (!config.get(ga_runtime_enabled)) {
             LOG.info("GraphAware Runtime disabled.");
             return;
         }
@@ -163,13 +172,13 @@ public class RuntimeKernelExtension implements Lifecycle {
     private List<Pair<Integer, Pair<String, String>>> findOrderedBootstrappers() {
         List<Pair<Integer, Pair<String, String>>> orderedBootstrappers = new ArrayList<>();
 
-        for (Setting<Object> paramKey : config.getValues().keySet()) {
-            Matcher matcher = MODULE_ENABLED_KEY.matcher(paramKey.name());
+        for (String paramKey : gaConfig.keySet()) {
+            Matcher matcher = MODULE_ENABLED_KEY.matcher(paramKey);
 
             if (matcher.find()) {
                 String moduleId = matcher.group(1);
                 Integer moduleOrder = Integer.valueOf(matcher.group(2));
-                String bootstrapperClass = config.get(paramKey) == null ? "UNKNOWN" : config.get(paramKey).toString();
+                String bootstrapperClass = gaConfig.get(paramKey) == null ? "UNKNOWN" : gaConfig.get(paramKey);
                 orderedBootstrappers.add(Pair.of(moduleOrder, Pair.of(moduleId, bootstrapperClass)));
             }
         }
@@ -183,13 +192,28 @@ public class RuntimeKernelExtension implements Lifecycle {
         Map<String, String> moduleConfig = new HashMap<>();
 
         String moduleConfigKeyPrefix = MODULE_CONFIG_KEY + "." + moduleId + ".";
-        for (Setting<Object> paramKey: config.getValues().keySet()) {
-            if (paramKey.name().startsWith(moduleConfigKeyPrefix) || !MODULE_ENABLED_KEY.matcher(paramKey.name()).find()) {
-                moduleConfig.put(paramKey.name().replace(moduleConfigKeyPrefix, ""), config.get(paramKey).toString());
+        for (String paramKey: gaConfig.keySet()) {
+            if (paramKey.startsWith(moduleConfigKeyPrefix) || !MODULE_ENABLED_KEY.matcher(paramKey).find()) {
+                moduleConfig.put(paramKey.replace(moduleConfigKeyPrefix, ""), gaConfig.get(paramKey));
             }
         }
 
         return moduleConfig;
+    }
+
+    private Map<String, String> gaConfig() {
+        Map<String, String> result = new HashMap<>();
+
+        String configAsString = config.get(ga_modules_config);
+        String[] individualConfig = configAsString.split(",");
+        for (String config : individualConfig) {
+            String[] kv=config.split("=");
+            if (kv.length == 2) {
+                result.put(kv[0],kv[1]);
+            }
+        }
+
+        return result;
     }
 
     protected boolean isOnEnterprise() {

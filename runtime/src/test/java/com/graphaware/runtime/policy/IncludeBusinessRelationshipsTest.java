@@ -16,11 +16,14 @@
 
 package com.graphaware.runtime.policy;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.common.policy.inclusion.fluent.IncludeRelationships;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessRelationships;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -40,21 +43,13 @@ import static org.neo4j.graphdb.RelationshipType.withName;
 /**
  * Test for {@link com.graphaware.common.policy.inclusion.composite.CompositeRelationshipInclusionPolicy} with {@link com.graphaware.runtime.policy.all.IncludeAllBusinessNodes} and a programmatically configured {@link com.graphaware.common.policy.inclusion.fluent.IncludeRelationships}
  */
+@ExtendWith(Neo4jExtension.class)
 public class IncludeBusinessRelationshipsTest {
 
-    private Neo4j controls;
+    @InjectNeo4j
+    private Neo4j neo4j;
+    @InjectNeo4j
     private GraphDatabaseService database;
-
-    @BeforeEach
-    public void setUp() {
-        controls = Neo4jBuilders.newInProcessBuilder().build();
-        database = controls.defaultDatabaseService();
-    }
-
-    @AfterEach
-    public void tearDown() {
-        controls.close();
-    }
 
     @Test
     public void shouldIncludeCorrectRelationships() {

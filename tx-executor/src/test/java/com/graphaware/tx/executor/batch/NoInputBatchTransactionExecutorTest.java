@@ -16,10 +16,14 @@
 
 package com.graphaware.tx.executor.batch;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
+import com.graphaware.test.integration.DatabaseIntegrationTest;
 import com.graphaware.tx.executor.NullItem;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.harness.Neo4j;
@@ -31,21 +35,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Unit test for {@link com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class NoInputBatchTransactionExecutorTest {
 
-    private Neo4j controls;
+    @InjectNeo4j
     protected GraphDatabaseService database;
-
-    @BeforeEach
-    public void setUp() {
-        controls = Neo4jBuilders.newInProcessBuilder().build();
-        database = controls.defaultDatabaseService();
-    }
-
-    @AfterEach
-    public void tearDown() {
-        controls.close();
-    }
 
     @Test
     public void whenBatchSizeDividesNumberOfStepsThenAllStepsShouldBeExecuted() {

@@ -21,29 +21,33 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.neo4j.configuration.GraphDatabaseSettings;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.config.Setting;
-import org.neo4j.harness.Neo4j;
-import org.neo4j.harness.Neo4jBuilder;
-import org.neo4j.harness.Neo4jBuilders;
+import org.neo4j.server.NeoServer;
+import org.neo4j.server.database.DatabaseService;
+import org.neo4j.server.helpers.CommunityServerBuilder;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Base class for all kinds of Neo4j integration tests.
  * <p>
- * Allows subclasses to populate a test database by overriding {@link #populateDatabase(org.neo4j.graphdb.GraphDatabaseService)},
+ * Allows subclasses to create a database at the beginning of each test by overriding {@link #createDatabase()} and allows
+ * them to populate it by overriding {@link #populateDatabase(org.neo4j.graphdb.GraphDatabaseService)},
  * or by providing a {@link com.graphaware.test.data.DatabasePopulator} by overriding {@link #databasePopulator()}.
  * <p>
  * Shuts the database down at the end of each test.
  */
 public abstract class DatabaseIntegrationTest {
 
-    private Neo4j database;
+    private NeoServer server;
+    private GraphDatabaseService database;
 
     @BeforeEach
     public void setUp() throws Exception {
-        Neo4jBuilder builder = Neo4jBuilders.newInProcessBuilder();
+        CommunityServerBuilder builder = CommunityServerBuilder.serverOnRandomPorts();
 
         builder = configure(builder);
 
@@ -51,14 +55,18 @@ public abstract class DatabaseIntegrationTest {
             builder = registerProceduresAndFunctions(builder);
         }
 
-        database = builder.build();
+        server = builder.build();
 
-        populateDatabase(database.defaultDatabaseService());
+        server.start();
+
+        database = server.getDatabaseService().getDatabase();
+
+        populateDatabase(database);
     }
 
     @AfterEach
     public void tearDown() throws Exception {
-        database.close();
+        server.stop();
     }
 
     /**
@@ -83,7 +91,7 @@ public abstract class DatabaseIntegrationTest {
     }
 
     /**
-     * @return <code>iff</code> the {@link #registerProceduresAndFunctions(TestServerBuilder)} method should be called during {@link #setUp()}.
+     * @return <code>iff</code> the {@link #registerProceduresAndFunctions(Procedures)} method should be called during {@link #setUp()}.
      */
     protected boolean shouldRegisterProceduresAndFunctions() {
         return true;
@@ -92,9 +100,9 @@ public abstract class DatabaseIntegrationTest {
     /**
      * Register procedures and functions.
      *
-     * @param builder to register against.
+     * @param procedures to register against.
      */
-    protected Neo4jBuilder registerProceduresAndFunctions(Neo4jBuilder builder) throws Exception {
+    protected CommunityServerBuilder registerProceduresAndFunctions(CommunityServerBuilder builder) throws Exception {
         //no-op by default
 
         return builder;
@@ -107,17 +115,17 @@ public abstract class DatabaseIntegrationTest {
         return null;
     }
 
-    protected Neo4j getNeo4j() {
-        return database;
-    }
-
     /**
      * Get the database instantiated for this test.
      *
      * @return database.
      */
-    protected GraphDatabaseService getDatabase() {
-        return database.defaultDatabaseService();
+    protected DatabaseService getServer() {
+        return server.getDatabaseService();
+    }
+
+    public GraphDatabaseService getDatabase() {
+        return database;
     }
 
     /**
@@ -129,18 +137,40 @@ public abstract class DatabaseIntegrationTest {
      *
      * @param builder to populate.
      */
-    protected Neo4jBuilder configure(Neo4jBuilder builder) {
-        builder = builder.withConfig(GraphDatabaseSettings.auth_enabled, authEnabled());
-
-        if (configFile() != null) {
-            IntegrationTestUtils.applyConfig(builder, configFile());
+    protected CommunityServerBuilder configure(CommunityServerBuilder builder) throws IOException {
+        for (Map.Entry<String, String> mapping : thirdPartyJaxRsPackageMappings().entrySet()) {
+            builder = builder.withThirdPartyJaxRsPackage(mapping.getKey(), mapping.getValue());
         }
 
-        for (Map.Entry<Setting, String> config : additionalServerConfiguration().entrySet()) {
-            builder = builder.withConfig(config.getKey(), config.getValue());
+        builder = builder.withProperty(GraphDatabaseSettings.auth_enabled.name(), Boolean.toString(authEnabled()));
+
+        if (configFile() != null) {
+            Properties properties = new Properties();
+            properties.load(new ClassPathResource(configFile()).getInputStream());
+            for (String key : properties.stringPropertyNames()) {
+                builder = builder.withProperty(key, properties.getProperty(key));
+            }
+        }
+
+        for (Map.Entry<String, String> config : additionalServerConfiguration().entrySet()) {
+            builder = builder.withProperty(config.getKey(), config.getValue());
         }
 
         return builder;
+    }
+
+
+    /**
+     * Provide information for registering unmanaged extensions.
+     * <p>
+     * This method is only called iff {@link #configFile()} returns <code>null</code>.
+     *
+     * @return map where the key is the package in which a set of extensions live and value is the mount point of those
+     * extensions, i.e., a URL under which they will be exposed relative to the server address
+     * (typically http://localhost:7575 for tests).
+     */
+    protected Map<String, String> thirdPartyJaxRsPackageMappings() {
+        return Collections.emptyMap();
     }
 
     /**
@@ -150,7 +180,7 @@ public abstract class DatabaseIntegrationTest {
      *
      * @return map of configuration key-value pairs.
      */
-    protected Map<Setting, String> additionalServerConfiguration() {
+    protected Map<String, String> additionalServerConfiguration() {
         return Collections.emptyMap();
     }
 

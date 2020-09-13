@@ -17,11 +17,10 @@
 package com.graphaware.common.description.relationship;
 
 import com.graphaware.common.junit.InjectNeo4j;
-import com.graphaware.common.junit.InjectNeo4j.Lifecycle;
 import com.graphaware.common.junit.Neo4jExtension;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -32,20 +31,18 @@ import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.relationship.RelationshipDescriptionFactory.literal;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.neo4j.graphdb.Direction.*;
 
 /**
  * Test for {@link com.graphaware.common.description.relationship.DetachedRelationshipDescriptionImpl}.
  */
-@TestInstance(PER_CLASS)
 @ExtendWith(Neo4jExtension.class)
 public class DetachedRelationshipDescriptionImplTest {
 
-    @InjectNeo4j(lifecycle = Lifecycle.CLASS)
+    @InjectNeo4j
     private GraphDatabaseService database;
 
-    @BeforeAll
+    @BeforeEach
     protected void populate() {
         try (Transaction tx = database.beginTx()) {
             Node root = tx.createNode();

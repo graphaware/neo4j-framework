@@ -22,32 +22,22 @@ import com.graphaware.common.policy.inclusion.*;
 import com.graphaware.common.policy.inclusion.none.IncludeNoNodes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
-
-import java.util.function.Consumer;
 
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.test.unit.GraphUnit.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 
 /**
  * Unit test for {@link com.graphaware.test.unit.GraphUnit}.
  */
-@TestInstance(PER_CLASS)
 @ExtendWith(Neo4jExtension.class)
 public class GraphUnitTest {
 
-    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.CLASS)
+    @InjectNeo4j
     protected GraphDatabaseService database;
-
-    @AfterEach
-    public void tearDown() {
-        database.executeTransactionally("MATCH (n) DETACH DELETE n");
-    }
 
     private void populateDatabase(String cypher) {
         database.executeTransactionally(cypher);

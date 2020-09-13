@@ -17,14 +17,11 @@
 package com.graphaware.common.util;
 
 import com.graphaware.common.junit.InjectNeo4j;
-import com.graphaware.common.junit.InjectNeo4j.Lifecycle;
 import com.graphaware.common.junit.Neo4jExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -39,25 +36,32 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(Neo4jExtension.class)
 public class ChangeTest {
 
-    @InjectNeo4j(lifecycle = Lifecycle.METHOD)
+    @InjectNeo4j
     private GraphDatabaseService database;
+
+    private long a, b, c;
 
     @BeforeEach
     private void populate() {
-        database.executeTransactionally("CREATE " +
+        Map<String, Object> result = database.executeTransactionally("CREATE " +
                 "(a), " +
                 "(b {key:'value'})," +
                 "(b)-[:test]->(a)," +
-                "(c {key:'value'})");
+                "(c {key:'value'}) RETURN id(a) as a, id(b) as b, id(c) as c", Collections.emptyMap(),
+                Result::next);
+
+        a = (long) result.get("a");
+        b = (long) result.get("b");
+        c = (long) result.get("c");
     }
 
     @Test
     public void shouldConvertChangesToMap() {
         try (Transaction tx = database.beginTx()) {
-            Change<Node> nodeChange = new Change<>(tx.getNodeById(0), tx.getNodeById(0));
+            Change<Node> nodeChange = new Change<>(tx.getNodeById(a), tx.getNodeById(a));
             Map<Long, Change<Node>> changeMap = changesToMap(asList(nodeChange));
-            assertEquals(0, changeMap.get(0L).getCurrent().getId());
-            assertEquals(0, changeMap.get(0L).getPrevious().getId());
+            assertEquals(a, changeMap.get(a).getCurrent().getId());
+            assertEquals(a, changeMap.get(a).getPrevious().getId());
             assertEquals(1, changeMap.size());
         }
     }
@@ -65,9 +69,9 @@ public class ChangeTest {
     @Test
     public void equalChangesShouldBeEqual() {
         try (Transaction tx = database.beginTx()) {
-            Change<Node> nodeChange1 = new Change<>(tx.getNodeById(0), tx.getNodeById(0));
-            Change<Node> nodeChange2 = new Change<>(tx.getNodeById(0), tx.getNodeById(0));
-            Change<Node> nodeChange3 = new Change<>(tx.getNodeById(1), tx.getNodeById(1));
+            Change<Node> nodeChange1 = new Change<>(tx.getNodeById(a), tx.getNodeById(a));
+            Change<Node> nodeChange2 = new Change<>(tx.getNodeById(a), tx.getNodeById(a));
+            Change<Node> nodeChange3 = new Change<>(tx.getNodeById(b), tx.getNodeById(b));
 
             assertTrue(nodeChange1.equals(nodeChange2));
             assertTrue(nodeChange2.equals(nodeChange1));
@@ -80,7 +84,7 @@ public class ChangeTest {
     public void invalidChangeShouldThrowException() {
         assertThrows(IllegalArgumentException.class, () -> {
             try (Transaction tx = database.beginTx()) {
-                Change<Node> nodeChange1 = new Change<>(tx.getNodeById(0), tx.getNodeById(1));
+                Change<Node> nodeChange1 = new Change<>(tx.getNodeById(a), tx.getNodeById(b));
                 changesToMap(Collections.singleton(nodeChange1));
             }
         });

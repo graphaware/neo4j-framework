@@ -16,12 +16,14 @@
 
 package com.graphaware.example;
 
-import com.graphaware.test.integration.DatabaseIntegrationTest;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.neo4j.graphdb.*;
+import org.neo4j.harness.Neo4j;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -33,24 +35,37 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Test for {@link FriendshipStrengthCounter}.
  */
-public class FriendshipStrengthCounterTest extends DatabaseIntegrationTest {
+@ExtendWith(Neo4jExtension.class)
+public class FriendshipStrengthCounterTest {
 
+    @InjectNeo4j
+    private Neo4j neo4j;
+    @InjectNeo4j
+    private GraphDatabaseService database;
+
+    private FriendshipStrengthCounter listener;
+
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
+        listener = new FriendshipStrengthCounter(database);
+        neo4j.databaseManagementService().registerTransactionEventListener(database.databaseName(), listener);
+    }
 
-        getNeo4j().databaseManagementService().registerTransactionEventListener(getDatabase().databaseName(), new FriendshipStrengthCounter(getDatabase()));
+    @AfterEach
+    public void tearDown() {
+        neo4j.databaseManagementService().unregisterTransactionEventListener(database.databaseName(), listener);
     }
 
     @Test
     public void totalFriendshipStrengthShouldBeZeroInEmptyDatabase() {
-        assertEquals(0L, getTotalFriendshipStrength(getDatabase()));
+        assertEquals(0L, getTotalFriendshipStrength(database));
     }
 
     @Test
     public void totalFriendshipStrengthShouldBeCounted() {
         long p1id, p2id;
 
-        try (Transaction tx = getDatabase().beginTx()) {
+        try (Transaction tx = database.beginTx()) {
             Node person1 = tx.createNode();
             Node person2 = tx.createNode();
             Node person3 = tx.createNode();
@@ -71,10 +86,10 @@ public class FriendshipStrengthCounterTest extends DatabaseIntegrationTest {
             tx.commit();
         }
 
-        assertEquals(9L, getTotalFriendshipStrength(getDatabase()));
+        assertEquals(9L, getTotalFriendshipStrength(database));
 
         //delete and change some friendships
-        try (Transaction tx = getDatabase().beginTx()) {
+        try (Transaction tx = database.beginTx()) {
             for (Relationship relationship : tx.getNodeById(p1id).getRelationships(Direction.OUTGOING, FRIEND_OF)) {
                 if (relationship.getEndNode().getId() == p2id) {
                     relationship.delete(); //remove 2 from total strength
@@ -86,12 +101,12 @@ public class FriendshipStrengthCounterTest extends DatabaseIntegrationTest {
             tx.commit();
         }
 
-        assertEquals(8L, getTotalFriendshipStrength(getDatabase()));
+        assertEquals(8L, getTotalFriendshipStrength(database));
     }
 
     @Test
     public void totalFriendshipStrengthShouldBeCountedUsingCypher() {
-        getDatabase().executeTransactionally("CREATE " +
+        database.executeTransactionally("CREATE " +
                 "(p1:Person), (p2:Person), (p3:Person)," +
                 "(p1)-[:FRIEND_OF {strength:3}]->(p2)," +
                 "(p2)-[:FRIEND_OF {strength:1}]->(p1)," +
@@ -99,7 +114,7 @@ public class FriendshipStrengthCounterTest extends DatabaseIntegrationTest {
 
         String query = "MATCH (c:FriendshipCounter) RETURN c.totalFriendshipStrength as result";
 
-        try (Transaction tx = getDatabase().beginTx()) {
+        try (Transaction tx = database.beginTx()) {
             Iterator<Map<String, Object>> execute = tx.execute(query);
 
             while (execute.hasNext()) {
@@ -110,10 +125,9 @@ public class FriendshipStrengthCounterTest extends DatabaseIntegrationTest {
             tx.commit();
         }
 
-
         query = "MATCH (p1:Person)-[f:FRIEND_OF {strength:3}]->(p2) DELETE f";
 
-        try (Transaction tx = getDatabase().beginTx()) {
+        try (Transaction tx = database.beginTx()) {
             Iterator<Map<String, Object>> execute = tx.execute(query);
 
             while (execute.hasNext()) {

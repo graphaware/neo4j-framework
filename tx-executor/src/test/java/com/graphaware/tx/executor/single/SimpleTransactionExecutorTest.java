@@ -16,9 +16,12 @@
 
 package com.graphaware.tx.executor.single;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
 import org.neo4j.harness.Neo4j;
 import org.neo4j.harness.Neo4jBuilders;
@@ -30,28 +33,23 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * Unit test for {@link com.graphaware.tx.executor.single.SimpleTransactionExecutor}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class SimpleTransactionExecutorTest {
 
-    private TransactionExecutor executor;
-    private Neo4j controls;
+    @InjectNeo4j
     protected GraphDatabaseService database;
+
+    private TransactionExecutor executor;
+    private long id;
 
     @BeforeEach
     public void setUp() {
-        controls = Neo4jBuilders.newInProcessBuilder().build();
-        database = controls.defaultDatabaseService();
-
         try (Transaction tx = database.beginTx()) {
-            tx.createNode();
+            id = tx.createNode().getId();
             tx.commit();
         }
 
         executor = new SimpleTransactionExecutor(database);
-    }
-
-    @AfterEach
-    public void tearDown() {
-        controls.close();
     }
 
     @Test
@@ -73,7 +71,7 @@ public class SimpleTransactionExecutorTest {
         executor.executeInTransaction(new VoidReturningCallback() {
             @Override
             protected void doInTx(Transaction tx) {
-                tx.getNodeById(0).delete();
+                tx.getNodeById(id).delete();
             }
         });
 
@@ -88,7 +86,7 @@ public class SimpleTransactionExecutorTest {
 
         assertThrows(ConstraintViolationException.class, () -> {
             executor.executeInTransaction(tx -> {
-                tx.getNodeById(0).delete();
+                tx.getNodeById(id).delete();
                 return null;
             });
         });
@@ -103,7 +101,7 @@ public class SimpleTransactionExecutorTest {
         }
 
         executor.executeInTransaction(db -> {
-            db.getNodeById(0).delete();
+            db.getNodeById(id).delete();
             return null;
         }, KeepCalmAndCarryOn.getInstance());
 
@@ -115,7 +113,7 @@ public class SimpleTransactionExecutorTest {
     private void createNodeAndRelationship() {
         executor.executeInTransaction(db -> {
             Node node = db.createNode();
-            node.createRelationshipTo(db.getNodeById(0), RelationshipType.withName("TEST_REL_TYPE"));
+            node.createRelationshipTo(db.getNodeById(id), RelationshipType.withName("TEST_REL_TYPE"));
             return null;
         });
     }

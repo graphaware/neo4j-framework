@@ -30,8 +30,11 @@ import java.util.Map;
  */
 public class TestModuleBootstrapper implements ModuleBootstrapper {
 
-    public static final Setting<String> MODULE_ENABLED = SettingImpl.newBuilder("com.graphaware.module.test.1", SettingValueParsers.STRING, TestModuleBootstrapper.class.getCanonicalName()).build();
-    public static final Setting<String> MODULE_CONFIG = SettingImpl.newBuilder("com.graphaware.module.test.configKey", SettingValueParsers.STRING, "configValue").build();
+    public static final String MODULE_CONFIG;
+
+    static {
+        MODULE_CONFIG = "com.graphaware.module.test.1=" + TestModuleBootstrapper.class.getCanonicalName() + "," + "com.graphaware.module.test.configKey=configValue";
+    }
 
     @Override
     public Module bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {

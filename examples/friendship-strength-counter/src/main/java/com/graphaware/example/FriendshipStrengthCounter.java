@@ -37,10 +37,7 @@ public class FriendshipStrengthCounter extends TransactionEventListenerAdapter<V
     public static final String TOTAL_FRIENDSHIP_STRENGTH = "totalFriendshipStrength";
     public static final Label COUNTER_NODE_LABEL = Label.label("FriendshipCounter");
 
-    private final GraphDatabaseService database;
-
     public FriendshipStrengthCounter(GraphDatabaseService database) {
-        this.database = database;
         try (Transaction tx = database.beginTx()) {
             getCounterNode(tx); //do this in constructor to prevent multiple threads creating multiple nodes
             tx.commit();
@@ -80,12 +77,7 @@ public class FriendshipStrengthCounter extends TransactionEventListenerAdapter<V
 
         if (delta != 0) {
             Node counter = getCounterNode(transaction);
-
-            try (Transaction tx = database.beginTx()) {
-                tx.acquireWriteLock(counter);
-                counter.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (long) counter.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L) + delta);
-                tx.commit();
-            }
+            counter.setProperty(TOTAL_FRIENDSHIP_STRENGTH, (long) counter.getProperty(TOTAL_FRIENDSHIP_STRENGTH, 0L) + delta);
         }
 
         return null;

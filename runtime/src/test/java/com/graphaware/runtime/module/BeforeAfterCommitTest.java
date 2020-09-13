@@ -16,11 +16,15 @@
 
 package com.graphaware.runtime.module;
 
+import com.graphaware.common.junit.DirtiesNeo4j;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.TransactionData;
@@ -31,27 +35,20 @@ import org.neo4j.harness.Neo4jBuilders;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(Neo4jExtension.class)
 public class BeforeAfterCommitTest {
 
-    private Neo4j controls;
+    @InjectNeo4j
+    private Neo4j neo4j;
+
+    @InjectNeo4j
     private GraphDatabaseService database;
 
-    @BeforeEach
-    public void setUp() {
-        controls = Neo4jBuilders.newInProcessBuilder().build();
-        database = controls.defaultDatabaseService();
-    }
-
-    @AfterEach
-    public void tearDown() {
-        controls.close();
-    }
-
     @Test
-    public void afterCommitShouldBeCalled() throws InterruptedException {
+    public void afterCommitShouldBeCalled() {
         BeforeAfterCommitModule module = new BeforeAfterCommitModule("test", null);
 
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(controls.databaseManagementService(), database);
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(module);
         runtime.start();
         runtime.waitUntilStarted();
@@ -63,23 +60,27 @@ public class BeforeAfterCommitTest {
 
         assertTrue(module.isAfterCommitCalled());
         assertFalse(module.isAfterRollbackCalled());
+
+        runtime.removeSelf();
     }
 
     @Test
-    public void afterRollbackShouldBeCalled() throws InterruptedException {
+    public void afterRollbackShouldBeCalled() {
         BeforeAfterCommitModule module = new BeforeAfterCommitModule("test", null);
 
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(controls.databaseManagementService(), database);
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(module);
         runtime.start();
         runtime.waitUntilStarted();
 
-        controls.databaseManagementService().registerTransactionEventListener(database.databaseName(), new TransactionEventListenerAdapter<Void>() {
+        TransactionEventListenerAdapter<Void> bang = new TransactionEventListenerAdapter<>() {
             @Override
             public Void beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) {
                 throw new RuntimeException("bang");
             }
-        });
+        };
+
+        neo4j.databaseManagementService().registerTransactionEventListener(database.databaseName(), bang);
 
         try (Transaction tx = database.beginTx()) {
             tx.createNode();
@@ -90,5 +91,8 @@ public class BeforeAfterCommitTest {
 
         assertFalse(module.isAfterCommitCalled());
         assertTrue(module.isAfterRollbackCalled());
+
+        runtime.removeSelf();
+        neo4j.databaseManagementService().unregisterTransactionEventListener(database.databaseName(), bang);
     }
 }

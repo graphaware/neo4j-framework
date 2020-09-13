@@ -16,14 +16,14 @@
 
 package com.graphaware.common.util;
 
-import com.graphaware.common.junit.Neo4jInstances;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.harness.Neo4j;
-import org.neo4j.harness.Neo4jBuilders;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,40 +37,21 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit test for {@link com.graphaware.common.util.IterableUtils}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class IterableUtilsTest {
 
-    private final Neo4jInstances instances = Neo4jInstances.getInstances();
-    private Neo4j controls;
-    protected GraphDatabaseService database;
-
-    public IterableUtilsTest() {
-        instances.start();
-    }
-
-    protected final void createDatabase() {
-        controls = instances.get();
-        database = controls.defaultDatabaseService();
-    }
-
-    protected final void destroyDatabase() {
-        controls.close();
-    }
+    @InjectNeo4j
+    private GraphDatabaseService database;
 
     @Test
     public void newDatabaseShouldHaveNoNodes() {
-        createDatabase();
-
         try (Transaction tx = database.beginTx()) {
             assertEquals(0, countNodes(tx));
         }
-
-        destroyDatabase();
     }
 
     @Test
     public void afterCreatingANodeDatabaseShouldHaveOneNode() {
-        createDatabase();
-
         try (Transaction tx = database.beginTx()) {
             tx.createNode();
             tx.commit();
@@ -79,8 +60,6 @@ public class IterableUtilsTest {
         try (Transaction tx = database.beginTx()) {
             assertEquals(1, countNodes(tx));
         }
-
-        destroyDatabase();
     }
 
     @Test
@@ -96,8 +75,6 @@ public class IterableUtilsTest {
 
     @Test
     public void checkContainsRealIterables() {
-        createDatabase();
-
         Node node;
 
         try (Transaction tx = database.beginTx()) {
@@ -110,35 +87,32 @@ public class IterableUtilsTest {
         }
 
         try (Transaction tx = database.beginTx()) {
-            tx.getNodeById(0).delete();
+            tx.getNodeById(node.getId()).delete();
             tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
             assertFalse(contains(tx.getAllNodes(), node));
         }
-
-        destroyDatabase();
     }
 
     @Test
     public void testRandom() {
-        createDatabase();
+        long a, b;
 
         try (Transaction tx = database.beginTx()) {
-            tx.createNode();
+            a = tx.createNode().getId();
+            b = tx.createNode().getId();
             tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertTrue(asList(0L, 1L).contains(random(tx.getAllNodes()).getId()));
-            assertTrue(asList(0L, 1L).contains(random(tx.getAllNodes()).getId()));
-            assertTrue(asList(0L, 1L).contains(random(tx.getAllNodes()).getId()));
-            assertTrue(asList(0L, 1L).contains(random(tx.getAllNodes()).getId()));
-            assertTrue(asList(0L, 1L).contains(random(tx.getAllNodes()).getId()));
+            assertTrue(asList(a, b).contains(random(tx.getAllNodes()).getId()));
+            assertTrue(asList(a, b).contains(random(tx.getAllNodes()).getId()));
+            assertTrue(asList(a, b).contains(random(tx.getAllNodes()).getId()));
+            assertTrue(asList(a, b).contains(random(tx.getAllNodes()).getId()));
+            assertTrue(asList(a, b).contains(random(tx.getAllNodes()).getId()));
         }
-
-        destroyDatabase();
     }
 
     @Test

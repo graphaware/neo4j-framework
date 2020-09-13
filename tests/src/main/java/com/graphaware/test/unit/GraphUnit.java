@@ -43,6 +43,11 @@ import static org.neo4j.internal.helpers.collection.Iterables.count;
 public final class GraphUnit {
 
     private static final Log LOG = LoggerFactory.getLogger(GraphUnit.class);
+    private static final Neo4j tempDb;
+
+    static {
+        tempDb = Neo4jBuilders.newInProcessBuilder().withDisabledServer().build();
+    }
 
     /**
      * Private constructor - this class is a utility and should not be instantiated.
@@ -97,7 +102,7 @@ public final class GraphUnit {
         try {
             assertSameGraph(database, otherDatabase.defaultDatabaseService(), inclusionPolicies);
         } finally {
-            otherDatabase.close();
+            clearOtherDb();
         }
     }
 
@@ -149,7 +154,7 @@ public final class GraphUnit {
         try {
             return areSameGraph(database, otherDatabase.defaultDatabaseService(), inclusionPolicies);
         } finally {
-            otherDatabase.close();
+            clearOtherDb();
         }
     }
 
@@ -214,7 +219,7 @@ public final class GraphUnit {
         try {
             assertSubgraph(database, otherDatabase.defaultDatabaseService(), inclusionPolicies);
         } finally {
-            otherDatabase.close();
+            clearOtherDb();
         }
     }
 
@@ -281,7 +286,7 @@ public final class GraphUnit {
         try {
             return isSubgraph(database, otherDatabase.defaultDatabaseService(), inclusionPolicies);
         } finally {
-            otherDatabase.close();
+            clearOtherDb();
         }
     }
 
@@ -794,6 +799,10 @@ public final class GraphUnit {
     }
 
     private static Neo4j createTemporaryDb() {
-        return Neo4jBuilders.newInProcessBuilder().build();
+        return tempDb;
+    }
+
+    private static void clearOtherDb() {
+        tempDb.defaultDatabaseService().executeTransactionally("MATCH (n) DETACH DELETE (n)");
     }
 }

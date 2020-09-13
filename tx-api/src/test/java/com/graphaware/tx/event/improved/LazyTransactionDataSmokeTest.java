@@ -16,13 +16,17 @@
 
 package com.graphaware.tx.event.improved;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventListenerAdapter;
@@ -39,39 +43,32 @@ import static org.neo4j.graphdb.Label.label;
 /**
  * Unit test for {@link com.graphaware.tx.event.improved.api.LazyTransactionData}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class LazyTransactionDataSmokeTest {
 
-    private Neo4j controls;
+    @InjectNeo4j
+    private Neo4j neo4j;
+    @InjectNeo4j
     private GraphDatabaseService database;
+
     private CapturingTransactionEventHandler eventHandler;
 
     @BeforeEach
     public void setUp() {
-        createDatabase();
-
         eventHandler = new CapturingTransactionEventHandler();
-        controls.databaseManagementService().registerTransactionEventListener(controls.defaultDatabaseService().databaseName(), eventHandler);
+        neo4j.databaseManagementService().registerTransactionEventListener(neo4j.defaultDatabaseService().databaseName(), eventHandler);
     }
 
     @AfterEach
     public void tearDown() {
-        destroyDatabase();
-    }
-
-    protected final void createDatabase() {
-        controls = Neo4jBuilders.newInProcessBuilder().build();
-        database = controls.defaultDatabaseService();
-    }
-
-    protected final void destroyDatabase() {
-        controls.close();
+        neo4j.databaseManagementService().unregisterTransactionEventListener(neo4j.defaultDatabaseService().databaseName(), eventHandler);
     }
 
     @Test
     public void nothingShouldBeReportedWhenNoChangesOccur() {
         try (Transaction tx = database.beginTx()) {
-            tx.createNode(label("TestLabel"));
-            tx.getNodeById(0).delete();
+            Node n = tx.createNode(label("TestLabel"));
+            tx.getNodeById(n.getId()).delete();
             tx.commit();
         }
 

@@ -37,11 +37,10 @@ import static org.neo4j.graphdb.Label.label;
 /**
  * Unit test for  {@link com.graphaware.common.policy.inclusion.fluent.IncludeNodes}.
  */
-@TestInstance(PER_CLASS)
 @ExtendWith(Neo4jExtension.class)
 public class IncludeNodesTest {
 
-    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.CLASS)
+    @InjectNeo4j
     private GraphDatabaseService database;
 
     @Test

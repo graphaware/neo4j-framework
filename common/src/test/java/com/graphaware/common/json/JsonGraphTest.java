@@ -23,20 +23,17 @@ import com.graphaware.common.junit.Neo4jExtension;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
-
-@TestInstance(PER_CLASS)
 @ExtendWith(Neo4jExtension.class)
 public class JsonGraphTest {
 
-    @InjectNeo4j(lifecycle = InjectNeo4j.Lifecycle.CLASS)
+    @InjectNeo4j
     private GraphDatabaseService database;
 
+    private long a, b, r1, r2;
     private ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
@@ -52,9 +49,14 @@ public class JsonGraphTest {
             r.setProperty("k1", "v1");
             r.setProperty("k2", 2);
 
-            Relationship r2 = node1.createRelationshipTo(node2, RelationshipType.withName("R2"));
-            r2.setProperty("k1", "v2");
-            r2.setProperty("k2", 4);
+            Relationship rel2 = node1.createRelationshipTo(node2, RelationshipType.withName("R2"));
+            rel2.setProperty("k1", "v2");
+            rel2.setProperty("k2", 4);
+
+            a = node1.getId();
+            b = node2.getId();
+            r1 = r.getId();
+            r2 = rel2.getId();
 
             tx.commit();
         }
@@ -65,19 +67,19 @@ public class JsonGraphTest {
         Graph g = new Graph();
 
         try (Transaction tx = database.beginTx()) {
-            g.addNode(tx.getNodeById(0));
-            g.addNode(tx.getNodeById(1));
-            g.addRelationship(tx.getRelationshipById(0));
-            g.addRelationship(tx.getRelationshipById(1));
+            g.addNode(tx.getNodeById(a));
+            g.addNode(tx.getNodeById(b));
+            g.addRelationship(tx.getRelationshipById(r1));
+            g.addRelationship(tx.getRelationshipById(r2));
             tx.commit();
         }
 
         JSONAssert.assertEquals("{\"nodes\":" +
-                "[{\"properties\":{\"k1\":\"v1\",\"k2\":2},\"labels\":[\"L1\",\"L2\"],\"id\":0}," +
-                "{\"properties\":{},\"labels\":[],\"id\":1}]," +
+                "[{\"properties\":{\"k1\":\"v1\",\"k2\":2},\"labels\":[\"L1\",\"L2\"],\"id\":" + a + "}," +
+                "{\"properties\":{},\"labels\":[],\"id\":" + b + "}]," +
                 "\"relationships\":" +
-                "[{\"properties\":{\"k1\":\"v1\",\"k2\":2},\"type\":\"R\",\"id\":0,\"startNodeId\":0,\"endNodeId\":1}," +
-                "{\"properties\":{\"k1\":\"v2\",\"k2\":4},\"type\":\"R2\",\"id\":1,\"startNodeId\":0,\"endNodeId\":1}]}", mapper.writeValueAsString(g), false);
+                "[{\"properties\":{\"k1\":\"v1\",\"k2\":2},\"type\":\"R\",\"id\":" + r1 + ",\"startNodeId\":" + a + ",\"endNodeId\":" + b + "}," +
+                "{\"properties\":{\"k1\":\"v2\",\"k2\":4},\"type\":\"R2\",\"id\":" + r2 + ",\"startNodeId\":" + a + ",\"endNodeId\":" + b + "}]}", mapper.writeValueAsString(g), false);
 
         System.out.println(mapper.writeValueAsString(g));
     }
@@ -87,19 +89,19 @@ public class JsonGraphTest {
         Graph g = new Graph();
 
         try (Transaction tx = database.beginTx()) {
-            g.addRelationship(tx.getRelationshipById(1));
-            g.addRelationship(tx.getRelationshipById(0));
-            g.addNode(tx.getNodeById(0));
-            g.addNode(tx.getNodeById(1));
+            g.addRelationship(tx.getRelationshipById(r2));
+            g.addRelationship(tx.getRelationshipById(r1));
+            g.addNode(tx.getNodeById(a));
+            g.addNode(tx.getNodeById(b));
             tx.commit();
         }
 
         JSONAssert.assertEquals("{\"nodes\":" +
-                "[{\"properties\":{\"k1\":\"v1\",\"k2\":2},\"labels\":[\"L1\",\"L2\"],\"id\":0}," +
-                "{\"properties\":{},\"labels\":[],\"id\":1}]," +
+                "[{\"properties\":{\"k1\":\"v1\",\"k2\":2},\"labels\":[\"L1\",\"L2\"],\"id\":" + a + "}," +
+                "{\"properties\":{},\"labels\":[],\"id\":" + b + "}]," +
                 "\"relationships\":" +
-                "[{\"properties\":{\"k1\":\"v1\",\"k2\":2},\"type\":\"R\",\"id\":0,\"startNodeId\":0,\"endNodeId\":1}," +
-                "{\"properties\":{\"k1\":\"v2\",\"k2\":4},\"type\":\"R2\",\"id\":1,\"startNodeId\":0,\"endNodeId\":1}]}", mapper.writeValueAsString(g), false);
+                "[{\"properties\":{\"k1\":\"v1\",\"k2\":2},\"type\":\"R\",\"id\":" + r1 + ",\"startNodeId\":" + a + ",\"endNodeId\":" + b + "}," +
+                "{\"properties\":{\"k1\":\"v2\",\"k2\":4},\"type\":\"R2\",\"id\":" + r2 + ",\"startNodeId\":" + a + ",\"endNodeId\":" + b + "}]}", mapper.writeValueAsString(g), false);
     }
 
     private class Graph extends JsonGraph<Graph> {

@@ -18,6 +18,7 @@ package com.graphaware.common.description.property;
 
 import com.graphaware.common.util.IterableUtils;
 import org.junit.jupiter.api.Test;
+import org.neo4j.graphdb.Transaction;
 
 import java.util.List;
 
@@ -32,64 +33,77 @@ public class LazyPropertiesDescriptionTest extends PropertiesDescriptionTest {
 
     @Test
     public void shouldContainCorrectKeys() {
-        PropertiesDescription description = lazy();
+        try (Transaction tx = database.beginTx()) {
+            PropertiesDescription description = lazy(tx);
 
-        List<String> keys = IterableUtils.toList(description.getKeys());
+            List<String> keys = IterableUtils.toList(description.getKeys());
 
-        assertEquals(3, keys.size());
-        assertTrue(keys.contains("two"));
-        assertTrue(keys.contains("three"));
-        assertTrue(keys.contains("array"));
+            assertEquals(3, keys.size());
+            assertTrue(keys.contains("two"));
+            assertTrue(keys.contains("three"));
+            assertTrue(keys.contains("array"));
+        }
     }
 
     @Test
     public void shouldReturnEqualPredicatesForExistingKeys() {
-        PropertiesDescription description = lazy();
+        try (Transaction tx = database.beginTx()) {
+            PropertiesDescription description = lazy(tx);
 
-        assertEquals(equalTo(2), description.get("two"));
-        assertEquals(equalTo("3"), description.get("three"));
-        assertEquals(equalTo(new int[]{4, 5}), description.get("array"));
+            assertEquals(equalTo(2), description.get("two"));
+            assertEquals(equalTo("3"), description.get("three"));
+            assertEquals(equalTo(new int[]{4, 5}), description.get("array"));
+        }
     }
 
     @Test
     public void shouldReturnUndefinedForNonExistingKeys() {
-        PropertiesDescription description = lazy();
+        try (Transaction tx = database.beginTx()) {
+            PropertiesDescription description = lazy(tx);
 
-        assertEquals(undefined(), description.get("non-existing"));
+            assertEquals(undefined(), description.get("non-existing"));
+        }
     }
 
     @Test
     public void shouldCorrectlyJudgeMoreGeneral() {
-        assertTrue(lazy().isMoreGeneralThan(lazy()));
-        assertTrue(lazy().isMoreGeneralThan(literal()));
-        assertTrue(lazy().isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}))));
-        assertFalse(lazy().isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("4"), "array", equalTo(new int[]{4, 5}))));
-        assertFalse(lazy().isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("3"))));
-        assertFalse(lazy().isMoreGeneralThan(wildcard("two", equalTo(2), "three", equalTo("3"))));
-        assertFalse(lazy().isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}), "four", equalTo(4))));
+        try (Transaction tx = database.beginTx()) {
+            assertTrue(lazy(tx).isMoreGeneralThan(lazy(tx)));
+            assertTrue(lazy(tx).isMoreGeneralThan(literal(tx)));
+            assertTrue(lazy(tx).isMoreGeneralThan(wildcard(tx)));
+            assertTrue(lazy(tx).isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}))));
+            assertFalse(lazy(tx).isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("4"), "array", equalTo(new int[]{4, 5}))));
+            assertFalse(lazy(tx).isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("3"))));
+            assertFalse(lazy(tx).isMoreGeneralThan(wildcard("two", equalTo(2), "three", equalTo("3"))));
+            assertFalse(lazy(tx).isMoreGeneralThan(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}), "four", equalTo(4))));
+        }
     }
 
     @Test
     public void shouldCorrectlyJudgeMoreSpecific() {
-        assertTrue(lazy().isMoreSpecificThan(lazy()));
-        assertTrue(lazy().isMoreSpecificThan(literal()));
-        assertTrue(lazy().isMoreSpecificThan(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}))));
-        assertFalse(lazy().isMoreSpecificThan(literal("two", equalTo(2), "three", equalTo("4"), "array", equalTo(new int[]{4, 5}))));
-        assertFalse(lazy().isMoreSpecificThan(literal("two", equalTo(2), "three", equalTo("3"))));
-        assertTrue(lazy().isMoreSpecificThan(wildcard("two", equalTo(2), "three", equalTo("3"))));
-        assertFalse(lazy().isMoreSpecificThan(wildcard("two", equalTo(2), "three", equalTo("4"))));
-        assertFalse(lazy().isMoreSpecificThan(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}), "four", equalTo(4))));
+        try (Transaction tx = database.beginTx()) {
+            assertTrue(lazy(tx).isMoreSpecificThan(lazy(tx)));
+            assertTrue(lazy(tx).isMoreSpecificThan(literal(tx)));
+            assertTrue(lazy(tx).isMoreSpecificThan(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}))));
+            assertFalse(lazy(tx).isMoreSpecificThan(literal("two", equalTo(2), "three", equalTo("4"), "array", equalTo(new int[]{4, 5}))));
+            assertFalse(lazy(tx).isMoreSpecificThan(literal("two", equalTo(2), "three", equalTo("3"))));
+            assertTrue(lazy(tx).isMoreSpecificThan(wildcard("two", equalTo(2), "three", equalTo("3"))));
+            assertFalse(lazy(tx).isMoreSpecificThan(wildcard("two", equalTo(2), "three", equalTo("4"))));
+            assertFalse(lazy(tx).isMoreSpecificThan(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}), "four", equalTo(4))));
+        }
     }
 
     @Test
     public void shouldCorrectlyJudgeMutex() {
-        assertFalse(lazy().isMutuallyExclusive(lazy()));
-        assertFalse(lazy().isMutuallyExclusive(literal()));
-        assertFalse(lazy().isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}))));
-        assertTrue(lazy().isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("4"), "array", equalTo(new int[]{4, 5}))));
-        assertTrue(lazy().isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("3"))));
-        assertFalse(lazy().isMutuallyExclusive(wildcard("two", equalTo(2), "three", equalTo("3"))));
-        assertTrue(lazy().isMutuallyExclusive(wildcard("two", equalTo(2), "three", equalTo("4"))));
-        assertTrue(lazy().isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}), "four", equalTo(4))));
+        try (Transaction tx = database.beginTx()) {
+            assertFalse(lazy(tx).isMutuallyExclusive(lazy(tx)));
+            assertFalse(lazy(tx).isMutuallyExclusive(literal(tx)));
+            assertFalse(lazy(tx).isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}))));
+            assertTrue(lazy(tx).isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("4"), "array", equalTo(new int[]{4, 5}))));
+            assertTrue(lazy(tx).isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("3"))));
+            assertFalse(lazy(tx).isMutuallyExclusive(wildcard("two", equalTo(2), "three", equalTo("3"))));
+            assertTrue(lazy(tx).isMutuallyExclusive(wildcard("two", equalTo(2), "three", equalTo("4"))));
+            assertTrue(lazy(tx).isMutuallyExclusive(literal("two", equalTo(2), "three", equalTo("3"), "array", equalTo(new int[]{4, 5}), "four", equalTo(4))));
+        }
     }
 }

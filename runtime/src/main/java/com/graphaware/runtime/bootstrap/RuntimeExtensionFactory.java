@@ -19,16 +19,22 @@ package com.graphaware.runtime.bootstrap;
 import org.neo4j.configuration.Config;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.config.Setting;
 import org.neo4j.kernel.extension.ExtensionFactory;
 import org.neo4j.kernel.extension.ExtensionType;
 import org.neo4j.kernel.extension.context.ExtensionContext;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 import org.neo4j.logging.internal.LogService;
 
+import static org.neo4j.configuration.SettingImpl.newBuilder;
+import static org.neo4j.configuration.SettingValueParsers.BOOL;
+
 /**
  * {@link ExtensionFactory} that initializes the {@link RuntimeKernelExtension}.
  */
 public class RuntimeExtensionFactory extends ExtensionFactory<RuntimeExtensionFactory.Dependencies> {
+
+    public static final Setting<Boolean> test = newBuilder("test", BOOL, false).build();
 
     public interface Dependencies {
         Config getConfig();

@@ -16,6 +16,8 @@
 
 package com.graphaware.example;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.example.module.FriendshipStrengthCounter;
 import com.graphaware.example.module.FriendshipStrengthModule;
 import com.graphaware.runtime.GraphAwareRuntime;
@@ -23,6 +25,7 @@ import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
 import org.neo4j.harness.Neo4j;
 import org.neo4j.harness.Neo4jBuilders;
@@ -33,27 +36,29 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Test for {@link com.graphaware.example.module.FriendshipStrengthCounter}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
 
-    private Neo4j database;
+    @InjectNeo4j
+    private Neo4j neo4j;
+
+    private GraphAwareRuntime runtime;
 
     @BeforeEach
     public void setUp() {
-        database = Neo4jBuilders.newInProcessBuilder().build();
-
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database.databaseManagementService(), database.defaultDatabaseService());
-        runtime.registerModule(new FriendshipStrengthModule("FSM", database.defaultDatabaseService()));
+        runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), neo4j.defaultDatabaseService());
+        runtime.registerModule(new FriendshipStrengthModule("FSM", neo4j.defaultDatabaseService()));
         runtime.start();
     }
 
     @AfterEach
     public void tearDown() {
-        database.close();
+        runtime.removeSelf();
     }
 
     @Test
     public void totalFriendshipStrengthOnEmptyDatabaseShouldBeZero() {
-        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+        try (Transaction tx = neo4j.defaultDatabaseService().beginTx()) {
             assertEquals(0, new FriendshipStrengthCounter().getTotalFriendshipStrength(tx));
             tx.commit();
         }
@@ -61,11 +66,11 @@ public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
 
     @Test
     public void totalFriendshipStrengthShouldBeCorrectlyCalculated() {
-        database.defaultDatabaseService().executeTransactionally("CREATE " +
+        neo4j.defaultDatabaseService().executeTransactionally("CREATE " +
                 "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
                 "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
 
-        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+        try (Transaction tx = neo4j.defaultDatabaseService().beginTx()) {
             assertEquals(3, new FriendshipStrengthCounter().getTotalFriendshipStrength(tx));
             tx.commit();
         }
@@ -73,7 +78,7 @@ public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
 
     @Test
     public void totalFriendshipStrengthShouldBeCorrectlyCalculated2() {
-        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+        try (Transaction tx = neo4j.defaultDatabaseService().beginTx()) {
             Node p1 = tx.createNode(Label.label("Person"));
             Node p2 = tx.createNode(Label.label("Person"));
             Node p3 = tx.createNode(Label.label("Person"));
@@ -82,7 +87,7 @@ public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
             tx.commit();
         }
 
-        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+        try (Transaction tx = neo4j.defaultDatabaseService().beginTx()) {
             assertEquals(3, new FriendshipStrengthCounter().getTotalFriendshipStrength(tx));
             tx.commit();
         }

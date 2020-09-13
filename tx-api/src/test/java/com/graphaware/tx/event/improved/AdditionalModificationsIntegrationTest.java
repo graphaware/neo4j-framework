@@ -16,23 +16,33 @@
 
 package com.graphaware.tx.event.improved;
 
+import com.graphaware.common.junit.DirtiesNeo4j;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.test.data.CypherPopulator;
 import com.graphaware.test.data.DatabasePopulator;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventListenerAdapter;
+import org.neo4j.harness.Neo4j;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AdditionalModificationsIntegrationTest extends DatabaseIntegrationTest {
+@ExtendWith(Neo4jExtension.class)
+public class AdditionalModificationsIntegrationTest {
 
-    @Override
-    protected DatabasePopulator databasePopulator() {
-        return new CypherPopulator() {
+    @InjectNeo4j
+    private Neo4j neo4j;
+
+    @BeforeEach
+    protected void poulate() {
+         new CypherPopulator() {
             @Override
             protected String[] statementGroups() {
                 return new String[]{"CREATE " +
@@ -43,12 +53,13 @@ public class AdditionalModificationsIntegrationTest extends DatabaseIntegrationT
                         "(m)-[:LIVES_IN]->(l)" +
                         ""};
             }
-        };
+        }.populate(neo4j.defaultDatabaseService());
     }
 
     @Test
+    @DirtiesNeo4j
     public void additionalCreatesShouldNotImpactTxData() {
-        getNeo4j().databaseManagementService().registerTransactionEventListener(getNeo4j().defaultDatabaseService().databaseName(), new TransactionEventListenerAdapter<Void>() {
+        neo4j.databaseManagementService().registerTransactionEventListener(neo4j.defaultDatabaseService().databaseName(), new TransactionEventListenerAdapter<Void>() {
 
             @Override
             public Void beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) throws Exception {

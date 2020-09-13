@@ -55,6 +55,8 @@ public interface GraphAwareRuntime {
      */
     void waitUntilStarted();
 
+    void stop();
+
     /**
      * Get a module registered with the runtime.
      *
@@ -83,4 +85,6 @@ public interface GraphAwareRuntime {
      * @return config.
      */
     RuntimeConfiguration getConfiguration();
+
+    void removeSelf();
 }

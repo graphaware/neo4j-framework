@@ -16,14 +16,20 @@
 
 package com.graphaware.example;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.test.integration.DatabaseIntegrationTest;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.harness.Neo4j;
 
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.Label.label;
@@ -33,16 +39,30 @@ import static org.neo4j.graphdb.RelationshipType.withName;
 /**
  * Demo of {@link ChangeLogger}.
  */
-public class ChangeLoggerDemo extends DatabaseIntegrationTest {
+@ExtendWith(Neo4jExtension.class)
+public class ChangeLoggerDemo {
 
+    @InjectNeo4j
+    private Neo4j neo4j;
+    @InjectNeo4j
+    private GraphDatabaseService database;
+
+    private ChangeLogger listener;
+
+    @BeforeEach
     public void setUp() throws Exception {
-        super.setUp();
-        getNeo4j().databaseManagementService().registerTransactionEventListener(getDatabase().databaseName(), new ChangeLogger());
+        listener = new ChangeLogger();
+        neo4j.databaseManagementService().registerTransactionEventListener(database.databaseName(), listener);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        neo4j.databaseManagementService().unregisterTransactionEventListener(database.databaseName(), listener);
     }
 
     @Test
     public void demonstrateLogging() {
-        performMutations(getDatabase());
+        performMutations(database);
     }
 
     private void performMutations(GraphDatabaseService database) {
