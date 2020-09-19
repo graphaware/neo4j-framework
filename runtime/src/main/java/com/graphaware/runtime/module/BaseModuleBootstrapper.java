@@ -38,8 +38,6 @@ public abstract class BaseModuleBootstrapper<C extends BaseModuleConfiguration<C
 
     private static final Log LOG = LoggerFactory.getLogger(BaseModuleBootstrapper.class);
 
-    protected static final String INITIALIZE_UNTIL = "initializeUntil";
-
     protected static final String NODE = "node";
     protected static final String NODE_PROPERTY = "node.property";
     protected static final String RELATIONSHIP = "relationship";

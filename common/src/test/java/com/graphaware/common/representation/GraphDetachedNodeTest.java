@@ -37,7 +37,6 @@ public class GraphDetachedNodeTest {
     public void nodeRepresentationIsCorrectlyConvertedToJson() throws JsonProcessingException, JSONException {
         GraphDetachedNode representation = new GraphDetachedNode(0, new String[]{"Label1, Label2"}, Collections.singletonMap("key", "value"));
         String actualStr = mapper.writeValueAsString(representation);
-        System.out.println(actualStr);
         JSONAssert.assertEquals("{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"labels\":[\"Label1, Label2\"]}", actualStr, true);
     }
 

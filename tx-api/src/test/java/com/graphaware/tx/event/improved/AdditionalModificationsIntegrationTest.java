@@ -16,12 +16,9 @@
 
 package com.graphaware.tx.event.improved;
 
-import com.graphaware.common.junit.DirtiesNeo4j;
 import com.graphaware.common.junit.InjectNeo4j;
 import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.test.data.CypherPopulator;
-import com.graphaware.test.data.DatabasePopulator;
-import com.graphaware.test.integration.DatabaseIntegrationTest;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,9 +54,8 @@ public class AdditionalModificationsIntegrationTest {
     }
 
     @Test
-    @DirtiesNeo4j
     public void additionalCreatesShouldNotImpactTxData() {
-        neo4j.databaseManagementService().registerTransactionEventListener(neo4j.defaultDatabaseService().databaseName(), new TransactionEventListenerAdapter<Void>() {
+        TransactionEventListenerAdapter<Void> listener = new TransactionEventListenerAdapter<>() {
 
             @Override
             public Void beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) throws Exception {
@@ -76,7 +72,16 @@ public class AdditionalModificationsIntegrationTest {
 
                 return null;
             }
-        });
+        };
+
+        neo4j.databaseManagementService().registerTransactionEventListener(neo4j.defaultDatabaseService().databaseName(), listener);
+
+        try (Transaction tx = neo4j.defaultDatabaseService().beginTx()) {
+            tx.createNode();
+            tx.commit();
+        }
+
+        neo4j.databaseManagementService().unregisterTransactionEventListener(neo4j.defaultDatabaseService().databaseName(), listener);
     }
 
 

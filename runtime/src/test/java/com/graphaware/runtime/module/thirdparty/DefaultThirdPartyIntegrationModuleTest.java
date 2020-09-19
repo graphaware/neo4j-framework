@@ -16,7 +16,6 @@
 
 package com.graphaware.runtime.module.thirdparty;
 
-import com.graphaware.common.junit.DirtiesNeo4j;
 import com.graphaware.common.junit.InjectNeo4j;
 import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.common.representation.GraphDetachedNode;
@@ -25,13 +24,10 @@ import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.runtime.module.Module;
 import com.graphaware.writer.thirdparty.*;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
 import org.neo4j.harness.Neo4j;
-import org.neo4j.harness.Neo4jBuilders;
 import org.neo4j.internal.helpers.collection.MapUtil;
 
 import java.util.Collection;

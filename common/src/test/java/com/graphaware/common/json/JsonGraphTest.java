@@ -80,8 +80,6 @@ public class JsonGraphTest {
                 "\"relationships\":" +
                 "[{\"properties\":{\"k1\":\"v1\",\"k2\":2},\"type\":\"R\",\"id\":" + r1 + ",\"startNodeId\":" + a + ",\"endNodeId\":" + b + "}," +
                 "{\"properties\":{\"k1\":\"v2\",\"k2\":4},\"type\":\"R2\",\"id\":" + r2 + ",\"startNodeId\":" + a + ",\"endNodeId\":" + b + "}]}", mapper.writeValueAsString(g), false);
-
-        System.out.println(mapper.writeValueAsString(g));
     }
 
     @Test

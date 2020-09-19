@@ -32,7 +32,6 @@ import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 /**
  * Test for {@link com.graphaware.example.module.FriendshipStrengthCounter}.
  */

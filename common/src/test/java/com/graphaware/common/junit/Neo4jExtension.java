@@ -4,16 +4,11 @@ import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.util.AnnotationUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import java.lang.reflect.Field;
 
-public class Neo4jExtension implements BeforeEachCallback, AfterEachCallback, BeforeAllCallback, AfterAllCallback {
-
-    private static final Neo4jInstances INSTANCES = Neo4jInstances.getInstances();
-
-    public Neo4jExtension() {
-        INSTANCES.start();
-    }
+public class Neo4jExtension implements BeforeEachCallback, AfterEachCallback {
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
@@ -27,14 +22,6 @@ public class Neo4jExtension implements BeforeEachCallback, AfterEachCallback, Be
         } else {
             context.getRoot().getStore(ExtensionContext.Namespace.GLOBAL).get("neo4j", Neo4j.class).defaultDatabaseService().executeTransactionally("MATCH (n) DETACH DELETE n");
         }
-    }
-
-    @Override
-    public void beforeAll(ExtensionContext context) throws Exception {
-    }
-
-    @Override
-    public void afterAll(ExtensionContext context) {
     }
 
     private void setUpNeo4j(ExtensionContext context) throws IllegalAccessException {
@@ -57,8 +44,7 @@ public class Neo4jExtension implements BeforeEachCallback, AfterEachCallback, Be
         Neo4j current = context.getRoot().getStore(ExtensionContext.Namespace.GLOBAL).get("neo4j", Neo4j.class);
 
         if (current == null) {
-            System.out.println("GETTING NEW NEO");
-            current = INSTANCES.get();
+            current = Neo4jBuilders.newInProcessBuilder().withDisabledServer().build();
             context.getRoot().getStore(ExtensionContext.Namespace.GLOBAL).put("neo4j", current);
         }
 

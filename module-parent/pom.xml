@@ -128,6 +128,13 @@
                 <scope>provided</scope>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-configuration2</artifactId>
+                <version>${commons-config.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
         </dependencies>
 
     </dependencyManagement>
@@ -182,7 +189,6 @@
                         <link>https://neo4j.com/docs/java-reference/4.0/javadocs/</link>
                         <link>http://graphaware.com/site/framework/latest/apidocs/</link>
                     </links>
-                    <additionalparam>-Xdoclint:none</additionalparam>
                     <additionalOptions>-Xdoclint:none</additionalOptions>
                     <additionalJOption>-Xdoclint:none</additionalJOption>
                 </configuration>
