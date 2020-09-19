@@ -17,10 +17,18 @@
 package com.graphaware.example;
 
 import com.graphaware.example.module.FriendshipStrengthCounter;
-import com.graphaware.test.integration.DatabaseIntegrationTest;
-import org.junit.jupiter.api.Disabled;
+import com.graphaware.runtime.bootstrap.RuntimeExtensionFactory;
+import com.graphaware.runtime.settings.FrameworkSettingsDeclaration;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,17 +36,30 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Test for {@link com.graphaware.example.module.FriendshipStrengthCounter}.
  */
-@Disabled //todo need to fix some dependencies here
-public class FriendshipStrengthModuleEmbeddedDeclarativeIntegrationTest extends DatabaseIntegrationTest {
+public class FriendshipStrengthModuleEmbeddedDeclarativeIntegrationTest {
 
-    @Override
-    protected String configFile() {
-        return "neo4j-friendship.conf";
+    private Neo4j neo4j;
+    private GraphDatabaseService database;
+
+    @BeforeEach
+    public void setUp() {
+        neo4j = Neo4jBuilders.newInProcessBuilder()
+                .withDisabledServer()
+                .withExtensionFactories(new ArrayList<>(Collections.singleton(new RuntimeExtensionFactory())))
+                .withConfig(FrameworkSettingsDeclaration.ga_config_file_name, "neo4j-friendship.conf")
+                .build();
+
+        database = neo4j.defaultDatabaseService();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        neo4j.close();
     }
 
     @Test
     public void totalFriendshipStrengthOnEmptyDatabaseShouldBeZero() {
-        try (Transaction tx = getDatabase().beginTx()) {
+        try (Transaction tx = database.beginTx()) {
             assertEquals(0, new FriendshipStrengthCounter().getTotalFriendshipStrength(tx));
             tx.commit();
         }
@@ -46,11 +67,11 @@ public class FriendshipStrengthModuleEmbeddedDeclarativeIntegrationTest extends 
 
     @Test
     public void totalFriendshipStrengthShouldBeCorrectlyCalculated() {
-        getDatabase().executeTransactionally("CREATE " +
+        database.executeTransactionally("CREATE " +
                 "(p1:Person)-[:FRIEND_OF {strength:2}]->(p2:Person)," +
                 "(p1)-[:FRIEND_OF {strength:1}]->(p3:Person)");
 
-        try (Transaction tx = getDatabase().beginTx()) {
+        try (Transaction tx = database.beginTx()) {
             assertEquals(3, new FriendshipStrengthCounter().getTotalFriendshipStrength(tx));
             tx.commit();
         }

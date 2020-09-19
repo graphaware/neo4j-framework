@@ -24,20 +24,22 @@ import com.graphaware.runtime.config.Neo4jConfigBasedRuntimeConfiguration;
 import com.graphaware.runtime.module.Module;
 import com.graphaware.runtime.module.ModuleBootstrapper;
 import com.graphaware.runtime.settings.FrameworkSettingsDeclaration;
+import org.apache.commons.configuration2.CompositeConfiguration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.SystemConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.neo4j.configuration.Config;
-import org.neo4j.configuration.SettingImpl;
-import org.neo4j.configuration.SettingValueParsers;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.config.Setting;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 import org.neo4j.logging.Log;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static com.graphaware.runtime.settings.FrameworkSettingsDeclaration.*;
 
 /**
  * Neo4j kernel extension that automatically creates a {@link GraphAwareRuntime} and registers
@@ -79,20 +81,22 @@ import static com.graphaware.runtime.settings.FrameworkSettingsDeclaration.*;
 public class RuntimeKernelExtension implements Lifecycle {
     private static final Log LOG = LoggerFactory.getLogger(RuntimeKernelExtension.class);
 
+    public static final String RUNTIME_ENABLED_CONFIG = "com.graphaware.runtime.enabled";
     public static final String MODULE_CONFIG_KEY = "com.graphaware.module"; //.ID.Order = fully qualified class name of bootstrapper
-    private static final Pattern MODULE_ENABLED_KEY = Pattern.compile("com\\.graphaware\\.module\\.([a-zA-Z0-9]{1,})\\.([0-9]{1,})");
+    private static final Pattern MODULE_ENABLED_KEY = Pattern.compile("([a-zA-Z0-9]{1,})\\.([0-9]{1,})");
     private static final int WAIT_MINUTES = 5;
     private static final int WAIT_MS = WAIT_MINUTES * 60 * 1000;
 
-    protected final Config config;
+    protected final Config neo4jConfig;
+    protected Configuration gaConfig;
     protected final DatabaseManagementService managementService;
     protected final GraphDatabaseService database;
-    protected Map<String, String> gaConfig;
 
-    public RuntimeKernelExtension(Config config, DatabaseManagementService managementService, GraphDatabaseService database) {
-        this.config = config;
+    public RuntimeKernelExtension(Config neo4jConfig, DatabaseManagementService managementService, GraphDatabaseService database) {
+        this.neo4jConfig = neo4jConfig;
         this.managementService = managementService;
         this.database = database;
+        this.gaConfig = gaConfig();
     }
 
     /**
@@ -103,8 +107,6 @@ public class RuntimeKernelExtension implements Lifecycle {
         if (isOnEnterprise() && !hasEnterpriseFramework()) {
             throw new RuntimeException("GraphAware Framework Community Edition is not supported on Neo4j Enterprise. Please email info@graphaware.com to get access to GraphAware Framework Enterprise Edition instead.");
         }
-
-        gaConfig = gaConfig();
     }
 
     /**
@@ -116,7 +118,13 @@ public class RuntimeKernelExtension implements Lifecycle {
             LOG.info("GraphAware Runtime always disabled on system database.");
             return;
         }
-        if (!config.get(ga_runtime_enabled)) {
+
+        if (!gaConfig.containsKey(RUNTIME_ENABLED_CONFIG)) {
+            LOG.info("GraphAware Runtime disabled.");
+            return;
+        }
+
+        if (!gaConfig.getBoolean(RUNTIME_ENABLED_CONFIG)) {
             LOG.info("GraphAware Runtime disabled.");
             return;
         }
@@ -127,13 +135,19 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         registerModules(runtime);
 
-        new Thread(() -> {
+        new
+
+                Thread(() ->
+
+        {
             if (databaseIsAvailable()) {
                 runtime.start();
             } else {
                 LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within " + WAIT_MINUTES + " minutes.");
             }
-        }, "GraphAware Starter").start();
+        }, "GraphAware Starter").
+
+                start();
 
         LOG.info("GraphAware Runtime bootstrapped.");
     }
@@ -143,7 +157,7 @@ public class RuntimeKernelExtension implements Lifecycle {
     }
 
     protected GraphAwareRuntime createRuntime() {
-        return GraphAwareRuntimeFactory.createRuntime(managementService, database, new Neo4jConfigBasedRuntimeConfiguration(database, config));
+        return GraphAwareRuntimeFactory.createRuntime(managementService, database, new Neo4jConfigBasedRuntimeConfiguration(database, neo4jConfig));
     }
 
     private void registerModules(GraphAwareRuntime runtime) {
@@ -172,18 +186,18 @@ public class RuntimeKernelExtension implements Lifecycle {
     private List<Pair<Integer, Pair<String, String>>> findOrderedBootstrappers() {
         List<Pair<Integer, Pair<String, String>>> orderedBootstrappers = new ArrayList<>();
 
-        for (String paramKey : gaConfig.keySet()) {
-            Matcher matcher = MODULE_ENABLED_KEY.matcher(paramKey);
-
+        Configuration subset = gaConfig.subset(MODULE_CONFIG_KEY);
+        subset.getKeys().forEachRemaining(s -> {
+            Matcher matcher = MODULE_ENABLED_KEY.matcher(s);
             if (matcher.find()) {
                 String moduleId = matcher.group(1);
                 Integer moduleOrder = Integer.valueOf(matcher.group(2));
-                String bootstrapperClass = gaConfig.get(paramKey) == null ? "UNKNOWN" : gaConfig.get(paramKey);
+                String bootstrapperClass = subset.getString(s, "UNKNOWN");
                 orderedBootstrappers.add(Pair.of(moduleOrder, Pair.of(moduleId, bootstrapperClass)));
             }
-        }
+        });
 
-        Collections.sort(orderedBootstrappers, (o1, o2) -> Integer.compare(o1.first(), o2.first()));
+        orderedBootstrappers.sort(Comparator.comparingInt(Pair::first));
 
         return orderedBootstrappers;
     }
@@ -191,29 +205,37 @@ public class RuntimeKernelExtension implements Lifecycle {
     private Map<String, String> findModuleConfig(String moduleId) {
         Map<String, String> moduleConfig = new HashMap<>();
 
-        String moduleConfigKeyPrefix = MODULE_CONFIG_KEY + "." + moduleId + ".";
-        for (String paramKey: gaConfig.keySet()) {
-            if (paramKey.startsWith(moduleConfigKeyPrefix) || !MODULE_ENABLED_KEY.matcher(paramKey).find()) {
-                moduleConfig.put(paramKey.replace(moduleConfigKeyPrefix, ""), gaConfig.get(paramKey));
+        String moduleConfigKeyPrefix = MODULE_CONFIG_KEY + "." + moduleId;
+
+        Configuration subset = gaConfig.subset(moduleConfigKeyPrefix);
+        subset.getKeys().forEachRemaining(s -> {
+            if (!MODULE_ENABLED_KEY.matcher(s).find()) {
+                moduleConfig.put(s, subset.getString(s));
             }
-        }
+        });
 
         return moduleConfig;
     }
 
-    private Map<String, String> gaConfig() {
-        Map<String, String> result = new HashMap<>();
+    private Configuration gaConfig() {
+        Parameters params = new Parameters();
+        FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
+                new FileBasedConfigurationBuilder<>(PropertiesConfiguration.class)
+                        .configure(
+                                params.fileBased().setURL(getClass().getClassLoader().getResource(neo4jConfig.get(FrameworkSettingsDeclaration.ga_config_file_name))));
 
-        String configAsString = config.get(ga_modules_config);
-        String[] individualConfig = configAsString.split(",");
-        for (String config : individualConfig) {
-            String[] kv=config.split("=");
-            if (kv.length == 2) {
-                result.put(kv[0],kv[1]);
-            }
+        SystemConfiguration systemConfiguration = new SystemConfiguration();
+
+        CompositeConfiguration cc = new CompositeConfiguration();
+
+        cc.addConfiguration(systemConfiguration);
+        try {
+            cc.addConfiguration(builder.getConfiguration());
+        } catch (ConfigurationException e) {
+            throw new RuntimeException(e);
         }
 
-        return result;
+        return cc;
     }
 
     protected boolean isOnEnterprise() {

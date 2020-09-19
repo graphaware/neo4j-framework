@@ -12,9 +12,6 @@ import static org.neo4j.configuration.SettingValueParsers.STRING;
 @ServiceProvider
 public class FrameworkSettingsDeclaration implements SettingsDeclaration {
 
-    @Description("Enable GraphAware Runtime")
-    public static final Setting<Boolean> ga_runtime_enabled = newBuilder("com.graphaware.runtime.enabled", BOOL, false).build();
-
-    @Description("GraphAware Modules Configuration")
-    public static final Setting<String> ga_modules_config = newBuilder("com.graphaware.modules.config", STRING, "").build();
+    @Description("Name of GraphAware Config File")
+    public static final Setting<String> ga_config_file_name = newBuilder("com.graphaware.config.file", STRING, "graphaware.conf").build();
 }

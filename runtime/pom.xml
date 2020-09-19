@@ -51,6 +51,11 @@
             <artifactId>tx-api</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-configuration2</artifactId>
+        </dependency>
+
         <!-- Test -->
 <!--        <dependency>-->
 <!--            <groupId>com.graphaware.neo4j</groupId>-->
