@@ -135,19 +135,13 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         registerModules(runtime);
 
-        new
-
-                Thread(() ->
-
-        {
+        new Thread(() -> {
             if (databaseIsAvailable()) {
                 runtime.start();
             } else {
                 LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within " + WAIT_MINUTES + " minutes.");
             }
-        }, "GraphAware Starter").
-
-                start();
+        }, "GraphAware Starter").start();
 
         LOG.info("GraphAware Runtime bootstrapped.");
     }
@@ -218,19 +212,17 @@ public class RuntimeKernelExtension implements Lifecycle {
     }
 
     private Configuration gaConfig() {
-        Parameters params = new Parameters();
         FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
                 new FileBasedConfigurationBuilder<>(PropertiesConfiguration.class)
-                        .configure(
-                                params.fileBased().setURL(getClass().getClassLoader().getResource(neo4jConfig.get(FrameworkSettingsDeclaration.ga_config_file_name))));
-
-        SystemConfiguration systemConfiguration = new SystemConfiguration();
+                        .configure(new Parameters()
+                                .fileBased()
+                                .setURL(getClass().getClassLoader().getResource(neo4jConfig.get(FrameworkSettingsDeclaration.ga_config_file_name))));
 
         CompositeConfiguration cc = new CompositeConfiguration();
 
-        cc.addConfiguration(systemConfiguration);
         try {
             cc.addConfiguration(builder.getConfiguration());
+            cc.addConfiguration(new SystemConfiguration());
         } catch (ConfigurationException e) {
             throw new RuntimeException(e);
         }

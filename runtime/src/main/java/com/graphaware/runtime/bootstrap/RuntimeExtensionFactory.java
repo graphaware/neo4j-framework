@@ -34,16 +34,12 @@ import static org.neo4j.configuration.SettingValueParsers.BOOL;
  */
 public class RuntimeExtensionFactory extends ExtensionFactory<RuntimeExtensionFactory.Dependencies> {
 
-    public static final Setting<Boolean> test = newBuilder("test", BOOL, false).build();
-
     public interface Dependencies {
         Config getConfig();
 
         GraphDatabaseService getDatabase();
 
         DatabaseManagementService managementService();
-
-        LogService getLogging();
     }
 
     public static final String KEY = "GraphAware Runtime";
