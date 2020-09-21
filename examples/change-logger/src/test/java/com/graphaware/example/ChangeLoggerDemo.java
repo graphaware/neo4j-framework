@@ -18,7 +18,6 @@ package com.graphaware.example;
 
 import com.graphaware.common.junit.InjectNeo4j;
 import com.graphaware.common.junit.Neo4jExtension;
-import com.graphaware.test.integration.DatabaseIntegrationTest;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
 import org.junit.jupiter.api.AfterEach;

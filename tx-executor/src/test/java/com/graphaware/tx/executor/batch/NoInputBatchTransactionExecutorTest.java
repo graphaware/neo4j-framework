@@ -18,7 +18,6 @@ package com.graphaware.tx.executor.batch;
 
 import com.graphaware.common.junit.InjectNeo4j;
 import com.graphaware.common.junit.Neo4jExtension;
-import com.graphaware.test.integration.DatabaseIntegrationTest;
 import com.graphaware.tx.executor.NullItem;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

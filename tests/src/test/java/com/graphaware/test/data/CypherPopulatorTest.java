@@ -18,7 +18,6 @@ package com.graphaware.test.data;
 
 import com.graphaware.common.junit.InjectNeo4j;
 import com.graphaware.common.junit.Neo4jExtension;
-import com.graphaware.test.integration.DatabaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;

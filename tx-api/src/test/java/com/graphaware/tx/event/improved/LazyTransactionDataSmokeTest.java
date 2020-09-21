@@ -21,7 +21,6 @@ import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,13 +30,13 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventListenerAdapter;
 import org.neo4j.harness.Neo4j;
-import org.neo4j.harness.Neo4jBuilders;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.neo4j.graphdb.Label.label;
 
 /**
@@ -197,14 +196,11 @@ public class LazyTransactionDataSmokeTest {
 
         startCapturing();
         execute("MATCH (p1 {name:'Michal'})-[r:FRIEND_OF {since:2007}]->(p2:Person {name:'Daniela'}) DELETE r, p1, p2");
-        verify(
-                "Deleted relationship ({name: Michal})-[:FRIEND_OF {since: 2007}]->(:Person {name: Daniela})",
+        verify("Deleted relationship ({name: Michal})-[:FRIEND_OF {since: 2007}]->(:Person {name: Daniela})",
                 "Deleted node ({name: Michal})",
                 "Deleted node (:Person {name: Daniela})"
         );
     }
-
-
 
     private void execute(String cypher) {
         database.executeTransactionally(cypher);

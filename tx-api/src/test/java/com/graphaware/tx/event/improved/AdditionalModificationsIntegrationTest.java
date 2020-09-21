@@ -83,6 +83,4 @@ public class AdditionalModificationsIntegrationTest {
 
         neo4j.databaseManagementService().unregisterTransactionEventListener(neo4j.defaultDatabaseService().databaseName(), listener);
     }
-
-
 }

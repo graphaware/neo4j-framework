@@ -1038,7 +1038,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
                         Map<Long, Relationship> created = entitiesToMap(transactionData.getAllCreatedRelationships());
 
-                        long r1Id = getNodeById(tx, 5).getSingleRelationship(withName("R2"), OUTGOING).getId();
+                        long r1Id = getNodeById(tx, ids.get(5L)).getSingleRelationship(withName("R2"), OUTGOING).getId();
                         Relationship r1 = created.get(r1Id);
 
                         r1.setProperty("additional", "someValue");
@@ -1048,7 +1048,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
         );
 
         try (Transaction tx = database.beginTx()) {
-            Relationship r1 = getNodeById(tx, 5).getSingleRelationship(withName("R2"), OUTGOING);
+            Relationship r1 = getNodeById(tx, ids.get(5L)).getSingleRelationship(withName("R2"), OUTGOING);
             assertEquals(1, count(r1.getPropertyKeys()));
             assertEquals("someValue", r1.getProperty("additional"));
             assertFalse(r1.hasProperty("time"));

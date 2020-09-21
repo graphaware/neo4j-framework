@@ -22,7 +22,6 @@ import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.runtime.bootstrap.TestModule;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
-import com.graphaware.test.integration.DatabaseIntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
