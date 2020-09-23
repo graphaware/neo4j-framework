@@ -232,7 +232,7 @@ public class RuntimeKernelExtension implements Lifecycle {
 
     protected boolean isOnEnterprise() {
         try {
-            Class.forName("org.neo4j.kernel.impl.enterprise.EnterpriseEditionModule");
+            Class.forName("org.neo4j.enterprise.edition.EnterpriseEditionModule");
             return true;
         } catch (Exception e) {
             return false;

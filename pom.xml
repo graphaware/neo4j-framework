@@ -79,7 +79,7 @@
         <jsonassert.version>1.5.0</jsonassert.version>
         <guava.version>21.0</guava.version>
         <fw.version>4.0.7.58-SNAPSHOT</fw.version>
-        <commons-config.version>2.7</commons-config.version>
+        <commons-config.version>2.5</commons-config.version>
     </properties>
 
     <developers>
