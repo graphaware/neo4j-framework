@@ -118,6 +118,6 @@ public class ThirdPartyIntegrationModuleTest {
             }
         }
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 }

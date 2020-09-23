@@ -78,7 +78,7 @@ public class GraphUnitTest {
             tx.commit();
         }
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -93,6 +93,6 @@ public class GraphUnitTest {
 
         assertSameGraph(database, assertCypher, InclusionPoliciesFactory.allBusiness());
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 }

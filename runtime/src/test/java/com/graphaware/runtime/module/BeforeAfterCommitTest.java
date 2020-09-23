@@ -57,7 +57,7 @@ public class BeforeAfterCommitTest {
         assertTrue(module.isAfterCommitCalled());
         assertFalse(module.isAfterRollbackCalled());
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -88,7 +88,7 @@ public class BeforeAfterCommitTest {
         assertFalse(module.isAfterCommitCalled());
         assertTrue(module.isAfterRollbackCalled());
 
-        runtime.removeSelf();
+        runtime.stop();
         neo4j.databaseManagementService().unregisterTransactionEventListener(database.databaseName(), bang);
     }
 }

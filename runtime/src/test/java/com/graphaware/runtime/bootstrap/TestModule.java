@@ -51,10 +51,6 @@ public class TestModule extends BaseModule<Void> {
     }
 
     @Override
-    public void shutdown() {
-    }
-
-    @Override
     public Void beforeCommit(ImprovedTransactionData transactionData) {
         return null;
     }

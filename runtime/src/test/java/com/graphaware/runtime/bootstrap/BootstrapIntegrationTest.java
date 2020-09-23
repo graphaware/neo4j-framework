@@ -16,7 +16,6 @@
 
 package com.graphaware.runtime.bootstrap;
 
-import com.graphaware.runtime.RuntimeRegistry;
 import com.graphaware.test.integration.GraphAwareNeo4jBuilder;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.junit.jupiter.api.AfterEach;
@@ -25,13 +24,15 @@ import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.harness.Neo4j;
 import org.neo4j.harness.Neo4jBuilders;
-import org.neo4j.kernel.extension.ExtensionFactory;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED_CONFIG;
 import static com.graphaware.runtime.bootstrap.TestModule.TEST_RUNTIME_MODULES;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Integration test for runtime and module bootstrapping.
@@ -41,7 +42,6 @@ public class BootstrapIntegrationTest {
     @BeforeEach
     public void setUp() {
         TEST_RUNTIME_MODULES.clear();
-        RuntimeRegistry.clear();
     }
 
     @AfterEach
@@ -191,8 +191,7 @@ public class BootstrapIntegrationTest {
     }
 
     private GraphAwareNeo4jBuilder builder() {
-        List<ExtensionFactory<?>> factories = Collections.singletonList(new RuntimeExtensionFactory());
-        return GraphAwareNeo4jBuilder.builder(Neo4jBuilders.newInProcessBuilder().withExtensionFactories(new ArrayList<>(factories)));
+        return GraphAwareNeo4jBuilder.builder(Neo4jBuilders.newInProcessBuilder());
     }
 
 }

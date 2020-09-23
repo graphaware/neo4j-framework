@@ -130,6 +130,6 @@ public class DefaultThirdPartyIntegrationModuleTest {
                 new GraphDetachedRelationship(aWorksForId, adamId, gaId, "WORKS_FOR", MapUtil.map("since", 2014L))
         )));
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 }

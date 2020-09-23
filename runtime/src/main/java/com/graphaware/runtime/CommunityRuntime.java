@@ -76,33 +76,14 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
             throw new IllegalStateException("Only one instance of the GraphAware Runtime should ever be instantiated and started.");
         }
 
-        if (RuntimeRegistry.getRuntime(database.databaseName()) != null) {
-            throw new IllegalStateException("It is not possible to create multiple runtimes for a single database!");
-        }
-
         this.state = State.REGISTERED;
         this.configuration = configuration;
         this.database = database;
         this.databaseManagementService = databaseManagementService;
         this.runtimeModuleManager = moduleManager;
 
-        databaseManagementService.registerTransactionEventListener(database.databaseName(),this);
+        databaseManagementService.registerTransactionEventListener(database.databaseName(), this);
         databaseManagementService.registerDatabaseEventListener(this);
-
-        RuntimeRegistry.registerRuntime(database.databaseName(), this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void removeSelf() {
-        stop();
-
-        databaseManagementService.unregisterTransactionEventListener(database.databaseName(),this);
-        databaseManagementService.unregisterDatabaseEventListener(this);
-
-        RuntimeRegistry.unregisterRuntime(database.databaseName(), this);
     }
 
     /**
@@ -120,11 +101,6 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         runtimeModuleManager.checkNotAlreadyRegistered(module);
 
         runtimeModuleManager.registerModule(module);
-    }
-
-    @Override
-    public void databaseStart(DatabaseEventContext eventContext) {
-
     }
 
     /**
@@ -149,8 +125,6 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         LOG.info("Starting GraphAware Runtime...");
         state = State.STARTING;
 
-        beforeStart();
-
         startModules();
 
         state = State.STARTED;
@@ -166,18 +140,11 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
     }
 
     /**
-     * Start whatever subclasses want to start.
-     */
-    protected void beforeStart() {
-
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public final void waitUntilStarted() {
-        if (!isStarted(null)) {
+        if (!isStarted()) {
             throw new IllegalStateException("It appears that the thread starting the runtime called waitUntilStarted() before it's finished its job. This is a bug");
         }
     }
@@ -197,6 +164,9 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
 
         doStop();
 
+        databaseManagementService.unregisterTransactionEventListener(database.databaseName(),this);
+        databaseManagementService.unregisterDatabaseEventListener(this);
+
         LOG.info("GraphAware Runtime stopped.");
     }
 
@@ -207,7 +177,7 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
     public Map<String, Object> beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) throws Exception {
         LazyTransactionData transactionData = new LazyTransactionData(data, transaction);
 
-        if (!isStarted(transactionData)) {
+        if (!isStarted()) {
             return null;
         }
 
@@ -252,7 +222,7 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
      * <code>false</code> iff the runtime isn't started but it is safe to proceed.
      * @throws IllegalStateException in case the runtime hasn't been started at all.
      */
-    private boolean isStarted(ImprovedTransactionData transactionData) {
+    private boolean isStarted() {
         if (State.NONE.equals(state)) {
             throw new IllegalStateException("Runtime has not been registered! This is a bug.");
         }
@@ -264,11 +234,6 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         int attempts = 0;
 
         while (!State.STARTED.equals(state)) {
-            //workaround for https://github.com/neo4j/neo4j/issues/2804
-            if (transactionData != null && !transactionData.mutationsOccurred()) {
-                return false;
-            }
-
             if (State.STARTING.equals(state) && STARTING.get()) {
                 return false;
             }
@@ -285,20 +250,6 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         }
 
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void databaseShutdown(DatabaseEventContext eventContext) {
-        LOG.info("Shutting down GraphAware Runtime... ");
-
-        stop();
-
-        RuntimeRegistry.removeRuntime(eventContext.getDatabaseName());
-
-        LOG.info("GraphAware Runtime shut down.");
     }
 
     protected void doStop() {
@@ -337,15 +288,22 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
      * {@inheritDoc}
      */
     @Override
-    public void databasePanic(DatabaseEventContext eventContext) {
-        //do nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public RuntimeConfiguration getConfiguration() {
         return configuration;
+    }
+
+    @Override
+    public void databaseStart(DatabaseEventContext eventContext) {
+
+    }
+
+    @Override
+    public void databaseShutdown(DatabaseEventContext eventContext) {
+        stop();
+    }
+
+    @Override
+    public void databasePanic(DatabaseEventContext eventContext) {
+
     }
 }

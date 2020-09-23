@@ -54,59 +54,6 @@ public class CommunityRuntimeTest {
     private GraphDatabaseService database;
 
     @Test
-    public void shouldNotBeAllowedToCreateTwoRuntimes() {
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
-
-        assertThrows(IllegalStateException.class, () -> {
-            createRuntime(neo4j.databaseManagementService(), database);
-        });
-
-        runtime.removeSelf();
-    }
-
-    @Test
-    public void nullShouldBeReturnedWhenNoRuntimeHasBeenRegisteredForDatabase() {
-        assertNull(RuntimeRegistry.getRuntime(database.databaseName()));
-    }
-
-    @Test
-    public void exceptionShouldBeThrownWhenNoRuntimeHasBeenRegisteredForDatabase() {
-        assertThrows(IllegalStateException.class, () -> {
-            assertNull(RuntimeRegistry.getStartedRuntime(database.databaseName()));
-        });
-    }
-
-    @Test
-    public void exceptionShouldBeThrownWhenRuntimeHasNotBeenStarted() {
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
-
-        assertThrows(IllegalStateException.class, () -> {
-            RuntimeRegistry.getStartedRuntime(database.databaseName());
-        });
-
-        runtime.removeSelf();
-    }
-
-    @Test
-    public void registeredRuntimeShouldBeRetrieved() {
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
-
-        assertEquals(runtime, RuntimeRegistry.getRuntime(database.databaseName()));
-
-        runtime.removeSelf();
-    }
-
-    @Test
-    public void registeredRuntimeShouldBeRetrieved2() {
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
-        runtime.start();
-
-        assertEquals(runtime, RuntimeRegistry.getStartedRuntime(database.databaseName()));
-
-        runtime.removeSelf();
-    }
-
-    @Test
     public void shouldFailWaitingForRuntimeThatHasNotBeenStarted() {
         GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
 
@@ -114,7 +61,7 @@ public class CommunityRuntimeTest {
             runtime.waitUntilStarted();
         });
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -135,7 +82,7 @@ public class CommunityRuntimeTest {
 
         assertTrue(finished.get());
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -158,7 +105,7 @@ public class CommunityRuntimeTest {
             runtime.waitUntilStarted();
         });
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -183,7 +130,7 @@ public class CommunityRuntimeTest {
             tx.commit();
         }
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -208,7 +155,7 @@ public class CommunityRuntimeTest {
             tx.commit();
         }
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -220,7 +167,7 @@ public class CommunityRuntimeTest {
             runtime.registerModule(mockTxModule());
         });
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -268,7 +215,7 @@ public class CommunityRuntimeTest {
         verify(mockModule2, atLeastOnce()).getConfiguration();
         verifyNoMoreInteractions(mockModule1, mockModule2);
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -295,7 +242,7 @@ public class CommunityRuntimeTest {
             //ok
         }
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -306,7 +253,7 @@ public class CommunityRuntimeTest {
             runtime.getModule("non-existing", Module.class);
         });
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -320,7 +267,7 @@ public class CommunityRuntimeTest {
             runtime.registerModule(mockModule);
         });
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -337,7 +284,7 @@ public class CommunityRuntimeTest {
             runtime.registerModule(mockModule2);
         });
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -380,7 +327,7 @@ public class CommunityRuntimeTest {
         //no interaction with module3, it is not interested!
         verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -394,7 +341,7 @@ public class CommunityRuntimeTest {
             runtime.registerModule(mockModule);
         });
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -405,7 +352,7 @@ public class CommunityRuntimeTest {
         runtime.start();
         runtime.start();
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -456,7 +403,7 @@ public class CommunityRuntimeTest {
         verify(mockModule1, atLeastOnce()).getConfiguration();
         verifyNoMoreInteractions(mockModule1, mockModule2);
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -504,7 +451,7 @@ public class CommunityRuntimeTest {
         verify(mockModule2, atLeastOnce()).getConfiguration();
         verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test
@@ -518,7 +465,7 @@ public class CommunityRuntimeTest {
             }
         });
 
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     private Module mockTxModule() {

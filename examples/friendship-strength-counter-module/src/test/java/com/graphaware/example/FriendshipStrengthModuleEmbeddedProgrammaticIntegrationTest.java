@@ -53,7 +53,7 @@ public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
 
     @AfterEach
     public void tearDown() {
-        runtime.removeSelf();
+        runtime.stop();
     }
 
     @Test

@@ -85,6 +85,4 @@ public interface GraphAwareRuntime {
      * @return config.
      */
     RuntimeConfiguration getConfiguration();
-
-    void removeSelf();
 }

@@ -91,6 +91,7 @@ public class RuntimeKernelExtension implements Lifecycle {
     protected final Configuration gaConfig;
     protected final DatabaseManagementService managementService;
     protected final GraphDatabaseService database;
+    protected GraphAwareRuntime runtime;
 
     public RuntimeKernelExtension(Config neo4jConfig, DatabaseManagementService managementService, GraphDatabaseService database) {
         this.neo4jConfig = neo4jConfig;
@@ -131,7 +132,7 @@ public class RuntimeKernelExtension implements Lifecycle {
 
         LOG.info("GraphAware Runtime enabled, bootstrapping...");
 
-        final GraphAwareRuntime runtime = createRuntime();
+        runtime = createRuntime();
 
         registerModules(runtime);
 
@@ -142,6 +143,8 @@ public class RuntimeKernelExtension implements Lifecycle {
                 LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within " + WAIT_MINUTES + " minutes.");
             }
         }, "GraphAware Starter").start();
+
+//        runtime.start();
 
         LOG.info("GraphAware Runtime bootstrapped.");
     }
@@ -253,7 +256,8 @@ public class RuntimeKernelExtension implements Lifecycle {
      */
     @Override
     public void stop() {
-        //do nothing
+        //runtime.stop();
+        runtime = null;
     }
 
     /**
