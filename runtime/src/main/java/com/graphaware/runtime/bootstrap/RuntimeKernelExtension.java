@@ -88,7 +88,7 @@ public class RuntimeKernelExtension implements Lifecycle {
     private static final int WAIT_MS = WAIT_MINUTES * 60 * 1000;
 
     protected final Config neo4jConfig;
-    protected Configuration gaConfig;
+    protected final Configuration gaConfig;
     protected final DatabaseManagementService managementService;
     protected final GraphDatabaseService database;
 
