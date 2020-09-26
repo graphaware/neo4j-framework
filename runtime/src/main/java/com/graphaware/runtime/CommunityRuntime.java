@@ -20,7 +20,6 @@ import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.ModuleManager;
 import com.graphaware.runtime.module.Module;
-import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -39,8 +38,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * {@link GraphAwareRuntime} intended for Community production use.
  * <p>
- * Supports {@link Module} {@link Module}s.
- * <p>
  * To use this {@link GraphAwareRuntime}, construct it using {@link GraphAwareRuntimeFactory}.
  */
 public class CommunityRuntime implements TransactionEventListener<Map<String, Object>>, GraphAwareRuntime, DatabaseEventListener {
@@ -50,14 +47,13 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
     private static final ThreadLocal<Boolean> STARTING = ThreadLocal.withInitial(() -> false);
 
     private enum State {
-        NONE,
-        REGISTERED,
+        STOPPED,
         STARTING,
         STARTED,
-        SHUTDOWN;
+        STOPPING;
     }
 
-    private volatile State state = State.NONE;
+    private volatile State state;
 
     private final RuntimeConfiguration configuration;
     private final GraphDatabaseService database;
@@ -72,11 +68,7 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
      * @param moduleManager manager for transaction-driven modules.
      */
     protected CommunityRuntime(RuntimeConfiguration configuration, GraphDatabaseService database, DatabaseManagementService databaseManagementService, ModuleManager moduleManager) {
-        if (!State.NONE.equals(state)) {
-            throw new IllegalStateException("Only one instance of the GraphAware Runtime should ever be instantiated and started.");
-        }
-
-        this.state = State.REGISTERED;
+        this.state = State.STOPPED;
         this.configuration = configuration;
         this.database = database;
         this.databaseManagementService = databaseManagementService;
@@ -90,13 +82,13 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
      * {@inheritDoc}
      */
     @Override
-    public synchronized void registerModule(Module module) {
-        if (!State.REGISTERED.equals(state)) {
+    public synchronized void registerModule(Module<?> module) {
+        if (!State.STOPPED.equals(state)) {
             LOG.error("Modules must be registered before GraphAware Runtime is started!");
             throw new IllegalStateException("Modules must be registered before GraphAware Runtime is started!");
         }
 
-        LOG.info("Registering module " + module.getId() + " with GraphAware Runtime.");
+        LOG.info("Registering module " + module.getId() + " with GraphAware Runtime for database " + database.databaseName() + ".");
 
         runtimeModuleManager.checkNotAlreadyRegistered(module);
 
@@ -109,26 +101,30 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
     @Override
     public final synchronized void start() {
         if (State.STARTED.equals(state)) {
-            LOG.debug("GraphAware Runtime already started");
+            LOG.warn("GraphAware Runtime already started for database " + database.databaseName() + ".");
             return;
         }
 
         if (State.STARTING.equals(state)) {
-            throw new IllegalStateException("Attempt to start GraphAware Runtime from multiple different threads. This is a bug");
+            throw new IllegalStateException("Attempt to start GraphAware Runtime for database " + database.databaseName() + " from multiple different threads. This is a bug.");
         }
 
-        if (!State.REGISTERED.equals(state)) {
+        if (State.STOPPING.equals(state)) {
+            throw new IllegalStateException("Attempt to start GraphAware Runtime for database " + database.databaseName() + " while it is stopping. This is a bug.");
+        }
+
+        if (!State.STOPPED.equals(state)) {
             throw new IllegalStateException("Illegal GraphAware Runtime state " + state + "! This is a bug");
         }
 
         STARTING.set(true);
-        LOG.info("Starting GraphAware Runtime...");
+        LOG.info("Starting GraphAware Runtime for database " + database.databaseName() + "...");
         state = State.STARTING;
 
         startModules();
 
         state = State.STARTED;
-        LOG.info("GraphAware Runtime started.");
+        LOG.info("GraphAware Runtime started for database " + database.databaseName() + ".");
         STARTING.set(false);
     }
 
@@ -143,31 +139,23 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
      * {@inheritDoc}
      */
     @Override
-    public final void waitUntilStarted() {
-        if (!isStarted()) {
-            throw new IllegalStateException("It appears that the thread starting the runtime called waitUntilStarted() before it's finished its job. This is a bug");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void stop() {
-        if (State.SHUTDOWN.equals(state)) {
-            return;
+        if (State.STOPPED.equals(state)) {
+            LOG.warn("GraphAware Runtime for database " + database.databaseName() + " already stopped.");
+        } else {
+            LOG.info("Stopping GraphAware Runtime for database " + database.databaseName() + "...");
+
+            state = State.STOPPING;
+
+            doStop();
+
+            LOG.info("GraphAware Runtime for database " + database.databaseName() + " stopped.");
+
+            state = State.STOPPED;
         }
 
-        LOG.info("Stopping GraphAware Runtime... ");
-
-        state = State.SHUTDOWN;
-
-        doStop();
-
-        databaseManagementService.unregisterTransactionEventListener(database.databaseName(),this);
+        databaseManagementService.unregisterTransactionEventListener(database.databaseName(), this);
         databaseManagementService.unregisterDatabaseEventListener(this);
-
-        LOG.info("GraphAware Runtime stopped.");
     }
 
     /**
@@ -214,7 +202,6 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
      * <ul>
      * <li>it's already started, in which case the method returns <code>true</code></li>
      * <li>hasn't even started starting for more than 1s, in which case an exception is thrown</li>
-     * <li>hasn't been started yet, but the transaction triggering the call of this method isn't mutating, in which case it returns <code>false</code></li>
      * <li>it's starting but the caller is the thread that starts the runtime itself, in which case it returns <code>false</code></li>
      * </ul>
      *
@@ -223,12 +210,8 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
      * @throws IllegalStateException in case the runtime hasn't been started at all.
      */
     private boolean isStarted() {
-        if (State.NONE.equals(state)) {
-            throw new IllegalStateException("Runtime has not been registered! This is a bug.");
-        }
-
-        if (State.SHUTDOWN.equals(state)) {
-            throw new IllegalStateException("Runtime is being / has been shut down.");
+        if (State.STOPPING.equals(state)) {
+            throw new IllegalStateException("Runtime for database " + database.databaseName() + " is being / has been stopped.");
         }
 
         int attempts = 0;
@@ -240,7 +223,7 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
 
             try {
                 attempts++;
-                if (attempts > 100 && State.REGISTERED.equals(state)) {
+                if (attempts > 100 && State.STOPPED.equals(state)) {
                     throw new IllegalStateException("Runtime has not been started!");
                 }
                 TimeUnit.MILLISECONDS.sleep(10);
@@ -260,7 +243,7 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
      * {@inheritDoc}
      */
     @Override
-    public <M extends Module> M getModule(String moduleId, Class<M> clazz) throws NotFoundException {
+    public <M extends Module<?>> M getModule(String moduleId, Class<M> clazz) throws NotFoundException {
         M module = runtimeModuleManager.getModule(moduleId, clazz);
 
         if (module != null) {
@@ -274,7 +257,7 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
      * {@inheritDoc}
      */
     @Override
-    public <M extends Module> M getModule(Class<M> clazz) throws NotFoundException {
+    public <M extends Module<?>> M getModule(Class<M> clazz) throws NotFoundException {
         M txResult = runtimeModuleManager.getModule(clazz);
 
         if (txResult == null) {
@@ -294,12 +277,20 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
 
     @Override
     public void databaseStart(DatabaseEventContext eventContext) {
-
+        if (database.databaseName().equals(eventContext.getDatabaseName())) {
+            start();
+        } else {
+            LOG.warn("Not starting runtime for database " + eventContext.getDatabaseName() + ", because it has been registered for database " + database.databaseName());
+        }
     }
 
     @Override
     public void databaseShutdown(DatabaseEventContext eventContext) {
-        stop();
+        if (database.databaseName().equals(eventContext.getDatabaseName())) {
+            stop();
+        } else {
+            LOG.warn("Not stopping runtime for database " + eventContext.getDatabaseName() + ", because it has been registered for database " + database.databaseName());
+        }
     }
 
     @Override

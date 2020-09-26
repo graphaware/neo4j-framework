@@ -70,7 +70,6 @@ public class DefaultThirdPartyIntegrationModuleTest {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(module);
         runtime.start();
-        runtime.waitUntilStarted();
 
         try (Transaction tx = database.beginTx()) {
             tx.execute("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Daniela'})-[:WORKS_FOR]->(ga)");

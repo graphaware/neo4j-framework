@@ -16,22 +16,19 @@
 
 package com.graphaware.runtime.bootstrap;
 
-import com.graphaware.runtime.module.ModuleBootstrapper;
 import com.graphaware.runtime.module.Module;
-import org.neo4j.configuration.SettingImpl;
-import org.neo4j.configuration.SettingValueParsers;
+import com.graphaware.runtime.module.ModuleBootstrapper;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.config.Setting;
 
 import java.util.Map;
 
 /**
  * {@link ModuleBootstrapper} for {@link TestModule}.
  */
-public class TestModuleBootstrapper implements ModuleBootstrapper {
+public class WritingModuleBootstrapper implements ModuleBootstrapper {
 
     @Override
     public Module<?> bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
-        return new TestModule(moduleId, config);
+        return new WritingModule(moduleId, config);
     }
 }

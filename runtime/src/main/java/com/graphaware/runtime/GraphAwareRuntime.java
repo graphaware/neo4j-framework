@@ -30,8 +30,6 @@ import org.neo4j.graphdb.NotFoundException;
  * If not called explicitly, the {@link #start()} method shall be called automatically by the runtime upon first
  * transaction received from callers. In such case, all other transaction will be blocked until the runtime and all its
  * modules have been initialized.
- * <p>
- * The runtime might use special nodes for internal data storage and prevent the deletion of those nodes.
  */
 public interface GraphAwareRuntime {
 
@@ -41,7 +39,7 @@ public interface GraphAwareRuntime {
      *
      * @param module to register.
      */
-    void registerModule(Module module);
+    void registerModule(Module<?> module);
 
     /**
      * Start the Runtime. Must be called before anything gets written into the database, but will be called automatically
@@ -51,10 +49,9 @@ public interface GraphAwareRuntime {
     void start();
 
     /**
-     * Blocks until this runtime has been started and is ready to use.
+     * Stop the Runtime. All modules will be stopped first, before this method call returns. Should be called before
+     * the database is stopped, but the Framework will do this automatically.
      */
-    void waitUntilStarted();
-
     void stop();
 
     /**
@@ -66,7 +63,7 @@ public interface GraphAwareRuntime {
      * @return module.
      * @throws NotFoundException in case no such module has been registered.
      */
-    <T extends Module> T getModule(String moduleId, Class<T> clazz) throws NotFoundException;
+    <T extends Module<?>> T getModule(String moduleId, Class<T> clazz) throws NotFoundException;
 
     /**
      * Get a module registered with the runtime.
@@ -77,7 +74,7 @@ public interface GraphAwareRuntime {
      * @throws NotFoundException     in case no such module has been registered.
      * @throws IllegalStateException in case more than one such module has been registered.
      */
-    <T extends Module> T getModule(Class<T> clazz) throws NotFoundException;
+    <T extends Module<?>> T getModule(Class<T> clazz) throws NotFoundException;
 
     /**
      * Get the configuration of this runtime.

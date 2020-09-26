@@ -47,7 +47,6 @@ public class BeforeAfterCommitTest {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(module);
         runtime.start();
-        runtime.waitUntilStarted();
 
         try (Transaction tx = database.beginTx()) {
             tx.createNode();
@@ -67,7 +66,6 @@ public class BeforeAfterCommitTest {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(module);
         runtime.start();
-        runtime.waitUntilStarted();
 
         TransactionEventListenerAdapter<Void> bang = new TransactionEventListenerAdapter<>() {
             @Override

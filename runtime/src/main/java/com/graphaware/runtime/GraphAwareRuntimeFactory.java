@@ -29,9 +29,10 @@ import org.neo4j.graphdb.GraphDatabaseService;
 public final class GraphAwareRuntimeFactory {
 
     /**
-     * Create a runtime backed by a database using default runtime configuration.
+     * Create a runtime for the given database using default runtime configuration.
      *
-     * @param database backing the runtime.
+     * @param service  Neo4j database management service.
+     * @param database for which the runtime is being created.
      * @return runtime.
      */
     public static GraphAwareRuntime createRuntime(DatabaseManagementService service, GraphDatabaseService database) {
@@ -39,9 +40,10 @@ public final class GraphAwareRuntimeFactory {
     }
 
     /**
-     * Create a runtime backed by a database using specific runtime configuration.
+     * Create a runtime for the given database using specific runtime configuration.
      *
-     * @param database      backing the runtime.
+     * @param service       Neo4j database management service.
+     * @param database      for which the runtime is being created.
      * @param configuration custom configuration.
      * @return runtime.
      */

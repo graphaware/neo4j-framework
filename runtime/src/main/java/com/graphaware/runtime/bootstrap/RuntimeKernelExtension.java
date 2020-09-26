@@ -42,8 +42,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Neo4j kernel extension that automatically creates a {@link GraphAwareRuntime} and registers
- * {@link Module}s with it.
+ * Neo4j kernel extension that automatically creates a {@link GraphAwareRuntime} and registers {@link Module}s with it.
  * <p/>
  * The mechanism of this extension works as follows. Of course, the GraphAware Framework .jar file must be present on
  * classpath (embedded mode), or in the "plugins" directory (server mode).
@@ -84,8 +83,6 @@ public class RuntimeKernelExtension implements Lifecycle {
     public static final String RUNTIME_ENABLED_CONFIG = "com.graphaware.runtime.enabled";
     public static final String MODULE_CONFIG_KEY = "com.graphaware.module"; //.ID.Order = fully qualified class name of bootstrapper
     private static final Pattern MODULE_ENABLED_KEY = Pattern.compile("([a-zA-Z0-9]{1,})\\.([0-9]{1,})");
-    private static final int WAIT_MINUTES = 5;
-    private static final int WAIT_MS = WAIT_MINUTES * 60 * 1000;
 
     protected final Config neo4jConfig;
     protected final Configuration gaConfig;
@@ -115,42 +112,18 @@ public class RuntimeKernelExtension implements Lifecycle {
      */
     @Override
     public void start() {
-        if ("system".equals(database.databaseName())) {
-            LOG.info("GraphAware Runtime always disabled on system database.");
+        if ("system".equals(database.databaseName()) || !gaConfig.containsKey(RUNTIME_ENABLED_CONFIG) || !gaConfig.getBoolean(RUNTIME_ENABLED_CONFIG)) {
+            LOG.info("GraphAware Runtime disabled for database " + database.databaseName() + ".");
             return;
         }
 
-        if (!gaConfig.containsKey(RUNTIME_ENABLED_CONFIG)) {
-            LOG.info("GraphAware Runtime disabled.");
-            return;
-        }
-
-        if (!gaConfig.getBoolean(RUNTIME_ENABLED_CONFIG)) {
-            LOG.info("GraphAware Runtime disabled.");
-            return;
-        }
-
-        LOG.info("GraphAware Runtime enabled, bootstrapping...");
+        LOG.info("GraphAware Runtime enabled for database " + database.databaseName() + ", bootstrapping...");
 
         runtime = createRuntime();
 
         registerModules(runtime);
 
-        new Thread(() -> {
-            if (databaseIsAvailable()) {
-                runtime.start();
-            } else {
-                LOG.error("Could not start GraphAware Runtime because the database didn't get to a usable state within " + WAIT_MINUTES + " minutes.");
-            }
-        }, "GraphAware Starter").start();
-
-//        runtime.start();
-
-        LOG.info("GraphAware Runtime bootstrapped.");
-    }
-
-    protected boolean databaseIsAvailable() {
-        return database.isAvailable(WAIT_MS);
+        LOG.info("GraphAware Runtime bootstrapped for database " + database.databaseName() + ".");
     }
 
     protected GraphAwareRuntime createRuntime() {
@@ -256,7 +229,6 @@ public class RuntimeKernelExtension implements Lifecycle {
      */
     @Override
     public void stop() {
-        //runtime.stop();
         runtime = null;
     }
 

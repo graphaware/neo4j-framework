@@ -49,5 +49,5 @@ public interface ModuleBootstrapper {
      * @param database which the module will run on.
      * @return fully configured runtime module.
      */
-    Module bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database);
+    Module<?> bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database);
 }

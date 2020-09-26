@@ -20,16 +20,20 @@ import com.graphaware.common.junit.DirtiesNeo4j;
 import com.graphaware.common.junit.InjectNeo4j;
 import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.common.policy.inclusion.InclusionPolicies;
+import com.graphaware.runtime.bootstrap.RuntimeKernelExtension;
 import com.graphaware.runtime.config.FluentModuleConfiguration;
 import com.graphaware.runtime.config.ModuleConfiguration;
 import com.graphaware.runtime.config.NullModuleConfiguration;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.Module;
+import com.graphaware.test.integration.GraphAwareNeo4jBuilder;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
 import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilder;
+import org.neo4j.harness.Neo4jBuilders;
 import org.neo4j.internal.helpers.collection.Iterables;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -54,17 +58,6 @@ public class CommunityRuntimeTest {
     private GraphDatabaseService database;
 
     @Test
-    public void shouldFailWaitingForRuntimeThatHasNotBeenStarted() {
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
-
-        assertThrows(IllegalStateException.class, () -> {
-            runtime.waitUntilStarted();
-        });
-
-        runtime.stop();
-    }
-
-    @Test
     public void shouldWaitForRuntimeToStart() throws InterruptedException {
         final GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
 
@@ -72,13 +65,20 @@ public class CommunityRuntimeTest {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    throw new IllegalStateException(e);
+                }
                 runtime.start();
                 finished.set(true);
             }
         }).start();
 
-        runtime.waitUntilStarted();
-        Thread.sleep(5);
+        try (Transaction tx = database.beginTx()) {
+            tx.createNode();
+            tx.commit();
+        }
 
         assertTrue(finished.get());
 
@@ -101,8 +101,11 @@ public class CommunityRuntimeTest {
             }
         }).start();
 
-        assertThrows(IllegalStateException.class, () -> {
-            runtime.waitUntilStarted();
+        assertThrows(TransactionFailureException.class, () -> {
+            try (Transaction tx = database.beginTx()) {
+                tx.createNode();
+                tx.commit();
+            }
         });
 
         runtime.stop();

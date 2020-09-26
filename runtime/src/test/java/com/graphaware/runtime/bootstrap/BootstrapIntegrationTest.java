@@ -21,6 +21,7 @@ import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.harness.Neo4j;
 import org.neo4j.harness.Neo4jBuilders;
@@ -61,7 +62,7 @@ public class BootstrapIntegrationTest {
     }
 
     @Test
-    public void moduleShouldNotBeInitializedWhenRuntimeIsDisabled() throws ConfigurationException {
+    public void moduleShouldNotBeInitializedWhenRuntimeIsDisabled() {
         Neo4j database = builder()
                 .withGAConfig(RUNTIME_ENABLED_CONFIG, "false")
                 .withGAConfig("com.graphaware.module.test.1", TestModuleBootstrapper.class.getCanonicalName())
@@ -111,7 +112,7 @@ public class BootstrapIntegrationTest {
     }
 
     @Test
-    public void moduleShouldBeInitializedWhenModuleIsDisabled() throws InterruptedException {
+    public void moduleShouldBeInitializedWhenModuleIsDisabled() {
         Neo4j database = builder()
                 .withGAConfig(RUNTIME_ENABLED_CONFIG, "true")
                 .build();
@@ -124,7 +125,7 @@ public class BootstrapIntegrationTest {
     }
 
     @Test
-    public void moduleShouldBeInitializedWhenAnotherModuleIsMisConfigured() throws InterruptedException {
+    public void moduleShouldBeInitializedWhenAnotherModuleIsMisConfigured() {
         Neo4j database = builder()
                 .withGAConfig(RUNTIME_ENABLED_CONFIG, "true")
                 .withGAConfig("com.graphaware.module.wrong1.enabled", "com.not.existent.Bootstrapper")
@@ -145,7 +146,7 @@ public class BootstrapIntegrationTest {
     }
 
     @Test
-    public void modulesShouldBeDelegatedToInCorrectOrder() throws InterruptedException {
+    public void modulesShouldBeDelegatedToInCorrectOrder() {
         Neo4j database = builder()
                 .withGAConfig(RUNTIME_ENABLED_CONFIG, "true")
                 .withGAConfig("com.graphaware.module.test1.1", TestModuleBootstrapper.class.getCanonicalName())
@@ -167,7 +168,7 @@ public class BootstrapIntegrationTest {
     }
 
     @Test
-    public void modulesShouldBeDelegatedToInRandomOrderWhenOrderClashes() throws InterruptedException {
+    public void modulesShouldBeDelegatedToInRandomOrderWhenOrderClashes() {
         Neo4j database = builder()
                 .withGAConfig(RUNTIME_ENABLED_CONFIG, "true")
                 .withGAConfig("com.graphaware.module.test1.1", TestModuleBootstrapper.class.getCanonicalName())
@@ -186,6 +187,26 @@ public class BootstrapIntegrationTest {
         assertTrue(remaining.remove(TEST_RUNTIME_MODULES.get(1).getId()));
         assertTrue(remaining.remove(TEST_RUNTIME_MODULES.get(2).getId()));
         assertTrue(remaining.isEmpty());
+
+        database.close();
+    }
+
+    @Test
+    public void moduleShouldBeAbleToWriteDataUponStart() {
+        Neo4j database = builder()
+                .withGAConfig(RUNTIME_ENABLED_CONFIG, "true")
+                .withGAConfig("com.graphaware.module.test.1", WritingModuleBootstrapper.class.getCanonicalName())
+                .build();
+
+        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+            Node node = tx.createNode();
+            node.setProperty("test", "real");
+            tx.commit();
+        }
+
+        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+            assertEquals(2, tx.getAllNodes().stream().count());
+        }
 
         database.close();
     }
