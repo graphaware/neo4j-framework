@@ -17,8 +17,7 @@
 package com.graphaware.runtime.policy.all;
 
 import com.graphaware.common.policy.inclusion.RelationshipInclusionPolicy;
-import com.graphaware.runtime.config.RuntimeConfiguration;
-import org.neo4j.graphdb.GraphDatabaseService;
+import com.graphaware.runtime.GraphAwareRuntime;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
 
@@ -42,7 +41,7 @@ public final class IncludeAllBusinessRelationships extends RelationshipInclusion
      */
     @Override
     public boolean include(Relationship relationship) {
-        return !relationship.getType().name().startsWith(RuntimeConfiguration.GA_PREFIX);
+        return !relationship.getType().name().startsWith(GraphAwareRuntime.GA_PREFIX);
     }
 
     /**

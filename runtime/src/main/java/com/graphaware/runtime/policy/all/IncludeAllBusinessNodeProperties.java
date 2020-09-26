@@ -18,7 +18,7 @@ package com.graphaware.runtime.policy.all;
 
 import com.graphaware.common.policy.inclusion.NodePropertyInclusionPolicy;
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
-import com.graphaware.runtime.config.RuntimeConfiguration;
+import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.module.Module;
 import org.neo4j.graphdb.Node;
 
@@ -43,6 +43,6 @@ public final class IncludeAllBusinessNodeProperties implements NodePropertyInclu
      */
     @Override
     public boolean include(String key, Node node) {
-        return !key.startsWith(RuntimeConfiguration.GA_PREFIX);
+        return !key.startsWith(GraphAwareRuntime.GA_PREFIX);
     }
 }

@@ -21,6 +21,7 @@ import com.graphaware.runtime.config.NullModuleConfiguration;
 import com.graphaware.runtime.module.BaseModule;
 import com.graphaware.runtime.module.Module;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
+import org.apache.commons.configuration2.Configuration;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -33,9 +34,9 @@ import java.util.function.Consumer;
  */
 public class WritingModule extends BaseModule<Void> {
 
-    private final Map<String, String> config;
+    private final Configuration config;
 
-    public WritingModule(String moduleId, Map<String, String> config) {
+    public WritingModule(String moduleId, Configuration config) {
         super(moduleId);
         this.config = config;
     }
@@ -45,7 +46,7 @@ public class WritingModule extends BaseModule<Void> {
         return NullModuleConfiguration.getInstance();
     }
 
-    public Map<String, String> getConfig() {
+    public Configuration getConfig() {
         return config;
     }
 

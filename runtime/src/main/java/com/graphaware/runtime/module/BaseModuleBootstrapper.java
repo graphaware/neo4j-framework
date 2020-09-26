@@ -24,6 +24,7 @@ import com.graphaware.runtime.config.function.StringToNodeInclusionPolicy;
 import com.graphaware.runtime.config.function.StringToNodePropertyInclusionPolicy;
 import com.graphaware.runtime.config.function.StringToRelationshipInclusionPolicy;
 import com.graphaware.runtime.config.function.StringToRelationshipPropertyInclusionPolicy;
+import org.apache.commons.configuration2.Configuration;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.logging.Log;
 
@@ -54,7 +55,7 @@ public abstract class BaseModuleBootstrapper<C extends BaseModuleConfiguration<C
      * {@inheritDoc}
      */
     @Override
-    public Module bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
+    public Module<?> bootstrapModule(String moduleId, Configuration config, GraphDatabaseService database) {
         C configuration = defaultConfiguration();
 
         configuration = configureInclusionPolicies(config, configuration);
@@ -62,27 +63,27 @@ public abstract class BaseModuleBootstrapper<C extends BaseModuleConfiguration<C
         return doBootstrapModule(moduleId, config, database, configuration);
     }
 
-    protected C configureInclusionPolicies(Map<String, String> config, C configuration) {
+    protected C configureInclusionPolicies(Configuration config, C configuration) {
         if (configExists(config, NODE)) {
-            NodeInclusionPolicy policy = StringToNodeInclusionPolicy.getInstance().apply(config.get(NODE));
+            NodeInclusionPolicy policy = StringToNodeInclusionPolicy.getInstance().apply(config.getString(NODE));
             LOG.info("Node Inclusion Policy set to %s", policy);
             configuration = configuration.with(policy);
         }
 
         if (configExists(config, NODE_PROPERTY)) {
-            NodePropertyInclusionPolicy policy = StringToNodePropertyInclusionPolicy.getInstance().apply(config.get(NODE_PROPERTY));
+            NodePropertyInclusionPolicy policy = StringToNodePropertyInclusionPolicy.getInstance().apply(config.getString(NODE_PROPERTY));
             LOG.info("Node Property Inclusion Policy set to %s", policy);
             configuration = configuration.with(policy);
         }
 
         if (configExists(config, RELATIONSHIP)) {
-            RelationshipInclusionPolicy policy = StringToRelationshipInclusionPolicy.getInstance().apply(config.get(RELATIONSHIP));
+            RelationshipInclusionPolicy policy = StringToRelationshipInclusionPolicy.getInstance().apply(config.getString(RELATIONSHIP));
             LOG.info("Relationship Inclusion Policy set to %s", policy);
             configuration = configuration.with(policy);
         }
 
         if (configExists(config, RELATIONSHIP_PROPERTY)) {
-            RelationshipPropertyInclusionPolicy policy = StringToRelationshipPropertyInclusionPolicy.getInstance().apply(config.get(RELATIONSHIP_PROPERTY));
+            RelationshipPropertyInclusionPolicy policy = StringToRelationshipPropertyInclusionPolicy.getInstance().apply(config.getString(RELATIONSHIP_PROPERTY));
             LOG.info("Relationship Property Inclusion Policy set to %s", policy);
             configuration = configuration.with(policy);
         }
@@ -100,7 +101,7 @@ public abstract class BaseModuleBootstrapper<C extends BaseModuleConfiguration<C
      * @param configuration pre-populated with configuration common for all modules, such as "initializeUntil" and all {@link InclusionPolicies}.
      * @return fully configured runtime module.
      */
-    protected abstract Module doBootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database, C configuration);
+    protected abstract Module<?> doBootstrapModule(String moduleId, Configuration config, GraphDatabaseService database, C configuration);
 
     /**
      * Check if a configuration has been specified.
@@ -109,7 +110,7 @@ public abstract class BaseModuleBootstrapper<C extends BaseModuleConfiguration<C
      * @param key    to check for.
      * @return true iff the passed in config contains the key and the value is not empty.
      */
-    protected final boolean configExists(Map<String, String> config, String key) {
-        return config.get(key) != null && config.get(key).length() > 0;
+    protected final boolean configExists(Configuration config, String key) {
+        return config.containsKey(key) && config.getString(key).length() > 0;
     }
 }

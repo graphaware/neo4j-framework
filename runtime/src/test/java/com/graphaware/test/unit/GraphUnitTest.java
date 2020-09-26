@@ -22,6 +22,7 @@ import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.runtime.bootstrap.TestModule;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
+import org.apache.commons.configuration2.MapConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,7 +57,7 @@ public class GraphUnitTest {
     @Test
     public void clearGraphWithRuntimeShouldDeleteAllNodesAndRelsButNotGraphProps() {
         GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), database);
-        runtime.registerModule(new TestModule("test", Collections.singletonMap("test", "test")));
+        runtime.registerModule(new TestModule("test", new MapConfiguration(Collections.singletonMap("test", "test"))));
         runtime.start();
 
         try (Transaction tx = database.beginTx()) {

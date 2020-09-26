@@ -16,7 +16,6 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.module.Module;
 import org.neo4j.graphdb.NotFoundException;
 
@@ -32,6 +31,12 @@ import org.neo4j.graphdb.NotFoundException;
  * modules have been initialized.
  */
 public interface GraphAwareRuntime {
+
+    /**
+     * Prefix for GraphAware internal nodes, relationships, and properties. This is fixed as there is little chance
+     * that users would have a reason to change it.
+     */
+    String GA_PREFIX = "_GA_";
 
     /**
      * Register a {@link Module}. Note that modules are delegated to in the order
@@ -75,11 +80,4 @@ public interface GraphAwareRuntime {
      * @throws IllegalStateException in case more than one such module has been registered.
      */
     <T extends Module<?>> T getModule(Class<T> clazz) throws NotFoundException;
-
-    /**
-     * Get the configuration of this runtime.
-     *
-     * @return config.
-     */
-    RuntimeConfiguration getConfiguration();
 }

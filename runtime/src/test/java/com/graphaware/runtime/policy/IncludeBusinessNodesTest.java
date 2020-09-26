@@ -20,6 +20,7 @@ import com.graphaware.common.junit.InjectNeo4j;
 import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.common.policy.inclusion.composite.CompositeNodeInclusionPolicy;
 import com.graphaware.common.policy.inclusion.fluent.IncludeNodes;
+import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +36,6 @@ import org.neo4j.harness.Neo4jBuilders;
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
 import static com.graphaware.common.policy.inclusion.composite.CompositeNodeInclusionPolicy.of;
-import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.neo4j.graphdb.Label.label;
@@ -56,7 +56,7 @@ public class IncludeBusinessNodesTest {
         try (Transaction tx = database.beginTx()) {
             Node n = tx.createNode(label("Test"));
             n.setProperty("test", "test");
-            Node internal = tx.createNode(label(GA_PREFIX + "test"));
+            Node internal = tx.createNode(label(GraphAwareRuntime.GA_PREFIX + "test"));
 
             assertTrue(of(IncludeAllBusinessNodes.getInstance(), IncludeNodes.all()).include(n));
             assertFalse(of(IncludeAllBusinessNodes.getInstance(), IncludeNodes.all()).include(internal));

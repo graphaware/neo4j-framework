@@ -18,6 +18,7 @@ package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.runtime.module.Module;
 import com.graphaware.runtime.module.ModuleBootstrapper;
+import org.apache.commons.configuration2.Configuration;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import java.util.Map;
@@ -28,7 +29,7 @@ import java.util.Map;
 public class WritingModuleBootstrapper implements ModuleBootstrapper {
 
     @Override
-    public Module<?> bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
+    public Module<?> bootstrapModule(String moduleId, Configuration config, GraphDatabaseService database) {
         return new WritingModule(moduleId, config);
     }
 }

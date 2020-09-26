@@ -17,29 +17,20 @@
 package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.common.log.LoggerFactory;
-import com.graphaware.common.util.Pair;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
-import com.graphaware.runtime.config.Neo4jConfigBasedRuntimeConfiguration;
+import com.graphaware.runtime.config.Neo4jConfigurationReader;
+import com.graphaware.runtime.config.CommunityRuntimeConfiguration;
+import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.module.Module;
 import com.graphaware.runtime.module.ModuleBootstrapper;
-import com.graphaware.runtime.settings.FrameworkSettingsDeclaration;
-import org.apache.commons.configuration2.CompositeConfiguration;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.PropertiesConfiguration;
-import org.apache.commons.configuration2.SystemConfiguration;
-import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
-import org.apache.commons.configuration2.builder.fluent.Parameters;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.neo4j.configuration.Config;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 import org.neo4j.logging.Log;
 
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Map;
 
 /**
  * Neo4j kernel extension that automatically creates a {@link GraphAwareRuntime} and registers {@link Module}s with it.
@@ -75,26 +66,23 @@ import java.util.regex.Pattern;
  * <p/>
  *
  * @see ModuleBootstrapper
- * @see Neo4jConfigBasedRuntimeConfiguration
  */
 public class RuntimeKernelExtension implements Lifecycle {
     private static final Log LOG = LoggerFactory.getLogger(RuntimeKernelExtension.class);
 
-    public static final String RUNTIME_ENABLED_CONFIG = "com.graphaware.runtime.enabled";
-    public static final String MODULE_CONFIG_KEY = "com.graphaware.module"; //.ID.Order = fully qualified class name of bootstrapper
-    private static final Pattern MODULE_ENABLED_KEY = Pattern.compile("([a-zA-Z0-9]{1,})\\.([0-9]{1,})");
-
-    protected final Config neo4jConfig;
-    protected final Configuration gaConfig;
     protected final DatabaseManagementService managementService;
     protected final GraphDatabaseService database;
+    protected final RuntimeConfiguration runtimeConfiguration;
     protected GraphAwareRuntime runtime;
 
     public RuntimeKernelExtension(Config neo4jConfig, DatabaseManagementService managementService, GraphDatabaseService database) {
-        this.neo4jConfig = neo4jConfig;
         this.managementService = managementService;
         this.database = database;
-        this.gaConfig = gaConfig();
+        this.runtimeConfiguration = constructRuntimeConfiguration(neo4jConfig, database);
+    }
+
+    protected RuntimeConfiguration constructRuntimeConfiguration(Config neo4jConfig, GraphDatabaseService database) {
+        return new CommunityRuntimeConfiguration(database, new Neo4jConfigurationReader(neo4jConfig));
     }
 
     /**
@@ -112,7 +100,7 @@ public class RuntimeKernelExtension implements Lifecycle {
      */
     @Override
     public void start() {
-        if ("system".equals(database.databaseName()) || !gaConfig.containsKey(RUNTIME_ENABLED_CONFIG) || !gaConfig.getBoolean(RUNTIME_ENABLED_CONFIG)) {
+        if (!runtimeConfiguration.runtimeEnabled()) {
             LOG.info("GraphAware Runtime disabled for database " + database.databaseName() + ".");
             return;
         }
@@ -127,83 +115,20 @@ public class RuntimeKernelExtension implements Lifecycle {
     }
 
     protected GraphAwareRuntime createRuntime() {
-        return GraphAwareRuntimeFactory.createRuntime(managementService, database, new Neo4jConfigBasedRuntimeConfiguration(database, neo4jConfig));
+        return GraphAwareRuntimeFactory.createRuntime(managementService, database);
     }
 
     private void registerModules(GraphAwareRuntime runtime) {
-        List<Pair<Integer, Pair<String, String>>> orderedBootstrappers = findOrderedBootstrappers();
-
-        int lastOrder = -1;
-        for (Pair<Integer, Pair<String, String>> bootstrapperPair : orderedBootstrappers) {
-            int order = bootstrapperPair.first();
-            LOG.info("Bootstrapping module with order " + order + ", ID " + bootstrapperPair.second().first() + ", using " + bootstrapperPair.second().second());
-
-            if (lastOrder == order) {
-                LOG.warn("There is more than one module with order " + order + "! Will order clashing modules randomly");
-            }
-
-            lastOrder = order;
+        runtimeConfiguration.loadConfig().entrySet().stream().sorted(Map.Entry.comparingByValue()).forEach(entry -> {
+            LOG.info("Bootstrapping module with order " + entry.getValue().getOrder() + ", ID " + entry.getValue().getId() + ", using " + entry.getValue().getBootstrapper() + " for database " + database.databaseName());
 
             try {
-                ModuleBootstrapper bootstrapper = (ModuleBootstrapper) Class.forName(bootstrapperPair.second().second()).newInstance();
-                runtime.registerModule(bootstrapper.bootstrapModule(bootstrapperPair.second().first(), findModuleConfig(bootstrapperPair.second().first()), database));
+                ModuleBootstrapper bootstrapper = (ModuleBootstrapper) Class.forName(entry.getValue().getBootstrapper()).newInstance();
+                runtime.registerModule(bootstrapper.bootstrapModule(entry.getValue().getId(), entry.getValue().getConfig(), database));
             } catch (Exception e) {
-                LOG.error("Unable to bootstrap module " + bootstrapperPair.first(), e);
-            }
-        }
-    }
-
-    private List<Pair<Integer, Pair<String, String>>> findOrderedBootstrappers() {
-        List<Pair<Integer, Pair<String, String>>> orderedBootstrappers = new ArrayList<>();
-
-        Configuration subset = gaConfig.subset(MODULE_CONFIG_KEY);
-        subset.getKeys().forEachRemaining(s -> {
-            Matcher matcher = MODULE_ENABLED_KEY.matcher(s);
-            if (matcher.find()) {
-                String moduleId = matcher.group(1);
-                Integer moduleOrder = Integer.valueOf(matcher.group(2));
-                String bootstrapperClass = subset.getString(s, "UNKNOWN");
-                orderedBootstrappers.add(Pair.of(moduleOrder, Pair.of(moduleId, bootstrapperClass)));
+                LOG.error("Unable to bootstrap module " + entry.getKey() + " for database " + database.databaseName(), e);
             }
         });
-
-        orderedBootstrappers.sort(Comparator.comparingInt(Pair::first));
-
-        return orderedBootstrappers;
-    }
-
-    private Map<String, String> findModuleConfig(String moduleId) {
-        Map<String, String> moduleConfig = new HashMap<>();
-
-        String moduleConfigKeyPrefix = MODULE_CONFIG_KEY + "." + moduleId;
-
-        Configuration subset = gaConfig.subset(moduleConfigKeyPrefix);
-        subset.getKeys().forEachRemaining(s -> {
-            if (!MODULE_ENABLED_KEY.matcher(s).find()) {
-                moduleConfig.put(s, subset.getString(s));
-            }
-        });
-
-        return moduleConfig;
-    }
-
-    private Configuration gaConfig() {
-        FileBasedConfigurationBuilder<PropertiesConfiguration> builder =
-                new FileBasedConfigurationBuilder<>(PropertiesConfiguration.class)
-                        .configure(new Parameters()
-                                .fileBased()
-                                .setURL(getClass().getClassLoader().getResource(neo4jConfig.get(FrameworkSettingsDeclaration.ga_config_file_name))));
-
-        CompositeConfiguration cc = new CompositeConfiguration();
-
-        try {
-            cc.addConfiguration(builder.getConfiguration());
-            cc.addConfiguration(new SystemConfiguration());
-        } catch (ConfigurationException e) {
-            throw new RuntimeException(e);
-        }
-
-        return cc;
     }
 
     protected boolean isOnEnterprise() {

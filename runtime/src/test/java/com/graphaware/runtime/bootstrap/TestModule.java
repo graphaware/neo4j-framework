@@ -21,6 +21,7 @@ import com.graphaware.runtime.config.ModuleConfiguration;
 import com.graphaware.runtime.module.BaseModule;
 import com.graphaware.runtime.module.Module;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
+import org.apache.commons.configuration2.Configuration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +34,9 @@ public class TestModule extends BaseModule<Void> {
 
     public static final List<TestModule> TEST_RUNTIME_MODULES = new ArrayList<>();
 
-    private final Map<String, String> config;
+    private final Configuration config;
 
-    public TestModule(String moduleId, Map<String, String> config) {
+    public TestModule(String moduleId, Configuration config) {
         super(moduleId);
         this.config = config;
         TEST_RUNTIME_MODULES.add(this);
@@ -46,7 +47,7 @@ public class TestModule extends BaseModule<Void> {
         return NullModuleConfiguration.getInstance();
     }
 
-    public Map<String, String> getConfig() {
+    public Configuration getConfig() {
         return config;
     }
 

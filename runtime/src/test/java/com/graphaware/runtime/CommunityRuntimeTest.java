@@ -39,7 +39,6 @@ import org.neo4j.internal.helpers.collection.Iterables;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.graphaware.runtime.GraphAwareRuntimeFactory.createRuntime;
-import static com.graphaware.runtime.config.FluentRuntimeConfiguration.defaultConfiguration;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -116,7 +115,7 @@ public class CommunityRuntimeTest {
         Module mockModule = mockTxModule(MOCK);
         doThrow(new DeliberateTransactionRollbackException("Deliberate testing exception")).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(mockModule);
         runtime.start();
 
@@ -141,7 +140,7 @@ public class CommunityRuntimeTest {
         Module mockModule = mockTxModule(MOCK);
         doThrow(new RuntimeException("Deliberate testing exception")).when(mockModule).beforeCommit(any(ImprovedTransactionData.class));
 
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(mockModule);
         runtime.start();
 
@@ -163,7 +162,7 @@ public class CommunityRuntimeTest {
 
     @Test
     public void shouldNotBeAbleToRegisterDifferentModulesWithSameId() {
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(mockTxModule());
 
         assertThrows(IllegalStateException.class, () -> {
@@ -186,7 +185,7 @@ public class CommunityRuntimeTest {
         Module mockModule1 = mockTxModule(MOCK + "1");
         Module mockModule2 = mockTxModule(MOCK + "2");
 
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
 
@@ -227,7 +226,7 @@ public class CommunityRuntimeTest {
         M2 mockM2a = mockTxModule("M2a", M2.class);
         M2 mockM2b = mockTxModule("M2b", M2.class);
 
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(mockM1);
         runtime.registerModule(mockM2a);
         runtime.registerModule(mockM2b);
@@ -250,7 +249,7 @@ public class CommunityRuntimeTest {
 
     @Test
     public void shouldThrowExceptionWhenAskedForNonExistingModule() {
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
 
         assertThrows(NotFoundException.class, () -> {
             runtime.getModule("non-existing", Module.class);
@@ -263,7 +262,7 @@ public class CommunityRuntimeTest {
     public void shouldNotBeAbleToRegisterTheSameModuleTwice() {
         final Module mockModule = mockTxModule();
 
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(mockModule);
 
         assertThrows(IllegalStateException.class, () -> {
@@ -280,7 +279,7 @@ public class CommunityRuntimeTest {
         when(mockModule1.getId()).thenReturn("ID");
         when(mockModule2.getId()).thenReturn("ID");
 
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(mockModule1);
 
         assertThrows(IllegalStateException.class, () -> {
@@ -296,7 +295,7 @@ public class CommunityRuntimeTest {
         Module mockModule2 = mockTxModule(MOCK + "2");
         Module mockModule3 = mockTxModule(MOCK + "3", FluentModuleConfiguration.defaultConfiguration().with(InclusionPolicies.none()));
 
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
         runtime.registerModule(mockModule3);
@@ -337,7 +336,7 @@ public class CommunityRuntimeTest {
     public void modulesCannotBeRegisteredAfterStart() {
         final Module mockModule = mockTxModule();
 
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
         runtime.start();
 
         assertThrows(IllegalStateException.class, () -> {
@@ -349,7 +348,7 @@ public class CommunityRuntimeTest {
 
     @Test
     public void multipleCallsToStartFrameworkHaveNoEffect() {
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
         runtime.start();
         runtime.start();
         runtime.start();
@@ -363,7 +362,7 @@ public class CommunityRuntimeTest {
     public void shutdownShouldBeCalledBeforeShutdown() {
         Module mockModule = mockTxModule();
 
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(mockModule);
         runtime.start();
 
@@ -379,7 +378,7 @@ public class CommunityRuntimeTest {
 
         Module mockModule2 = mockTxModule(MOCK + "2");
 
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
 
@@ -417,7 +416,7 @@ public class CommunityRuntimeTest {
 
         doThrow(new DeliberateTransactionRollbackException()).when(mockModule2).beforeCommit(any(ImprovedTransactionData.class));
 
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(mockModule1);
         runtime.registerModule(mockModule2);
         runtime.registerModule(mockModule3);
@@ -459,7 +458,7 @@ public class CommunityRuntimeTest {
 
     @Test
     public void whenRuntimeIsNotStartedExceptionShouldBeThrown() {
-        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database, defaultConfiguration(database));
+        GraphAwareRuntime runtime = createRuntime(neo4j.databaseManagementService(), database);
 
         assertThrows(RuntimeException.class, () -> {
             try (Transaction tx = database.beginTx()) {

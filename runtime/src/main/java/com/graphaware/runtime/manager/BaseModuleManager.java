@@ -112,7 +112,7 @@ public abstract class BaseModuleManager implements ModuleManager {
      * {@inheritDoc}
      */
     @Override
-    public void shutdownModules() {
+    public void stopModules() {
         for (Module<?> module : modules.values()) {
             LOG.info("Shutting down module " + module.getId());
             module.shutdown();

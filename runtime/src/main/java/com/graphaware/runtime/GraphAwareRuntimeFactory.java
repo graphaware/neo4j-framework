@@ -16,8 +16,6 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.FluentRuntimeConfiguration;
-import com.graphaware.runtime.config.RuntimeConfiguration;
 import com.graphaware.runtime.manager.CommunityModuleManager;
 import com.graphaware.runtime.manager.ModuleManager;
 import org.neo4j.dbms.api.DatabaseManagementService;
@@ -29,28 +27,16 @@ import org.neo4j.graphdb.GraphDatabaseService;
 public final class GraphAwareRuntimeFactory {
 
     /**
-     * Create a runtime for the given database using default runtime configuration.
-     *
-     * @param service  Neo4j database management service.
-     * @param database for which the runtime is being created.
-     * @return runtime.
-     */
-    public static GraphAwareRuntime createRuntime(DatabaseManagementService service, GraphDatabaseService database) {
-        return createRuntime(service, database, FluentRuntimeConfiguration.defaultConfiguration(database));
-    }
-
-    /**
-     * Create a runtime for the given database using specific runtime configuration.
+     * Create a runtime for the given database.
      *
      * @param service       Neo4j database management service.
      * @param database      for which the runtime is being created.
-     * @param configuration custom configuration.
      * @return runtime.
      */
-    public static GraphAwareRuntime createRuntime(DatabaseManagementService service, GraphDatabaseService database, RuntimeConfiguration configuration) {
+    public static GraphAwareRuntime createRuntime(DatabaseManagementService service, GraphDatabaseService database) {
         ModuleManager moduleManager = new CommunityModuleManager(database);
 
-        return new CommunityRuntime(configuration, database, service, moduleManager);
+        return new CommunityRuntime(database, service, moduleManager);
     }
 
     private GraphAwareRuntimeFactory() {

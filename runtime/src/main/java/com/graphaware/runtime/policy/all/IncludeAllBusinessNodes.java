@@ -18,8 +18,7 @@ package com.graphaware.runtime.policy.all;
 
 import com.graphaware.common.policy.inclusion.BaseEntityInclusionPolicy;
 import com.graphaware.common.policy.inclusion.NodeInclusionPolicy;
-import com.graphaware.runtime.config.RuntimeConfiguration;
-import org.neo4j.graphdb.GraphDatabaseService;
+import com.graphaware.runtime.GraphAwareRuntime;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
@@ -45,7 +44,7 @@ public final class IncludeAllBusinessNodes extends BaseEntityInclusionPolicy<Nod
     @Override
     public boolean include(Node node) {
         for (Label label : node.getLabels()) {
-            if (label.name().startsWith(RuntimeConfiguration.GA_PREFIX)) {
+            if (label.name().startsWith(GraphAwareRuntime.GA_PREFIX)) {
                 return false;
             }
         }

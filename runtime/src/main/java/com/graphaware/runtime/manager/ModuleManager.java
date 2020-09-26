@@ -70,7 +70,7 @@ public interface ModuleManager {
     /**
      * Bring all modules to an orderly shutdown, when the database is stopped.
      */
-    void shutdownModules();
+    void stopModules();
 
     /**
      * Delegate work to modules before a transaction is committed.
