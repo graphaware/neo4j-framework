@@ -52,7 +52,7 @@ public abstract class BaseThirdPartyWriter extends QueueBackedScheduledService<C
      * {@inheritDoc}
      */
     @Override
-    protected void runOneIteration() throws Exception {
+    protected void runOneIteration() {
         if (queue.isEmpty()) {
             return;
         }

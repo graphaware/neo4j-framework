@@ -73,8 +73,7 @@ public class TransactionalInputTest {
         }
 
         assertEquals(4, nodes.size());
-        assertEquals(noTx + 1, monitor.getNumberOfCommittedTransactions());
-//        assertEquals(noTx + 3, monitor.getNumberOfCommittedTransactions());
+        assertEquals(noTx + 3, monitor.getNumberOfCommittedTransactions());
 
     }
 
@@ -92,8 +91,7 @@ public class TransactionalInputTest {
         }
 
         assertEquals(4, nodes.size());
-//        assertEquals(noTx + 5, monitor.getNumberOfCommittedTransactions());
-        assertEquals(noTx + 1, monitor.getNumberOfCommittedTransactions());
+        assertEquals(noTx + 5, monitor.getNumberOfCommittedTransactions());
     }
 
     @Test
@@ -110,8 +108,7 @@ public class TransactionalInputTest {
         }
 
         assertEquals(4, nodes.size());
-//        assertEquals(noTx + 2, monitor.getNumberOfCommittedTransactions());
-        assertEquals(noTx + 1, monitor.getNumberOfCommittedTransactions());
+        assertEquals(noTx + 2, monitor.getNumberOfCommittedTransactions());
     }
 
     @Test

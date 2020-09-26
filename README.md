@@ -16,7 +16,7 @@ See the <a href="http://graphaware.com/neo4j/2014/05/28/graph-aware-neo4j-framew
 This open-source (GPL) version of the GraphAware Framework is compatible with Neo4j Community Edition (GPL) only. 
 It *will not work* with Neo4j Enterprise Edition, which is a proprietary and commercial software product of Neo4j, Inc..
 
-GraphAware offers a paid Enterprise version of the GraphAware Framework to licensed users of Neo4j Enterprise Edition.
+GraphAware offers a *paid* Enterprise version of the GraphAware Framework to licensed users of Neo4j Enterprise Edition.
 Please [get in touch](mailto:info@graphaware.com) to receive access.
 
 ## Features Overview
@@ -88,25 +88,11 @@ The version number has two parts. The first three numbers indicate compatibility
  The last number is the version of the framework. For example, version 2.2.0.28 is version 28 of the framework
  compatible with Neo4j 2.2.0
 
-
-## Data Collection
-
-Note that framework sends a POST request to Google Analytics every 5 minutes after start just so we know how many people
-actually use it. The only data transmitted are module and controller class names, version and edition of the framework,
-and the database store ID.
-
-If you wish to completely disable stats collection, please add the following to `neo4j.conf`:
-
-```
-com.graphaware.runtime.stats.disabled=true
-com.graphaware.server.stats.disabled=true
-```
-
 ## License
 
 Copyright (c) 2013-2020 GraphAware
 
-GraphAware is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+GraphAware Framework is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
 warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.

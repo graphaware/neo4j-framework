@@ -80,10 +80,7 @@ public class TransactionalInput<T> extends PrefetchingIterator<T> implements Ite
 
         int i = ++count % batchSize;
         if (i == 0) {
-            //The next line is commented out because of a bug in Neo that will hopefully be resolved in 3.3.
-            //See here: https://docs.google.com/document/d/1vlmaGyLgwyBeQUeBiEjfpAAMOh0WvjcCQpfdS0P1TFY/edit#
-            //Functionality is preserved, but this may eat up all the memory in large graphs...
-            //closeTx();
+            closeTx();
         }
 
         return next;

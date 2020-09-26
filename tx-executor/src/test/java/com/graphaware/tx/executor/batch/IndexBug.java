@@ -16,10 +16,13 @@
 
 package com.graphaware.tx.executor.batch;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
 import org.neo4j.harness.Neo4j;
 import org.neo4j.harness.Neo4jBuilders;
@@ -28,20 +31,20 @@ import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Disabled
+@ExtendWith(Neo4jExtension.class)
 public class IndexBug {
 
     private static final int NUMBER_OF_NODES = 10_000;
     private static final int BATCH_SIZE = 1_000;
 
+    @InjectNeo4j
     private Neo4j controls;
+
+    @InjectNeo4j
     protected GraphDatabaseService database;
 
     @BeforeEach
     public void setUp() {
-        controls = Neo4jBuilders.newInProcessBuilder().build();
-        database = controls.defaultDatabaseService();
-
         try (Transaction tx = database.beginTx()) {
             for (int i = 0; i < NUMBER_OF_NODES; i++) {
                 Node node = tx.createNode();
@@ -49,11 +52,6 @@ public class IndexBug {
             }
             tx.commit();
         }
-    }
-
-    @AfterEach
-    public void tearDown() {
-        controls.close();
     }
 
     @Test
@@ -95,8 +93,7 @@ public class IndexBug {
                 }
 
                 Node next = allNodes.next();
-                System.out.println(next.getProperty("test", "nothing"));
-                //next.addLabel(Label.label("SecondLabel"));
+                tx.getNodeById(next.getId()).addLabel(Label.label("SecondLabel"));
             }
             tx.commit();
         }
