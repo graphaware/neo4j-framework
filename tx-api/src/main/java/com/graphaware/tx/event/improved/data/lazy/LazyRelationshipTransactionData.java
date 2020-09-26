@@ -161,11 +161,6 @@ public class LazyRelationshipTransactionData extends LazyEntityTransactionData<R
 
     @Override
     protected Change<Relationship> createChangeObject(Relationship candidate) {
-        return new Change<>(oldSnapshot(bugWorkaround(candidate)), newSnapshot(bugWorkaround(candidate)));
-    }
-
-    private Relationship bugWorkaround(Relationship relationship) {
-        return relationship;
-        //return relationship.getGraphDatabase().getRelationshipById(relationship.getId());
+        return new Change<>(oldSnapshot(candidate), newSnapshot(candidate));
     }
 }
