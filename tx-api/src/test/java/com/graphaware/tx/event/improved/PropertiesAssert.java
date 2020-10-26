@@ -18,15 +18,15 @@ package com.graphaware.tx.event.improved;
 
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Entity;
-import org.neo4j.helpers.collection.Iterables;
-import org.neo4j.helpers.collection.MapUtil;
+import org.neo4j.internal.helpers.collection.Iterables;
+import org.neo4j.internal.helpers.collection.MapUtil;
 
 import java.util.Map;
 
 import static com.graphaware.common.util.ArrayUtils.arrayFriendlyEquals;
 import static com.graphaware.common.util.ArrayUtils.arrayFriendlyMapEquals;
 import static com.graphaware.tx.event.improved.LazyTransactionDataComprehensiveTest.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public final class PropertiesAssert {
 

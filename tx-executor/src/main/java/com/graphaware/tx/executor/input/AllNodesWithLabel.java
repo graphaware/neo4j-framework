@@ -16,24 +16,29 @@
 
 package com.graphaware.tx.executor.input;
 
+import com.graphaware.tx.executor.single.TransactionCallback;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.neo4j.helpers.collection.Iterators;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.internal.helpers.collection.Iterables;
+import org.neo4j.internal.helpers.collection.Iterators;
+
+import java.util.Iterator;
 
 /**
  * {@link TransactionalInput} returning all nodes with a specific label.
  */
-public final class AllNodesWithLabel  extends TransactionalInput<Node> {
+public final class AllNodesWithLabel extends TransactionalInput<Node> {
 
     /**
      * Create a new input.
      *
      * @param database  to take all nodes from.
      * @param batchSize how many nodes in a batch.
-     * @param label which all returned nodes have.
+     * @param label     which all returned nodes have.
      */
     public AllNodesWithLabel(GraphDatabaseService database, int batchSize, final Label label) {
-        super(database, batchSize, db -> Iterators.asResourceIterable(db.findNodes(label)));
+        super(database, batchSize, tx -> () -> tx.findNodes(label));
     }
 }

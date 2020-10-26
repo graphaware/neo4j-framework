@@ -84,6 +84,8 @@ import java.util.Set;
  */
 public interface ImprovedTransactionData extends TransactionDataWrapper {
 
+    Transaction getTransaction();
+
     /**
      * Check whether the given node has been created in the transaction.
      *

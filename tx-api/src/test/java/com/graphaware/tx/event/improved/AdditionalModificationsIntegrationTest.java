@@ -16,26 +16,30 @@
 
 package com.graphaware.tx.event.improved;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.test.data.CypherPopulator;
-import com.graphaware.test.data.DatabasePopulator;
-import com.graphaware.test.integration.DatabaseIntegrationTest;
-import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
-import org.junit.Test;
-import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.event.TransactionData;
-import org.neo4j.graphdb.event.TransactionEventHandler;
+import org.neo4j.graphdb.event.TransactionEventListenerAdapter;
+import org.neo4j.harness.Neo4j;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AdditionalModificationsIntegrationTest extends EmbeddedDatabaseIntegrationTest {
+@ExtendWith(Neo4jExtension.class)
+public class AdditionalModificationsIntegrationTest {
 
-    @Override
-    protected DatabasePopulator databasePopulator() {
-        return new CypherPopulator() {
+    @InjectNeo4j
+    private Neo4j neo4j;
+
+    @BeforeEach
+    protected void poulate() {
+         new CypherPopulator() {
             @Override
             protected String[] statementGroups() {
                 return new String[]{"CREATE " +
@@ -46,21 +50,21 @@ public class AdditionalModificationsIntegrationTest extends EmbeddedDatabaseInte
                         "(m)-[:LIVES_IN]->(l)" +
                         ""};
             }
-        };
+        }.populate(neo4j.defaultDatabaseService());
     }
 
     @Test
     public void additionalCreatesShouldNotImpactTxData() {
-        getDatabase().registerTransactionEventHandler(new TransactionEventHandler.Adapter<Void>(){
+        TransactionEventListenerAdapter<Void> listener = new TransactionEventListenerAdapter<>() {
 
             @Override
-            public Void beforeCommit(TransactionData data) throws Exception {
-                ImprovedTransactionData transactionData = new LazyTransactionData(data);
+            public Void beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) throws Exception {
+                ImprovedTransactionData transactionData = new LazyTransactionData(data, transaction);
 
                 assertEquals(1, transactionData.getAllCreatedNodes().size());
 
                 for (Node node : transactionData.getAllCreatedNodes()) {
-                    Node unknownCity = node.getGraphDatabase().createNode(Label.label("City"));
+                    Node unknownCity = transaction.createNode(Label.label("City"));
                     node.createRelationshipTo(unknownCity, RelationshipType.withName("LIVES_IN"));
                 }
 
@@ -68,8 +72,15 @@ public class AdditionalModificationsIntegrationTest extends EmbeddedDatabaseInte
 
                 return null;
             }
-        });
+        };
+
+        neo4j.databaseManagementService().registerTransactionEventListener(neo4j.defaultDatabaseService().databaseName(), listener);
+
+        try (Transaction tx = neo4j.defaultDatabaseService().beginTx()) {
+            tx.createNode();
+            tx.commit();
+        }
+
+        neo4j.databaseManagementService().unregisterTransactionEventListener(neo4j.defaultDatabaseService().databaseName(), listener);
     }
-
-
 }

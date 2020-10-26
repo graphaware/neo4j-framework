@@ -19,7 +19,7 @@ package com.graphaware.tx.event.improved.entity.filtered;
 import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.common.policy.inclusion.RelationshipInclusionPolicy;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.helpers.collection.PrefetchingIterator;
+import org.neo4j.internal.helpers.collection.PrefetchingIterator;
 
 import java.util.Iterator;
 

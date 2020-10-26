@@ -18,10 +18,11 @@ package com.graphaware.runtime.module.thirdparty;
 
 import com.graphaware.common.representation.DetachedNode;
 import com.graphaware.common.representation.DetachedRelationship;
-import com.graphaware.runtime.module.BaseTxDrivenModule;
+import com.graphaware.runtime.module.BaseModule;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.writer.thirdparty.*;
+import org.neo4j.cypher.internal.v4_0.parser.Base;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
@@ -35,10 +36,10 @@ import java.util.stream.Collectors;
  * Before committing, a collection of {@link WriteOperation}s is built, representing all the about-to-be-committed changes
  * in a way that allows it to be sent over the wire (no dependency on Neo4j APIs).
  * <p/>
- * The collection of {@link WriteOperation}s is passed into the {@link #afterCommit(Object)} method after the transaction
- * has successfully committed. The {@link #afterCommit(Object)} should be overridden by sub-classes.
+ * The collection of {@link WriteOperation}s is passed into the {@link BaseModule#afterCommit(Object)} method after the transaction
+ * has successfully committed. The {@link BaseModule##afterCommit (Object)} should be overridden by sub-classes.
  */
-public abstract class ThirdPartyIntegrationModule<ID> extends BaseTxDrivenModule<Collection<WriteOperation<?>>> {
+public abstract class ThirdPartyIntegrationModule<ID> extends BaseModule<Collection<WriteOperation<?>>> {
 
     /**
      * Construct a new module.

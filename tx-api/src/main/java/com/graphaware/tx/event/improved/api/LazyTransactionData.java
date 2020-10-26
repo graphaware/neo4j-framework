@@ -22,6 +22,7 @@ import com.graphaware.tx.event.improved.data.RelationshipTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import com.graphaware.tx.event.improved.data.lazy.LazyNodeTransactionData;
 import com.graphaware.tx.event.improved.data.lazy.LazyRelationshipTransactionData;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.TransactionData;
 
 /**
@@ -38,8 +39,8 @@ public class LazyTransactionData extends BaseImprovedTransactionData implements 
      *
      * @param transactionData data about the transaction.
      */
-    public LazyTransactionData(TransactionData transactionData) {
-        super(transactionData);
+    public LazyTransactionData(TransactionData transactionData, Transaction transaction) {
+        super(transactionData, transaction);
         nodeTransactionData = new LazyNodeTransactionData(transactionData, this);
         relationshipTransactionData = new LazyRelationshipTransactionData(transactionData, this);
     }

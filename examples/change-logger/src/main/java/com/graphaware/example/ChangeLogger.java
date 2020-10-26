@@ -20,10 +20,12 @@ import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.util.Change;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.TransactionData;
-import org.neo4j.graphdb.event.TransactionEventHandler;
+import org.neo4j.graphdb.event.TransactionEventListenerAdapter;
 import org.neo4j.logging.Log;
 
 import java.util.HashSet;
@@ -33,11 +35,10 @@ import static com.graphaware.common.util.EntityUtils.nodeToString;
 import static com.graphaware.common.util.EntityUtils.relationshipToString;
 
 /**
- * Example of a Neo4j {@link org.neo4j.graphdb.event.TransactionEventHandler} that uses GraphAware {@link ImprovedTransactionData}
- * to do its job, which is counting the total strength of all friendships in the database and writing that to a special
- * node created for that purpose.
+ * Example of a Neo4j {@link org.neo4j.graphdb.event.TransactionEventListener} that uses GraphAware {@link ImprovedTransactionData}
+ * to do its job, which is simply logging what has changed in a transaction.
  */
-public class ChangeLogger extends TransactionEventHandler.Adapter<Void> {
+public class ChangeLogger extends TransactionEventListenerAdapter<Void> {
 
     private static final Log LOG = LoggerFactory.getLogger(ChangeLogger.class);
 
@@ -45,8 +46,8 @@ public class ChangeLogger extends TransactionEventHandler.Adapter<Void> {
      * {@inheritDoc}
      */
     @Override
-    public Void beforeCommit(TransactionData data) throws Exception {
-        logChanges(new LazyTransactionData(data));
+    public Void beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) {
+        logChanges(new LazyTransactionData(data, transaction));
 
         return null;
     }

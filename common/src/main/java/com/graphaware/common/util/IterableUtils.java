@@ -16,9 +16,9 @@
 
 package com.graphaware.common.util;
 
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.internal.helpers.collection.Iterables;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,11 +35,11 @@ public final class IterableUtils {
      * <p/>
      * Please note that this can be an expensive operation! As such, it is intended mainly for testing.
      *
-     * @param database in which to count nodes.
+     * @param tx in which to count nodes.
      * @return all nodes in the database (including root with ID 0, i.e. an brand new database will have 1 node).
      */
-    public static long countNodes(GraphDatabaseService database) {
-        return count(database.getAllNodes());
+    public static long countNodes(Transaction tx) {
+        return count(tx.getAllNodes());
     }
 
     /**
@@ -48,9 +48,9 @@ public final class IterableUtils {
      * @param iterable to count items in.
      * @return number of items in the iterable.
      */
-    public static long count(Iterable iterable) {
+    public static long count(Iterable<?> iterable) {
         if (iterable instanceof Collection) {
-            return ((Collection) iterable).size();
+            return ((Collection<?>) iterable).size();
         }
 
         return Iterables.count(iterable);
@@ -66,7 +66,7 @@ public final class IterableUtils {
      */
     public static <T> boolean contains(Iterable<T> iterable, T object) {
         if (iterable instanceof Collection) {
-            return ((Collection) iterable).contains(object);
+            return ((Collection<?>) iterable).contains(object);
         }
 
         for (T t : iterable) {
@@ -265,8 +265,8 @@ public final class IterableUtils {
     /**
      * Get the first element from iterator.
      *
-     * @param iterator        to find the first element.
-     * @param <T>             type of the element.
+     * @param iterator to find the first element.
+     * @param <T>      type of the element.
      * @return the element iff there is one or more, null if there is none.
      */
     public static <T> T getFirstOrNull(Iterator<T> iterator) {
@@ -282,8 +282,8 @@ public final class IterableUtils {
     /**
      * Get the first element from iterable.
      *
-     * @param iterable        to find the first element.
-     * @param <T>             type of the element.
+     * @param iterable to find the first element.
+     * @param <T>      type of the element.
      * @return the element iff there is one or more, null if there is none.
      */
     public static <T> T getFirstOrNull(Iterable<T> iterable) {

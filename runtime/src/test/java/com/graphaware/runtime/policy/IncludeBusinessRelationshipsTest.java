@@ -16,54 +16,50 @@
 
 package com.graphaware.runtime.policy;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.common.policy.inclusion.fluent.IncludeRelationships;
+import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessRelationships;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
 import static com.graphaware.common.policy.inclusion.composite.CompositeRelationshipInclusionPolicy.of;
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.neo4j.graphdb.Direction.*;
 import static org.neo4j.graphdb.RelationshipType.withName;
 
 /**
  * Test for {@link com.graphaware.common.policy.inclusion.composite.CompositeRelationshipInclusionPolicy} with {@link com.graphaware.runtime.policy.all.IncludeAllBusinessNodes} and a programmatically configured {@link com.graphaware.common.policy.inclusion.fluent.IncludeRelationships}
  */
+@ExtendWith(Neo4jExtension.class)
 public class IncludeBusinessRelationshipsTest {
 
+    @InjectNeo4j
+    private Neo4j neo4j;
+    @InjectNeo4j
     private GraphDatabaseService database;
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
-    }
 
     @Test
     public void shouldIncludeCorrectRelationships() {
         try (Transaction tx = database.beginTx()) {
-            Node n1 = database.createNode();
-            Node n2 = database.createNode();
+            Node n1 = tx.createNode();
+            Node n2 = tx.createNode();
             Relationship r = n1.createRelationshipTo(n2, withName("TEST"));
             r.setProperty("test", "test");
 
-            Relationship internal = n1.createRelationshipTo(n2, withName(GA_PREFIX + "TEST"));
+            Relationship internal = n1.createRelationshipTo(n2, withName(GraphAwareRuntime.GA_PREFIX + "TEST"));
             internal.setProperty("test", "test");
 
             assertTrue(of(IncludeAllBusinessRelationships.getInstance(), IncludeRelationships.all()).include(r));
@@ -108,7 +104,7 @@ public class IncludeBusinessRelationshipsTest {
                             .with(BOTH, withName("TEST"))
                             .with("test", undefined())).include(r));
 
-            tx.success();
+            tx.commit();
         }
     }
 }

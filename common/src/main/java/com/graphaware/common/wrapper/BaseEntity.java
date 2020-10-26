@@ -102,12 +102,12 @@ public abstract class BaseEntity implements Entity {
     }
 
     /**
-     * @see org.neo4j.graphdb.Node#getSingleRelationship(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction).
+     * (@see org.neo4j.graphdb.Node#getSingleRelationship(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction)).
      */
     public Relationship getSingleRelationship(RelationshipType type, Direction dir) {
         Node self = node();
 
-        Iterator<Relationship> iterator = self.getRelationships(type, dir).iterator();
+        Iterator<Relationship> iterator = self.getRelationships(dir, type).iterator();
         if (!iterator.hasNext()) {
             return null;
         }
@@ -150,10 +150,10 @@ public abstract class BaseEntity implements Entity {
     }
 
     /**
-     * @see org.neo4j.graphdb.Node#hasRelationship(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction)
+     * @see org.neo4j.graphdb.Node#hasRelationship(Direction, RelationshipType...)
      */
     public boolean hasRelationship(RelationshipType type, Direction dir) {
-        return node().getRelationships(type, dir).iterator().hasNext();
+        return node().getRelationships(dir, type).iterator().hasNext();
     }
 
     /**

@@ -16,53 +16,52 @@
 
 package com.graphaware.common.util;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.neo4j.graphdb.*;
 
 import java.util.Collections;
 import java.util.Map;
 
 import static com.graphaware.common.util.Change.changesToMap;
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *  Unit test for {@link Change}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class ChangeTest {
 
+    @InjectNeo4j
     private GraphDatabaseService database;
 
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
+    private long a, b, c;
 
-        database.execute("CREATE " +
+    @BeforeEach
+    private void populate() {
+        Map<String, Object> result = database.executeTransactionally("CREATE " +
                 "(a), " +
                 "(b {key:'value'})," +
                 "(b)-[:test]->(a)," +
-                "(c {key:'value'})");
-    }
+                "(c {key:'value'}) RETURN id(a) as a, id(b) as b, id(c) as c", Collections.emptyMap(),
+                Result::next);
 
-    @After
-    public void tearDown() {
-        database.shutdown();
+        a = (long) result.get("a");
+        b = (long) result.get("b");
+        c = (long) result.get("c");
     }
 
     @Test
     public void shouldConvertChangesToMap() {
         try (Transaction tx = database.beginTx()) {
-            Change<Node> nodeChange = new Change<>(database.getNodeById(0), database.getNodeById(0));
+            Change<Node> nodeChange = new Change<>(tx.getNodeById(a), tx.getNodeById(a));
             Map<Long, Change<Node>> changeMap = changesToMap(asList(nodeChange));
-            assertEquals(0, changeMap.get(0L).getCurrent().getId());
-            assertEquals(0, changeMap.get(0L).getPrevious().getId());
+            assertEquals(a, changeMap.get(a).getCurrent().getId());
+            assertEquals(a, changeMap.get(a).getPrevious().getId());
             assertEquals(1, changeMap.size());
         }
     }
@@ -70,9 +69,9 @@ public class ChangeTest {
     @Test
     public void equalChangesShouldBeEqual() {
         try (Transaction tx = database.beginTx()) {
-            Change<Node> nodeChange1 = new Change<>(database.getNodeById(0), database.getNodeById(0));
-            Change<Node> nodeChange2 = new Change<>(database.getNodeById(0), database.getNodeById(0));
-            Change<Node> nodeChange3 = new Change<>(database.getNodeById(1), database.getNodeById(1));
+            Change<Node> nodeChange1 = new Change<>(tx.getNodeById(a), tx.getNodeById(a));
+            Change<Node> nodeChange2 = new Change<>(tx.getNodeById(a), tx.getNodeById(a));
+            Change<Node> nodeChange3 = new Change<>(tx.getNodeById(b), tx.getNodeById(b));
 
             assertTrue(nodeChange1.equals(nodeChange2));
             assertTrue(nodeChange2.equals(nodeChange1));
@@ -81,11 +80,13 @@ public class ChangeTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void invalidChangeShouldThrowException() {
-        try (Transaction tx = database.beginTx()) {
-            Change<Node> nodeChange1 = new Change<>(database.getNodeById(0), database.getNodeById(1));
-            changesToMap(Collections.singleton(nodeChange1));
-        }
+        assertThrows(IllegalArgumentException.class, () -> {
+            try (Transaction tx = database.beginTx()) {
+                Change<Node> nodeChange1 = new Change<>(tx.getNodeById(a), tx.getNodeById(b));
+                changesToMap(Collections.singleton(nodeChange1));
+            }
+        });
     }
 }

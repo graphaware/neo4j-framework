@@ -21,8 +21,10 @@ import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.input.TransactionalInput;
 import com.graphaware.tx.executor.single.KeepCalmAndCarryOn;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
+import com.graphaware.tx.executor.single.TransactionCallback;
 import com.graphaware.tx.executor.single.TransactionExecutor;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.logging.Log;
 import com.graphaware.common.log.LoggerFactory;
 
@@ -100,30 +102,32 @@ public class IterableInputBatchTransactionExecutor<T> extends DisposableBatchTra
 
             final AtomicInteger currentBatchSteps = new AtomicInteger(0);
             final AtomicBoolean polled = new AtomicBoolean(false);
-            NullItem result = executor.executeInTransaction(database -> {
-                while ((notFinished()) && currentBatchSteps.get() < batchSize) {
-                    T next;
-                    try {
-                        next = queue.poll(100, TimeUnit.MILLISECONDS);
-                    } catch (InterruptedException e) {
-                        continue;
-                    }
+            NullItem result = executor.executeInTransaction(new TransactionCallback<NullItem>() {
+                @Override
+                public NullItem doInTransaction(Transaction tx) throws Exception {
+                    while ((notFinished()) && currentBatchSteps.get() < batchSize) {
+                        T next;
+                        try {
+                            next = queue.poll(100, TimeUnit.MILLISECONDS);
+                        } catch (InterruptedException e) {
+                            continue;
+                        }
 
-                    if (next != null) {
-                        polled.set(true);
-                        totalSteps.incrementAndGet();
-                        unitOfWork.execute(database, next, batchNo, currentBatchSteps.incrementAndGet());
-                    } else {
-                        if (!finished.get()) {
-                            LOG.warn("Waited for over 100ms but no input arrived. Still expecting more input. ");
+                        if (next != null) {
+                            polled.set(true);
+                            totalSteps.incrementAndGet();
+                            unitOfWork.execute(tx, next, batchNo, currentBatchSteps.incrementAndGet());
                         } else {
-                            break;
+                            if (!finished.get()) {
+                                LOG.warn("Waited for over 100ms but no input arrived. Still expecting more input. ");
+                            } else {
+                                break;
+                            }
                         }
                     }
+                    return NullItem.getInstance();
                 }
-                return NullItem.getInstance();
-
-            }, KeepCalmAndCarryOn.getInstance());
+            },  KeepCalmAndCarryOn.getInstance());
 
             if (result != null) {
                 successfulSteps.addAndGet(currentBatchSteps.get());

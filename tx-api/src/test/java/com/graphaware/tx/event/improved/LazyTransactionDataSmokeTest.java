@@ -16,54 +16,59 @@
 
 package com.graphaware.tx.event.improved;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.TransactionData;
-import org.neo4j.graphdb.event.TransactionEventHandler;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.graphdb.event.TransactionEventListenerAdapter;
+import org.neo4j.harness.Neo4j;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.neo4j.graphdb.Label.label;
 
 /**
  * Unit test for {@link com.graphaware.tx.event.improved.api.LazyTransactionData}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class LazyTransactionDataSmokeTest {
 
+    @InjectNeo4j
+    private Neo4j neo4j;
+    @InjectNeo4j
     private GraphDatabaseService database;
+
     private CapturingTransactionEventHandler eventHandler;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-
         eventHandler = new CapturingTransactionEventHandler();
-        database.registerTransactionEventHandler(eventHandler);
+        neo4j.databaseManagementService().registerTransactionEventListener(neo4j.defaultDatabaseService().databaseName(), eventHandler);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
-        database.shutdown();
+        neo4j.databaseManagementService().unregisterTransactionEventListener(neo4j.defaultDatabaseService().databaseName(), eventHandler);
     }
 
     @Test
     public void nothingShouldBeReportedWhenNoChangesOccur() {
         try (Transaction tx = database.beginTx()) {
-            database.createNode(label("TestLabel"));
-            database.getNodeById(0).delete();
-            tx.success();
+            Node n = tx.createNode(label("TestLabel"));
+            tx.getNodeById(n.getId()).delete();
+            tx.commit();
         }
 
         verify(Collections.<String>emptySet());
@@ -191,17 +196,14 @@ public class LazyTransactionDataSmokeTest {
 
         startCapturing();
         execute("MATCH (p1 {name:'Michal'})-[r:FRIEND_OF {since:2007}]->(p2:Person {name:'Daniela'}) DELETE r, p1, p2");
-        verify(
-                "Deleted relationship ({name: Michal})-[:FRIEND_OF {since: 2007}]->(:Person {name: Daniela})",
+        verify("Deleted relationship ({name: Michal})-[:FRIEND_OF {since: 2007}]->(:Person {name: Daniela})",
                 "Deleted node ({name: Michal})",
                 "Deleted node (:Person {name: Daniela})"
         );
     }
 
-
-
     private void execute(String cypher) {
-        database.execute(cypher);
+        database.executeTransactionally(cypher);
     }
 
     private void startCapturing() {
@@ -224,13 +226,13 @@ public class LazyTransactionDataSmokeTest {
         assertTrue(actual.containsAll(expected));
     }
 
-    private class CapturingTransactionEventHandler extends TransactionEventHandler.Adapter<Void> {
+    private class CapturingTransactionEventHandler extends TransactionEventListenerAdapter<Void> {
 
         private Set<String> capturedData = new HashSet<>();
 
         @Override
-        public Void beforeCommit(TransactionData data) throws Exception {
-            ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data);
+        public Void beforeCommit(TransactionData data, Transaction tx, GraphDatabaseService database) {
+            ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data, tx);
             capturedData.addAll(improvedTransactionData.mutationsToStrings());
             return null;
         }

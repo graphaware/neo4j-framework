@@ -17,14 +17,15 @@
 package com.graphaware.runtime.policy.all;
 
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
-import com.graphaware.runtime.config.RuntimeConfiguration;
+import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.module.Module;
 import org.neo4j.graphdb.Entity;
 
 /**
  * Base-class for all {@link PropertyInclusionPolicy}
  * implementations that include arbitrary business / application level
  * properties (up to subclasses to decide which ones), but exclude any
- * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link com.graphaware.runtime.module.TxDrivenModule} internal properties.
+ * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link Module} internal properties.
  */
 public abstract class IncludeAllBusinessProperties<T extends Entity> implements PropertyInclusionPolicy<T> {
 
@@ -33,7 +34,7 @@ public abstract class IncludeAllBusinessProperties<T extends Entity> implements 
      */
     @Override
     public boolean include(String key, T entity) {
-        if (key.startsWith(RuntimeConfiguration.GA_PREFIX)) {
+        if (key.startsWith(GraphAwareRuntime.GA_PREFIX)) {
             return false;
         }
 

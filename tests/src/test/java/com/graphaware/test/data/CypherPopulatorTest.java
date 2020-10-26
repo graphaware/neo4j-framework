@@ -16,9 +16,11 @@
 
 package com.graphaware.test.data;
 
-import com.graphaware.test.integration.DatabaseIntegrationTest;
-import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
-import org.junit.Test;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.neo4j.graphdb.GraphDatabaseService;
 
 import static com.graphaware.test.unit.GraphUnit.assertEmpty;
 import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
@@ -26,8 +28,12 @@ import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 /**
  * Test for {@link com.graphaware.test.data.CypherPopulator}.
  */
-public class CypherPopulatorTest extends EmbeddedDatabaseIntegrationTest {
+@ExtendWith(Neo4jExtension.class)
+public class CypherPopulatorTest {
 
+    @InjectNeo4j
+    private GraphDatabaseService database;
+    
     @Test
     public void shouldProduceEmptyDatabaseWhenPopulatorReturnsNoStatementGroups() {
         new CypherPopulator() {
@@ -35,9 +41,9 @@ public class CypherPopulatorTest extends EmbeddedDatabaseIntegrationTest {
             protected String[] statementGroups() {
                 return new String[0];
             }
-        }.populate(getDatabase());
+        }.populate(database);
 
-        assertEmpty(getDatabase());
+        assertEmpty(database);
     }
 
     @Test
@@ -47,9 +53,9 @@ public class CypherPopulatorTest extends EmbeddedDatabaseIntegrationTest {
             protected String[] statementGroups() {
                 return null;
             }
-        }.populate(getDatabase());
+        }.populate(database);
 
-        assertEmpty(getDatabase());
+        assertEmpty(database);
     }
 
     @Test
@@ -59,9 +65,9 @@ public class CypherPopulatorTest extends EmbeddedDatabaseIntegrationTest {
             protected String[] statementGroups() {
                 return new String[]{"CREATE (m:Person {name:'Michal'})"};
             }
-        }.populate(getDatabase());
+        }.populate(database);
 
-        assertSameGraph(getDatabase(), "CREATE (m:Person {name:'Michal'})");
+        assertSameGraph(database, "CREATE (m:Person {name:'Michal'})");
     }
 
     @Test
@@ -71,9 +77,9 @@ public class CypherPopulatorTest extends EmbeddedDatabaseIntegrationTest {
             protected String[] statementGroups() {
                 return new String[]{"CREATE (m:Person {name:'Michal'});"};
             }
-        }.populate(getDatabase());
+        }.populate(database);
 
-        assertSameGraph(getDatabase(), "CREATE (m:Person {name:'Michal'})");
+        assertSameGraph(database, "CREATE (m:Person {name:'Michal'})");
     }
 
     @Test
@@ -88,9 +94,9 @@ public class CypherPopulatorTest extends EmbeddedDatabaseIntegrationTest {
             protected String separator() {
                 return ";";
             }
-        }.populate(getDatabase());
+        }.populate(database);
 
-        assertSameGraph(getDatabase(), "CREATE (m:Person {name:'Michal'})-[:WORKS_FOR]->(ga:Company {name:'GraphAware'})");
+        assertSameGraph(database, "CREATE (m:Person {name:'Michal'})-[:WORKS_FOR]->(ga:Company {name:'GraphAware'})");
     }
 
     @Test
@@ -100,9 +106,9 @@ public class CypherPopulatorTest extends EmbeddedDatabaseIntegrationTest {
             protected String[] statementGroups() {
                 return new String[]{"CREATE (m:Person {name:'Michal'});" + System.getProperty("line.separator") + "MATCH (m:Person {name:'Michal'}) MERGE (m)-[:WORKS_FOR]->(ga:Company {name:'GraphAware'})"};
             }
-        }.populate(getDatabase());
+        }.populate(database);
 
-        assertSameGraph(getDatabase(), "CREATE (m:Person {name:'Michal'})-[:WORKS_FOR]->(ga:Company {name:'GraphAware'})");
+        assertSameGraph(database, "CREATE (m:Person {name:'Michal'})-[:WORKS_FOR]->(ga:Company {name:'GraphAware'})");
     }
 
     @Test
@@ -117,8 +123,8 @@ public class CypherPopulatorTest extends EmbeddedDatabaseIntegrationTest {
             protected String separator() {
                 return ";";
             }
-        }.populate(getDatabase());
+        }.populate(database);
 
-        assertSameGraph(getDatabase(), "CREATE (d:Person {name:'Daniela'}), (m:Person {name:'Michal'})-[:WORKS_FOR]->(ga:Company {name:'GraphAware'})");
+        assertSameGraph(database, "CREATE (d:Person {name:'Daniela'}), (m:Person {name:'Michal'})-[:WORKS_FOR]->(ga:Company {name:'GraphAware'})");
     }
 }

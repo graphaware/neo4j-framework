@@ -17,7 +17,7 @@
 package com.graphaware.common.wrapper;
 
 import org.neo4j.graphdb.*;
-import org.neo4j.helpers.collection.IterableWrapper;
+import org.neo4j.internal.helpers.collection.IterableWrapper;
 
 import static org.neo4j.graphdb.Direction.BOTH;
 
@@ -103,7 +103,7 @@ public abstract class BaseEntityWrapper<T extends Entity> extends BaseEntity imp
     }
 
     /**
-     * @see org.neo4j.graphdb.Node#getRelationships(org.neo4j.graphdb.RelationshipType, org.neo4j.graphdb.Direction).
+     * @see org.neo4j.graphdb.Node#getRelationships(Direction, RelationshipType...).
      */
     public Iterable<Relationship> getRelationships(RelationshipType type, Direction dir) {
         return getRelationships(dir, type);
@@ -247,7 +247,7 @@ public abstract class BaseEntityWrapper<T extends Entity> extends BaseEntity imp
      * @return wrapped relationship.
      */
     protected Iterable<Relationship> wrapRelationships(Iterable<Relationship> relationships, Direction direction, RelationshipType... relationshipTypes) {
-        return new IterableWrapper<Relationship, Relationship>(relationships) {
+        return new IterableWrapper<>(relationships) {
             @Override
             protected Relationship underlyingObjectToObject(Relationship object) {
                 return wrapRelationship(object);
@@ -273,14 +273,6 @@ public abstract class BaseEntityWrapper<T extends Entity> extends BaseEntity imp
         }
 
         throw new IllegalStateException(this + " is not a Node or Relationship");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GraphDatabaseService getGraphDatabase() {
-        return getWrapped().getGraphDatabase();
     }
 
     /**

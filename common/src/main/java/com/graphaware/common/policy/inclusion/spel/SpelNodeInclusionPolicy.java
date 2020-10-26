@@ -22,7 +22,8 @@ import com.graphaware.common.representation.AttachedNode;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.neo4j.helpers.collection.FilteringIterable;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.internal.helpers.collection.FilteringIterable;
 
 /**
  * {@link NodeInclusionPolicy} based on a SPEL expression. The expression can use methods defined in {@link AttachedNodeExpressions}.
@@ -45,15 +46,14 @@ public class SpelNodeInclusionPolicy extends SpelInclusionPolicy implements Node
      * {@inheritDoc}
      */
     @Override
-    public Iterable<Node> getAll(GraphDatabaseService database) {
+    public Iterable<Node> getAll(Transaction tx) {
         //In simple cases, we can fetch nodes using more efficient native syntax
         if(expressionNode.toStringAST().startsWith("hasLabel")) {
             String labelName = stripWrappingQuotes(expressionNode.getChild(0).toStringAST());
-            return () -> database.findNodes(Label.label(labelName));
+            return () -> tx.findNodes(Label.label(labelName));
         }
 
-
-        return new FilteringIterable<>(database.getAllNodes(), this::include);
+        return new FilteringIterable<>(tx.getAllNodes(), this::include);
     }
 
     private String stripWrappingQuotes(String s) {

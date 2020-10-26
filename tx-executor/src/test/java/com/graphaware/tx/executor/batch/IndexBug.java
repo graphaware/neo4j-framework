@@ -16,44 +16,42 @@
 
 package com.graphaware.tx.executor.batch;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
-import org.neo4j.helpers.collection.Iterables;
-import org.neo4j.helpers.collection.Iterators;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import java.util.Iterator;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Ignore
+@ExtendWith(Neo4jExtension.class)
 public class IndexBug {
 
     private static final int NUMBER_OF_NODES = 10_000;
     private static final int BATCH_SIZE = 1_000;
-    private GraphDatabaseService database;
 
-    @Before
-    public void setUp() throws Exception {
-        database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .newGraphDatabase();
+    @InjectNeo4j
+    private Neo4j controls;
 
+    @InjectNeo4j
+    protected GraphDatabaseService database;
+
+    @BeforeEach
+    public void setUp() {
         try (Transaction tx = database.beginTx()) {
             for (int i = 0; i < NUMBER_OF_NODES; i++) {
-                Node node = database.createNode();
+                Node node = tx.createNode();
                 node.addLabel(Label.label("FirstLabel"));
             }
-            tx.success();
+            tx.commit();
         }
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        database.shutdown();
     }
 
     @Test
@@ -61,8 +59,8 @@ public class IndexBug {
         Iterator<Node> allNodes;
 
         try (Transaction tx = database.beginTx()) {
-            allNodes = database.findNodes(Label.label("FirstLabel"));
-            tx.success();
+            allNodes = tx.findNodes(Label.label("FirstLabel"));
+            tx.commit();
         }
 
         int counter = 0;
@@ -72,13 +70,13 @@ public class IndexBug {
 
         int i = 0;
         try (Transaction tx = database.beginTx()) {
-            ResourceIterator<Node> nodes = database.findNodes(Label.label("SecondLabel"));
+            ResourceIterator<Node> nodes = tx.findNodes(Label.label("SecondLabel"));
             while (nodes.hasNext()) {
                 i++;
                 nodes.next();
             }
 
-            tx.success();
+            tx.commit();
         }
 
         assertEquals(NUMBER_OF_NODES, i);
@@ -95,10 +93,9 @@ public class IndexBug {
                 }
 
                 Node next = allNodes.next();
-                System.out.println(next.getProperty("test", "nothing"));
-                //next.addLabel(Label.label("SecondLabel"));
+                tx.getNodeById(next.getId()).addLabel(Label.label("SecondLabel"));
             }
-            tx.success();
+            tx.commit();
         }
 
         return result;

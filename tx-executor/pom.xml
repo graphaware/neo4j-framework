@@ -19,9 +19,8 @@
 
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
-        <artifactId>framework-parent</artifactId>
-        <version>3.5.19.58-SNAPSHOT</version>
-        <relativePath>../parent-pom/framework/pom.xml</relativePath>
+        <artifactId>graphaware-parent</artifactId>
+        <version>4.0.8.58-SNAPSHOT</version>
     </parent>
 
     <artifactId>tx-executor</artifactId>

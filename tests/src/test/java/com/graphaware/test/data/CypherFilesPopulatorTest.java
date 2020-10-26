@@ -16,9 +16,11 @@
 
 package com.graphaware.test.data;
 
-import com.graphaware.test.integration.DatabaseIntegrationTest;
-import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
-import org.junit.Test;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -29,8 +31,12 @@ import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 /**
  * Test for {@link com.graphaware.test.data.CypherFilesPopulator}.
  */
-public class CypherFilesPopulatorTest extends EmbeddedDatabaseIntegrationTest {
+@ExtendWith(Neo4jExtension.class)
+public class CypherFilesPopulatorTest {
 
+    @InjectNeo4j
+    protected GraphDatabaseService database;
+    
     @Test
     public void shouldProduceEmptyDatabaseWhenPopulatorReturnsNoFiles() {
         new CypherFilesPopulator() {
@@ -38,9 +44,9 @@ public class CypherFilesPopulatorTest extends EmbeddedDatabaseIntegrationTest {
             protected String[] files() {
                 return new String[0];
             }
-        }.populate(getDatabase());
+        }.populate(database);
 
-        assertEmpty(getDatabase());
+        assertEmpty(database);
     }
 
     @Test
@@ -50,9 +56,9 @@ public class CypherFilesPopulatorTest extends EmbeddedDatabaseIntegrationTest {
             protected String[] files() {
                 return null;
             }
-        }.populate(getDatabase());
+        }.populate(database);
 
-        assertEmpty(getDatabase());
+        assertEmpty(database);
     }
 
     @Test
@@ -62,9 +68,9 @@ public class CypherFilesPopulatorTest extends EmbeddedDatabaseIntegrationTest {
             protected String[] files() throws IOException {
                 return new String[]{new ClassPathResource("statements.cyp").getFile().getAbsolutePath()};
             }
-        }.populate(getDatabase());
+        }.populate(database);
 
-        assertSameGraph(getDatabase(), "CREATE " +
+        assertSameGraph(database, "CREATE " +
                 "(n1:Person {name: 'Isabell McGlynn'})," +
                 "(n2:Person {name: 'Kelton Kuhn'})," +
                 "(n3:Person {name: 'Chesley Feil'})," +
@@ -85,8 +91,8 @@ public class CypherFilesPopulatorTest extends EmbeddedDatabaseIntegrationTest {
             protected String[] files() throws IOException {
                 return new String[]{new ClassPathResource("statements2.cyp").getFile().getAbsolutePath(), new ClassPathResource("statements3.cyp").getFile().getAbsolutePath()};
             }
-        }.populate(getDatabase());
+        }.populate(database);
 
-        assertSameGraph(getDatabase(), "CREATE (m:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})<-[:WORKS_FOR]-(d:Person {name: 'Daniela'})");
+        assertSameGraph(database, "CREATE (m:Person {name:'Michal'})-[:WORKS_FOR]->(c:Company {name:'GraphAware'})<-[:WORKS_FOR]-(d:Person {name: 'Daniela'})");
     }
 }

@@ -28,7 +28,7 @@ public abstract class SingleTransactionPopulator implements DatabasePopulator {
     public final void populate(GraphDatabaseService database) {
         try (Transaction tx = database.beginTx()) {
             doPopulate(database);
-            tx.success();
+            tx.commit();
         }
     }
 

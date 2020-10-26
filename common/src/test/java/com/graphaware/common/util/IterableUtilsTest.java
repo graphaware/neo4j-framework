@@ -16,59 +16,49 @@
 
 package com.graphaware.common.util;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.*;
 import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for {@link com.graphaware.common.util.IterableUtils}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class IterableUtilsTest {
 
+    @InjectNeo4j
     private GraphDatabaseService database;
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
-    }
 
     @Test
     public void newDatabaseShouldHaveNoNodes() {
         try (Transaction tx = database.beginTx()) {
-            assertEquals(0, countNodes(database));
+            assertEquals(0, countNodes(tx));
         }
     }
 
     @Test
     public void afterCreatingANodeDatabaseShouldHaveOneNode() {
         try (Transaction tx = database.beginTx()) {
-            database.createNode();
-            tx.success();
+            tx.createNode();
+            tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(1, countNodes(database));
+            assertEquals(1, countNodes(tx));
         }
     }
 
@@ -88,37 +78,40 @@ public class IterableUtilsTest {
         Node node;
 
         try (Transaction tx = database.beginTx()) {
-            node = database.createNode();
-            tx.success();
+            node = tx.createNode();
+            tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertTrue(contains(database.getAllNodes(), node));
+            assertTrue(contains(tx.getAllNodes(), node));
         }
 
         try (Transaction tx = database.beginTx()) {
-            database.getNodeById(0).delete();
-            tx.success();
+            tx.getNodeById(node.getId()).delete();
+            tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertFalse(contains(database.getAllNodes(), node));
+            assertFalse(contains(tx.getAllNodes(), node));
         }
     }
 
     @Test
     public void testRandom() {
+        long a, b;
+
         try (Transaction tx = database.beginTx()) {
-            database.createNode();
-            tx.success();
+            a = tx.createNode().getId();
+            b = tx.createNode().getId();
+            tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            assertTrue(asList(0L, 1L).contains(random(database.getAllNodes()).getId()));
-            assertTrue(asList(0L, 1L).contains(random(database.getAllNodes()).getId()));
-            assertTrue(asList(0L, 1L).contains(random(database.getAllNodes()).getId()));
-            assertTrue(asList(0L, 1L).contains(random(database.getAllNodes()).getId()));
-            assertTrue(asList(0L, 1L).contains(random(database.getAllNodes()).getId()));
+            assertTrue(asList(a, b).contains(random(tx.getAllNodes()).getId()));
+            assertTrue(asList(a, b).contains(random(tx.getAllNodes()).getId()));
+            assertTrue(asList(a, b).contains(random(tx.getAllNodes()).getId()));
+            assertTrue(asList(a, b).contains(random(tx.getAllNodes()).getId()));
+            assertTrue(asList(a, b).contains(random(tx.getAllNodes()).getId()));
         }
     }
 
@@ -144,9 +137,11 @@ public class IterableUtilsTest {
         assertNull(getSingleOrNull(Collections.emptyList()));
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void exceptionShouldBeThrownWhenIterableHasNoElements() {
-        getSingle(Collections.emptyList());
+        assertThrows(NotFoundException.class, () -> {
+            getSingle(Collections.emptyList());
+        });
     }
 
     @Test
@@ -158,14 +153,18 @@ public class IterableUtilsTest {
         }
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionShouldBeThrownWhenIterableHasMoreThanOneElement() {
-        getSingleOrNull(Arrays.asList("test1", "test2"));
+        assertThrows(IllegalStateException.class, () -> {
+            getSingleOrNull(Arrays.asList("test1", "test2"));
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void exceptionShouldBeThrownWhenIterableHasMoreThanOneElement2() {
-        getSingle(Arrays.asList("test1", "test2"));
+        assertThrows(IllegalStateException.class, () -> {
+            getSingle(Arrays.asList("test1", "test2"));
+        });
     }
 
     //
@@ -185,9 +184,11 @@ public class IterableUtilsTest {
         assertNull(getFirstOrNull(Collections.emptyList()));
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void exceptionShouldBeThrownWhenIterableHasNoElementsWhenRequestingFirst() {
-        getFirst(Collections.emptyList(), "test");
+        assertThrows(NotFoundException.class, () -> {
+            getFirst(Collections.emptyList(), "test");
+        });
     }
 
     @Test

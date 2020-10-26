@@ -19,6 +19,7 @@ package com.graphaware.tx.executor.batch;
 import com.graphaware.tx.executor.NullItem;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 import java.util.UUID;
 
@@ -36,7 +37,7 @@ public class CreateRandomNode implements UnitOfWork<NullItem> {
     }
 
     @Override
-    public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
+    public void execute(Transaction database, NullItem input, int batchNumber, int stepNumber) {
         Node node = database.createNode();
         node.setProperty("name", UUID.randomUUID());
     }

@@ -17,39 +17,30 @@
 package com.graphaware.example.module;
 
 import com.graphaware.common.policy.inclusion.RelationshipInclusionPolicy;
-import com.graphaware.runtime.config.FluentTxDrivenModuleConfiguration;
-import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
-import com.graphaware.runtime.module.BaseTxDrivenModule;
+import com.graphaware.runtime.config.FluentModuleConfiguration;
+import com.graphaware.runtime.config.ModuleConfiguration;
+import com.graphaware.runtime.module.BaseModule;
+import com.graphaware.runtime.module.Module;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
-import com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor;
-import com.graphaware.tx.executor.input.TransactionalInput;
-import com.graphaware.tx.executor.single.TransactionCallback;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.helpers.collection.Iterators;
 
-import java.util.Collections;
-
-import static com.graphaware.example.module.Labels.FriendshipCounter;
 import static com.graphaware.example.module.Relationships.FRIEND_OF;
 
 /**
- * {@link com.graphaware.runtime.module.TxDrivenModule} that counts the total friendship strength in the database
- * and keeps it up to date.
+ * {@link Module} that counts the total friendship strength in the database and keeps it up to date.
  */
-public class FriendshipStrengthModule extends BaseTxDrivenModule<Void> {
+public class FriendshipStrengthModule extends BaseModule<Void> {
 
-    private final TxDrivenModuleConfiguration configuration;
+    private final ModuleConfiguration configuration;
     private final FriendshipStrengthCounter counter;
 
-    public FriendshipStrengthModule(String moduleId, GraphDatabaseService database) {
+    public FriendshipStrengthModule(String moduleId) {
         super(moduleId);
-        this.counter = new FriendshipStrengthCounter(database);
+        this.counter = new FriendshipStrengthCounter();
 
         //only take into account relationships with FRIEND_OF type:
-        configuration = FluentTxDrivenModuleConfiguration
+        configuration = FluentModuleConfiguration
                 .defaultConfiguration()
                 .with(
                         new RelationshipInclusionPolicy.Adapter() {
@@ -65,32 +56,8 @@ public class FriendshipStrengthModule extends BaseTxDrivenModule<Void> {
      * {@inheritDoc}
      */
     @Override
-    public TxDrivenModuleConfiguration getConfiguration() {
+    public ModuleConfiguration getConfiguration() {
         return configuration;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void initialize(GraphDatabaseService database) {
-        try (Transaction tx = database.beginTx()) {
-            for (Node counter : Iterators.asResourceIterable(database.findNodes(FriendshipCounter))) {
-                counter.delete();
-            }
-            tx.success();
-        }
-
-        new IterableInputBatchTransactionExecutor<>(
-                database, 10000,
-                new TransactionalInput<>(database, 10000, new TransactionCallback<Iterable<Relationship>>() {
-                    @Override
-                    public Iterable<Relationship> doInTransaction(GraphDatabaseService database) throws Exception {
-                        return database.getAllRelationships();
-                    }
-                }),
-                (db, relationship, batchNumber, stepNumber) -> counter.handleCreatedFriendships(Collections.singleton(relationship))
-        ).execute();
     }
 
     /**
@@ -99,9 +66,9 @@ public class FriendshipStrengthModule extends BaseTxDrivenModule<Void> {
     @Override
     public Void beforeCommit(ImprovedTransactionData transactionData) {
         if (transactionData.mutationsOccurred()) {
-            counter.handleCreatedFriendships(transactionData.getAllCreatedRelationships());
-            counter.handleChangedFriendships(transactionData.getAllChangedRelationships());
-            counter.handleDeletedFriendships(transactionData.getAllDeletedRelationships());
+            counter.handleCreatedFriendships(transactionData.getTransaction(), transactionData.getAllCreatedRelationships());
+            counter.handleChangedFriendships(transactionData.getTransaction(), transactionData.getAllChangedRelationships());
+            counter.handleDeletedFriendships(transactionData.getTransaction(), transactionData.getAllDeletedRelationships());
         }
 
         return null;

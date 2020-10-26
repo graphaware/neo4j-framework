@@ -18,21 +18,16 @@ package com.graphaware.runtime.policy.all;
 
 import com.graphaware.common.policy.inclusion.NodePropertyInclusionPolicy;
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
-import com.graphaware.common.serialize.Serializer;
-import com.graphaware.common.serialize.SingletonSerializer;
-import com.graphaware.runtime.config.RuntimeConfiguration;
+import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.module.Module;
 import org.neo4j.graphdb.Node;
 
 /**
  * {@link Node} {@link PropertyInclusionPolicy} that includes arbitrary business / application level
  * properties (up to subclasses to decide which ones), but excludes any
- * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link com.graphaware.runtime.module.TxDrivenModule} internal properties.
+ * {@link com.graphaware.runtime.GraphAwareRuntime}/{@link Module} internal properties.
  */
 public final class IncludeAllBusinessNodeProperties implements NodePropertyInclusionPolicy {
-
-    static {
-        Serializer.register(IncludeAllBusinessNodeProperties.class, new SingletonSerializer());
-    }
 
     private static final NodePropertyInclusionPolicy INSTANCE = new IncludeAllBusinessNodeProperties();
 
@@ -48,6 +43,6 @@ public final class IncludeAllBusinessNodeProperties implements NodePropertyInclu
      */
     @Override
     public boolean include(String key, Node node) {
-        return !key.startsWith(RuntimeConfiguration.GA_PREFIX);
+        return !key.startsWith(GraphAwareRuntime.GA_PREFIX);
     }
 }

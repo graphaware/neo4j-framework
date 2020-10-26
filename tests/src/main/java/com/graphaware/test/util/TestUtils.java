@@ -67,24 +67,6 @@ public final class TestUtils {
     }
 
     /**
-     * Get some available port.
-     *
-     * @return port number.
-     */
-    public static int getAvailablePort() {
-        try {
-            ServerSocket socket = new ServerSocket(0);
-            try {
-                return socket.getLocalPort();
-            } finally {
-                socket.close();
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException("Cannot find available port: " + e.getMessage(), e);
-        }
-    }
-
-    /**
      * Measure the time of the timed callback.
      *
      * @param timed callback.

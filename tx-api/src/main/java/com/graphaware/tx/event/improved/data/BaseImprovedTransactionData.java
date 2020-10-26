@@ -35,9 +35,15 @@ import static com.graphaware.common.util.EntityUtils.relationshipToString;
 public abstract class BaseImprovedTransactionData {
 
     private final TransactionData wrapped;
+    private final Transaction transaction;
 
-    public BaseImprovedTransactionData(TransactionData wrapped) {
+    public BaseImprovedTransactionData(TransactionData wrapped, Transaction transaction) {
         this.wrapped = wrapped;
+        this.transaction = transaction;
+    }
+
+    public Transaction getTransaction() {
+        return transaction;
     }
 
     /**

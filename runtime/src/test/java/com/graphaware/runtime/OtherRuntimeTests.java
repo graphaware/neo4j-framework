@@ -17,189 +17,150 @@
 package com.graphaware.runtime;
 
 import com.graphaware.runtime.bootstrap.RuntimeKernelExtension;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.RepeatedTest;
+import org.neo4j.configuration.SettingImpl;
+import org.neo4j.configuration.SettingValueParsers;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
-import org.neo4j.test.TestGraphDatabaseFactory;
-import org.neo4j.test.rule.RepeatRule;
-
+import java.time.Duration;
 import java.util.Random;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static org.neo4j.kernel.configuration.Settings.*;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 /**
  * Aux runtime tests for bugs found while doing manual testing.
  */
+@Disabled
 public class OtherRuntimeTests {
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
-    @Rule
-    public RepeatRule repeatRule = new RepeatRule();
-
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-    @Before
-    public void createTempFolder() {
-        temporaryFolder.getRoot().deleteOnExit();
-    }
-
-    @After
-    public void deleteTempFolder() {
-        temporaryFolder.delete();
-    }
-
-    @Test(timeout = 5000)
-    @RepeatRule.Repeat(times = 10)
-    public void makeSureDeadlockDoesNotOccur() throws InterruptedException {
-        GraphDatabaseService database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-
-        Thread.sleep(random.nextInt(10));
-
-        try (Transaction tx = database.beginTx()) {
-            Node node = database.createNode(Label.label("TEST"));
-            node.setProperty("test", "test");
-            tx.success();
-        }
-
-        Thread.sleep(random.nextInt(200));
-
-        database.shutdown();
-    }
-
-    @Test(timeout = 5000)
-    @RepeatRule.Repeat(times = 10)
-    public void makeSureDeadlockDoesNotOccur1() throws InterruptedException {
-        GraphDatabaseService database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-
-        Thread.sleep(random.nextInt(10));
-
-
-        try (Transaction tx = database.beginTx()) {
-            Node node1 = database.createNode();
-            node1.setProperty("name", "MB");
-            node1.addLabel(Label.label("Person"));
-
-            tx.success();
-        }
-
-        Thread.sleep(random.nextInt(200));
-
-        database.shutdown();
-    }
-
-    @Test(timeout = 5000)
-    @RepeatRule.Repeat(times = 10)
-    public void makeSureDeadlockDoesNotOccur2() {
-        GraphDatabaseService database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-
-        try (Transaction tx = database.beginTx()) {
-            Node node = database.createNode();
-            node.setProperty("test", "test");
-            tx.success();
-        }
-
-        database.shutdown();
-    }
-
-    @Test(timeout = 5000)
-    @RepeatRule.Repeat(times = 10)
-    public void makeSureDeadlockDoesNotOccur3() {
-        GraphDatabaseService database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-
-        try (Transaction tx = database.beginTx()) {
-            database.createNode();
-            tx.success();
-        }
-
-        database.shutdown();
-    }
-
-    @Test(timeout = 5000)
-    @RepeatRule.Repeat(times = 10)
-    public void makeSureDeadlockDoesNotOccur4() {
-        GraphDatabaseService database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-
-        try (Transaction tx = database.beginTx()) {
-            database.createNode(Label.label("TEST"));
-            tx.success();
-        }
-
-        database.shutdown();
-    }
-
-    @Test(timeout = 5000)
-    @RepeatRule.Repeat(times = 10)
-    public void makeSureDeadlockDoesNotOccur5() {
-        GraphDatabaseService database = new GraphDatabaseFactory()
-                .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot())
-                .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-
-        try (Transaction tx = database.beginTx()) {
-            Node node = database.createNode(Label.label("TEST"));
-            node.setProperty("test", "test");
-            tx.success();
-        }
-
-        database.shutdown();
-    }
-
-    @Test(timeout = 5000)
-    @RepeatRule.Repeat(times = 10)
-    public void makeSureDeadlockDoesNotOccur6() throws InterruptedException {
-        GraphDatabaseService database = new GraphDatabaseFactory()
-                .newEmbeddedDatabaseBuilder(temporaryFolder.getRoot())
-                .setConfig(RuntimeKernelExtension.RUNTIME_ENABLED, "true")
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-
-        try (Transaction tx = database.beginTx()) {
-            Node node = database.createNode(Label.label("TEST"));
-            node.setProperty("test", "test");
-            tx.success();
-        }
-
-        Thread.sleep(random.nextInt(200));
-
-        database.shutdown();
-    }
+//    @RepeatedTest(10)
+//    public void makeSureDeadlockDoesNotOccur() {
+//        Neo4j controls = Neo4jBuilders.newInProcessBuilder().withConfig(ga_runtime_enabled, true).build();
+//        GraphDatabaseService database = controls.defaultDatabaseService();
+//
+//        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
+//                    Thread.sleep(random.nextInt(10));
+//
+//                    try (Transaction tx = database.beginTx()) {
+//                        Node node = tx.createNode(Label.label("TEST"));
+//                        node.setProperty("test", "test");
+//                        tx.commit();
+//                    }
+//
+//                    Thread.sleep(random.nextInt(200));
+//                }
+//        );
+//
+//        controls.close();
+//    }
+//
+//    @RepeatedTest(10)
+//    public void makeSureDeadlockDoesNotOccur1() {
+//        Neo4j controls = Neo4jBuilders.newInProcessBuilder().withConfig(ga_runtime_enabled, true).build();
+//        GraphDatabaseService database = controls.defaultDatabaseService();
+//
+//        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
+//            Thread.sleep(random.nextInt(10));
+//
+//            try (Transaction tx = database.beginTx()) {
+//                Node node1 = tx.createNode();
+//                node1.setProperty("name", "MB");
+//                node1.addLabel(Label.label("Person"));
+//
+//                tx.commit();
+//            }
+//
+//            Thread.sleep(random.nextInt(200));
+//        });
+//
+//        controls.close();
+//    }
+//
+//    @RepeatedTest(10)
+//    public void makeSureDeadlockDoesNotOccur2() {
+//        Neo4j controls = Neo4jBuilders.newInProcessBuilder().withConfig(ga_runtime_enabled, true).build();
+//        GraphDatabaseService database = controls.defaultDatabaseService();
+//
+//        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
+//            try (Transaction tx = database.beginTx()) {
+//                Node node = tx.createNode();
+//                node.setProperty("test", "test");
+//                tx.commit();
+//            }
+//        });
+//
+//        controls.close();
+//    }
+//
+//    @RepeatedTest(10)
+//    public void makeSureDeadlockDoesNotOccur3() {
+//        Neo4j controls = Neo4jBuilders.newInProcessBuilder().withConfig(ga_runtime_enabled, true).build();
+//        GraphDatabaseService database = controls.defaultDatabaseService();
+//
+//        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
+//            try (Transaction tx = database.beginTx()) {
+//                tx.createNode();
+//                tx.commit();
+//            }
+//        });
+//
+//        controls.close();
+//    }
+//
+//    @RepeatedTest(10)
+//    public void makeSureDeadlockDoesNotOccur4() {
+//        Neo4j controls = Neo4jBuilders.newInProcessBuilder().withConfig(ga_runtime_enabled, true).build();
+//        GraphDatabaseService database = controls.defaultDatabaseService();
+//
+//        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
+//            try (Transaction tx = database.beginTx()) {
+//                tx.createNode(Label.label("TEST"));
+//                tx.commit();
+//            }
+//        });
+//
+//        controls.close();
+//    }
+//
+//    @RepeatedTest(10)
+//    public void makeSureDeadlockDoesNotOccur5() {
+//        Neo4j controls = Neo4jBuilders.newInProcessBuilder().withConfig(ga_runtime_enabled, true).build();
+//        GraphDatabaseService database = controls.defaultDatabaseService();
+//
+//        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
+//            try (Transaction tx = database.beginTx()) {
+//                Node node = tx.createNode(Label.label("TEST"));
+//                node.setProperty("test", "test");
+//                tx.commit();
+//            }
+//        });
+//
+//        controls.close();
+//    }
+//
+//    @RepeatedTest(10)
+//    public void makeSureDeadlockDoesNotOccur6() throws InterruptedException {
+//        Neo4j controls = Neo4jBuilders.newInProcessBuilder().withConfig(ga_runtime_enabled, true).build();
+//        GraphDatabaseService database = controls.defaultDatabaseService();
+//
+//        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
+//            try (Transaction tx = database.beginTx()) {
+//                Node node = tx.createNode(Label.label("TEST"));
+//                node.setProperty("test", "test");
+//                tx.commit();
+//            }
+//        });
+//
+//        Thread.sleep(random.nextInt(200));
+//
+//        controls.close();
+//    }
 }

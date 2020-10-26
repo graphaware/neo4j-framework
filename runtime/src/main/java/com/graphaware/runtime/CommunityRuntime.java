@@ -17,111 +17,79 @@
 package com.graphaware.runtime;
 
 import com.graphaware.common.log.LoggerFactory;
-import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.manager.TimerDrivenModuleManager;
-import com.graphaware.runtime.manager.TxDrivenModuleManager;
-import com.graphaware.runtime.module.RuntimeModule;
-import com.graphaware.runtime.module.TimerDrivenModule;
-import com.graphaware.runtime.module.TxDrivenModule;
-import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
+import com.graphaware.runtime.manager.ModuleManager;
+import com.graphaware.runtime.module.Module;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
-import com.graphaware.writer.neo4j.Neo4jWriter;
+import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.event.ErrorState;
-import org.neo4j.graphdb.event.KernelEventHandler;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.event.DatabaseEventContext;
+import org.neo4j.graphdb.event.DatabaseEventListener;
 import org.neo4j.graphdb.event.TransactionData;
-import org.neo4j.graphdb.event.TransactionEventHandler;
+import org.neo4j.graphdb.event.TransactionEventListener;
 import org.neo4j.logging.Log;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 
 /**
  * {@link GraphAwareRuntime} intended for Community production use.
  * <p>
- * Supports both {@link TimerDrivenModule} and {@link TxDrivenModule} {@link RuntimeModule}s.
- * <p>
  * To use this {@link GraphAwareRuntime}, construct it using {@link GraphAwareRuntimeFactory}.
  */
-public class CommunityRuntime implements TransactionEventHandler<Map<String, Object>>, GraphAwareRuntime, KernelEventHandler {
+public class CommunityRuntime implements TransactionEventListener<Map<String, Object>>, GraphAwareRuntime, DatabaseEventListener {
 
     private static final Log LOG = LoggerFactory.getLogger(CommunityRuntime.class);
 
     private static final ThreadLocal<Boolean> STARTING = ThreadLocal.withInitial(() -> false);
 
     private enum State {
-        NONE,
-        REGISTERED,
+        FRESH,
         STARTING,
         STARTED,
-        SHUTDOWN;
+        STOPPING,
+        DESTROYED;
     }
 
-    private volatile State state = State.NONE;
+    private volatile State state;
 
-    private final RuntimeConfiguration configuration;
     private final GraphDatabaseService database;
-    private final TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager;
-    private final TimerDrivenModuleManager timerDrivenModuleManager;
-    private final Neo4jWriter writer;
+    private final DatabaseManagementService databaseManagementService;
+    private final ModuleManager runtimeModuleManager;
 
     /**
      * Construct a new runtime. Protected, please use {@link GraphAwareRuntimeFactory}.
      *
-     * @param configuration            config.
-     * @param database                 on which the runtime operates.
-     * @param txDrivenModuleManager    manager for transaction-driven modules.
-     * @param timerDrivenModuleManager manager for timer-driven modules.
-     * @param writer                   to use when writing to the database.
+     * @param database      on which the runtime operates.
+     * @param moduleManager manager for transaction-driven modules.
      */
-    protected CommunityRuntime(RuntimeConfiguration configuration, GraphDatabaseService database, TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager, TimerDrivenModuleManager timerDrivenModuleManager, Neo4jWriter writer) {
-        if (!State.NONE.equals(state)) {
-            throw new IllegalStateException("Only one instance of the GraphAware Runtime should ever be instantiated and started.");
-        }
-
-        if (RuntimeRegistry.getRuntime(database) != null) {
-            throw new IllegalStateException("It is not possible to create multiple runtimes for a single database!");
-        }
-
-        this.state = State.REGISTERED;
-        this.configuration = configuration;
+    protected CommunityRuntime(GraphDatabaseService database, DatabaseManagementService databaseManagementService, ModuleManager moduleManager) {
+        this.state = State.FRESH;
         this.database = database;
-        this.txDrivenModuleManager = txDrivenModuleManager;
-        this.timerDrivenModuleManager = timerDrivenModuleManager;
-        this.writer = writer;
+        this.databaseManagementService = databaseManagementService;
+        this.runtimeModuleManager = moduleManager;
 
-        database.registerTransactionEventHandler(this);
-        database.registerKernelEventHandler(this);
-
-        RuntimeRegistry.registerRuntime(database, this);
+        databaseManagementService.registerTransactionEventListener(database.databaseName(), this);
+        databaseManagementService.registerDatabaseEventListener(this);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public synchronized void registerModule(RuntimeModule module) {
-        if (!State.REGISTERED.equals(state)) {
+    public synchronized void registerModule(Module<?> module) {
+        if (!State.FRESH.equals(state)) {
             LOG.error("Modules must be registered before GraphAware Runtime is started!");
             throw new IllegalStateException("Modules must be registered before GraphAware Runtime is started!");
         }
 
-        LOG.info("Registering module " + module.getId() + " with GraphAware Runtime.");
+        LOG.info("Registering module " + module.getId() + " with GraphAware Runtime for database " + database.databaseName() + ".");
 
-        txDrivenModuleManager.checkNotAlreadyRegistered(module);
-        timerDrivenModuleManager.checkNotAlreadyRegistered(module);
+        runtimeModuleManager.checkNotAlreadyRegistered(module);
 
-        if (module instanceof TxDrivenModule) {
-            txDrivenModuleManager.registerModule((TxDrivenModule) module);
-        }
-
-        if (module instanceof TimerDrivenModule) {
-            timerDrivenModuleManager.registerModule((TimerDrivenModule) module);
-        }
+        runtimeModuleManager.registerModule(module);
     }
 
     /**
@@ -130,126 +98,101 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
     @Override
     public final synchronized void start() {
         if (State.STARTED.equals(state)) {
-            LOG.debug("GraphAware already started");
+            LOG.warn("GraphAware Runtime already started for database " + database.databaseName() + ".");
             return;
         }
 
         if (State.STARTING.equals(state)) {
-            throw new IllegalStateException("Attempt to start GraphAware from multiple different threads. This is a bug");
+            throw new IllegalStateException("Attempt to start GraphAware Runtime for database " + database.databaseName() + " from multiple different threads. This is a bug.");
         }
 
-        if (!State.REGISTERED.equals(state)) {
-            throw new IllegalStateException("Illegal Runtime state " + state + "! This is a bug");
+        if (State.STOPPING.equals(state)) {
+            throw new IllegalStateException("Attempt to start GraphAware Runtime for database " + database.databaseName() + " while it is stopping. This is a bug.");
+        }
+
+        if (State.DESTROYED.equals(state)) {
+            throw new IllegalStateException("Attempt to start GraphAware Runtime for database " + database.databaseName() + " after it has been destroyed. Please create a fresh Runtime.");
+        }
+
+        if (!State.FRESH.equals(state)) {
+            throw new IllegalStateException("Illegal GraphAware Runtime state " + state + "! This is a bug");
         }
 
         STARTING.set(true);
-        LOG.info("Starting GraphAware...");
+        LOG.info("Starting GraphAware Runtime for database " + database.databaseName() + "...");
         state = State.STARTING;
 
-        beforeStart();
-
-        startStatsCollector();
-        handleModuleMetadata();
-
-        startModules();
-        startWriter();
+        runtimeModuleManager.startModules();
 
         state = State.STARTED;
-        LOG.info("GraphAware started.");
+        LOG.info("GraphAware Runtime started for database " + database.databaseName() + ".");
         STARTING.set(false);
     }
 
     /**
-     * Start stats collector.
-     */
-    private void startStatsCollector() {
-        configuration.getStatsCollector().runtimeStart();
-    }
-
-    /**
-     * Load and verify metadata, perform initialization if needed.
-     */
-    protected void handleModuleMetadata() {
-        LOG.info("Loading module metadata...");
-
-        Set<String> moduleIds = new HashSet<>();
-        moduleIds.addAll(txDrivenModuleManager.loadMetadata());
-        moduleIds.addAll(timerDrivenModuleManager.loadMetadata());
-
-        txDrivenModuleManager.cleanupMetadata(moduleIds);
-        timerDrivenModuleManager.cleanupMetadata(moduleIds);
-
-        LOG.info("Module metadata loaded.");
-    }
-
-    /**
-     * Start the modules.
-     */
-    private void startModules() {
-        txDrivenModuleManager.startModules();
-        timerDrivenModuleManager.startModules();
-    }
-
-    /**
-     * Start the database writer.
-     */
-    private void startWriter() {
-        getDatabaseWriter().start();
-    }
-
-    /**
-     * Start whatever subclasses want to start.
-     */
-    protected void beforeStart() {
-
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
-    public final void waitUntilStarted() {
-        if (!isStarted(null)) {
-            throw new IllegalStateException("It appears that the thread starting the runtime called waitUntilStarted() before it's finished its job. This is a bug");
+    public void stop() {
+        switch (state) {
+            case FRESH:
+                LOG.warn("GraphAware Runtime for database " + database.databaseName() + " hasn't even been started.");
+                break;
+            case DESTROYED:
+                LOG.warn("GraphAware Runtime for database " + database.databaseName() + " has already been destroyed.");
+                break;
+            default:
+                LOG.info("Stopping GraphAware Runtime for database " + database.databaseName() + "...");
+
+                state = State.STOPPING;
+
+                runtimeModuleManager.stopModules();
+
+                LOG.info("GraphAware Runtime for database " + database.databaseName() + " stopped.");
+
+                state = State.DESTROYED;
         }
+
+        databaseManagementService.unregisterTransactionEventListener(database.databaseName(), this);
+        databaseManagementService.unregisterDatabaseEventListener(this);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Map<String, Object> beforeCommit(TransactionData data) {
-        LazyTransactionData transactionData = new LazyTransactionData(data);
+    public Map<String, Object> beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) throws Exception {
+        LazyTransactionData transactionData = new LazyTransactionData(data, transaction);
 
-        if (!isStarted(transactionData)) {
+        if (!isStarted()) {
             return null;
         }
 
-        return txDrivenModuleManager.beforeCommit(transactionData);
+        return runtimeModuleManager.beforeCommit(transactionData);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final void afterCommit(TransactionData data, Map<String, Object> states) {
-        if (states == null) {
+    public void afterCommit(TransactionData data, Map<String, Object> state, GraphDatabaseService databaseService) {
+        if (state == null) {
             return;
         }
 
-        txDrivenModuleManager.afterCommit(states);
+        runtimeModuleManager.afterCommit(state);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final void afterRollback(TransactionData data, Map<String, Object> states) {
-        if (states == null) {
+    public void afterRollback(TransactionData data, Map<String, Object> state, GraphDatabaseService databaseService) {
+        if (state == null) {
             return;
         }
 
-        txDrivenModuleManager.afterRollback(states);
+        runtimeModuleManager.afterRollback(state);
     }
 
     /**
@@ -258,7 +201,6 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      * <ul>
      * <li>it's already started, in which case the method returns <code>true</code></li>
      * <li>hasn't even started starting for more than 1s, in which case an exception is thrown</li>
-     * <li>hasn't been started yet, but the transaction triggering the call of this method isn't mutating, in which case it returns <code>false</code></li>
      * <li>it's starting but the caller is the thread that starts the runtime itself, in which case it returns <code>false</code></li>
      * </ul>
      *
@@ -266,30 +208,21 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      * <code>false</code> iff the runtime isn't started but it is safe to proceed.
      * @throws IllegalStateException in case the runtime hasn't been started at all.
      */
-    private boolean isStarted(ImprovedTransactionData transactionData) {
-        if (State.NONE.equals(state)) {
-            throw new IllegalStateException("Runtime has not been registered! This is a bug.");
-        }
-
-        if (State.SHUTDOWN.equals(state)) {
-            throw new IllegalStateException("Runtime is being / has been shut down.");
+    private boolean isStarted() {
+        if (State.STOPPING.equals(state) || (State.DESTROYED.equals(state))) {
+            throw new IllegalStateException("Runtime for database " + database.databaseName() + " is being / has been stopped.");
         }
 
         int attempts = 0;
 
         while (!State.STARTED.equals(state)) {
-            //workaround for https://github.com/neo4j/neo4j/issues/2804
-            if (transactionData != null && !transactionData.mutationsOccurred()) {
-                return false;
-            }
-
             if (State.STARTING.equals(state) && STARTING.get()) {
                 return false;
             }
 
             try {
                 attempts++;
-                if (attempts > 100 && State.REGISTERED.equals(state)) {
+                if (attempts > 100 && State.FRESH.equals(state)) {
                     throw new IllegalStateException("Runtime has not been started!");
                 }
                 TimeUnit.MILLISECONDS.sleep(10);
@@ -305,36 +238,8 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      * {@inheritDoc}
      */
     @Override
-    public void beforeShutdown() {
-        LOG.info("Shutting down GraphAware Runtime... ");
-
-        state = State.SHUTDOWN;
-
-        doStop();
-
-        RuntimeRegistry.removeRuntime(database);
-
-        LOG.info("GraphAware Runtime shut down.");
-    }
-
-    protected void doStop() {
-        txDrivenModuleManager.shutdownModules();
-        timerDrivenModuleManager.shutdownModules();
-        getDatabaseWriter().stop();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <M extends RuntimeModule> M getModule(String moduleId, Class<M> clazz) throws NotFoundException {
-        M module = txDrivenModuleManager.getModule(moduleId, clazz);
-
-        if (module != null) {
-            return module;
-        }
-
-        module = timerDrivenModuleManager.getModule(moduleId, clazz);
+    public <M extends Module<?>> M getModule(String moduleId, Class<M> clazz) throws NotFoundException {
+        M module = runtimeModuleManager.getModule(moduleId, clazz);
 
         if (module != null) {
             return module;
@@ -347,58 +252,32 @@ public class CommunityRuntime implements TransactionEventHandler<Map<String, Obj
      * {@inheritDoc}
      */
     @Override
-    public <M extends RuntimeModule> M getModule(Class<M> clazz) throws NotFoundException {
-        M txResult = txDrivenModuleManager.getModule(clazz);
-        M timerResult = timerDrivenModuleManager.getModule(clazz);
+    public <M extends Module<?>> M getModule(Class<M> clazz) throws NotFoundException {
+        M txResult = runtimeModuleManager.getModule(clazz);
 
-        if (txResult != null && timerResult != null && timerResult != txResult) {
-            throw new IllegalStateException("More than one module of type " + clazz + " has been registered");
-        }
-
-        if (txResult == null && timerResult == null) {
+        if (txResult == null) {
             throw new NotFoundException("No module of type " + clazz.getName() + " has been registered");
         }
 
-        return txResult == null ? timerResult : txResult;
+        return txResult;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public final void kernelPanic(ErrorState error) {
-        //do nothing
+    public void databaseStart(DatabaseEventContext eventContext) {
+        if (database.databaseName().equals(eventContext.getDatabaseName())) {
+            start();
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public final Object getResource() {
-        return null;
+    public void databaseShutdown(DatabaseEventContext eventContext) {
+        if (database.databaseName().equals(eventContext.getDatabaseName())) {
+            stop();
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public final ExecutionOrder orderComparedTo(KernelEventHandler other) {
-        return ExecutionOrder.DOESNT_MATTER;
-    }
+    public void databasePanic(DatabaseEventContext eventContext) {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public RuntimeConfiguration getConfiguration() {
-        return configuration;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Neo4jWriter getDatabaseWriter() {
-        return writer;
     }
 }

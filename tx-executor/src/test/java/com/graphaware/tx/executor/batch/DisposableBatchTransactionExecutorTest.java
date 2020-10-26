@@ -16,12 +16,13 @@
 
 package com.graphaware.tx.executor.batch;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
  * Unit tests for {@link com.graphaware.tx.executor.batch.DisposableBatchTransactionExecutor}.
@@ -42,12 +43,8 @@ public class DisposableBatchTransactionExecutorTest {
         DummyDisposableBatchTransactionExecutor executor = new DummyDisposableBatchTransactionExecutor();
 
         executor.execute();
-        try {
-            executor.execute();
-            fail();
-        } catch (IllegalStateException e) {
-            //expected
-        }
+
+        assertThrows(IllegalStateException.class, executor::execute);
 
         assertEquals(1, executor.getNoTimesExecuted());
     }

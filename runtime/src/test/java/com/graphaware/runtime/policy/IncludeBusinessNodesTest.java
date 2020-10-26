@@ -16,52 +16,47 @@
 
 package com.graphaware.runtime.policy;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.common.policy.inclusion.composite.CompositeNodeInclusionPolicy;
 import com.graphaware.common.policy.inclusion.fluent.IncludeNodes;
+import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodes;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
 import static com.graphaware.common.policy.inclusion.composite.CompositeNodeInclusionPolicy.of;
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static com.graphaware.runtime.config.RuntimeConfiguration.GA_PREFIX;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.neo4j.graphdb.Label.label;
 
 /**
  * Test for {@link CompositeNodeInclusionPolicy} with {@link IncludeAllBusinessNodes} and a programmatically configured {@link IncludeNodes}
  */
+@ExtendWith(Neo4jExtension.class)
 public class IncludeBusinessNodesTest {
 
+    @InjectNeo4j
+    private Neo4j controls;
+    @InjectNeo4j
     private GraphDatabaseService database;
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
-    }
 
     @Test
     public void shouldIncludeCorrectRelationships() {
         try (Transaction tx = database.beginTx()) {
-            Node n = database.createNode(label("Test"));
+            Node n = tx.createNode(label("Test"));
             n.setProperty("test", "test");
-            Node internal = database.createNode(label(GA_PREFIX + "test"));
+            Node internal = tx.createNode(label(GraphAwareRuntime.GA_PREFIX + "test"));
 
             assertTrue(of(IncludeAllBusinessNodes.getInstance(), IncludeNodes.all()).include(n));
             assertFalse(of(IncludeAllBusinessNodes.getInstance(), IncludeNodes.all()).include(internal));
@@ -90,7 +85,7 @@ public class IncludeBusinessNodesTest {
                             .all()
                             .with("test", undefined())).include(n));
 
-            tx.success();
+            tx.commit();
         }
     }
 }

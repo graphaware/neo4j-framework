@@ -27,6 +27,7 @@ import com.graphaware.tx.event.improved.data.RelationshipTransactionData;
 import com.graphaware.tx.event.improved.data.TransactionDataContainer;
 import com.graphaware.tx.event.improved.data.filtered.FilteredNodeTransactionData;
 import com.graphaware.tx.event.improved.data.filtered.FilteredRelationshipTransactionData;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * {@link ImprovedTransactionData} with filtering capabilities defined by {@link InclusionPolicies}, delegating to
@@ -55,8 +56,8 @@ public class FilteredTransactionData extends BaseImprovedTransactionData impleme
      * @param transactionDataContainer container for original unfiltered transaction data.
      * @param inclusionPolicies      policies for filtering.
      */
-    public FilteredTransactionData(TransactionDataContainer transactionDataContainer, InclusionPolicies inclusionPolicies) {
-        super(transactionDataContainer.getWrapped());
+    public FilteredTransactionData(TransactionDataContainer transactionDataContainer, Transaction transaction, InclusionPolicies inclusionPolicies) {
+        super(transactionDataContainer.getWrapped(), transaction);
         this.inclusionPolicies = inclusionPolicies;
         nodeTransactionData = new FilteredNodeTransactionData(transactionDataContainer.getNodeTransactionData(), inclusionPolicies);
         relationshipTransactionData = new FilteredRelationshipTransactionData(transactionDataContainer.getRelationshipTransactionData(), inclusionPolicies);

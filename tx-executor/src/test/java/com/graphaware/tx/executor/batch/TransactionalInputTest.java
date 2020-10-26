@@ -16,32 +16,37 @@
 
 package com.graphaware.tx.executor.batch;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.test.data.CypherPopulator;
 import com.graphaware.test.data.DatabasePopulator;
-import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
 import com.graphaware.tx.executor.input.TransactionalInput;
-import com.graphaware.tx.executor.single.TransactionCallback;
-import org.junit.Test;
-import org.neo4j.graphdb.Label;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.neo4j.helpers.collection.Iterators;
 import org.neo4j.kernel.impl.transaction.stats.TransactionCounters;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit test for {@link TransactionalInput}.
  */
-public class TransactionalInputTest extends EmbeddedDatabaseIntegrationTest {
+@ExtendWith(Neo4jExtension.class)
+public class TransactionalInputTest {
 
-    @Override
-    protected DatabasePopulator databasePopulator() {
-        return new CypherPopulator() {
+    @InjectNeo4j
+    protected GraphDatabaseService database;
+
+    @BeforeEach
+    private void populate() {
+        new CypherPopulator() {
             @Override
             protected String[] statementGroups() {
                 return new String[]{
@@ -51,15 +56,15 @@ public class TransactionalInputTest extends EmbeddedDatabaseIntegrationTest {
                         "CREATE (p:Person {name:'Christophe'})"
                 };
             }
-        };
+        }.populate(database);
     }
 
     @Test
     public void shouldReturnItemsInMultipleTransactions() {
-        TransactionCounters monitor = ((GraphDatabaseAPI) getDatabase()).getDependencyResolver().resolveDependency(TransactionCounters.class);
+        TransactionCounters monitor = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(TransactionCounters.class);
         long noTx = monitor.getNumberOfCommittedTransactions();
 
-        TransactionalInput<Node> input = new TransactionalInput<>(getDatabase(), 2, database -> Iterators.asResourceIterable(database.findNodes(Label.label("Person"))));
+        TransactionalInput<Node> input = new TransactionalInput<>(database, 2, database -> () -> database.findNodes(Label.label("Person")));
 
         Set<Node> nodes = new HashSet<>();
 
@@ -68,22 +73,16 @@ public class TransactionalInputTest extends EmbeddedDatabaseIntegrationTest {
         }
 
         assertEquals(4, nodes.size());
-        assertEquals(noTx + 1, monitor.getNumberOfCommittedTransactions());
-//        assertEquals(noTx + 3, monitor.getNumberOfCommittedTransactions());
+        assertEquals(noTx + 3, monitor.getNumberOfCommittedTransactions());
 
     }
 
     @Test
     public void shouldReturnItemsInMultipleTransactions2() {
-        TransactionCounters monitor = ((GraphDatabaseAPI) getDatabase()).getDependencyResolver().resolveDependency(TransactionCounters.class);
+        TransactionCounters monitor = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(TransactionCounters.class);
         long noTx = monitor.getNumberOfCommittedTransactions();
 
-        TransactionalInput<Node> input = new TransactionalInput<>(getDatabase(), 1, new TransactionCallback<Iterable<Node>>() {
-            @Override
-            public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
-                return Iterators.asResourceIterable(database.findNodes(Label.label("Person")));
-            }
-        });
+        TransactionalInput<Node> input = new TransactionalInput<>(database, 1, database -> () -> database.findNodes(Label.label("Person")));
 
         Set<Node> nodes = new HashSet<>();
 
@@ -92,21 +91,15 @@ public class TransactionalInputTest extends EmbeddedDatabaseIntegrationTest {
         }
 
         assertEquals(4, nodes.size());
-//        assertEquals(noTx + 5, monitor.getNumberOfCommittedTransactions());
-        assertEquals(noTx + 1, monitor.getNumberOfCommittedTransactions());
+        assertEquals(noTx + 5, monitor.getNumberOfCommittedTransactions());
     }
 
     @Test
     public void shouldReturnItemsInMultipleTransactions3() {
-        TransactionCounters monitor = ((GraphDatabaseAPI) getDatabase()).getDependencyResolver().resolveDependency(TransactionCounters.class);
+        TransactionCounters monitor = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(TransactionCounters.class);
         long noTx = monitor.getNumberOfCommittedTransactions();
 
-        TransactionalInput<Node> input = new TransactionalInput<>(getDatabase(), 3, new TransactionCallback<Iterable<Node>>() {
-            @Override
-            public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
-                return Iterators.asResourceIterable(database.findNodes(Label.label("Person")));
-            }
-        });
+        TransactionalInput<Node> input = new TransactionalInput<>(database, 3, database -> () -> database.findNodes(Label.label("Person")));
 
         Set<Node> nodes = new HashSet<>();
 
@@ -115,21 +108,15 @@ public class TransactionalInputTest extends EmbeddedDatabaseIntegrationTest {
         }
 
         assertEquals(4, nodes.size());
-//        assertEquals(noTx + 2, monitor.getNumberOfCommittedTransactions());
-        assertEquals(noTx + 1, monitor.getNumberOfCommittedTransactions());
+        assertEquals(noTx + 2, monitor.getNumberOfCommittedTransactions());
     }
 
     @Test
     public void shouldReturnItemsInMultipleTransactions4() {
-        TransactionCounters monitor = ((GraphDatabaseAPI) getDatabase()).getDependencyResolver().resolveDependency(TransactionCounters.class);
+        TransactionCounters monitor = ((GraphDatabaseAPI) database).getDependencyResolver().resolveDependency(TransactionCounters.class);
         long noTx = monitor.getNumberOfCommittedTransactions();
 
-        TransactionalInput<Node> input = new TransactionalInput<>(getDatabase(), 100, new TransactionCallback<Iterable<Node>>() {
-            @Override
-            public Iterable<Node> doInTransaction(GraphDatabaseService database) throws Exception {
-                return Iterators.asResourceIterable(database.findNodes(Label.label("Person")));
-            }
-        });
+        TransactionalInput<Node> input = new TransactionalInput<>(database, 100, database -> () -> database.findNodes(Label.label("Person")));
 
         Set<Node> nodes = new HashSet<>();
 

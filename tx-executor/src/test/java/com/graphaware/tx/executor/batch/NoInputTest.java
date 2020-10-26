@@ -18,11 +18,11 @@ package com.graphaware.tx.executor.batch;
 
 import com.graphaware.tx.executor.NullItem;
 import com.graphaware.tx.executor.input.NoInput;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.NoSuchElementException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for {@link NoInput}.
@@ -42,17 +42,21 @@ public class NoInputTest {
         assertFalse(generator.hasNext());
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void shouldThrowExceptionWhenNoMoreItems() {
         NoInput generator = new NoInput(1);
+        generator.next();
 
-        generator.next();
-        generator.next();
+        assertThrows(NoSuchElementException.class, () -> {
+            generator.next();
+        });
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test
     public void shouldNotSupportRemove() {
-        new NoInput(2).remove();
+        assertThrows(UnsupportedOperationException.class, () -> {
+            new NoInput(2).remove();
+        });
     }
 
 }

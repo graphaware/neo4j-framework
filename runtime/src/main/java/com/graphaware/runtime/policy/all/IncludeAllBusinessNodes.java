@@ -18,22 +18,16 @@ package com.graphaware.runtime.policy.all;
 
 import com.graphaware.common.policy.inclusion.BaseEntityInclusionPolicy;
 import com.graphaware.common.policy.inclusion.NodeInclusionPolicy;
-import com.graphaware.common.serialize.Serializer;
-import com.graphaware.common.serialize.SingletonSerializer;
-import com.graphaware.runtime.config.RuntimeConfiguration;
-import org.neo4j.graphdb.GraphDatabaseService;
+import com.graphaware.runtime.GraphAwareRuntime;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * Policy that includes all business / application level nodes, but exclude any
  * {@link com.graphaware.runtime.GraphAwareRuntime} internal nodes. Singleton.
  */
 public final class IncludeAllBusinessNodes extends BaseEntityInclusionPolicy<Node> implements NodeInclusionPolicy {
-
-    static {
-        Serializer.register(IncludeAllBusinessNodes.class, new SingletonSerializer());
-    }
 
     private static final NodeInclusionPolicy INSTANCE = new IncludeAllBusinessNodes();
 
@@ -50,7 +44,7 @@ public final class IncludeAllBusinessNodes extends BaseEntityInclusionPolicy<Nod
     @Override
     public boolean include(Node node) {
         for (Label label : node.getLabels()) {
-            if (label.name().startsWith(RuntimeConfiguration.GA_PREFIX)) {
+            if (label.name().startsWith(GraphAwareRuntime.GA_PREFIX)) {
                 return false;
             }
         }
@@ -62,7 +56,7 @@ public final class IncludeAllBusinessNodes extends BaseEntityInclusionPolicy<Nod
      * {@inheritDoc}
      */
     @Override
-    protected Iterable<Node> doGetAll(GraphDatabaseService database) {
-        return database.getAllNodes();
+    protected Iterable<Node> doGetAll(Transaction tx) {
+        return tx.getAllNodes();
     }
 }

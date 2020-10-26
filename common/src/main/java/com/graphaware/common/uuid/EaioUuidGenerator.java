@@ -16,7 +16,7 @@
 
 package com.graphaware.common.uuid;
 
-import com.eaio.uuid.UUID;
+import java.util.UUID;
 
 /**
  * UUID Generator using the UUID library from http://johannburkard.de/software/uuid/
@@ -28,7 +28,7 @@ public class EaioUuidGenerator implements UuidGenerator {
      */
     @Override
     public String generateUuid() {
-        UUID uuid = new UUID();
+        UUID uuid = UUID.randomUUID();
         return uuid.toString();
     }
 }

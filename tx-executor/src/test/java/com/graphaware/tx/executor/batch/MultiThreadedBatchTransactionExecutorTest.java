@@ -16,37 +16,28 @@
 
 package com.graphaware.tx.executor.batch;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.countNodes;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit test for {@link com.graphaware.tx.executor.batch.MultiThreadedBatchTransactionExecutor}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class MultiThreadedBatchTransactionExecutorTest {
 
-    private GraphDatabaseService database;
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
-    }
+    @InjectNeo4j
+    protected GraphDatabaseService database;
 
     @Test
     public void resultShouldBeCorrectWhenExecutedInMultipleThreads() {
@@ -55,7 +46,7 @@ public class MultiThreadedBatchTransactionExecutorTest {
         batchExecutor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(40000, countNodes(database));
+            assertEquals(40000, countNodes(tx));
         }
     }
 }

@@ -20,7 +20,8 @@ import com.graphaware.common.policy.inclusion.BaseEntityInclusionPolicy;
 import com.graphaware.common.policy.inclusion.EntityInclusionPolicy;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Entity;
-import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.internal.helpers.collection.Iterables;
 
 /**
  * {@link EntityInclusionPolicy} that ignores all entities.
@@ -42,7 +43,7 @@ public abstract class IncludeNoEntities<T extends Entity> extends BaseEntityIncl
      * {@inheritDoc}
      */
     @Override
-    protected Iterable<T> doGetAll(GraphDatabaseService database) {
+    protected Iterable<T> doGetAll(Transaction tx) {
         return Iterables.empty();
     }
 }

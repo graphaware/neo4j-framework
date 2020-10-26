@@ -16,71 +16,55 @@
 
 package com.graphaware.common.util;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.common.policy.inclusion.ObjectInclusionPolicy;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
-import org.neo4j.helpers.collection.Iterables;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.internal.helpers.collection.Iterables;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.EntityUtils.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.graphdb.RelationshipType.*;
+import static org.neo4j.graphdb.RelationshipType.withName;
 
 /**
  * Unit test for {@link EntityUtils}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class EntityUtilsTest {
 
+    @InjectNeo4j
     private GraphDatabaseService database;
 
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-
-        database.execute("CREATE " +
-                "(a), " +
-                "(b {key:'value'})," +
-                "(b)-[:test]->(a)," +
-                "(c {key:'value'})");
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
-    }
+    private long a, b, c, r;
 
     @Test
     public void shouldConvertEntitiesToMap() {
+        populate();
+
         try (Transaction tx = database.beginTx()) {
-            Map<Long, Node> nodeMap = entitiesToMap(Iterables.asList(database.getAllNodes()));
-            assertEquals(0, nodeMap.get(0L).getId());
-            assertEquals(1, nodeMap.get(1L).getId());
-            assertEquals(2, nodeMap.get(2L).getId());
+            Map<Long, Node> nodeMap = entitiesToMap(Iterables.asList(tx.getAllNodes()));
+            assertEquals(a, nodeMap.get(a).getId());
+            assertEquals(b, nodeMap.get(b).getId());
+            assertEquals(c, nodeMap.get(c).getId());
             assertEquals(3, nodeMap.size());
         }
     }
 
     @Test
-    public void shouldFindNodeIds() {
-        try (Transaction tx = database.beginTx()) {
-            assertEquals("[0, 1, 2]", Arrays.toString(ids(database.getAllNodes())));
-        }
-    }
+    public void shouldFindIds() {
+        populate();
 
-    @Test
-    public void shouldFindRelationshipIds() {
         try (Transaction tx = database.beginTx()) {
-            assertEquals("[0]", Arrays.toString((ids(database.getAllRelationships()))));
+            assertEquals("[" + r + "]", Arrays.toString((ids(tx.getAllRelationships()))));
+        }
+        try (Transaction tx = database.beginTx()) {
+            assertEquals("[" + a + ", " + b + ", " + c + "]", Arrays.toString(ids(tx.getAllNodes())));
         }
     }
 
@@ -97,12 +81,14 @@ public class EntityUtilsTest {
 
     @Test
     public void verifyPropertiesToMap() {
+        populate();
+
         try (Transaction tx = database.beginTx()) {
-            assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(database.getNodeById(1).getSingleRelationship(withName("test"), OUTGOING)));
+            assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(tx.getNodeById(b).getSingleRelationship(withName("test"), OUTGOING)));
 
-            assertEquals(Collections.singletonMap("key", (Object) "value"), propertiesToMap(database.getNodeById(2)));
+            assertEquals(Collections.singletonMap("key", (Object) "value"), propertiesToMap(tx.getNodeById(c)));
 
-            assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(database.getNodeById(2), new ObjectInclusionPolicy<String>() {
+            assertEquals(Collections.<String, Object>emptyMap(), propertiesToMap(tx.getNodeById(c), new ObjectInclusionPolicy<String>() {
                 @Override
                 public boolean include(String object) {
                     return !"key".equals(object);
@@ -113,188 +99,187 @@ public class EntityUtilsTest {
 
     @Test
     public void shouldDeleteNodeWithAllRelationships() {
-        database.shutdown();
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-
-        database.execute("CREATE " +
+        database.executeTransactionally("CREATE " +
                 "(a), " +
                 "(b {name:'node1'})," +
-                "(c {name:'node2'})," +
+                "(c:ToDelete {name:'node2'})," +
                 "(c)-[:test {key1:'value1'}]->(b)," +
                 "(c)-[:test {key1:'value1'}]->(a)");
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(2, deleteNodeAndRelationships(database.getNodeById(2)));
-            tx.success();
+            assertEquals(2, deleteNodeAndRelationships(tx.findNodes(Label.label("ToDelete")).next()));
+            tx.commit();
         }
     }
 
     @Test
     public void shouldSafelyGetInt() {
-        populateDatabaseWithNumberProperties();
+        Long[] ids = populateDatabaseWithNumberProperties();
         int expected = 123;
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(expected, getInt(database.getNodeById(0), "test"));
-            assertEquals(expected, getInt(database.getNodeById(1), "test"));
-            assertEquals(expected, getInt(database.getNodeById(2), "test"));
+            assertEquals(expected, getInt(tx.getNodeById(ids[0]), "test"));
+            assertEquals(expected, getInt(tx.getNodeById(ids[1]), "test"));
+            assertEquals(expected, getInt(tx.getNodeById(ids[2]), "test"));
 
-            try {
-                getInt(database.getNodeById(3), "test");
-                fail();
-            } catch (ClassCastException e) {
-                //ok
-            }
+            assertThrows(ClassCastException.class, () -> {
+                getInt(tx.getNodeById(ids[3]), "test");
+            });
 
-            try {
-                getInt(database.getNodeById(4), "test");
-                fail();
-            } catch (NotFoundException e) {
-                //ok
-            }
+            assertThrows(NotFoundException.class, () -> {
+                getInt(tx.getNodeById(ids[4]), "test");
+            });
 
-            tx.success();
+            tx.commit();
         }
     }
 
     @Test
     public void shouldSafelyGetIntWithDefaults() {
-        populateDatabaseWithNumberProperties();
+        Long[] ids = populateDatabaseWithNumberProperties();
         int expected = 123;
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(expected, getInt(database.getNodeById(0), "test", 123));
-            assertEquals(expected, getInt(database.getNodeById(1), "test", 123));
-            assertEquals(expected, getInt(database.getNodeById(2), "test", 123));
-            assertEquals(expected, getInt(database.getNodeById(4), "test", 123));
+            assertEquals(expected, getInt(tx.getNodeById(ids[0]), "test", 123));
+            assertEquals(expected, getInt(tx.getNodeById(ids[1]), "test", 123));
+            assertEquals(expected, getInt(tx.getNodeById(ids[2]), "test", 123));
+            assertEquals(expected, getInt(tx.getNodeById(ids[4]), "test", 123));
 
-            try {
-                getInt(database.getNodeById(3), "test", 123);
-                fail();
-            } catch (ClassCastException e) {
-                //ok
-            }
+            assertThrows(ClassCastException.class, () -> {
+                getInt(tx.getNodeById(ids[3]), "test", 123);
+            });
 
-            tx.success();
+            tx.commit();
         }
     }
 
     @Test
     public void shouldSafelyGetLong() {
-        populateDatabaseWithNumberProperties();
+        Long[] ids = populateDatabaseWithNumberProperties();
         long expected = 123L;
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(expected, getLong(database.getNodeById(0), "test"));
-            assertEquals(expected, getLong(database.getNodeById(1), "test"));
-            assertEquals(expected, getLong(database.getNodeById(2), "test"));
+            assertEquals(expected, getLong(tx.getNodeById(ids[0]), "test"));
+            assertEquals(expected, getLong(tx.getNodeById(ids[1]), "test"));
+            assertEquals(expected, getLong(tx.getNodeById(ids[2]), "test"));
 
-            try {
-                getLong(database.getNodeById(3), "test");
-                fail();
-            } catch (ClassCastException e) {
-                //ok
-            }
+            assertThrows(ClassCastException.class, () -> {
+                getLong(tx.getNodeById(ids[3]), "test");
+            });
 
-            try {
-                getLong(database.getNodeById(4), "test");
-                fail();
-            } catch (NotFoundException e) {
-                //ok
-            }
+            assertThrows(NotFoundException.class, () -> {
+                getLong(tx.getNodeById(ids[4]), "test");
+            });
 
-            tx.success();
+            tx.commit();
         }
     }
 
     @Test
     public void shouldSafelyGetLongWithDefaults() {
-        populateDatabaseWithNumberProperties();
+        Long[] ids = populateDatabaseWithNumberProperties();
         long expected = 123L;
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(expected, getLong(database.getNodeById(0), "test", 123L));
-            assertEquals(expected, getLong(database.getNodeById(1), "test", 123L));
-            assertEquals(expected, getLong(database.getNodeById(2), "test", 123L));
-            assertEquals(expected, getLong(database.getNodeById(4), "test", 123L));
+            assertEquals(expected, getLong(tx.getNodeById(ids[0]), "test", 123L));
+            assertEquals(expected, getLong(tx.getNodeById(ids[1]), "test", 123L));
+            assertEquals(expected, getLong(tx.getNodeById(ids[2]), "test", 123L));
+            assertEquals(expected, getLong(tx.getNodeById(ids[4]), "test", 123L));
 
-            try {
-                getLong(database.getNodeById(3), "test", 123L);
-                fail();
-            } catch (ClassCastException e) {
-                //ok
-            }
+            assertThrows(ClassCastException.class, () -> {
+                getLong(tx.getNodeById(ids[3]), "test", 123L);
+            });
 
-            tx.success();
+            tx.commit();
         }
     }
 
     @Test
     public void shouldSafelyGetFloat() {
-        populateDatabaseWithNumberProperties();
+        Long[] ids = populateDatabaseWithNumberProperties();
         float expected = 123.0f;
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(expected, getFloat(database.getNodeById(0), "test"),0);
-            assertEquals(expected, getFloat(database.getNodeById(1), "test"),0);
-            assertEquals(expected, getFloat(database.getNodeById(2), "test"),0);
-            assertEquals(expected, getFloat(database.getNodeById(5), "test"),0);
+            assertEquals(expected, getFloat(tx.getNodeById(ids[0]), "test"), 0);
+            assertEquals(expected, getFloat(tx.getNodeById(ids[1]), "test"), 0);
+            assertEquals(expected, getFloat(tx.getNodeById(ids[2]), "test"), 0);
+            assertEquals(expected, getFloat(tx.getNodeById(ids[5]), "test"), 0);
 
-            try {
-                getFloat(database.getNodeById(3), "test");
-                fail();
-            } catch (ClassCastException e) {
-                //ok
-            }
+            assertThrows(ClassCastException.class, () -> {
+                getFloat(tx.getNodeById(ids[3]), "test");
+            });
 
-            try {
-                getFloat(database.getNodeById(4), "test");
-                fail();
-            } catch (NotFoundException e) {
-                //ok
-            }
+            assertThrows(NotFoundException.class, () -> {
+                getFloat(tx.getNodeById(ids[4]), "test");
+            });
 
-            tx.success();
+            tx.commit();
         }
     }
 
     @Test
     public void shouldSafelyGetFloatWithDefaults() {
-        populateDatabaseWithNumberProperties();
+        Long[] ids = populateDatabaseWithNumberProperties();
         long expected = 123L;
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(expected, getFloat(database.getNodeById(0), "test", 123L),0);
-            assertEquals(expected, getFloat(database.getNodeById(1), "test", 123L),0);
-            assertEquals(expected, getFloat(database.getNodeById(2), "test", 123L),0);
-            assertEquals(expected, getFloat(database.getNodeById(4), "test", 123L),0);
-            assertEquals(expected, getFloat(database.getNodeById(5), "test", 123L),0);
+            assertEquals(expected, getFloat(tx.getNodeById(ids[0]), "test", 123L), 0);
+            assertEquals(expected, getFloat(tx.getNodeById(ids[1]), "test", 123L), 0);
+            assertEquals(expected, getFloat(tx.getNodeById(ids[2]), "test", 123L), 0);
+            assertEquals(expected, getFloat(tx.getNodeById(ids[4]), "test", 123L), 0);
+            assertEquals(expected, getFloat(tx.getNodeById(ids[5]), "test", 123L), 0);
 
-            try {
-                getFloat(database.getNodeById(3), "test", 123L);
-                fail();
-            } catch (ClassCastException e) {
-                //ok
-            }
+            assertThrows(ClassCastException.class, () -> {
+                getFloat(tx.getNodeById(ids[3]), "test", 123L);
+            });
 
-            tx.success();
+            tx.commit();
         }
     }
 
-    private void populateDatabaseWithNumberProperties() {
-        database.shutdown();
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
+    private Long[] populateDatabaseWithNumberProperties() {
+        List<Long> result = new LinkedList<>();
 
         try (Transaction tx = database.beginTx()) {
-            database.createNode().setProperty("test", (byte) 123);
-            database.createNode().setProperty("test", 123);
-            database.createNode().setProperty("test", 123L);
-            database.createNode().setProperty("test", "string");
-            database.createNode();
-            database.createNode().setProperty("test", 123.0f);
-            tx.success();
+            Node node = tx.createNode();
+            node.setProperty("test", (byte) 123);
+            result.add(node.getId());
+
+            node = tx.createNode();
+            node.setProperty("test", 123);
+            result.add(node.getId());
+
+            node = tx.createNode();
+            node.setProperty("test", 123L);
+            result.add(node.getId());
+
+            node = tx.createNode();
+            node.setProperty("test", "string");
+            result.add(node.getId());
+
+            result.add(tx.createNode().getId());
+
+            node = tx.createNode();
+            node.setProperty("test", 123.0f);
+            result.add(node.getId());
+
+            tx.commit();
         }
+
+        return result.toArray(new Long[0]);
+    }
+
+    private void populate() {
+        Map<String, Object> result = database.executeTransactionally("CREATE " +
+                        "(a), " +
+                        "(b {key:'value'})," +
+                        "(b)-[r:test]->(a)," +
+                        "(c {key:'value'}) RETURN id(a) as a, id(b) as b, id(c) as c, id (r) as r", Collections.emptyMap(),
+                Result::next);
+
+        a = (long) result.get("a");
+        b = (long) result.get("b");
+        c = (long) result.get("c");
+        r = (long) result.get("r");
     }
 }

@@ -16,20 +16,10 @@
 
 package com.graphaware.runtime;
 
-import com.graphaware.runtime.config.FluentRuntimeConfiguration;
-import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.manager.CommunityTxDrivenModuleManager;
-import com.graphaware.runtime.manager.CommunityTimerDrivenModuleManager;
-import com.graphaware.runtime.manager.TimerDrivenModuleManager;
-import com.graphaware.runtime.manager.TxDrivenModuleManager;
-import com.graphaware.runtime.metadata.GraphPropertiesMetadataRepository;
-import com.graphaware.runtime.metadata.ModuleMetadataRepository;
-import com.graphaware.runtime.module.TxDrivenModule;
+import com.graphaware.runtime.manager.CommunityModuleManager;
+import com.graphaware.runtime.manager.ModuleManager;
+import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.kernel.internal.GraphDatabaseAPI;
-
-import static com.graphaware.runtime.config.RuntimeConfiguration.TIMER_MODULES_PROPERTY_PREFIX;
-import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROPERTY_PREFIX;
 
 /**
  * Factory producing {@link GraphAwareRuntime}. This should be the only way a runtime is created.
@@ -37,36 +27,16 @@ import static com.graphaware.runtime.config.RuntimeConfiguration.TX_MODULES_PROP
 public final class GraphAwareRuntimeFactory {
 
     /**
-     * Create a runtime backed by a database using default runtime configuration.
-     * <p>
-     * The runtime only supports {@link com.graphaware.runtime.module.TimerDrivenModule}s if the database is a real transactional
-     * (rather than batch) database, i.e., that it implements {@link GraphDatabaseAPI}.
+     * Create a runtime for the given database.
      *
-     * @param database backing the runtime.
+     * @param service       Neo4j database management service.
+     * @param database      for which the runtime is being created.
      * @return runtime.
      */
-    public static GraphAwareRuntime createRuntime(GraphDatabaseService database) {
-        return createRuntime(database, FluentRuntimeConfiguration.defaultConfiguration(database));
-    }
+    public static GraphAwareRuntime createRuntime(DatabaseManagementService service, GraphDatabaseService database) {
+        ModuleManager moduleManager = new CommunityModuleManager(database);
 
-    /**
-     * Create a runtime backed by a database using specific runtime configuration.
-     * <p>
-     * The runtime only supports {@link com.graphaware.runtime.module.TimerDrivenModule}s if the database is a real transactional
-     * (rather than batch) database, i.e., that it implements {@link GraphDatabaseAPI}.
-     *
-     * @param database      backing the runtime.
-     * @param configuration custom configuration.
-     * @return runtime.
-     */
-    public static GraphAwareRuntime createRuntime(GraphDatabaseService database, RuntimeConfiguration configuration) {
-        ModuleMetadataRepository timerRepo = new GraphPropertiesMetadataRepository(database, configuration, TIMER_MODULES_PROPERTY_PREFIX);
-        ModuleMetadataRepository txRepo = new GraphPropertiesMetadataRepository(database, configuration, TX_MODULES_PROPERTY_PREFIX);
-
-        TimerDrivenModuleManager timerDrivenModuleManager = new CommunityTimerDrivenModuleManager(database, timerRepo, configuration.getTimingStrategy(), configuration.getStatsCollector());
-        TxDrivenModuleManager<TxDrivenModule> txDrivenModuleManager = new CommunityTxDrivenModuleManager<>(database, txRepo, configuration.getStatsCollector());
-
-        return new CommunityRuntime(configuration, database, txDrivenModuleManager, timerDrivenModuleManager, configuration.getWritingConfig().produceWriter(database));
+        return new CommunityRuntime(database, service, moduleManager);
     }
 
     private GraphAwareRuntimeFactory() {

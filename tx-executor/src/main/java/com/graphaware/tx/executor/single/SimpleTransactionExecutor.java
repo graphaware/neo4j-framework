@@ -63,22 +63,19 @@ public class SimpleTransactionExecutor implements TransactionExecutor {
     }
 
     private <T> T doExecuteInTransaction(TransactionCallback<T> callback) {
-        Transaction tx = database.beginTx();
-        T result = null;
-        try {
-            result = callback.doInTransaction(database); //can throw a business exception
-            tx.success();
+        T result;
+
+        try (Transaction tx = database.beginTx()) {
+            result = callback.doInTransaction(tx); //can throw a business exception
+            tx.commit();
         } catch (RuntimeException e) {
             LOG.warn("Runtime exception occurred during transaction execution.", e);
-            tx.failure();
             throw e;
         } catch (Exception e) {
             LOG.warn("Checked exception occurred during transaction execution.", e);
-            tx.failure();
             throw new RuntimeException(e);
-        } finally {
-            tx.close(); //can throw a DB exception
         }
+
         return result;
     }
 }

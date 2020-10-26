@@ -16,64 +16,75 @@
 
 package com.graphaware.test.unit;
 
-import com.graphaware.common.kv.GraphKeyValueStore;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
-import com.graphaware.runtime.bootstrap.TestRuntimeModule;
+import com.graphaware.runtime.bootstrap.TestModule;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
-import com.graphaware.test.integration.DatabaseIntegrationTest;
-import com.graphaware.test.integration.EmbeddedDatabaseIntegrationTest;
-import org.junit.Test;
+import org.apache.commons.configuration2.MapConfiguration;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.harness.Neo4j;
 
 import java.util.Collections;
 
 import static com.graphaware.common.util.IterableUtils.count;
 import static com.graphaware.test.unit.GraphUnit.assertSameGraph;
 import static com.graphaware.test.unit.GraphUnit.clearGraph;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
  * Test for {@link com.graphaware.test.unit.GraphUnit} when Runtime is present.
  */
-public class GraphUnitTest extends EmbeddedDatabaseIntegrationTest {
+@ExtendWith(Neo4jExtension.class)
+public class GraphUnitTest {
 
+    @InjectNeo4j
+    private Neo4j neo4j;
+
+    @InjectNeo4j
+    private GraphDatabaseService database;
+    
     private void populateDatabase(String cypher) {
-        getDatabase().execute(cypher);
+        database.executeTransactionally(cypher);
     }
 
     @Test
     public void clearGraphWithRuntimeShouldDeleteAllNodesAndRelsButNotGraphProps() {
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(getDatabase());
-        runtime.registerModule(new TestRuntimeModule("test", Collections.singletonMap("test", "test")));
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), database);
+        runtime.registerModule(new TestModule("test", new MapConfiguration(Collections.singletonMap("test", "test"))));
         runtime.start();
 
-        try (Transaction tx = getDatabase().beginTx()) {
+        try (Transaction tx = database.beginTx()) {
             String cypher = "CREATE " +
                     "(blue:Blue {name:'Blue'})<-[:REL]-(red1:Red {name:'Red'})-[:REL]->(black1:Black {name:'Black'})-[:REL]->(green:Green {name:'Green'})," +
                     "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
 
             populateDatabase(cypher);
-            tx.success();
+            tx.commit();
         }
 
-        try (Transaction tx = getDatabase().beginTx()) {
-            clearGraph(getDatabase(), InclusionPoliciesFactory.allBusiness());
-            tx.success();
+        try (Transaction tx = database.beginTx()) {
+            clearGraph(tx, InclusionPoliciesFactory.allBusiness());
+            tx.commit();
         }
 
-        try (Transaction tx = getDatabase().beginTx()) {
-            assertEquals(0, count(getDatabase().getAllNodes()));
-            assertTrue(new GraphKeyValueStore(getDatabase()).hasKey("_GA_TX_MODULE_test"));
-            tx.success();
+        try (Transaction tx = database.beginTx()) {
+            assertEquals(0, count(tx.getAllNodes()));
+            tx.commit();
         }
+
+        runtime.stop();
     }
 
     @Test
     public void equalGraphsWithRuntimeShouldPassSameGraphTestBusinessStrategies() {
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(getDatabase());
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), database);
         runtime.start();
 
         String assertCypher = "CREATE " +
@@ -81,6 +92,8 @@ public class GraphUnitTest extends EmbeddedDatabaseIntegrationTest {
                 "(red2:Red {name:'Red'})-[:REL]->(black2:Black {name:'Black'})";
         populateDatabase(assertCypher);
 
-        assertSameGraph(getDatabase(), assertCypher, InclusionPoliciesFactory.allBusiness());
+        assertSameGraph(database, assertCypher, InclusionPoliciesFactory.allBusiness());
+
+        runtime.stop();
     }
 }

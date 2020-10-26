@@ -23,5 +23,4 @@ import org.neo4j.graphdb.Node;
  * {@link EntityInclusionPolicy} for {@link Node}s.
  */
 public interface NodeInclusionPolicy extends EntityInclusionPolicy<Node> {
-    //todo good toString method on incl policies
 }

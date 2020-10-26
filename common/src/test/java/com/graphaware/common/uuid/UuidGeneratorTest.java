@@ -15,7 +15,8 @@
  */
 package com.graphaware.common.uuid;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Set;
@@ -24,8 +25,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static org.junit.Assert.assertFalse;
 
 public class UuidGeneratorTest {
 
@@ -50,6 +49,6 @@ public class UuidGeneratorTest {
         executor.shutdown();
         executor.awaitTermination(1, TimeUnit.MINUTES);
 
-        assertFalse("Duplicate UUID Generated", failure.get());
+        Assertions.assertFalse(failure.get(), "Duplicate UUID Generated");
     }
 }

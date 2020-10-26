@@ -16,57 +16,53 @@
 
 package com.graphaware.tx.executor.single;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.countNodes;
-import static org.junit.Assert.assertEquals;
-import static org.neo4j.kernel.configuration.Settings.FALSE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit test for {@link com.graphaware.tx.executor.single.SimpleTransactionExecutor}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class SimpleTransactionExecutorTest {
 
-    private GraphDatabaseService database;
+    @InjectNeo4j
+    protected GraphDatabaseService database;
+
     private TransactionExecutor executor;
+    private long id;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-
         try (Transaction tx = database.beginTx()) {
-            database.createNode();
-            tx.success();
+            id = tx.createNode().getId();
+            tx.commit();
         }
 
         executor = new SimpleTransactionExecutor(database);
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
     }
 
     @Test
     public void nodeShouldBeSuccessfullyCreatedInTransaction() {
         executor.executeInTransaction(new VoidReturningCallback() {
             @Override
-            public void doInTx(GraphDatabaseService database) {
-                database.createNode();
+            public void doInTx(Transaction tx) {
+                tx.createNode();
             }
         });
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(2, countNodes(database));
+            assertEquals(2, countNodes(tx));
         }
     }
 
@@ -74,23 +70,25 @@ public class SimpleTransactionExecutorTest {
     public void nodeShouldBeSuccessfullyDeletedInTransaction() {
         executor.executeInTransaction(new VoidReturningCallback() {
             @Override
-            protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(0).delete();
+            protected void doInTx(Transaction tx) {
+                tx.getNodeById(id).delete();
             }
         });
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(0, countNodes(database));
+            assertEquals(0, countNodes(tx));
         }
     }
 
-    @Test(expected = ConstraintViolationException.class)
+    @Test
     public void deletingNodeWithRelationshipsShouldThrowException() {
         createNodeAndRelationship();
 
-        executor.executeInTransaction(database -> {
-            database.getNodeById(0).delete();
-            return null;
+        assertThrows(ConstraintViolationException.class, () -> {
+            executor.executeInTransaction(tx -> {
+                tx.getNodeById(id).delete();
+                return null;
+            });
         });
     }
 
@@ -99,23 +97,23 @@ public class SimpleTransactionExecutorTest {
         createNodeAndRelationship();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(2, countNodes(database));
+            assertEquals(2, countNodes(tx));
         }
 
         executor.executeInTransaction(db -> {
-            db.getNodeById(0).delete();
+            db.getNodeById(id).delete();
             return null;
         }, KeepCalmAndCarryOn.getInstance());
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(2, countNodes(database));
+            assertEquals(2, countNodes(tx));
         }
     }
 
     private void createNodeAndRelationship() {
         executor.executeInTransaction(db -> {
             Node node = db.createNode();
-            node.createRelationshipTo(db.getNodeById(0), RelationshipType.withName("TEST_REL_TYPE"));
+            node.createRelationshipTo(db.getNodeById(id), RelationshipType.withName("TEST_REL_TYPE"));
             return null;
         });
     }

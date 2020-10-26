@@ -19,6 +19,7 @@ package com.graphaware.common.policy.inclusion.composite;
 import com.graphaware.common.policy.inclusion.NodeInclusionPolicy;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * {@link CompositeEntityInclusionPolicy} for {@link Node}s.
@@ -37,7 +38,7 @@ public final class CompositeNodeInclusionPolicy extends CompositeEntityInclusion
      * {@inheritDoc}
      */
     @Override
-    protected Iterable<Node> doGetAll(GraphDatabaseService database) {
-        return database.getAllNodes();
+    protected Iterable<Node> doGetAll(Transaction tx) {
+        return tx.getAllNodes();
     }
 }

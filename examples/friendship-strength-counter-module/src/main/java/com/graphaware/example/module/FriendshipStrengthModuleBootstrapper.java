@@ -16,22 +16,24 @@
 
 package com.graphaware.example.module;
 
-import com.graphaware.runtime.module.RuntimeModule;
-import com.graphaware.runtime.module.RuntimeModuleBootstrapper;
+import com.graphaware.runtime.GraphAwareRuntime;
+import com.graphaware.runtime.module.Module;
+import com.graphaware.runtime.module.ModuleBootstrapper;
+import org.apache.commons.configuration2.Configuration;
 import org.neo4j.graphdb.GraphDatabaseService;
 
 import java.util.Map;
 
 /**
- * {@link com.graphaware.runtime.module.RuntimeModuleBootstrapper} for {@link FriendshipStrengthModule}.
+ * {@link ModuleBootstrapper} for {@link FriendshipStrengthModule}.
  */
-public class FriendshipStrengthModuleBootstrapper implements RuntimeModuleBootstrapper {
+public class FriendshipStrengthModuleBootstrapper implements ModuleBootstrapper {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public RuntimeModule bootstrapModule(String moduleId, Map<String, String> config, GraphDatabaseService database) {
-        return new FriendshipStrengthModule(moduleId, database);
+    public Module<?> bootstrapModule(String moduleId, Configuration config, GraphDatabaseService database, GraphAwareRuntime runtime) {
+        return new FriendshipStrengthModule(moduleId);
     }
 }

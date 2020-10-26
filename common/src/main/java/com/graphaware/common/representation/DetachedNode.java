@@ -20,7 +20,8 @@ import com.graphaware.common.expression.DetachedNodeExpressions;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.internal.helpers.collection.Iterables;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -103,16 +104,16 @@ public abstract class DetachedNode<ID> extends DetachedEntity<ID, Node> implemen
      * {@inheritDoc}
      */
     @Override
-    protected Node create(GraphDatabaseService database) {
-        return database.createNode();
+    protected Node create(Transaction tx) {
+        return tx.createNode();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Node fetch(GraphDatabaseService database) {
-        return database.getNodeById(getGraphId());
+    protected Node fetch(Transaction tx) {
+        return tx.getNodeById(getGraphId());
     }
 
     /**

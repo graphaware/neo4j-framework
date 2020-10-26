@@ -16,12 +16,12 @@
 
 package com.graphaware.common.policy.inclusion;
 
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Entity;
-import org.neo4j.helpers.collection.FilteringIterable;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.internal.helpers.collection.FilteringIterable;
 
 /**
- * Base class for {@link EntityInclusionPolicy} implementations that implement the {@link #getAll(GraphDatabaseService)}
+ * Base class for {@link EntityInclusionPolicy} implementations that implement the {@link #getAll(Transaction)}
  * method in a naive way.
  *
  * @param <T>
@@ -32,17 +32,16 @@ public abstract class BaseEntityInclusionPolicy<T extends Entity> implements Ent
      * {@inheritDoc}
      */
     @Override
-    public Iterable<T> getAll(GraphDatabaseService database) {
-        //Neo suggests replacing this deprecated stuff with another deprecated class - not much we can do
-        return new FilteringIterable<>(doGetAll(database), this::include);
+    public Iterable<T> getAll(Transaction tx) {
+        return new FilteringIterable<>(doGetAll(tx), this::include);
     }
 
     /**
-     * Simply get all possible {@link Entity}s from the database, not worrying whether they are included by
+     * Simply get all possible {@link Entity}s from the tx, not worrying whether they are included by
      * this policy or not.
      *
-     * @param database to get entities from.
+     * @param tx to get entities from.
      * @return all entities.
      */
-    protected abstract Iterable<T> doGetAll(GraphDatabaseService database);
+    protected abstract Iterable<T> doGetAll(Transaction tx);
 }

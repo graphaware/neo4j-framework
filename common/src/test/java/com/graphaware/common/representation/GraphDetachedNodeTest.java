@@ -19,13 +19,15 @@ package com.graphaware.common.representation;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.io.IOException;
 import java.util.Collections;
 
-import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class GraphDetachedNodeTest {
 
@@ -35,13 +37,12 @@ public class GraphDetachedNodeTest {
     public void nodeRepresentationIsCorrectlyConvertedToJson() throws JsonProcessingException, JSONException {
         GraphDetachedNode representation = new GraphDetachedNode(0, new String[]{"Label1, Label2"}, Collections.singletonMap("key", "value"));
         String actualStr = mapper.writeValueAsString(representation);
-        System.out.println(actualStr);
-        assertEquals("{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"labels\":[\"Label1, Label2\"]}", actualStr, true);
+        JSONAssert.assertEquals("{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"labels\":[\"Label1, Label2\"]}", actualStr, true);
     }
 
     @Test
     public void nodeRepresentationIsCorrectlyConvertedFromJson() throws IOException, JSONException {
         String json = "{\"graphId\":0,\"properties\":{\"key\":\"value\"},\"labels\":[\"Label1, Label2\"]}";
-        Assert.assertEquals(new GraphDetachedNode(0, new String[]{"Label1, Label2"}, Collections.singletonMap("key", "value")), mapper.readValue(json, GraphDetachedNode.class));
+        assertEquals(new GraphDetachedNode(0, new String[]{"Label1, Label2"}, Collections.singletonMap("key", "value")), mapper.readValue(json, GraphDetachedNode.class));
     }
 }

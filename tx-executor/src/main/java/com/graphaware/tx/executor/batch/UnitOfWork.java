@@ -16,7 +16,7 @@
 
 package com.graphaware.tx.executor.batch;
 
-import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * A unit of work to be executed as a part of batch execution by {@link BatchTransactionExecutor}.
@@ -28,10 +28,10 @@ public interface UnitOfWork<T> {
     /**
      * Execute the unit of work.
      *
-     * @param database    against which to execute the work.
+     * @param tx          in the context of which to execute the work.
      * @param input       to the unit of work.
      * @param batchNumber current batch number.
      * @param stepNumber  current step number.
      */
-    void execute(GraphDatabaseService database, T input, int batchNumber, int stepNumber);
+    void execute(Transaction tx, T input, int batchNumber, int stepNumber);
 }

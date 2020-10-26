@@ -17,11 +17,13 @@
 package com.graphaware.common.policy.inclusion.spel;
 
 import com.graphaware.common.policy.inclusion.NodeInclusionPolicy;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.helpers.collection.Iterables;
+import org.neo4j.internal.helpers.collection.Iterables;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for {@link com.graphaware.common.policy.inclusion.spel.SpelNodeInclusionPolicy}.
@@ -39,10 +41,8 @@ public class SpelNodeInclusionPolicyTest extends SpelInclusionPolicyTest {
     private NodeInclusionPolicy policy6;
     private NodeInclusionPolicy policy7;
 
-    @Override
+    @BeforeEach
     public void setUp() {
-        super.setUp();
-
         simplePolicy1 = new SpelNodeInclusionPolicy("hasLabel('Employee')");
         simplePolicy2 = new SpelNodeInclusionPolicy("!hasLabel('Employee')");
 
@@ -58,69 +58,69 @@ public class SpelNodeInclusionPolicyTest extends SpelInclusionPolicyTest {
     @Test
     public void shouldIncludeCorrectNodes() {
         try (Transaction tx = database.beginTx()) {
-            assertTrue(simplePolicy1.include(michal()));
-            assertFalse(simplePolicy1.include(graphaware()));
-            assertFalse(simplePolicy1.include(vojta()));
-            assertFalse(simplePolicy1.include(london()));
+            assertTrue(simplePolicy1.include(michal(tx)));
+            assertFalse(simplePolicy1.include(graphaware(tx)));
+            assertFalse(simplePolicy1.include(vojta(tx)));
+            assertFalse(simplePolicy1.include(london(tx)));
 
-            assertFalse(simplePolicy2.include(michal()));
-            assertTrue(simplePolicy2.include(graphaware()));
-            assertTrue(simplePolicy2.include(vojta()));
-            assertTrue(simplePolicy2.include(london()));
+            assertFalse(simplePolicy2.include(michal(tx)));
+            assertTrue(simplePolicy2.include(graphaware(tx)));
+            assertTrue(simplePolicy2.include(vojta(tx)));
+            assertTrue(simplePolicy2.include(london(tx)));
 
-            assertTrue(policy1.include(michal()));
-            assertTrue(policy1.include(graphaware()));
-            assertTrue(policy1.include(vojta()));
-            assertFalse(policy1.include(london()));
+            assertTrue(policy1.include(michal(tx)));
+            assertTrue(policy1.include(graphaware(tx)));
+            assertTrue(policy1.include(vojta(tx)));
+            assertFalse(policy1.include(london(tx)));
 
-            assertTrue(policy2.include(michal()));
-            assertFalse(policy2.include(graphaware()));
-            assertTrue(policy2.include(vojta()));
-            assertFalse(policy2.include(london()));
+            assertTrue(policy2.include(michal(tx)));
+            assertFalse(policy2.include(graphaware(tx)));
+            assertTrue(policy2.include(vojta(tx)));
+            assertFalse(policy2.include(london(tx)));
 
-            assertFalse(policy3.include(michal()));
-            assertTrue(policy3.include(graphaware()));
-            assertFalse(policy3.include(vojta()));
-            assertFalse(policy3.include(london()));
+            assertFalse(policy3.include(michal(tx)));
+            assertTrue(policy3.include(graphaware(tx)));
+            assertFalse(policy3.include(vojta(tx)));
+            assertFalse(policy3.include(london(tx)));
 
-            assertFalse(policy4.include(michal()));
-            assertTrue(policy4.include(graphaware()));
-            assertFalse(policy4.include(vojta()));
-            assertFalse(policy4.include(london()));
+            assertFalse(policy4.include(michal(tx)));
+            assertTrue(policy4.include(graphaware(tx)));
+            assertFalse(policy4.include(vojta(tx)));
+            assertFalse(policy4.include(london(tx)));
 
-            assertFalse(policy5.include(michal()));
-            assertFalse(policy5.include(graphaware()));
-            assertFalse(policy5.include(vojta()));
-            assertFalse(policy5.include(london()));
+            assertFalse(policy5.include(michal(tx)));
+            assertFalse(policy5.include(graphaware(tx)));
+            assertFalse(policy5.include(vojta(tx)));
+            assertFalse(policy5.include(london(tx)));
 
-            tx.success();
+            tx.commit();
         }
     }
 
     @Test
     public void shouldCorrectlyGetAllNodes() {
         try (Transaction tx = database.beginTx()) {
-            assertEquals(1, Iterables.count(simplePolicy1.getAll(database)));
-            assertEquals(michal(), simplePolicy1.getAll(database).iterator().next());
+            assertEquals(1, Iterables.count(simplePolicy1.getAll(tx)));
+            assertEquals(michal(tx), simplePolicy1.getAll(tx).iterator().next());
 
-            assertEquals(3, Iterables.count(simplePolicy2.getAll(database)));
+            assertEquals(3, Iterables.count(simplePolicy2.getAll(tx)));
 
-            assertEquals(3, Iterables.count(policy1.getAll(database)));
+            assertEquals(3, Iterables.count(policy1.getAll(tx)));
 
-            assertEquals(2, Iterables.count(policy2.getAll(database)));
+            assertEquals(2, Iterables.count(policy2.getAll(tx)));
 
-            assertEquals(1, Iterables.count(policy3.getAll(database)));
-            assertEquals(graphaware(), policy3.getAll(database).iterator().next());
+            assertEquals(1, Iterables.count(policy3.getAll(tx)));
+            assertEquals(graphaware(tx), policy3.getAll(tx).iterator().next());
 
-            assertEquals(1, Iterables.count(policy4.getAll(database)));
-            assertEquals(graphaware(), policy4.getAll(database).iterator().next());
+            assertEquals(1, Iterables.count(policy4.getAll(tx)));
+            assertEquals(graphaware(tx), policy4.getAll(tx).iterator().next());
 
-            assertEquals(0, Iterables.count(policy5.getAll(database)));
+            assertEquals(0, Iterables.count(policy5.getAll(tx)));
 
-            assertEquals(2, Iterables.count(policy6.getAll(database)));
-            assertEquals(2, Iterables.count(policy7.getAll(database)));
+            assertEquals(2, Iterables.count(policy6.getAll(tx)));
+            assertEquals(2, Iterables.count(policy7.getAll(tx)));
 
-            tx.success();
+            tx.commit();
         }
     }
 }

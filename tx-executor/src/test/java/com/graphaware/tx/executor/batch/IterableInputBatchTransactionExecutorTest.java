@@ -16,83 +16,80 @@
 
 package com.graphaware.tx.executor.batch;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.tx.executor.input.AllNodes;
 import com.graphaware.tx.executor.input.AllNodesWithLabel;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
+import javax.ws.rs.core.Link;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.countNodes;
-import static org.junit.Assert.assertEquals;
-import static org.neo4j.kernel.configuration.Settings.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit test for {@link com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class IterableInputBatchTransactionExecutorTest {
 
-    private GraphDatabaseService database;
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
-    }
+    @InjectNeo4j
+    protected GraphDatabaseService database;
 
     @Test
     public void nodesShouldBeCreatedFromListOfNames() {
         List<String> nodeNames = Arrays.asList("Name1", "Name2", "Name3");
+        final List<Long> ids = new LinkedList<>();
 
         BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, 2, nodeNames, new UnitOfWork<String>() {
             @Override
-            public void execute(GraphDatabaseService database, String nodeName, int batchNumber, int stepNumber) {
-                Node node = database.createNode();
+            public void execute(Transaction tx, String nodeName, int batchNumber, int stepNumber) {
+                Node node = tx.createNode();
                 node.setProperty("name", nodeName + batchNumber + stepNumber);
+                ids.add(node.getId());
             }
         });
 
         executor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(3, countNodes(database));
-            assertEquals("Name111", database.getNodeById(0).getProperty("name"));
-            assertEquals("Name212", database.getNodeById(1).getProperty("name"));
-            assertEquals("Name321", database.getNodeById(20).getProperty("name"));
+            assertEquals(3, countNodes(tx));
+            assertEquals("Name111", tx.getNodeById(ids.get(0)).getProperty("name"));
+            assertEquals("Name212", tx.getNodeById(ids.get(1)).getProperty("name"));
+            assertEquals("Name321", tx.getNodeById(ids.get(2)).getProperty("name"));
         }
     }
 
     @Test
     public void iterableAcquiredInTransactionShouldBeProcessed() {
+        final List<Long> ids = new LinkedList<>();
+
         try (Transaction tx = database.beginTx()) {
             for (int i = 0; i < 100; i++) {
-                database.createNode();
+                Node n = tx.createNode();
+                ids.add(n.getId());
             }
-            tx.success();
+            tx.commit();
         }
 
         BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, 10,
                 new AllNodes(database, 10),
-                new UnitOfWork<Node>() {
+                new NodeUnitOfWork() {
                     @Override
-                    public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
+                    public void execute(Node node, int batchNumber, int stepNumber) {
                         node.setProperty("name", "Name" + batchNumber + stepNumber);
                     }
                 }
@@ -101,29 +98,32 @@ public class IterableInputBatchTransactionExecutorTest {
         executor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals("Name11", database.getNodeById(0).getProperty("name"));
-            assertEquals("Name12", database.getNodeById(1).getProperty("name"));
-            assertEquals("Name13", database.getNodeById(2).getProperty("name"));
-            assertEquals("Name108", database.getNodeById(97).getProperty("name"));
-            assertEquals("Name109", database.getNodeById(98).getProperty("name"));
-            assertEquals("Name1010", database.getNodeById(99).getProperty("name"));
+            assertEquals("Name11", tx.getNodeById(ids.get(0)).getProperty("name"));
+            assertEquals("Name12", tx.getNodeById(ids.get(1)).getProperty("name"));
+            assertEquals("Name13", tx.getNodeById(ids.get(2)).getProperty("name"));
+            assertEquals("Name108", tx.getNodeById(ids.get(97)).getProperty("name"));
+            assertEquals("Name109", tx.getNodeById(ids.get(98)).getProperty("name"));
+            assertEquals("Name1010", tx.getNodeById(ids.get(99)).getProperty("name"));
         }
     }
 
     @Test
     public void iterorAcquiredInTransactionShouldBeProcessed() {
+        final List<Long> ids = new LinkedList<>();
+
         try (Transaction tx = database.beginTx()) {
             for (int i = 0; i < 100; i++) {
-                database.createNode(Label.label("Test"));
+                Node n = tx.createNode(Label.label("Test"));
+                ids.add(n.getId());
             }
-            tx.success();
+            tx.commit();
         }
 
         BatchTransactionExecutor executor = new IterableInputBatchTransactionExecutor<>(database, 10,
                 new AllNodesWithLabel(database, 10, Label.label("Test")),
-                new UnitOfWork<Node>() {
+                new NodeUnitOfWork() {
                     @Override
-                    public void execute(GraphDatabaseService database, Node node, int batchNumber, int stepNumber) {
+                    protected void execute(Node node, int batchNumber, int stepNumber) {
                         node.setProperty("name", "Name" + batchNumber + stepNumber);
                     }
                 }
@@ -132,12 +132,12 @@ public class IterableInputBatchTransactionExecutorTest {
         executor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals("Name11", database.getNodeById(0).getProperty("name"));
-            assertEquals("Name12", database.getNodeById(1).getProperty("name"));
-            assertEquals("Name13", database.getNodeById(2).getProperty("name"));
-            assertEquals("Name108", database.getNodeById(97).getProperty("name"));
-            assertEquals("Name109", database.getNodeById(98).getProperty("name"));
-            assertEquals("Name1010", database.getNodeById(99).getProperty("name"));
+            assertEquals("Name11", tx.getNodeById(ids.get(0)).getProperty("name"));
+            assertEquals("Name12", tx.getNodeById(ids.get(1)).getProperty("name"));
+            assertEquals("Name13", tx.getNodeById(ids.get(2)).getProperty("name"));
+            assertEquals("Name108", tx.getNodeById(ids.get(97)).getProperty("name"));
+            assertEquals("Name109", tx.getNodeById(ids.get(98)).getProperty("name"));
+            assertEquals("Name1010", tx.getNodeById(ids.get(99)).getProperty("name"));
         }
     }
 
@@ -146,9 +146,9 @@ public class IterableInputBatchTransactionExecutorTest {
         final Label label = Label.label("TEST");
 
         try (Transaction tx = database.beginTx()) {
-            database.createNode(label);
-            database.createNode(label);
-            tx.success();
+            tx.createNode(label);
+            tx.createNode(label);
+            tx.commit();
         }
 
         final AtomicInteger count = new AtomicInteger(0);
@@ -156,7 +156,7 @@ public class IterableInputBatchTransactionExecutorTest {
         new IterableInputBatchTransactionExecutor<>(database, 100, new AllNodesWithLabel(database, 100, label),
                 new UnitOfWork<Node>() {
                     @Override
-                    public void execute(GraphDatabaseService database, Node input, int batchNumber, int stepNumber) {
+                    public void execute(Transaction tx, Node input, int batchNumber, int stepNumber) {
                         count.incrementAndGet();
                     }
                 }

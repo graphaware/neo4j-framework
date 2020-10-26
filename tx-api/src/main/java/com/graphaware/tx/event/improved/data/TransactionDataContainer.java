@@ -16,12 +16,15 @@
 
 package com.graphaware.tx.event.improved.data;
 
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.event.TransactionData;
 
 /**
  * A component that contains {@link NodeTransactionData} and {@link RelationshipTransactionData}.
  */
 public interface TransactionDataContainer extends TransactionDataWrapper {
+
+    Transaction getTransaction();
 
     /**
      * Get contained node transaction data.

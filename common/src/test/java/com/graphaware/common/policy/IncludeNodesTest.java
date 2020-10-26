@@ -16,33 +16,37 @@
 
 package com.graphaware.common.policy;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.common.policy.inclusion.fluent.IncludeNodes;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
 
 import static com.graphaware.common.description.predicate.Predicates.equalTo;
 import static com.graphaware.common.description.predicate.Predicates.undefined;
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 import static org.neo4j.graphdb.Label.label;
 
 /**
  * Unit test for  {@link com.graphaware.common.policy.inclusion.fluent.IncludeNodes}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class IncludeNodesTest {
+
+    @InjectNeo4j
+    private GraphDatabaseService database;
 
     @Test
     public void shouldIncludeCorrectRelationships() {
-        GraphDatabaseService database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-
         try (Transaction tx = database.beginTx()) {
-            Node n = database.createNode(label("Test"));
+            Node n = tx.createNode(label("Test"));
             n.setProperty("test", "test");
 
             assertTrue(IncludeNodes.all().include(n));
@@ -65,9 +69,7 @@ public class IncludeNodesTest {
                             .all()
                             .with("test", undefined()).include(n));
 
-            tx.success();
+            tx.commit();
         }
-
-        database.shutdown();
     }
 }

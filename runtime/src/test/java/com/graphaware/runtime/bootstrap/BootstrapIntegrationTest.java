@@ -16,193 +16,124 @@
 
 package com.graphaware.runtime.bootstrap;
 
-import com.graphaware.runtime.RuntimeRegistry;
-import org.junit.Before;
-import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
+import com.graphaware.test.integration.GraphAwareNeo4jBuilder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.config.InvalidSettingException;
-import org.neo4j.graphdb.factory.GraphDatabaseBuilder;
-
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static com.graphaware.runtime.bootstrap.RuntimeKernelExtension.RUNTIME_ENABLED;
-import static com.graphaware.runtime.bootstrap.TestRuntimeModule.TEST_RUNTIME_MODULES;
-import static org.junit.Assert.*;
+import static com.graphaware.runtime.bootstrap.TestModule.TEST_RUNTIME_MODULES;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Integration test for runtime and module bootstrapping.
  */
 public class BootstrapIntegrationTest {
 
-    @Before
+    @BeforeEach
     public void setUp() {
         TEST_RUNTIME_MODULES.clear();
-        RuntimeRegistry.clear();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        GraphAwareNeo4jBuilder.cleanup();
     }
 
     @Test
-    public void moduleShouldNotBeInitializedWhenNoConfigProvided() throws InterruptedException {
-        GraphDatabaseService database = builder().newGraphDatabase();
-
-        registerShutdownHook(database);
+    public void moduleShouldNotBeInitializedWhenNoConfigProvided() {
+        Neo4j database = builder().build();
 
         assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
-        database.shutdown();
-
-        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
-    }
-
-    @Test
-    public void moduleShouldNotBeInitializedWhenRuntimeIsDisabled() throws InterruptedException {
-        GraphDatabaseService database = builder()
-                .setConfig(RUNTIME_ENABLED, "false")
-                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-
-        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
-
-        database.shutdown();
-
-        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
-    }
-
-    @Test(expected = InvalidSettingException.class)
-    public void misconfiguredRuntimeShouldFailStartup() throws InterruptedException {
-        GraphDatabaseService database = builder()
-                .setConfig(RUNTIME_ENABLED, "whatever")
-                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-
-        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
-
-        database.shutdown();
+        database.close();
 
         assertTrue(TEST_RUNTIME_MODULES.isEmpty());
     }
 
     @Test
-    public void moduleShouldNotBeInitializedWhenRuntimeIsDisabled3() throws InterruptedException {
-        GraphDatabaseService database = builder()
-                .setConfig(RUNTIME_ENABLED, null)
-                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
+    public void moduleShouldNotBeInitializedWhenRuntimeIsDisabled() {
+        Neo4j database = builder().build();
 
         assertTrue(TEST_RUNTIME_MODULES.isEmpty());
 
-        database.shutdown();
+        database.close();
 
         assertTrue(TEST_RUNTIME_MODULES.isEmpty());
     }
 
     @Test
-    public void moduleShouldBeInitializedWhenRuntimeIsEnabled() throws InterruptedException {
-        GraphDatabaseService database = builder()
-                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
-                .newGraphDatabase();
+    public void moduleShouldBeInitializedWhenRuntimeIsEnabled() {
+        Neo4j database = builder()
+                .withGAConfig("com.graphaware.module.neo4j.test.1", TestModuleBootstrapper.class.getCanonicalName())
+                .withGAConfig("com.graphaware.module.neo4j.test.configKey", "configValue")
+                .build();
 
-        registerShutdownHook(database);
-
-        try (Transaction tx = database.beginTx()) {
-            database.createNode(); //tx just to kick off Runtime init
-            tx.success();
+        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+            tx.createNode(); //tx just to kick off Runtime init
+            tx.commit();
         }
 
         assertEquals(1, TEST_RUNTIME_MODULES.size());
-        assertTrue(TEST_RUNTIME_MODULES.get(0).isInitialized());
-        assertEquals("configValue", TEST_RUNTIME_MODULES.get(0).getConfig().get("configKey"));
+        assertEquals("configValue", TEST_RUNTIME_MODULES.get(0).getConfig().getString("configKey"));
 
-        database.shutdown();
-
-        assertFalse(TEST_RUNTIME_MODULES.get(0).isInitialized());
+        database.close();
     }
 
     @Test
     public void moduleShouldBeInitializedWhenRuntimeIsEnabledWithoutAnyTransactions() throws InterruptedException {
-        GraphDatabaseService database = builder()
-                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
+        Neo4j database = builder()
+                .withGAConfig("com.graphaware.module.neo4j.test.1", TestModuleBootstrapper.class.getCanonicalName())
+                .withGAConfig("com.graphaware.module.neo4j.test.configKey", "configValue")
+                .build();
 
         Thread.sleep(1000);
 
         assertEquals(1, TEST_RUNTIME_MODULES.size());
-        assertTrue(TEST_RUNTIME_MODULES.get(0).isInitialized());
-        assertEquals("configValue", TEST_RUNTIME_MODULES.get(0).getConfig().get("configKey"));
+        assertEquals("configValue", TEST_RUNTIME_MODULES.get(0).getConfig().getString("configKey"));
 
-        database.shutdown();
-
-        assertFalse(TEST_RUNTIME_MODULES.get(0).isInitialized());
+        database.close();
     }
 
     @Test
-    public void moduleShouldBeInitializedWhenModuleIsDisabled() throws InterruptedException {
-        GraphDatabaseService database = builder()
-                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, null)
-                .newGraphDatabase();
+    public void moduleShouldBeInitializedWhenAnotherModuleIsMisConfigured() {
+        Neo4j database = builder()
+                .withGAConfig("com.graphaware.module.neo4j.wrong1.enabled", "com.not.existent.Bootstrapper")
+                .withGAConfig("com.graphaware.module.neo4j.wrong2.2", "com.not.existent.Bootstrapper")
+                .withGAConfig("com.graphaware.module.neo4j.test.1", TestModuleBootstrapper.class.getCanonicalName())
+                .withGAConfig("com.graphaware.module.neo4j.test.configKey", "configValue")
+                .build();
 
-        registerShutdownHook(database);
-
-        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
-
-        database.shutdown();
-
-        assertTrue(TEST_RUNTIME_MODULES.isEmpty());
-    }
-
-    @Test
-    public void moduleShouldBeInitializedWhenAnotherModuleIsMisConfigured() throws InterruptedException {
-        GraphDatabaseService database = builder()
-                .setConfig("com.graphaware.module.wrong1.enabled", "com.not.existent.Bootstrapper")
-                .setConfig("com.graphaware.module.wrong2.2", "com.not.existent.Bootstrapper")
-                .setConfig(TestModuleBootstrapper.MODULE_ENABLED, TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .setConfig(TestModuleBootstrapper.MODULE_CONFIG, TestModuleBootstrapper.MODULE_CONFIG.getDefaultValue())
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-
-        try (Transaction tx = database.beginTx()) {
-            database.createNode();
-            tx.success();
+        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+            tx.createNode();
+            tx.commit();
         }
 
         assertEquals(1, TEST_RUNTIME_MODULES.size());
-        assertTrue(TEST_RUNTIME_MODULES.get(0).isInitialized());
-        assertEquals("configValue", TEST_RUNTIME_MODULES.get(0).getConfig().get("configKey"));
+        assertEquals("configValue", TEST_RUNTIME_MODULES.get(0).getConfig().getString("configKey"));
 
-        database.shutdown();
-
-        assertFalse(TEST_RUNTIME_MODULES.get(0).isInitialized());
+        database.close();
     }
 
     @Test
-    public void modulesShouldBeDelegatedToInCorrectOrder() throws InterruptedException {
-        GraphDatabaseService database = builder()
-                .setConfig("com.graphaware.module.test1.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .setConfig("com.graphaware.module.test3.3", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .setConfig("com.graphaware.module.test2.2", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .newGraphDatabase();
+    public void modulesShouldBeDelegatedToInCorrectOrder() {
+        Neo4j database = builder()
+                .withGAConfig("com.graphaware.module.neo4j.test1.1", TestModuleBootstrapper.class.getCanonicalName())
+                .withGAConfig("com.graphaware.module.neo4j.test3.3", TestModuleBootstrapper.class.getCanonicalName())
+                .withGAConfig("com.graphaware.module.neo4j.test2.2", TestModuleBootstrapper.class.getCanonicalName())
+                .build();
 
-        registerShutdownHook(database);
-
-        try (Transaction tx = database.beginTx()) {
-            database.createNode();
-            tx.success();
+        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+            tx.createNode();
+            tx.commit();
         }
 
         assertEquals(3, TEST_RUNTIME_MODULES.size());
@@ -210,22 +141,20 @@ public class BootstrapIntegrationTest {
         assertEquals("test2", TEST_RUNTIME_MODULES.get(1).getId());
         assertEquals("test3", TEST_RUNTIME_MODULES.get(2).getId());
 
-        database.shutdown();
+        database.close();
     }
 
     @Test
-    public void modulesShouldBeDelegatedToInRandomOrderWhenOrderClashes() throws InterruptedException {
-        GraphDatabaseService database = builder()
-                .setConfig("com.graphaware.module.test1.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .setConfig("com.graphaware.module.test3.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .setConfig("com.graphaware.module.test2.1", TestModuleBootstrapper.MODULE_ENABLED.getDefaultValue())
-                .newGraphDatabase();
+    public void modulesShouldBeDelegatedToInRandomOrderWhenOrderClashes() {
+        Neo4j database = builder()
+                .withGAConfig("com.graphaware.module.neo4j.test1.1", TestModuleBootstrapper.class.getCanonicalName())
+                .withGAConfig("com.graphaware.module.neo4j.test3.1", TestModuleBootstrapper.class.getCanonicalName())
+                .withGAConfig("com.graphaware.module.neo4j.test2.1", TestModuleBootstrapper.class.getCanonicalName())
+                .build();
 
-        registerShutdownHook(database);
-
-        try (Transaction tx = database.beginTx()) {
-            database.createNode();
-            tx.success();
+        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+            tx.createNode();
+            tx.commit();
         }
 
         assertEquals(3, TEST_RUNTIME_MODULES.size());
@@ -235,12 +164,30 @@ public class BootstrapIntegrationTest {
         assertTrue(remaining.remove(TEST_RUNTIME_MODULES.get(2).getId()));
         assertTrue(remaining.isEmpty());
 
-        database.shutdown();
+        database.close();
     }
 
-    private GraphDatabaseBuilder builder() {
-        return new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .setConfig(RUNTIME_ENABLED, "true");
+    @Test
+    public void moduleShouldBeAbleToWriteDataUponStart() {
+        Neo4j database = builder()
+                .withGAConfig("com.graphaware.module.neo4j.test.1", WritingModuleBootstrapper.class.getCanonicalName())
+                .build();
+
+        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+            Node node = tx.createNode();
+            node.setProperty("test", "real");
+            tx.commit();
+        }
+
+        try (Transaction tx = database.defaultDatabaseService().beginTx()) {
+            assertEquals(2, tx.getAllNodes().stream().count());
+        }
+
+        database.close();
     }
+
+    private GraphAwareNeo4jBuilder builder() {
+        return GraphAwareNeo4jBuilder.builder(Neo4jBuilders.newInProcessBuilder());
+    }
+
 }

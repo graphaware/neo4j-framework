@@ -16,14 +16,17 @@
 
 package com.graphaware.common.policy.inclusion.spel;
 
-import org.junit.After;
-import org.junit.Before;
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.graphdb.Transaction;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.getSingle;
 import static org.neo4j.graphdb.Direction.OUTGOING;
 import static org.neo4j.graphdb.Label.label;
@@ -32,56 +35,50 @@ import static org.neo4j.graphdb.RelationshipType.withName;
 /**
  * Abstract base class for {@link com.graphaware.common.policy.inclusion.spel.SpelInclusionPolicy} implementation unit tests.
  */
+@ExtendWith(Neo4jExtension.class)
 public abstract class SpelInclusionPolicyTest {
 
+    @InjectNeo4j
     protected GraphDatabaseService database;
 
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        registerShutdownHook(database);
-
-        database.execute("CREATE " +
+    @BeforeEach
+    protected void populate() {
+        database.executeTransactionally("CREATE " +
                 "(m:Employee {name:'Michal'})-[:WORKS_FOR {role:'Director', since:2013}]->(ga:Company {name:'GraphAware', form:'Ltd'})," +
                 "(v:Intern {name:'Vojta', age:25})-[:WORKS_FOR {since:2014, until:2014}]->(ga)," +
                 "(m)-[:LIVES_IN]->(l:Place {name:'London'})<-[:LIVES_IN]-(v)"
         );
     }
 
-    @After
-    public void tearDown() {
-        database.shutdown();
-    }
-
-    protected Node michal() {
+    protected Node michal(Transaction database) {
         return getSingle(database.findNodes(label("Employee"), "name", "Michal"));
     }
 
-    protected Node vojta() {
+    protected Node vojta(Transaction database) {
         return getSingle(database.findNodes(label("Intern"), "name", "Vojta"));
     }
 
-    protected Node graphaware() {
+    protected Node graphaware(Transaction database) {
         return getSingle(database.findNodes(label("Company"), "name", "GraphAware"));
     }
 
-    protected Node london() {
+    protected Node london(Transaction database) {
         return getSingle(database.findNodes(label("Place"), "name", "London"));
     }
 
-    protected Relationship michalWorksFor() {
-        return michal().getSingleRelationship(withName("WORKS_FOR"), OUTGOING);
+    protected Relationship michalWorksFor(Transaction database) {
+        return michal(database).getSingleRelationship(withName("WORKS_FOR"), OUTGOING);
     }
 
-    protected Relationship michalLivesIn() {
-        return michal().getSingleRelationship(withName("LIVES_IN"), OUTGOING);
+    protected Relationship michalLivesIn(Transaction database) {
+        return michal(database).getSingleRelationship(withName("LIVES_IN"), OUTGOING);
     }
 
-    protected Relationship vojtaWorksFor() {
-        return vojta().getSingleRelationship(withName("WORKS_FOR"), OUTGOING);
+    protected Relationship vojtaWorksFor(Transaction database) {
+        return vojta(database).getSingleRelationship(withName("WORKS_FOR"), OUTGOING);
     }
 
-    protected Relationship vojtaLivesIn() {
-        return vojta().getSingleRelationship(withName("LIVES_IN"), OUTGOING);
+    protected Relationship vojtaLivesIn(Transaction database) {
+        return vojta(database).getSingleRelationship(withName("LIVES_IN"), OUTGOING);
     }
 }

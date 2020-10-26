@@ -38,9 +38,9 @@ public abstract class CypherPopulator implements DatabasePopulator {
         for (String statementGroup : statementGroups) {
             try (Transaction tx = database.beginTx()) {
                 for (String statement : normalize(statementGroup).split(separator)) {
-                    database.execute(statement);
+                    database.executeTransactionally(statement);
                 }
-                tx.success();
+                tx.commit();
             }
         }
     }

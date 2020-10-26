@@ -16,39 +16,29 @@
 
 package com.graphaware.tx.executor.batch;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.tx.executor.NullItem;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.IterableUtils.countNodes;
-import static org.junit.Assert.assertEquals;
-import static org.neo4j.kernel.configuration.Settings.FALSE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit test for {@link com.graphaware.tx.executor.batch.NoInputBatchTransactionExecutor}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class NoInputBatchTransactionExecutorTest {
 
-    private GraphDatabaseService database;
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
-    }
+    @InjectNeo4j
+    protected GraphDatabaseService database;
 
     @Test
     public void whenBatchSizeDividesNumberOfStepsThenAllStepsShouldBeExecuted() {
@@ -57,7 +47,7 @@ public class NoInputBatchTransactionExecutorTest {
         batchExecutor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(6, countNodes(database));
+            assertEquals(6, countNodes(tx));
         }
     }
 
@@ -68,7 +58,7 @@ public class NoInputBatchTransactionExecutorTest {
         batchExecutor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(6, countNodes(database));
+            assertEquals(6, countNodes(tx));
         }
     }
 
@@ -79,7 +69,7 @@ public class NoInputBatchTransactionExecutorTest {
         batchExecutor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(6, countNodes(database));
+            assertEquals(6, countNodes(tx));
         }
     }
 
@@ -90,7 +80,7 @@ public class NoInputBatchTransactionExecutorTest {
         batchExecutor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(7, countNodes(database));  //1,2,3,7,8,9,10 (batch 4,5,6 is rolled back)
+            assertEquals(7, countNodes(tx));  //1,2,3,7,8,9,10 (batch 4,5,6 is rolled back)
         }
     }
 
@@ -101,7 +91,7 @@ public class NoInputBatchTransactionExecutorTest {
         batchExecutor.execute();
 
         try (Transaction tx = database.beginTx()) {
-            assertEquals(8, countNodes(database));  //1,2,3,5,6,7,9,10
+            assertEquals(8, countNodes(tx));  //1,2,3,5,6,7,9,10
         }
     }
 
@@ -114,12 +104,12 @@ public class NoInputBatchTransactionExecutorTest {
         }
 
         @Override
-        public void execute(GraphDatabaseService database, NullItem input, int batchNumber, int stepNumber) {
+        public void execute(Transaction tx, NullItem input, int batchNumber, int stepNumber) {
             steps++;
             if (steps % exceptionRate == 0) {
                 throw new RuntimeException("Testing exception");
             } else {
-                database.createNode();
+                tx.createNode();
             }
         }
     }

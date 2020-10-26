@@ -16,25 +16,21 @@
 
 package com.graphaware.test.unit;
 
+import com.graphaware.common.log.LoggerFactory;
 import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.common.policy.inclusion.PropertyInclusionPolicy;
 import com.graphaware.common.util.EntityUtils;
 import org.neo4j.graphdb.*;
-import org.neo4j.helpers.collection.Iterators;
-import org.neo4j.kernel.configuration.Settings;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.harness.Neo4jBuilders;
 import org.neo4j.logging.Log;
-import org.neo4j.test.TestGraphDatabaseFactory;
-import com.graphaware.common.log.LoggerFactory;
 
-import java.io.File;
 import java.util.*;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static com.graphaware.common.util.EntityUtils.*;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.helpers.collection.Iterables.count;
-import static org.neo4j.kernel.configuration.Settings.*;
+import static org.neo4j.internal.helpers.collection.Iterables.count;
 
 /**
  * A set of assertion methods useful for writing tests for Neo4j. Uses the {@link org.junit.Assert} class from JUnit
@@ -47,7 +43,11 @@ import static org.neo4j.kernel.configuration.Settings.*;
 public final class GraphUnit {
 
     private static final Log LOG = LoggerFactory.getLogger(GraphUnit.class);
-    private static final File PATH = new File("target/test-data/graphunit-db");
+    private static final Neo4j tempDb;
+
+    static {
+        tempDb = Neo4jBuilders.newInProcessBuilder().withDisabledServer().build();
+    }
 
     /**
      * Private constructor - this class is a utility and should not be instantiated.
@@ -95,14 +95,14 @@ public final class GraphUnit {
             return;
         }
 
-        GraphDatabaseService otherDatabase = createTemporaryDb();
+        Neo4j otherDatabase = createTemporaryDb();
 
-        otherDatabase.execute(sameGraphCypher);
+        otherDatabase.defaultDatabaseService().executeTransactionally(sameGraphCypher);
 
         try {
-            assertSameGraph(database, otherDatabase, inclusionPolicies);
+            assertSameGraph(database, otherDatabase.defaultDatabaseService(), inclusionPolicies);
         } finally {
-            otherDatabase.shutdown();
+            clearOtherDb();
         }
     }
 
@@ -131,10 +131,10 @@ public final class GraphUnit {
      * Properties values are converted to {@link String} before comparison, which means 123L (long) is equal to 123 (int),
      * but also "123" (String) is considered equal to 123 (int).
      *
-     * @param database        first graph, typically the one that has been created by some code that is being tested by this
-     *                        method.
-     * @param sameGraphCypher second graph expressed as a Cypher create statement, which communicates the desired state
-     *                        of the database (first parameter) iff the code that created it is correct.
+     * @param database          first graph, typically the one that has been created by some code that is being tested by this
+     *                          method.
+     * @param sameGraphCypher   second graph expressed as a Cypher create statement, which communicates the desired state
+     *                          of the database (first parameter) iff the code that created it is correct.
      * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships/properties in the comparisons.
      * @return boolean value true in case the graphs are the same, false otherwise
      */
@@ -147,14 +147,14 @@ public final class GraphUnit {
             return isEmpty(database, inclusionPolicies);
         }
 
-        GraphDatabaseService otherDatabase = createTemporaryDb();
+        Neo4j otherDatabase = createTemporaryDb();
 
-        otherDatabase.execute(sameGraphCypher);
+        otherDatabase.defaultDatabaseService().executeTransactionally(sameGraphCypher);
 
         try {
-            return areSameGraph(database, otherDatabase, inclusionPolicies);
+            return areSameGraph(database, otherDatabase.defaultDatabaseService(), inclusionPolicies);
         } finally {
-            otherDatabase.shutdown();
+            clearOtherDb();
         }
     }
 
@@ -212,14 +212,14 @@ public final class GraphUnit {
             throw new IllegalArgumentException("Cypher statement must not be null or empty");
         }
 
-        GraphDatabaseService otherDatabase = createTemporaryDb();
+        Neo4j otherDatabase = createTemporaryDb();
 
-        otherDatabase.execute(subgraphCypher);
+        otherDatabase.defaultDatabaseService().executeTransactionally(subgraphCypher);
 
         try {
-            assertSubgraph(database, otherDatabase, inclusionPolicies);
+            assertSubgraph(database, otherDatabase.defaultDatabaseService(), inclusionPolicies);
         } finally {
-            otherDatabase.shutdown();
+            clearOtherDb();
         }
     }
 
@@ -263,10 +263,10 @@ public final class GraphUnit {
      * This method is useful for testing that some portion of a graph has been created correctly without the need to
      * express the entire graph structure in Cypher.
      *
-     * @param database       first graph, typically the one that has been created by some code that is being tested by
-     *                       this method.
-     * @param subgraphCypher second graph expressed as a Cypher create statement, which communicates the desired state
-     *                       of the database (first parameter) iff the code that created it is correct.
+     * @param database          first graph, typically the one that has been created by some code that is being tested by
+     *                          this method.
+     * @param subgraphCypher    second graph expressed as a Cypher create statement, which communicates the desired state
+     *                          of the database (first parameter) iff the code that created it is correct.
      * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships/properties or not.
      * @return boolean value true in case the "cypher" graph is a subgraph of the "database" graph, false otherwise.
      */
@@ -279,14 +279,14 @@ public final class GraphUnit {
             throw new IllegalArgumentException("Cypher statement must not be null or empty");
         }
 
-        GraphDatabaseService otherDatabase = createTemporaryDb();
+        Neo4j otherDatabase = createTemporaryDb();
 
-        otherDatabase.execute(subgraphCypher);
+        otherDatabase.defaultDatabaseService().executeTransactionally(subgraphCypher);
 
         try {
-            return isSubgraph(database, otherDatabase, inclusionPolicies);
+            return isSubgraph(database, otherDatabase.defaultDatabaseService(), inclusionPolicies);
         } finally {
-            otherDatabase.shutdown();
+            clearOtherDb();
         }
     }
 
@@ -311,26 +311,26 @@ public final class GraphUnit {
         }
 
         try (Transaction tx = database.beginTx()) {
-            for (Node node : database.getAllNodes()) {
+            for (Node node : tx.getAllNodes()) {
                 if (inclusionPolicies.getNodeInclusionPolicy().include(node)) {
                     fail("The database is not empty, there are nodes");
                 }
             }
 
-            for (Relationship relationship : database.getAllRelationships()) {
+            for (Relationship relationship : tx.getAllRelationships()) {
                 if (inclusionPolicies.getRelationshipInclusionPolicy().include(relationship)) {
                     fail("The database is not empty, there are relationships");
                 }
             }
 
-            tx.success();
+            tx.commit();
         }
     }
 
     /**
      * Check that the database is empty.
      *
-     * @param database          to run the assertion against.
+     * @param database to run the assertion against.
      * @return boolean true if the database is empty, false otherwise.
      */
     public static boolean isEmpty(GraphDatabaseService database) {
@@ -349,67 +349,71 @@ public final class GraphUnit {
             throw new IllegalArgumentException("Database must not be null");
         }
 
-        for (Node node : database.getAllNodes()) {
-            if (inclusionPolicies.getNodeInclusionPolicy().include(node)) {
-                return false;
+        try (Transaction tx = database.beginTx()) {
+            for (Node node : tx.getAllNodes()) {
+                if (inclusionPolicies.getNodeInclusionPolicy().include(node)) {
+                    return false;
+                }
             }
-        }
 
-        for (Relationship relationship : database.getAllRelationships()) {
-            if (inclusionPolicies.getRelationshipInclusionPolicy().include(relationship)) {
-                return false;
+            for (Relationship relationship : tx.getAllRelationships()) {
+                if (inclusionPolicies.getRelationshipInclusionPolicy().include(relationship)) {
+                    return false;
+                }
             }
+
+            tx.commit();
         }
 
         return true;
     }
 
-	/**
-	 * Assert that the database is not empty.
-	 *
-	 * @param database to run the assertion against.
-	 */
-	public static void assertNotEmpty(GraphDatabaseService database) {
-		assertNotEmpty(database, InclusionPolicies.all());
-	}
+    /**
+     * Assert that the database is not empty.
+     *
+     * @param database to run the assertion against.
+     */
+    public static void assertNotEmpty(GraphDatabaseService database) {
+        assertNotEmpty(database, InclusionPolicies.all());
+    }
 
-	/**
-	 * Assert that the database is not empty.
-	 *
-	 * @param database to run the assertion against.
-	 * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships/properties or not in the assertion.
-	 */
-	public static void assertNotEmpty(GraphDatabaseService database, InclusionPolicies inclusionPolicies) {
-		if (database == null) {
-			throw new IllegalArgumentException("Database must not be null");
-		}
+    /**
+     * Assert that the database is not empty.
+     *
+     * @param database          to run the assertion against.
+     * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships/properties or not in the assertion.
+     */
+    public static void assertNotEmpty(GraphDatabaseService database, InclusionPolicies inclusionPolicies) {
+        if (database == null) {
+            throw new IllegalArgumentException("Database must not be null");
+        }
 
         try (Transaction tx = database.beginTx()) {
-            for (Node node : database.getAllNodes()) {
+            for (Node node : tx.getAllNodes()) {
                 if (inclusionPolicies.getNodeInclusionPolicy().include(node)) {
                     return;
                 }
             }
 
-            for (Relationship relationship : database.getAllRelationships()) {
+            for (Relationship relationship : tx.getAllRelationships()) {
                 if (inclusionPolicies.getRelationshipInclusionPolicy().include(relationship)) {
                     return;
                 }
             }
-            tx.success();
+            tx.commit();
         }
 
         fail(String.format("The database is empty with respect to inclusion policies: %s",
                 inclusionPolicies.toString()));
 
-	}
+    }
 
     /**
      * Clear the graph by deleting all nodes and relationships.
      *
      * @param database graph, typically the one that has been created by some code that is being tested.
      */
-    public static void clearGraph(GraphDatabaseService database) {
+    public static void clearGraph(Transaction database) {
         clearGraph(database, InclusionPolicies.all());
     }
 
@@ -420,7 +424,7 @@ public final class GraphUnit {
      * @param inclusionPolicies {@link InclusionPolicies} deciding whether to include nodes/relationships or not.
      *                          Note that {@link PropertyInclusionPolicy}s are ignored when clearing the graph.
      */
-    public static void clearGraph(GraphDatabaseService database, InclusionPolicies inclusionPolicies) {
+    public static void clearGraph(Transaction database, InclusionPolicies inclusionPolicies) {
         if (database == null) {
             throw new IllegalArgumentException("Database must not be null");
         }
@@ -461,19 +465,19 @@ public final class GraphUnit {
 
         try (Transaction tx = database.beginTx()) {
             System.out.println("Nodes:");
-            for (Node node : database.getAllNodes()) {
+            for (Node node : tx.getAllNodes()) {
                 if (isNodeIncluded(node, inclusionPolicies)) {
                     System.out.println(EntityUtils.nodeToString(node));
                 }
             }
 
             System.out.println("Relationships:");
-            for (Relationship rel : database.getAllRelationships()) {
+            for (Relationship rel : tx.getAllRelationships()) {
                 if (isRelationshipIncluded(rel, inclusionPolicies)) {
                     System.out.println(EntityUtils.relationshipToString(rel));
                 }
             }
-            tx.success();
+            tx.commit();
         }
     }
 
@@ -528,11 +532,11 @@ public final class GraphUnit {
     private static void assertSameGraph(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies InclusionPolicies) {
         try (Transaction tx = database.beginTx()) {
             try (Transaction tx2 = otherDatabase.beginTx()) {
-                doAssertSubgraph(database, otherDatabase, InclusionPolicies, "existing database");
-                doAssertSubgraph(otherDatabase, database, InclusionPolicies, "Cypher-created database");
-                tx2.failure();
+                doAssertSubgraph(tx, tx2, InclusionPolicies, "existing database");
+                doAssertSubgraph(tx2, tx, InclusionPolicies, "Cypher-created database");
+                tx2.rollback();
             }
-            tx.failure();
+            tx.rollback();
         }
     }
 
@@ -540,13 +544,13 @@ public final class GraphUnit {
         try (Transaction tx = database.beginTx()) {
             try (Transaction tx2 = otherDatabase.beginTx()) {
                 try {
-                    doAssertSubgraph(database, otherDatabase, InclusionPolicies, "existing database");
-                    doAssertSubgraph(otherDatabase, database, InclusionPolicies, "Cypher-created database");
+                    doAssertSubgraph(tx, tx2, InclusionPolicies, "existing database");
+                    doAssertSubgraph(tx2, tx, InclusionPolicies, "Cypher-created database");
                 } catch (AssertionError error) {
                     return false;
-                }finally {
-                    tx2.success();
-                    tx.success();
+                } finally {
+                    tx2.commit();
+                    tx.commit();
                 }
             }
         }
@@ -557,12 +561,12 @@ public final class GraphUnit {
         try (Transaction tx = database.beginTx()) {
             try (Transaction tx2 = otherDatabase.beginTx()) {
                 try {
-                    doAssertSubgraph(database, otherDatabase, InclusionPolicies, "existing database");
+                    doAssertSubgraph(tx, tx2, InclusionPolicies, "existing database");
                 } catch (AssertionError error) {
                     return false;
                 } finally {
-                    tx2.success();
-                    tx.success();
+                    tx2.commit();
+                    tx.commit();
                 }
             }
         }
@@ -572,15 +576,15 @@ public final class GraphUnit {
     private static void assertSubgraph(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies InclusionPolicies) {
         try (Transaction tx = database.beginTx()) {
             try (Transaction tx2 = otherDatabase.beginTx()) {
-                doAssertSubgraph(database, otherDatabase, InclusionPolicies, "existing database");
-                tx2.failure();
+                doAssertSubgraph(tx, tx2, InclusionPolicies, "existing database");
+                tx2.rollback();
             }
-            tx.failure();
+            tx.rollback();
         }
     }
 
 
-    private static void doAssertSubgraph(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies inclusionPolicies, String firstDatabaseName) {
+    private static void doAssertSubgraph(Transaction database, Transaction otherDatabase, InclusionPolicies inclusionPolicies, String firstDatabaseName) {
         Map<Long, Long[]> sameNodesMap = buildSameNodesMap(database, otherDatabase, inclusionPolicies, firstDatabaseName);
         Set<Map<Long, Long>> nodeMappings = buildNodeMappingPermutations(sameNodesMap, otherDatabase);
 
@@ -598,7 +602,7 @@ public final class GraphUnit {
         fail("There is no corresponding relationship mapping for any of the possible node mappings");
     }
 
-    private static Map<Long, Long[]> buildSameNodesMap(GraphDatabaseService database, GraphDatabaseService otherDatabase, InclusionPolicies inclusionPolicies, String firstDatabaseName) {
+    private static Map<Long, Long[]> buildSameNodesMap(Transaction database, Transaction otherDatabase, InclusionPolicies inclusionPolicies, String firstDatabaseName) {
         Map<Long, Long[]> sameNodesMap = new HashMap<>();  //map of nodeID and IDs of nodes that match
 
         for (Node node : otherDatabase.getAllNodes()) {
@@ -622,7 +626,7 @@ public final class GraphUnit {
         return sameNodesMap;
     }
 
-    private static Set<Map<Long, Long>> buildNodeMappingPermutations(Map<Long, Long[]> sameNodesMap, GraphDatabaseService otherDatabase) {
+    private static Set<Map<Long, Long>> buildNodeMappingPermutations(Map<Long, Long[]> sameNodesMap, Transaction otherDatabase) {
         Set<Map<Long, Long>> result = new HashSet<>();
         result.add(new HashMap<Long, Long>());
 
@@ -652,7 +656,7 @@ public final class GraphUnit {
         return result;
     }
 
-    private static boolean relationshipsMappingExists(GraphDatabaseService database, GraphDatabaseService otherDatabase, Map<Long, Long> mapping, InclusionPolicies inclusionPolicies) {
+    private static boolean relationshipsMappingExists(Transaction database, Transaction otherDatabase, Map<Long, Long> mapping, InclusionPolicies inclusionPolicies) {
         LOG.debug("Attempting a node mapping...");
 
         Set<Long> usedRelationships = new HashSet<>();
@@ -667,7 +671,7 @@ public final class GraphUnit {
         return true;
     }
 
-    private static void assertRelationshipsMappingExistsForSingleNodeMapping(GraphDatabaseService database, GraphDatabaseService otherDatabase, Map<Long, Long> mapping, InclusionPolicies inclusionPolicies, String firstDatabaseName) {
+    private static void assertRelationshipsMappingExistsForSingleNodeMapping(Transaction database, Transaction otherDatabase, Map<Long, Long> mapping, InclusionPolicies inclusionPolicies, String firstDatabaseName) {
         Set<Long> usedRelationships = new HashSet<>();
         for (Relationship relationship : otherDatabase.getAllRelationships()) {
             if (!relationshipMappingExists(database, relationship, mapping, usedRelationships, inclusionPolicies)) {
@@ -676,7 +680,7 @@ public final class GraphUnit {
         }
     }
 
-    private static boolean relationshipMappingExists(GraphDatabaseService database, Relationship relationship, Map<Long, Long> nodeMapping, Set<Long> usedRelationships, InclusionPolicies inclusionPolicies) {
+    private static boolean relationshipMappingExists(Transaction database, Relationship relationship, Map<Long, Long> nodeMapping, Set<Long> usedRelationships, InclusionPolicies inclusionPolicies) {
         if (!isRelationshipIncluded(relationship, inclusionPolicies)) {
             return true;
         }
@@ -693,7 +697,7 @@ public final class GraphUnit {
         return false;
     }
 
-    private static Iterable<Node> findSameNodes(GraphDatabaseService database, Node node, InclusionPolicies inclusionPolicies) {
+    private static Iterable<Node> findSameNodes(Transaction database, Node node, InclusionPolicies inclusionPolicies) {
         Iterator<Label> labels = node.getLabels().iterator();
         if (labels.hasNext()) {
             return findSameNodesByLabel(database, node, labels.next(), inclusionPolicies);
@@ -702,10 +706,15 @@ public final class GraphUnit {
         return findSameNodesWithoutLabel(database, node, inclusionPolicies);
     }
 
-    private static Iterable<Node> findSameNodesByLabel(GraphDatabaseService database, Node node, Label label, InclusionPolicies inclusionPolicies) {
+    private static Iterable<Node> findSameNodesByLabel(Transaction database, Node node, Label label, InclusionPolicies inclusionPolicies) {
         Set<Node> result = new HashSet<>();
 
-        for (Node candidate : Iterators.asResourceIterable(database.findNodes(label))) {
+        for (Node candidate : new Iterable<Node>() {
+            @Override
+            public Iterator<Node> iterator() {
+                return database.findNodes(label);
+            }
+        }) {
             if (isNodeIncluded(candidate, inclusionPolicies)) {
                 if (areSame(node, candidate, inclusionPolicies)) {
                     result.add(candidate);
@@ -716,7 +725,7 @@ public final class GraphUnit {
         return result;
     }
 
-    private static Iterable<Node> findSameNodesWithoutLabel(GraphDatabaseService database, Node node, InclusionPolicies inclusionPolicies) {
+    private static Iterable<Node> findSameNodesWithoutLabel(Transaction database, Node node, InclusionPolicies inclusionPolicies) {
         Set<Node> result = new HashSet<>();
 
         for (Node candidate : database.getAllNodes()) {
@@ -789,14 +798,11 @@ public final class GraphUnit {
         throw new IllegalStateException("Entity is not a Node or Relationship!");
     }
 
-    private static GraphDatabaseService createTemporaryDb() {
-        GraphDatabaseService result = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder(PATH)
-                .setConfig("online_backup_enabled", FALSE)
-                .newGraphDatabase();
+    private static Neo4j createTemporaryDb() {
+        return tempDb;
+    }
 
-        registerShutdownHook(result);
-
-        return result;
+    private static void clearOtherDb() {
+        tempDb.defaultDatabaseService().executeTransactionally("MATCH (n) DETACH DELETE (n)");
     }
 }

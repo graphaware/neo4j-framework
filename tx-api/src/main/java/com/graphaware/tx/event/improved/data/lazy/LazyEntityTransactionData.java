@@ -417,7 +417,7 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
                 continue;
             }
 
-            if (propertyEntry.previouslyCommitedValue() == null) {
+            if (propertyEntry.previouslyCommittedValue() == null) {
                 if (!createdProperties.containsKey(entity.getId())) {
                     createdProperties.put(entity.getId(), new HashMap<String, Object>());
                 }
@@ -426,7 +426,7 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
                 if (!changedProperties.containsKey(entity.getId())) {
                     changedProperties.put(entity.getId(), new HashMap<String, Change<Object>>());
                 }
-                changedProperties.get(entity.getId()).put(propertyEntry.key(), new Change<>(propertyEntry.previouslyCommitedValue(), propertyEntry.value()));
+                changedProperties.get(entity.getId()).put(propertyEntry.key(), new Change<>(propertyEntry.previouslyCommittedValue(), propertyEntry.value()));
             }
         }
 
@@ -437,7 +437,7 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
                 if (!deletedEntityProperties.containsKey(entity.getId())) {
                     deletedEntityProperties.put(entity.getId(), new HashMap<String, Object>());
                 }
-                deletedEntityProperties.get(entity.getId()).put(propertyEntry.key(), propertyEntry.previouslyCommitedValue());
+                deletedEntityProperties.get(entity.getId()).put(propertyEntry.key(), propertyEntry.previouslyCommittedValue());
                 continue;
             }
 
@@ -451,11 +451,11 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
                 deletedProperties.put(entity.getId(), new HashMap<String, Object>());
             }
 
-            deletedProperties.get(entity.getId()).put(propertyEntry.key(), propertyEntry.previouslyCommitedValue());
+            deletedProperties.get(entity.getId()).put(propertyEntry.key(), propertyEntry.previouslyCommittedValue());
         }
     }
 
     private boolean hasNotActuallyChanged(PropertyEntry<T> propertyEntry) {
-        return propertyEntry.previouslyCommitedValue() != null && propertyEntry.previouslyCommitedValue().equals(propertyEntry.value());
+        return propertyEntry.previouslyCommittedValue() != null && propertyEntry.previouslyCommittedValue().equals(propertyEntry.value());
     }
 }

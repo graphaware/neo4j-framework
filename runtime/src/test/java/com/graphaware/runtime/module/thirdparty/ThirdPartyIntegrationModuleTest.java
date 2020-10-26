@@ -16,79 +16,73 @@
 
 package com.graphaware.runtime.module.thirdparty;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.common.representation.GraphDetachedNode;
 import com.graphaware.common.representation.GraphDetachedRelationship;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.writer.thirdparty.*;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.helpers.collection.MapUtil;
-
-import org.neo4j.test.TestGraphDatabaseFactory;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.neo4j.graphdb.*;
+import org.neo4j.harness.Neo4j;
+import org.neo4j.internal.helpers.collection.MapUtil;
 
 import java.util.Collection;
 import java.util.Collections;
 
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.neo4j.kernel.configuration.Settings.FALSE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(Neo4jExtension.class)
 public class ThirdPartyIntegrationModuleTest {
 
+    @InjectNeo4j
+    private Neo4j neo4j;
+
+    @InjectNeo4j
     private GraphDatabaseService database;
-
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .newGraphDatabase();
-
-        registerShutdownHook(database);
-    }
-
-    @After
-    public void tearDown() {
-        database.shutdown();
-    }
 
     @Test
     public void modificationsShouldBeCorrectlyBuilt() {
         TestThirdPartyModule module = new TestThirdPartyModule("test");
 
-        database.execute("CREATE (p:Person {name:'Michal', age:30})-[:WORKS_FOR {since:2013, role:'MD'}]->(c:Company {name:'GraphAware', est: 2013})");
-        database.execute("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Adam'})-[:WORKS_FOR {since:2014}]->(ga)");
+        database.executeTransactionally("CREATE (p:Person {name:'Michal', age:30})-[:WORKS_FOR {since:2013, role:'MD'}]->(c:Company {name:'GraphAware', est: 2013})");
+        database.executeTransactionally("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Adam'})-[:WORKS_FOR {since:2014}]->(ga)");
 
-        long danielaId, michalId, adamId, gaId;
+        long danielaId, michalId, adamId, gaId, dWorksForId, mWorksForId, aWorksForId;
         try (Transaction tx = database.beginTx()) {
-            michalId = database.findNode(Label.label("Person"), "name", "Michal").getId();
-            adamId = database.findNode(Label.label("Person"), "name", "Adam").getId();
-            gaId = database.findNode(Label.label("Company"), "name", "GraphAware").getId();
+            michalId = tx.findNode(Label.label("Person"), "name", "Michal").getId();
+            Node adam = tx.findNode(Label.label("Person"), "name", "Adam");
+            adamId = adam.getId();
+            gaId = tx.findNode(Label.label("Company"), "name", "GraphAware").getId();
+            aWorksForId = adam.getSingleRelationship(RelationshipType.withName("WORKS_FOR"), Direction.OUTGOING).getId();
 
-            tx.success();
+            tx.commit();
         }
 
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(database);
+        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), database);
         runtime.registerModule(module);
         runtime.start();
-        runtime.waitUntilStarted();
 
         try (Transaction tx = database.beginTx()) {
-            database.execute("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Daniela'})-[:WORKS_FOR]->(ga)");
-            database.execute("MATCH (p:Person {name:'Michal'}) SET p.age=31");
-            database.execute("MATCH (p:Person {name:'Adam'})-[r]-() DELETE p,r");
-            database.execute("MATCH (p:Person {name:'Michal'})-[r:WORKS_FOR]->() REMOVE r.role");
-            tx.success();
+            tx.execute("MATCH (ga:Company {name:'GraphAware'}) CREATE (p:Person {name:'Daniela'})-[:WORKS_FOR]->(ga)");
+            tx.execute("MATCH (p:Person {name:'Michal'}) SET p.age=31");
+            tx.execute("MATCH (p:Person {name:'Adam'})-[r]-() DELETE p,r");
+            tx.execute("MATCH (p:Person {name:'Michal'})-[r:WORKS_FOR]->() REMOVE r.role");
+            tx.commit();
         }
 
         try (Transaction tx = database.beginTx()) {
-            danielaId = database.findNode(Label.label("Person"), "name", "Daniela").getId();
-            tx.success();
+            Node daniela = tx.findNode(Label.label("Person"), "name", "Daniela");
+            dWorksForId = daniela.getSingleRelationship(RelationshipType.withName("WORKS_FOR"), Direction.OUTGOING).getId();
+            danielaId = daniela.getId();
+
+            Node michal = tx.findNode(Label.label("Person"), "name", "Michal");
+            mWorksForId = michal.getSingleRelationship(RelationshipType.withName("WORKS_FOR"), Direction.OUTGOING).getId();
+
+            tx.commit();
         }
 
         Collection<WriteOperation<?>> writeOperations = module.getWriteOperations();
@@ -105,15 +99,15 @@ public class ThirdPartyIntegrationModuleTest {
                 new GraphDetachedNode(adamId, new String[]{"Person"}, MapUtil.map("name", "Adam")))));
 
         assertTrue(writeOperations.contains(new RelationshipCreated<>(
-                new GraphDetachedRelationship(1L, danielaId, gaId, "WORKS_FOR", Collections.<String, Object>emptyMap())
+                new GraphDetachedRelationship(dWorksForId, danielaId, gaId, "WORKS_FOR", Collections.<String, Object>emptyMap())
         )));
 
         assertTrue(writeOperations.contains(new RelationshipUpdated<>(
-                new GraphDetachedRelationship(0L, michalId, gaId, "WORKS_FOR", MapUtil.map("since", 2013L, "role", "MD")),
-                new GraphDetachedRelationship(0L, michalId, gaId, "WORKS_FOR", MapUtil.map("since", 2013L)))));
+                new GraphDetachedRelationship(mWorksForId, michalId, gaId, "WORKS_FOR", MapUtil.map("since", 2013L, "role", "MD")),
+                new GraphDetachedRelationship(mWorksForId, michalId, gaId, "WORKS_FOR", MapUtil.map("since", 2013L)))));
 
         assertTrue(writeOperations.contains(new RelationshipDeleted<>(
-                new GraphDetachedRelationship(20L, adamId, gaId, "WORKS_FOR", MapUtil.map("since", 2014L))
+                new GraphDetachedRelationship(aWorksForId, adamId, gaId, "WORKS_FOR", MapUtil.map("since", 2014L))
         )));
 
         for (WriteOperation<?> operation : writeOperations) {
@@ -123,6 +117,6 @@ public class ThirdPartyIntegrationModuleTest {
             }
         }
 
-        database.shutdown();
+        runtime.stop();
     }
 }

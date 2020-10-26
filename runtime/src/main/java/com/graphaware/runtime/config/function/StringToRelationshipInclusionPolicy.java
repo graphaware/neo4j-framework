@@ -27,7 +27,7 @@ import com.graphaware.runtime.policy.all.IncludeAllBusinessRelationships;
  */
 public final class StringToRelationshipInclusionPolicy extends StringToInclusionPolicy<RelationshipInclusionPolicy> {
 
-    private static StringToRelationshipInclusionPolicy INSTANCE = new StringToRelationshipInclusionPolicy();
+    private static final StringToRelationshipInclusionPolicy INSTANCE = new StringToRelationshipInclusionPolicy();
 
     public static StringToRelationshipInclusionPolicy getInstance() {
         return INSTANCE;

@@ -16,16 +16,16 @@
 
 package com.graphaware.runtime.module;
 
-import com.graphaware.runtime.config.NullTxDrivenModuleConfiguration;
-import com.graphaware.runtime.config.TxDrivenModuleConfiguration;
+import com.graphaware.runtime.config.NullModuleConfiguration;
+import com.graphaware.runtime.config.ModuleConfiguration;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 
 import java.util.Map;
 
 /**
- * {@link com.graphaware.runtime.module.TxDrivenModule} that can tell whether it has been initialized for testing.
+ * {@link Module} that can tell whether it has been initialized for testing.
  */
-public class BeforeAfterCommitModule extends BaseTxDrivenModule<String> {
+public class BeforeAfterCommitModule extends BaseModule<String> {
 
     private final Map<String, String> config;
     private boolean afterCommitCalled = false;
@@ -37,8 +37,8 @@ public class BeforeAfterCommitModule extends BaseTxDrivenModule<String> {
     }
 
     @Override
-    public TxDrivenModuleConfiguration getConfiguration() {
-        return NullTxDrivenModuleConfiguration.getInstance();
+    public ModuleConfiguration getConfiguration() {
+        return NullModuleConfiguration.getInstance();
     }
 
     public Map<String, String> getConfig() {

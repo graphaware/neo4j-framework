@@ -20,17 +20,15 @@ import com.graphaware.common.policy.inclusion.NodeInclusionPolicy;
 import com.graphaware.common.policy.inclusion.none.IncludeNoNodes;
 import com.graphaware.common.policy.inclusion.spel.SpelNodeInclusionPolicy;
 import com.graphaware.runtime.policy.all.IncludeAllBusinessNodes;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static com.graphaware.common.policy.inclusion.composite.CompositeNodeInclusionPolicy.of;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for {@link StringToNodeInclusionPolicy}.
  */
 public class StringToNodeInclusionPolicyTest {
-
 
     @Test
     public void shouldConstructPolicyFromAllNodesKeywords() {
@@ -88,8 +86,10 @@ public class StringToNodeInclusionPolicyTest {
         assertEquals(of(IncludeAllBusinessNodes.getInstance(), new SpelNodeInclusionPolicy("isType('R1')")), policy);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void uninstantiableClassCausesException() {
-        StringToNodeInclusionPolicy.getInstance().apply("com.graphaware.runtime.config.function.WrongNodeInclusionPolicy");
+        assertThrows(RuntimeException.class, () -> {
+            StringToNodeInclusionPolicy.getInstance().apply("com.graphaware.runtime.config.function.WrongNodeInclusionPolicy");
+        });
     }
 }

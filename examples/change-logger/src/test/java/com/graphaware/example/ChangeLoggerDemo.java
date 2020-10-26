@@ -16,43 +16,47 @@
 
 package com.graphaware.example;
 
+import com.graphaware.common.junit.InjectNeo4j;
+import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.tx.executor.single.SimpleTransactionExecutor;
 import com.graphaware.tx.executor.single.VoidReturningCallback;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
+import org.neo4j.harness.Neo4j;
 
-import org.neo4j.test.TestGraphDatabaseFactory;
-
-import static com.graphaware.common.util.DatabaseUtils.registerShutdownHook;
 import static org.neo4j.graphdb.Direction.OUTGOING;
-import static org.neo4j.graphdb.RelationshipType.withName;
 import static org.neo4j.graphdb.Label.label;
+import static org.neo4j.graphdb.RelationshipType.withName;
 
 
 /**
  * Demo of {@link ChangeLogger}.
  */
+@ExtendWith(Neo4jExtension.class)
 public class ChangeLoggerDemo {
 
+    @InjectNeo4j
+    private Neo4j neo4j;
+    @InjectNeo4j
     private GraphDatabaseService database;
 
-    @Before
-    public void setUp() {
-        database = new TestGraphDatabaseFactory()
-                .newImpermanentDatabaseBuilder()
-                .newGraphDatabase();
+    private ChangeLogger listener;
 
-        registerShutdownHook(database);
-        database.registerTransactionEventHandler(new ChangeLogger());
+    @BeforeEach
+    public void setUp() throws Exception {
+        listener = new ChangeLogger();
+        neo4j.databaseManagementService().registerTransactionEventListener(database.databaseName(), listener);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
-        database.shutdown();
+        neo4j.databaseManagementService().unregisterTransactionEventListener(database.databaseName(), listener);
     }
 
     @Test
@@ -66,7 +70,7 @@ public class ChangeLoggerDemo {
         //create nodes
         executor.executeInTransaction(new VoidReturningCallback() {
             @Override
-            protected void doInTx(GraphDatabaseService database) {
+            protected void doInTx(Transaction database) {
                 database.createNode(label("SomeLabel1"));
 
                 Node node1 = database.createNode(label("SomeLabel2"));
@@ -83,9 +87,9 @@ public class ChangeLoggerDemo {
         //create relationship
         executor.executeInTransaction(new VoidReturningCallback() {
             @Override
-            protected void doInTx(GraphDatabaseService database) {
-                Node one = database.getNodeById(1);
-                Node two = database.getNodeById(2);
+            protected void doInTx(Transaction tx) {
+                Node one = tx.getNodeById(1);
+                Node two = tx.getNodeById(2);
 
                 Relationship relationship = one.createRelationshipTo(two, withName("TEST"));
                 relationship.setProperty("level", 2);
@@ -97,21 +101,21 @@ public class ChangeLoggerDemo {
         //change and delete nodes
         executor.executeInTransaction(new VoidReturningCallback() {
             @Override
-            protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(3).delete();
-                database.getNodeById(1).setProperty("name", "New One");
-                database.getNodeById(1).setProperty("numbers", new int[]{1, 2, 3});
-                database.getNodeById(2).addLabel(label("NewLabel"));
+            protected void doInTx(Transaction tx) {
+                tx.getNodeById(3).delete();
+                tx.getNodeById(1).setProperty("name", "New One");
+                tx.getNodeById(1).setProperty("numbers", new int[]{1, 2, 3});
+                tx.getNodeById(2).addLabel(label("NewLabel"));
             }
         });
 
         //change and delete relationships
         executor.executeInTransaction(new VoidReturningCallback() {
             @Override
-            protected void doInTx(GraphDatabaseService database) {
-                database.getNodeById(2).getSingleRelationship(withName("TEST"), OUTGOING).delete();
+            protected void doInTx(Transaction tx) {
+                tx.getNodeById(2).getSingleRelationship(withName("TEST"), OUTGOING).delete();
 
-                database.getNodeById(1).getSingleRelationship(withName("TEST"), OUTGOING).setProperty("level", 3);
+                tx.getNodeById(1).getSingleRelationship(withName("TEST"), OUTGOING).setProperty("level", 3);
             }
         });
     }

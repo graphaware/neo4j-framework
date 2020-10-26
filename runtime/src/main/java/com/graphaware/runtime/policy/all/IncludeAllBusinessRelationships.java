@@ -17,21 +17,15 @@
 package com.graphaware.runtime.policy.all;
 
 import com.graphaware.common.policy.inclusion.RelationshipInclusionPolicy;
-import com.graphaware.common.serialize.Serializer;
-import com.graphaware.common.serialize.SingletonSerializer;
-import com.graphaware.runtime.config.RuntimeConfiguration;
-import org.neo4j.graphdb.GraphDatabaseService;
+import com.graphaware.runtime.GraphAwareRuntime;
 import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.Transaction;
 
 /**
  * Policy that includes all business / application level relationships, but exclude any
  * {@link com.graphaware.runtime.GraphAwareRuntime} internal relationships. Singleton.
  */
 public final class IncludeAllBusinessRelationships extends RelationshipInclusionPolicy.Adapter {
-
-    static {
-        Serializer.register(IncludeAllBusinessRelationships.class, new SingletonSerializer());
-    }
 
     private static final IncludeAllBusinessRelationships INSTANCE = new IncludeAllBusinessRelationships();
 
@@ -47,14 +41,14 @@ public final class IncludeAllBusinessRelationships extends RelationshipInclusion
      */
     @Override
     public boolean include(Relationship relationship) {
-        return !relationship.getType().name().startsWith(RuntimeConfiguration.GA_PREFIX);
+        return !relationship.getType().name().startsWith(GraphAwareRuntime.GA_PREFIX);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Iterable<Relationship> doGetAll(GraphDatabaseService database) {
-        return database.getAllRelationships();
+    protected Iterable<Relationship> doGetAll(Transaction tx) {
+        return tx.getAllRelationships();
     }
 }

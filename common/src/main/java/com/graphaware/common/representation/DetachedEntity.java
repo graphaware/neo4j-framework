@@ -126,27 +126,27 @@ public abstract class DetachedEntity<ID, T extends Entity> implements Serializab
 
     /**
      * Produce a {@link Entity} from this representation. This means either fetch the entity from the
-     * given database (iff id is set), or create it.
+     * given tx (iff id is set), or create it.
      *
-     * @param database to create/fetch entity in.
+     * @param tx to create/fetch entity in.
      * @return entity.
      */
-    public T produceEntity(GraphDatabaseService database) {
+    public T produceEntity(Transaction tx) {
         T result;
 
-        try (Transaction tx = database.beginTx()) {
+        //try (Transaction tx = tx.beginTx()) {
 
             if (getGraphId() == NEW) {
                 checkCanCreate();
-                result = create(database);
+                result = create(tx);
                 populate(result);
             } else {
                 checkCanFetch();
-                result = fetch(database);
+                result = fetch(tx);
             }
 
-            tx.success();
-        }
+         //   tx.commit();
+      //  }
 
         return result;
     }
@@ -154,18 +154,18 @@ public abstract class DetachedEntity<ID, T extends Entity> implements Serializab
     /**
      * Create a new entity from this representation in the given database.
      *
-     * @param database to create the entity in.
+     * @param tx to create the entity in.
      * @return entity.
      */
-    protected abstract T create(GraphDatabaseService database);
+    protected abstract T create(Transaction tx);
 
     /**
      * Fetch a entity from the given database.
      *
-     * @param database to fetch in.
+     * @param tx to fetch in.
      * @return entity.
      */
-    protected abstract T fetch(GraphDatabaseService database);
+    protected abstract T fetch(Transaction tx);
 
     /**
      * Populate this instance of a entity representation with data from the given {@link Entity}.

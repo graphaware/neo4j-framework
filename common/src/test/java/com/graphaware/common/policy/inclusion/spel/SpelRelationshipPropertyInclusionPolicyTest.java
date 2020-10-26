@@ -17,11 +17,12 @@
 package com.graphaware.common.policy.inclusion.spel;
 
 import com.graphaware.common.policy.inclusion.RelationshipPropertyInclusionPolicy;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.neo4j.graphdb.Transaction;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 /**
  * Unit test for {@link com.graphaware.common.policy.inclusion.spel.SpelRelationshipPropertyInclusionPolicy}.
@@ -34,17 +35,17 @@ public class SpelRelationshipPropertyInclusionPolicyTest extends SpelInclusionPo
         RelationshipPropertyInclusionPolicy policy2 = new SpelRelationshipPropertyInclusionPolicy("relationship.isType('WORKS_FOR')");
 
         try (Transaction tx = database.beginTx()) {
-            assertFalse(policy1.include("since", vojtaWorksFor()));
-            assertFalse(policy1.include("since", michalWorksFor()));
-            assertTrue(policy1.include("until", michalWorksFor()));
-            assertTrue(policy1.include("until", vojtaWorksFor()));
+            assertFalse(policy1.include("since", vojtaWorksFor(tx)));
+            assertFalse(policy1.include("since", michalWorksFor(tx)));
+            assertTrue(policy1.include("until", michalWorksFor(tx)));
+            assertTrue(policy1.include("until", vojtaWorksFor(tx)));
 
-            assertTrue(policy2.include("since", michalWorksFor()));
-            assertFalse(policy2.include("since", michalLivesIn()));
-            assertTrue(policy2.include("since", vojtaWorksFor()));
-            assertFalse(policy2.include("since", vojtaLivesIn()));
+            assertTrue(policy2.include("since", michalWorksFor(tx)));
+            assertFalse(policy2.include("since", michalLivesIn(tx)));
+            assertTrue(policy2.include("since", vojtaWorksFor(tx)));
+            assertFalse(policy2.include("since", vojtaLivesIn(tx)));
 
-            tx.success();
+            tx.commit();
         }
     }
 }
