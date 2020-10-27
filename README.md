@@ -4,66 +4,51 @@ GraphAware Neo4j Framework
 ==========================
 
 [![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework) | <a href="http://graphaware.com/downloads/" target="_blank">Downloads</a> |
-<a href="http://graphaware.com/site/framework/latest/apidocs/" target="_blank">Javadoc</a>
 
-GraphAware Framework speeds up development with <a href="http://neo4j.org" target="_blank">Neo4j</a> by providing a
-platform for building useful transaction-driven behaviour.
-
-See the <a href="http://graphaware.com/neo4j/2014/05/28/graph-aware-neo4j-framework.html" target="_blank">announcement on our blog</a>.
+GraphAware Framework provides a platform for building custom transaction-driven behaviour into <a href="http://neo4j.org" target="_blank">Neo4j</a>.
 
 ## Community vs Enterprise
 
-This open-source (GPL) version of the GraphAware Framework is compatible with Neo4j Community Edition (GPL) only. 
-It *will not work* with Neo4j Enterprise Edition, which is a proprietary and commercial software product of Neo4j, Inc..
+This open-source (GPLv3) version of the GraphAware Framework is compatible with Neo4j Community Edition only. 
+It *will not work* with Neo4j Enterprise Edition, which is a proprietary and commercial software product of Neo4j, Inc.
 
 GraphAware offers a *paid* Enterprise version of the GraphAware Framework to licensed users of Neo4j Enterprise Edition.
 Please [get in touch](mailto:info@graphaware.com) to receive access.
 
-## Features Overview
+## Versioning
 
-On a high level, the key piece of functionality is the [GraphAware Runtime](runtime). It is a runtime environment 
-for both embedded and server deployments, which allows the use of pre-built as well as custom modules called [GraphAware Runtime Modules](runtime). These
-modules typically extend the core functionality of the database by transparently enriching/modifying/preventing ongoing transactions in real-time.
+The Framework version number has two parts. The first three numbers indicate compatibility with a Neo4j version. The last number 
+is the version of the Framework. For example, version 4.0.8.58 is version 58 of the Framework compatible with Neo4j 4.0.8.
+**Please note that we will not address issues related to the usage of incompatible versions of the Framework and Neo4j.**
+
+## Functionality
+
+On a high level, the Framework is a Neo4j kernel extension that enables the use of GraphAware as well as custom Modules. 
+These Modules typically extend the core functionality of the database by transparently enriching/modifying/preventing ongoing transactions in real-time.
+
+Examples of popular Framework Modules are:
+* GraphAware UUID
+* GraphAware TimeTree
+* GraphAware Neo2Elastic
+* GraphAware Schema (Enterprise Only)
+* GraphAware Audit (Enterprise Only)
  
-You can also use the GraphAware Framework as a software library by adding it as a dependency to your project and taking advantage of its useful features.
- For Java developers only(1), the following functionality is provided:
+You can also make use the Framework as a software library, taking advantage of its useful features, such as GraphUnit for testing code that talks to Neo4j.
 
-* [GraphAware Test](tests)
-    * [GraphUnit](tests#graphunit) - simple graph unit-testing
-    * [Integration Testing](tests#inttest) - support for integration testing
-    * [Performance Testing](tests#perftest) - support for performance testing
-* [Improved Neo4j Transaction API](tx-api)
-* [Transaction Executor](tx-executor) and [Batch Transaction Executor](tx-executor#batch-tx)
-* [Database Writer](writer)
-* [Miscellaneous Utilities](common)
+## Using the Framework
 
-(1) i.e., for embedded mode users, managed/unmanaged extensions developers, and [GraphAware Runtime Module](#runtime)
- developers
-
-Please take a look at the provided [examples](examples).
-
-## Framework Usage
-
-<a name="servermode"/>
-
-### Server Mode
-
-When using Neo4j in the <a href="http://docs.neo4j.org/chunked/stable/server-installation.html" target="_blank">standalone server</a> mode,
-deploying the GraphAware Framework (and any code using it) is a matter of :
+Deploying the GraphAware Framework (as well as any modules) is a matter of :
 * [downloading](#download) the appropriate .jar files
 * copying them into the _plugins_ directory in your Neo4j installation
 * restarting the server
 
 The framework and modules are then used via Cypher calls to their procedures, if they provide any.
 
-### Embedded Mode / Java Development
+### Configuration
 
-Java developers that use Neo4j in <a href="http://docs.neo4j.org/chunked/stable/tutorials-java-embedded.html" target="_blank">embedded mode</a>
-and those developing Neo4j <a href="http://docs.neo4j.org/chunked/stable/server-plugins.html" target="_blank">server plugins</a>,
-<a href="http://docs.neo4j.org/chunked/stable/server-unmanaged-extensions.html" target="_blank">unmanaged extensions</a>,
-or [GraphAware Runtime Modules](runtime) can include use the framework as a dependency
-for their Java project and use it as a library of useful tested code, in addition to the functionality provided for
-[server mode](#servermode).
+By default, the Framework reads its configuration from `graphaware.conf` located in the `conf` directory of Neo4j. You
+can change the file name by setting `com.graphaware.config.file` to your desired value in `neo4j.conf`. The Framework
+itself has no more configuration options but its Modules typically do.
 
 <a name="download"/>
 
@@ -80,13 +65,20 @@ repository</a>. When using Maven for dependency management, include one or more 
 
 ### Snapshots
 
-To use the latest development version, just clone this repository and run `mvn clean install`. This will produce {newVersion}.XX-SNAPSHOT jar files (eg. 4.2.6.66-SNAPSHOT). If you need standalone .jar files with all dependencies, look into the `target` folders in the `build` directory.
+To use the latest development version, just clone this repository and run `mvn clean install`. This will produce {newVersion}.XX-SNAPSHOT jar files (eg. 4.2.6.66-SNAPSHOT). If you need standalone .jar files with all dependencies, look into the `target` folder in the `build` directory.
 
-### Note on Versioning Scheme
+## Building Own Modules
 
-The version number has two parts. The first three numbers indicate compatibility with a Neo4j version.
- The last number is the version of the framework. For example, version 2.2.0.28 is version 28 of the framework
- compatible with Neo4j 2.2.0
+Java developers that want to build own Modules should use the provided parent Maven module:
+```
+ <parent>
+    <groupId>com.graphaware.neo4j</groupId>
+    <artifactId>module-parent</artifactId>
+    <version>{framework version}</version>
+ </parent>
+```
+
+The easiest way to start is to look at the Friendship Strength Counter Module example, or the GraphAware TimeTree Module.
 
 ## License
 
