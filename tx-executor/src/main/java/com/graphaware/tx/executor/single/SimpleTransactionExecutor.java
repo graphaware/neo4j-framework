@@ -40,17 +40,11 @@ public class SimpleTransactionExecutor implements TransactionExecutor {
         this.database = database;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <T> T executeInTransaction(TransactionCallback<T> callback) {
         return executeInTransaction(callback, RethrowException.getInstance());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <T> T executeInTransaction(TransactionCallback<T> callback, ExceptionHandlingStrategy exceptionHandlingStrategy) {
         T result = null;

@@ -100,25 +100,16 @@ public abstract class DetachedNode<ID> extends DetachedEntity<ID, Node> implemen
         this.labels = labels;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Node create(Transaction tx) {
         return tx.createNode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Node fetch(Transaction tx) {
         return tx.getNodeById(getGraphId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void populate(Node node) {
         super.populate(node);
@@ -130,9 +121,6 @@ public abstract class DetachedNode<ID> extends DetachedEntity<ID, Node> implemen
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void checkCanFetch() {
         super.checkCanFetch();
@@ -155,9 +143,6 @@ public abstract class DetachedNode<ID> extends DetachedEntity<ID, Node> implemen
 
     //helpers
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -176,9 +161,6 @@ public abstract class DetachedNode<ID> extends DetachedEntity<ID, Node> implemen
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int result = super.hashCode();

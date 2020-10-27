@@ -86,9 +86,6 @@ public abstract class QueueBackedScheduledService<E> extends AbstractScheduledSe
         awaitTerminated();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void shutDown() throws Exception {
         runOneIteration();
@@ -124,17 +121,11 @@ public abstract class QueueBackedScheduledService<E> extends AbstractScheduledSe
         return LOGGING_INTERVAL_MS;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Scheduler scheduler() {
         return Scheduler.newFixedDelaySchedule(0, 5, TimeUnit.MILLISECONDS);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -153,9 +144,6 @@ public abstract class QueueBackedScheduledService<E> extends AbstractScheduledSe
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return queueCapacity;

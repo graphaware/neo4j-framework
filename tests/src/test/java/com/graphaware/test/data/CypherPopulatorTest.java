@@ -90,7 +90,7 @@ public class CypherPopulatorTest {
                 return new String[]{"CREATE (m:Person {name:'Michal'}); MATCH (m:Person {name:'Michal'}) MERGE (m)-[:WORKS_FOR]->(ga:Company {name:'GraphAware'})"};
             }
 
-            @Override
+    @Override
             protected String separator() {
                 return ";";
             }
@@ -119,7 +119,7 @@ public class CypherPopulatorTest {
                 return new String[]{"CREATE (m:Person {name:'Michal'}); CREATE (d:Person {name:'Daniela'});", "MATCH (m:Person {name:'Michal'}) MERGE (m)-[:WORKS_FOR]->(ga:Company {name:'GraphAware'});"};
             }
 
-            @Override
+    @Override
             protected String separator() {
                 return ";";
             }

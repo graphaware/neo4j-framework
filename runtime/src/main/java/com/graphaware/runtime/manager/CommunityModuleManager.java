@@ -43,9 +43,6 @@ public class CommunityModuleManager extends BaseModuleManager implements ModuleM
         this.database = database;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void startModules() {
         super.startModules();
@@ -72,9 +69,6 @@ public class CommunityModuleManager extends BaseModuleManager implements ModuleM
         module.start(database);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Map<String, Object> beforeCommit(TransactionDataContainer transactionData) {
         Map<String, Object> result = new HashMap<>();
@@ -110,9 +104,6 @@ public class CommunityModuleManager extends BaseModuleManager implements ModuleM
         throw e;               //will cause rollback
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void afterCommit(Map<String, Object> states) {
         for (Module module : modules.values()) {
@@ -124,9 +115,6 @@ public class CommunityModuleManager extends BaseModuleManager implements ModuleM
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void afterRollback(Map<String, Object> states) {
         for (Module module : modules.values()) {

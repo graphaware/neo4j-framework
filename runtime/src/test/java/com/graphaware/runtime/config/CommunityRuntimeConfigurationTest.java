@@ -30,7 +30,7 @@ public class CommunityRuntimeConfigurationTest {
 
         assertTrue(configuration.runtimeEnabled());
 
-        Map<String, ModuleConfig> bootstrappers = configuration.loadConfig();
+        Map<String, DeclaredConfiguration> bootstrappers = configuration.loadConfig();
 
         assertEquals(2, bootstrappers.size());
         assertEquals(1, bootstrappers.get("MODULE_ID").getOrder());
@@ -64,7 +64,7 @@ public class CommunityRuntimeConfigurationTest {
 
         assertFalse(configuration.runtimeEnabled());
 
-        Map<String, ModuleConfig> bootstrappers = configuration.loadConfig();
+        Map<String, DeclaredConfiguration> bootstrappers = configuration.loadConfig();
 
         assertEquals(0, bootstrappers.size());
     }
@@ -87,7 +87,7 @@ public class CommunityRuntimeConfigurationTest {
 
         assertTrue(configuration.runtimeEnabled());
 
-        Map<String, ModuleConfig> bootstrappers = configuration.loadConfig();
+        Map<String, DeclaredConfiguration> bootstrappers = configuration.loadConfig();
 
         assertEquals(0, bootstrappers.size());
     }
@@ -110,7 +110,7 @@ public class CommunityRuntimeConfigurationTest {
 
         assertTrue(configuration.runtimeEnabled());
 
-        Map<String, ModuleConfig> bootstrappers = configuration.loadConfig();
+        Map<String, DeclaredConfiguration> bootstrappers = configuration.loadConfig();
 
         assertEquals(0, bootstrappers.size());
     }

@@ -37,9 +37,6 @@ public abstract class StringToInclusionPolicy<T extends InclusionPolicy> impleme
     private static final Set<String> ALL_BUSINESS_NODES_POLICY = new HashSet<>(Arrays.asList("true", "all"));
     private static final Set<String> EXCLUDE_ALL_NODES_POLICY = new HashSet<>(Arrays.asList("false", "none"));
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T apply(String s) {
         if (ALL_BUSINESS_NODES_POLICY.contains(s)) {

@@ -47,65 +47,41 @@ public class FilteredRelationshipTransactionData extends FilteredEntityTransacti
         this.wrapped = wrapped;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected EntityTransactionData<Relationship> getWrapped() {
         return wrapped;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Relationship filtered(Relationship original) {
         return new FilteredRelationship(original, policies);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Relationship> getCreated(Node node, RelationshipType... types) {
         return filterEntities(wrapped.getCreated(node, types));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Relationship> getCreated(Node node, Direction direction, RelationshipType... types) {
         return filterEntities(wrapped.getCreated(node, direction, types));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Relationship> getDeleted(Node node, RelationshipType... types) {
         return filterEntities(wrapped.getDeleted(node, types));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Relationship> getDeleted(Node node, Direction direction, RelationshipType... types) {
         return filterEntities(wrapped.getDeleted(node, direction, types));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected EntityInclusionPolicy<Relationship> getEntityInclusionPolicy() {
         return policies.getRelationshipInclusionPolicy();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected PropertyInclusionPolicy<Relationship> getPropertyInclusionPolicy() {
         return policies.getRelationshipPropertyInclusionPolicy();

@@ -41,9 +41,6 @@ public final class NullModuleConfiguration implements ModuleConfiguration {
         inclusionPolicies = InclusionPoliciesFactory.allBusiness();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public InclusionPolicies getInclusionPolicies() {
         return inclusionPolicies;

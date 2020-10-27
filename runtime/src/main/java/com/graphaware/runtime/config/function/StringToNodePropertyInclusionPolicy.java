@@ -34,33 +34,21 @@ public final class StringToNodePropertyInclusionPolicy extends StringToInclusion
         return INSTANCE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected NodePropertyInclusionPolicy compositePolicy(NodePropertyInclusionPolicy policy) {
         return CompositeNodePropertyInclusionPolicy.of(IncludeAllBusinessNodeProperties.getInstance(), policy);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected NodePropertyInclusionPolicy spelPolicy(String spel) {
         return new SpelNodePropertyInclusionPolicy(spel);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected NodePropertyInclusionPolicy all() {
         return IncludeAllNodeProperties.getInstance();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected NodePropertyInclusionPolicy none() {
         return IncludeNoNodeProperties.getInstance();

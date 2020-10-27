@@ -44,17 +44,11 @@ public class FilteredRelationshipIterator extends PrefetchingIterator<Relationsh
         this.policies = policies;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<Relationship> iterator() {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Relationship fetchNextOrNull() {
         while (wrappedIterator.hasNext()) {

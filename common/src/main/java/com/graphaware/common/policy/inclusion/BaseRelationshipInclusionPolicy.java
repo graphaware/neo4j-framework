@@ -26,9 +26,6 @@ import org.neo4j.graphdb.Transaction;
  */
 public abstract class BaseRelationshipInclusionPolicy extends BaseEntityInclusionPolicy<Relationship> implements RelationshipInclusionPolicy {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<Relationship> doGetAll(Transaction tx) {
         return tx.getAllRelationships();

@@ -53,9 +53,6 @@ public abstract class EntitySnapshot<T extends Entity> extends BaseEntityWrapper
         this.transactionDataContainer = transactionDataContainer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T getWrapped() {
         return wrapped;
@@ -68,9 +65,6 @@ public abstract class EntitySnapshot<T extends Entity> extends BaseEntityWrapper
      */
     protected abstract EntityTransactionData<T> transactionData();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasProperty(String key) {
         if (transactionData().hasBeenDeleted(wrapped)) {
@@ -95,9 +89,6 @@ public abstract class EntitySnapshot<T extends Entity> extends BaseEntityWrapper
         return super.hasProperty(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object getProperty(String key) {
         if (!hasProperty(key)) {
@@ -121,18 +112,12 @@ public abstract class EntitySnapshot<T extends Entity> extends BaseEntityWrapper
         return super.getProperty(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setProperty(String key, Object value) {
         checkCanBeMutated();
         super.setProperty(key, value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object removeProperty(String key) {
         checkCanBeMutated();
@@ -150,9 +135,6 @@ public abstract class EntitySnapshot<T extends Entity> extends BaseEntityWrapper
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterable<String> getPropertyKeys() {
         if (transactionData().hasBeenDeleted(wrapped)) {

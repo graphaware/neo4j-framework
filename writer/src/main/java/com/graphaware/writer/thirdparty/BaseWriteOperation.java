@@ -38,17 +38,11 @@ public abstract class BaseWriteOperation<T> implements WriteOperation<T> {
         this.details = details;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T getDetails() {
         return details;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -64,9 +58,6 @@ public abstract class BaseWriteOperation<T> implements WriteOperation<T> {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return details.hashCode();

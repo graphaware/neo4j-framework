@@ -39,10 +39,7 @@ public interface RelationshipInclusionPolicy extends EntityInclusionPolicy<Relat
      */
     abstract class Adapter extends BaseRelationshipInclusionPolicy implements RelationshipInclusionPolicy {
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
+    @Override
         public boolean include(Relationship relationship, Node pointOfView) {
             return include(relationship);
         }

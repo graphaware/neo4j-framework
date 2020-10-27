@@ -35,9 +35,6 @@ public class RelationshipCreated<ID> extends CreateOrDelete<ID, DetachedRelation
         super(createdRelationship);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public OperationType getType() {
         return OperationType.RELATIONSHIP_CREATED;

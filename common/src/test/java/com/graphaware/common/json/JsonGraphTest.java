@@ -104,7 +104,7 @@ public class JsonGraphTest {
 
     private class Graph extends JsonGraph<Graph> {
 
-        @Override
+    @Override
         protected Graph self() {
             return this;
         }

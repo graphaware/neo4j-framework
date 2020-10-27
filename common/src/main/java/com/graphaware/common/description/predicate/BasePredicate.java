@@ -25,17 +25,11 @@ import static com.graphaware.common.util.ArrayUtils.isPrimitiveOrStringArray;
  */
 abstract class BasePredicate extends BasePartiallyComparable<Predicate> implements Predicate {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Predicate self() {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMoreGeneralThan(Predicate other) {
         if (other instanceof Or) {
@@ -44,9 +38,6 @@ abstract class BasePredicate extends BasePartiallyComparable<Predicate> implemen
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMutuallyExclusive(Predicate other) {
         if (other instanceof Or) {

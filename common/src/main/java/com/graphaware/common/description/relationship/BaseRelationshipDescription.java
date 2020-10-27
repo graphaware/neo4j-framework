@@ -48,9 +48,6 @@ public abstract class BaseRelationshipDescription<P extends PropertiesDescriptio
         this.propertiesDescription = propertiesDescription;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMoreGeneralThan(RelationshipDescription other) {
         return getType().equals(other.getType())
@@ -58,9 +55,6 @@ public abstract class BaseRelationshipDescription<P extends PropertiesDescriptio
                 && getPropertiesDescription().isMoreGeneralThan(other.getPropertiesDescription());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMutuallyExclusive(RelationshipDescription other) {
         return !getType().equals(other.getType())
@@ -68,41 +62,26 @@ public abstract class BaseRelationshipDescription<P extends PropertiesDescriptio
                 || getPropertiesDescription().isMutuallyExclusive(other.getPropertiesDescription());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected RelationshipDescription self() {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getType() {
         return relationshipType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Direction getDirection() {
         return direction;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public P getPropertiesDescription() {
         return propertiesDescription;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -117,9 +96,6 @@ public abstract class BaseRelationshipDescription<P extends PropertiesDescriptio
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int result = relationshipType.hashCode();

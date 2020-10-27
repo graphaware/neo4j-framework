@@ -52,9 +52,6 @@ public class MultiThreadedBatchTransactionExecutor extends DisposableBatchTransa
         this.numberOfThreads = numberOfThreads;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void doExecute() {
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);

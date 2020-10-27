@@ -25,12 +25,8 @@ import com.graphaware.runtime.config.function.StringToNodeInclusionPolicy;
 import com.graphaware.runtime.config.function.StringToNodePropertyInclusionPolicy;
 import com.graphaware.runtime.config.function.StringToRelationshipInclusionPolicy;
 import com.graphaware.runtime.config.function.StringToRelationshipPropertyInclusionPolicy;
-import com.graphaware.runtime.manager.ModuleManager;
 import org.apache.commons.configuration2.Configuration;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.logging.Log;
-
-import java.util.Map;
 
 /**
  * Abstract base-class for {@link ModuleBootstrapper} implementations for {@link Module}s.
@@ -53,16 +49,13 @@ public abstract class BaseModuleBootstrapper<C extends BaseModuleConfiguration<C
      */
     protected abstract C defaultConfiguration();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Module<?> bootstrapModule(String moduleId, Configuration config, GraphDatabaseService database, GraphAwareRuntime runtime) {
+    public Module<?> bootstrapModule(String moduleId, Configuration config) {
         C configuration = defaultConfiguration();
 
         configuration = configureInclusionPolicies(config, configuration);
 
-        return doBootstrapModule(moduleId, config, database, configuration, runtime);
+        return doBootstrapModule(moduleId, config, configuration);
     }
 
     protected C configureInclusionPolicies(Configuration config, C configuration) {
@@ -99,11 +92,10 @@ public abstract class BaseModuleBootstrapper<C extends BaseModuleConfiguration<C
      *
      * @param moduleId      ID of the module.
      * @param config        for this module as key-value pairs.
-     * @param database      which the module will run on.
      * @param configuration pre-populated with configuration common for all modules, such as "initializeUntil" and all {@link InclusionPolicies}.
      * @return fully configured runtime module.
      */
-    protected abstract Module<?> doBootstrapModule(String moduleId, Configuration config, GraphDatabaseService database, C configuration, GraphAwareRuntime runtime);
+    protected abstract Module<?> doBootstrapModule(String moduleId, Configuration config, C configuration);
 
     /**
      * Check if a configuration has been specified.

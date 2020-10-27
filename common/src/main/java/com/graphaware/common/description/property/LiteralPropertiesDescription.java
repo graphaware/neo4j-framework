@@ -46,17 +46,11 @@ public class LiteralPropertiesDescription extends BaseDetachedPropertiesDescript
         super(predicates);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected LiteralPropertiesDescription newInstance(Map<String, Predicate> predicates) {
         return new LiteralPropertiesDescription(predicates);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Predicate undefined() {
         return Predicates.undefined();

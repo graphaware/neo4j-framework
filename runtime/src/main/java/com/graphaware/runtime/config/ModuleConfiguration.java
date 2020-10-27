@@ -20,9 +20,8 @@ import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.runtime.module.Module;
 
 /**
- * Encapsulates all configuration of a single {@link Module}. Modules that need
- * no configuration should use {@link NullModuleConfiguration}. Otherwise, start with
- * {@link FluentModuleConfiguration}.
+ * Encapsulates all configuration of a single {@link Module}. Modules that need no configuration should use {@link NullModuleConfiguration}.
+ * Otherwise, start with {@link FluentModuleConfiguration}.
  */
 public interface ModuleConfiguration {
 

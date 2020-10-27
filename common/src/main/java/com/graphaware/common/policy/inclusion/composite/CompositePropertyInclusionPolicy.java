@@ -42,9 +42,6 @@ public abstract class CompositePropertyInclusionPolicy<T extends Entity> impleme
         this.policies = policies;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(String key, T object) {
         for (PropertyInclusionPolicy<T> policy : policies) {
@@ -56,9 +53,6 @@ public abstract class CompositePropertyInclusionPolicy<T extends Entity> impleme
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -77,9 +71,6 @@ public abstract class CompositePropertyInclusionPolicy<T extends Entity> impleme
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return Arrays.hashCode(policies);

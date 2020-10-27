@@ -52,25 +52,16 @@ public class IncludeNodes extends BaseIncludeNodes<IncludeNodes> {
         super(label, propertiesDescription);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected IncludeNodes newInstance(String label) {
         return new IncludeNodes(label, getPropertiesDescription());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected IncludeNodes newInstance(DetachedPropertiesDescription propertiesDescription) {
         return new IncludeNodes(getLabel(), propertiesDescription);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<Node> doGetAll(Transaction tx) {
         return tx.getAllNodes();

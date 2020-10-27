@@ -1465,7 +1465,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
             this.beforeCommitCallback = beforeCommitCallback;
         }
 
-        @Override
+    @Override
         public Object beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) throws Exception {
             LazyTransactionData lazyTransactionData = new LazyTransactionData(data, transaction);
 
@@ -1499,12 +1499,12 @@ public class FilteredLazyTransactionDataIntegrationTest {
             return null;
         }
 
-        @Override
+    @Override
         public void afterCommit(TransactionData data, Object state, GraphDatabaseService databaseService) {
             //do nothing
         }
 
-        @Override
+    @Override
         public void afterRollback(TransactionData data, Object state, GraphDatabaseService databaseService) {
             //do nothing
         }
@@ -1550,7 +1550,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
     private class TestGraphMutation extends VoidReturningCallback {
 
-        @Override
+    @Override
         public void doInTx(Transaction tx) {
             Node one = getNodeById(tx, ids.get(1L));
             one.setProperty("name", "NewOne");
@@ -1615,7 +1615,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
     private class InternalTestGraphMutation extends VoidReturningCallback {
 
-        @Override
+    @Override
         public void doInTx(Transaction tx) {
             Node one = getNodeById(tx, ids.get(1L));
             one.setProperty(INTERNAL_PREFIX + "name", "NewOne");
@@ -1676,7 +1676,7 @@ public class FilteredLazyTransactionDataIntegrationTest {
 
     private class LabelChange extends VoidReturningCallback {
 
-        @Override
+    @Override
         public void doInTx(Transaction database) {
             Node michal = (database.findNode(label("Person"), "name", "Michal"));
             michal.removeLabel(label("Person"));

@@ -47,25 +47,16 @@ public class WildcardPropertiesDescription extends BaseDetachedPropertiesDescrip
         super(predicates);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected DetachedPropertiesDescription newInstance(Map<String, Predicate> predicates) {
         return new WildcardPropertiesDescription(predicates);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Predicate undefined() {
         return any();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMoreGeneralThan(PropertiesDescription other) {
         //optimization

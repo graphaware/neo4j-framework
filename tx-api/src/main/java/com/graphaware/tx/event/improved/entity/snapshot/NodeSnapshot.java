@@ -41,25 +41,16 @@ public class NodeSnapshot extends EntitySnapshot<Node> implements Node, NodeWrap
         super(wrapped, transactionDataContainer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected EntityTransactionData<Node> transactionData() {
         return transactionDataContainer.getNodeTransactionData();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Node self() {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void delete() {
         if (transactionDataContainer.getNodeTransactionData().hasBeenDeleted(wrapped)) {
@@ -69,42 +60,27 @@ public class NodeSnapshot extends EntitySnapshot<Node> implements Node, NodeWrap
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Relationship createRelationshipTo(Node otherNode, RelationshipType type) {
         checkCanBeMutated();
         return super.createRelationshipTo(otherNode, type);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Relationship wrapRelationship(Relationship relationship) {
         return new RelationshipSnapshot(relationship, transactionDataContainer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<Relationship> wrapRelationships(Iterable<Relationship> relationships, Direction direction, RelationshipType... relationshipTypes) {
         return new RelationshipSnapshotIterator(this, relationships, transactionDataContainer, direction, relationshipTypes);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasLabel(Label label) {
         return IterableUtils.contains(getLabels(), label);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterable<Label> getLabels() {
         if (transactionDataContainer.getNodeTransactionData().hasBeenDeleted(this)) {
@@ -113,27 +89,18 @@ public class NodeSnapshot extends EntitySnapshot<Node> implements Node, NodeWrap
         return new LabelSnapshotIterator(this, super.getLabels(), transactionDataContainer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addLabel(Label label) {
         checkCanBeMutated();
         super.addLabel(label);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void removeLabel(Label label) {
         checkCanBeMutated();
         super.removeLabel(label);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getDegree() {
         int degree = 0;
@@ -146,9 +113,6 @@ public class NodeSnapshot extends EntitySnapshot<Node> implements Node, NodeWrap
         return degree + (int) removed - (int) added;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getDegree(RelationshipType type) {
         int degree = 0;
@@ -161,9 +125,6 @@ public class NodeSnapshot extends EntitySnapshot<Node> implements Node, NodeWrap
         return degree + (int) removed - (int) added;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getDegree(Direction direction) {
         int degree = 0;
@@ -176,9 +137,6 @@ public class NodeSnapshot extends EntitySnapshot<Node> implements Node, NodeWrap
         return degree + (int) removed - (int) added;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getDegree(RelationshipType type, Direction direction) {
         int degree = 0;

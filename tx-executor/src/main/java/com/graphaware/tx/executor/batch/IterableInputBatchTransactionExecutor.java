@@ -69,9 +69,6 @@ public class IterableInputBatchTransactionExecutor<T> extends DisposableBatchTra
         this.executor = new SimpleTransactionExecutor(database);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void doExecute() {
         populateQueue();

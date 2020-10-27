@@ -183,7 +183,7 @@ public class LongIdJsonNodeTest {
 
     private class TimesThousandNodeIdTransformer implements NodeIdTransformer<Long> {
 
-        @Override
+    @Override
         public long toGraphId(Long id) {
             if (id == null) {
                 return DetachedEntity.NEW;
@@ -192,7 +192,7 @@ public class LongIdJsonNodeTest {
             return id / 1000;
         }
 
-        @Override
+    @Override
         public Long fromEntity(Node entity) {
             return entity.getId() * 1000;
         }

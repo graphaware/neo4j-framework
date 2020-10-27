@@ -48,9 +48,6 @@ public class RuntimeExtensionFactory extends ExtensionFactory<RuntimeExtensionFa
         super(ExtensionType.DATABASE, KEY);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Lifecycle newInstance(ExtensionContext extensionContext, Dependencies dependencies) {
         return new RuntimeKernelExtension(dependencies.getConfig(), dependencies.managementService(), dependencies.getDatabase());

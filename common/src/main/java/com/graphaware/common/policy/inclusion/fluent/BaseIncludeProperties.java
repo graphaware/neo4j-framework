@@ -63,9 +63,6 @@ public abstract class BaseIncludeProperties<T extends BaseIncludeProperties<T, E
      */
     protected abstract T newInstance(String key);
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(String key, E Entity) {
         return this.key == null || this.key.equals(key);
@@ -75,9 +72,6 @@ public abstract class BaseIncludeProperties<T extends BaseIncludeProperties<T, E
         return key;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -90,9 +84,6 @@ public abstract class BaseIncludeProperties<T extends BaseIncludeProperties<T, E
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return key != null ? key.hashCode() : 0;

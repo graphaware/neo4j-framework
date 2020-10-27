@@ -62,9 +62,6 @@ public class LongIdJsonNode extends JsonNode<Long> {
         super(id, labels, properties);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Node produceEntity(Transaction tx) {
         return produceEntity(tx, TrivialNodeIdTransformer.getInstance());

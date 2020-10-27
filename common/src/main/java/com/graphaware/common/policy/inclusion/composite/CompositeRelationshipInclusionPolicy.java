@@ -46,9 +46,6 @@ public final class CompositeRelationshipInclusionPolicy extends CompositeEntityI
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<Relationship> doGetAll(Transaction tx) {
         return tx.getAllRelationships();

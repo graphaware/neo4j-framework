@@ -57,9 +57,6 @@ public class ComparableItem<T, C extends Comparable<C>> implements Comparable<Co
         return getQuantity().compareTo(o.getQuantity());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -72,9 +69,6 @@ public class ComparableItem<T, C extends Comparable<C>> implements Comparable<Co
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return item.hashCode();

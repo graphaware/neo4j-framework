@@ -23,9 +23,6 @@ import com.graphaware.common.policy.inclusion.ObjectInclusionPolicy;
  */
 public class IncludeAll<T> implements ObjectInclusionPolicy<T> {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(T object) {
         return true;

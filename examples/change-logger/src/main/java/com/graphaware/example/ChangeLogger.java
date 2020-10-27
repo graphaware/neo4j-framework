@@ -42,9 +42,6 @@ public class ChangeLogger extends TransactionEventListenerAdapter<Void> {
 
     private static final Log LOG = LoggerFactory.getLogger(ChangeLogger.class);
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Void beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) {
         logChanges(new LazyTransactionData(data, transaction));

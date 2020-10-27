@@ -118,25 +118,16 @@ public abstract class DetachedRelationship<ID, N extends DetachedNode<ID>> exten
         this.type = type;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Relationship create(Transaction tx) {
         return tx.getNodeById(startNodeGraphId).createRelationshipTo(tx.getNodeById(endNodeGraphId), withName(type));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Relationship fetch(Transaction tx) {
         return tx.getRelationshipById(getGraphId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void checkCanCreate() {
         super.checkCanCreate();
@@ -150,9 +141,6 @@ public abstract class DetachedRelationship<ID, N extends DetachedNode<ID>> exten
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void checkCanFetch() {
         super.checkCanFetch();
@@ -207,9 +195,6 @@ public abstract class DetachedRelationship<ID, N extends DetachedNode<ID>> exten
 
     protected abstract N endNode(Relationship relationship, NodeIdTransformer<ID> nodeIdTransformer);
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -234,9 +219,6 @@ public abstract class DetachedRelationship<ID, N extends DetachedNode<ID>> exten
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int result = super.hashCode();

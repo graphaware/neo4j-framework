@@ -45,17 +45,11 @@ public class LazyTransactionData extends BaseImprovedTransactionData implements 
         relationshipTransactionData = new LazyRelationshipTransactionData(transactionData, this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public NodeTransactionData getNodeTransactionData() {
         return nodeTransactionData;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public RelationshipTransactionData getRelationshipTransactionData() {
         return relationshipTransactionData;

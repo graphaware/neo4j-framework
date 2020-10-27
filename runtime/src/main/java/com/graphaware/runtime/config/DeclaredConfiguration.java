@@ -2,7 +2,7 @@ package com.graphaware.runtime.config;
 
 import org.apache.commons.configuration2.Configuration;
 
-public class ModuleConfig implements Comparable<ModuleConfig> {
+public class DeclaredConfiguration implements Comparable<DeclaredConfiguration> {
 
     private final int order;
     private final String id;
@@ -10,7 +10,7 @@ public class ModuleConfig implements Comparable<ModuleConfig> {
     private final String database;
     private final Configuration config;
 
-    public ModuleConfig(int order, String id, String bootstrapper, String database, Configuration config) {
+    public DeclaredConfiguration(int order, String id, String bootstrapper, String database, Configuration config) {
         this.order = order;
         this.id = id;
         this.bootstrapper = bootstrapper;
@@ -39,7 +39,7 @@ public class ModuleConfig implements Comparable<ModuleConfig> {
     }
 
     @Override
-    public int compareTo(ModuleConfig o) {
+    public int compareTo(DeclaredConfiguration o) {
         return Integer.compare(this.order, o.order);
     }
 }

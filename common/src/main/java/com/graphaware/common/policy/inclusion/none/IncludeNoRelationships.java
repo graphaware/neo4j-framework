@@ -35,9 +35,6 @@ public final class IncludeNoRelationships extends IncludeNoEntities<Relationship
     private IncludeNoRelationships() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(Relationship relationship, Node pointOfView) {
         return false;

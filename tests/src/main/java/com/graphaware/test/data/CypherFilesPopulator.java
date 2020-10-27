@@ -29,9 +29,6 @@ import java.util.List;
  */
 public abstract class CypherFilesPopulator extends CypherPopulator {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String[] statementGroups() {
         List<String> result = new LinkedList<>();

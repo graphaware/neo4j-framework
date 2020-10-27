@@ -41,9 +41,6 @@ public class LazyPropertiesDescription extends BasePropertiesDescription impleme
         this.entity = entity;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Predicate get(String key) {
         Object value = entity.getProperty(key, null);
@@ -55,17 +52,11 @@ public class LazyPropertiesDescription extends BasePropertiesDescription impleme
         return equalTo(value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterable<String> getKeys() {
         return entity.getPropertyKeys();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -78,9 +69,6 @@ public class LazyPropertiesDescription extends BasePropertiesDescription impleme
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return entity.hashCode();

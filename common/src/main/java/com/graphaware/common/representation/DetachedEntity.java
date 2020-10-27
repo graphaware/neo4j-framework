@@ -243,9 +243,6 @@ public abstract class DetachedEntity<ID, T extends Entity> implements Serializab
         return keysAsList.toArray(new String[keysAsList.size()]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -264,9 +261,6 @@ public abstract class DetachedEntity<ID, T extends Entity> implements Serializab
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int result = (int) (graphId ^ (graphId >>> 32));

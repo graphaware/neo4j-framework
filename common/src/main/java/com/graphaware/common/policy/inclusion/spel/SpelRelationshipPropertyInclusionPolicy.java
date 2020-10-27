@@ -32,9 +32,6 @@ public class SpelRelationshipPropertyInclusionPolicy extends SpelInclusionPolicy
         super(expression);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(String key, Relationship relationship) {
         return (Boolean) exp.getValue(new AttachedRelationshipProperty(key, new AttachedRelationship(relationship)));

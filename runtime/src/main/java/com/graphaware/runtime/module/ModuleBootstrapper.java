@@ -17,11 +17,8 @@
 package com.graphaware.runtime.module;
 
 import com.graphaware.runtime.GraphAwareRuntime;
-import com.graphaware.runtime.manager.ModuleManager;
 import org.apache.commons.configuration2.Configuration;
 import org.neo4j.graphdb.GraphDatabaseService;
-
-import java.util.Map;
 
 /**
  * Component that automatically bootstraps a {@link Module} based on config parameters passed to Neo4j.
@@ -31,12 +28,12 @@ import java.util.Map;
  * com.graphaware.module.x.y = z
  * <p>
  * where x is the ID of the module, y is the order in which the module will be registered with respect to other modules,
- * and z is the fully qualified class name of the bootstrapper implementation, then x will be passed to the {@link #bootstrapModule(String, java.util.Map, org.neo4j.graphdb.GraphDatabaseService)}
+ * and z is the fully qualified class name of the bootstrapper implementation, then x will be passed to the {@link #bootstrapModule(String, Configuration)}
  * method of an instance of z as the first parameter (moduleId). Moreover, from all other entries of the form
  * <p>
  * com.graphaware.module.x.a = b
  * <p>
- * a map with a's as keys and b's as values will be passed as the second parameter (config) to the {@link #bootstrapModule(String, java.util.Map, org.neo4j.graphdb.GraphDatabaseService)}
+ * a map with a's as keys and b's as values will be passed as the second parameter (config) to the {@link #bootstrapModule(String, Configuration)}
  * method. {@link ModuleBootstrapper} implementations should document, which key-value configurations
  * they expect.
  *
@@ -49,8 +46,7 @@ public interface ModuleBootstrapper {
      *
      * @param moduleId ID of the module.
      * @param config   for this module.
-     * @param database which the module will run on.
      * @return fully configured runtime module.
      */
-    Module<?> bootstrapModule(String moduleId, Configuration config, GraphDatabaseService database, GraphAwareRuntime runtime);
+    Module<?> bootstrapModule(String moduleId, Configuration config);
 }

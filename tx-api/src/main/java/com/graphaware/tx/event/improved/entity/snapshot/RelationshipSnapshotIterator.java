@@ -46,17 +46,11 @@ public class RelationshipSnapshotIterator extends PrefetchingIterator<Relationsh
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<Relationship> iterator() {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Relationship fetchNextOrNull() {
         while (wrappedIterator.hasNext()) {

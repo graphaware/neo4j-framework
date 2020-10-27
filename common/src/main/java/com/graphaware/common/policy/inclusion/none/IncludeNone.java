@@ -27,9 +27,7 @@ public abstract class IncludeNone<T> implements ObjectInclusionPolicy<T> {
     protected IncludeNone() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    
     public final boolean include(T t) {
         return false;
     }

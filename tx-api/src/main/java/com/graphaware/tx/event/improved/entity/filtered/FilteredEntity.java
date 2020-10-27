@@ -42,9 +42,6 @@ public abstract class FilteredEntity<T extends Entity> extends BaseEntityWrapper
         this.policies = policies;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T getWrapped() {
         return wrapped;
@@ -57,9 +54,6 @@ public abstract class FilteredEntity<T extends Entity> extends BaseEntityWrapper
      */
     protected abstract PropertyInclusionPolicy<T> getPropertyInclusionPolicy();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasProperty(String key) {
         if (!getPropertyInclusionPolicy().include(key, self())) {
@@ -68,9 +62,6 @@ public abstract class FilteredEntity<T extends Entity> extends BaseEntityWrapper
         return super.hasProperty(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterable<String> getPropertyKeys() {
         return new FilteredPropertyKeyIterator<>(super.getPropertyKeys(), self(), getPropertyInclusionPolicy());

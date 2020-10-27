@@ -27,9 +27,6 @@ public abstract class IncludeAllProperties<T extends Entity> implements Property
     protected IncludeAllProperties() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(String key, T t) {
         return true;

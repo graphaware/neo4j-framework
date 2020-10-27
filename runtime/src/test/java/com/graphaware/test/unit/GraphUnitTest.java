@@ -18,12 +18,12 @@ package com.graphaware.test.unit;
 
 import com.graphaware.common.junit.InjectNeo4j;
 import com.graphaware.common.junit.Neo4jExtension;
+import com.graphaware.runtime.CommunityRuntime;
 import com.graphaware.runtime.GraphAwareRuntime;
-import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.runtime.bootstrap.TestModule;
+import com.graphaware.runtime.manager.CommunityModuleManager;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
 import org.apache.commons.configuration2.MapConfiguration;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -56,7 +56,7 @@ public class GraphUnitTest {
 
     @Test
     public void clearGraphWithRuntimeShouldDeleteAllNodesAndRelsButNotGraphProps() {
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), database);
+        GraphAwareRuntime runtime = new CommunityRuntime(database, neo4j.databaseManagementService());
         runtime.registerModule(new TestModule("test", new MapConfiguration(Collections.singletonMap("test", "test"))));
         runtime.start();
 
@@ -84,7 +84,7 @@ public class GraphUnitTest {
 
     @Test
     public void equalGraphsWithRuntimeShouldPassSameGraphTestBusinessStrategies() {
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), database);
+        GraphAwareRuntime runtime = new CommunityRuntime(database, neo4j.databaseManagementService());
         runtime.start();
 
         String assertCypher = "CREATE " +

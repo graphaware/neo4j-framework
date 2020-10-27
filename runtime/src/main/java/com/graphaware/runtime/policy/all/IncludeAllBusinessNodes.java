@@ -38,9 +38,6 @@ public final class IncludeAllBusinessNodes extends BaseEntityInclusionPolicy<Nod
     private IncludeAllBusinessNodes() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(Node node) {
         for (Label label : node.getLabels()) {
@@ -52,9 +49,6 @@ public final class IncludeAllBusinessNodes extends BaseEntityInclusionPolicy<Nod
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<Node> doGetAll(Transaction tx) {
         return tx.getAllNodes();

@@ -53,7 +53,7 @@ public class DisposableBatchTransactionExecutorTest {
 
         AtomicInteger noTimesExecuted = new AtomicInteger(0);
 
-        @Override
+    @Override
         protected void doExecute() {
             noTimesExecuted.incrementAndGet();
         }

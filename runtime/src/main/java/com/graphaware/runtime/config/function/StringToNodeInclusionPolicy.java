@@ -33,33 +33,21 @@ public final class StringToNodeInclusionPolicy extends StringToInclusionPolicy<N
         return INSTANCE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected NodeInclusionPolicy compositePolicy(NodeInclusionPolicy policy) {
         return CompositeNodeInclusionPolicy.of(IncludeAllBusinessNodes.getInstance(), policy);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected NodeInclusionPolicy spelPolicy(String spel) {
         return new SpelNodeInclusionPolicy(spel);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected NodeInclusionPolicy all() {
         return IncludeAllBusinessNodes.getInstance();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected NodeInclusionPolicy none() {
         return IncludeNoNodes.getInstance();

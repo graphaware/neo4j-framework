@@ -8,9 +8,6 @@ import org.neo4j.graphdb.Transaction;
  */
 public abstract class NodeUnitOfWork implements UnitOfWork<Node> {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void execute(Transaction tx, Node input, int batchNumber, int stepNumber) {
         execute(tx.getNodeById(input.getId()), batchNumber, stepNumber);

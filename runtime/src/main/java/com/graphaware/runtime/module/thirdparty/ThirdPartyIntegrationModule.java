@@ -50,9 +50,6 @@ public abstract class ThirdPartyIntegrationModule<ID> extends BaseModule<Collect
         super(moduleId);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<WriteOperation<?>> beforeCommit(ImprovedTransactionData transactionData) throws DeliberateTransactionRollbackException {
         Collection<WriteOperation<?>> result = transactionData.getAllCreatedNodes().stream().map(createdNode -> new NodeCreated<>(nodeRepresentation(createdNode))).collect(Collectors.toCollection(HashSet::new));

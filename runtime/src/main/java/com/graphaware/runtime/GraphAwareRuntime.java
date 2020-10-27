@@ -17,6 +17,7 @@
 package com.graphaware.runtime;
 
 import com.graphaware.runtime.module.Module;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.NotFoundException;
 
 /**
@@ -31,6 +32,11 @@ import org.neo4j.graphdb.NotFoundException;
  * modules have been initialized.
  */
 public interface GraphAwareRuntime {
+
+    /**
+     * @return the database this runtime has been registered with.
+     */
+    GraphDatabaseService getDatabase();
 
     /**
      * Prefix for GraphAware internal nodes, relationships, and properties. This is fixed as there is little chance

@@ -40,25 +40,16 @@ public class SpelRelationshipInclusionPolicy extends SpelInclusionPolicy impleme
         super(expression);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(Relationship relationship) {
         return (Boolean) exp.getValue(new AttachedRelationship(relationship));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(Relationship relationship, Node pointOfView) {
         return (Boolean) exp.getValue(new AttachedRelationship(relationship, pointOfView));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterable<Relationship> getAll(Transaction tx) {
         return new FilteringIterable<>(tx.getAllRelationships(), this::include);

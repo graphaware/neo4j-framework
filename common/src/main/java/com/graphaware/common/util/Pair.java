@@ -62,9 +62,6 @@ public class Pair<FIRST, SECOND> {
         return second;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -78,9 +75,6 @@ public class Pair<FIRST, SECOND> {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int result = first != null ? first.hashCode() : 0;
@@ -88,9 +82,6 @@ public class Pair<FIRST, SECOND> {
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "(" + Objects.toString(first) + ", " + Objects.toString(second) + ")";

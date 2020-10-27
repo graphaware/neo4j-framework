@@ -44,17 +44,11 @@ public class FilteredPropertyKeyIterator<T extends Entity> extends PrefetchingIt
         this.propertyInclusionPolicy = propertyInclusionPolicy;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<String> iterator() {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String fetchNextOrNull() {
         while (wrappedIterator.hasNext()) {

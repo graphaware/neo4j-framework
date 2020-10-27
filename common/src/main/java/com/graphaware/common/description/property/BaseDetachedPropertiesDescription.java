@@ -52,9 +52,6 @@ public abstract class BaseDetachedPropertiesDescription extends BasePropertiesDe
         this.predicates.putAll(predicates);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public DetachedPropertiesDescription with(String propertyKey, Predicate predicate) {
         Map<String, Predicate> newPredicates = new HashMap<>(predicates);
@@ -70,9 +67,6 @@ public abstract class BaseDetachedPropertiesDescription extends BasePropertiesDe
      */
     protected abstract DetachedPropertiesDescription newInstance(Map<String, Predicate> predicates);
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Predicate get(String key) {
         if (!predicates.containsKey(key)) {
@@ -89,17 +83,11 @@ public abstract class BaseDetachedPropertiesDescription extends BasePropertiesDe
      */
     protected abstract Predicate undefined();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterable<String> getKeys() {
         return predicates.keySet();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -112,9 +100,6 @@ public abstract class BaseDetachedPropertiesDescription extends BasePropertiesDe
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return predicates.hashCode();

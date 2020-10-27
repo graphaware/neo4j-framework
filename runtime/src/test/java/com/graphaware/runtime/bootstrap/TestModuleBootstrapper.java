@@ -33,7 +33,7 @@ import java.util.Map;
 public class TestModuleBootstrapper implements ModuleBootstrapper {
 
     @Override
-    public Module<?> bootstrapModule(String moduleId, Configuration config, GraphDatabaseService database, GraphAwareRuntime runtime) {
+    public Module<?> bootstrapModule(String moduleId, Configuration config) {
         return new TestModule(moduleId, config);
     }
 }

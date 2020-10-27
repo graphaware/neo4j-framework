@@ -23,9 +23,6 @@ public class Neo4jConfigurationReader implements ConfigurationReader {
         this.neo4jConfig = neo4jConfig;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Configuration readConfiguration() {
         FileBasedConfigurationBuilder<PropertiesConfiguration> builder =

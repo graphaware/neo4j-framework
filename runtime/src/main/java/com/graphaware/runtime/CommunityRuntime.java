@@ -17,6 +17,7 @@
 package com.graphaware.runtime;
 
 import com.graphaware.common.log.LoggerFactory;
+import com.graphaware.runtime.manager.CommunityModuleManager;
 import com.graphaware.runtime.manager.ModuleManager;
 import com.graphaware.runtime.module.Module;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
@@ -36,8 +37,6 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * {@link GraphAwareRuntime} intended for Community production use.
- * <p>
- * To use this {@link GraphAwareRuntime}, construct it using {@link GraphAwareRuntimeFactory}.
  */
 public class CommunityRuntime implements TransactionEventListener<Map<String, Object>>, GraphAwareRuntime, DatabaseEventListener {
 
@@ -59,25 +58,21 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
     private final DatabaseManagementService databaseManagementService;
     private final ModuleManager runtimeModuleManager;
 
-    /**
-     * Construct a new runtime. Protected, please use {@link GraphAwareRuntimeFactory}.
-     *
-     * @param database      on which the runtime operates.
-     * @param moduleManager manager for transaction-driven modules.
-     */
-    protected CommunityRuntime(GraphDatabaseService database, DatabaseManagementService databaseManagementService, ModuleManager moduleManager) {
+    public CommunityRuntime(GraphDatabaseService database, DatabaseManagementService databaseManagementService) {
         this.state = State.FRESH;
         this.database = database;
         this.databaseManagementService = databaseManagementService;
-        this.runtimeModuleManager = moduleManager;
+        this.runtimeModuleManager = new CommunityModuleManager(database);
 
         databaseManagementService.registerTransactionEventListener(database.databaseName(), this);
         databaseManagementService.registerDatabaseEventListener(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    public GraphDatabaseService getDatabase() {
+        return database;
+    }
+
     @Override
     public synchronized void registerModule(Module<?> module) {
         if (!State.FRESH.equals(state)) {
@@ -92,9 +87,6 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         runtimeModuleManager.registerModule(module);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final synchronized void start() {
         if (State.STARTED.equals(state)) {
@@ -129,9 +121,6 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         STARTING.set(false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void stop() {
         switch (state) {
@@ -157,9 +146,6 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         databaseManagementService.unregisterDatabaseEventListener(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Map<String, Object> beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) throws Exception {
         LazyTransactionData transactionData = new LazyTransactionData(data, transaction);
@@ -171,9 +157,6 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         return runtimeModuleManager.beforeCommit(transactionData);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void afterCommit(TransactionData data, Map<String, Object> state, GraphDatabaseService databaseService) {
         if (state == null) {
@@ -183,9 +166,6 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         runtimeModuleManager.afterCommit(state);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void afterRollback(TransactionData data, Map<String, Object> state, GraphDatabaseService databaseService) {
         if (state == null) {
@@ -234,9 +214,6 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <M extends Module<?>> M getModule(String moduleId, Class<M> clazz) throws NotFoundException {
         M module = runtimeModuleManager.getModule(moduleId, clazz);
@@ -248,9 +225,6 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         throw new NotFoundException("No module of type " + clazz.getName() + " with ID " + moduleId + " has been registered");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <M extends Module<?>> M getModule(Class<M> clazz) throws NotFoundException {
         M txResult = runtimeModuleManager.getModule(clazz);
@@ -264,16 +238,20 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
 
     @Override
     public void databaseStart(DatabaseEventContext eventContext) {
-        if (database.databaseName().equals(eventContext.getDatabaseName())) {
+        if (databaseApplies(eventContext)) {
             start();
         }
     }
 
     @Override
     public void databaseShutdown(DatabaseEventContext eventContext) {
-        if (database.databaseName().equals(eventContext.getDatabaseName())) {
+        if (databaseApplies(eventContext)) {
             stop();
         }
+    }
+
+    private boolean databaseApplies(DatabaseEventContext eventContext) {
+        return database.databaseName().equals(eventContext.getDatabaseName());
     }
 
     @Override

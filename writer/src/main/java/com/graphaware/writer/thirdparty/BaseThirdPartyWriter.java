@@ -48,9 +48,6 @@ public abstract class BaseThirdPartyWriter extends QueueBackedScheduledService<C
         super(queueCapacity);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected void runOneIteration() {
         if (queue.isEmpty()) {
@@ -63,17 +60,11 @@ public abstract class BaseThirdPartyWriter extends QueueBackedScheduledService<C
         processOperations(tasks);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void write(final WriteOperation<?> operation, String id) {
         write(Collections.<WriteOperation<?>>singleton(operation), id);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void write(final Collection<WriteOperation<?>> operations, String id) {
         offer(operations, id);

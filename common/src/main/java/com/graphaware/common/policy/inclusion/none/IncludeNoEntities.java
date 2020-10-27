@@ -31,17 +31,11 @@ public abstract class IncludeNoEntities<T extends Entity> extends BaseEntityIncl
     protected IncludeNoEntities() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final boolean include(T entity) {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<T> doGetAll(Transaction tx) {
         return Iterables.empty();

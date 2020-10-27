@@ -33,18 +33,12 @@ final class LessThan extends ComparablePredicate {
         super(value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean evaluate(Object beta) {
         checkValueIsLegal(beta);
         return isGreaterThan(beta);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMoreGeneralThan(Predicate other) {
         if (super.isMoreGeneralThan(other)) {
@@ -66,9 +60,6 @@ final class LessThan extends ComparablePredicate {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMutuallyExclusive(Predicate other) {
         if (super.isMutuallyExclusive(other)) {
@@ -89,9 +80,6 @@ final class LessThan extends ComparablePredicate {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "<" + getValue();

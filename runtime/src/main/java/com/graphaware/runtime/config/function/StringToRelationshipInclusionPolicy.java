@@ -33,33 +33,21 @@ public final class StringToRelationshipInclusionPolicy extends StringToInclusion
         return INSTANCE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected RelationshipInclusionPolicy compositePolicy(RelationshipInclusionPolicy policy) {
         return CompositeRelationshipInclusionPolicy.of(IncludeAllBusinessRelationships.getInstance(), policy);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected RelationshipInclusionPolicy spelPolicy(String spel) {
         return new SpelRelationshipInclusionPolicy(spel);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected RelationshipInclusionPolicy all() {
         return IncludeAllBusinessRelationships.getInstance();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected RelationshipInclusionPolicy none() {
         return IncludeNoRelationships.getInstance();

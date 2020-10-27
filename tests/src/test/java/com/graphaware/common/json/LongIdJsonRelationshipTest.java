@@ -173,7 +173,7 @@ public class LongIdJsonRelationshipTest {
 
     private class TimesThousandNodeIdTransformer implements NodeIdTransformer<Long> {
 
-        @Override
+    @Override
         public long toGraphId(Long id) {
             if (id == null) {
                 return DetachedEntity.NEW;
@@ -182,7 +182,7 @@ public class LongIdJsonRelationshipTest {
             return id / 1000;
         }
 
-        @Override
+    @Override
         public Long fromEntity(Node entity) {
             return entity.getId() * 1000;
         }
@@ -190,7 +190,7 @@ public class LongIdJsonRelationshipTest {
 
     private class TimesThousandRelationshipIdTransformer implements RelationshipIdTransformer<Long> {
 
-        @Override
+    @Override
         public long toGraphId(Long id) {
             if (id == null) {
                 return DetachedEntity.NEW;
@@ -199,7 +199,7 @@ public class LongIdJsonRelationshipTest {
             return id / 1000;
         }
 
-        @Override
+    @Override
         public Long fromEntity(Relationship entity) {
             return entity.getId() * 1000;
         }

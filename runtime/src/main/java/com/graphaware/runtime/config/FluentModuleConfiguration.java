@@ -50,9 +50,6 @@ public final class FluentModuleConfiguration extends BaseModuleConfiguration<Flu
         super(inclusionPolicies);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected FluentModuleConfiguration newInstance(InclusionPolicies inclusionPolicies) {
         return new FluentModuleConfiguration(inclusionPolicies);

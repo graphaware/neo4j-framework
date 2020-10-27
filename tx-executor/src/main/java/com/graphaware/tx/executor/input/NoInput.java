@@ -31,9 +31,6 @@ public final class NoInput extends GeneratedInput<NullItem> {
         super(numberOfItems);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected NullItem generate() {
         return NullItem.getInstance();

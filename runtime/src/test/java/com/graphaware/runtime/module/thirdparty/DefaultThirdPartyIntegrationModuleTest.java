@@ -20,8 +20,9 @@ import com.graphaware.common.junit.InjectNeo4j;
 import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.common.representation.GraphDetachedNode;
 import com.graphaware.common.representation.GraphDetachedRelationship;
+import com.graphaware.runtime.CommunityRuntime;
 import com.graphaware.runtime.GraphAwareRuntime;
-import com.graphaware.runtime.GraphAwareRuntimeFactory;
+import com.graphaware.runtime.manager.CommunityModuleManager;
 import com.graphaware.runtime.module.Module;
 import com.graphaware.writer.thirdparty.*;
 import org.junit.jupiter.api.Test;
@@ -67,7 +68,7 @@ public class DefaultThirdPartyIntegrationModuleTest {
             tx.commit();
         }
 
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), database);
+        GraphAwareRuntime runtime = new CommunityRuntime(database, neo4j.databaseManagementService());
         runtime.registerModule(module);
         runtime.start();
 

@@ -25,17 +25,11 @@ import static org.springframework.util.Assert.notNull;
  */
 public abstract class BaseTrivialIdTransformer<E extends Entity> extends BaseIdTransformer<Long, E> {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected long toExistingGraphId(Long id) {
         return id;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final Long fromEntity(E entity) {
         notNull(entity, "Entity must not be null");

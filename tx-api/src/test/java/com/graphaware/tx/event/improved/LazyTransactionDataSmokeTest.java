@@ -230,7 +230,7 @@ public class LazyTransactionDataSmokeTest {
 
         private Set<String> capturedData = new HashSet<>();
 
-        @Override
+    @Override
         public Void beforeCommit(TransactionData data, Transaction tx, GraphDatabaseService database) {
             ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data, tx);
             capturedData.addAll(improvedTransactionData.mutationsToStrings());

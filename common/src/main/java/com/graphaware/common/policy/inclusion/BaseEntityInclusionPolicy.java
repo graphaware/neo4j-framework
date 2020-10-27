@@ -28,9 +28,6 @@ import org.neo4j.internal.helpers.collection.FilteringIterable;
  */
 public abstract class BaseEntityInclusionPolicy<T extends Entity> implements EntityInclusionPolicy<T> {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterable<T> getAll(Transaction tx) {
         return new FilteringIterable<>(doGetAll(tx), this::include);

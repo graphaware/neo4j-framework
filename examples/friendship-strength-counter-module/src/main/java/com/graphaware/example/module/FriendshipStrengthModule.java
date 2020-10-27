@@ -52,17 +52,11 @@ public class FriendshipStrengthModule extends BaseModule<Void> {
                 );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ModuleConfiguration getConfiguration() {
         return configuration;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Void beforeCommit(ImprovedTransactionData transactionData) {
         if (transactionData.mutationsOccurred()) {

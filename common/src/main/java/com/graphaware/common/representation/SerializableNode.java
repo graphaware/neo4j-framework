@@ -103,9 +103,6 @@ public class SerializableNode<ID> extends DetachedNode<ID> {
         this.id = id;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -124,9 +121,6 @@ public class SerializableNode<ID> extends DetachedNode<ID> {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int result = super.hashCode();

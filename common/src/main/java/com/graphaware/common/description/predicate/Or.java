@@ -35,17 +35,11 @@ final class Or extends BasePredicate {
         this.second = second;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean evaluate(Object beta) {
         return first.evaluate(beta) || second.evaluate(beta);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMoreGeneralThan(Predicate other) {
         if (super.isMoreGeneralThan(other)) {
@@ -55,9 +49,6 @@ final class Or extends BasePredicate {
         return first.isMoreGeneralThan(other) || second.isMoreGeneralThan(other);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMutuallyExclusive(Predicate other) {
         if (super.isMutuallyExclusive(other)) {
@@ -85,9 +76,6 @@ final class Or extends BasePredicate {
         return second;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -101,9 +89,6 @@ final class Or extends BasePredicate {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int result = first.hashCode();
@@ -111,9 +96,6 @@ final class Or extends BasePredicate {
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return getFirst().toString() + "||" + getSecond().toString();

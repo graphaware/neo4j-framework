@@ -28,9 +28,6 @@ public abstract class IncludeNoProperties<T extends Entity> implements PropertyI
     protected IncludeNoProperties() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final boolean include(String key, T entity) {
         return false;

@@ -34,9 +34,6 @@ public final class CompositeNodeInclusionPolicy extends CompositeEntityInclusion
         super(policies);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<Node> doGetAll(Transaction tx) {
         return tx.getAllNodes();

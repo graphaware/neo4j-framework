@@ -44,49 +44,31 @@ public abstract class BaseModule<T> implements Module<T> {
         this.moduleId = moduleId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getId() {
         return moduleId;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public ModuleConfiguration getConfiguration() {
         return NullModuleConfiguration.getInstance();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void start(GraphDatabaseService database) {
         //to be overridden
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void shutdown() {
         //to be overridden
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void afterCommit(T state) {
         //allow subclasses to override
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void afterRollback(T state) {
         //allow subclasses to override

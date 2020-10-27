@@ -59,9 +59,7 @@ public class Change<T> {
         return current;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    
     @SuppressWarnings("RedundantIfStatement")
     @Override
     public boolean equals(Object o) {
@@ -76,9 +74,6 @@ public class Change<T> {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int result = previous.hashCode();

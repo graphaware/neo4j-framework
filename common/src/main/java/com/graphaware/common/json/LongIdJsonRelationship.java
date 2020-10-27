@@ -66,9 +66,6 @@ public class LongIdJsonRelationship extends JsonRelationship<Long> {
         super(null, startNodeId, endNodeId, type, properties);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Relationship produceEntity(Transaction tx) {
         return produceEntity(tx, TrivialRelationshipIdTransformer.getInstance(), TrivialNodeIdTransformer.getInstance());

@@ -32,9 +32,6 @@ public class SpelNodePropertyInclusionPolicy extends SpelInclusionPolicy impleme
         super(expression);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(String key, Node node) {
         return (Boolean) exp.getValue(new AttachedNodeProperty(key, new AttachedNode(node)));

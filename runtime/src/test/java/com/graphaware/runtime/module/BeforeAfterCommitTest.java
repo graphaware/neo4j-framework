@@ -18,8 +18,8 @@ package com.graphaware.runtime.module;
 
 import com.graphaware.common.junit.InjectNeo4j;
 import com.graphaware.common.junit.Neo4jExtension;
+import com.graphaware.runtime.CommunityRuntime;
 import com.graphaware.runtime.GraphAwareRuntime;
-import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -44,7 +44,7 @@ public class BeforeAfterCommitTest {
     public void afterCommitShouldBeCalled() {
         BeforeAfterCommitModule module = new BeforeAfterCommitModule("test", null);
 
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), database);
+        GraphAwareRuntime runtime = new CommunityRuntime(database, neo4j.databaseManagementService());
         runtime.registerModule(module);
         runtime.start();
 
@@ -63,7 +63,7 @@ public class BeforeAfterCommitTest {
     public void afterRollbackShouldBeCalled() {
         BeforeAfterCommitModule module = new BeforeAfterCommitModule("test", null);
 
-        GraphAwareRuntime runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), database);
+        GraphAwareRuntime runtime = new CommunityRuntime(database, neo4j.databaseManagementService());
         runtime.registerModule(module);
         runtime.start();
 

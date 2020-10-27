@@ -38,9 +38,6 @@ public final class IncludeAllBusinessRelationshipProperties implements Relations
     private IncludeAllBusinessRelationshipProperties() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(String key, Relationship relationship) {
         if (key.startsWith(GraphAwareRuntime.GA_PREFIX)) {

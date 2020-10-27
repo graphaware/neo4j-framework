@@ -35,9 +35,6 @@ public final class IncludeAllNodes extends BaseNodeInclusionPolicy {
     private IncludeAllNodes() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(Node object) {
         return true;

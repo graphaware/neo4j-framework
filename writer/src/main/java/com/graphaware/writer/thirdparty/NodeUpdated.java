@@ -35,9 +35,6 @@ public class NodeUpdated<ID> extends Update<ID, DetachedNode<ID>, Node> {
         super(previous, current);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public OperationType getType() {
         return OperationType.NODE_UPDATED;

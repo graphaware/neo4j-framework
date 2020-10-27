@@ -36,9 +36,6 @@ public class RelationshipUpdated<ID> extends Update<ID, DetachedRelationship<ID,
         super(previous, current);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public OperationType getType() {
         return OperationType.RELATIONSHIP_UPDATED;

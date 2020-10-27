@@ -34,33 +34,21 @@ public final class StringToRelationshipPropertyInclusionPolicy extends StringToI
         return INSTANCE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected RelationshipPropertyInclusionPolicy compositePolicy(RelationshipPropertyInclusionPolicy policy) {
         return CompositeRelationshipPropertyInclusionPolicy.of(IncludeAllBusinessRelationshipProperties.getInstance(), policy);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected RelationshipPropertyInclusionPolicy spelPolicy(String spel) {
         return new SpelRelationshipPropertyInclusionPolicy(spel);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected RelationshipPropertyInclusionPolicy all() {
         return IncludeAllRelationshipProperties.getInstance();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected RelationshipPropertyInclusionPolicy none() {
         return  IncludeNoRelationshipProperties.getInstance();

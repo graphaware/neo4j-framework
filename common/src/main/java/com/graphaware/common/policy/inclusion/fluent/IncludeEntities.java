@@ -71,17 +71,11 @@ public abstract class IncludeEntities<C extends IncludeEntities<?, T>, T extends
         return propertiesDescription;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(T entity) {
         return new LiteralPropertiesDescription(entity).isMoreSpecificThan(propertiesDescription);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -94,9 +88,6 @@ public abstract class IncludeEntities<C extends IncludeEntities<?, T>, T extends
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return propertiesDescription.hashCode();

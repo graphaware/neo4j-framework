@@ -30,9 +30,6 @@ final class UndefinedValue {
         return INSTANCE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -40,17 +37,11 @@ final class UndefinedValue {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return "undef".hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "UNDEF";

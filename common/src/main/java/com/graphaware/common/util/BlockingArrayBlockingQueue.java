@@ -32,9 +32,6 @@ public class BlockingArrayBlockingQueue<E> extends ArrayBlockingQueue<E> {
         super(capacity);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean offer(E e) {
         try {

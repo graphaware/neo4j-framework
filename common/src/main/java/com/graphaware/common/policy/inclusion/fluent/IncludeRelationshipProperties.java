@@ -32,9 +32,6 @@ public class IncludeRelationshipProperties extends BaseIncludeProperties<Include
         super(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected IncludeRelationshipProperties newInstance(String key) {
         return new IncludeRelationshipProperties(key);

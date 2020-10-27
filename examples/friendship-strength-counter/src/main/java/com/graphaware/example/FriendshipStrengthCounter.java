@@ -44,9 +44,6 @@ public class FriendshipStrengthCounter extends TransactionEventListenerAdapter<V
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Void beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) throws Exception {
         ImprovedTransactionData improvedTransactionData = new LazyTransactionData(data, transaction);

@@ -75,18 +75,12 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
      */
     protected abstract T newSnapshot(T original);
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasBeenCreated(T entity) {
         initializeCreated();
         return created.containsKey(entity.getId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<T> getAllCreated() {
         initializeCreated();
@@ -111,18 +105,12 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
      */
     protected abstract Iterable<T> created();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasBeenDeleted(T entity) {
         initializeDeleted();
         return deleted.containsKey(entity.getId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T getDeleted(T entity) {
         initializeDeleted();
@@ -134,9 +122,6 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
         return deleted.get(entity.getId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<T> getAllDeleted() {
         initializeDeleted();
@@ -161,18 +146,12 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
      */
     protected abstract Iterable<T> deleted();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasBeenChanged(T entity) {
         initializeChanged();
         return changedContainsKey(entity);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Change<T> getChanged(T entity) {
         initializeChanged();
@@ -184,9 +163,6 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
         return changed.get(entity.getId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Change<T>> getAllChanged() {
         initializeChanged();
@@ -255,9 +231,6 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
      */
     protected abstract Iterable<PropertyEntry<T>> removedProperties();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasPropertyBeenCreated(T entity, String key) {
         initializeProperties();
@@ -274,9 +247,6 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
         return createdProperties.get(entity.getId()).containsKey(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Map<String, Object> createdProperties(T entity) {
         initializeProperties();
@@ -293,9 +263,6 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
         return Collections.unmodifiableMap(createdProperties.get(entity.getId()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasPropertyBeenDeleted(T entity, String key) {
         initializeProperties();
@@ -312,9 +279,6 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
         return deletedProperties.get(entity.getId()).containsKey(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Map<String, Object> deletedProperties(T entity) {
         initializeProperties();
@@ -331,9 +295,6 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
         return Collections.unmodifiableMap(deletedProperties.get(entity.getId()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Map<String, Object> propertiesOfDeletedEntity(T entity) {
         initializeProperties();
@@ -350,9 +311,6 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
         return Collections.unmodifiableMap(deletedEntityProperties.get(entity.getId()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasPropertyBeenChanged(T entity, String key) {
         initializeProperties();
@@ -369,9 +327,6 @@ public abstract class LazyEntityTransactionData<T extends Entity> implements Ent
         return changedProperties.get(entity.getId()).containsKey(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Map<String, Change<Object>> changedProperties(T entity) {
         initializeProperties();

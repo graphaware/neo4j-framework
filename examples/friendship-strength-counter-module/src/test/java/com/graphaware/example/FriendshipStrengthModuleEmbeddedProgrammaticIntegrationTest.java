@@ -20,15 +20,15 @@ import com.graphaware.common.junit.InjectNeo4j;
 import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.example.module.FriendshipStrengthCounter;
 import com.graphaware.example.module.FriendshipStrengthModule;
+import com.graphaware.runtime.CommunityRuntime;
 import com.graphaware.runtime.GraphAwareRuntime;
-import com.graphaware.runtime.GraphAwareRuntimeFactory;
+import com.graphaware.runtime.manager.CommunityModuleManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.neo4j.graphdb.*;
 import org.neo4j.harness.Neo4j;
-import org.neo4j.harness.Neo4jBuilders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -46,7 +46,8 @@ public class FriendshipStrengthModuleEmbeddedProgrammaticIntegrationTest {
 
     @BeforeEach
     public void setUp() {
-        runtime = GraphAwareRuntimeFactory.createRuntime(neo4j.databaseManagementService(), neo4j.defaultDatabaseService());
+        GraphDatabaseService database = neo4j.defaultDatabaseService();
+        runtime = new CommunityRuntime(database, neo4j.databaseManagementService());
         runtime.registerModule(new FriendshipStrengthModule("FSM"));
         runtime.start();
     }

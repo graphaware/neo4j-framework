@@ -38,17 +38,11 @@ public abstract class BaseModuleManager implements ModuleManager {
     protected BaseModuleManager() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final void registerModule(Module module) {
         modules.put(module.getId(), module);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <M extends Module<?>> M getModule(String moduleId, Class<M> clazz) {
         if (!modules.containsKey(moduleId)) {
@@ -64,9 +58,6 @@ public abstract class BaseModuleManager implements ModuleManager {
         return (M) module;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public <M extends Module<?>> M getModule(Class<M> clazz) {
         M result = null;
@@ -100,17 +91,11 @@ public abstract class BaseModuleManager implements ModuleManager {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void startModules() {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void stopModules() {
         for (Module<?> module : modules.values()) {

@@ -144,9 +144,6 @@ public class SerializableRelationship<ID> extends DetachedRelationship<ID, Seria
         return new SerializableNode<>(relationship.getEndNode(), nodeIdTransformer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -171,9 +168,6 @@ public class SerializableRelationship<ID> extends DetachedRelationship<ID, Seria
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int result = super.hashCode();

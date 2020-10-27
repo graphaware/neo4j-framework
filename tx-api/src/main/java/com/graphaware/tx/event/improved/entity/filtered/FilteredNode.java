@@ -39,33 +39,21 @@ public class FilteredNode extends FilteredEntity<Node> implements Node, NodeWrap
         super(wrapped, policies);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Node self() {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected PropertyInclusionPolicy<Node> getPropertyInclusionPolicy() {
         return policies.getNodePropertyInclusionPolicy();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<Relationship> wrapRelationships(Iterable<Relationship> relationships, Direction direction, RelationshipType... relationshipTypes) {
         return new FilteredRelationshipIterator(relationships, policies);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Relationship wrapRelationship(Relationship relationship) {
         return new FilteredRelationship(relationship, policies);

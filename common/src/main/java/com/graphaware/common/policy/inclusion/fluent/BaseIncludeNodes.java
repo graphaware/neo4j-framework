@@ -81,9 +81,6 @@ public abstract class BaseIncludeNodes<T extends BaseIncludeNodes<T>> extends In
      */
     protected abstract T newInstance(String label);
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(Node node) {
         return !(label != null && !node.hasLabel(Label.label(label))) && super.include(node);
@@ -98,9 +95,6 @@ public abstract class BaseIncludeNodes<T extends BaseIncludeNodes<T>> extends In
         return label;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -114,9 +108,6 @@ public abstract class BaseIncludeNodes<T extends BaseIncludeNodes<T>> extends In
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int result = super.hashCode();

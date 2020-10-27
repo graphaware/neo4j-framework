@@ -38,9 +38,6 @@ public final class IncludeAllBusinessNodeProperties implements NodePropertyInclu
     private IncludeAllBusinessNodeProperties() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(String key, Node node) {
         return !key.startsWith(GraphAwareRuntime.GA_PREFIX);

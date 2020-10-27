@@ -34,17 +34,11 @@ public class SpelNodeInclusionPolicy extends SpelInclusionPolicy implements Node
         super(expression);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(Node node) {
         return (Boolean) exp.getValue(new AttachedNode(node));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterable<Node> getAll(Transaction tx) {
         //In simple cases, we can fetch nodes using more efficient native syntax

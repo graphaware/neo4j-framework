@@ -26,9 +26,6 @@ public abstract class DisposableBatchTransactionExecutor implements BatchTransac
 
     private final AtomicBoolean alreadyExecuted = new AtomicBoolean(false);
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final void execute() {
         if (alreadyExecuted.compareAndSet(false, true)) {

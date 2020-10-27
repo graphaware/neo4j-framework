@@ -29,9 +29,6 @@ import org.neo4j.graphdb.Entity;
  */
 public abstract class IncludeAllBusinessProperties<T extends Entity> implements PropertyInclusionPolicy<T> {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(String key, T entity) {
         if (key.startsWith(GraphAwareRuntime.GA_PREFIX)) {

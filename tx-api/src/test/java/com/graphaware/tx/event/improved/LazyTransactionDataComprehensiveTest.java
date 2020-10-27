@@ -1514,7 +1514,7 @@ public class LazyTransactionDataComprehensiveTest {
                             assertFalse(td.mutationsOccurred());
                         }
 
-                        @Override
+    @Override
                         public boolean mutationsOccurred() {
                             return true;
                         }
@@ -1630,18 +1630,18 @@ public class LazyTransactionDataComprehensiveTest {
             this.beforeCommitCallback = beforeCommitCallback;
         }
 
-        @Override
+    @Override
         public Object beforeCommit(TransactionData data, Transaction tx, GraphDatabaseService database) throws Exception {
             beforeCommitCallback.beforeCommit(new LazyTransactionData(data, tx), tx);
             return null;
         }
 
-        @Override
+    @Override
         public void afterCommit(TransactionData data, Object state, GraphDatabaseService database) {
             //do nothing
         }
 
-        @Override
+    @Override
         public void afterRollback(TransactionData data, Object state, GraphDatabaseService database) {
             //do nothing
         }
@@ -1656,7 +1656,7 @@ public class LazyTransactionDataComprehensiveTest {
 
             private boolean mutationsOccurred = false;
 
-            @Override
+    @Override
             public void beforeCommit(ImprovedTransactionData transactionData, Transaction tx) {
                 if (!transactionData.mutationsOccurred()) {
                     return;
@@ -1718,7 +1718,7 @@ public class LazyTransactionDataComprehensiveTest {
 
     private class TestGraphMutation extends VoidReturningCallback {
 
-        @Override
+    @Override
         public void doInTx(Transaction tx) {
             Node one = getNodeById(tx, ids.get(1L));
             one.setProperty(NAME, "NewOne");

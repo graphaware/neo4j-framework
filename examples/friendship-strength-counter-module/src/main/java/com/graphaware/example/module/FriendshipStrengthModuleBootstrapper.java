@@ -29,11 +29,8 @@ import java.util.Map;
  */
 public class FriendshipStrengthModuleBootstrapper implements ModuleBootstrapper {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Module<?> bootstrapModule(String moduleId, Configuration config, GraphDatabaseService database, GraphAwareRuntime runtime) {
+    public Module<?> bootstrapModule(String moduleId, Configuration config) {
         return new FriendshipStrengthModule(moduleId);
     }
 }

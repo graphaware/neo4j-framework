@@ -33,27 +33,18 @@ class EqualTo extends ValueBasedPredicate<Object> {
         super(value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean evaluate(Object beta) {
         checkValueIsLegal(beta);
         return arrayFriendlyEquals(getValue(), beta);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMoreGeneralThan(Predicate other) {
         return super.isMoreGeneralThan(other)
                 || (other instanceof EqualTo && arrayFriendlyEquals(getValue(), ((EqualTo) other).getValue()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMutuallyExclusive(Predicate other) {
         if (super.isMutuallyExclusive(other)) {
@@ -67,9 +58,6 @@ class EqualTo extends ValueBasedPredicate<Object> {
         return other.isMutuallyExclusive(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "=" + getValue();

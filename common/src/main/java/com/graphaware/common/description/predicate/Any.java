@@ -36,34 +36,22 @@ final class Any extends BasePredicate {
         return INSTANCE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean evaluate(Object beta) {
         checkValueIsLegal(beta);
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMoreGeneralThan(Predicate other) {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMutuallyExclusive(Predicate other) {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -71,17 +59,11 @@ final class Any extends BasePredicate {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return "any".hashCode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "=*";

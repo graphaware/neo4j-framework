@@ -33,9 +33,6 @@ public final class IncludeAllRelationships extends RelationshipInclusionPolicy.A
     private IncludeAllRelationships() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(Relationship object) {
         return true;

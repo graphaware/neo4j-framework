@@ -36,26 +36,14 @@ public class FilteredRelationship extends FilteredEntity<Relationship> implement
     public FilteredRelationship(Relationship wrapped, InclusionPolicies policies) {
         super(wrapped, policies);
     }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected PropertyInclusionPolicy<Relationship> getPropertyInclusionPolicy() {
         return policies.getRelationshipPropertyInclusionPolicy();
     }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Relationship self() {
         return this;
     }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Node wrapNode(Node node) {
         return new FilteredNode(node, policies);

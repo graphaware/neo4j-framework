@@ -27,9 +27,6 @@ import java.io.IOException;
  */
 public abstract class GraphgenPopulator extends CypherPopulator {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected String[] statementGroups() {
         StringBuilder schema = new StringBuilder();

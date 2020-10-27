@@ -103,7 +103,7 @@ public class NoInputBatchTransactionExecutorTest {
             this.exceptionRate = exceptionRate;
         }
 
-        @Override
+    @Override
         public void execute(Transaction tx, NullItem input, int batchNumber, int stepNumber) {
             steps++;
             if (steps % exceptionRate == 0) {

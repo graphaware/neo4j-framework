@@ -60,9 +60,6 @@ public class TransactionalInput<T> extends PrefetchingIterator<T> implements Ite
         this.batchSize = batchSize;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected synchronized T fetchNextOrNull() {
         beginTxIfNeeded();
@@ -115,9 +112,6 @@ public class TransactionalInput<T> extends PrefetchingIterator<T> implements Ite
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<T> iterator() {
         return this;

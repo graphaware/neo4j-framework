@@ -39,17 +39,11 @@ public abstract class SpelInclusionPolicy {
         this.exp = parser.parseExpression(expression);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return expression;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -62,9 +56,6 @@ public abstract class SpelInclusionPolicy {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return expression.hashCode();

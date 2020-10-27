@@ -45,9 +45,6 @@ abstract class ValueBasedPredicate<V> extends BasePredicate {
         return value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -60,9 +57,6 @@ abstract class ValueBasedPredicate<V> extends BasePredicate {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return arrayFriendlyHashCode(value);

@@ -23,24 +23,18 @@ public class CommunityRuntimeConfiguration implements RuntimeConfiguration {
         this.runtimeConfiguration = configurationReader.readConfiguration();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean runtimeEnabled() {
         return NEO4J.equals(database.databaseName());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Map<String, ModuleConfig> loadConfig() {
+    public Map<String, DeclaredConfiguration> loadConfig() {
         if (!runtimeEnabled()) {
             return Collections.emptyMap();
         }
 
-        Map<String, ModuleConfig> orderedBootstrappers = new HashMap<>();
+        Map<String, DeclaredConfiguration> orderedBootstrappers = new HashMap<>();
 
         Configuration subset = runtimeConfiguration.subset(MODULE_CONFIG_KEY);
 
@@ -52,7 +46,7 @@ public class CommunityRuntimeConfiguration implements RuntimeConfiguration {
                     String moduleId = matcher.group(2);
                     int moduleOrder = Integer.parseInt(matcher.group(3));
                     String bootstrapperClass = subset.getString(s, "UNKNOWN");
-                    orderedBootstrappers.put(moduleId, new ModuleConfig(moduleOrder, moduleId, bootstrapperClass, database.databaseName(), subset.subset(dbName).subset(moduleId)));
+                    orderedBootstrappers.put(moduleId, new DeclaredConfiguration(moduleOrder, moduleId, bootstrapperClass, database.databaseName(), subset.subset(dbName).subset(moduleId)));
                 }
             }
         });

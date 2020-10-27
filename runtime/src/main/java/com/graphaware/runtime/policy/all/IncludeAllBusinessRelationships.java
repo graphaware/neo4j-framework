@@ -36,17 +36,11 @@ public final class IncludeAllBusinessRelationships extends RelationshipInclusion
     private IncludeAllBusinessRelationships() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(Relationship relationship) {
         return !relationship.getType().name().startsWith(GraphAwareRuntime.GA_PREFIX);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<Relationship> doGetAll(Transaction tx) {
         return tx.getAllRelationships();

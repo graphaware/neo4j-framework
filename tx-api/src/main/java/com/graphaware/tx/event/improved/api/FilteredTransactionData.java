@@ -63,25 +63,16 @@ public class FilteredTransactionData extends BaseImprovedTransactionData impleme
         relationshipTransactionData = new FilteredRelationshipTransactionData(transactionDataContainer.getRelationshipTransactionData(), inclusionPolicies);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public NodeTransactionData getNodeTransactionData() {
         return nodeTransactionData;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public RelationshipTransactionData getRelationshipTransactionData() {
         return relationshipTransactionData;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean mutationsOccurred() {
         //overridden for optimization - we don't want to load things (and especially properties) if we don't need to

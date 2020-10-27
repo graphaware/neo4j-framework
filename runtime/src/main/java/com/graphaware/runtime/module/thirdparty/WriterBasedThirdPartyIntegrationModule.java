@@ -44,26 +44,17 @@ public abstract class WriterBasedThirdPartyIntegrationModule<ID> extends ThirdPa
         this.writer = writer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void afterCommit(Collection<WriteOperation<?>> state) {
         writer.write(state, getId() + "-" + System.currentTimeMillis());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void start(GraphDatabaseService database) {
         super.start(database);
         writer.start();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void shutdown() {
         writer.stop();

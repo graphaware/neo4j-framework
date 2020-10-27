@@ -35,9 +35,6 @@ public class UnorderedPair<T> extends SameTypePair<T> {
         super(first, second);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj)
@@ -51,9 +48,6 @@ public class UnorderedPair<T> extends SameTypePair<T> {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return Objects.hashCode(first()) + Objects.hashCode(second());

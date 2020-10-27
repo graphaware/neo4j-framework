@@ -909,7 +909,7 @@ public class GraphUnitTest {
      */
     class BlueNodeInclusionPolicy extends BaseNodeInclusionPolicy {
 
-        @Override
+    @Override
         public boolean include(Node node) {
             return node.hasLabel(Label.label("Blue"));
         }
@@ -920,7 +920,7 @@ public class GraphUnitTest {
      */
     class ExcludeChangeSetNodeInclusionPolicy extends BaseNodeInclusionPolicy {
 
-        @Override
+    @Override
         public boolean include(Node node) {
             return !(node.hasLabel(Label.label("ChangeSet")));
         }
@@ -931,7 +931,7 @@ public class GraphUnitTest {
      */
     class Rel2InclusionPolicy extends RelationshipInclusionPolicy.Adapter {
 
-        @Override
+    @Override
         public boolean include(Relationship relationship) {
             return relationship.getType().name().equals("REL2");
         }
@@ -942,7 +942,7 @@ public class GraphUnitTest {
      */
     class ExcludeNextInclusionPolicy extends RelationshipInclusionPolicy.Adapter {
 
-        @Override
+    @Override
         public boolean include(Relationship relationship) {
             return !(relationship.getType().name().equals("NEXT"));
         }
@@ -950,7 +950,7 @@ public class GraphUnitTest {
 
     class ExcludeCountPropertyInclusionPolicy implements RelationshipPropertyInclusionPolicy {
 
-        @Override
+    @Override
         public boolean include(String s, Relationship relationship) {
             return !s.equals("count");
         }
@@ -958,7 +958,7 @@ public class GraphUnitTest {
 
     class ExcludeCreatedOnPropertyInclusionPolicy implements NodePropertyInclusionPolicy {
 
-        @Override
+    @Override
         public boolean include(String s, Node node) {
             return !s.equals("createdOn");
         }

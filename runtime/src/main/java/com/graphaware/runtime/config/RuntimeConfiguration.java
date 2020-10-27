@@ -19,7 +19,7 @@ public interface RuntimeConfiguration {
     /**
      * Load the runtime configuration.
      *
-     * @return a configuration map, where key is a {@link Module} ID and value is the module's {@link ModuleConfig}.
+     * @return a configuration map, where key is a {@link Module} ID and value is the module's {@link DeclaredConfiguration}.
      */
-    Map<String, ModuleConfig> loadConfig();
+    Map<String, DeclaredConfiguration> loadConfig();
 }

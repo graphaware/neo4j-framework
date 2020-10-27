@@ -53,57 +53,36 @@ public class LazyNodeTransactionData extends LazyEntityTransactionData<Node> imp
         this.transactionDataContainer = transactionDataContainer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Node oldSnapshot(Node original) {
         return new NodeSnapshot(original, transactionDataContainer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Node newSnapshot(Node original) {
         return original;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<Node> created() {
         return transactionData.createdNodes();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<Node> deleted() {
         return transactionData.deletedNodes();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<PropertyEntry<Node>> assignedProperties() {
         return transactionData.assignedNodeProperties();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<PropertyEntry<Node>> removedProperties() {
         return transactionData.removedNodeProperties();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasLabelBeenAssigned(Node node, Label label) {
         initializeChanged();
@@ -120,9 +99,6 @@ public class LazyNodeTransactionData extends LazyEntityTransactionData<Node> imp
         return assignedLabels.get(node.getId()).contains(label);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Set<Label> assignedLabels(Node node) {
         initializeChanged();
@@ -139,9 +115,6 @@ public class LazyNodeTransactionData extends LazyEntityTransactionData<Node> imp
         return Collections.unmodifiableSet(assignedLabels.get(node.getId()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasLabelBeenRemoved(Node node, Label label) {
         initializeChanged();
@@ -158,9 +131,6 @@ public class LazyNodeTransactionData extends LazyEntityTransactionData<Node> imp
         return removedLabels.get(node.getId()).contains(label);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Set<Label> removedLabels(Node node) {
         initializeChanged();
@@ -177,9 +147,6 @@ public class LazyNodeTransactionData extends LazyEntityTransactionData<Node> imp
         return Collections.unmodifiableSet(removedLabels.get(node.getId()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Set<Label> labelsOfDeletedNode(Node node) {
         initializeChanged();

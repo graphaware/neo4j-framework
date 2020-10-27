@@ -24,9 +24,6 @@ import org.neo4j.graphdb.Transaction;
  */
 public abstract class VoidReturningCallback implements TransactionCallback<Void> {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final Void doInTransaction(Transaction database) {
         doInTx(database);

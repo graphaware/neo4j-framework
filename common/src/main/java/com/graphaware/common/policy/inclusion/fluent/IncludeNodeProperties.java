@@ -32,9 +32,6 @@ public class IncludeNodeProperties extends BaseIncludeProperties<IncludeNodeProp
         super(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected IncludeNodeProperties newInstance(String key) {
         return new IncludeNodeProperties(key);

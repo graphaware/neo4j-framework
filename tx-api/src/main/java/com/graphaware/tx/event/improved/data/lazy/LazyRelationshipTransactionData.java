@@ -53,81 +53,51 @@ public class LazyRelationshipTransactionData extends LazyEntityTransactionData<R
         this.transactionDataContainer = transactionDataContainer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Relationship oldSnapshot(Relationship original) {
         return new RelationshipSnapshot(original, transactionDataContainer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Relationship newSnapshot(Relationship original) {
         return original;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<Relationship> created() {
         return transactionData.createdRelationships();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<Relationship> deleted() {
         return transactionData.deletedRelationships();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<PropertyEntry<Relationship>> assignedProperties() {
         return transactionData.assignedRelationshipProperties();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<PropertyEntry<Relationship>> removedProperties() {
         return transactionData.removedRelationshipProperties();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Relationship> getCreated(Node node, RelationshipType... types) {
         return getCreated(node, BOTH, types);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Relationship> getCreated(Node node, Direction direction, RelationshipType... types) {
         return filterRelationships(getAllCreated(), node, direction, types);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Relationship> getDeleted(Node node, RelationshipType... types) {
         return getDeleted(node, BOTH, types);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collection<Relationship> getDeleted(Node node, Direction direction, RelationshipType... types) {
         return filterRelationships(getAllDeleted(), node, direction, types);

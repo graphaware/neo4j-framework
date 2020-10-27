@@ -54,25 +54,16 @@ public class IncludeRelationships extends BaseIncludeRelationships<IncludeRelati
         super(direction, relationshipTypes, propertiesDescription);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected IncludeRelationships newInstance(Direction direction, String... relationshipTypes) {
         return new IncludeRelationships(direction, relationshipTypes, getPropertiesDescription());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected IncludeRelationships newInstance(DetachedPropertiesDescription propertiesDescription) {
         return new IncludeRelationships(getDirection(), getRelationshipTypes(), propertiesDescription);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Iterable<Relationship> doGetAll(Transaction tx) {
         return tx.getAllRelationships();

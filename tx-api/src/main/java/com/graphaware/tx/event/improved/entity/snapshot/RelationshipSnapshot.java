@@ -40,25 +40,16 @@ public class RelationshipSnapshot extends EntitySnapshot<Relationship> implement
         super(wrapped, transactionDataContainer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected EntityTransactionData<Relationship> transactionData() {
         return transactionDataContainer.getRelationshipTransactionData();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Relationship self() {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void delete() {
         if (transactionDataContainer.getRelationshipTransactionData().hasBeenDeleted(wrapped)) {
@@ -68,9 +59,6 @@ public class RelationshipSnapshot extends EntitySnapshot<Relationship> implement
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Node wrapNode(Node node) {
         return new NodeSnapshot(node, transactionDataContainer);

@@ -23,9 +23,6 @@ import java.util.UUID;
  */
 public class EaioUuidGenerator implements UuidGenerator {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String generateUuid() {
         UUID uuid = UUID.randomUUID();

@@ -23,17 +23,11 @@ import com.graphaware.common.description.BasePartiallyComparable;
  */
 public abstract class BasePropertiesDescription extends BasePartiallyComparable<PropertiesDescription> implements PropertiesDescription {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected final PropertiesDescription self() {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMoreGeneralThan(PropertiesDescription other) {
         for (String key : getKeys()) {
@@ -51,9 +45,6 @@ public abstract class BasePropertiesDescription extends BasePartiallyComparable<
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isMutuallyExclusive(PropertiesDescription other) {
         for (String key : getKeys()) {
@@ -71,9 +62,6 @@ public abstract class BasePropertiesDescription extends BasePartiallyComparable<
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();

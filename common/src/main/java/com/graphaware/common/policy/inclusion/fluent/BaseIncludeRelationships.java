@@ -132,9 +132,6 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
      */
     protected abstract T newInstance(Direction direction, String... relationshipTypes);
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(Relationship relationship) {
         if (relationshipTypes == null || relationshipTypes.length == 0) {
@@ -150,9 +147,6 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean include(Relationship relationship, Node pointOfView) {
         return include(relationship)
@@ -197,9 +191,6 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
         return types.toArray(new String[types.size()]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -214,9 +205,6 @@ public abstract class BaseIncludeRelationships<T extends BaseIncludeRelationship
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         int result = super.hashCode();

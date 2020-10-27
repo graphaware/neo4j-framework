@@ -45,9 +45,6 @@ public abstract class BaseModuleConfiguration<T extends BaseModuleConfiguration<
      */
     protected abstract T newInstance(InclusionPolicies inclusionPolicies);
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public InclusionPolicies getInclusionPolicies() {
         return inclusionPolicies;
@@ -103,9 +100,6 @@ public abstract class BaseModuleConfiguration<T extends BaseModuleConfiguration<
         return newInstance(inclusionPolicies);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -124,9 +118,6 @@ public abstract class BaseModuleConfiguration<T extends BaseModuleConfiguration<
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return inclusionPolicies.hashCode();

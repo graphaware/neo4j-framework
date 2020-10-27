@@ -38,9 +38,6 @@ public final class RethrowException implements ExceptionHandlingStrategy {
         return INSTANCE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void handleException(RuntimeException e) {
         LOG.warn("An exception occurred while executing transaction", e);

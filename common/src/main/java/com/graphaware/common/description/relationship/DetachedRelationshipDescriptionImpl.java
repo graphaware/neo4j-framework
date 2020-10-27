@@ -37,17 +37,11 @@ public class DetachedRelationshipDescriptionImpl extends BaseRelationshipDescrip
         super(relationshipType, direction, propertiesDescription);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public DetachedRelationshipDescription with(String propertyKey, Predicate predicate) {
         return new DetachedRelationshipDescriptionImpl(getType(), getDirection(), getPropertiesDescription().with(propertyKey, predicate));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return getType() + "#" + getDirection() + "#" + getPropertiesDescription().toString();

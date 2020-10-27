@@ -34,9 +34,6 @@ public class NodeDeleted<ID> extends CreateOrDelete<ID, DetachedNode<ID>, Node> 
         super(deletedNode);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public OperationType getType() {
         return OperationType.NODE_DELETED;

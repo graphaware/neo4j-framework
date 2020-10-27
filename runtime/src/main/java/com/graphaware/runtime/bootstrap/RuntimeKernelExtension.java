@@ -17,11 +17,12 @@
 package com.graphaware.runtime.bootstrap;
 
 import com.graphaware.common.log.LoggerFactory;
+import com.graphaware.runtime.CommunityRuntime;
 import com.graphaware.runtime.GraphAwareRuntime;
-import com.graphaware.runtime.GraphAwareRuntimeFactory;
 import com.graphaware.runtime.config.Neo4jConfigurationReader;
 import com.graphaware.runtime.config.CommunityRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
+import com.graphaware.runtime.manager.CommunityModuleManager;
 import com.graphaware.runtime.module.Module;
 import com.graphaware.runtime.module.ModuleBootstrapper;
 import org.neo4j.configuration.Config;
@@ -33,8 +34,7 @@ import org.neo4j.logging.Log;
 import java.util.Map;
 
 /**
- * Neo4j kernel extension that automatically creates a {@link GraphAwareRuntime} for the Neo4j database
- * and registers {@link Module}s with it.
+ * Neo4j kernel extension that creates a {@link GraphAwareRuntime} for the Neo4j database and registers {@link Module}s with it.
  */
 public class RuntimeKernelExtension implements Lifecycle {
     private static final Log LOG = LoggerFactory.getLogger(RuntimeKernelExtension.class);
@@ -54,9 +54,6 @@ public class RuntimeKernelExtension implements Lifecycle {
         return new CommunityRuntimeConfiguration(database, new Neo4jConfigurationReader(neo4jConfig));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void init() {
         if (isOnEnterprise() && !hasEnterpriseFramework()) {
@@ -64,9 +61,6 @@ public class RuntimeKernelExtension implements Lifecycle {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void start() {
         if (!runtimeConfiguration.runtimeEnabled()) {
@@ -84,7 +78,7 @@ public class RuntimeKernelExtension implements Lifecycle {
     }
 
     protected GraphAwareRuntime createRuntime() {
-        return GraphAwareRuntimeFactory.createRuntime(managementService, database);
+        return new CommunityRuntime(database, managementService);
     }
 
     private void registerModules(GraphAwareRuntime runtime) {
@@ -93,7 +87,8 @@ public class RuntimeKernelExtension implements Lifecycle {
 
             try {
                 ModuleBootstrapper bootstrapper = (ModuleBootstrapper) Class.forName(entry.getValue().getBootstrapper()).getDeclaredConstructor().newInstance();
-                runtime.registerModule(bootstrapper.bootstrapModule(entry.getValue().getId(), entry.getValue().getConfig(), database, runtime));
+                Module<?> module = bootstrapper.bootstrapModule(entry.getValue().getId(), entry.getValue().getConfig());
+                runtime.registerModule(module);
             } catch (Exception e) {
                 LOG.error("Unable to bootstrap module " + entry.getKey() + " for database " + database.databaseName(), e);
             }
@@ -118,17 +113,11 @@ public class RuntimeKernelExtension implements Lifecycle {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void stop() {
         runtime = null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void shutdown() {
         //do nothing

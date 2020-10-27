@@ -36,9 +36,6 @@ final class Undefined extends EqualTo {
         return INSTANCE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "=UNDEF";

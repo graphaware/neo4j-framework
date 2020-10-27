@@ -38,17 +38,11 @@ public abstract class BaseEntityWrapper<T extends Entity> extends BaseEntity imp
 
     //Typically overridden:
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasProperty(String key) {
         return getWrapped().hasProperty(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object getProperty(String key) {
         if (!hasProperty(key)) {
@@ -57,25 +51,16 @@ public abstract class BaseEntityWrapper<T extends Entity> extends BaseEntity imp
         return getWrapped().getProperty(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void setProperty(String key, Object value) {
         getWrapped().setProperty(key, value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object removeProperty(String key) {
         return getWrapped().removeProperty(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterable<String> getPropertyKeys() {
         return getWrapped().getPropertyKeys();
@@ -275,9 +260,6 @@ public abstract class BaseEntityWrapper<T extends Entity> extends BaseEntity imp
         throw new IllegalStateException(this + " is not a Node or Relationship");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -296,9 +278,6 @@ public abstract class BaseEntityWrapper<T extends Entity> extends BaseEntity imp
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return getWrapped().hashCode();

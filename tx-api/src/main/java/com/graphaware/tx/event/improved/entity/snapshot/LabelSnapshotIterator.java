@@ -49,17 +49,11 @@ public class LabelSnapshotIterator extends PrefetchingIterator<Label> implements
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<Label> iterator() {
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Label fetchNextOrNull() {
         while (wrappedIterator.hasNext()) {

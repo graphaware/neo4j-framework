@@ -45,81 +45,51 @@ public class FilteredNodeTransactionData extends FilteredEntityTransactionData<N
         this.wrapped = wrapped;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected NodeTransactionData getWrapped() {
         return wrapped;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected Node filtered(Node original) {
         return new FilteredNode(original, policies);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected EntityInclusionPolicy<Node> getEntityInclusionPolicy() {
         return policies.getNodeInclusionPolicy();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected PropertyInclusionPolicy<Node> getPropertyInclusionPolicy() {
         return policies.getNodePropertyInclusionPolicy();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasLabelBeenAssigned(Node node, Label label) {
         return getWrapped().hasLabelBeenAssigned(node, label);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Set<Label> assignedLabels(Node node) {
         return getWrapped().assignedLabels(node);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasLabelBeenRemoved(Node node, Label label) {
         return getWrapped().hasLabelBeenRemoved(node, label);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Set<Label> removedLabels(Node node) {
         return getWrapped().removedLabels(node);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Set<Label> labelsOfDeletedNode(Node node) {
         return getWrapped().labelsOfDeletedNode(node);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean hasChanged(Change<Node> candidate) {
         return super.hasChanged(candidate) || !assignedLabels(candidate.getPrevious()).isEmpty() || !removedLabels(candidate.getPrevious()).isEmpty();

@@ -49,17 +49,11 @@ public abstract class GeneratedInput<T> implements Iterable<T>, Iterator<T> {
      */
     protected abstract T generate();
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean hasNext() {
         return generated.get() < numberOfItems;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public T next() {
         if (generated.incrementAndGet() > numberOfItems) {
@@ -69,17 +63,11 @@ public abstract class GeneratedInput<T> implements Iterable<T>, Iterator<T> {
         return generate();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void remove() {
         throw new UnsupportedOperationException("GeneratedInput does not support removal. It has nothing to remove!");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<T> iterator() {
         return this;

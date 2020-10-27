@@ -29,9 +29,6 @@ public abstract class BaseEntity implements Entity {
 
     //Typically no need to override:
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object getProperty(String key, Object defaultValue) {
         if (!hasProperty(key)) {
@@ -40,9 +37,6 @@ public abstract class BaseEntity implements Entity {
         return getProperty(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Map<String, Object> getAllProperties() {
         Map<String, Object> result = new HashMap<>();
@@ -54,9 +48,6 @@ public abstract class BaseEntity implements Entity {
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Map<String, Object> getProperties(String... keys) {
         Map<String, Object> result = new HashMap<>();

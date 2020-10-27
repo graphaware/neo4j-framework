@@ -27,9 +27,6 @@ import org.neo4j.graphdb.Entity;
  */
 public abstract class BaseIdTransformer<ID, E extends Entity> implements IdTransformer<ID, E> {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final long toGraphId(ID id) {
         if (id == null) {
