@@ -44,6 +44,7 @@ public class FriendshipStrengthModuleEmbeddedDeclarativeIntegrationTest {
     public void setUp() {
         neo4j = Neo4jBuilders.newInProcessBuilder()
                 .withDisabledServer()
+                .withExtensionFactories(new ArrayList<>(Collections.singleton(new RuntimeExtensionFactory())))
                 .withConfig(FrameworkSettingsDeclaration.ga_config_file_name, "neo4j-friendship.conf")
                 .build();
 
