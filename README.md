@@ -47,8 +47,41 @@ The framework and modules are then used via Cypher calls to their procedures, if
 ### Configuration
 
 By default, the Framework reads its configuration from `graphaware.conf` located in the `conf` directory of Neo4j. You
-can change the file name by setting `com.graphaware.config.file` to your desired value in `neo4j.conf`. The Framework
-itself has no more configuration options but its Modules typically do.
+can change the file name by setting `com.graphaware.config.file` to your desired value in `neo4j.conf`. 
+
+#### Community Configuration
+
+The Framework itself has no more configuration options but its Modules typically do.
+
+#### Enterprise Configuration
+
+You can selectively enable the GraphAware Framework for different databases running within the same Neo4j instance, by
+setting `com.graphaware.runtime.enabled` in `graphaware.conf` to either:
+- `*` for any database (except for the 'system' database), or
+- name of a single database, or
+- a comma-separated list of database names
+
+For example, the configuration of GraphAware Enterprise on Neo4j Enterprise with the UUID module running for all databases
+could look like this: 
+```
+com.graphaware.runtime.enabled=*
+com.graphaware.module.*.UIDM.1=com.graphaware.module.uuid.UuidBootstrapper
+``` 
+
+For two specific databases ('db1' and 'db2'), it would look like this:
+```
+com.graphaware.runtime.enabled=db1,db2
+com.graphaware.module.*.UIDM.1=com.graphaware.module.uuid.UuidBootstrapper
+```
+
+If you wanted a different configuration of a specific module for each database, you could do
+```
+com.graphaware.runtime.enabled=db1,db2
+com.graphaware.module.db1.UIDM1.1=com.graphaware.module.uuid.UuidBootstrapper
+com.graphaware.module.db2.UIDM2.1=com.graphaware.module.uuid.UuidBootstrapper
+# ... more config for the UUID modules ...
+```
+Note that in this case, the UUID module must have a unique ID (UIDM1 vs UIDM2).
 
 <a name="download"/>
 
