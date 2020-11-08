@@ -51,7 +51,8 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         STARTING,
         STARTED,
         STOPPING,
-        DESTROYED;
+        DESTROYED,
+        FAILED;
     }
 
     private volatile State state;
@@ -114,18 +115,26 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         }
 
         if (State.STARTING.equals(state)) {
+            state = State.FAILED;
             throw new IllegalStateException("Attempt to start GraphAware Runtime for database " + database.databaseName() + " from multiple different threads. This is a bug.");
         }
 
         if (State.STOPPING.equals(state)) {
+            state = State.FAILED;
             throw new IllegalStateException("Attempt to start GraphAware Runtime for database " + database.databaseName() + " while it is stopping. This is a bug.");
         }
 
         if (State.DESTROYED.equals(state)) {
+            state = State.FAILED;
             throw new IllegalStateException("Attempt to start GraphAware Runtime for database " + database.databaseName() + " after it has been destroyed. Please create a fresh Runtime.");
         }
 
+        if (State.FAILED.equals(state)) {
+            throw new IllegalStateException("Failed GraphAware Runtime state. Please restart Neo4j.");
+        }
+
         if (!State.FRESH.equals(state)) {
+            state = State.FAILED;
             throw new IllegalStateException("Illegal GraphAware Runtime state " + state + "! This is a bug");
         }
 
@@ -133,10 +142,16 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         LOG.info("Starting GraphAware Runtime for database " + database.databaseName() + "...");
         state = State.STARTING;
 
-        startModules();
+        try {
+            startModules();
 
-        state = State.STARTED;
-        LOG.info("Started GraphAware Runtime for database " + database.databaseName() + ".");
+            state = State.STARTED;
+            LOG.info("Started GraphAware Runtime for database " + database.databaseName() + ".");
+        } catch (Throwable throwable) {
+            state = State.FAILED;
+            LOG.info("Failed starting GraphAware Runtime for database " + database.databaseName() + ".");
+        }
+
         STARTING.set(false);
     }
 
@@ -158,6 +173,9 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
     @Override
     public void stop() {
         switch (state) {
+            case FAILED:
+                LOG.warn("GraphAware Runtime for database " + database.databaseName() + " has failed starting.");
+                break;
             case FRESH:
                 LOG.warn("GraphAware Runtime for database " + database.databaseName() + " hasn't even been started.");
                 break;
@@ -189,12 +207,12 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
     }
 
     @Override
-    public Map<String, Object> beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) throws Exception {
-        LazyTransactionData transactionData = new LazyTransactionData(data, transaction);
-
+    public Map<String, Object> beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) {
         if (!isStarted()) {
             return null;
         }
+
+        LazyTransactionData transactionData = new LazyTransactionData(data, transaction);
 
         Map<String, Object> result = new HashMap<>();
 
@@ -275,6 +293,10 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
     private boolean isStarted() {
         if (State.STOPPING.equals(state) || (State.DESTROYED.equals(state))) {
             throw new IllegalStateException("Runtime for database " + database.databaseName() + " is being / has been stopped.");
+        }
+
+        if (State.FAILED.equals(state)) {
+            throw new IllegalStateException("Runtime for database " + database.databaseName() + " has failed.");
         }
 
         int attempts = 0;
