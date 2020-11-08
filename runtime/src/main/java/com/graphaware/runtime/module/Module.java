@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime.module;
 
+import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.config.NullModuleConfiguration;
 import com.graphaware.runtime.config.ModuleConfiguration;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -89,9 +90,9 @@ public interface Module<T> {
      * able to handle multi-threaded requests. This method is guaranteed to be called exactly once every time the runtime/database
      * starts.
      *
-     * @param database to start this module against.
+     * @param runtime which starts the module.
      */
-    void start(GraphDatabaseService database);
+    void start(GraphAwareRuntime runtime);
 
     /**
      * Perform cleanup if needed before database shutdown.

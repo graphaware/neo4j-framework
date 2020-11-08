@@ -22,7 +22,6 @@ import com.graphaware.example.module.FriendshipStrengthCounter;
 import com.graphaware.example.module.FriendshipStrengthModule;
 import com.graphaware.runtime.CommunityRuntime;
 import com.graphaware.runtime.GraphAwareRuntime;
-import com.graphaware.runtime.manager.CommunityModuleManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

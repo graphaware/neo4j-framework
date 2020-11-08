@@ -23,7 +23,6 @@ import com.graphaware.common.policy.inclusion.InclusionPolicies;
 import com.graphaware.runtime.config.FluentModuleConfiguration;
 import com.graphaware.runtime.config.ModuleConfiguration;
 import com.graphaware.runtime.config.NullModuleConfiguration;
-import com.graphaware.runtime.manager.CommunityModuleManager;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.Module;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
@@ -187,8 +186,8 @@ public class CommunityRuntimeTest {
 
         runtime.start();
 
-        verify(mockModule1).start(database);
-        verify(mockModule2).start(database);
+        verify(mockModule1).start(runtime);
+        verify(mockModule2).start(runtime);
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verifyNoMoreInteractions(mockModule1, mockModule2);
@@ -301,9 +300,9 @@ public class CommunityRuntimeTest {
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
         verify(mockModule3, atLeastOnce()).getId();
-        verify(mockModule1).start(database);
-        verify(mockModule2).start(database);
-        verify(mockModule3).start(database);
+        verify(mockModule1).start(runtime);
+        verify(mockModule2).start(runtime);
+        verify(mockModule3).start(runtime);
         verifyNoMoreInteractions(mockModule1, mockModule2, mockModule3);
 
         try (Transaction tx = database.beginTx()) {
@@ -380,8 +379,8 @@ public class CommunityRuntimeTest {
 
         runtime.start();
 
-        verify(mockModule1).start(database);
-        verify(mockModule2).start(database);
+        verify(mockModule1).start(runtime);
+        verify(mockModule2).start(runtime);
 
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();
@@ -419,9 +418,9 @@ public class CommunityRuntimeTest {
 
         runtime.start();
 
-        verify(mockModule1).start(database);
-        verify(mockModule2).start(database);
-        verify(mockModule3).start(database);
+        verify(mockModule1).start(runtime);
+        verify(mockModule2).start(runtime);
+        verify(mockModule3).start(runtime);
 
         verify(mockModule1, atLeastOnce()).getId();
         verify(mockModule2, atLeastOnce()).getId();

@@ -16,18 +16,15 @@
 
 package com.graphaware.runtime.bootstrap;
 
+import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.config.ModuleConfiguration;
 import com.graphaware.runtime.config.NullModuleConfiguration;
 import com.graphaware.runtime.module.BaseModule;
 import com.graphaware.runtime.module.Module;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import org.apache.commons.configuration2.Configuration;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-
-import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * {@link Module} that can tell whether it has been initialized for testing.
@@ -57,10 +54,10 @@ public class WritingModule extends BaseModule<Void> {
     }
 
     @Override
-    public void start(GraphDatabaseService database) {
-        super.start(database);
+    public void start(GraphAwareRuntime runtime) {
+        super.start(runtime);
 
-        try (Transaction tx = database.beginTx()) {
+        try (Transaction tx = runtime.getDatabase().beginTx()) {
             Node node = tx.createNode();
             node.setProperty("test", "init");
             tx.commit();

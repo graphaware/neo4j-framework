@@ -21,7 +21,6 @@ import com.graphaware.common.junit.Neo4jExtension;
 import com.graphaware.runtime.CommunityRuntime;
 import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.bootstrap.TestModule;
-import com.graphaware.runtime.manager.CommunityModuleManager;
 import com.graphaware.runtime.policy.InclusionPoliciesFactory;
 import org.apache.commons.configuration2.MapConfiguration;
 import org.junit.jupiter.api.Test;

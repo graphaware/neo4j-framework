@@ -22,7 +22,6 @@ import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.config.Neo4jConfigurationReader;
 import com.graphaware.runtime.config.CommunityRuntimeConfiguration;
 import com.graphaware.runtime.config.RuntimeConfiguration;
-import com.graphaware.runtime.manager.CommunityModuleManager;
 import com.graphaware.runtime.module.Module;
 import com.graphaware.runtime.module.ModuleBootstrapper;
 import org.neo4j.configuration.Config;

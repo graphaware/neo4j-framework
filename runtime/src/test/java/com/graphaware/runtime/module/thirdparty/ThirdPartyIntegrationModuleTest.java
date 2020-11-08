@@ -22,7 +22,6 @@ import com.graphaware.common.representation.GraphDetachedNode;
 import com.graphaware.common.representation.GraphDetachedRelationship;
 import com.graphaware.runtime.CommunityRuntime;
 import com.graphaware.runtime.GraphAwareRuntime;
-import com.graphaware.runtime.manager.CommunityModuleManager;
 import com.graphaware.writer.thirdparty.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -16,6 +16,7 @@
 
 package com.graphaware.runtime.module;
 
+import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.runtime.config.NullModuleConfiguration;
 import com.graphaware.runtime.config.ModuleConfiguration;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -55,7 +56,7 @@ public abstract class BaseModule<T> implements Module<T> {
     }
 
     @Override
-    public void start(GraphDatabaseService database) {
+    public void start(GraphAwareRuntime runtime) {
         //to be overridden
     }
 

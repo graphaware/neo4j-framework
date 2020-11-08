@@ -17,9 +17,9 @@
 package com.graphaware.runtime;
 
 import com.graphaware.common.log.LoggerFactory;
-import com.graphaware.runtime.manager.CommunityModuleManager;
-import com.graphaware.runtime.manager.ModuleManager;
+import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.runtime.module.Module;
+import com.graphaware.tx.event.improved.api.FilteredTransactionData;
 import com.graphaware.tx.event.improved.api.LazyTransactionData;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -31,6 +31,8 @@ import org.neo4j.graphdb.event.TransactionData;
 import org.neo4j.graphdb.event.TransactionEventListener;
 import org.neo4j.logging.Log;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -56,13 +58,12 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
 
     private final GraphDatabaseService database;
     private final DatabaseManagementService databaseManagementService;
-    private final ModuleManager runtimeModuleManager;
+    private final Map<String, Module> modules = new LinkedHashMap<>();
 
     public CommunityRuntime(GraphDatabaseService database, DatabaseManagementService databaseManagementService) {
         this.state = State.FRESH;
         this.database = database;
         this.databaseManagementService = databaseManagementService;
-        this.runtimeModuleManager = new CommunityModuleManager(database);
 
         databaseManagementService.registerTransactionEventListener(database.databaseName(), this);
         databaseManagementService.registerDatabaseEventListener(this);
@@ -82,9 +83,27 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
 
         LOG.info("Registering module " + module.getId() + " with GraphAware Runtime for database " + database.databaseName() + ".");
 
-        runtimeModuleManager.checkNotAlreadyRegistered(module);
+        checkNotAlreadyRegistered(module);
 
-        runtimeModuleManager.registerModule(module);
+        modules.put(module.getId(), module);
+    }
+
+    /**
+     * Check that the given module isn't already registered with the manager.
+     *
+     * @param module to check.
+     * @throws IllegalStateException in case the module is already registered.
+     */
+    private void checkNotAlreadyRegistered(Module module) {
+        if (modules.containsValue(module)) {
+            LOG.error("Module " + module.getId() + " cannot be registered more than once!");
+            throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
+        }
+
+        if (modules.containsKey(module.getId())) {
+            LOG.error("Module " + module.getId() + " cannot be registered more than once!");
+            throw new IllegalStateException("Module " + module.getId() + " cannot be registered more than once!");
+        }
     }
 
     @Override
@@ -114,11 +133,26 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         LOG.info("Starting GraphAware Runtime for database " + database.databaseName() + "...");
         state = State.STARTING;
 
-        runtimeModuleManager.startModules();
+        startModules();
 
         state = State.STARTED;
         LOG.info("Started GraphAware Runtime for database " + database.databaseName() + ".");
         STARTING.set(false);
+    }
+
+    protected void startModules() {
+        if (modules.isEmpty()) {
+            LOG.info("No GraphAware Runtime modules registered.");
+            return;
+        }
+
+        LOG.info("Starting GraphAware Runtime modules...");
+        for (Module<?> module : modules.values()) {
+            LOG.info("Starting module " + module.getId() + "...");
+            module.start(this);
+            LOG.info("Started module " + module.getId() + ".");
+        }
+        LOG.info("GraphAware Runtime modules started.");
     }
 
     @Override
@@ -135,7 +169,7 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
 
                 state = State.STOPPING;
 
-                runtimeModuleManager.stopModules();
+                stopModules();
 
                 LOG.info("Stopped GraphAware Runtime for database " + database.databaseName() + ".");
 
@@ -146,6 +180,14 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         databaseManagementService.unregisterDatabaseEventListener(this);
     }
 
+    protected void stopModules() {
+        for (Module<?> module : modules.values()) {
+            LOG.info("Stopping module " + module.getId()+"...");
+            module.shutdown();
+            LOG.info("Stopped module " + module.getId()+".");
+        }
+    }
+
     @Override
     public Map<String, Object> beforeCommit(TransactionData data, Transaction transaction, GraphDatabaseService databaseService) throws Exception {
         LazyTransactionData transactionData = new LazyTransactionData(data, transaction);
@@ -154,25 +196,67 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
             return null;
         }
 
-        return runtimeModuleManager.beforeCommit(transactionData);
+        Map<String, Object> result = new HashMap<>();
+
+        for (Module<?> module : modules.values()) {
+            FilteredTransactionData filteredTransactionData = new FilteredTransactionData(transactionData, transactionData.getTransaction(), module.getConfiguration().getInclusionPolicies());
+
+            if (!filteredTransactionData.mutationsOccurred()) {
+                continue;
+            }
+
+            Object state = null;
+
+            try {
+                state = module.beforeCommit(filteredTransactionData);
+            } catch (DeliberateTransactionRollbackException e) {
+                LOG.debug("Module " + module.getId() + " threw an exception indicating that the transaction should be rolled back.", e);
+                return handleException(data, result, module, state, e);
+            } catch (RuntimeException e) {
+                LOG.warn("Module " + module.getId() + " threw an exception", e);
+                return handleException(data, result, module, state, e);
+            }
+
+            result.put(module.getId(), state);
+        }
+
+        return result;
+    }
+
+    private Map<String, Object> handleException(TransactionData data, Map<String, Object> result, Module<?> module, Object state, RuntimeException e) {
+        result.put(module.getId(), state);      //just so the module gets afterRollback called as well
+        afterRollback(data, result, database); //remove this when https://github.com/neo4j/neo4j/issues/2660 is resolved (todo this is fixed in 3.3)
+        throw e;               //will cause rollback
     }
 
     @Override
-    public void afterCommit(TransactionData data, Map<String, Object> state, GraphDatabaseService databaseService) {
-        if (state == null) {
+    public void afterCommit(TransactionData data, Map<String, Object> states, GraphDatabaseService databaseService) {
+        if (states == null) {
             return;
         }
 
-        runtimeModuleManager.afterCommit(state);
+        for (Module module : modules.values()) {
+            if (!states.containsKey(module.getId())) {
+                return; //perhaps module wasn't interested, or threw RuntimeException
+            }
+
+            module.afterCommit(states.get(module.getId()));
+        }
     }
 
     @Override
-    public void afterRollback(TransactionData data, Map<String, Object> state, GraphDatabaseService databaseService) {
-        if (state == null) {
+    public void afterRollback(TransactionData data, Map<String, Object> states, GraphDatabaseService databaseService) {
+        if (states == null) {
             return;
         }
 
-        runtimeModuleManager.afterRollback(state);
+        for (Module module : modules.values()) {
+            if (!states.containsKey(module.getId())) {
+                return; //rollback happened before this module had a go
+            }
+
+            module.afterRollback(states.get(module.getId()));
+        }
     }
 
     /**
@@ -216,24 +300,36 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
 
     @Override
     public <M extends Module<?>> M getModule(String moduleId, Class<M> clazz) throws NotFoundException {
-        M module = runtimeModuleManager.getModule(moduleId, clazz);
-
-        if (module != null) {
-            return module;
+        if (!modules.containsKey(moduleId)) {
+            throw new NotFoundException("No module of type " + clazz.getName() + " with ID " + moduleId + " has been registered");
         }
 
-        throw new NotFoundException("No module of type " + clazz.getName() + " with ID " + moduleId + " has been registered");
+        Module module = modules.get(moduleId);
+        if (!clazz.isAssignableFrom(module.getClass())) {
+            LOG.warn("Module " + moduleId + " is not a " + clazz.getName());
+            throw new NotFoundException("No module of type " + clazz.getName() + " with ID " + moduleId + " has been registered");
+        }
+
+        return (M) module;
     }
 
     @Override
     public <M extends Module<?>> M getModule(Class<M> clazz) throws NotFoundException {
-        M txResult = runtimeModuleManager.getModule(clazz);
+        M result = null;
+        for (Module module : modules.values()) {
+            if (clazz.isAssignableFrom(module.getClass())) {
+                if (result != null) {
+                    throw new IllegalStateException("More than one module of type " + clazz + " has been registered");
+                }
+                result = (M) module;
+            }
+        }
 
-        if (txResult == null) {
+        if (result == null) {
             throw new NotFoundException("No module of type " + clazz.getName() + " has been registered");
         }
 
-        return txResult;
+        return result;
     }
 
     @Override

@@ -16,9 +16,9 @@
 
 package com.graphaware.runtime.module.thirdparty;
 
+import com.graphaware.runtime.GraphAwareRuntime;
 import com.graphaware.writer.thirdparty.ThirdPartyWriter;
 import com.graphaware.writer.thirdparty.WriteOperation;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 import java.util.Collection;
 
@@ -50,8 +50,8 @@ public abstract class WriterBasedThirdPartyIntegrationModule<ID> extends ThirdPa
     }
 
     @Override
-    public void start(GraphDatabaseService database) {
-        super.start(database);
+    public void start(GraphAwareRuntime runtime) {
+        super.start(runtime);
         writer.start();
     }
 
