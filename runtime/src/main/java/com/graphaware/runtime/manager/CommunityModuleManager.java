@@ -66,7 +66,9 @@ public class CommunityModuleManager extends BaseModuleManager implements ModuleM
      * @param module to be started.
      */
     protected void start(Module<?> module) {
+        LOG.info("Starting module " + module.getId() + "...");
         module.start(database);
+        LOG.info("Started module " + module.getId() + ".");
     }
 
     @Override

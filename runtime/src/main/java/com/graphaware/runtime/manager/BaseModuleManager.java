@@ -99,8 +99,9 @@ public abstract class BaseModuleManager implements ModuleManager {
     @Override
     public void stopModules() {
         for (Module<?> module : modules.values()) {
-            LOG.info("Shutting down module " + module.getId());
+            LOG.info("Stopping module " + module.getId()+"...");
             module.shutdown();
+            LOG.info("Stopped module " + module.getId()+".");
         }
     }
 }

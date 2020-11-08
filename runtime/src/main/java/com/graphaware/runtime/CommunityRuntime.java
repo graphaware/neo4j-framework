@@ -117,7 +117,7 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
         runtimeModuleManager.startModules();
 
         state = State.STARTED;
-        LOG.info("GraphAware Runtime started for database " + database.databaseName() + ".");
+        LOG.info("Started GraphAware Runtime for database " + database.databaseName() + ".");
         STARTING.set(false);
     }
 
@@ -137,7 +137,7 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
 
                 runtimeModuleManager.stopModules();
 
-                LOG.info("GraphAware Runtime for database " + database.databaseName() + " stopped.");
+                LOG.info("Stopped GraphAware Runtime for database " + database.databaseName() + ".");
 
                 state = State.DESTROYED;
         }
