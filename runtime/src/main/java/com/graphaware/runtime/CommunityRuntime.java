@@ -157,17 +157,17 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
 
     protected void startModules() {
         if (modules.isEmpty()) {
-            LOG.info("No GraphAware Runtime modules registered.");
+            LOG.info("No GraphAware Runtime modules registered for database " + database.databaseName() + ".");
             return;
         }
 
-        LOG.info("Starting GraphAware Runtime modules...");
+        LOG.info("Starting GraphAware Runtime modules for database " + database.databaseName() + "...");
         for (Module<?> module : modules.values()) {
-            LOG.info("Starting module " + module.getId() + "...");
+            LOG.info("Starting module " + module.getId() + " for database " + database.databaseName() + "...");
             module.start(this);
-            LOG.info("Started module " + module.getId() + ".");
+            LOG.info("Started module " + module.getId() + " for database " + database.databaseName() + ".");
         }
-        LOG.info("GraphAware Runtime modules started.");
+        LOG.info("GraphAware Runtime modules started for database " + database.databaseName() + ".");
     }
 
     @Override
@@ -200,9 +200,9 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
 
     protected void stopModules() {
         for (Module<?> module : modules.values()) {
-            LOG.info("Stopping module " + module.getId()+"...");
+            LOG.info("Stopping module " + module.getId() + " for database " + database.databaseName() + "...");
             module.shutdown();
-            LOG.info("Stopped module " + module.getId()+".");
+            LOG.info("Stopped module " + module.getId() + " for database " + database.databaseName() + ".");
         }
     }
 
