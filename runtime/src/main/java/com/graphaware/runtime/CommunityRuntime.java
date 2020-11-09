@@ -149,7 +149,7 @@ public class CommunityRuntime implements TransactionEventListener<Map<String, Ob
             LOG.info("Started GraphAware Runtime for database " + database.databaseName() + ".");
         } catch (Throwable throwable) {
             state = State.FAILED;
-            LOG.info("Failed starting GraphAware Runtime for database " + database.databaseName() + ".");
+            LOG.error("Failed starting GraphAware Runtime for database " + database.databaseName() + ".", throwable);
         }
 
         STARTING.set(false);
