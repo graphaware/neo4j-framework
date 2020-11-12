@@ -30,82 +30,81 @@ frameworkVersionBump:
       - $VERSION
   artifacts: #used for s3 upload
     paths:
-      - api/target
-      - build/graphaware-framework-server/target
+      - build/target
 
 uploadToS3:
   before_script:
-    - FROM="build/graphaware-framework-server/target/graphaware-server-all-$VERSION.jar"
-    - TO="$AWS_PATH/graphaware-server-all-$VERSION.jar"
+    - FROM="build/target/graphaware-server-community-$VERSION.jar"
+    - TO="$AWS_PATH/graphaware-server-community-$VERSION.jar"
   only:
     refs:
       - master
     variables:
       - $VERSION
 
-publishJavaDoc:
-  extends: .publishJavaDoc
-  variables:
-    FROM: api/target/apidocs
-    TO: framework
-  before_script: []
-  only:
-    refs:
-      - master
-    variables:
-      - $VERSION
+# publishJavaDoc:
+#   extends: .publishJavaDoc
+#   variables:
+#     FROM: api/target/apidocs
+#     TO: framework
+#   before_script: []
+#   only:
+#     refs:
+#       - master
+#     variables:
+#       - $VERSION
 
-#Delay triggers by 30 minutes - maven central needs some time to process the artifacts
-delay30mins:
-  extends: .delay30mins
+# #Delay triggers by 30 minutes - maven central needs some time to process the artifacts
+# delay30mins:
+#   extends: .delay30mins
 
-#trigger template
-.trigger:
-  stage: triggers
-  variables:
-    PARENT_VERSION: $VERSION
-  trigger:
-    strategy: depend
-  only:
-    refs:
-      - master
-    variables:
-      - $VERSION
+# #trigger template
+# .trigger:
+#   stage: triggers
+#   variables:
+#     PARENT_VERSION: $VERSION
+#   trigger:
+#     strategy: depend
+#   only:
+#     refs:
+#       - master
+#     variables:
+#       - $VERSION
 
-triggerUUID:
-  extends: .trigger
-  trigger:
-    project: GraphAware/neo4j-plugins/neo4j-uuid
+# triggerUUID:
+#   extends: .trigger
+#   trigger:
+#     project: GraphAware/neo4j-plugins/neo4j-uuid
 
-triggerRestTest:
-  extends: .trigger
-  trigger:
-    project: GraphAware/neo4j-plugins/neo4j-resttest
+# triggerRestTest:
+#   extends: .trigger
+#   trigger:
+#     project: GraphAware/neo4j-plugins/neo4j-resttest
 
-triggerExpire:
-  extends: .trigger
-  trigger:
-    project: GraphAware/neo4j-plugins/neo4j-expire
+# triggerExpire:
+#   extends: .trigger
+#   trigger:
+#     project: GraphAware/neo4j-plugins/neo4j-expire
 
-triggerRecommendation:
-  extends: .trigger
-  trigger:
-    project: GraphAware/neo4j-plugins/neo4j-reco
+# triggerRecommendation:
+#   extends: .trigger
+#   trigger:
+#     project: GraphAware/neo4j-plugins/neo4j-reco
 
-triggerTimetree:
-  extends: .trigger
-  trigger:
-    project: GraphAware/neo4j-plugins/neo4j-timetree
+# triggerTimetree:
+#   extends: .trigger
+#   trigger:
+#     project: GraphAware/neo4j-plugins/neo4j-timetree
 
-triggerGAstarter:
-  extends: .trigger
-  trigger:
-    project: GraphAware/neo4j-plugins/graphaware-starter
+# triggerGAstarter:
+#   extends: .trigger
+#   trigger:
+#     project: GraphAware/neo4j-plugins/graphaware-starter
 
-triggerRecommendationsMeetup:
-  extends: .trigger
-  trigger:
-    project: GraphAware/neo4j-plugins/recommendations-meetup
+# triggerRecommendationsMeetup:
+#   extends: .trigger
+#   trigger:
+#     project: GraphAware/neo4j-plugins/recommendations-meetup
 
 #neo4j-to-elasticsearch is launched from UUID as it depends on it
 #neo4j-triggers is launched from UUID as it depends on it
