@@ -1,3 +1,6 @@
+4.0.9.58:
+    - Upgrade to Neo4j 4.0.9
+
 4.0.8.58:
     - Upgrade to Neo4j 4.0.8
     - Remove all timer-driven functionality
