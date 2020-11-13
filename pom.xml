@@ -19,7 +19,7 @@
 
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>graphaware-parent</artifactId>
-    <version>4.0.9.59-SNAPSHOT</version>
+    <version>4.1.4.58-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>GraphAware Neo4j Framework Parent POM</name>
@@ -67,7 +67,7 @@
     <properties>
         <java.version>11</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <neo4j.version>4.0.9</neo4j.version>
+        <neo4j.version>4.1.4</neo4j.version>
         <spring.version>5.2.8.RELEASE</spring.version>
         <uuid.version>3.5</uuid.version>
         <jackson.version>2.9.10</jackson.version>
@@ -76,7 +76,7 @@
         <mockito.version>1.10.19</mockito.version>
         <jsonassert.version>1.5.0</jsonassert.version>
         <guava.version>21.0</guava.version>
-        <fw.version>4.0.9.59-SNAPSHOT</fw.version>
+        <fw.version>4.1.4.58-SNAPSHOT</fw.version>
         <commons-config.version>2.5</commons-config.version>
     </properties>
 

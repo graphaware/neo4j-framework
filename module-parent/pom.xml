@@ -18,13 +18,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>module-parent</artifactId>
-    <version>4.0.9.59-SNAPSHOT</version>
+    <version>4.1.4.58-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>graphaware-parent</artifactId>
-        <version>4.0.9.59-SNAPSHOT</version>
+        <version>4.1.4.58-SNAPSHOT</version>
     </parent>
 
     <name>GraphAware Neo4j Module</name>

@@ -22,7 +22,6 @@ import com.graphaware.runtime.module.BaseModule;
 import com.graphaware.runtime.module.DeliberateTransactionRollbackException;
 import com.graphaware.tx.event.improved.api.ImprovedTransactionData;
 import com.graphaware.writer.thirdparty.*;
-import org.neo4j.cypher.internal.v4_0.parser.Base;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
