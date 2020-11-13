@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.graphaware.neo4j</groupId>
         <artifactId>graphaware-parent</artifactId>
-        <version>4.0.9.58</version>
+        <version>4.0.9.59-SNAPSHOT</version>
     </parent>
 
     <artifactId>tx-executor</artifactId>
