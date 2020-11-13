@@ -32,13 +32,12 @@ import org.neo4j.harness.Neo4j;
 import org.neo4j.harness.Neo4jBuilders;
 
 import javax.ws.rs.core.Link;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.graphaware.common.util.IterableUtils.countNodes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit test for {@link com.graphaware.tx.executor.batch.IterableInputBatchTransactionExecutor}.
@@ -97,14 +96,20 @@ public class IterableInputBatchTransactionExecutorTest {
 
         executor.execute();
 
-        try (Transaction tx = database.beginTx()) {
-            assertEquals("Name11", tx.getNodeById(ids.get(0)).getProperty("name"));
-            assertEquals("Name12", tx.getNodeById(ids.get(1)).getProperty("name"));
-            assertEquals("Name13", tx.getNodeById(ids.get(2)).getProperty("name"));
-            assertEquals("Name108", tx.getNodeById(ids.get(97)).getProperty("name"));
-            assertEquals("Name109", tx.getNodeById(ids.get(98)).getProperty("name"));
-            assertEquals("Name1010", tx.getNodeById(ids.get(99)).getProperty("name"));
+        Set<String> remaining = new HashSet<>();
+        for (int i = 1; i <= 10; i++) {
+            for (int j = 1; j <= 10; j++) {
+                remaining.add("Name" + i + "" + j);
+            }
         }
+
+        try (Transaction tx = database.beginTx()) {
+            for (int i = 0; i < 100; i++) {
+                remaining.remove(tx.getNodeById(ids.get(i)).getProperty("name"));
+            }
+        }
+
+        assertTrue(remaining.isEmpty());
     }
 
     @Test
@@ -131,14 +136,20 @@ public class IterableInputBatchTransactionExecutorTest {
 
         executor.execute();
 
-        try (Transaction tx = database.beginTx()) {
-            assertEquals("Name11", tx.getNodeById(ids.get(0)).getProperty("name"));
-            assertEquals("Name12", tx.getNodeById(ids.get(1)).getProperty("name"));
-            assertEquals("Name13", tx.getNodeById(ids.get(2)).getProperty("name"));
-            assertEquals("Name108", tx.getNodeById(ids.get(97)).getProperty("name"));
-            assertEquals("Name109", tx.getNodeById(ids.get(98)).getProperty("name"));
-            assertEquals("Name1010", tx.getNodeById(ids.get(99)).getProperty("name"));
+        Set<String> remaining = new HashSet<>();
+        for (int i = 1; i <= 10; i++) {
+            for (int j = 1; j <= 10; j++) {
+                remaining.add("Name" + i + "" + j);
+            }
         }
+
+        try (Transaction tx = database.beginTx()) {
+            for (int i = 0; i < 100; i++) {
+                remaining.remove(tx.getNodeById(ids.get(i)).getProperty("name"));
+            }
+        }
+
+        assertTrue(remaining.isEmpty());
     }
 
     @Test
