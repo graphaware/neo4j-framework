@@ -19,7 +19,7 @@
 
     <groupId>com.graphaware.neo4j</groupId>
     <artifactId>graphaware-parent</artifactId>
-    <version>4.1.4.58-SNAPSHOT</version>
+    <version>4.1.4.58</version>
     <packaging>pom</packaging>
 
     <name>GraphAware Neo4j Framework Parent POM</name>
@@ -61,7 +61,7 @@
         <connection>scm:git:git@github.com:graphaware/neo4j-framework.git</connection>
         <developerConnection>scm:git:git@gitlab.com:graphaware/neo4j-plugins/neo4j-framework.git</developerConnection>
         <url>git@github.com:graphaware/neo4j-framework.git</url>
-      <tag>HEAD</tag>
+      <tag>Version-4.1.4.58</tag>
   </scm>
 
     <properties>
@@ -76,7 +76,7 @@
         <mockito.version>1.10.19</mockito.version>
         <jsonassert.version>1.5.0</jsonassert.version>
         <guava.version>21.0</guava.version>
-        <fw.version>4.1.4.58-SNAPSHOT</fw.version>
+        <fw.version>4.1.4.58</fw.version>
         <commons-config.version>2.5</commons-config.version>
     </properties>
 
