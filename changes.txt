@@ -1,11 +1,5 @@
 4.0.8.58:
     - Upgrade to Neo4j 4.0.8
-
-4.0.8.58:
-    - Upgrade to Neo4j 4.0.8
-
-4.0.8.58:
-    - Upgrade to Neo4j 4.0.8
     - Remove all timer-driven functionality
     - Remove all Spring MVC and Spring Core stuff
     - Remove support for building REST APIs in favour of building customer functions/procedures

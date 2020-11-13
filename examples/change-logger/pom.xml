@@ -19,7 +19,7 @@
 
     <groupId>com.graphaware.neo4j.example</groupId>
     <artifactId>change-logger</artifactId>
-    <version>4.0.8.58</version>
+    <version>4.0.8.59-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
