@@ -20,10 +20,10 @@ import org.neo4j.kernel.extension.ExtensionFactory;
 import org.neo4j.kernel.extension.context.ExtensionContext;
 import org.neo4j.kernel.lifecycle.Lifecycle;
 import org.neo4j.kernel.lifecycle.LifecycleAdapter;
-import org.neo4j.logging.FormattedLogProvider;
 import org.neo4j.logging.Log;
 import org.neo4j.logging.LogProvider;
 import org.neo4j.logging.internal.LogService;
+import org.neo4j.logging.log4j.Log4jLogProvider;
 
 /**
  * To be used by the Framework and all modules for logging. Call {@link #getLogger(Class)} to obtain Neo4j's own
@@ -32,7 +32,7 @@ import org.neo4j.logging.internal.LogService;
  */
 public final class LoggerFactory extends ExtensionFactory<LoggerFactory.Dependencies> {
 
-    private static LogProvider LOG_PROVIDER = FormattedLogProvider.toOutputStream(System.out);
+    private static LogProvider LOG_PROVIDER = new Log4jLogProvider(System.out);
 
     public static Log getLogger(Class<?> clazz) {
         return LOG_PROVIDER.getLog(clazz);
