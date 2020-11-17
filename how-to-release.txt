@@ -17,14 +17,11 @@ notes:
 
 List of modules to upgrade:
         uuid
-        resttest
         timetree
         expire
         reco
-        reco-meetup
         triggers
         neo4j-to-elasticsearch
-        graphaware-starter
         nlp
         audit
         schema
