@@ -119,7 +119,7 @@ public final class GraphUnit {
      *                        of the database (first parameter) iff the code that created it is correct.
      * @return boolean value true in case the graphs are the same, false otherwise
      */
-    public boolean areSameGraph(GraphDatabaseService database, String sameGraphCypher) {
+    public static boolean areSameGraph(GraphDatabaseService database, String sameGraphCypher) {
         return areSameGraph(database, sameGraphCypher, InclusionPolicies.all());
     }
 
