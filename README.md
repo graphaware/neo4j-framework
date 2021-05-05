@@ -1,9 +1,10 @@
 <a name="top"/>
 
-GraphAware Neo4j Framework
+GraphAware Neo4j Framework - RETIRED
 ==========================
 
-[![Build Status](https://travis-ci.org/graphaware/neo4j-framework.png)](https://travis-ci.org/graphaware/neo4j-framework) | <a href="http://graphaware.com/downloads/" target="_blank">Downloads</a> |
+## GraphAware Neo4j Framework Has Been Retired
+As of May 2021, this [repository has been retired](https://graphaware.com/framework/2021/05/06/from-graphaware-framework-to-graphaware-hume.html).
 
 GraphAware Framework provides a platform for building custom transaction-driven behaviour into <a href="http://neo4j.org" target="_blank">Neo4j</a>.
 
